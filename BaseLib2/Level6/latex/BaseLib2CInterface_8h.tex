@@ -1,0 +1,113 @@
+\hypertarget{BaseLib2CInterface_8h}{
+\section{BaseLib2CInterface.h File Reference}
+\label{BaseLib2CInterface_8h}\index{BaseLib2CInterface.h@{BaseLib2CInterface.h}}
+}
+
+
+C interface for BaseLib2.  
+
+
+{\ttfamily \#include \char`\"{}CDBCInterface.h\char`\"{}}\par
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{BaseLib2CInterface_8h_a0cc16156309f703ea43ed3ebbe33308d}{B2C\_\-CreateGODBObject} (const char $\ast$context, const char $\ast$className, const char $\ast$objectName)
+\item 
+int \hyperlink{BaseLib2CInterface_8h_a7c9e8dd4a4322555ea266d1ececb0c3f}{B2C\_\-CreateAndInitialiseGODBObject} (const char $\ast$context, CDBReference configuration)
+\item 
+int \hyperlink{BaseLib2CInterface_8h_af0ecdbebb94b802693c600e1fab821cc}{B2C\_\-InitialiseGODBObject} (const char $\ast$context, CDBReference configuration)
+\item 
+int \hyperlink{BaseLib2CInterface_8h_aec65245b4bd7dc8349cef17f4c1840ce}{B2C\_\-DeleteGODBSubTree} (const char $\ast$context, int deleteThisNode)
+\item 
+int \hyperlink{BaseLib2CInterface_8h_ae028161cbda18aea9d702feebd27f338}{B2C\_\-ListGODBNodes} (const char $\ast$context, int order, char $\ast$objectName, char $\ast$className, int bufferSize, int $\ast$containerClass)
+\item 
+int \hyperlink{BaseLib2CInterface_8h_aca10c6a286e737ae5853b1a1b6cb4e87}{B2C\_\-ShowGODBSubTree} (const char $\ast$context, char $\ast$output, int bufferSize)
+\item 
+int \hyperlink{BaseLib2CInterface_8h_aba5597b73986877f888b06a30167e79f}{B2C\_\-SendMessageToGODBObject} (const char $\ast$context, const char $\ast$messageText, int messageCode)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+C interface for BaseLib2. 
+
+\subsection{Function Documentation}
+\hypertarget{BaseLib2CInterface_8h_a7c9e8dd4a4322555ea266d1ececb0c3f}{
+\index{BaseLib2CInterface.h@{BaseLib2CInterface.h}!B2C\_\-CreateAndInitialiseGODBObject@{B2C\_\-CreateAndInitialiseGODBObject}}
+\index{B2C\_\-CreateAndInitialiseGODBObject@{B2C\_\-CreateAndInitialiseGODBObject}!BaseLib2CInterface.h@{BaseLib2CInterface.h}}
+\subsubsection[{B2C\_\-CreateAndInitialiseGODBObject}]{\setlength{\rightskip}{0pt plus 5cm}int B2C\_\-CreateAndInitialiseGODBObject (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{context, }
+\item[{CDBReference}]{configuration}
+\end{DoxyParamCaption}
+)}}
+\label{BaseLib2CInterface_8h_a7c9e8dd4a4322555ea266d1ececb0c3f}
+create an object to be inserted in the present GODB location (must be a container node) the object class, name and initialisation data is taken from CDB current subtree the object name is the current node name the object class is obtained from the ClassName leaf all the other leafs and sub-\/subtrees are for the object to use to initialise itself returns 0 on success return -\/1 if context is a wrong path \hypertarget{BaseLib2CInterface_8h_a0cc16156309f703ea43ed3ebbe33308d}{
+\index{BaseLib2CInterface.h@{BaseLib2CInterface.h}!B2C\_\-CreateGODBObject@{B2C\_\-CreateGODBObject}}
+\index{B2C\_\-CreateGODBObject@{B2C\_\-CreateGODBObject}!BaseLib2CInterface.h@{BaseLib2CInterface.h}}
+\subsubsection[{B2C\_\-CreateGODBObject}]{\setlength{\rightskip}{0pt plus 5cm}int B2C\_\-CreateGODBObject (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{context, }
+\item[{const char $\ast$}]{className, }
+\item[{const char $\ast$}]{objectName}
+\end{DoxyParamCaption}
+)}}
+\label{BaseLib2CInterface_8h_a0cc16156309f703ea43ed3ebbe33308d}
+create an object of className and objectName it works if class exists and is of the right type (GCNamedObject derivative) the object is located in the path specified by context returns 0 on success return -\/1 if context is a wrong path \hypertarget{BaseLib2CInterface_8h_aec65245b4bd7dc8349cef17f4c1840ce}{
+\index{BaseLib2CInterface.h@{BaseLib2CInterface.h}!B2C\_\-DeleteGODBSubTree@{B2C\_\-DeleteGODBSubTree}}
+\index{B2C\_\-DeleteGODBSubTree@{B2C\_\-DeleteGODBSubTree}!BaseLib2CInterface.h@{BaseLib2CInterface.h}}
+\subsubsection[{B2C\_\-DeleteGODBSubTree}]{\setlength{\rightskip}{0pt plus 5cm}int B2C\_\-DeleteGODBSubTree (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{context, }
+\item[{int}]{deleteThisNode}
+\end{DoxyParamCaption}
+)}}
+\label{BaseLib2CInterface_8h_aec65245b4bd7dc8349cef17f4c1840ce}
+delete the current subtree of the GODB deleteThisNode = 1 remove the container from ddb returns 0 on success return -\/1 if context is a wrong path
+
+delete the current subtree of the GODB returns 0 on success return -\/1 if context is a wrong path \hypertarget{BaseLib2CInterface_8h_af0ecdbebb94b802693c600e1fab821cc}{
+\index{BaseLib2CInterface.h@{BaseLib2CInterface.h}!B2C\_\-InitialiseGODBObject@{B2C\_\-InitialiseGODBObject}}
+\index{B2C\_\-InitialiseGODBObject@{B2C\_\-InitialiseGODBObject}!BaseLib2CInterface.h@{BaseLib2CInterface.h}}
+\subsubsection[{B2C\_\-InitialiseGODBObject}]{\setlength{\rightskip}{0pt plus 5cm}int B2C\_\-InitialiseGODBObject (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{context, }
+\item[{CDBReference}]{configuration}
+\end{DoxyParamCaption}
+)}}
+\label{BaseLib2CInterface_8h_af0ecdbebb94b802693c600e1fab821cc}
+configuration is a CDB reference pointing to the subtree containing the desired configuration data This call configures the object does not create a new object to be inserted returns 0 on success return -\/1 if context is a wrong path \hypertarget{BaseLib2CInterface_8h_ae028161cbda18aea9d702feebd27f338}{
+\index{BaseLib2CInterface.h@{BaseLib2CInterface.h}!B2C\_\-ListGODBNodes@{B2C\_\-ListGODBNodes}}
+\index{B2C\_\-ListGODBNodes@{B2C\_\-ListGODBNodes}!BaseLib2CInterface.h@{BaseLib2CInterface.h}}
+\subsubsection[{B2C\_\-ListGODBNodes}]{\setlength{\rightskip}{0pt plus 5cm}int B2C\_\-ListGODBNodes (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{context, }
+\item[{int}]{order, }
+\item[{char $\ast$}]{objectName, }
+\item[{char $\ast$}]{className, }
+\item[{int}]{bufferSize, }
+\item[{int $\ast$}]{containerClass}
+\end{DoxyParamCaption}
+)}}
+\label{BaseLib2CInterface_8h_ae028161cbda18aea9d702feebd27f338}
+describes the current subtree or its children order = -\/1 ==$>$ current node order $>$= 0 ==$>$ child i-\/th ObjectName ClassName must be pointers to buffers of size bufferSize containerClass is the pointer to an integer which returns 0 on success return -\/1 if context is a wrong path \hypertarget{BaseLib2CInterface_8h_aba5597b73986877f888b06a30167e79f}{
+\index{BaseLib2CInterface.h@{BaseLib2CInterface.h}!B2C\_\-SendMessageToGODBObject@{B2C\_\-SendMessageToGODBObject}}
+\index{B2C\_\-SendMessageToGODBObject@{B2C\_\-SendMessageToGODBObject}!BaseLib2CInterface.h@{BaseLib2CInterface.h}}
+\subsubsection[{B2C\_\-SendMessageToGODBObject}]{\setlength{\rightskip}{0pt plus 5cm}int B2C\_\-SendMessageToGODBObject (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{context, }
+\item[{const char $\ast$}]{messageText, }
+\item[{int}]{messageCode}
+\end{DoxyParamCaption}
+)}}
+\label{BaseLib2CInterface_8h_aba5597b73986877f888b06a30167e79f}
+sends a message to an object within GODB returns 0 on success return -\/1 if context is a wrong path \hypertarget{BaseLib2CInterface_8h_aca10c6a286e737ae5853b1a1b6cb4e87}{
+\index{BaseLib2CInterface.h@{BaseLib2CInterface.h}!B2C\_\-ShowGODBSubTree@{B2C\_\-ShowGODBSubTree}}
+\index{B2C\_\-ShowGODBSubTree@{B2C\_\-ShowGODBSubTree}!BaseLib2CInterface.h@{BaseLib2CInterface.h}}
+\subsubsection[{B2C\_\-ShowGODBSubTree}]{\setlength{\rightskip}{0pt plus 5cm}int B2C\_\-ShowGODBSubTree (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{context, }
+\item[{char $\ast$}]{output, }
+\item[{int}]{bufferSize}
+\end{DoxyParamCaption}
+)}}
+\label{BaseLib2CInterface_8h_aca10c6a286e737ae5853b1a1b6cb4e87}
+dumps the current subtree returns 0 on success return -\/1 if context is a wrong path 

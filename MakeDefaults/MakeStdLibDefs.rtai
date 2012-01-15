@@ -1,0 +1,79 @@
+#############################################################
+#
+# Copyright 2011 EFDA | European Fusion Development Agreement
+#
+# Licensed under the EUPL, Version 1.1 or - as soon they 
+# will be approved by the European Commission - subsequent  
+# versions of the EUPL (the "Licence"); 
+# You may not use this work except in compliance with the 
+# Licence. 
+# You may obtain a copy of the Licence at: 
+#  
+# http://ec.europa.eu/idabc/eupl
+#
+# Unless required by applicable law or agreed to in 
+# writing, software distributed under the Licence is 
+# distributed on an "AS IS" basis, 
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
+# express or implied. 
+# See the Licence for the specific language governing 
+# permissions and limitations under the Licence. 
+#
+# $Id$
+#
+#############################################################
+
+EXEEXT=.ex
+
+DLLEXT=.ko
+
+LIBEXT=.a
+
+OBJEXT=.o
+
+ASMEXT=.s
+
+DRVEXT=.drv
+
+GAMEXT=.gam
+
+
+
+OBJS=   $(OBJSX:%.x=rtai/%.o) 
+
+OBJS2=  $(OBJSX2:%.x=rtai/%.o) 
+
+OBJS3=  $(OBJSX3:%.x=rtai/%.o) 
+
+#OBJS+=   $(OBJSRTAI:%.x=rtai/%.o) 
+OBJSR=   $(OBJSRTAI:%.x=rtai/%.o) 
+
+SUBPROJ = $(SPB:%.x=%.spb)
+SUBPROJC = $(SPB:%.x=%.spc)
+SUBPROJ2 = $(SPB2:%.x=%.spb)
+SUBPROJC += $(SPB2:%.x=%.spc)
+
+COMPILER = g++
+CCOMPILER = gcc
+MAKE     = make
+
+DEBUG = -g  
+
+OPTIM = 
+
+LFLAGS =  
+
+CFLAGS = -mregparm=3 -D_RTAI -fno-exceptions -fno-stack-protector -fno-use-cxa-atexit -I/usr/realtime/include/ -I../OSFiles/rtai/fcomm/kspace/ -I../OSFiles/rtai/
+.SUFFIXES:   .c  .cpp  .o .a .exe .ex .ex_ .so .gam .cc
+
+MAJOR=$(shell uname -r | cut -c 1)
+PATCH=$(shell uname -r | cut -c 3)
+MINOR=$(shell uname -r | cut -c 5-6)
+KERNEL_VERSION=$(shell echo "$(MAJOR) * 65536 + $(PATCH) * 256 + $(MINOR)" | bc)
+KERNEL_VERSION_TEST=$(shell echo "$(KERNEL_VERSION) < 132632" | bc)
+ifeq ($(KERNEL_VERSION_TEST),1)
+	LDFLAGS_NOKVERSION_PRE=LDFLAGS
+else
+	LDFLAGS_NOKVERSION_PRE=LDFLAGS_MODULE
+endif
+

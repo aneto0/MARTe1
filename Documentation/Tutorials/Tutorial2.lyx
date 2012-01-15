@@ -1,0 +1,2188 @@
+#LyX 1.6.10 created this file. For more info see http://www.lyx.org/
+\lyxformat 345
+\begin_document
+\begin_header
+\textclass beamer
+\begin_preamble
+\usepackage[absolute,overlay]{textpos} 
+
+\usetheme{Darmstadt}
+% or ...Singapore Darmstadt
+
+%\usecolortheme{seahorse}
+% or whatever (possibly just delete it)
+\end_preamble
+\use_default_options false
+\language english
+\inputencoding auto
+\font_roman times
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_amsmath 2
+\use_esint 0
+\cite_engine basic
+\use_bibtopic false
+\paperorientation portrait
+\secnumdepth 2
+\tocdepth 2
+\paragraph_separation indent
+\defskip medskip
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\author "" 
+\author "" 
+\end_header
+
+\begin_body
+
+\begin_layout Title
+
+\size large
+BaseLib2 Tutorial Series
+\end_layout
+
+\begin_layout Subtitle
+Streams
+\end_layout
+
+\begin_layout Author
+André Neto
+\end_layout
+
+\begin_layout Date
+June 14, 2011
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+%
+\backslash
+beamerdefaultoverlayspecification{<+->}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout BeginFrame
+Outline
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset toc
+LatexCommand tableofcontents
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout BeginFrame
+Streams?
+\end_layout
+
+\begin_layout Itemize
+Read and write information 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Streams allow to abstract the consuming media
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Can be a string, a file, a socket, a console...
+\end_layout
+
+\end_deeper
+\end_deeper
+\begin_layout Itemize
+You should use the Level2 classes
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+FString, File, TCPSocket, UDPSocket, Console, SXMemory,...
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+...and not the BasicXYZ Level0 classes
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+BString, BasicUDPSocket, BasicTCPSocket, ...
+\end_layout
+
+\end_deeper
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+Streamable functionality
+\end_layout
+
+\begin_layout Itemize
+Defines the streaming functions (most inherit from StreamInterface)
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Read and Write (complete and buffered)
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+With timeout
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Printf
+\end_layout
+
+\begin_layout Itemize
+Tokenizer
+\end_layout
+
+\begin_layout Itemize
+Line reading
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+The actual streaming implementation (file, socket, string) will then provide
+ the extra required functionality
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+e.g.
+ Open and Close for a file or a socket
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Streamable can also contain a collection of switchable streams
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Not always implemented
+\end_layout
+
+\end_deeper
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+Streamable.h
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Most important functions are}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+bool Read( void* buffer, uint32 & size, TimeoutType msecTimeout);
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+bool Write( const void* buffer, uint32 & size, TimeoutType msecTimeout);
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+virtual int64 Size();
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+virtual bool Seek(int64 pos);
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+virtual int64 Position(void);
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+virtual bool GetToken( char * buffer, const char * terminator, uint32 maxSize,...);
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+virtual bool GetLine( Streamable & output, bool skipTerminators =True);
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+bool Printf(const char *format,...);
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+virtual bool AddStream(const char *name);
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+virtual bool RemoveStream(const char *name);
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+virtual bool Switch(const char *name);
+\end_layout
+
+\begin_layout Section
+Common streams
+\end_layout
+
+\begin_layout Subsection
+FString
+\end_layout
+
+\begin_layout BeginFrame
+Introduction
+\end_layout
+
+\begin_layout Itemize
+Easy use and management of strings
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Assignment
+\end_layout
+
+\begin_layout Itemize
+Comparison
+\end_layout
+
+\begin_layout Itemize
+Allocation and deallocation
+\end_layout
+
+\begin_layout Itemize
+Size
+\end_layout
+
+\begin_layout Itemize
+Printfing
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+You should no longer need to use const char * very often
+\end_layout
+
+\begin_layout Itemize
+The name of the header file is FString.h (in Level2)
+\end_layout
+
+\begin_layout Itemize
+Being streamable can be 
+\shape italic
+interchanged
+\shape default
+ with other streams
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+FString.h
+\end_layout
+
+\begin_layout Itemize
+A streamable string 
+\end_layout
+
+\begin_layout Itemize
+Some operators redefined (=, +=, ==, !=)
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Example: BaseLib2/Documentation/Tutorials/examples/FStringExample.cpp}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\series bold
+\size tiny
+\color black
+//Create an initialised FString 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\series bold
+\size tiny
+\color black
+FString str1 = "/a/path/to/somewhere/"; 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\series bold
+\size tiny
+\color black
+//Create an empty FString
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\series bold
+\size tiny
+\color black
+FString str2; 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\series bold
+\size tiny
+\color black
+//Copy the contents of str1 to str2
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\series bold
+\size tiny
+\color black
+str2 = str1; 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\series bold
+\size tiny
+\color black
+//Compare the values (can also use the !=) 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\series bold
+\size tiny
+\color black
+if(str2 == str1){
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+...
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\series bold
+\size tiny
+\color black
+//It is also possible to printf in a string 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\series bold
+\size tiny
+\color black
+FString str3; 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\series bold
+\size tiny
+\color black
+str3.Printf("The value is %f", 0.12345);
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//To tokenize a string use the GetToken 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+FString token; 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+while(str1.GetToken(token, "/")){
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+...
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//It is also possible to concatenate to strings 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+str1 += "yet/another/string";
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\series bold
+\size tiny
+\color black
+...
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout Subsection
+Sockets
+\end_layout
+
+\begin_layout BeginFrame
+InternetAddress.h
+\end_layout
+
+\begin_layout Itemize
+Used by all Sockets implementations, enables to store and retrieve information
+ about the hostname and port
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Most important functions are}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+int16 Port();
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+const char *HostName(BString &hostName);
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+static const char *LocalAddress();
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+static const char *LocalIpNumber();
+\end_layout
+
+\begin_layout Standard
+\begin_inset space \thinspace{}
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Example: BaseLib2/ Documentation/Tutorials/examples/LocalInternetAddressExample.
+cpp}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\series bold
+\size tiny
+\color black
+CStaticAssertErrorCondition(Information, "This computer local address is:%s",
+ InternetAddress::LocalAddress()); 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\series bold
+\size tiny
+\color black
+CStaticAssertErrorCondition(Information, "This computer local ip is:%s",
+ InternetAddress::LocalIpNumber());
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+Sockets
+\end_layout
+
+\begin_layout Itemize
+Available socket types for TCP, UDP and ATM
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+All inherit from Streamable (again use the full featured sockets from Level2,
+ not the Basic from Level0)
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Can be used in server and client mode
+\end_layout
+
+\begin_layout Itemize
+Possibility to set in blocking mode
+\end_layout
+
+\begin_layout Itemize
+All inherit basic functionality from BasicSocket (see BasicSocket.h)
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Most important functions are}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+bool SetBlocking(bool flag);
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+InternetAddress &Source();
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+InternetAddress &Destination();
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+TCP socket server mode
+\end_layout
+
+\begin_layout Itemize
+Open the socket
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+
+\family typewriter
+\series bold
+\size footnotesize
+\color red
+Open();
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Set in server mode
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+
+\family typewriter
+\series bold
+\size footnotesize
+\color red
+bool Listen(int port,int maxConnections=1);
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+If you wish, set it to be blocking
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+
+\family typewriter
+\series bold
+\size footnotesize
+\color red
+bool SetBlocking(bool flag);
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Wait for connections
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+
+\family typewriter
+\series bold
+\size footnotesize
+\color red
+BasicTCPSocket *WaitConnection(TimeoutType msecTimeout = TTInfiniteWait,BasicTCP
+Socket *client=NULL);
+\end_layout
+
+\begin_layout Itemize
+Notice that a new socket, with the client connection, is returned
+\end_layout
+
+\begin_layout Itemize
+You can now read and write to this socket just as you would do with any
+ other stream
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Usually multi-threading is used to handle new connections
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+TCP socket server example
+\end_layout
+
+\begin_layout FrameSubtitle
+(BaseLib2/Documentation/Tutorials/examples/SimpleTCPServer.cpp)
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Example code}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//Create a server running in port 12468 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+int32 port = 12468; 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+TCPSocket server; 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//Open the socket
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+if(!server.Open()){
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+...
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+if(!server.Listen(port)){
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+...
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+TCPSocket *client = server.WaitConnection();
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//Set the client in blocking mode for the read 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+client->SetBlocking(True); 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//Print information from the client 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+FString hostname; 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+client->Source().HostName(hostname); 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+CStaticAssertErrorCondition(Information, "Accepted a connection from %s",
+ hostname.Buffer()); 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//Read a line from the client socket 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+FString line; client->GetLine(line); 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+CStaticAssertErrorCondition(Information, "Read line from socket: %s", line.Buffer
+());
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+TCP socket client mode
+\end_layout
+
+\begin_layout Itemize
+Open the socket
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+
+\family typewriter
+\series bold
+\size footnotesize
+\color red
+Open();
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Connect to the server 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+
+\family typewriter
+\series bold
+\size footnotesize
+\color red
+bool Connect(const char *address,int port,TimeoutType msecTimeout = TTInfiniteWa
+it, int retry=12)
+\end_layout
+
+\begin_layout Itemize
+You can now read and write to this socket just as you would do with any
+ other stream
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Remember housekeeping...
+ always close the sockets when you no longer need them
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+TCP socket client example
+\end_layout
+
+\begin_layout FrameSubtitle
+(BaseLib2/Documentation/Tutorials/examples/SimpleTCPClient.cpp)
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Example code}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//Connect to a server running in localhost and in port 12468 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+int32 port = 12468; 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+FString host = "localhost"; 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+TCPSocket client; 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//Open the socket 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+if(!client.Open()){
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+...
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//Connect to the server 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+if(!client.Connect(host.Buffer(), port)){
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+...
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//Write a line 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+FString line = "Hello!"; 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+uint32 size = line.Size(); 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+if(!client.Write(line.Buffer(), size)){
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+...
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//Notice that the actual number of bytes wrote is updated on the size variable
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+CStaticAssertErrorCondition(Information, "Successfully wrote %d out of %lld
+ bytes to %s:%d", size, line.Size(), host.Buffer(), port); 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//Housekeeping
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+client.Close();
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+UDP sockets
+\end_layout
+
+\begin_layout Itemize
+Usage very similar to the TCP socket, but obviously stateless
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+No WaitConnection in the server mode
+\end_layout
+
+\begin_layout Itemize
+Servers read and handle data directly from the socket (usually multi-threaded)
+\end_layout
+
+\end_deeper
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Snippet code}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+while(IsAlive()){ 
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+read = 1024; 
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+if(serverSocket->Read(buffer, read)){
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+...//New data is available
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout Subsection
+File handling
+\end_layout
+
+\begin_layout BeginFrame
+File.h
+\end_layout
+
+\begin_layout Itemize
+All streaming function available
+\end_layout
+
+\begin_layout Itemize
+Open is based on read/write modes
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Most important functions are}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\series bold
+\size footnotesize
+\color black
+bool Open(const char *fname,...);
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\series bold
+\size footnotesize
+\color black
+bool OpenRead(const char *fname,...);
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\series bold
+\size footnotesize
+\color black
+bool OpenWrite(const char *fname,...);
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\series bold
+\size footnotesize
+inline bool OpenNew(const char *fname,...);
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\series bold
+\size footnotesize
+void SetOpeningModes(uint32 modeSet);
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\series bold
+\size footnotesize
+bool FileLock(BasicFile &f,int64 start,int64 size,TimeoutType msecTimeout);
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\series bold
+\size footnotesize
+bool FileUnLock(BasicFile &f,int64 start,int64 size,TimeoutType msecTimeout);
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\series bold
+\size footnotesize
+bool FileEraseFile(const char *fname,...);
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+File handling example
+\end_layout
+
+\begin_layout FrameSubtitle
+(BaseLib2/Documentation/Tutorials/examples/SimpleFileHandling.cpp)
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Example code}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+//Create an output file 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+FString filename = "output.txt"; 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+File output; 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+if(!output.OpenWrite(filename.Buffer())){
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+...
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+//Write something to it 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+FString line = "Write something
+\backslash
+ninto this
+\backslash
+nfile
+\backslash
+n";
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+uint32 size = line.Size(); 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+if(!output.Write(line.Buffer(), size)){
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+...
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+//Housekeeping
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+output.Close();
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+//Open the file for reading
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+File input;
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+if(!input.OpenRead(filename.Buffer())){
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+...
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+//Reset the line string
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+line.SetSize(0);
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+//Read the file
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+while(input.GetLine(line)){
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+CStaticAssertErrorCondition(Information, "Read: %s", line.Buffer());
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+line.SetSize(0);
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+}
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+input.Close();
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout Subsection
+Console
+\end_layout
+
+\begin_layout BeginFrame
+Key ideas
+\end_layout
+
+\begin_layout Itemize
+Universal console mechanism
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Should be optimised for each OS console
+\end_layout
+
+\begin_layout Itemize
+Easy to set colours and if supported dimensions, titles, ...
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Read and write just like any other stream
+\end_layout
+
+\begin_layout Itemize
+Particularly useful to get user input
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Special automatically built-in menus are available in other classes
+\end_layout
+
+\end_deeper
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+Console example
+\end_layout
+
+\begin_layout FrameSubtitle
+(BaseLib2/Documentation/Tutorials/examples/SimpleConsole.cpp)
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Example code}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+//Create a console in single character read input
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+Console con(PerformCharacterInput);
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+con.Clear();
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+//Change the color of the text
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+con.Printf("Select foreground color
+\backslash
+n");
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+PrintColourMenu(con);
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+char c1;
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+//Read a single char
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+con.GetC(c1);
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+switch(c1){
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+case '1':
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+con.SetColour(Red, Black);
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+break;
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+case '2':
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+con.SetColour(Green, Black);
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+break;
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+...
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+}
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+//Read a line
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+FString line;
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+con.Printf("
+\backslash
+nWrite a line
+\backslash
+n");
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+con.GetLine(line);
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+con.Printf("You wrote: %s
+\backslash
+n", line.Buffer());
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout Subsection
+SXMemory
+\end_layout
+
+\begin_layout BeginFrame
+Key ideas
+\end_layout
+
+\begin_layout Itemize
+Add streaming capabilities to an existing buffer
+\end_layout
+
+\begin_layout Itemize
+Very useful to use when the argument of a function is a streamable and we
+ only have an anonymous buffer
+\end_layout
+
+\begin_layout Itemize
+Most of the times the FString is a better option
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Snippet code}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+void ReadFromStream(Streamable &stream){
+\end_layout
+
+\begin_layout AlertBlock
+...
+\end_layout
+
+\begin_layout AlertBlock
+}
+\end_layout
+
+\begin_layout AlertBlock
+...
+\end_layout
+
+\begin_layout AlertBlock
+float buffer[10];
+\end_layout
+
+\begin_layout AlertBlock
+SXMemory sxm((char *)&buffer[0], sizeof(float) * 10);
+\end_layout
+
+\begin_layout AlertBlock
+//the buffer can now be handled as a stream
+\end_layout
+
+\begin_layout AlertBlock
+ReadFromStream(sxm);
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+Training ideas
+\end_layout
+
+\begin_layout Enumerate
+Write a network server with the following specifications
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+Each client connection is handled in a different thread
+\end_layout
+
+\begin_layout Enumerate
+For each connection a new file, with an unique name (for you to decide),
+ is open
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+The first line of the file must contain the IP address and hostname of the
+ client
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+The connection is kept alive until the client sends a close keyword (like
+ quit)
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+or until the client closes the connection...
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+Each line sent by the client is stored in this file
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+Write the client for the above server
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+It should be capable of reading a file and sending its contents to the server
+\end_layout
+
+\begin_layout Enumerate
+and/or using a console, send each line input by the user
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+Write a simple program capable of copying the contents of two files
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\end_body
+\end_document

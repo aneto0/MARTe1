@@ -1,0 +1,106 @@
+##############################################################
+#
+# Copyright 2011 EFDA | European Fusion Development Agreement
+#
+# Licensed under the EUPL, Version 1.1 or - as soon they 
+# will be approved by the European Commission - subsequent  
+# versions of the EUPL (the "Licence"); 
+# You may not use this work except in compliance with the 
+# Licence. 
+# You may obtain a copy of the Licence at: 
+#  
+# http://ec.europa.eu/idabc/eupl
+#
+# Unless required by applicable law or agreed to in 
+# writing, software distributed under the Licence is 
+# distributed on an "AS IS" basis, 
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
+# express or implied. 
+# See the Licence for the specific language governing 
+# permissions and limitations under the Licence. 
+#
+# $Id$
+#
+#############################################################
+
+msc/%.obj : %.cpp
+	$(COMPILER) -c $(CFLAGS) $(CFLAGSPEC) $(DEBUG) $(OPTIM)  $*.cpp  -Fa
+	@touch msc/$*.obj >temp/temp
+	@rm msc/$*.obj >temp/temp
+	@mv $*.obj msc >temp/temp
+	@touch msc/$*.asm >temp/temp
+	@rm msc/$*.asm >temp/temp
+	@touch $*.asm >temp/temp
+	@mv $*.asm msc >temp/temp
+
+
+msc/%.obj : %.c
+	$(COMPILER) -c $(CFLAGS) $(CFLAGSPEC) $(DEBUG) $(OPTIM)  $*.c  -Fa
+	@touch msc/$*.obj >temp/temp
+	@rm msc/$*.obj >temp/temp
+	@mv $*.obj msc >temp/temp
+	@touch msc/$*.asm >temp/temp
+	@rm msc/$*.asm >temp/temp
+	@touch $*.asm >temp/temp
+	@mv $*.asm msc >temp/temp
+
+msc/%.obj : %.f
+	$(FCOMPILER) -compile_only $(FFLAGS) $(FOPTS) $*.f  
+	@touch msc/$*.obj >temp/temp
+	@rm msc/$*.obj >temp/temp
+	@mv $*.obj msc >temp/temp
+
+msc/%.pp :  %.cpp
+	$(COMPILER) -E $(CFLAGS) $(CFLAGSPEC) $(DEBUG) $(OPTIM)  $*.cpp > msc/$*.pp
+	echo done
+
+%.ifo :  %.h
+	$(COMPILER) -E $(CFLAGS) $(CFLAGSPEC) $(DEBUG) $(OPTIM)  $*.h > temp/temp.pp
+	
+	cint  -i temp/temp.pp $(MAKEDEFAULTDIR)/MakeIfo.cxx $* > $*.ifo
+
+%.sinfo.cpp :  %.h
+	$(COMPILER) -D_CINT -E $(CFLAGS) $(CFLAGSPEC) $(DEBUG) $(OPTIM)  $*.h > temp/temp.pp
+	
+	cint.exe   -i  $(MAKEDEFAULTDIR)/MakeIfo.cxx $* > $*.sinfo.cpp
+#-DINCL=temp/temp.pp
+
+	
+msc/%.lib : $(OBJS) $(OBJSRTTI)
+	@touch $@
+	@rm msc/$*.lib
+	lib -OUT:$@  $(OBJS) -NODEFAULTLIB
+
+msc/%.exe : msc/%.obj $(OBJS) $(LIBRARIES) 
+	$(COMPILER)  $(LFLAGS)  $(DEBUG) $(OBJS) msc/$*.obj $(LIBRARIES) -o $@ $(LOPTS)
+
+msc/%.dll : msc/%.obj $(OBJS)  $(LIBRARIES)  %.def
+	$(COMPILER)  $(LFLAGS) -LDd -Zi $(OBJS) msc/$*.obj $(LIBRARIES) $*.def -o $@
+
+msc/%.drv : msc/%.obj $(OBJS)  $(LIBRARIES)  %.def
+	$(COMPILER)  $(LFLAGS) -LDd -Zi $(OBJS) msc/$*.obj $(LIBRARIES) $*.def -o $@
+
+depends.msc: depends.nt 
+	sed -f $(MAKEDEFAULTDIR)/CreateMSCDepends.sed depends.nt >depends.msc
+
+depends.nt: 
+	gcc -MM -D_CY32 -DWIN32 $(CFLAGS) *.c* > depends.nt
+
+msc/%.gam : msc/%.obj $(OBJS)  $(LIBRARIES)  %.def
+	$(COMPILER)  $(LFLAGS) -LDd -Zi $(OBJS) msc/$*.obj $(LIBRARIES) $*.def -o $@
+
+%.spb : 
+	$(MAKE) -C $* -f Makefile.$(TARGET)
+
+%.spc : 
+	$(MAKE) -C $* -f Makefile.$(TARGET) clean
+
+
+clean:  $(SUBPROJC)
+	@rm -f depends.*
+	@rm -f $(TARGET)/*$(OBJEXT)
+	@rm -f $(TARGET)/*$(DLLEXT)
+	@rm -f $(TARGET)/*$(EXEEXT)
+	@rm -f $(TARGET)/*$(LIBEXT)
+	@rm -f $(TARGET)/*$(DRVEXT)
+	@rm -f $(TARGET)/*$(GAMEXT)

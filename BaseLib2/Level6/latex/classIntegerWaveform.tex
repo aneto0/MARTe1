@@ -1,0 +1,118 @@
+\hypertarget{classIntegerWaveform}{
+\section{IntegerWaveform Class Reference}
+\label{classIntegerWaveform}\index{IntegerWaveform@{IntegerWaveform}}
+}
+
+
+{\ttfamily \#include $<$IntegerWaveform.h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classIntegerWaveform_ac3b34133ae90c80c9ae32051cec2611a}{IntegerWaveform} ()
+\item 
+virtual \hyperlink{classIntegerWaveform_a929899dea90a14cc1ea676df7336d090}{$\sim$IntegerWaveform} ()
+\item 
+bool \hyperlink{classIntegerWaveform_afb9674852c2d2040508a375c1c5cc8d6}{ObjectLoadSetup} (ConfigurationDataBase \&cdbData)
+\item 
+float \hyperlink{classIntegerWaveform_ab236b723a92b8f174c65930671887ae6}{GetValue} (int32 usecTime)
+\item 
+void \hyperlink{classIntegerWaveform_a15587809f76da953aaaf03264298cf5e}{Reset} ()
+\item 
+float \hyperlink{classIntegerWaveform_ad6582c22eb5896be14805487706711d0}{Minimum} ()
+\item 
+float \hyperlink{classIntegerWaveform_ad669c89fd753d72f6aca58af1dde2b78}{Maximum} ()
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+A waveform which keeps its internal time in microseconds. Note that all slopes are calculated at the moment of creation (function ObjectLoadSetup), and that the waveform has to be resetted (function Reset) between a pulse and the other. 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classIntegerWaveform_ac3b34133ae90c80c9ae32051cec2611a}{
+\index{IntegerWaveform@{IntegerWaveform}!IntegerWaveform@{IntegerWaveform}}
+\index{IntegerWaveform@{IntegerWaveform}!IntegerWaveform@{IntegerWaveform}}
+\subsubsection[{IntegerWaveform}]{\setlength{\rightskip}{0pt plus 5cm}IntegerWaveform::IntegerWaveform (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classIntegerWaveform_ac3b34133ae90c80c9ae32051cec2611a}
+Constructor \hypertarget{classIntegerWaveform_a929899dea90a14cc1ea676df7336d090}{
+\index{IntegerWaveform@{IntegerWaveform}!$\sim$IntegerWaveform@{$\sim$IntegerWaveform}}
+\index{$\sim$IntegerWaveform@{$\sim$IntegerWaveform}!IntegerWaveform@{IntegerWaveform}}
+\subsubsection[{$\sim$IntegerWaveform}]{\setlength{\rightskip}{0pt plus 5cm}virtual IntegerWaveform::$\sim$IntegerWaveform (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline, virtual\mbox{]}}}}
+\label{classIntegerWaveform_a929899dea90a14cc1ea676df7336d090}
+Deconstructor 
+
+\subsection{Member Function Documentation}
+\hypertarget{classIntegerWaveform_ab236b723a92b8f174c65930671887ae6}{
+\index{IntegerWaveform@{IntegerWaveform}!GetValue@{GetValue}}
+\index{GetValue@{GetValue}!IntegerWaveform@{IntegerWaveform}}
+\subsubsection[{GetValue}]{\setlength{\rightskip}{0pt plus 5cm}float IntegerWaveform::GetValue (
+\begin{DoxyParamCaption}
+\item[{int32}]{usecTime}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classIntegerWaveform_ab236b723a92b8f174c65930671887ae6}
+Returns the value of the waveform at a certain time. 
+\begin{DoxyParams}{Parameters}
+{\em usecTime} & Time in microseconds. Note that usecTime needs to be crescent: in order to obtain the value of the waveform in the past you must Reset it first. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The value of the waveform at the specified time. If usecTime is before or after the start or end time of the waveform, the first or last value is held. 
+\end{DoxyReturn}
+\hypertarget{classIntegerWaveform_ad669c89fd753d72f6aca58af1dde2b78}{
+\index{IntegerWaveform@{IntegerWaveform}!Maximum@{Maximum}}
+\index{Maximum@{Maximum}!IntegerWaveform@{IntegerWaveform}}
+\subsubsection[{Maximum}]{\setlength{\rightskip}{0pt plus 5cm}float IntegerWaveform::Maximum (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classIntegerWaveform_ad669c89fd753d72f6aca58af1dde2b78}
+Returns waveform's maximum value. \hypertarget{classIntegerWaveform_ad6582c22eb5896be14805487706711d0}{
+\index{IntegerWaveform@{IntegerWaveform}!Minimum@{Minimum}}
+\index{Minimum@{Minimum}!IntegerWaveform@{IntegerWaveform}}
+\subsubsection[{Minimum}]{\setlength{\rightskip}{0pt plus 5cm}float IntegerWaveform::Minimum (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classIntegerWaveform_ad6582c22eb5896be14805487706711d0}
+Returns waveform's minimum value. \hypertarget{classIntegerWaveform_afb9674852c2d2040508a375c1c5cc8d6}{
+\index{IntegerWaveform@{IntegerWaveform}!ObjectLoadSetup@{ObjectLoadSetup}}
+\index{ObjectLoadSetup@{ObjectLoadSetup}!IntegerWaveform@{IntegerWaveform}}
+\subsubsection[{ObjectLoadSetup}]{\setlength{\rightskip}{0pt plus 5cm}bool IntegerWaveform::ObjectLoadSetup (
+\begin{DoxyParamCaption}
+\item[{ConfigurationDataBase \&}]{cdbData}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classIntegerWaveform_afb9674852c2d2040508a375c1c5cc8d6}
+Loads parameters from a CDB 
+\begin{DoxyParams}{Parameters}
+{\em cdbData} & the CDB \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if the initialisation went ok, False otherwise 
+\end{DoxyReturn}
+\hypertarget{classIntegerWaveform_a15587809f76da953aaaf03264298cf5e}{
+\index{IntegerWaveform@{IntegerWaveform}!Reset@{Reset}}
+\index{Reset@{Reset}!IntegerWaveform@{IntegerWaveform}}
+\subsubsection[{Reset}]{\setlength{\rightskip}{0pt plus 5cm}void IntegerWaveform::Reset (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classIntegerWaveform_a15587809f76da953aaaf03264298cf5e}
+Reset function. Resets the internal states and waveforms. To be called in the PREPULSE phase. 
+
+The documentation for this class was generated from the following file:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{IntegerWaveform_8h}{IntegerWaveform.h}\end{DoxyCompactItemize}

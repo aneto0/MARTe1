@@ -1,0 +1,82 @@
+##############################################################
+#
+# Copyright 2011 EFDA | European Fusion Development Agreement
+#
+# Licensed under the EUPL, Version 1.1 or - as soon they 
+# will be approved by the European Commission - subsequent  
+# versions of the EUPL (the "Licence"); 
+# You may not use this work except in compliance with the 
+# Licence. 
+# You may obtain a copy of the Licence at: 
+#  
+# http://ec.europa.eu/idabc/eupl
+#
+# Unless required by applicable law or agreed to in 
+# writing, software distributed under the Licence is 
+# distributed on an "AS IS" basis, 
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
+# express or implied. 
+# See the Licence for the specific language governing 
+# permissions and limitations under the Licence. 
+#
+# $Id$
+#
+#############################################################
+
+include depends.rtai
+
+rtai/%.o : %.cpp	
+	$(COMPILER) -S $(OPTIM) $(CFLAGS) $(DEBUG)  $*.cpp -o rtai/$*.s
+	$(COMPILER) -c $(OPTIM) $(CFLAGS) $(DEBUG)  $*.cpp -o rtai/$*.o	
+
+rtai/%.o : %.c
+	$(COMPILER) -c $(CFLAGS) $(DEBUG) $(OPTIM)  $*.c -o rtai/$*.o
+	$(COMPILER) -S $(CFLAGS) $(DEBUG) $(OPTIM)  $*.c -o rtai/$*.s
+
+rtai/%.a : $(OBJS)
+	touch $@
+	rm rtai/$*.a
+	ld   -r $(OBJS) -o $@
+
+rtai/%.ko : rtai/%.o $(OBJS) $(OBJSR)
+#Cannot use -C because I lose the PWD in the kernel Makefile...
+	cd $(TARGET) && export LDFLAGS_NOKVERSION=$(LDFLAGS_NOKVERSION_PRE) && make 2>&1 | grep -vi undefined\! && cd -
+
+#rtai/%.exe : rtai/%.o 
+#	touch rtai/$*.exe
+#	echo cannot build executable rtai/$*.exe use rtai/$*.ex
+#
+rtai/%.ex : rtai/%.o $(OBJS) $(OBJSR)
+#Cannot use -C because I lose the PWD in the kernel Makefile...	
+	cd $(TARGET) && export LDFLAGS_NOKVERSION=$(LDFLAGS_NOKVERSION_PRE) && make 2>&1 | grep -vi undefined\! && cd -
+
+depends.rtai: dependsRaw.rtai 
+	sed -f $(MAKEDEFAULTDIR)/CreateRTAIDepends.sed dependsRaw.rtai >depends.rtai
+
+dependsRaw.rtai: 
+	$(COMPILER) $(CFLAGS) $(DEBUG) $(OPTIM) -MM -I. *.c* > dependsRaw.rtai
+	@mkdir -p temp
+	@mkdir -p rtai
+
+rtai/%.gam : rtai/%.o $(OBJS) $(OBJSR)
+	cd $(TARGET) && export LDFLAGS_NOKVERSION=$(LDFLAGS_NOKVERSION_PRE) && make 2>&1 | grep -vi undefined\! && cd -	
+
+rtai/%.drv : rtai/%.o $(OBJS) $(OBJSR)
+	cd $(TARGET) && export LDFLAGS_NOKVERSION=$(LDFLAGS_NOKVERSION_PRE) && make 2>&1 | grep -vi undefined\! && cd -	
+%.spb :
+	$(MAKE) -C $* -f Makefile.$(TARGET)
+
+%.spc :
+	$(MAKE) -C $* -f Makefile.$(TARGET) clean
+
+clean:  $(SUBPROJC)
+	rm -f depends*
+	rm -f $(TARGET)/*$(OBJEXT)
+	rm -f $(TARGET)/*$(GAMEXT)
+	rm -f $(TARGET)/*$(DLLEXT)
+	rm -f $(TARGET)/*$(EXEEXT)
+	rm -f $(TARGET)/*$(LIBEXT)
+	#rm -f $(TARGET)/*.ko
+	rm -f $(TARGET)/*.mod.c
+	rm -f $(TARGET)/*$(ASMEXT)
+	rm -f $(TARGET)/Module.symvers

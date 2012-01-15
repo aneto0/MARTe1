@@ -1,0 +1,132 @@
+\hypertarget{classWaveform}{
+\section{Waveform Class Reference}
+\label{classWaveform}\index{Waveform@{Waveform}}
+}
+
+
+{\ttfamily \#include $<$Waveform.h$>$}
+
+Inheritance diagram for Waveform:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classWaveform}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classWaveform_a4a10db706dde8126a190a650f0b639fb}{Waveform} ()
+\item 
+virtual \hyperlink{classWaveform_afe871149df16f9cd13db35327c2b18b4}{$\sim$Waveform} ()
+\item 
+virtual bool \hyperlink{classWaveform_a692472f16f4d52b2a1378b8f4a9ec979}{ObjectLoadSetup} (ConfigurationDataBase \&cdbData, StreamInterface $\ast$err)
+\item 
+virtual float \hyperlink{classWaveform_ad7063bc356998bd730c79345a97f6656}{GetValue} (int32 usecTime)
+\item 
+virtual void \hyperlink{classWaveform_acd7677715381b3e9edc15f25f55f8edb}{Reset} ()
+\item 
+\hypertarget{classWaveform_a5f8c1672244a62bd673e752e7a741222}{
+virtual bool {\bfseries ProcessHttpMessage} (HttpStream \&hStream)}
+\label{classWaveform_a5f8c1672244a62bd673e752e7a741222}
+
+\item 
+\hypertarget{classWaveform_a53510c056e86f9d93f95edcb13b3e816}{
+void {\bfseries HTMLInfo} (HttpStream \&hStream)}
+\label{classWaveform_a53510c056e86f9d93f95edcb13b3e816}
+
+\item 
+\hypertarget{classWaveform_a740fbd30b18492210592b685cfbb31de}{
+\hyperlink{structWaveformData}{WaveformData} $\ast$ {\bfseries GetWaveformDataPointer} ()}
+\label{classWaveform_a740fbd30b18492210592b685cfbb31de}
+
+\item 
+\hypertarget{classWaveform_a3fd5e0286b2234cc73cdce919bc286dd}{
+int32 {\bfseries NumberOfWindows} ()}
+\label{classWaveform_a3fd5e0286b2234cc73cdce919bc286dd}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+A waveform which keeps its internal time in microseconds but loads data from CDB in seconds. Note that all slopes are calculated at the moment of creation (function ObjectLoadSetup), and that the waveform has to be resetted (function Reset) between a pulse and the other. 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classWaveform_a4a10db706dde8126a190a650f0b639fb}{
+\index{Waveform@{Waveform}!Waveform@{Waveform}}
+\index{Waveform@{Waveform}!Waveform@{Waveform}}
+\subsubsection[{Waveform}]{\setlength{\rightskip}{0pt plus 5cm}Waveform::Waveform (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classWaveform_a4a10db706dde8126a190a650f0b639fb}
+Constructor \hypertarget{classWaveform_afe871149df16f9cd13db35327c2b18b4}{
+\index{Waveform@{Waveform}!$\sim$Waveform@{$\sim$Waveform}}
+\index{$\sim$Waveform@{$\sim$Waveform}!Waveform@{Waveform}}
+\subsubsection[{$\sim$Waveform}]{\setlength{\rightskip}{0pt plus 5cm}virtual Waveform::$\sim$Waveform (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline, virtual\mbox{]}}}}
+\label{classWaveform_afe871149df16f9cd13db35327c2b18b4}
+Deconstructor 
+
+\subsection{Member Function Documentation}
+\hypertarget{classWaveform_ad7063bc356998bd730c79345a97f6656}{
+\index{Waveform@{Waveform}!GetValue@{GetValue}}
+\index{GetValue@{GetValue}!Waveform@{Waveform}}
+\subsubsection[{GetValue}]{\setlength{\rightskip}{0pt plus 5cm}float Waveform::GetValue (
+\begin{DoxyParamCaption}
+\item[{int32}]{usecTime}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}
+\label{classWaveform_ad7063bc356998bd730c79345a97f6656}
+Returns the value of the waveform at a certain time. 
+\begin{DoxyParams}{Parameters}
+{\em usecTime} & Time in microseconds. Note that usecTime needs to be crescent: in order to obtain the value of the waveform in the past you must Reset it first. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The value of the waveform at the specified time. If usecTime is before or after the start or end time of the waveform, the first or last value is held. 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{classWaveformInterface}{WaveformInterface}.
+
+\hypertarget{classWaveform_a692472f16f4d52b2a1378b8f4a9ec979}{
+\index{Waveform@{Waveform}!ObjectLoadSetup@{ObjectLoadSetup}}
+\index{ObjectLoadSetup@{ObjectLoadSetup}!Waveform@{Waveform}}
+\subsubsection[{ObjectLoadSetup}]{\setlength{\rightskip}{0pt plus 5cm}bool Waveform::ObjectLoadSetup (
+\begin{DoxyParamCaption}
+\item[{ConfigurationDataBase \&}]{cdbData, }
+\item[{StreamInterface $\ast$}]{err}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}
+\label{classWaveform_a692472f16f4d52b2a1378b8f4a9ec979}
+Loads parameters from a CDB 
+\begin{DoxyParams}{Parameters}
+{\em cdbData} & the CDB \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if the initialisation went ok, False otherwise 
+\end{DoxyReturn}
+\hypertarget{classWaveform_acd7677715381b3e9edc15f25f55f8edb}{
+\index{Waveform@{Waveform}!Reset@{Reset}}
+\index{Reset@{Reset}!Waveform@{Waveform}}
+\subsubsection[{Reset}]{\setlength{\rightskip}{0pt plus 5cm}virtual void Waveform::Reset (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline, virtual\mbox{]}}}}
+\label{classWaveform_acd7677715381b3e9edc15f25f55f8edb}
+Reset function. Resets the internal states and waveforms. To be called in the PREPULSE phase. 
+
+Implements \hyperlink{classWaveformInterface}{WaveformInterface}.
+
+
+
+The documentation for this class was generated from the following files:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{Waveform_8h}{Waveform.h}\item 
+Waveform.cpp\end{DoxyCompactItemize}

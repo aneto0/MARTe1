@@ -1,0 +1,3 @@
+cp ../JTLogger/JTLogger.jar html/
+jarsigner -keystore ppccstore -storepass jetjet -signedjar html/JTLogger_sig.jar html/JTLogger.jar ppcckey
+jarsigner -keystore ppccstore -storepass jetjet -signedjar html/xerces_sig.jar html/xerces.jar ppcckey

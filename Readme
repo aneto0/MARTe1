@@ -1,0 +1,8 @@
+EFDA-MARTe is licenced with EUPL (http://ec.europa.eu/idabc/eupl.html). See the file Licence-EUPL
+
+For convenience some 3rd party libraries, with versions which are known to work with MARTe, are also included in this distribution: 
+-RTAI
+-flot
+-RGraph
+If you wish to use them, you must accept their original licences.
+

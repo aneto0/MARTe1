@@ -1,0 +1,6 @@
+LIBRARY    SignalServer
+DESCRIPTION "SignalServer"
+EXPORTS
+
+Get_private_SignalServerInfo @1
+

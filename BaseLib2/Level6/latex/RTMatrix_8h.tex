@@ -1,0 +1,1321 @@
+\hypertarget{RTMatrix_8h}{
+\section{RTMatrix.h File Reference}
+\label{RTMatrix_8h}\index{RTMatrix.h@{RTMatrix.h}}
+}
+{\ttfamily \#include \char`\"{}System.h\char`\"{}}\par
+{\ttfamily \#include \char`\"{}Streamable.h\char`\"{}}\par
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classRTMatrixRow}{RTMatrixRow$<$ T $>$}
+\item 
+class \hyperlink{class__pRTMatrix__}{\_\-pRTMatrix\_\-$<$ T $>$}
+\item 
+class \hyperlink{classRTMatrixT}{RTMatrixT$<$ T $>$}
+\end{DoxyCompactItemize}
+\subsection*{Defines}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{RTMatrix_8h_aeed3f0ff49f35f8497df4ec2e60b85bb}{RTMatrixI}~\hyperlink{classRTMatrixT}{RTMatrixT}$<$int$>$
+\item 
+\#define \hyperlink{RTMatrix_8h_ade0302fb277803a6c6fbf355a62f7400}{RTMatrixF}~\hyperlink{classRTMatrixT}{RTMatrixT}$<$float$>$
+\item 
+\#define \hyperlink{RTMatrix_8h_af288fdb6044f14cf2451efd6b7ceafba}{RTMatrixD}~\hyperlink{classRTMatrixT}{RTMatrixT}$<$double$>$
+\item 
+\#define \hyperlink{RTMatrix_8h_a969a17f767ecfa0a242b214710cccf39}{RTMLOAD\_\-MATRIX}(matrix, data)~RTMLoad(matrix,data\mbox{[}0\mbox{]},sizeof(data)/sizeof(data\mbox{[}0\mbox{]}),sizeof(data\mbox{[}0\mbox{]})/sizeof(data\mbox{[}0\mbox{]}\mbox{[}0\mbox{]}));
+\item 
+\#define \hyperlink{RTMatrix_8h_aba7f189e2f4a6d93f81955882c36040d}{RTMLOAD\_\-VECTOR}(matrix, data)~RTMLoad(matrix,data,1,sizeof(data)/sizeof(data\mbox{[}0\mbox{]}));
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \hyperlink{RTMatrix_8h_aa75ddcb36b31d0266728692a91b7fcb5}{RTM\_\-\_\-vecIsNull\_\-I} (const int $\ast$d, const uint32 sz)
+\item 
+bool \hyperlink{RTMatrix_8h_a3657f922f2b70074560303ed4b6629e7}{RTM\_\-\_\-vecIsNull\_\-F} (const float $\ast$d, const uint32 sz)
+\item 
+bool \hyperlink{RTMatrix_8h_a8a43a6ceea1b0ea2bb580bbc79d98a67}{RTM\_\-\_\-vecIsNull\_\-D} (const double $\ast$d, const uint32 sz)
+\item 
+void \hyperlink{RTMatrix_8h_a53d50e8e3abf484465831a14b04704f1}{RTM\_\-\_\-vecCopy\_\-F} (float $\ast$d, const float $\ast$s, const uint32 sz)
+\item 
+void \hyperlink{RTMatrix_8h_a7e73e19bb890700ae3cdb221b30d1454}{RTM\_\-\_\-vecCopy\_\-D} (double $\ast$d, const double $\ast$s, const uint32 sz)
+\item 
+void \hyperlink{RTMatrix_8h_a37d8ca039d22b6a3eb2ac0c9e7006f46}{RTM\_\-\_\-vecCopy\_\-I} (int $\ast$d, const int $\ast$s, const uint32 sz)
+\item 
+void \hyperlink{RTMatrix_8h_ae91b4db16a74601fd53ed1173c35aa25}{RTM\_\-\_\-vecCopy\_\-DI} (double $\ast$d, const int $\ast$s, const uint32 sz)
+\item 
+void \hyperlink{RTMatrix_8h_a0441ee2f9066d0378ed78b45c3cf4724}{RTM\_\-\_\-vecCopy\_\-DF} (double $\ast$d, const float $\ast$s, const uint32 sz)
+\item 
+void \hyperlink{RTMatrix_8h_ac4ad1eced61baf9ab174ad1142aa6be4}{RTM\_\-\_\-vecCopy\_\-FI} (float $\ast$d, const int $\ast$s, const uint32 sz)
+\item 
+void \hyperlink{RTMatrix_8h_a04a5c2d1bc7d4256045d48fde6cd8a8a}{RTM\_\-\_\-vecCopy\_\-FD} (float $\ast$d, const double $\ast$s, const uint32 sz)
+\item 
+void \hyperlink{RTMatrix_8h_ad7a195bcf8d595f30a4e7562af75d6f7}{RTM\_\-\_\-vecCopy\_\-IF} (int $\ast$d, const float $\ast$s, const uint32 sz)
+\item 
+void \hyperlink{RTMatrix_8h_a99ecd0f95022aefe8e8da99119f28a5b}{RTM\_\-\_\-vecCopy\_\-ID} (int $\ast$d, const double $\ast$s, const uint32 sz)
+\item 
+void \hyperlink{RTMatrix_8h_a9338b800c6e38746d9b78a2caec57c02}{RTM\_\-\_\-vecSum\_\-F} (float $\ast$d, const float $\ast$s1, const float $\ast$s2, uint32 sz)
+\item 
+void \hyperlink{RTMatrix_8h_a99d985ce809f61f803ce4cf1422a80b3}{RTM\_\-\_\-vecSum\_\-D} (double $\ast$d, const double $\ast$s1, const double $\ast$s2, uint32 sz)
+\item 
+void \hyperlink{RTMatrix_8h_adefd4533aefddd18cfe62e93a55f3f41}{RTM\_\-\_\-vecSum\_\-I} (int $\ast$d, const int $\ast$s1, const int $\ast$s2, uint32 sz)
+\item 
+void \hyperlink{RTMatrix_8h_adbb7310a4fed7f663fcff4cf843d6a49}{RTM\_\-\_\-vecDiff\_\-F} (float $\ast$d, const float $\ast$s1, const float $\ast$s2, uint32 sz)
+\item 
+void \hyperlink{RTMatrix_8h_a97894ac4167aba3b9d27f4957aff4d88}{RTM\_\-\_\-vecDiff\_\-D} (double $\ast$d, const double $\ast$s1, const double $\ast$s2, uint32 sz)
+\item 
+void \hyperlink{RTMatrix_8h_a13491bdb0b859a389ea62150896a62c5}{RTM\_\-\_\-vecDiff\_\-I} (int $\ast$d, const int $\ast$s1, const int $\ast$s2, uint32 sz)
+\item 
+void \hyperlink{RTMatrix_8h_aa7d6f1c02bdaf5eb7f70730868f4b1f9}{RTM\_\-\_\-vecComb\_\-I} (int $\ast$d, uint32 sz, const int $\ast$s1, const int w1, const int $\ast$s2, const int w2)
+\item 
+void \hyperlink{RTMatrix_8h_a535c5ae0442d96729e581118b617739b}{RTM\_\-\_\-vecComb\_\-F} (float $\ast$d, uint32 sz, const float $\ast$s1, const float w1, const float $\ast$s2, const float w2)
+\item 
+void \hyperlink{RTMatrix_8h_a68095b3df196ccad8d98019e44160163}{RTM\_\-\_\-vecComb\_\-D} (double $\ast$d, uint32 sz, const double $\ast$s1, const double w1, const double $\ast$s2, const double w2)
+\item 
+int \hyperlink{RTMatrix_8h_a572026ffe6552623fecfb7c4686fd4ed}{RTM\_\-\_\-vecMax\_\-I} (const int $\ast$d, const uint32 sz)
+\item 
+float \hyperlink{RTMatrix_8h_af853549c3dcff48ce4c25a65852d5daf}{RTM\_\-\_\-vecMax\_\-F} (const float $\ast$d, const uint32 sz)
+\item 
+double \hyperlink{RTMatrix_8h_ae1635166ada4f999dff97fd128bcf08c}{RTM\_\-\_\-vecMax\_\-D} (const double $\ast$d, const uint32 sz)
+\item 
+int \hyperlink{RTMatrix_8h_abbef5f3350ad6c3f6a7e824647a4d2e5}{RTM\_\-\_\-vecMin\_\-I} (const int $\ast$d, const uint32 sz)
+\item 
+float \hyperlink{RTMatrix_8h_a28fcb9da3e14befca81fb83bbf420bb9}{RTM\_\-\_\-vecMin\_\-F} (const float $\ast$d, const uint32 sz)
+\item 
+double \hyperlink{RTMatrix_8h_aa0145eae7b587da376087e5663d1a044}{RTM\_\-\_\-vecMin\_\-D} (const double $\ast$d, const uint32 sz)
+\item 
+void \hyperlink{RTMatrix_8h_a9570e56b122e0104f44f3051177b36b8}{RTM\_\-\_\-vecScale\_\-F} (float $\ast$d, uint32 sz, const float w)
+\item 
+void \hyperlink{RTMatrix_8h_a1cb77c45c73927a616c1211c6a4a17ff}{RTM\_\-\_\-vecScale\_\-D} (double $\ast$d, uint32 sz, const double w)
+\item 
+void \hyperlink{RTMatrix_8h_a6c2c26acdfe338c8d5530fe986b4ea45}{RTM\_\-\_\-vecScale\_\-I} (int $\ast$d, uint32 sz, const int w)
+\item 
+void \hyperlink{RTMatrix_8h_a68d8f255596da3ff24c3f2ec527c8b3d}{RTMZerofy\_\-I} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ int $>$ \&A)
+\item 
+void \hyperlink{RTMatrix_8h_a6df7dff12f16685aad1059159c490e45}{RTMZerofy\_\-F} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ float $>$ \&A)
+\item 
+void \hyperlink{RTMatrix_8h_a50236f2104102200e7f611ca2c734f48}{RTMZerofy\_\-D} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ double $>$ \&A)
+\item 
+void \hyperlink{RTMatrix_8h_a9ad26b512b778b31b1d0f1a82b7a8821}{RTMOnefy\_\-I} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ int $>$ \&A)
+\item 
+void \hyperlink{RTMatrix_8h_a804921e4d00d795c6d20d74649e8e8c6}{RTMOnefy\_\-F} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ float $>$ \&A)
+\item 
+void \hyperlink{RTMatrix_8h_a440a84a58eacd1051c3f26f794f874b4}{RTMOnefy\_\-D} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ double $>$ \&A)
+\item 
+void \hyperlink{RTMatrix_8h_a883cc67437a9d00731b9d346ee0bd85e}{RTMEyefy\_\-I} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ int $>$ \&A)
+\item 
+void \hyperlink{RTMatrix_8h_aef1fd00e956fee157ce9a75354f15913}{RTMEyefy\_\-F} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ float $>$ \&A)
+\item 
+void \hyperlink{RTMatrix_8h_a8bbcf34ef6acc1c80b836e91d0b16268}{RTMEyefy\_\-D} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ double $>$ \&A)
+\item 
+void \hyperlink{RTMatrix_8h_ae6527320b663c60a20f9bf9c27786556}{RTMScale\_\-II} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ int $>$ \&A, const int factor)
+\item 
+void \hyperlink{RTMatrix_8h_a02e969762649fb710c7a307e1b63c9e4}{RTMScale\_\-FF} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ float $>$ \&A, const float factor)
+\item 
+void \hyperlink{RTMatrix_8h_a22019f86ebd3c17d9e46088aa1b3d4fb}{RTMScale\_\-DD} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ double $>$ \&A, const double factor)
+\item 
+bool \hyperlink{RTMatrix_8h_abb22bd863849977e94f15adc56d4eed1}{RTMIsNull\_\-I} (const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ int $>$ \&A)
+\item 
+bool \hyperlink{RTMatrix_8h_ad6483aa504ee746f155ec07aeac5b450}{RTMIsNull\_\-F} (const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ float $>$ \&A)
+\item 
+bool \hyperlink{RTMatrix_8h_adeb9a10eb7c6d77446a38692c56c1471}{RTMIsNull\_\-D} (const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ double $>$ \&A)
+\item 
+int \hyperlink{RTMatrix_8h_a9ff0f73cccf50e5bebac06922c7516f4}{RTMMax\_\-I} (const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ int $>$ \&ma)
+\item 
+float \hyperlink{RTMatrix_8h_a422afa5ae22f65d66185b784ef82bc5a}{RTMMax\_\-F} (const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ float $>$ \&ma)
+\item 
+double \hyperlink{RTMatrix_8h_a7e45391c0661da9c91c8da2950c1d275}{RTMMax\_\-D} (const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ double $>$ \&ma)
+\item 
+int \hyperlink{RTMatrix_8h_af2efb1bcdd355095fd077632b29dfb99}{RTMMin\_\-I} (const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ int $>$ \&ma)
+\item 
+float \hyperlink{RTMatrix_8h_af20e1de07cf9ae7c06dbe17f22d1d85d}{RTMMin\_\-F} (const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ float $>$ \&ma)
+\item 
+double \hyperlink{RTMatrix_8h_a549ac0002160ee98b713ab2a5b747f9c}{RTMMin\_\-D} (const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ double $>$ \&ma)
+\item 
+void \hyperlink{RTMatrix_8h_a0e3c5a0efd2eb18b127df1b44d6f373d}{RTMCombine\_\-UIIII} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ int $>$ \&rtm, const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ int $>$ \&A, const int aw, const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ int $>$ \&B, const int bw)
+\item 
+void \hyperlink{RTMatrix_8h_ad26f3428637273284649469ef633c847}{RTMCombine\_\-UFFFF} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ float $>$ \&rtm, const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ float $>$ \&A, const float aw, const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ float $>$ \&B, const float bw)
+\item 
+void \hyperlink{RTMatrix_8h_a8bd90bcb14bbdc5e0ddb0dd6f925aa3d}{RTMCombine\_\-UDDDD} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ double $>$ \&rtm, const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ double $>$ \&A, const double aw, const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ double $>$ \&B, const double bw)
+\item 
+void \hyperlink{RTMatrix_8h_af85f91c53501d584c99d5ed4e0bcdd25}{RTMProduct\_\-UIII} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ int $>$ \&rtm, const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ int $>$ \&A, const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ int $>$ \&B)
+\item 
+void \hyperlink{RTMatrix_8h_a919e90f4983d9e6c680fbcc2e28675d5}{RTMProduct\_\-UFFF} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ float $>$ \&rtm, const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ float $>$ \&A, const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ float $>$ \&B)
+\item 
+void \hyperlink{RTMatrix_8h_a8372dad7d4ef4d965765e8ccff9aff0a}{RTMProduct\_\-UDDD} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ double $>$ \&rtm, const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ double $>$ \&A, const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ double $>$ \&B)
+\item 
+void \hyperlink{RTMatrix_8h_ac29cf2dbf1a34c5dee187c6f84d70023}{RTMVProduct\_\-UIII} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ int $>$ \&rtm, int $\ast$input, int $\ast$output)
+\item 
+void \hyperlink{RTMatrix_8h_aa076e9e19ef872b9121feca22ae31d50}{RTMVProduct\_\-UFFF} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ float $>$ \&rtm, float $\ast$input, float $\ast$output)
+\item 
+void \hyperlink{RTMatrix_8h_ad9f938074825d8fc745ba96b34c78088}{RTMVProduct\_\-UDDD} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ double $>$ \&rtm, double $\ast$input, double $\ast$output)
+\item 
+void \hyperlink{RTMatrix_8h_af846bd0aa876a18c4a01f790e1602b56}{RTMVProductAcc\_\-UIII} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ int $>$ \&rtm, int $\ast$input, int $\ast$output)
+\item 
+void \hyperlink{RTMatrix_8h_ac5a17fef956a5d719a553bbe09cec38b}{RTMVProductAcc\_\-UFFF} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ float $>$ \&rtm, float $\ast$input, float $\ast$output)
+\item 
+void \hyperlink{RTMatrix_8h_a6de73e08c886ca2b4779995a0cc7952b}{RTMVProductAcc\_\-UDDD} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ double $>$ \&rtm, double $\ast$input, double $\ast$output)
+\item 
+void \hyperlink{RTMatrix_8h_ae78d9fbfcd4b4da32fc07d76317ccaef}{RTMDotProduct\_\-UII} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ int $>$ \&rtm, const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ int $>$ \&A)
+\item 
+void \hyperlink{RTMatrix_8h_a77894552f3e11c689fbaceff8de0d2a7}{RTMDotProduct\_\-UFF} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ float $>$ \&rtm, const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ float $>$ \&A)
+\item 
+void \hyperlink{RTMatrix_8h_abc1b79009752fc9540808b99ec0a3f42}{RTMDotProduct\_\-UDD} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ double $>$ \&rtm, const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ double $>$ \&A)
+\item 
+int \hyperlink{RTMatrix_8h_a614ec767294f73591dbf0adfc3b641be}{RTMMaxAbsRowSumNorm\_\-I} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ int $>$ \&A)
+\item 
+float \hyperlink{RTMatrix_8h_a8fb3d20ca7b42db6b6b80fe6a4bd783e}{RTMMaxAbsRowSumNorm\_\-F} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ float $>$ \&A)
+\item 
+double \hyperlink{RTMatrix_8h_a9ef06de8d8b54861beecee1dd514b1f9}{RTMMaxAbsRowSumNorm\_\-D} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ double $>$ \&A)
+\item 
+int \hyperlink{RTMatrix_8h_ae39501c6390bc97b46f866f902880228}{RTMMaxAbsColSumNorm\_\-I} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ int $>$ \&A)
+\item 
+float \hyperlink{RTMatrix_8h_a2ad30bcc69068fa7d191682159a6c30d}{RTMMaxAbsColSumNorm\_\-F} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ float $>$ \&A)
+\item 
+double \hyperlink{RTMatrix_8h_a7d2937ff527b0a65658aca387a867676}{RTMMaxAbsColSumNorm\_\-D} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ double $>$ \&A)
+\item 
+void \hyperlink{RTMatrix_8h_ad61457d881b6c795555b48195350e8ee}{RTMTranspose\_\-UII} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ int $>$ \&rtm, const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ int $>$ \&A)
+\item 
+void \hyperlink{RTMatrix_8h_ae7143ac65aa272673885fbf8f7abff73}{RTMTranspose\_\-UFF} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ float $>$ \&rtm, const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ float $>$ \&A)
+\item 
+void \hyperlink{RTMatrix_8h_a908fe2cf4195b33e5fb40b13c82858bc}{RTMTranspose\_\-UDD} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ double $>$ \&rtm, const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ double $>$ \&A)
+\item 
+bool \hyperlink{RTMatrix_8h_af04dd73c19b37c0fbc7da918b3c8326a}{RTMInvert\_\-UFF} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ float $>$ \&rtm, \hyperlink{classRTMatrixT}{RTMatrixT}$<$ float $>$ \&A)
+\item 
+bool \hyperlink{RTMatrix_8h_a79de8652456d9f55efb11387d3415e77}{RTMInvert\_\-UDF} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ double $>$ \&rtm, \hyperlink{classRTMatrixT}{RTMatrixT}$<$ float $>$ \&A)
+\item 
+bool \hyperlink{RTMatrix_8h_ac9544641f25b7ff9ba55d177576616bf}{RTMInvert\_\-UDD} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ double $>$ \&rtm, \hyperlink{classRTMatrixT}{RTMatrixT}$<$ double $>$ \&A)
+\item 
+bool \hyperlink{RTMatrix_8h_ab8e6223b990aa56fa4801e72d03310a1}{RTMLU\_\-FFFF} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ float $>$ \&rtm, \hyperlink{classRTMatrixT}{RTMatrixT}$<$ float $>$ \&L, \hyperlink{classRTMatrixT}{RTMatrixT}$<$ float $>$ \&U, \hyperlink{classRTMatrixT}{RTMatrixT}$<$ float $>$ \&P)
+\item 
+bool \hyperlink{RTMatrix_8h_a06bb48c05de428b21385c2c74823b92d}{RTMLU\_\-DDDD} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ double $>$ \&rtm, \hyperlink{classRTMatrixT}{RTMatrixT}$<$ double $>$ \&L, \hyperlink{classRTMatrixT}{RTMatrixT}$<$ double $>$ \&U, \hyperlink{classRTMatrixT}{RTMatrixT}$<$ double $>$ \&P)
+\item 
+bool \hyperlink{RTMatrix_8h_af8d97342e6f1efd0dc5bd1471c059f9f}{RTMSVD\_\-FFFF} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ float $>$ \&rtm, \hyperlink{classRTMatrixT}{RTMatrixT}$<$ float $>$ \&U, \hyperlink{classRTMatrixT}{RTMatrixT}$<$ float $>$ \&W, \hyperlink{classRTMatrixT}{RTMatrixT}$<$ float $>$ \&V)
+\item 
+bool \hyperlink{RTMatrix_8h_a03e8a55e695bfcd9fcc5e35c49ee78eb}{RTMSVD\_\-DDDD} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ double $>$ \&rtm, \hyperlink{classRTMatrixT}{RTMatrixT}$<$ double $>$ \&U, \hyperlink{classRTMatrixT}{RTMatrixT}$<$ double $>$ \&W, \hyperlink{classRTMatrixT}{RTMatrixT}$<$ double $>$ \&V)
+\item 
+void \hyperlink{RTMatrix_8h_a509bb05c165d4e5b4cd14a19d4339b97}{RTMPrint\_\-I} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ int $>$ \&rtm, StreamInterface \&s, int maxrow)
+\item 
+void \hyperlink{RTMatrix_8h_a3a1ec09d4c3b43de616cb8c86062fc8b}{RTMPrint\_\-F} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ float $>$ \&rtm, StreamInterface \&s, int maxrow)
+\item 
+void \hyperlink{RTMatrix_8h_ae60300c1f44fb1b6cd85f6c6151f3d03}{RTMPrint\_\-D} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ double $>$ \&rtm, StreamInterface \&s, int maxrow)
+\item 
+bool \hyperlink{RTMatrix_8h_a1cdd6e486d11885191994a8dd61812a4}{RTMAllocate\_\-I} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ int $>$ \&rtm, uint32 nRows, uint32 nColumns)
+\item 
+bool \hyperlink{RTMatrix_8h_a8767f4d87e5d9b79d815daf2242395fa}{RTMAllocate\_\-F} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ float $>$ \&rtm, uint32 nRows, uint32 nColumns)
+\item 
+bool \hyperlink{RTMatrix_8h_a70b0ba74608c5e31a9125f20d03f268b}{RTMAllocate\_\-D} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ double $>$ \&rtm, uint32 nRows, uint32 nColumns)
+\item 
+void \hyperlink{RTMatrix_8h_afb0c39ac741153360239318e8a2cfa25}{REFMAllocate\_\-I} (\hyperlink{classRefMatrixT}{RefMatrixT}$<$ int $>$ \&refm)
+\item 
+void \hyperlink{RTMatrix_8h_afaa61748857fa4c97950810d6bdc3a39}{REFMAllocate\_\-F} (\hyperlink{classRefMatrixT}{RefMatrixT}$<$ float $>$ \&refm)
+\item 
+void \hyperlink{RTMatrix_8h_a2e414fb65195b3397061200f6f674ad6}{REFMAllocate\_\-D} (\hyperlink{classRefMatrixT}{RefMatrixT}$<$ double $>$ \&refm)
+\item 
+void \hyperlink{RTMatrix_8h_a34a2fc343efa944086ed187b9bec8b58}{REFMDeAllocate\_\-I} (\hyperlink{classRefMatrixT}{RefMatrixT}$<$ int $>$ \&refm)
+\item 
+void \hyperlink{RTMatrix_8h_a31621c37bf75c32ac546bc1e97ac0574}{REFMDeAllocate\_\-F} (\hyperlink{classRefMatrixT}{RefMatrixT}$<$ float $>$ \&refm)
+\item 
+void \hyperlink{RTMatrix_8h_aed31fc3c33db81326ca68affead32036}{REFMDeAllocate\_\-D} (\hyperlink{classRefMatrixT}{RefMatrixT}$<$ double $>$ \&refm)
+\item 
+void \hyperlink{RTMatrix_8h_ae18fbb653e58d700382e19d94c937c36}{MAReAllocate\_\-I} (\hyperlink{classMatrixT}{MatrixT}$<$ int $>$ \&ma, uint32 nRows, uint32 nColumns)
+\item 
+void \hyperlink{RTMatrix_8h_a4e3ce3097f7165da9aaf28607692b620}{MAReAllocate\_\-F} (\hyperlink{classMatrixT}{MatrixT}$<$ float $>$ \&ma, uint32 nRows, uint32 nColumns)
+\item 
+void \hyperlink{RTMatrix_8h_a0bd8ba5166234f526018230566eb1e14}{MAReAllocate\_\-D} (\hyperlink{classMatrixT}{MatrixT}$<$ double $>$ \&ma, uint32 nRows, uint32 nColumns)
+\item 
+{\footnotesize template$<$class T1 , class T2 $>$ }\\bool \hyperlink{RTMatrix_8h_a3cef3c775cb920ba64c4319ca4ebe7db}{RTMCopy} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ T1 $>$ \&dest, const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ T2 $>$ \&src)
+\item 
+{\footnotesize template$<$class T1 , class T2 $>$ }\\bool \hyperlink{RTMatrix_8h_a100200372970cf47330971198d8d0bbf}{RTMLoad} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ T1 $>$ \&dest, const T2 $\ast$src, const uint32 nRows, const uint32 nColumns)
+\item 
+{\footnotesize template$<$class T1 , class T2 $>$ }\\bool \hyperlink{RTMatrix_8h_ade8645881118ab2953d0ded3db5b098b}{RTMSave} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ T1 $>$ \&src, T2 $\ast$dest, const uint32 nRows, const uint32 nColumns)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+
+
+\subsection{Define Documentation}
+\hypertarget{RTMatrix_8h_af288fdb6044f14cf2451efd6b7ceafba}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMatrixD@{RTMatrixD}}
+\index{RTMatrixD@{RTMatrixD}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMatrixD}]{\setlength{\rightskip}{0pt plus 5cm}\#define RTMatrixD~{\bf RTMatrixT}$<$double$>$}}
+\label{RTMatrix_8h_af288fdb6044f14cf2451efd6b7ceafba}
+\hypertarget{RTMatrix_8h_ade0302fb277803a6c6fbf355a62f7400}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMatrixF@{RTMatrixF}}
+\index{RTMatrixF@{RTMatrixF}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMatrixF}]{\setlength{\rightskip}{0pt plus 5cm}\#define RTMatrixF~{\bf RTMatrixT}$<$float$>$}}
+\label{RTMatrix_8h_ade0302fb277803a6c6fbf355a62f7400}
+\hypertarget{RTMatrix_8h_aeed3f0ff49f35f8497df4ec2e60b85bb}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMatrixI@{RTMatrixI}}
+\index{RTMatrixI@{RTMatrixI}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMatrixI}]{\setlength{\rightskip}{0pt plus 5cm}\#define RTMatrixI~{\bf RTMatrixT}$<$int$>$}}
+\label{RTMatrix_8h_aeed3f0ff49f35f8497df4ec2e60b85bb}
+\hypertarget{RTMatrix_8h_a969a17f767ecfa0a242b214710cccf39}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMLOAD\_\-MATRIX@{RTMLOAD\_\-MATRIX}}
+\index{RTMLOAD\_\-MATRIX@{RTMLOAD\_\-MATRIX}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMLOAD\_\-MATRIX}]{\setlength{\rightskip}{0pt plus 5cm}\#define RTMLOAD\_\-MATRIX(
+\begin{DoxyParamCaption}
+\item[{}]{matrix, }
+\item[{}]{data}
+\end{DoxyParamCaption}
+)~RTMLoad(matrix,data\mbox{[}0\mbox{]},sizeof(data)/sizeof(data\mbox{[}0\mbox{]}),sizeof(data\mbox{[}0\mbox{]})/sizeof(data\mbox{[}0\mbox{]}\mbox{[}0\mbox{]}));}}
+\label{RTMatrix_8h_a969a17f767ecfa0a242b214710cccf39}
+\hypertarget{RTMatrix_8h_aba7f189e2f4a6d93f81955882c36040d}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMLOAD\_\-VECTOR@{RTMLOAD\_\-VECTOR}}
+\index{RTMLOAD\_\-VECTOR@{RTMLOAD\_\-VECTOR}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMLOAD\_\-VECTOR}]{\setlength{\rightskip}{0pt plus 5cm}\#define RTMLOAD\_\-VECTOR(
+\begin{DoxyParamCaption}
+\item[{}]{matrix, }
+\item[{}]{data}
+\end{DoxyParamCaption}
+)~RTMLoad(matrix,data,1,sizeof(data)/sizeof(data\mbox{[}0\mbox{]}));}}
+\label{RTMatrix_8h_aba7f189e2f4a6d93f81955882c36040d}
+
+
+\subsection{Function Documentation}
+\hypertarget{RTMatrix_8h_a0bd8ba5166234f526018230566eb1e14}{
+\index{RTMatrix.h@{RTMatrix.h}!MAReAllocate\_\-D@{MAReAllocate\_\-D}}
+\index{MAReAllocate\_\-D@{MAReAllocate\_\-D}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{MAReAllocate\_\-D}]{\setlength{\rightskip}{0pt plus 5cm}void MAReAllocate\_\-D (
+\begin{DoxyParamCaption}
+\item[{{\bf MatrixT}$<$ double $>$ \&}]{ma, }
+\item[{uint32}]{nRows, }
+\item[{uint32}]{nColumns}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a0bd8ba5166234f526018230566eb1e14}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a4e3ce3097f7165da9aaf28607692b620}{
+\index{RTMatrix.h@{RTMatrix.h}!MAReAllocate\_\-F@{MAReAllocate\_\-F}}
+\index{MAReAllocate\_\-F@{MAReAllocate\_\-F}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{MAReAllocate\_\-F}]{\setlength{\rightskip}{0pt plus 5cm}void MAReAllocate\_\-F (
+\begin{DoxyParamCaption}
+\item[{{\bf MatrixT}$<$ float $>$ \&}]{ma, }
+\item[{uint32}]{nRows, }
+\item[{uint32}]{nColumns}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a4e3ce3097f7165da9aaf28607692b620}
+parts of RTMatrix \hypertarget{RTMatrix_8h_ae18fbb653e58d700382e19d94c937c36}{
+\index{RTMatrix.h@{RTMatrix.h}!MAReAllocate\_\-I@{MAReAllocate\_\-I}}
+\index{MAReAllocate\_\-I@{MAReAllocate\_\-I}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{MAReAllocate\_\-I}]{\setlength{\rightskip}{0pt plus 5cm}void MAReAllocate\_\-I (
+\begin{DoxyParamCaption}
+\item[{{\bf MatrixT}$<$ int $>$ \&}]{ma, }
+\item[{uint32}]{nRows, }
+\item[{uint32}]{nColumns}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_ae18fbb653e58d700382e19d94c937c36}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a2e414fb65195b3397061200f6f674ad6}{
+\index{RTMatrix.h@{RTMatrix.h}!REFMAllocate\_\-D@{REFMAllocate\_\-D}}
+\index{REFMAllocate\_\-D@{REFMAllocate\_\-D}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{REFMAllocate\_\-D}]{\setlength{\rightskip}{0pt plus 5cm}void REFMAllocate\_\-D (
+\begin{DoxyParamCaption}
+\item[{{\bf RefMatrixT}$<$ double $>$ \&}]{refm}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a2e414fb65195b3397061200f6f674ad6}
+parts of RTMatrix \hypertarget{RTMatrix_8h_afaa61748857fa4c97950810d6bdc3a39}{
+\index{RTMatrix.h@{RTMatrix.h}!REFMAllocate\_\-F@{REFMAllocate\_\-F}}
+\index{REFMAllocate\_\-F@{REFMAllocate\_\-F}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{REFMAllocate\_\-F}]{\setlength{\rightskip}{0pt plus 5cm}void REFMAllocate\_\-F (
+\begin{DoxyParamCaption}
+\item[{{\bf RefMatrixT}$<$ float $>$ \&}]{refm}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_afaa61748857fa4c97950810d6bdc3a39}
+parts of RTMatrix \hypertarget{RTMatrix_8h_afb0c39ac741153360239318e8a2cfa25}{
+\index{RTMatrix.h@{RTMatrix.h}!REFMAllocate\_\-I@{REFMAllocate\_\-I}}
+\index{REFMAllocate\_\-I@{REFMAllocate\_\-I}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{REFMAllocate\_\-I}]{\setlength{\rightskip}{0pt plus 5cm}void REFMAllocate\_\-I (
+\begin{DoxyParamCaption}
+\item[{{\bf RefMatrixT}$<$ int $>$ \&}]{refm}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_afb0c39ac741153360239318e8a2cfa25}
+parts of RTMatrix \hypertarget{RTMatrix_8h_aed31fc3c33db81326ca68affead32036}{
+\index{RTMatrix.h@{RTMatrix.h}!REFMDeAllocate\_\-D@{REFMDeAllocate\_\-D}}
+\index{REFMDeAllocate\_\-D@{REFMDeAllocate\_\-D}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{REFMDeAllocate\_\-D}]{\setlength{\rightskip}{0pt plus 5cm}void REFMDeAllocate\_\-D (
+\begin{DoxyParamCaption}
+\item[{{\bf RefMatrixT}$<$ double $>$ \&}]{refm}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_aed31fc3c33db81326ca68affead32036}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a31621c37bf75c32ac546bc1e97ac0574}{
+\index{RTMatrix.h@{RTMatrix.h}!REFMDeAllocate\_\-F@{REFMDeAllocate\_\-F}}
+\index{REFMDeAllocate\_\-F@{REFMDeAllocate\_\-F}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{REFMDeAllocate\_\-F}]{\setlength{\rightskip}{0pt plus 5cm}void REFMDeAllocate\_\-F (
+\begin{DoxyParamCaption}
+\item[{{\bf RefMatrixT}$<$ float $>$ \&}]{refm}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a31621c37bf75c32ac546bc1e97ac0574}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a34a2fc343efa944086ed187b9bec8b58}{
+\index{RTMatrix.h@{RTMatrix.h}!REFMDeAllocate\_\-I@{REFMDeAllocate\_\-I}}
+\index{REFMDeAllocate\_\-I@{REFMDeAllocate\_\-I}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{REFMDeAllocate\_\-I}]{\setlength{\rightskip}{0pt plus 5cm}void REFMDeAllocate\_\-I (
+\begin{DoxyParamCaption}
+\item[{{\bf RefMatrixT}$<$ int $>$ \&}]{refm}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a34a2fc343efa944086ed187b9bec8b58}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a68095b3df196ccad8d98019e44160163}{
+\index{RTMatrix.h@{RTMatrix.h}!RTM\_\-\_\-vecComb\_\-D@{RTM\_\-\_\-vecComb\_\-D}}
+\index{RTM\_\-\_\-vecComb\_\-D@{RTM\_\-\_\-vecComb\_\-D}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTM\_\-\_\-vecComb\_\-D}]{\setlength{\rightskip}{0pt plus 5cm}void RTM\_\-\_\-vecComb\_\-D (
+\begin{DoxyParamCaption}
+\item[{double $\ast$}]{d, }
+\item[{uint32}]{sz, }
+\item[{const double $\ast$}]{s1, }
+\item[{const double}]{w1, }
+\item[{const double $\ast$}]{s2, }
+\item[{const double}]{w2}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a68095b3df196ccad8d98019e44160163}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a535c5ae0442d96729e581118b617739b}{
+\index{RTMatrix.h@{RTMatrix.h}!RTM\_\-\_\-vecComb\_\-F@{RTM\_\-\_\-vecComb\_\-F}}
+\index{RTM\_\-\_\-vecComb\_\-F@{RTM\_\-\_\-vecComb\_\-F}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTM\_\-\_\-vecComb\_\-F}]{\setlength{\rightskip}{0pt plus 5cm}void RTM\_\-\_\-vecComb\_\-F (
+\begin{DoxyParamCaption}
+\item[{float $\ast$}]{d, }
+\item[{uint32}]{sz, }
+\item[{const float $\ast$}]{s1, }
+\item[{const float}]{w1, }
+\item[{const float $\ast$}]{s2, }
+\item[{const float}]{w2}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a535c5ae0442d96729e581118b617739b}
+parts of RTMatrix \hypertarget{RTMatrix_8h_aa7d6f1c02bdaf5eb7f70730868f4b1f9}{
+\index{RTMatrix.h@{RTMatrix.h}!RTM\_\-\_\-vecComb\_\-I@{RTM\_\-\_\-vecComb\_\-I}}
+\index{RTM\_\-\_\-vecComb\_\-I@{RTM\_\-\_\-vecComb\_\-I}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTM\_\-\_\-vecComb\_\-I}]{\setlength{\rightskip}{0pt plus 5cm}void RTM\_\-\_\-vecComb\_\-I (
+\begin{DoxyParamCaption}
+\item[{int $\ast$}]{d, }
+\item[{uint32}]{sz, }
+\item[{const int $\ast$}]{s1, }
+\item[{const int}]{w1, }
+\item[{const int $\ast$}]{s2, }
+\item[{const int}]{w2}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_aa7d6f1c02bdaf5eb7f70730868f4b1f9}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a7e73e19bb890700ae3cdb221b30d1454}{
+\index{RTMatrix.h@{RTMatrix.h}!RTM\_\-\_\-vecCopy\_\-D@{RTM\_\-\_\-vecCopy\_\-D}}
+\index{RTM\_\-\_\-vecCopy\_\-D@{RTM\_\-\_\-vecCopy\_\-D}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTM\_\-\_\-vecCopy\_\-D}]{\setlength{\rightskip}{0pt plus 5cm}void RTM\_\-\_\-vecCopy\_\-D (
+\begin{DoxyParamCaption}
+\item[{double $\ast$}]{d, }
+\item[{const double $\ast$}]{s, }
+\item[{const uint32}]{sz}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a7e73e19bb890700ae3cdb221b30d1454}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a0441ee2f9066d0378ed78b45c3cf4724}{
+\index{RTMatrix.h@{RTMatrix.h}!RTM\_\-\_\-vecCopy\_\-DF@{RTM\_\-\_\-vecCopy\_\-DF}}
+\index{RTM\_\-\_\-vecCopy\_\-DF@{RTM\_\-\_\-vecCopy\_\-DF}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTM\_\-\_\-vecCopy\_\-DF}]{\setlength{\rightskip}{0pt plus 5cm}void RTM\_\-\_\-vecCopy\_\-DF (
+\begin{DoxyParamCaption}
+\item[{double $\ast$}]{d, }
+\item[{const float $\ast$}]{s, }
+\item[{const uint32}]{sz}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a0441ee2f9066d0378ed78b45c3cf4724}
+parts of RTMatrix \hypertarget{RTMatrix_8h_ae91b4db16a74601fd53ed1173c35aa25}{
+\index{RTMatrix.h@{RTMatrix.h}!RTM\_\-\_\-vecCopy\_\-DI@{RTM\_\-\_\-vecCopy\_\-DI}}
+\index{RTM\_\-\_\-vecCopy\_\-DI@{RTM\_\-\_\-vecCopy\_\-DI}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTM\_\-\_\-vecCopy\_\-DI}]{\setlength{\rightskip}{0pt plus 5cm}void RTM\_\-\_\-vecCopy\_\-DI (
+\begin{DoxyParamCaption}
+\item[{double $\ast$}]{d, }
+\item[{const int $\ast$}]{s, }
+\item[{const uint32}]{sz}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_ae91b4db16a74601fd53ed1173c35aa25}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a53d50e8e3abf484465831a14b04704f1}{
+\index{RTMatrix.h@{RTMatrix.h}!RTM\_\-\_\-vecCopy\_\-F@{RTM\_\-\_\-vecCopy\_\-F}}
+\index{RTM\_\-\_\-vecCopy\_\-F@{RTM\_\-\_\-vecCopy\_\-F}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTM\_\-\_\-vecCopy\_\-F}]{\setlength{\rightskip}{0pt plus 5cm}void RTM\_\-\_\-vecCopy\_\-F (
+\begin{DoxyParamCaption}
+\item[{float $\ast$}]{d, }
+\item[{const float $\ast$}]{s, }
+\item[{const uint32}]{sz}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a53d50e8e3abf484465831a14b04704f1}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a04a5c2d1bc7d4256045d48fde6cd8a8a}{
+\index{RTMatrix.h@{RTMatrix.h}!RTM\_\-\_\-vecCopy\_\-FD@{RTM\_\-\_\-vecCopy\_\-FD}}
+\index{RTM\_\-\_\-vecCopy\_\-FD@{RTM\_\-\_\-vecCopy\_\-FD}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTM\_\-\_\-vecCopy\_\-FD}]{\setlength{\rightskip}{0pt plus 5cm}void RTM\_\-\_\-vecCopy\_\-FD (
+\begin{DoxyParamCaption}
+\item[{float $\ast$}]{d, }
+\item[{const double $\ast$}]{s, }
+\item[{const uint32}]{sz}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a04a5c2d1bc7d4256045d48fde6cd8a8a}
+parts of RTMatrix \hypertarget{RTMatrix_8h_ac4ad1eced61baf9ab174ad1142aa6be4}{
+\index{RTMatrix.h@{RTMatrix.h}!RTM\_\-\_\-vecCopy\_\-FI@{RTM\_\-\_\-vecCopy\_\-FI}}
+\index{RTM\_\-\_\-vecCopy\_\-FI@{RTM\_\-\_\-vecCopy\_\-FI}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTM\_\-\_\-vecCopy\_\-FI}]{\setlength{\rightskip}{0pt plus 5cm}void RTM\_\-\_\-vecCopy\_\-FI (
+\begin{DoxyParamCaption}
+\item[{float $\ast$}]{d, }
+\item[{const int $\ast$}]{s, }
+\item[{const uint32}]{sz}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_ac4ad1eced61baf9ab174ad1142aa6be4}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a37d8ca039d22b6a3eb2ac0c9e7006f46}{
+\index{RTMatrix.h@{RTMatrix.h}!RTM\_\-\_\-vecCopy\_\-I@{RTM\_\-\_\-vecCopy\_\-I}}
+\index{RTM\_\-\_\-vecCopy\_\-I@{RTM\_\-\_\-vecCopy\_\-I}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTM\_\-\_\-vecCopy\_\-I}]{\setlength{\rightskip}{0pt plus 5cm}void RTM\_\-\_\-vecCopy\_\-I (
+\begin{DoxyParamCaption}
+\item[{int $\ast$}]{d, }
+\item[{const int $\ast$}]{s, }
+\item[{const uint32}]{sz}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a37d8ca039d22b6a3eb2ac0c9e7006f46}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a99ecd0f95022aefe8e8da99119f28a5b}{
+\index{RTMatrix.h@{RTMatrix.h}!RTM\_\-\_\-vecCopy\_\-ID@{RTM\_\-\_\-vecCopy\_\-ID}}
+\index{RTM\_\-\_\-vecCopy\_\-ID@{RTM\_\-\_\-vecCopy\_\-ID}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTM\_\-\_\-vecCopy\_\-ID}]{\setlength{\rightskip}{0pt plus 5cm}void RTM\_\-\_\-vecCopy\_\-ID (
+\begin{DoxyParamCaption}
+\item[{int $\ast$}]{d, }
+\item[{const double $\ast$}]{s, }
+\item[{const uint32}]{sz}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a99ecd0f95022aefe8e8da99119f28a5b}
+parts of RTMatrix \hypertarget{RTMatrix_8h_ad7a195bcf8d595f30a4e7562af75d6f7}{
+\index{RTMatrix.h@{RTMatrix.h}!RTM\_\-\_\-vecCopy\_\-IF@{RTM\_\-\_\-vecCopy\_\-IF}}
+\index{RTM\_\-\_\-vecCopy\_\-IF@{RTM\_\-\_\-vecCopy\_\-IF}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTM\_\-\_\-vecCopy\_\-IF}]{\setlength{\rightskip}{0pt plus 5cm}void RTM\_\-\_\-vecCopy\_\-IF (
+\begin{DoxyParamCaption}
+\item[{int $\ast$}]{d, }
+\item[{const float $\ast$}]{s, }
+\item[{const uint32}]{sz}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_ad7a195bcf8d595f30a4e7562af75d6f7}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a97894ac4167aba3b9d27f4957aff4d88}{
+\index{RTMatrix.h@{RTMatrix.h}!RTM\_\-\_\-vecDiff\_\-D@{RTM\_\-\_\-vecDiff\_\-D}}
+\index{RTM\_\-\_\-vecDiff\_\-D@{RTM\_\-\_\-vecDiff\_\-D}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTM\_\-\_\-vecDiff\_\-D}]{\setlength{\rightskip}{0pt plus 5cm}void RTM\_\-\_\-vecDiff\_\-D (
+\begin{DoxyParamCaption}
+\item[{double $\ast$}]{d, }
+\item[{const double $\ast$}]{s1, }
+\item[{const double $\ast$}]{s2, }
+\item[{uint32}]{sz}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a97894ac4167aba3b9d27f4957aff4d88}
+parts of RTMatrix \hypertarget{RTMatrix_8h_adbb7310a4fed7f663fcff4cf843d6a49}{
+\index{RTMatrix.h@{RTMatrix.h}!RTM\_\-\_\-vecDiff\_\-F@{RTM\_\-\_\-vecDiff\_\-F}}
+\index{RTM\_\-\_\-vecDiff\_\-F@{RTM\_\-\_\-vecDiff\_\-F}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTM\_\-\_\-vecDiff\_\-F}]{\setlength{\rightskip}{0pt plus 5cm}void RTM\_\-\_\-vecDiff\_\-F (
+\begin{DoxyParamCaption}
+\item[{float $\ast$}]{d, }
+\item[{const float $\ast$}]{s1, }
+\item[{const float $\ast$}]{s2, }
+\item[{uint32}]{sz}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_adbb7310a4fed7f663fcff4cf843d6a49}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a13491bdb0b859a389ea62150896a62c5}{
+\index{RTMatrix.h@{RTMatrix.h}!RTM\_\-\_\-vecDiff\_\-I@{RTM\_\-\_\-vecDiff\_\-I}}
+\index{RTM\_\-\_\-vecDiff\_\-I@{RTM\_\-\_\-vecDiff\_\-I}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTM\_\-\_\-vecDiff\_\-I}]{\setlength{\rightskip}{0pt plus 5cm}void RTM\_\-\_\-vecDiff\_\-I (
+\begin{DoxyParamCaption}
+\item[{int $\ast$}]{d, }
+\item[{const int $\ast$}]{s1, }
+\item[{const int $\ast$}]{s2, }
+\item[{uint32}]{sz}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a13491bdb0b859a389ea62150896a62c5}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a8a43a6ceea1b0ea2bb580bbc79d98a67}{
+\index{RTMatrix.h@{RTMatrix.h}!RTM\_\-\_\-vecIsNull\_\-D@{RTM\_\-\_\-vecIsNull\_\-D}}
+\index{RTM\_\-\_\-vecIsNull\_\-D@{RTM\_\-\_\-vecIsNull\_\-D}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTM\_\-\_\-vecIsNull\_\-D}]{\setlength{\rightskip}{0pt plus 5cm}bool RTM\_\-\_\-vecIsNull\_\-D (
+\begin{DoxyParamCaption}
+\item[{const double $\ast$}]{d, }
+\item[{const uint32}]{sz}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a8a43a6ceea1b0ea2bb580bbc79d98a67}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a3657f922f2b70074560303ed4b6629e7}{
+\index{RTMatrix.h@{RTMatrix.h}!RTM\_\-\_\-vecIsNull\_\-F@{RTM\_\-\_\-vecIsNull\_\-F}}
+\index{RTM\_\-\_\-vecIsNull\_\-F@{RTM\_\-\_\-vecIsNull\_\-F}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTM\_\-\_\-vecIsNull\_\-F}]{\setlength{\rightskip}{0pt plus 5cm}bool RTM\_\-\_\-vecIsNull\_\-F (
+\begin{DoxyParamCaption}
+\item[{const float $\ast$}]{d, }
+\item[{const uint32}]{sz}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a3657f922f2b70074560303ed4b6629e7}
+parts of RTMatrix \hypertarget{RTMatrix_8h_aa75ddcb36b31d0266728692a91b7fcb5}{
+\index{RTMatrix.h@{RTMatrix.h}!RTM\_\-\_\-vecIsNull\_\-I@{RTM\_\-\_\-vecIsNull\_\-I}}
+\index{RTM\_\-\_\-vecIsNull\_\-I@{RTM\_\-\_\-vecIsNull\_\-I}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTM\_\-\_\-vecIsNull\_\-I}]{\setlength{\rightskip}{0pt plus 5cm}bool RTM\_\-\_\-vecIsNull\_\-I (
+\begin{DoxyParamCaption}
+\item[{const int $\ast$}]{d, }
+\item[{const uint32}]{sz}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_aa75ddcb36b31d0266728692a91b7fcb5}
+parts of RTMatrix \hypertarget{RTMatrix_8h_ae1635166ada4f999dff97fd128bcf08c}{
+\index{RTMatrix.h@{RTMatrix.h}!RTM\_\-\_\-vecMax\_\-D@{RTM\_\-\_\-vecMax\_\-D}}
+\index{RTM\_\-\_\-vecMax\_\-D@{RTM\_\-\_\-vecMax\_\-D}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTM\_\-\_\-vecMax\_\-D}]{\setlength{\rightskip}{0pt plus 5cm}double RTM\_\-\_\-vecMax\_\-D (
+\begin{DoxyParamCaption}
+\item[{const double $\ast$}]{d, }
+\item[{const uint32}]{sz}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_ae1635166ada4f999dff97fd128bcf08c}
+parts of RTMatrix \hypertarget{RTMatrix_8h_af853549c3dcff48ce4c25a65852d5daf}{
+\index{RTMatrix.h@{RTMatrix.h}!RTM\_\-\_\-vecMax\_\-F@{RTM\_\-\_\-vecMax\_\-F}}
+\index{RTM\_\-\_\-vecMax\_\-F@{RTM\_\-\_\-vecMax\_\-F}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTM\_\-\_\-vecMax\_\-F}]{\setlength{\rightskip}{0pt plus 5cm}float RTM\_\-\_\-vecMax\_\-F (
+\begin{DoxyParamCaption}
+\item[{const float $\ast$}]{d, }
+\item[{const uint32}]{sz}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_af853549c3dcff48ce4c25a65852d5daf}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a572026ffe6552623fecfb7c4686fd4ed}{
+\index{RTMatrix.h@{RTMatrix.h}!RTM\_\-\_\-vecMax\_\-I@{RTM\_\-\_\-vecMax\_\-I}}
+\index{RTM\_\-\_\-vecMax\_\-I@{RTM\_\-\_\-vecMax\_\-I}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTM\_\-\_\-vecMax\_\-I}]{\setlength{\rightskip}{0pt plus 5cm}int RTM\_\-\_\-vecMax\_\-I (
+\begin{DoxyParamCaption}
+\item[{const int $\ast$}]{d, }
+\item[{const uint32}]{sz}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a572026ffe6552623fecfb7c4686fd4ed}
+parts of RTMatrix \hypertarget{RTMatrix_8h_aa0145eae7b587da376087e5663d1a044}{
+\index{RTMatrix.h@{RTMatrix.h}!RTM\_\-\_\-vecMin\_\-D@{RTM\_\-\_\-vecMin\_\-D}}
+\index{RTM\_\-\_\-vecMin\_\-D@{RTM\_\-\_\-vecMin\_\-D}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTM\_\-\_\-vecMin\_\-D}]{\setlength{\rightskip}{0pt plus 5cm}double RTM\_\-\_\-vecMin\_\-D (
+\begin{DoxyParamCaption}
+\item[{const double $\ast$}]{d, }
+\item[{const uint32}]{sz}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_aa0145eae7b587da376087e5663d1a044}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a28fcb9da3e14befca81fb83bbf420bb9}{
+\index{RTMatrix.h@{RTMatrix.h}!RTM\_\-\_\-vecMin\_\-F@{RTM\_\-\_\-vecMin\_\-F}}
+\index{RTM\_\-\_\-vecMin\_\-F@{RTM\_\-\_\-vecMin\_\-F}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTM\_\-\_\-vecMin\_\-F}]{\setlength{\rightskip}{0pt plus 5cm}float RTM\_\-\_\-vecMin\_\-F (
+\begin{DoxyParamCaption}
+\item[{const float $\ast$}]{d, }
+\item[{const uint32}]{sz}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a28fcb9da3e14befca81fb83bbf420bb9}
+parts of RTMatrix \hypertarget{RTMatrix_8h_abbef5f3350ad6c3f6a7e824647a4d2e5}{
+\index{RTMatrix.h@{RTMatrix.h}!RTM\_\-\_\-vecMin\_\-I@{RTM\_\-\_\-vecMin\_\-I}}
+\index{RTM\_\-\_\-vecMin\_\-I@{RTM\_\-\_\-vecMin\_\-I}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTM\_\-\_\-vecMin\_\-I}]{\setlength{\rightskip}{0pt plus 5cm}int RTM\_\-\_\-vecMin\_\-I (
+\begin{DoxyParamCaption}
+\item[{const int $\ast$}]{d, }
+\item[{const uint32}]{sz}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_abbef5f3350ad6c3f6a7e824647a4d2e5}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a1cb77c45c73927a616c1211c6a4a17ff}{
+\index{RTMatrix.h@{RTMatrix.h}!RTM\_\-\_\-vecScale\_\-D@{RTM\_\-\_\-vecScale\_\-D}}
+\index{RTM\_\-\_\-vecScale\_\-D@{RTM\_\-\_\-vecScale\_\-D}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTM\_\-\_\-vecScale\_\-D}]{\setlength{\rightskip}{0pt plus 5cm}void RTM\_\-\_\-vecScale\_\-D (
+\begin{DoxyParamCaption}
+\item[{double $\ast$}]{d, }
+\item[{uint32}]{sz, }
+\item[{const double}]{w}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a1cb77c45c73927a616c1211c6a4a17ff}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a9570e56b122e0104f44f3051177b36b8}{
+\index{RTMatrix.h@{RTMatrix.h}!RTM\_\-\_\-vecScale\_\-F@{RTM\_\-\_\-vecScale\_\-F}}
+\index{RTM\_\-\_\-vecScale\_\-F@{RTM\_\-\_\-vecScale\_\-F}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTM\_\-\_\-vecScale\_\-F}]{\setlength{\rightskip}{0pt plus 5cm}void RTM\_\-\_\-vecScale\_\-F (
+\begin{DoxyParamCaption}
+\item[{float $\ast$}]{d, }
+\item[{uint32}]{sz, }
+\item[{const float}]{w}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a9570e56b122e0104f44f3051177b36b8}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a6c2c26acdfe338c8d5530fe986b4ea45}{
+\index{RTMatrix.h@{RTMatrix.h}!RTM\_\-\_\-vecScale\_\-I@{RTM\_\-\_\-vecScale\_\-I}}
+\index{RTM\_\-\_\-vecScale\_\-I@{RTM\_\-\_\-vecScale\_\-I}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTM\_\-\_\-vecScale\_\-I}]{\setlength{\rightskip}{0pt plus 5cm}void RTM\_\-\_\-vecScale\_\-I (
+\begin{DoxyParamCaption}
+\item[{int $\ast$}]{d, }
+\item[{uint32}]{sz, }
+\item[{const int}]{w}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a6c2c26acdfe338c8d5530fe986b4ea45}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a99d985ce809f61f803ce4cf1422a80b3}{
+\index{RTMatrix.h@{RTMatrix.h}!RTM\_\-\_\-vecSum\_\-D@{RTM\_\-\_\-vecSum\_\-D}}
+\index{RTM\_\-\_\-vecSum\_\-D@{RTM\_\-\_\-vecSum\_\-D}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTM\_\-\_\-vecSum\_\-D}]{\setlength{\rightskip}{0pt plus 5cm}void RTM\_\-\_\-vecSum\_\-D (
+\begin{DoxyParamCaption}
+\item[{double $\ast$}]{d, }
+\item[{const double $\ast$}]{s1, }
+\item[{const double $\ast$}]{s2, }
+\item[{uint32}]{sz}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a99d985ce809f61f803ce4cf1422a80b3}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a9338b800c6e38746d9b78a2caec57c02}{
+\index{RTMatrix.h@{RTMatrix.h}!RTM\_\-\_\-vecSum\_\-F@{RTM\_\-\_\-vecSum\_\-F}}
+\index{RTM\_\-\_\-vecSum\_\-F@{RTM\_\-\_\-vecSum\_\-F}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTM\_\-\_\-vecSum\_\-F}]{\setlength{\rightskip}{0pt plus 5cm}void RTM\_\-\_\-vecSum\_\-F (
+\begin{DoxyParamCaption}
+\item[{float $\ast$}]{d, }
+\item[{const float $\ast$}]{s1, }
+\item[{const float $\ast$}]{s2, }
+\item[{uint32}]{sz}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a9338b800c6e38746d9b78a2caec57c02}
+parts of RTMatrix \hypertarget{RTMatrix_8h_adefd4533aefddd18cfe62e93a55f3f41}{
+\index{RTMatrix.h@{RTMatrix.h}!RTM\_\-\_\-vecSum\_\-I@{RTM\_\-\_\-vecSum\_\-I}}
+\index{RTM\_\-\_\-vecSum\_\-I@{RTM\_\-\_\-vecSum\_\-I}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTM\_\-\_\-vecSum\_\-I}]{\setlength{\rightskip}{0pt plus 5cm}void RTM\_\-\_\-vecSum\_\-I (
+\begin{DoxyParamCaption}
+\item[{int $\ast$}]{d, }
+\item[{const int $\ast$}]{s1, }
+\item[{const int $\ast$}]{s2, }
+\item[{uint32}]{sz}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_adefd4533aefddd18cfe62e93a55f3f41}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a70b0ba74608c5e31a9125f20d03f268b}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMAllocate\_\-D@{RTMAllocate\_\-D}}
+\index{RTMAllocate\_\-D@{RTMAllocate\_\-D}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMAllocate\_\-D}]{\setlength{\rightskip}{0pt plus 5cm}bool RTMAllocate\_\-D (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ double $>$ \&}]{rtm, }
+\item[{uint32}]{nRows, }
+\item[{uint32}]{nColumns}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a70b0ba74608c5e31a9125f20d03f268b}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a8767f4d87e5d9b79d815daf2242395fa}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMAllocate\_\-F@{RTMAllocate\_\-F}}
+\index{RTMAllocate\_\-F@{RTMAllocate\_\-F}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMAllocate\_\-F}]{\setlength{\rightskip}{0pt plus 5cm}bool RTMAllocate\_\-F (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ float $>$ \&}]{rtm, }
+\item[{uint32}]{nRows, }
+\item[{uint32}]{nColumns}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a8767f4d87e5d9b79d815daf2242395fa}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a1cdd6e486d11885191994a8dd61812a4}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMAllocate\_\-I@{RTMAllocate\_\-I}}
+\index{RTMAllocate\_\-I@{RTMAllocate\_\-I}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMAllocate\_\-I}]{\setlength{\rightskip}{0pt plus 5cm}bool RTMAllocate\_\-I (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ int $>$ \&}]{rtm, }
+\item[{uint32}]{nRows, }
+\item[{uint32}]{nColumns}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a1cdd6e486d11885191994a8dd61812a4}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a8bd90bcb14bbdc5e0ddb0dd6f925aa3d}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMCombine\_\-UDDDD@{RTMCombine\_\-UDDDD}}
+\index{RTMCombine\_\-UDDDD@{RTMCombine\_\-UDDDD}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMCombine\_\-UDDDD}]{\setlength{\rightskip}{0pt plus 5cm}void RTMCombine\_\-UDDDD (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ double $>$ \&}]{rtm, }
+\item[{const {\bf RTMatrixT}$<$ double $>$ \&}]{A, }
+\item[{const double}]{aw, }
+\item[{const {\bf RTMatrixT}$<$ double $>$ \&}]{B, }
+\item[{const double}]{bw}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a8bd90bcb14bbdc5e0ddb0dd6f925aa3d}
+parts of RTMatrix \hypertarget{RTMatrix_8h_ad26f3428637273284649469ef633c847}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMCombine\_\-UFFFF@{RTMCombine\_\-UFFFF}}
+\index{RTMCombine\_\-UFFFF@{RTMCombine\_\-UFFFF}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMCombine\_\-UFFFF}]{\setlength{\rightskip}{0pt plus 5cm}void RTMCombine\_\-UFFFF (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ float $>$ \&}]{rtm, }
+\item[{const {\bf RTMatrixT}$<$ float $>$ \&}]{A, }
+\item[{const float}]{aw, }
+\item[{const {\bf RTMatrixT}$<$ float $>$ \&}]{B, }
+\item[{const float}]{bw}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_ad26f3428637273284649469ef633c847}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a0e3c5a0efd2eb18b127df1b44d6f373d}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMCombine\_\-UIIII@{RTMCombine\_\-UIIII}}
+\index{RTMCombine\_\-UIIII@{RTMCombine\_\-UIIII}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMCombine\_\-UIIII}]{\setlength{\rightskip}{0pt plus 5cm}void RTMCombine\_\-UIIII (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ int $>$ \&}]{rtm, }
+\item[{const {\bf RTMatrixT}$<$ int $>$ \&}]{A, }
+\item[{const int}]{aw, }
+\item[{const {\bf RTMatrixT}$<$ int $>$ \&}]{B, }
+\item[{const int}]{bw}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a0e3c5a0efd2eb18b127df1b44d6f373d}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a3cef3c775cb920ba64c4319ca4ebe7db}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMCopy@{RTMCopy}}
+\index{RTMCopy@{RTMCopy}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMCopy}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T1 , class T2 $>$ bool RTMCopy (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ T1 $>$ \&}]{dest, }
+\item[{const {\bf RTMatrixT}$<$ T2 $>$ \&}]{src}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{RTMatrix_8h_a3cef3c775cb920ba64c4319ca4ebe7db}
+copies a matrix \hypertarget{RTMatrix_8h_abc1b79009752fc9540808b99ec0a3f42}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMDotProduct\_\-UDD@{RTMDotProduct\_\-UDD}}
+\index{RTMDotProduct\_\-UDD@{RTMDotProduct\_\-UDD}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMDotProduct\_\-UDD}]{\setlength{\rightskip}{0pt plus 5cm}void RTMDotProduct\_\-UDD (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ double $>$ \&}]{rtm, }
+\item[{const {\bf RTMatrixT}$<$ double $>$ \&}]{A}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_abc1b79009752fc9540808b99ec0a3f42}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a77894552f3e11c689fbaceff8de0d2a7}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMDotProduct\_\-UFF@{RTMDotProduct\_\-UFF}}
+\index{RTMDotProduct\_\-UFF@{RTMDotProduct\_\-UFF}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMDotProduct\_\-UFF}]{\setlength{\rightskip}{0pt plus 5cm}void RTMDotProduct\_\-UFF (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ float $>$ \&}]{rtm, }
+\item[{const {\bf RTMatrixT}$<$ float $>$ \&}]{A}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a77894552f3e11c689fbaceff8de0d2a7}
+parts of RTMatrix \hypertarget{RTMatrix_8h_ae78d9fbfcd4b4da32fc07d76317ccaef}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMDotProduct\_\-UII@{RTMDotProduct\_\-UII}}
+\index{RTMDotProduct\_\-UII@{RTMDotProduct\_\-UII}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMDotProduct\_\-UII}]{\setlength{\rightskip}{0pt plus 5cm}void RTMDotProduct\_\-UII (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ int $>$ \&}]{rtm, }
+\item[{const {\bf RTMatrixT}$<$ int $>$ \&}]{A}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_ae78d9fbfcd4b4da32fc07d76317ccaef}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a8bbcf34ef6acc1c80b836e91d0b16268}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMEyefy\_\-D@{RTMEyefy\_\-D}}
+\index{RTMEyefy\_\-D@{RTMEyefy\_\-D}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMEyefy\_\-D}]{\setlength{\rightskip}{0pt plus 5cm}void RTMEyefy\_\-D (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ double $>$ \&}]{A}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a8bbcf34ef6acc1c80b836e91d0b16268}
+parts of RTMatrix \hypertarget{RTMatrix_8h_aef1fd00e956fee157ce9a75354f15913}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMEyefy\_\-F@{RTMEyefy\_\-F}}
+\index{RTMEyefy\_\-F@{RTMEyefy\_\-F}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMEyefy\_\-F}]{\setlength{\rightskip}{0pt plus 5cm}void RTMEyefy\_\-F (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ float $>$ \&}]{A}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_aef1fd00e956fee157ce9a75354f15913}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a883cc67437a9d00731b9d346ee0bd85e}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMEyefy\_\-I@{RTMEyefy\_\-I}}
+\index{RTMEyefy\_\-I@{RTMEyefy\_\-I}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMEyefy\_\-I}]{\setlength{\rightskip}{0pt plus 5cm}void RTMEyefy\_\-I (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ int $>$ \&}]{A}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a883cc67437a9d00731b9d346ee0bd85e}
+parts of RTMatrix \hypertarget{RTMatrix_8h_ac9544641f25b7ff9ba55d177576616bf}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMInvert\_\-UDD@{RTMInvert\_\-UDD}}
+\index{RTMInvert\_\-UDD@{RTMInvert\_\-UDD}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMInvert\_\-UDD}]{\setlength{\rightskip}{0pt plus 5cm}bool RTMInvert\_\-UDD (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ double $>$ \&}]{rtm, }
+\item[{{\bf RTMatrixT}$<$ double $>$ \&}]{A}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_ac9544641f25b7ff9ba55d177576616bf}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a79de8652456d9f55efb11387d3415e77}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMInvert\_\-UDF@{RTMInvert\_\-UDF}}
+\index{RTMInvert\_\-UDF@{RTMInvert\_\-UDF}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMInvert\_\-UDF}]{\setlength{\rightskip}{0pt plus 5cm}bool RTMInvert\_\-UDF (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ double $>$ \&}]{rtm, }
+\item[{{\bf RTMatrixT}$<$ float $>$ \&}]{A}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a79de8652456d9f55efb11387d3415e77}
+parts of RTMatrix \hypertarget{RTMatrix_8h_af04dd73c19b37c0fbc7da918b3c8326a}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMInvert\_\-UFF@{RTMInvert\_\-UFF}}
+\index{RTMInvert\_\-UFF@{RTMInvert\_\-UFF}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMInvert\_\-UFF}]{\setlength{\rightskip}{0pt plus 5cm}bool RTMInvert\_\-UFF (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ float $>$ \&}]{rtm, }
+\item[{{\bf RTMatrixT}$<$ float $>$ \&}]{A}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_af04dd73c19b37c0fbc7da918b3c8326a}
+parts of RTMatrix \hypertarget{RTMatrix_8h_adeb9a10eb7c6d77446a38692c56c1471}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMIsNull\_\-D@{RTMIsNull\_\-D}}
+\index{RTMIsNull\_\-D@{RTMIsNull\_\-D}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMIsNull\_\-D}]{\setlength{\rightskip}{0pt plus 5cm}bool RTMIsNull\_\-D (
+\begin{DoxyParamCaption}
+\item[{const {\bf RTMatrixT}$<$ double $>$ \&}]{A}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_adeb9a10eb7c6d77446a38692c56c1471}
+parts of RTMatrix \hypertarget{RTMatrix_8h_ad6483aa504ee746f155ec07aeac5b450}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMIsNull\_\-F@{RTMIsNull\_\-F}}
+\index{RTMIsNull\_\-F@{RTMIsNull\_\-F}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMIsNull\_\-F}]{\setlength{\rightskip}{0pt plus 5cm}bool RTMIsNull\_\-F (
+\begin{DoxyParamCaption}
+\item[{const {\bf RTMatrixT}$<$ float $>$ \&}]{A}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_ad6483aa504ee746f155ec07aeac5b450}
+parts of RTMatrix \hypertarget{RTMatrix_8h_abb22bd863849977e94f15adc56d4eed1}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMIsNull\_\-I@{RTMIsNull\_\-I}}
+\index{RTMIsNull\_\-I@{RTMIsNull\_\-I}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMIsNull\_\-I}]{\setlength{\rightskip}{0pt plus 5cm}bool RTMIsNull\_\-I (
+\begin{DoxyParamCaption}
+\item[{const {\bf RTMatrixT}$<$ int $>$ \&}]{A}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_abb22bd863849977e94f15adc56d4eed1}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a100200372970cf47330971198d8d0bbf}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMLoad@{RTMLoad}}
+\index{RTMLoad@{RTMLoad}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMLoad}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T1 , class T2 $>$ bool RTMLoad (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ T1 $>$ \&}]{dest, }
+\item[{const T2 $\ast$}]{src, }
+\item[{const uint32}]{nRows, }
+\item[{const uint32}]{nColumns}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{RTMatrix_8h_a100200372970cf47330971198d8d0bbf}
+loads a packed array of data as floats \hypertarget{RTMatrix_8h_a06bb48c05de428b21385c2c74823b92d}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMLU\_\-DDDD@{RTMLU\_\-DDDD}}
+\index{RTMLU\_\-DDDD@{RTMLU\_\-DDDD}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMLU\_\-DDDD}]{\setlength{\rightskip}{0pt plus 5cm}bool RTMLU\_\-DDDD (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ double $>$ \&}]{rtm, }
+\item[{{\bf RTMatrixT}$<$ double $>$ \&}]{L, }
+\item[{{\bf RTMatrixT}$<$ double $>$ \&}]{U, }
+\item[{{\bf RTMatrixT}$<$ double $>$ \&}]{P}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a06bb48c05de428b21385c2c74823b92d}
+parts of RTMatrix \hypertarget{RTMatrix_8h_ab8e6223b990aa56fa4801e72d03310a1}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMLU\_\-FFFF@{RTMLU\_\-FFFF}}
+\index{RTMLU\_\-FFFF@{RTMLU\_\-FFFF}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMLU\_\-FFFF}]{\setlength{\rightskip}{0pt plus 5cm}bool RTMLU\_\-FFFF (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ float $>$ \&}]{rtm, }
+\item[{{\bf RTMatrixT}$<$ float $>$ \&}]{L, }
+\item[{{\bf RTMatrixT}$<$ float $>$ \&}]{U, }
+\item[{{\bf RTMatrixT}$<$ float $>$ \&}]{P}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_ab8e6223b990aa56fa4801e72d03310a1}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a7e45391c0661da9c91c8da2950c1d275}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMMax\_\-D@{RTMMax\_\-D}}
+\index{RTMMax\_\-D@{RTMMax\_\-D}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMMax\_\-D}]{\setlength{\rightskip}{0pt plus 5cm}double RTMMax\_\-D (
+\begin{DoxyParamCaption}
+\item[{const {\bf RTMatrixT}$<$ double $>$ \&}]{ma}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a7e45391c0661da9c91c8da2950c1d275}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a422afa5ae22f65d66185b784ef82bc5a}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMMax\_\-F@{RTMMax\_\-F}}
+\index{RTMMax\_\-F@{RTMMax\_\-F}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMMax\_\-F}]{\setlength{\rightskip}{0pt plus 5cm}float RTMMax\_\-F (
+\begin{DoxyParamCaption}
+\item[{const {\bf RTMatrixT}$<$ float $>$ \&}]{ma}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a422afa5ae22f65d66185b784ef82bc5a}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a9ff0f73cccf50e5bebac06922c7516f4}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMMax\_\-I@{RTMMax\_\-I}}
+\index{RTMMax\_\-I@{RTMMax\_\-I}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMMax\_\-I}]{\setlength{\rightskip}{0pt plus 5cm}int RTMMax\_\-I (
+\begin{DoxyParamCaption}
+\item[{const {\bf RTMatrixT}$<$ int $>$ \&}]{ma}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a9ff0f73cccf50e5bebac06922c7516f4}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a7d2937ff527b0a65658aca387a867676}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMMaxAbsColSumNorm\_\-D@{RTMMaxAbsColSumNorm\_\-D}}
+\index{RTMMaxAbsColSumNorm\_\-D@{RTMMaxAbsColSumNorm\_\-D}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMMaxAbsColSumNorm\_\-D}]{\setlength{\rightskip}{0pt plus 5cm}double RTMMaxAbsColSumNorm\_\-D (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ double $>$ \&}]{A}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a7d2937ff527b0a65658aca387a867676}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a2ad30bcc69068fa7d191682159a6c30d}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMMaxAbsColSumNorm\_\-F@{RTMMaxAbsColSumNorm\_\-F}}
+\index{RTMMaxAbsColSumNorm\_\-F@{RTMMaxAbsColSumNorm\_\-F}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMMaxAbsColSumNorm\_\-F}]{\setlength{\rightskip}{0pt plus 5cm}float RTMMaxAbsColSumNorm\_\-F (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ float $>$ \&}]{A}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a2ad30bcc69068fa7d191682159a6c30d}
+parts of RTMatrix \hypertarget{RTMatrix_8h_ae39501c6390bc97b46f866f902880228}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMMaxAbsColSumNorm\_\-I@{RTMMaxAbsColSumNorm\_\-I}}
+\index{RTMMaxAbsColSumNorm\_\-I@{RTMMaxAbsColSumNorm\_\-I}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMMaxAbsColSumNorm\_\-I}]{\setlength{\rightskip}{0pt plus 5cm}int RTMMaxAbsColSumNorm\_\-I (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ int $>$ \&}]{A}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_ae39501c6390bc97b46f866f902880228}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a9ef06de8d8b54861beecee1dd514b1f9}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMMaxAbsRowSumNorm\_\-D@{RTMMaxAbsRowSumNorm\_\-D}}
+\index{RTMMaxAbsRowSumNorm\_\-D@{RTMMaxAbsRowSumNorm\_\-D}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMMaxAbsRowSumNorm\_\-D}]{\setlength{\rightskip}{0pt plus 5cm}double RTMMaxAbsRowSumNorm\_\-D (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ double $>$ \&}]{A}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a9ef06de8d8b54861beecee1dd514b1f9}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a8fb3d20ca7b42db6b6b80fe6a4bd783e}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMMaxAbsRowSumNorm\_\-F@{RTMMaxAbsRowSumNorm\_\-F}}
+\index{RTMMaxAbsRowSumNorm\_\-F@{RTMMaxAbsRowSumNorm\_\-F}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMMaxAbsRowSumNorm\_\-F}]{\setlength{\rightskip}{0pt plus 5cm}float RTMMaxAbsRowSumNorm\_\-F (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ float $>$ \&}]{A}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a8fb3d20ca7b42db6b6b80fe6a4bd783e}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a614ec767294f73591dbf0adfc3b641be}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMMaxAbsRowSumNorm\_\-I@{RTMMaxAbsRowSumNorm\_\-I}}
+\index{RTMMaxAbsRowSumNorm\_\-I@{RTMMaxAbsRowSumNorm\_\-I}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMMaxAbsRowSumNorm\_\-I}]{\setlength{\rightskip}{0pt plus 5cm}int RTMMaxAbsRowSumNorm\_\-I (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ int $>$ \&}]{A}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a614ec767294f73591dbf0adfc3b641be}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a549ac0002160ee98b713ab2a5b747f9c}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMMin\_\-D@{RTMMin\_\-D}}
+\index{RTMMin\_\-D@{RTMMin\_\-D}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMMin\_\-D}]{\setlength{\rightskip}{0pt plus 5cm}double RTMMin\_\-D (
+\begin{DoxyParamCaption}
+\item[{const {\bf RTMatrixT}$<$ double $>$ \&}]{ma}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a549ac0002160ee98b713ab2a5b747f9c}
+parts of RTMatrix \hypertarget{RTMatrix_8h_af20e1de07cf9ae7c06dbe17f22d1d85d}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMMin\_\-F@{RTMMin\_\-F}}
+\index{RTMMin\_\-F@{RTMMin\_\-F}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMMin\_\-F}]{\setlength{\rightskip}{0pt plus 5cm}float RTMMin\_\-F (
+\begin{DoxyParamCaption}
+\item[{const {\bf RTMatrixT}$<$ float $>$ \&}]{ma}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_af20e1de07cf9ae7c06dbe17f22d1d85d}
+parts of RTMatrix \hypertarget{RTMatrix_8h_af2efb1bcdd355095fd077632b29dfb99}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMMin\_\-I@{RTMMin\_\-I}}
+\index{RTMMin\_\-I@{RTMMin\_\-I}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMMin\_\-I}]{\setlength{\rightskip}{0pt plus 5cm}int RTMMin\_\-I (
+\begin{DoxyParamCaption}
+\item[{const {\bf RTMatrixT}$<$ int $>$ \&}]{ma}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_af2efb1bcdd355095fd077632b29dfb99}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a440a84a58eacd1051c3f26f794f874b4}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMOnefy\_\-D@{RTMOnefy\_\-D}}
+\index{RTMOnefy\_\-D@{RTMOnefy\_\-D}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMOnefy\_\-D}]{\setlength{\rightskip}{0pt plus 5cm}void RTMOnefy\_\-D (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ double $>$ \&}]{A}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a440a84a58eacd1051c3f26f794f874b4}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a804921e4d00d795c6d20d74649e8e8c6}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMOnefy\_\-F@{RTMOnefy\_\-F}}
+\index{RTMOnefy\_\-F@{RTMOnefy\_\-F}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMOnefy\_\-F}]{\setlength{\rightskip}{0pt plus 5cm}void RTMOnefy\_\-F (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ float $>$ \&}]{A}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a804921e4d00d795c6d20d74649e8e8c6}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a9ad26b512b778b31b1d0f1a82b7a8821}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMOnefy\_\-I@{RTMOnefy\_\-I}}
+\index{RTMOnefy\_\-I@{RTMOnefy\_\-I}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMOnefy\_\-I}]{\setlength{\rightskip}{0pt plus 5cm}void RTMOnefy\_\-I (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ int $>$ \&}]{A}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a9ad26b512b778b31b1d0f1a82b7a8821}
+parts of RTMatrix \hypertarget{RTMatrix_8h_ae60300c1f44fb1b6cd85f6c6151f3d03}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMPrint\_\-D@{RTMPrint\_\-D}}
+\index{RTMPrint\_\-D@{RTMPrint\_\-D}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMPrint\_\-D}]{\setlength{\rightskip}{0pt plus 5cm}void RTMPrint\_\-D (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ double $>$ \&}]{rtm, }
+\item[{StreamInterface \&}]{s, }
+\item[{int}]{maxrow}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_ae60300c1f44fb1b6cd85f6c6151f3d03}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a3a1ec09d4c3b43de616cb8c86062fc8b}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMPrint\_\-F@{RTMPrint\_\-F}}
+\index{RTMPrint\_\-F@{RTMPrint\_\-F}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMPrint\_\-F}]{\setlength{\rightskip}{0pt plus 5cm}void RTMPrint\_\-F (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ float $>$ \&}]{rtm, }
+\item[{StreamInterface \&}]{s, }
+\item[{int}]{maxrow}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a3a1ec09d4c3b43de616cb8c86062fc8b}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a509bb05c165d4e5b4cd14a19d4339b97}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMPrint\_\-I@{RTMPrint\_\-I}}
+\index{RTMPrint\_\-I@{RTMPrint\_\-I}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMPrint\_\-I}]{\setlength{\rightskip}{0pt plus 5cm}void RTMPrint\_\-I (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ int $>$ \&}]{rtm, }
+\item[{StreamInterface \&}]{s, }
+\item[{int}]{maxrow}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a509bb05c165d4e5b4cd14a19d4339b97}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a8372dad7d4ef4d965765e8ccff9aff0a}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMProduct\_\-UDDD@{RTMProduct\_\-UDDD}}
+\index{RTMProduct\_\-UDDD@{RTMProduct\_\-UDDD}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMProduct\_\-UDDD}]{\setlength{\rightskip}{0pt plus 5cm}void RTMProduct\_\-UDDD (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ double $>$ \&}]{rtm, }
+\item[{const {\bf RTMatrixT}$<$ double $>$ \&}]{A, }
+\item[{const {\bf RTMatrixT}$<$ double $>$ \&}]{B}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a8372dad7d4ef4d965765e8ccff9aff0a}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a919e90f4983d9e6c680fbcc2e28675d5}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMProduct\_\-UFFF@{RTMProduct\_\-UFFF}}
+\index{RTMProduct\_\-UFFF@{RTMProduct\_\-UFFF}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMProduct\_\-UFFF}]{\setlength{\rightskip}{0pt plus 5cm}void RTMProduct\_\-UFFF (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ float $>$ \&}]{rtm, }
+\item[{const {\bf RTMatrixT}$<$ float $>$ \&}]{A, }
+\item[{const {\bf RTMatrixT}$<$ float $>$ \&}]{B}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a919e90f4983d9e6c680fbcc2e28675d5}
+parts of RTMatrix \hypertarget{RTMatrix_8h_af85f91c53501d584c99d5ed4e0bcdd25}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMProduct\_\-UIII@{RTMProduct\_\-UIII}}
+\index{RTMProduct\_\-UIII@{RTMProduct\_\-UIII}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMProduct\_\-UIII}]{\setlength{\rightskip}{0pt plus 5cm}void RTMProduct\_\-UIII (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ int $>$ \&}]{rtm, }
+\item[{const {\bf RTMatrixT}$<$ int $>$ \&}]{A, }
+\item[{const {\bf RTMatrixT}$<$ int $>$ \&}]{B}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_af85f91c53501d584c99d5ed4e0bcdd25}
+parts of RTMatrix \hypertarget{RTMatrix_8h_ade8645881118ab2953d0ded3db5b098b}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMSave@{RTMSave}}
+\index{RTMSave@{RTMSave}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMSave}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T1 , class T2 $>$ bool RTMSave (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ T1 $>$ \&}]{src, }
+\item[{T2 $\ast$}]{dest, }
+\item[{const uint32}]{nRows, }
+\item[{const uint32}]{nColumns}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{RTMatrix_8h_ade8645881118ab2953d0ded3db5b098b}
+saves the matrix into a packed array of data \hypertarget{RTMatrix_8h_a22019f86ebd3c17d9e46088aa1b3d4fb}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMScale\_\-DD@{RTMScale\_\-DD}}
+\index{RTMScale\_\-DD@{RTMScale\_\-DD}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMScale\_\-DD}]{\setlength{\rightskip}{0pt plus 5cm}void RTMScale\_\-DD (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ double $>$ \&}]{A, }
+\item[{const double}]{factor}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a22019f86ebd3c17d9e46088aa1b3d4fb}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a02e969762649fb710c7a307e1b63c9e4}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMScale\_\-FF@{RTMScale\_\-FF}}
+\index{RTMScale\_\-FF@{RTMScale\_\-FF}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMScale\_\-FF}]{\setlength{\rightskip}{0pt plus 5cm}void RTMScale\_\-FF (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ float $>$ \&}]{A, }
+\item[{const float}]{factor}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a02e969762649fb710c7a307e1b63c9e4}
+parts of RTMatrix \hypertarget{RTMatrix_8h_ae6527320b663c60a20f9bf9c27786556}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMScale\_\-II@{RTMScale\_\-II}}
+\index{RTMScale\_\-II@{RTMScale\_\-II}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMScale\_\-II}]{\setlength{\rightskip}{0pt plus 5cm}void RTMScale\_\-II (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ int $>$ \&}]{A, }
+\item[{const int}]{factor}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_ae6527320b663c60a20f9bf9c27786556}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a03e8a55e695bfcd9fcc5e35c49ee78eb}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMSVD\_\-DDDD@{RTMSVD\_\-DDDD}}
+\index{RTMSVD\_\-DDDD@{RTMSVD\_\-DDDD}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMSVD\_\-DDDD}]{\setlength{\rightskip}{0pt plus 5cm}bool RTMSVD\_\-DDDD (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ double $>$ \&}]{rtm, }
+\item[{{\bf RTMatrixT}$<$ double $>$ \&}]{U, }
+\item[{{\bf RTMatrixT}$<$ double $>$ \&}]{W, }
+\item[{{\bf RTMatrixT}$<$ double $>$ \&}]{V}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a03e8a55e695bfcd9fcc5e35c49ee78eb}
+parts of RTMatrix \hypertarget{RTMatrix_8h_af8d97342e6f1efd0dc5bd1471c059f9f}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMSVD\_\-FFFF@{RTMSVD\_\-FFFF}}
+\index{RTMSVD\_\-FFFF@{RTMSVD\_\-FFFF}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMSVD\_\-FFFF}]{\setlength{\rightskip}{0pt plus 5cm}bool RTMSVD\_\-FFFF (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ float $>$ \&}]{rtm, }
+\item[{{\bf RTMatrixT}$<$ float $>$ \&}]{U, }
+\item[{{\bf RTMatrixT}$<$ float $>$ \&}]{W, }
+\item[{{\bf RTMatrixT}$<$ float $>$ \&}]{V}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_af8d97342e6f1efd0dc5bd1471c059f9f}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a908fe2cf4195b33e5fb40b13c82858bc}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMTranspose\_\-UDD@{RTMTranspose\_\-UDD}}
+\index{RTMTranspose\_\-UDD@{RTMTranspose\_\-UDD}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMTranspose\_\-UDD}]{\setlength{\rightskip}{0pt plus 5cm}void RTMTranspose\_\-UDD (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ double $>$ \&}]{rtm, }
+\item[{const {\bf RTMatrixT}$<$ double $>$ \&}]{A}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a908fe2cf4195b33e5fb40b13c82858bc}
+parts of RTMatrix \hypertarget{RTMatrix_8h_ae7143ac65aa272673885fbf8f7abff73}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMTranspose\_\-UFF@{RTMTranspose\_\-UFF}}
+\index{RTMTranspose\_\-UFF@{RTMTranspose\_\-UFF}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMTranspose\_\-UFF}]{\setlength{\rightskip}{0pt plus 5cm}void RTMTranspose\_\-UFF (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ float $>$ \&}]{rtm, }
+\item[{const {\bf RTMatrixT}$<$ float $>$ \&}]{A}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_ae7143ac65aa272673885fbf8f7abff73}
+parts of RTMatrix \hypertarget{RTMatrix_8h_ad61457d881b6c795555b48195350e8ee}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMTranspose\_\-UII@{RTMTranspose\_\-UII}}
+\index{RTMTranspose\_\-UII@{RTMTranspose\_\-UII}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMTranspose\_\-UII}]{\setlength{\rightskip}{0pt plus 5cm}void RTMTranspose\_\-UII (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ int $>$ \&}]{rtm, }
+\item[{const {\bf RTMatrixT}$<$ int $>$ \&}]{A}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_ad61457d881b6c795555b48195350e8ee}
+parts of RTMatrix \hypertarget{RTMatrix_8h_ad9f938074825d8fc745ba96b34c78088}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMVProduct\_\-UDDD@{RTMVProduct\_\-UDDD}}
+\index{RTMVProduct\_\-UDDD@{RTMVProduct\_\-UDDD}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMVProduct\_\-UDDD}]{\setlength{\rightskip}{0pt plus 5cm}void RTMVProduct\_\-UDDD (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ double $>$ \&}]{rtm, }
+\item[{double $\ast$}]{input, }
+\item[{double $\ast$}]{output}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_ad9f938074825d8fc745ba96b34c78088}
+parts of RTMatrix \hypertarget{RTMatrix_8h_aa076e9e19ef872b9121feca22ae31d50}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMVProduct\_\-UFFF@{RTMVProduct\_\-UFFF}}
+\index{RTMVProduct\_\-UFFF@{RTMVProduct\_\-UFFF}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMVProduct\_\-UFFF}]{\setlength{\rightskip}{0pt plus 5cm}void RTMVProduct\_\-UFFF (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ float $>$ \&}]{rtm, }
+\item[{float $\ast$}]{input, }
+\item[{float $\ast$}]{output}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_aa076e9e19ef872b9121feca22ae31d50}
+parts of RTMatrix \hypertarget{RTMatrix_8h_ac29cf2dbf1a34c5dee187c6f84d70023}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMVProduct\_\-UIII@{RTMVProduct\_\-UIII}}
+\index{RTMVProduct\_\-UIII@{RTMVProduct\_\-UIII}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMVProduct\_\-UIII}]{\setlength{\rightskip}{0pt plus 5cm}void RTMVProduct\_\-UIII (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ int $>$ \&}]{rtm, }
+\item[{int $\ast$}]{input, }
+\item[{int $\ast$}]{output}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_ac29cf2dbf1a34c5dee187c6f84d70023}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a6de73e08c886ca2b4779995a0cc7952b}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMVProductAcc\_\-UDDD@{RTMVProductAcc\_\-UDDD}}
+\index{RTMVProductAcc\_\-UDDD@{RTMVProductAcc\_\-UDDD}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMVProductAcc\_\-UDDD}]{\setlength{\rightskip}{0pt plus 5cm}void RTMVProductAcc\_\-UDDD (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ double $>$ \&}]{rtm, }
+\item[{double $\ast$}]{input, }
+\item[{double $\ast$}]{output}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a6de73e08c886ca2b4779995a0cc7952b}
+parts of RTMatrix \hypertarget{RTMatrix_8h_ac5a17fef956a5d719a553bbe09cec38b}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMVProductAcc\_\-UFFF@{RTMVProductAcc\_\-UFFF}}
+\index{RTMVProductAcc\_\-UFFF@{RTMVProductAcc\_\-UFFF}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMVProductAcc\_\-UFFF}]{\setlength{\rightskip}{0pt plus 5cm}void RTMVProductAcc\_\-UFFF (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ float $>$ \&}]{rtm, }
+\item[{float $\ast$}]{input, }
+\item[{float $\ast$}]{output}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_ac5a17fef956a5d719a553bbe09cec38b}
+parts of RTMatrix \hypertarget{RTMatrix_8h_af846bd0aa876a18c4a01f790e1602b56}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMVProductAcc\_\-UIII@{RTMVProductAcc\_\-UIII}}
+\index{RTMVProductAcc\_\-UIII@{RTMVProductAcc\_\-UIII}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMVProductAcc\_\-UIII}]{\setlength{\rightskip}{0pt plus 5cm}void RTMVProductAcc\_\-UIII (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ int $>$ \&}]{rtm, }
+\item[{int $\ast$}]{input, }
+\item[{int $\ast$}]{output}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_af846bd0aa876a18c4a01f790e1602b56}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a50236f2104102200e7f611ca2c734f48}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMZerofy\_\-D@{RTMZerofy\_\-D}}
+\index{RTMZerofy\_\-D@{RTMZerofy\_\-D}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMZerofy\_\-D}]{\setlength{\rightskip}{0pt plus 5cm}void RTMZerofy\_\-D (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ double $>$ \&}]{A}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a50236f2104102200e7f611ca2c734f48}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a6df7dff12f16685aad1059159c490e45}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMZerofy\_\-F@{RTMZerofy\_\-F}}
+\index{RTMZerofy\_\-F@{RTMZerofy\_\-F}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMZerofy\_\-F}]{\setlength{\rightskip}{0pt plus 5cm}void RTMZerofy\_\-F (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ float $>$ \&}]{A}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a6df7dff12f16685aad1059159c490e45}
+parts of RTMatrix \hypertarget{RTMatrix_8h_a68d8f255596da3ff24c3f2ec527c8b3d}{
+\index{RTMatrix.h@{RTMatrix.h}!RTMZerofy\_\-I@{RTMZerofy\_\-I}}
+\index{RTMZerofy\_\-I@{RTMZerofy\_\-I}!RTMatrix.h@{RTMatrix.h}}
+\subsubsection[{RTMZerofy\_\-I}]{\setlength{\rightskip}{0pt plus 5cm}void RTMZerofy\_\-I (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ int $>$ \&}]{A}
+\end{DoxyParamCaption}
+)}}
+\label{RTMatrix_8h_a68d8f255596da3ff24c3f2ec527c8b3d}
+parts of RTMatrix 

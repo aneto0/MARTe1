@@ -1,0 +1,101 @@
+##############################################################
+#
+# Copyright 2011 EFDA | European Fusion Development Agreement
+#
+# Licensed under the EUPL, Version 1.1 or - as soon they 
+# will be approved by the European Commission - subsequent  
+# versions of the EUPL (the "Licence"); 
+# You may not use this work except in compliance with the 
+# Licence. 
+# You may obtain a copy of the Licence at: 
+#  
+# http://ec.europa.eu/idabc/eupl
+#
+# Unless required by applicable law or agreed to in 
+# writing, software distributed under the Licence is 
+# distributed on an "AS IS" basis, 
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
+# express or implied. 
+# See the Licence for the specific language governing 
+# permissions and limitations under the Licence. 
+#
+# $Id$
+#
+#############################################################
+
+# -no-vxw-linkscript is required to avoid generation of incompatible symbols at intermediate stages.
+V6X5100_LDPPC=jldppc6 -no-vxw-linkscript
+V6X5100_NMPPC=nmppc
+V6X5100_MUNCH=jmunch6
+CTOR_COMPILER=/jet/share/bin/jccppc6
+
+v6x5100/%.o : %.cpp
+	$(COMPILER) -c $(CFLAGS) $(DEBUG) $(OPTIM)  $*.cpp -o v6x5100/$*.o
+#	$(COMPILER) -S $(CFLAGS) $(DEBUG) $(OPTIM)  $*.cpp -o v6x5100/$*.s
+
+v6x5100/%.o : %.c
+	$(COMPILER) -c $(CFLAGS) $(DEBUG) $(OPTIM)  $*.c -o v6x5100/$*.o
+#	$(COMPILER) -S $(CFLAGS) $(DEBUG) $(OPTIM)  $*.c -o v6x5100/$*.s
+
+v6x5100/%.a : $(OBJS)
+	touch $@
+	rm v6x5100/$*.a
+	$(V6X5100_LDPPC) -r -nostdlib $(OBJS) -o $@
+
+v6x5100/%.exe : v6x5100/%.o 
+	touch v6x5100/$*.exe
+	echo cannot build executable v6x5100/$*.exe use v6x5100/$*.ex
+
+v6x5100/%.dl : v6x5100/%.ex_
+#	$(V6X5100_NMPPC) v6x5100/$*.ex_ | wtxtcl ${WIND_BASE}/ppc/host/src/hutils/munch.tcl -asm ppc > v6x5100/$*.ctdt.c
+	$(V6X5100_MUNCH) v6x5100/$*.ex_ v6x5100/$*.ctdt.c
+	$(CTOR_COMPILER) -c $(CFLAGS) -mstrict-align -fdollars-in-identifiers -fno-builtin v6x5100/$*.ctdt.c -o v6x5100/$*.ctdt.o
+	$(V6X5100_LDPPC) -r -nostdlib v6x5100/$*.ctdt.o  v6x5100/$*.ex_ -o v6x5100/$*.dl
+
+v6x5100/%.gam : v6x5100/%.ex_
+#	$(V6X5100_NMPPC) v6x5100/$*.ex_ | wtxtcl ${WIND_BASE}/ppc/host/src/hutils/munch.tcl -asm ppc > v6x5100/$*.ctdt.c
+	$(V6X5100_MUNCH) v6x5100/$*.ex_ v6x5100/$*.ctdt.c
+	$(CTOR_COMPILER) -c $(CFLAGS) -mstrict-align -fdollars-in-identifiers -fno-builtin v6x5100/$*.ctdt.c -o v6x5100/$*.ctdt.o
+	$(V6X5100_LDPPC) -r -nostdlib v6x5100/$*.ctdt.o  v6x5100/$*.ex_ -o v6x5100/$*.gam
+
+v6x5100/%.ex : v6x5100/%.ex_
+#	$(V6X5100_NMPPC) v6x5100/$*.ex_ | wtxtcl ${WIND_BASE}/ppc/host/src/hutils/munch.tcl -asm ppc > v6x5100/$*.ctdt.c
+	$(V6X5100_MUNCH) v6x5100/$*.ex_ v6x5100/$*.ctdt.c
+	$(CTOR_COMPILER) -c $(CFLAGS) -mstrict-align -fdollars-in-identifiers -fno-builtin v6x5100/$*.ctdt.c -o v6x5100/$*.ctdt.o
+	$(V6X5100_LDPPC) -r -nostdlib v6x5100/$*.ctdt.o  v6x5100/$*.ex_ -o v6x5100/$*.ex
+
+v6x5100/%.drv : v6x5100/%.ex_
+#	$(V6X5100_NMPPC) v6x5100/$*.ex_ | wtxtcl ${WIND_BASE}/ppc/host/src/hutils/munch.tcl -asm ppc > v6x5100/$*.ctdt.c
+	$(V6X5100_MUNCH) v6x5100/$*.ex_ v6x5100/$*.ctdt.c
+	$(CTOR_COMPILER) -c $(CFLAGS) -mstrict-align -fdollars-in-identifiers -fno-builtin v6x5100/$*.ctdt.c -o v6x5100/$*.ctdt.o
+	$(V6X5100_LDPPC) -r -nostdlib v6x5100/$*.ctdt.o  v6x5100/$*.ex_ -o v6x5100/$*.drv
+
+v6x5100/%.ex_ : v6x5100/%.o $(OBJS)
+	$(V6X5100_LDPPC) -r -nostdlib v6x5100/$*.o $(OBJS) $(LIBRARIES)  -o v6x5100/$*.ex_
+
+depends.v6x5100: dependsRaw.v6x5100 
+	sed -f $(MAKEDEFAULTDIR)/CreateV6X5100Depends.sed dependsRaw.v6x5100 >depends.v6x5100
+
+dependsRaw.v6x5100: 
+	$(COMPILER) $(CFLAGS) $(DEBUG) $(OPTIM) -MM -I. *.c* > dependsRaw.v6x5100
+	@mkdir -p temp
+	@mkdir -p v6x5100
+
+
+%.spb : 
+	$(MAKE) -C $* -f Makefile.$(TARGET)
+
+
+%.spc : 
+	$(MAKE) -C $* -f Makefile.$(TARGET) clean
+
+
+clean:  $(SUBPROJC)
+	rm -f depends*
+	rm -f $(TARGET)/*$(OBJEXT)
+	rm -f $(TARGET)/*$(DLLEXT)
+	rm -f $(TARGET)/*$(EXEEXT)
+	rm -f $(TARGET)/*$(LIBEXT)
+	rm -f $(TARGET)/*$(GAMEXT)
+	rm -f $(TARGET)/*$(DRVEXT)
+

@@ -1,0 +1,81 @@
+##############################################################
+#
+# Copyright 2011 EFDA | European Fusion Development Agreement
+#
+# Licensed under the EUPL, Version 1.1 or - as soon they 
+# will be approved by the European Commission - subsequent  
+# versions of the EUPL (the "Licence"); 
+# You may not use this work except in compliance with the 
+# Licence. 
+# You may obtain a copy of the Licence at: 
+#  
+# http://ec.europa.eu/idabc/eupl
+#
+# Unless required by applicable law or agreed to in 
+# writing, software distributed under the Licence is 
+# distributed on an "AS IS" basis, 
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
+# express or implied. 
+# See the Licence for the specific language governing 
+# permissions and limitations under the Licence. 
+#
+# $Id$
+#
+#############################################################
+
+vx68k/%.o : %.cpp
+	$(COMPILER) -c $(CFLAGS) $(DEBUG) $(OPTIM)  $*.cpp -o vx68k/$*.o
+	$(COMPILER) -S $(CFLAGS) $*.cpp -o vx68k/$*.s
+
+vx68k/%.o : %.c
+	$(COMPILER) -c $(CFLAGS) $(DEBUG) $(OPTIM)  $*.c -o vx68k/$*.o
+	$(COMPILER) -S $(CFLAGS) $*.c -o vx68k/$*.s
+
+vx68k/%.a : $(OBJS)
+	touch $@
+	rm vx68k/$*.a
+	jld68k -r $(OBJS) -o $@
+
+vx68k/%.exe : vx68k/%.o 
+	touch vx68k/$*.exe
+	echo cannot build executable vx68k/$*.exe use vx68k/$*.ex
+
+vx68k/%.ex : vx68k/%.ex_
+	nm68k vx68k/$*.ex_ | wtxtcl $$WIND_BASE/host/src/hutils/munch.tcl -asm 68k > vx68k/$*.ctdt.c
+#	nm68k vx68k/$*.ex_ | wtxtcl /common/tornado-2.0/host/src/hutils/munch.tcl -asm 68k > vx68k/$*.ctdt.c
+	$(COMPILER) -c $(CFLAGS) vx68k/$*.ctdt.c -o vx68k/$*.ctdt.o
+	jld68k -r  vx68k/$*.ctdt.o  vx68k/$*.ex_ -o vx68k/$*.ex
+
+vx68k/%.dl : vx68k/%.ex_
+	nm68k vx68k/$*.ex_ | wtxtcl $$WIND_BASE/host/src/hutils/munch.tcl -asm 68k > vx68k/$*.ctdt.c
+#	nm68k vx68k/$*.ex_ | wtxtcl /common/tornado-2.0/host/src/hutils/munch.tcl -asm 68k > vx68k/$*.ctdt.c
+	$(COMPILER) -c $(CFLAGS) vx68k/$*.ctdt.c -o vx68k/$*.ctdt.o
+	jld68k -r  vx68k/$*.ctdt.o  vx68k/$*.ex_ -o vx68k/$*.dl
+
+vx68k/%.gam : vx68k/%.ex_
+	nm68k vx68k/$*.ex_ | wtxtcl ${WIND_BASE}/host/src/hutils/munch.tcl -asm 68k > vx68k/$*.ctdt.c
+#	nm68k vx68k/$*.ex_ | wtxtcl /common/tornado-2.0/host/src/hutils/munch.tcl -asm 68k > vx68k/$*.ctdt.c
+	$(COMPILER) -c $(CFLAGS) vx68k/$*.ctdt.c -o vx68k/$*.ctdt.o
+	jld68k -r  vx68k/$*.ctdt.o  vx68k/$*.ex_ -o vx68k/$*.gam
+
+vx68k/%.drv : vx68k/%.ex_
+	nm68k vx68k/$*.ex_ | wtxtcl $$WIND_BASE/host/src/hutils/munch.tcl -asm 68k > vx68k/$*.ctdt.c
+#	nm68k vx68k/$*.ex_ | wtxtcl /common/tornado-2.0/host/src/hutils/munch.tcl -asm 68k > vx68k/$*.ctdt.c
+	$(COMPILER) -c $(CFLAGS) vx68k/$*.ctdt.c -o vx68k/$*.ctdt.o
+	jld68k -r  vx68k/$*.ctdt.o  vx68k/$*.ex_ -o vx68k/$*.drv
+
+vx68k/%.ex_ : vx68k/%.o $(OBJS)
+	jld68k -r  vx68k/$*.o $(OBJS) $(LIBRARIES)  -o vx68k/$*.ex_
+        
+
+
+depends.vx68k: dependsRaw.vx68k 
+	sed -f $(MAKEDEFAULTDIR)/CreateVX68kDepends.sed dependsRaw.vx68k >depends.vx68k
+
+dependsRaw.vx68k: 
+	$(COMPILER) $(CFLAGS) $(DEBUG) $(OPTIM) -MM -I. *.c* > dependsRaw.vx68k
+	@mkdir -p temp
+	@mkdir -p vx68k
+
+
+

@@ -1,0 +1,2 @@
+If you want to use this lib outside baselib, or better, without C++, then you have to set the __STANDALONE__ compilation flag.
+This will unset all the asmlinkage stuff

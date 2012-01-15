@@ -1,0 +1,487 @@
+\hypertarget{classMMCDB}{
+\section{MMCDB Class Reference}
+\label{classMMCDB}\index{MMCDB@{MMCDB}}
+}
+
+
+{\ttfamily \#include $<$MMCDB.h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classMMCDB_a4caf0b624505f7cf5eec2561e2324db2}{MMCDB} (\hyperlink{classMMCDB}{MMCDB} \&mmcdb)
+\item 
+\hyperlink{classMMCDB_a608fe503c83751b00f7c573da157604c}{MMCDB} ()
+\item 
+virtual bool \hyperlink{classMMCDB_a40cf641c31363f0df35989871d3d429c}{WriteStructure} (const char $\ast$className, char $\ast$address, const char $\ast$variableName, Streamable $\ast$err=NULL)
+\item 
+CDBVirtual $\ast$ \hyperlink{classMMCDB_a8e11b4ddcaab0c59e2b537bb869e8140}{Clone} (CDBCreationMode cdbcm)
+\item 
+virtual \hyperlink{classMMCDB_a80cec4032acc6bab40c397db7038cf0a}{$\sim$MMCDB} ()
+\item 
+virtual void \hyperlink{classMMCDB_ad46241e2be49936df5545075e8565085}{CleanUp} (CDBAddressMode cdbam=CDBAM\_\-FromRoot)
+\item 
+virtual bool \hyperlink{classMMCDB_a62105e3dd7022061528e9ea8232e73ef}{Lock} ()
+\item 
+virtual void \hyperlink{classMMCDB_aafba1fc4a03fc4d72807c3380c1f290e}{UnLock} ()
+\item 
+virtual bool \hyperlink{classMMCDB_a8b6979852399e578a24ce8db9d4ebf8c}{SubTreeName} (Streamable \&name, const char $\ast$sep=\char`\"{}.\char`\"{})
+\item 
+virtual bool \hyperlink{classMMCDB_a0780c41ba28c837b62693cc7237ccc5d}{NodeName} (BString \&name)
+\item 
+virtual bool \hyperlink{classMMCDB_a62a646711f64155b34c17cd42446432e}{NodeType} (BString \&name)
+\item 
+virtual bool \hyperlink{classMMCDB_a3014aa6014c46becbfa20b1f66171814}{AddChildAndMove} (const char $\ast$subTreeName, SortFilterFn $\ast$sorter=NULL)
+\item 
+virtual int \hyperlink{classMMCDB_adfa8bed6995045f16e15c4c0b97daa19}{NumberOfChildren} ()
+\item 
+virtual bool \hyperlink{classMMCDB_a1bd932558a26deb53f02825487157be5}{Move} (const char $\ast$subTreeName)
+\item 
+virtual bool \hyperlink{classMMCDB_a60779a37f5d8a558ec99990412b61d4c}{MoveToChildren} (int childNumber=0)
+\item 
+virtual bool \hyperlink{classMMCDB_aaf622ac3d828e1be4aed9353738f91aa}{MoveToBrother} (int steps=1)
+\item 
+virtual bool \hyperlink{classMMCDB_af80eb1914be00a4b81efeaa9b6ed883c}{MoveToFather} (int steps=1)
+\item 
+virtual bool \hyperlink{classMMCDB_a0ce70d1bfd4e8c2f7d577a78a6781c46}{CopyFrom} (CDBVirtual $\ast$cdbv)
+\item 
+bool \hyperlink{classMMCDB_a900ea4f1155eae9f815744877e0d7610}{CopyTo} (CDBVirtual $\ast$cdbv)
+\item 
+bool \hyperlink{classMMCDB_a6c562dc147062c4aa8410498ac83387b}{MoveToRoot} ()
+\item 
+virtual bool \hyperlink{classMMCDB_a27b70d1812a9443d91927c0aeb285d0b}{FindSubTree} (const char $\ast$configName, CDBAddressMode cdbam=CDBAM\_\-None)
+\item 
+virtual int \hyperlink{classMMCDB_a496aabebd44074232f0e60b134acc173}{Size} (CDBAddressMode cdbam)
+\item 
+virtual int \hyperlink{classMMCDB_ad09c66c9e5185a7a7308a704fde49c6e}{TreePosition} (CDBAddressMode cdbam=CDBAM\_\-LeafsOnly)
+\item 
+virtual bool \hyperlink{classMMCDB_a6b4658bebd1204230e2847f59dfcff86}{TreeMove} (int index, CDBAddressMode cdbam=CDBAM\_\-LeafsOnly)
+\item 
+virtual bool \hyperlink{classMMCDB_aff4a1b4ef7b7a0d52cc14003ca63d7b8}{GetArrayDims} (int $\ast$size, int \&maxDim, const char $\ast$configName, CDBArrayIndexingMode cdbaim=CDBAIM\_\-Flexible, bool caseSensitive=True)
+\item 
+virtual bool \hyperlink{classMMCDB_a9133b3217d6ed545915c95054ad320f6}{ReadArray} (void $\ast$array, const CDBTYPE \&valueType, const int $\ast$size, int nDim, const char $\ast$configName, bool caseSensitive=True)
+\item 
+virtual bool \hyperlink{classMMCDB_aecb7ea576d693233ed0d3f9decfc3fd8}{WriteArray} (const void $\ast$array, const CDBTYPE \&valueType, const int $\ast$size, int nDim, const char $\ast$configName, SortFilterFn $\ast$sorter=NULL)
+\item 
+virtual bool \hyperlink{classMMCDB_ad30f17ceca21b71704beab51d9c65d97}{Delete} (const char $\ast$configName)
+\item 
+virtual bool \hyperlink{classMMCDB_a205dc3d52790ccfb1b16d0ba673a0b3d}{Exists} (const char $\ast$configName)
+\item 
+virtual bool \hyperlink{classMMCDB_ab7e356a3c7aae42604aafc9af5a3a768}{Link} (const char $\ast$linkFrom, const char $\ast$linkTo, SortFilterFn $\ast$sorter=NULL)
+\item 
+virtual bool \hyperlink{classMMCDB_a8aa9bcc81864cc469b5afb9c36900b65}{ReadFromStream} (StreamInterface \&stream, StreamInterface $\ast$err=NULL, SortFilterFn $\ast$sorter=NULL)
+\item 
+virtual void \hyperlink{classMMCDB_a50be40a7843f2f37c8557b0b7d76ec63}{EnableParserReports} (bool flag)
+\item 
+virtual bool \hyperlink{classMMCDB_a99ba37f9be65826f933b69f2d88f5666}{WriteToStream} (StreamInterface \&stream, StreamInterface $\ast$err=NULL, CDBWriteMode mode=CDBWM\_\-Tree)
+\item 
+virtual bool \hyperlink{classMMCDB_afb71b98da114ae85f4801ebc2c0342cc}{LoadFromEnvironment} (char $\ast$$\ast$env)
+\item 
+virtual bool \hyperlink{classMMCDB_ab24a4a208545fed2091bb4d366d865f9}{ReadStructure} (const char $\ast$className, char $\ast$address, Streamable $\ast$err=NULL)
+\item 
+virtual bool \hyperlink{classMMCDB_a0ad3622e884d11d5a672c6b91ef6538c}{WriteStructure} (const char $\ast$className, char $\ast$address, Streamable $\ast$err=NULL)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+a tool to access a block of memory as if it was a CDB the block of memory is described by a class or structure name the name must be registered using sinfo 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classMMCDB_a4caf0b624505f7cf5eec2561e2324db2}{
+\index{MMCDB@{MMCDB}!MMCDB@{MMCDB}}
+\index{MMCDB@{MMCDB}!MMCDB@{MMCDB}}
+\subsubsection[{MMCDB}]{\setlength{\rightskip}{0pt plus 5cm}MMCDB::MMCDB (
+\begin{DoxyParamCaption}
+\item[{{\bf MMCDB} \&}]{mmcdb}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classMMCDB_a4caf0b624505f7cf5eec2561e2324db2}
+does not work as copy constructor ! \hypertarget{classMMCDB_a608fe503c83751b00f7c573da157604c}{
+\index{MMCDB@{MMCDB}!MMCDB@{MMCDB}}
+\index{MMCDB@{MMCDB}!MMCDB@{MMCDB}}
+\subsubsection[{MMCDB}]{\setlength{\rightskip}{0pt plus 5cm}MMCDB::MMCDB (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classMMCDB_a608fe503c83751b00f7c573da157604c}
+\hypertarget{classMMCDB_a80cec4032acc6bab40c397db7038cf0a}{
+\index{MMCDB@{MMCDB}!$\sim$MMCDB@{$\sim$MMCDB}}
+\index{$\sim$MMCDB@{$\sim$MMCDB}!MMCDB@{MMCDB}}
+\subsubsection[{$\sim$MMCDB}]{\setlength{\rightskip}{0pt plus 5cm}virtual MMCDB::$\sim$MMCDB (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline, virtual\mbox{]}}}}
+\label{classMMCDB_a80cec4032acc6bab40c397db7038cf0a}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classMMCDB_a3014aa6014c46becbfa20b1f66171814}{
+\index{MMCDB@{MMCDB}!AddChildAndMove@{AddChildAndMove}}
+\index{AddChildAndMove@{AddChildAndMove}!MMCDB@{MMCDB}}
+\subsubsection[{AddChildAndMove}]{\setlength{\rightskip}{0pt plus 5cm}virtual bool MMCDB::AddChildAndMove (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{subTreeName, }
+\item[{SortFilterFn $\ast$}]{sorter = {\ttfamily NULL}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline, virtual\mbox{]}}}}
+\label{classMMCDB_a3014aa6014c46becbfa20b1f66171814}
+the structure cannot be modified so it will work as a Move \hypertarget{classMMCDB_ad46241e2be49936df5545075e8565085}{
+\index{MMCDB@{MMCDB}!CleanUp@{CleanUp}}
+\index{CleanUp@{CleanUp}!MMCDB@{MMCDB}}
+\subsubsection[{CleanUp}]{\setlength{\rightskip}{0pt plus 5cm}virtual void MMCDB::CleanUp (
+\begin{DoxyParamCaption}
+\item[{CDBAddressMode}]{cdbam = {\ttfamily CDBAM\_\-FromRoot}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline, virtual\mbox{]}}}}
+\label{classMMCDB_ad46241e2be49936df5545075e8565085}
+Cannot remove anything!! \hypertarget{classMMCDB_a8e11b4ddcaab0c59e2b537bb869e8140}{
+\index{MMCDB@{MMCDB}!Clone@{Clone}}
+\index{Clone@{Clone}!MMCDB@{MMCDB}}
+\subsubsection[{Clone}]{\setlength{\rightskip}{0pt plus 5cm}CDBVirtual $\ast$ MMCDB::Clone (
+\begin{DoxyParamCaption}
+\item[{CDBCreationMode}]{cdbcm}
+\end{DoxyParamCaption}
+)}}
+\label{classMMCDB_a8e11b4ddcaab0c59e2b537bb869e8140}
+creates a new reference to a database, or if that is not possible it creates a copy 
+\begin{DoxyParams}{Parameters}
+{\em cdbcm} & = CDBCM\_\-CopyAddress ensures that the new object points at the same location \\
+\hline
+\end{DoxyParams}
+\hypertarget{classMMCDB_a0ce70d1bfd4e8c2f7d577a78a6781c46}{
+\index{MMCDB@{MMCDB}!CopyFrom@{CopyFrom}}
+\index{CopyFrom@{CopyFrom}!MMCDB@{MMCDB}}
+\subsubsection[{CopyFrom}]{\setlength{\rightskip}{0pt plus 5cm}virtual bool MMCDB::CopyFrom (
+\begin{DoxyParamCaption}
+\item[{CDBVirtual $\ast$}]{cdbv}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline, virtual\mbox{]}}}}
+\label{classMMCDB_a0ce70d1bfd4e8c2f7d577a78a6781c46}
+Copy the pointed subtree in cdbv into the current subtree \hypertarget{classMMCDB_a900ea4f1155eae9f815744877e0d7610}{
+\index{MMCDB@{MMCDB}!CopyTo@{CopyTo}}
+\index{CopyTo@{CopyTo}!MMCDB@{MMCDB}}
+\subsubsection[{CopyTo}]{\setlength{\rightskip}{0pt plus 5cm}bool MMCDB::CopyTo (
+\begin{DoxyParamCaption}
+\item[{CDBVirtual $\ast$}]{cdbv}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classMMCDB_a900ea4f1155eae9f815744877e0d7610}
+Copy the pointed subtree in cdbv into the current subtree \hypertarget{classMMCDB_ad30f17ceca21b71704beab51d9c65d97}{
+\index{MMCDB@{MMCDB}!Delete@{Delete}}
+\index{Delete@{Delete}!MMCDB@{MMCDB}}
+\subsubsection[{Delete}]{\setlength{\rightskip}{0pt plus 5cm}virtual bool MMCDB::Delete (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{configName}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline, virtual\mbox{]}}}}
+\label{classMMCDB_ad30f17ceca21b71704beab51d9c65d97}
+remove an entry or subtree (position is relative!) to delete a link use the linkTo as the leaf name to delete a subtree simply specify the group node \hypertarget{classMMCDB_a50be40a7843f2f37c8557b0b7d76ec63}{
+\index{MMCDB@{MMCDB}!EnableParserReports@{EnableParserReports}}
+\index{EnableParserReports@{EnableParserReports}!MMCDB@{MMCDB}}
+\subsubsection[{EnableParserReports}]{\setlength{\rightskip}{0pt plus 5cm}virtual void MMCDB::EnableParserReports (
+\begin{DoxyParamCaption}
+\item[{bool}]{flag}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline, virtual\mbox{]}}}}
+\label{classMMCDB_a50be40a7843f2f37c8557b0b7d76ec63}
+enable reports of parser during ReadFromStream into err \hypertarget{classMMCDB_a205dc3d52790ccfb1b16d0ba673a0b3d}{
+\index{MMCDB@{MMCDB}!Exists@{Exists}}
+\index{Exists@{Exists}!MMCDB@{MMCDB}}
+\subsubsection[{Exists}]{\setlength{\rightskip}{0pt plus 5cm}bool MMCDB::Exists (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{configName}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}
+\label{classMMCDB_a205dc3d52790ccfb1b16d0ba673a0b3d}
+whether a certain entry exists \hypertarget{classMMCDB_a27b70d1812a9443d91927c0aeb285d0b}{
+\index{MMCDB@{MMCDB}!FindSubTree@{FindSubTree}}
+\index{FindSubTree@{FindSubTree}!MMCDB@{MMCDB}}
+\subsubsection[{FindSubTree}]{\setlength{\rightskip}{0pt plus 5cm}virtual bool MMCDB::FindSubTree (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{configName, }
+\item[{CDBAddressMode}]{cdbam = {\ttfamily CDBAM\_\-None}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline, virtual\mbox{]}}}}
+\label{classMMCDB_a27b70d1812a9443d91927c0aeb285d0b}
+from node search on the right of the tree for the subtree identified by the string name. On success nodes points to the node containing the subtree or leaf Will not follow links. 
+\begin{DoxyParams}{Parameters}
+{\em cdbam} & = CDBAM\_\-SkipCurrent search in the current subtree excluding current node any other flag are NOT SUPPORTED \\
+\hline
+\end{DoxyParams}
+\hypertarget{classMMCDB_aff4a1b4ef7b7a0d52cc14003ca63d7b8}{
+\index{MMCDB@{MMCDB}!GetArrayDims@{GetArrayDims}}
+\index{GetArrayDims@{GetArrayDims}!MMCDB@{MMCDB}}
+\subsubsection[{GetArrayDims}]{\setlength{\rightskip}{0pt plus 5cm}bool MMCDB::GetArrayDims (
+\begin{DoxyParamCaption}
+\item[{int $\ast$}]{size, }
+\item[{int \&}]{maxDim, }
+\item[{const char $\ast$}]{configName, }
+\item[{CDBArrayIndexingMode}]{cdbaim = {\ttfamily CDBAIM\_\-Flexible}, }
+\item[{bool}]{caseSensitive = {\ttfamily True}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}
+\label{classMMCDB_aff4a1b4ef7b7a0d52cc14003ca63d7b8}
+if cdbaim is CDBAIM\_\-Strict, it expects all the indexes to be found form 0 to n-\/1 and the same number in all subtrees. \hypertarget{classMMCDB_ab7e356a3c7aae42604aafc9af5a3a768}{
+\index{MMCDB@{MMCDB}!Link@{Link}}
+\index{Link@{Link}!MMCDB@{MMCDB}}
+\subsubsection[{Link}]{\setlength{\rightskip}{0pt plus 5cm}virtual bool MMCDB::Link (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{linkFrom, }
+\item[{const char $\ast$}]{linkTo, }
+\item[{SortFilterFn $\ast$}]{sorter = {\ttfamily NULL}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline, virtual\mbox{]}}}}
+\label{classMMCDB_ab7e356a3c7aae42604aafc9af5a3a768}
+linkFrom is the path where the link is created from \hypertarget{classMMCDB_afb71b98da114ae85f4801ebc2c0342cc}{
+\index{MMCDB@{MMCDB}!LoadFromEnvironment@{LoadFromEnvironment}}
+\index{LoadFromEnvironment@{LoadFromEnvironment}!MMCDB@{MMCDB}}
+\subsubsection[{LoadFromEnvironment}]{\setlength{\rightskip}{0pt plus 5cm}virtual bool MMCDB::LoadFromEnvironment (
+\begin{DoxyParamCaption}
+\item[{char $\ast$$\ast$}]{env}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline, virtual\mbox{]}}}}
+\label{classMMCDB_afb71b98da114ae85f4801ebc2c0342cc}
+load from environment or from any NULL terminated list of chars \hypertarget{classMMCDB_a62105e3dd7022061528e9ea8232e73ef}{
+\index{MMCDB@{MMCDB}!Lock@{Lock}}
+\index{Lock@{Lock}!MMCDB@{MMCDB}}
+\subsubsection[{Lock}]{\setlength{\rightskip}{0pt plus 5cm}virtual bool MMCDB::Lock (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline, virtual\mbox{]}}}}
+\label{classMMCDB_a62105e3dd7022061528e9ea8232e73ef}
+no need for locking! \hypertarget{classMMCDB_a1bd932558a26deb53f02825487157be5}{
+\index{MMCDB@{MMCDB}!Move@{Move}}
+\index{Move@{Move}!MMCDB@{MMCDB}}
+\subsubsection[{Move}]{\setlength{\rightskip}{0pt plus 5cm}bool MMCDB::Move (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{subTreeName}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}
+\label{classMMCDB_a1bd932558a26deb53f02825487157be5}
+move to the specified location. The movement is relative to the current location \hypertarget{classMMCDB_aaf622ac3d828e1be4aed9353738f91aa}{
+\index{MMCDB@{MMCDB}!MoveToBrother@{MoveToBrother}}
+\index{MoveToBrother@{MoveToBrother}!MMCDB@{MMCDB}}
+\subsubsection[{MoveToBrother}]{\setlength{\rightskip}{0pt plus 5cm}bool MMCDB::MoveToBrother (
+\begin{DoxyParamCaption}
+\item[{int}]{steps = {\ttfamily 1}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}
+\label{classMMCDB_aaf622ac3d828e1be4aed9353738f91aa}
+0 means remain where you are, $>$ 0 brothers on the right $<$ 0 on the left \hypertarget{classMMCDB_a60779a37f5d8a558ec99990412b61d4c}{
+\index{MMCDB@{MMCDB}!MoveToChildren@{MoveToChildren}}
+\index{MoveToChildren@{MoveToChildren}!MMCDB@{MMCDB}}
+\subsubsection[{MoveToChildren}]{\setlength{\rightskip}{0pt plus 5cm}bool MMCDB::MoveToChildren (
+\begin{DoxyParamCaption}
+\item[{int}]{childNumber = {\ttfamily 0}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}
+\label{classMMCDB_a60779a37f5d8a558ec99990412b61d4c}
+negative number move up. $>$=0 chooses the subtree, 0 is the first of the children \hypertarget{classMMCDB_af80eb1914be00a4b81efeaa9b6ed883c}{
+\index{MMCDB@{MMCDB}!MoveToFather@{MoveToFather}}
+\index{MoveToFather@{MoveToFather}!MMCDB@{MMCDB}}
+\subsubsection[{MoveToFather}]{\setlength{\rightskip}{0pt plus 5cm}bool MMCDB::MoveToFather (
+\begin{DoxyParamCaption}
+\item[{int}]{steps = {\ttfamily 1}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}
+\label{classMMCDB_af80eb1914be00a4b81efeaa9b6ed883c}
+-\/1 = Root, one level up for each positive \hypertarget{classMMCDB_a6c562dc147062c4aa8410498ac83387b}{
+\index{MMCDB@{MMCDB}!MoveToRoot@{MoveToRoot}}
+\index{MoveToRoot@{MoveToRoot}!MMCDB@{MMCDB}}
+\subsubsection[{MoveToRoot}]{\setlength{\rightskip}{0pt plus 5cm}bool MMCDB::MoveToRoot (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classMMCDB_a6c562dc147062c4aa8410498ac83387b}
+moves back to the root \hypertarget{classMMCDB_a0780c41ba28c837b62693cc7237ccc5d}{
+\index{MMCDB@{MMCDB}!NodeName@{NodeName}}
+\index{NodeName@{NodeName}!MMCDB@{MMCDB}}
+\subsubsection[{NodeName}]{\setlength{\rightskip}{0pt plus 5cm}bool MMCDB::NodeName (
+\begin{DoxyParamCaption}
+\item[{BString \&}]{name}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}
+\label{classMMCDB_a0780c41ba28c837b62693cc7237ccc5d}
+the name of the current node \hypertarget{classMMCDB_a62a646711f64155b34c17cd42446432e}{
+\index{MMCDB@{MMCDB}!NodeType@{NodeType}}
+\index{NodeType@{NodeType}!MMCDB@{MMCDB}}
+\subsubsection[{NodeType}]{\setlength{\rightskip}{0pt plus 5cm}bool MMCDB::NodeType (
+\begin{DoxyParamCaption}
+\item[{BString \&}]{name}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}
+\label{classMMCDB_a62a646711f64155b34c17cd42446432e}
+the type of the current node \hypertarget{classMMCDB_adfa8bed6995045f16e15c4c0b97daa19}{
+\index{MMCDB@{MMCDB}!NumberOfChildren@{NumberOfChildren}}
+\index{NumberOfChildren@{NumberOfChildren}!MMCDB@{MMCDB}}
+\subsubsection[{NumberOfChildren}]{\setlength{\rightskip}{0pt plus 5cm}int MMCDB::NumberOfChildren (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}
+\label{classMMCDB_adfa8bed6995045f16e15c4c0b97daa19}
+how many branches from this node. Negative number implies that the location is a leaf \hypertarget{classMMCDB_a9133b3217d6ed545915c95054ad320f6}{
+\index{MMCDB@{MMCDB}!ReadArray@{ReadArray}}
+\index{ReadArray@{ReadArray}!MMCDB@{MMCDB}}
+\subsubsection[{ReadArray}]{\setlength{\rightskip}{0pt plus 5cm}bool MMCDB::ReadArray (
+\begin{DoxyParamCaption}
+\item[{void $\ast$}]{array, }
+\item[{const CDBTYPE \&}]{valueType, }
+\item[{const int $\ast$}]{size, }
+\item[{int}]{nDim, }
+\item[{const char $\ast$}]{configName, }
+\item[{bool}]{caseSensitive = {\ttfamily True}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}
+\label{classMMCDB_a9133b3217d6ed545915c95054ad320f6}
+if size == NULL it treats the input as a monodimensional array of size nDim if size does not agree with the actual dimensions of the matrix the routine will fail \hypertarget{classMMCDB_a8aa9bcc81864cc469b5afb9c36900b65}{
+\index{MMCDB@{MMCDB}!ReadFromStream@{ReadFromStream}}
+\index{ReadFromStream@{ReadFromStream}!MMCDB@{MMCDB}}
+\subsubsection[{ReadFromStream}]{\setlength{\rightskip}{0pt plus 5cm}virtual bool MMCDB::ReadFromStream (
+\begin{DoxyParamCaption}
+\item[{StreamInterface \&}]{stream, }
+\item[{StreamInterface $\ast$}]{err = {\ttfamily NULL}, }
+\item[{SortFilterFn $\ast$}]{sorter = {\ttfamily NULL}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline, virtual\mbox{]}}}}
+\label{classMMCDB_a8aa9bcc81864cc469b5afb9c36900b65}
+Reads a database from a stream \hypertarget{classMMCDB_ab24a4a208545fed2091bb4d366d865f9}{
+\index{MMCDB@{MMCDB}!ReadStructure@{ReadStructure}}
+\index{ReadStructure@{ReadStructure}!MMCDB@{MMCDB}}
+\subsubsection[{ReadStructure}]{\setlength{\rightskip}{0pt plus 5cm}virtual bool MMCDB::ReadStructure (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{className, }
+\item[{char $\ast$}]{address, }
+\item[{Streamable $\ast$}]{err = {\ttfamily NULL}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline, virtual\mbox{]}}}}
+\label{classMMCDB_ab24a4a208545fed2091bb4d366d865f9}
+from CDB to memory \hypertarget{classMMCDB_a496aabebd44074232f0e60b134acc173}{
+\index{MMCDB@{MMCDB}!Size@{Size}}
+\index{Size@{Size}!MMCDB@{MMCDB}}
+\subsubsection[{Size}]{\setlength{\rightskip}{0pt plus 5cm}virtual int MMCDB::Size (
+\begin{DoxyParamCaption}
+\item[{CDBAddressMode}]{cdbam}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline, virtual\mbox{]}}}}
+\label{classMMCDB_a496aabebd44074232f0e60b134acc173}
+The total number of nodes. 
+\begin{DoxyParams}{Parameters}
+{\em cdbam} & CDBAM\_\-SubTreeOnly allows to measure the current subtree CDBAM\_\-LeafsOnly allows counting only the data nodes \\
+\hline
+\end{DoxyParams}
+\hypertarget{classMMCDB_a8b6979852399e578a24ce8db9d4ebf8c}{
+\index{MMCDB@{MMCDB}!SubTreeName@{SubTreeName}}
+\index{SubTreeName@{SubTreeName}!MMCDB@{MMCDB}}
+\subsubsection[{SubTreeName}]{\setlength{\rightskip}{0pt plus 5cm}bool MMCDB::SubTreeName (
+\begin{DoxyParamCaption}
+\item[{Streamable \&}]{name, }
+\item[{const char $\ast$}]{sep = {\ttfamily \char`\"{}.\char`\"{}}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}
+\label{classMMCDB_a8b6979852399e578a24ce8db9d4ebf8c}
+finds the overall path leading to the current node \hypertarget{classMMCDB_a6b4658bebd1204230e2847f59dfcff86}{
+\index{MMCDB@{MMCDB}!TreeMove@{TreeMove}}
+\index{TreeMove@{TreeMove}!MMCDB@{MMCDB}}
+\subsubsection[{TreeMove}]{\setlength{\rightskip}{0pt plus 5cm}virtual bool MMCDB::TreeMove (
+\begin{DoxyParamCaption}
+\item[{int}]{index, }
+\item[{CDBAddressMode}]{cdbam = {\ttfamily CDBAM\_\-LeafsOnly}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline, virtual\mbox{]}}}}
+\label{classMMCDB_a6b4658bebd1204230e2847f59dfcff86}
+move to a location within the whole (sub)tree. The nodes are numbered from left to right and from subnode to supernode 
+\begin{DoxyParams}{Parameters}
+{\em cdbam} & if it contains CDBAM\_\-LeafsOnly it will not account the group nodes if it contains CDBAM\_\-SubTreeOnly addresses only the subtree if it contains CDBAM\_\-Relative it is a step from current location and is assumed global If the node does not exist returns False and remains in the start position \\
+\hline
+\end{DoxyParams}
+\hypertarget{classMMCDB_ad09c66c9e5185a7a7308a704fde49c6e}{
+\index{MMCDB@{MMCDB}!TreePosition@{TreePosition}}
+\index{TreePosition@{TreePosition}!MMCDB@{MMCDB}}
+\subsubsection[{TreePosition}]{\setlength{\rightskip}{0pt plus 5cm}virtual int MMCDB::TreePosition (
+\begin{DoxyParamCaption}
+\item[{CDBAddressMode}]{cdbam = {\ttfamily CDBAM\_\-LeafsOnly}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline, virtual\mbox{]}}}}
+\label{classMMCDB_ad09c66c9e5185a7a7308a704fde49c6e}
+in the left to right bottom to top order the absolute location of a node 
+\begin{DoxyParams}{Parameters}
+{\em cdbam} & CDBAM\_\-LeafsOnly allows counting only the data nodes \\
+\hline
+\end{DoxyParams}
+\hypertarget{classMMCDB_aafba1fc4a03fc4d72807c3380c1f290e}{
+\index{MMCDB@{MMCDB}!UnLock@{UnLock}}
+\index{UnLock@{UnLock}!MMCDB@{MMCDB}}
+\subsubsection[{UnLock}]{\setlength{\rightskip}{0pt plus 5cm}virtual void MMCDB::UnLock (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline, virtual\mbox{]}}}}
+\label{classMMCDB_aafba1fc4a03fc4d72807c3380c1f290e}
+no need for locking \hypertarget{classMMCDB_aecb7ea576d693233ed0d3f9decfc3fd8}{
+\index{MMCDB@{MMCDB}!WriteArray@{WriteArray}}
+\index{WriteArray@{WriteArray}!MMCDB@{MMCDB}}
+\subsubsection[{WriteArray}]{\setlength{\rightskip}{0pt plus 5cm}bool MMCDB::WriteArray (
+\begin{DoxyParamCaption}
+\item[{const void $\ast$}]{array, }
+\item[{const CDBTYPE \&}]{valueType, }
+\item[{const int $\ast$}]{size, }
+\item[{int}]{nDim, }
+\item[{const char $\ast$}]{configName, }
+\item[{SortFilterFn $\ast$}]{sorter = {\ttfamily NULL}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}
+\label{classMMCDB_aecb7ea576d693233ed0d3f9decfc3fd8}
+if size == NULL it treats the input as a monodimensional array of size nDim
+
+if size == NULL it treats the input as a monodimensional array of size nDim if size does not agree with the actual dimensions of the matrix the routine will fail \hypertarget{classMMCDB_a0ad3622e884d11d5a672c6b91ef6538c}{
+\index{MMCDB@{MMCDB}!WriteStructure@{WriteStructure}}
+\index{WriteStructure@{WriteStructure}!MMCDB@{MMCDB}}
+\subsubsection[{WriteStructure}]{\setlength{\rightskip}{0pt plus 5cm}virtual bool MMCDB::WriteStructure (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{className, }
+\item[{char $\ast$}]{address, }
+\item[{Streamable $\ast$}]{err = {\ttfamily NULL}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline, virtual\mbox{]}}}}
+\label{classMMCDB_a0ad3622e884d11d5a672c6b91ef6538c}
+from memory to CDb \hypertarget{classMMCDB_a40cf641c31363f0df35989871d3d429c}{
+\index{MMCDB@{MMCDB}!WriteStructure@{WriteStructure}}
+\index{WriteStructure@{WriteStructure}!MMCDB@{MMCDB}}
+\subsubsection[{WriteStructure}]{\setlength{\rightskip}{0pt plus 5cm}bool MMCDB::WriteStructure (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{className, }
+\item[{char $\ast$}]{address, }
+\item[{const char $\ast$}]{variableName, }
+\item[{Streamable $\ast$}]{err = {\ttfamily NULL}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}
+\label{classMMCDB_a40cf641c31363f0df35989871d3d429c}
+either copies or references a memory structure, at address 
+\begin{DoxyParams}{Parameters}
+{\em address} & and of type \\
+\hline
+{\em className} & CDB transforms the memory, \hyperlink{classMMCDB}{MMCDB} just references it \\
+\hline
+\end{DoxyParams}
+\hypertarget{classMMCDB_a99ba37f9be65826f933b69f2d88f5666}{
+\index{MMCDB@{MMCDB}!WriteToStream@{WriteToStream}}
+\index{WriteToStream@{WriteToStream}!MMCDB@{MMCDB}}
+\subsubsection[{WriteToStream}]{\setlength{\rightskip}{0pt plus 5cm}virtual bool MMCDB::WriteToStream (
+\begin{DoxyParamCaption}
+\item[{StreamInterface \&}]{stream, }
+\item[{StreamInterface $\ast$}]{err = {\ttfamily NULL}, }
+\item[{CDBWriteMode}]{mode = {\ttfamily CDBWM\_\-Tree}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline, virtual\mbox{]}}}}
+\label{classMMCDB_a99ba37f9be65826f933b69f2d88f5666}
+writes the database to stream without any ordering 
+
+The documentation for this class was generated from the following files:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{MMCDB_8h}{MMCDB.h}\item 
+MMCDB.cpp\end{DoxyCompactItemize}

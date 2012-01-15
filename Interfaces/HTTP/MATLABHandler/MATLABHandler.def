@@ -1,0 +1,6 @@
+LIBRARY    MATLABHandler
+DESCRIPTION "MATLABHandler"
+EXPORTS
+
+Get_private_MATLABHandlerInfo @1
+

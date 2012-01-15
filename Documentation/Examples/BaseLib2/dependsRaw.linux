@@ -1,0 +1,816 @@
+AtomicExample1.o: AtomicExample1.cpp ../../../BaseLib2/Level0/Atomic.h \
+ ../../../BaseLib2/Level0/GenDefs.h ../../../BaseLib2/Level0/Sleep.h \
+ ../../../BaseLib2/Level0/System.h ../../../BaseLib2/Level0/SystemMSC.h \
+ ../../../BaseLib2/Level0/SystemLinux.h \
+ ../../../BaseLib2/Level0/SystemVX5100.h \
+ ../../../BaseLib2/Level0/SystemVX5500.h \
+ ../../../BaseLib2/Level0/SystemV6X5100.h \
+ ../../../BaseLib2/Level0/SystemV6X5500.h \
+ ../../../BaseLib2/Level0/SystemVX68k.h \
+ ../../../BaseLib2/Level0/SystemRTAI.h \
+ ../../../BaseLib2/Level0/SystemSolaris.h \
+ ../../../BaseLib2/Level0/SystemMacOSX.h \
+ ../../../BaseLib2/Level0/Memory.h ../../../BaseLib2/Level0/FastMath.h \
+ ../../../BaseLib2/Level0/HRT.h ../../../BaseLib2/Level0/Processor.h \
+ ../../../BaseLib2/Level0/Threads.h \
+ ../../../BaseLib2/Level0/ErrorManagement.h \
+ ../../../BaseLib2/Level0/ExceptionHandlerDefinitions.h \
+ ../../../BaseLib2/Level0/ThreadInitialisationInterface.h \
+ ../../../BaseLib2/Level0/EventSem.h ../../../BaseLib2/Level0/SemCore.h \
+ ../../../BaseLib2/Level0/Iterators.h \
+ ../../../BaseLib2/Level0/TimeoutType.h \
+ ../../../BaseLib2/Level0/ProcessorType.h \
+ ../../../BaseLib2/Level0/ThreadsDatabase.h \
+ ../../../BaseLib2/Level0/ErrorManagement.h
+BTDExample1.o: BTDExample1.cpp ../../../BaseLib2/Level2/FString.h \
+ ../../../BaseLib2/Level0/BString.h ../../../BaseLib2/Level0/System.h \
+ ../../../BaseLib2/Level0/SystemMSC.h \
+ ../../../BaseLib2/Level0/SystemLinux.h \
+ ../../../BaseLib2/Level0/GenDefs.h \
+ ../../../BaseLib2/Level0/SystemVX5100.h \
+ ../../../BaseLib2/Level0/SystemVX5500.h \
+ ../../../BaseLib2/Level0/SystemV6X5100.h \
+ ../../../BaseLib2/Level0/SystemV6X5500.h \
+ ../../../BaseLib2/Level0/SystemVX68k.h \
+ ../../../BaseLib2/Level0/SystemRTAI.h \
+ ../../../BaseLib2/Level0/SystemSolaris.h \
+ ../../../BaseLib2/Level0/SystemMacOSX.h \
+ ../../../BaseLib2/Level0/Memory.h ../../../BaseLib2/Level2/Streamable.h \
+ ../../../BaseLib2/Level0/System.h ../../../BaseLib2/Level0/CStream.h \
+ ../../../BaseLib2/Level2/CStreamBuffering.h \
+ ../../../BaseLib2/Level0/StreamInterface.h \
+ ../../../BaseLib2/Level0/TimeoutType.h ../../../BaseLib2/Level0/HRT.h \
+ ../../../BaseLib2/Level0/Processor.h ../../../BaseLib2/Level1/Object.h \
+ ../../../BaseLib2/Level1/ObjectRegistryItem.h \
+ ../../../BaseLib2/Level0/LinkedListable.h \
+ ../../../BaseLib2/Level0/Iterators.h \
+ ../../../BaseLib2/Level1/ErrorSystemInstructions.h \
+ ../../../BaseLib2/Level0/GenDefs.h \
+ ../../../BaseLib2/Level0/LinkedListHolder.h \
+ ../../../BaseLib2/Level0/LinkedListable.h \
+ ../../../BaseLib2/Level0/FastPollingMutexSem.h \
+ ../../../BaseLib2/Level0/Atomic.h ../../../BaseLib2/Level0/Sleep.h \
+ ../../../BaseLib2/Level0/FastMath.h ../../../BaseLib2/Level0/Threads.h \
+ ../../../BaseLib2/Level0/ErrorManagement.h \
+ ../../../BaseLib2/Level0/ExceptionHandlerDefinitions.h \
+ ../../../BaseLib2/Level0/ThreadInitialisationInterface.h \
+ ../../../BaseLib2/Level0/EventSem.h ../../../BaseLib2/Level0/SemCore.h \
+ ../../../BaseLib2/Level0/ProcessorType.h \
+ ../../../BaseLib2/Level0/ThreadsDatabase.h \
+ ../../../BaseLib2/Level1/ErrorSystemInstructionItem.h \
+ ../../../BaseLib2/Level1/ClassStructure.h \
+ ../../../BaseLib2/Level1/ClassStructureEntry.h \
+ ../../../BaseLib2/Level1/BasicTypes.h \
+ ../../../BaseLib2/Level0/ErrorManagement.h \
+ ../../../BaseLib2/Level0/LoadableLibrary.h \
+ ../../../BaseLib2/Level1/ObjectMacros.h \
+ ../../../BaseLib2/Level1/StreamAttributes.h \
+ ../../../BaseLib2/Level1/BasicTypes.h
+CDBExample1.o: CDBExample1.cpp \
+ ../../../BaseLib2/Level1/GarbageCollectable.h \
+ ../../../BaseLib2/Level1/Object.h ../../../BaseLib2/Level0/System.h \
+ ../../../BaseLib2/Level0/SystemMSC.h \
+ ../../../BaseLib2/Level0/SystemLinux.h \
+ ../../../BaseLib2/Level0/GenDefs.h \
+ ../../../BaseLib2/Level0/SystemVX5100.h \
+ ../../../BaseLib2/Level0/SystemVX5500.h \
+ ../../../BaseLib2/Level0/SystemV6X5100.h \
+ ../../../BaseLib2/Level0/SystemV6X5500.h \
+ ../../../BaseLib2/Level0/SystemVX68k.h \
+ ../../../BaseLib2/Level0/SystemRTAI.h \
+ ../../../BaseLib2/Level0/SystemSolaris.h \
+ ../../../BaseLib2/Level0/SystemMacOSX.h \
+ ../../../BaseLib2/Level0/Memory.h ../../../BaseLib2/Level0/System.h \
+ ../../../BaseLib2/Level1/ObjectRegistryItem.h \
+ ../../../BaseLib2/Level0/LinkedListable.h \
+ ../../../BaseLib2/Level0/Iterators.h \
+ ../../../BaseLib2/Level1/ErrorSystemInstructions.h \
+ ../../../BaseLib2/Level0/GenDefs.h \
+ ../../../BaseLib2/Level0/LinkedListHolder.h \
+ ../../../BaseLib2/Level0/LinkedListable.h \
+ ../../../BaseLib2/Level0/FastPollingMutexSem.h \
+ ../../../BaseLib2/Level0/Atomic.h ../../../BaseLib2/Level0/Sleep.h \
+ ../../../BaseLib2/Level0/FastMath.h ../../../BaseLib2/Level0/HRT.h \
+ ../../../BaseLib2/Level0/Processor.h \
+ ../../../BaseLib2/Level0/TimeoutType.h \
+ ../../../BaseLib2/Level0/Threads.h \
+ ../../../BaseLib2/Level0/ErrorManagement.h \
+ ../../../BaseLib2/Level0/ExceptionHandlerDefinitions.h \
+ ../../../BaseLib2/Level0/ThreadInitialisationInterface.h \
+ ../../../BaseLib2/Level0/EventSem.h ../../../BaseLib2/Level0/SemCore.h \
+ ../../../BaseLib2/Level0/ProcessorType.h \
+ ../../../BaseLib2/Level0/ThreadsDatabase.h \
+ ../../../BaseLib2/Level1/ErrorSystemInstructionItem.h \
+ ../../../BaseLib2/Level1/ClassStructure.h \
+ ../../../BaseLib2/Level1/ClassStructureEntry.h \
+ ../../../BaseLib2/Level1/BasicTypes.h ../../../BaseLib2/Level0/BString.h \
+ ../../../BaseLib2/Level0/ErrorManagement.h \
+ ../../../BaseLib2/Level0/LoadableLibrary.h \
+ ../../../BaseLib2/Level0/StreamInterface.h \
+ ../../../BaseLib2/Level1/ObjectMacros.h \
+ ../../../BaseLib2/Level1/Object.h \
+ ../../../BaseLib2/Level1/ConfigurationDataBase.h \
+ ../../../BaseLib2/Level1/CDBVirtual.h \
+ ../../../BaseLib2/Level1/CDBTypes.h ../../../BaseLib2/Level0/Iterators.h \
+ ../../../BaseLib2/Level1/GCNamedObject.h \
+ ../../../BaseLib2/Level1/GarbageCollectable.h \
+ ../../../BaseLib2/Level1/GCRTemplate.h \
+ ../../../BaseLib2/Level1/GCReference.h ../../../BaseLib2/Level0/Atomic.h \
+ ../../../BaseLib2/Level1/ObjectRegistryDataBase.h \
+ ../../../BaseLib2/Level1/CDBNull.h ../../../BaseLib2/Level3/CDB.h \
+ ../../../BaseLib2/Level2/FString.h ../../../BaseLib2/Level2/Streamable.h \
+ ../../../BaseLib2/Level0/CStream.h \
+ ../../../BaseLib2/Level2/CStreamBuffering.h \
+ ../../../BaseLib2/Level1/StreamAttributes.h \
+ ../../../BaseLib2/Level3/CDBNodeRef.h ../../../BaseLib2/Level3/CDBNode.h \
+ ../../../BaseLib2/Level1/CDBTypes.h \
+ ../../../BaseLib2/Level1/CDBVirtual.h \
+ ../../../BaseLib2/Level2/CDBExtended.h \
+ ../../../BaseLib2/Level2/CDBDataTypes.h \
+ ../../../BaseLib2/Level2/FString.h
+CDBExample2.o: CDBExample2.cpp \
+ ../../../BaseLib2/Level1/GarbageCollectable.h \
+ ../../../BaseLib2/Level1/Object.h ../../../BaseLib2/Level0/System.h \
+ ../../../BaseLib2/Level0/SystemMSC.h \
+ ../../../BaseLib2/Level0/SystemLinux.h \
+ ../../../BaseLib2/Level0/GenDefs.h \
+ ../../../BaseLib2/Level0/SystemVX5100.h \
+ ../../../BaseLib2/Level0/SystemVX5500.h \
+ ../../../BaseLib2/Level0/SystemV6X5100.h \
+ ../../../BaseLib2/Level0/SystemV6X5500.h \
+ ../../../BaseLib2/Level0/SystemVX68k.h \
+ ../../../BaseLib2/Level0/SystemRTAI.h \
+ ../../../BaseLib2/Level0/SystemSolaris.h \
+ ../../../BaseLib2/Level0/SystemMacOSX.h \
+ ../../../BaseLib2/Level0/Memory.h ../../../BaseLib2/Level0/System.h \
+ ../../../BaseLib2/Level1/ObjectRegistryItem.h \
+ ../../../BaseLib2/Level0/LinkedListable.h \
+ ../../../BaseLib2/Level0/Iterators.h \
+ ../../../BaseLib2/Level1/ErrorSystemInstructions.h \
+ ../../../BaseLib2/Level0/GenDefs.h \
+ ../../../BaseLib2/Level0/LinkedListHolder.h \
+ ../../../BaseLib2/Level0/LinkedListable.h \
+ ../../../BaseLib2/Level0/FastPollingMutexSem.h \
+ ../../../BaseLib2/Level0/Atomic.h ../../../BaseLib2/Level0/Sleep.h \
+ ../../../BaseLib2/Level0/FastMath.h ../../../BaseLib2/Level0/HRT.h \
+ ../../../BaseLib2/Level0/Processor.h \
+ ../../../BaseLib2/Level0/TimeoutType.h \
+ ../../../BaseLib2/Level0/Threads.h \
+ ../../../BaseLib2/Level0/ErrorManagement.h \
+ ../../../BaseLib2/Level0/ExceptionHandlerDefinitions.h \
+ ../../../BaseLib2/Level0/ThreadInitialisationInterface.h \
+ ../../../BaseLib2/Level0/EventSem.h ../../../BaseLib2/Level0/SemCore.h \
+ ../../../BaseLib2/Level0/ProcessorType.h \
+ ../../../BaseLib2/Level0/ThreadsDatabase.h \
+ ../../../BaseLib2/Level1/ErrorSystemInstructionItem.h \
+ ../../../BaseLib2/Level1/ClassStructure.h \
+ ../../../BaseLib2/Level1/ClassStructureEntry.h \
+ ../../../BaseLib2/Level1/BasicTypes.h ../../../BaseLib2/Level0/BString.h \
+ ../../../BaseLib2/Level0/ErrorManagement.h \
+ ../../../BaseLib2/Level0/LoadableLibrary.h \
+ ../../../BaseLib2/Level0/StreamInterface.h \
+ ../../../BaseLib2/Level1/ObjectMacros.h \
+ ../../../BaseLib2/Level1/Object.h \
+ ../../../BaseLib2/Level1/ConfigurationDataBase.h \
+ ../../../BaseLib2/Level1/CDBVirtual.h \
+ ../../../BaseLib2/Level1/CDBTypes.h ../../../BaseLib2/Level0/Iterators.h \
+ ../../../BaseLib2/Level1/GCNamedObject.h \
+ ../../../BaseLib2/Level1/GarbageCollectable.h \
+ ../../../BaseLib2/Level1/GCRTemplate.h \
+ ../../../BaseLib2/Level1/GCReference.h ../../../BaseLib2/Level0/Atomic.h \
+ ../../../BaseLib2/Level1/ObjectRegistryDataBase.h \
+ ../../../BaseLib2/Level1/CDBNull.h ../../../BaseLib2/Level3/CDB.h \
+ ../../../BaseLib2/Level2/FString.h ../../../BaseLib2/Level2/Streamable.h \
+ ../../../BaseLib2/Level0/CStream.h \
+ ../../../BaseLib2/Level2/CStreamBuffering.h \
+ ../../../BaseLib2/Level1/StreamAttributes.h \
+ ../../../BaseLib2/Level3/CDBNodeRef.h ../../../BaseLib2/Level3/CDBNode.h \
+ ../../../BaseLib2/Level1/CDBTypes.h \
+ ../../../BaseLib2/Level1/CDBVirtual.h \
+ ../../../BaseLib2/Level2/CDBExtended.h \
+ ../../../BaseLib2/Level2/CDBDataTypes.h \
+ ../../../BaseLib2/Level2/FString.h
+CDBExample3.o: CDBExample3.cpp ../../../BaseLib2/Level1/GCNamedObject.h \
+ ../../../BaseLib2/Level1/GarbageCollectable.h \
+ ../../../BaseLib2/Level1/Object.h ../../../BaseLib2/Level0/System.h \
+ ../../../BaseLib2/Level0/SystemMSC.h \
+ ../../../BaseLib2/Level0/SystemLinux.h \
+ ../../../BaseLib2/Level0/GenDefs.h \
+ ../../../BaseLib2/Level0/SystemVX5100.h \
+ ../../../BaseLib2/Level0/SystemVX5500.h \
+ ../../../BaseLib2/Level0/SystemV6X5100.h \
+ ../../../BaseLib2/Level0/SystemV6X5500.h \
+ ../../../BaseLib2/Level0/SystemVX68k.h \
+ ../../../BaseLib2/Level0/SystemRTAI.h \
+ ../../../BaseLib2/Level0/SystemSolaris.h \
+ ../../../BaseLib2/Level0/SystemMacOSX.h \
+ ../../../BaseLib2/Level0/Memory.h ../../../BaseLib2/Level0/System.h \
+ ../../../BaseLib2/Level1/ObjectRegistryItem.h \
+ ../../../BaseLib2/Level0/LinkedListable.h \
+ ../../../BaseLib2/Level0/Iterators.h \
+ ../../../BaseLib2/Level1/ErrorSystemInstructions.h \
+ ../../../BaseLib2/Level0/GenDefs.h \
+ ../../../BaseLib2/Level0/LinkedListHolder.h \
+ ../../../BaseLib2/Level0/LinkedListable.h \
+ ../../../BaseLib2/Level0/FastPollingMutexSem.h \
+ ../../../BaseLib2/Level0/Atomic.h ../../../BaseLib2/Level0/Sleep.h \
+ ../../../BaseLib2/Level0/FastMath.h ../../../BaseLib2/Level0/HRT.h \
+ ../../../BaseLib2/Level0/Processor.h \
+ ../../../BaseLib2/Level0/TimeoutType.h \
+ ../../../BaseLib2/Level0/Threads.h \
+ ../../../BaseLib2/Level0/ErrorManagement.h \
+ ../../../BaseLib2/Level0/ExceptionHandlerDefinitions.h \
+ ../../../BaseLib2/Level0/ThreadInitialisationInterface.h \
+ ../../../BaseLib2/Level0/EventSem.h ../../../BaseLib2/Level0/SemCore.h \
+ ../../../BaseLib2/Level0/ProcessorType.h \
+ ../../../BaseLib2/Level0/ThreadsDatabase.h \
+ ../../../BaseLib2/Level1/ErrorSystemInstructionItem.h \
+ ../../../BaseLib2/Level1/ClassStructure.h \
+ ../../../BaseLib2/Level1/ClassStructureEntry.h \
+ ../../../BaseLib2/Level1/BasicTypes.h ../../../BaseLib2/Level0/BString.h \
+ ../../../BaseLib2/Level0/ErrorManagement.h \
+ ../../../BaseLib2/Level0/LoadableLibrary.h \
+ ../../../BaseLib2/Level0/StreamInterface.h \
+ ../../../BaseLib2/Level1/ObjectMacros.h \
+ ../../../BaseLib2/Level1/ConfigurationDataBase.h \
+ ../../../BaseLib2/Level1/CDBVirtual.h \
+ ../../../BaseLib2/Level1/CDBTypes.h ../../../BaseLib2/Level0/Iterators.h \
+ ../../../BaseLib2/Level1/GCNamedObject.h \
+ ../../../BaseLib2/Level1/GCRTemplate.h \
+ ../../../BaseLib2/Level1/GCReference.h ../../../BaseLib2/Level0/Atomic.h \
+ ../../../BaseLib2/Level1/ObjectRegistryDataBase.h \
+ ../../../BaseLib2/Level1/CDBNull.h ../../../BaseLib2/Level3/CDB.h \
+ ../../../BaseLib2/Level2/FString.h ../../../BaseLib2/Level2/Streamable.h \
+ ../../../BaseLib2/Level0/CStream.h \
+ ../../../BaseLib2/Level2/CStreamBuffering.h \
+ ../../../BaseLib2/Level1/Object.h \
+ ../../../BaseLib2/Level1/StreamAttributes.h \
+ ../../../BaseLib2/Level3/CDBNodeRef.h ../../../BaseLib2/Level3/CDBNode.h \
+ ../../../BaseLib2/Level1/CDBTypes.h \
+ ../../../BaseLib2/Level1/CDBVirtual.h \
+ ../../../BaseLib2/Level2/CDBExtended.h \
+ ../../../BaseLib2/Level2/CDBDataTypes.h \
+ ../../../BaseLib2/Level2/FString.h \
+ ../../../BaseLib2/Level1/GlobalObjectDataBase.h \
+ ../../../BaseLib2/Level1/GCReferenceContainer.h \
+ ../../../BaseLib2/Level0/MutexSem.h ../../../BaseLib2/Level1/GCRCItem.h \
+ ../../../BaseLib2/Level1/GCNOExtender.h
+FStringExample.o: FStringExample.cpp \
+ ../../../BaseLib2/Level0/ErrorManagement.h \
+ ../../../BaseLib2/Level0/System.h ../../../BaseLib2/Level0/SystemMSC.h \
+ ../../../BaseLib2/Level0/SystemLinux.h \
+ ../../../BaseLib2/Level0/GenDefs.h \
+ ../../../BaseLib2/Level0/SystemVX5100.h \
+ ../../../BaseLib2/Level0/SystemVX5500.h \
+ ../../../BaseLib2/Level0/SystemV6X5100.h \
+ ../../../BaseLib2/Level0/SystemV6X5500.h \
+ ../../../BaseLib2/Level0/SystemVX68k.h \
+ ../../../BaseLib2/Level0/SystemRTAI.h \
+ ../../../BaseLib2/Level0/SystemSolaris.h \
+ ../../../BaseLib2/Level0/SystemMacOSX.h \
+ ../../../BaseLib2/Level0/Memory.h ../../../BaseLib2/Level2/FString.h \
+ ../../../BaseLib2/Level0/BString.h ../../../BaseLib2/Level2/Streamable.h \
+ ../../../BaseLib2/Level0/System.h ../../../BaseLib2/Level0/CStream.h \
+ ../../../BaseLib2/Level2/CStreamBuffering.h \
+ ../../../BaseLib2/Level0/StreamInterface.h \
+ ../../../BaseLib2/Level0/TimeoutType.h ../../../BaseLib2/Level0/HRT.h \
+ ../../../BaseLib2/Level0/Processor.h ../../../BaseLib2/Level1/Object.h \
+ ../../../BaseLib2/Level1/ObjectRegistryItem.h \
+ ../../../BaseLib2/Level0/LinkedListable.h \
+ ../../../BaseLib2/Level0/Iterators.h \
+ ../../../BaseLib2/Level1/ErrorSystemInstructions.h \
+ ../../../BaseLib2/Level0/GenDefs.h \
+ ../../../BaseLib2/Level0/LinkedListHolder.h \
+ ../../../BaseLib2/Level0/LinkedListable.h \
+ ../../../BaseLib2/Level0/FastPollingMutexSem.h \
+ ../../../BaseLib2/Level0/Atomic.h ../../../BaseLib2/Level0/Sleep.h \
+ ../../../BaseLib2/Level0/FastMath.h ../../../BaseLib2/Level0/Threads.h \
+ ../../../BaseLib2/Level0/ErrorManagement.h \
+ ../../../BaseLib2/Level0/ExceptionHandlerDefinitions.h \
+ ../../../BaseLib2/Level0/ThreadInitialisationInterface.h \
+ ../../../BaseLib2/Level0/EventSem.h ../../../BaseLib2/Level0/SemCore.h \
+ ../../../BaseLib2/Level0/ProcessorType.h \
+ ../../../BaseLib2/Level0/ThreadsDatabase.h \
+ ../../../BaseLib2/Level1/ErrorSystemInstructionItem.h \
+ ../../../BaseLib2/Level1/ClassStructure.h \
+ ../../../BaseLib2/Level1/ClassStructureEntry.h \
+ ../../../BaseLib2/Level1/BasicTypes.h \
+ ../../../BaseLib2/Level0/LoadableLibrary.h \
+ ../../../BaseLib2/Level1/ObjectMacros.h \
+ ../../../BaseLib2/Level1/StreamAttributes.h
+GCReferenceContainerExample.o: GCReferenceContainerExample.cpp \
+ ../../../BaseLib2/Level1/GCReference.h ../../../BaseLib2/Level0/Atomic.h \
+ ../../../BaseLib2/Level0/GenDefs.h ../../../BaseLib2/Level0/Sleep.h \
+ ../../../BaseLib2/Level0/System.h ../../../BaseLib2/Level0/SystemMSC.h \
+ ../../../BaseLib2/Level0/SystemLinux.h \
+ ../../../BaseLib2/Level0/SystemVX5100.h \
+ ../../../BaseLib2/Level0/SystemVX5500.h \
+ ../../../BaseLib2/Level0/SystemV6X5100.h \
+ ../../../BaseLib2/Level0/SystemV6X5500.h \
+ ../../../BaseLib2/Level0/SystemVX68k.h \
+ ../../../BaseLib2/Level0/SystemRTAI.h \
+ ../../../BaseLib2/Level0/SystemSolaris.h \
+ ../../../BaseLib2/Level0/SystemMacOSX.h \
+ ../../../BaseLib2/Level0/Memory.h ../../../BaseLib2/Level0/FastMath.h \
+ ../../../BaseLib2/Level0/HRT.h ../../../BaseLib2/Level0/Processor.h \
+ ../../../BaseLib2/Level1/ObjectRegistryDataBase.h \
+ ../../../BaseLib2/Level0/StreamInterface.h \
+ ../../../BaseLib2/Level0/TimeoutType.h \
+ ../../../BaseLib2/Level1/GarbageCollectable.h \
+ ../../../BaseLib2/Level1/Object.h ../../../BaseLib2/Level0/System.h \
+ ../../../BaseLib2/Level1/ObjectRegistryItem.h \
+ ../../../BaseLib2/Level0/LinkedListable.h \
+ ../../../BaseLib2/Level0/Iterators.h \
+ ../../../BaseLib2/Level1/ErrorSystemInstructions.h \
+ ../../../BaseLib2/Level0/GenDefs.h \
+ ../../../BaseLib2/Level0/LinkedListHolder.h \
+ ../../../BaseLib2/Level0/LinkedListable.h \
+ ../../../BaseLib2/Level0/FastPollingMutexSem.h \
+ ../../../BaseLib2/Level0/Atomic.h ../../../BaseLib2/Level0/Threads.h \
+ ../../../BaseLib2/Level0/ErrorManagement.h \
+ ../../../BaseLib2/Level0/ExceptionHandlerDefinitions.h \
+ ../../../BaseLib2/Level0/ThreadInitialisationInterface.h \
+ ../../../BaseLib2/Level0/EventSem.h ../../../BaseLib2/Level0/SemCore.h \
+ ../../../BaseLib2/Level0/ProcessorType.h \
+ ../../../BaseLib2/Level0/ThreadsDatabase.h \
+ ../../../BaseLib2/Level1/ErrorSystemInstructionItem.h \
+ ../../../BaseLib2/Level1/ClassStructure.h \
+ ../../../BaseLib2/Level1/ClassStructureEntry.h \
+ ../../../BaseLib2/Level1/BasicTypes.h ../../../BaseLib2/Level0/BString.h \
+ ../../../BaseLib2/Level0/ErrorManagement.h \
+ ../../../BaseLib2/Level0/LoadableLibrary.h \
+ ../../../BaseLib2/Level1/ObjectMacros.h \
+ ../../../BaseLib2/Level1/GCRTemplate.h \
+ ../../../BaseLib2/Level1/GCReference.h \
+ ../../../BaseLib2/Level1/GCNamedObject.h \
+ ../../../BaseLib2/Level1/GCReferenceContainer.h \
+ ../../../BaseLib2/Level1/GCRTemplate.h \
+ ../../../BaseLib2/Level1/GCNamedObject.h \
+ ../../../BaseLib2/Level0/MutexSem.h ../../../BaseLib2/Level1/GCRCItem.h \
+ ../../../BaseLib2/Level1/GCNOExtender.h \
+ ../../../BaseLib2/Level1/GarbageCollectable.h
+GCReferenceExample1.o: GCReferenceExample1.cpp \
+ ../../../BaseLib2/Level1/GCReference.h ../../../BaseLib2/Level0/Atomic.h \
+ ../../../BaseLib2/Level0/GenDefs.h ../../../BaseLib2/Level0/Sleep.h \
+ ../../../BaseLib2/Level0/System.h ../../../BaseLib2/Level0/SystemMSC.h \
+ ../../../BaseLib2/Level0/SystemLinux.h \
+ ../../../BaseLib2/Level0/SystemVX5100.h \
+ ../../../BaseLib2/Level0/SystemVX5500.h \
+ ../../../BaseLib2/Level0/SystemV6X5100.h \
+ ../../../BaseLib2/Level0/SystemV6X5500.h \
+ ../../../BaseLib2/Level0/SystemVX68k.h \
+ ../../../BaseLib2/Level0/SystemRTAI.h \
+ ../../../BaseLib2/Level0/SystemSolaris.h \
+ ../../../BaseLib2/Level0/SystemMacOSX.h \
+ ../../../BaseLib2/Level0/Memory.h ../../../BaseLib2/Level0/FastMath.h \
+ ../../../BaseLib2/Level0/HRT.h ../../../BaseLib2/Level0/Processor.h \
+ ../../../BaseLib2/Level1/ObjectRegistryDataBase.h \
+ ../../../BaseLib2/Level0/StreamInterface.h \
+ ../../../BaseLib2/Level0/TimeoutType.h \
+ ../../../BaseLib2/Level1/GarbageCollectable.h \
+ ../../../BaseLib2/Level1/Object.h ../../../BaseLib2/Level0/System.h \
+ ../../../BaseLib2/Level1/ObjectRegistryItem.h \
+ ../../../BaseLib2/Level0/LinkedListable.h \
+ ../../../BaseLib2/Level0/Iterators.h \
+ ../../../BaseLib2/Level1/ErrorSystemInstructions.h \
+ ../../../BaseLib2/Level0/GenDefs.h \
+ ../../../BaseLib2/Level0/LinkedListHolder.h \
+ ../../../BaseLib2/Level0/LinkedListable.h \
+ ../../../BaseLib2/Level0/FastPollingMutexSem.h \
+ ../../../BaseLib2/Level0/Atomic.h ../../../BaseLib2/Level0/Threads.h \
+ ../../../BaseLib2/Level0/ErrorManagement.h \
+ ../../../BaseLib2/Level0/ExceptionHandlerDefinitions.h \
+ ../../../BaseLib2/Level0/ThreadInitialisationInterface.h \
+ ../../../BaseLib2/Level0/EventSem.h ../../../BaseLib2/Level0/SemCore.h \
+ ../../../BaseLib2/Level0/ProcessorType.h \
+ ../../../BaseLib2/Level0/ThreadsDatabase.h \
+ ../../../BaseLib2/Level1/ErrorSystemInstructionItem.h \
+ ../../../BaseLib2/Level1/ClassStructure.h \
+ ../../../BaseLib2/Level1/ClassStructureEntry.h \
+ ../../../BaseLib2/Level1/BasicTypes.h ../../../BaseLib2/Level0/BString.h \
+ ../../../BaseLib2/Level0/ErrorManagement.h \
+ ../../../BaseLib2/Level0/LoadableLibrary.h \
+ ../../../BaseLib2/Level1/ObjectMacros.h \
+ ../../../BaseLib2/Level1/GCRTemplate.h \
+ ../../../BaseLib2/Level1/GCReference.h \
+ ../../../BaseLib2/Level1/GarbageCollectable.h
+GCReferenceExample2.o: GCReferenceExample2.cpp \
+ ../../../BaseLib2/Level1/GCReference.h ../../../BaseLib2/Level0/Atomic.h \
+ ../../../BaseLib2/Level0/GenDefs.h ../../../BaseLib2/Level0/Sleep.h \
+ ../../../BaseLib2/Level0/System.h ../../../BaseLib2/Level0/SystemMSC.h \
+ ../../../BaseLib2/Level0/SystemLinux.h \
+ ../../../BaseLib2/Level0/SystemVX5100.h \
+ ../../../BaseLib2/Level0/SystemVX5500.h \
+ ../../../BaseLib2/Level0/SystemV6X5100.h \
+ ../../../BaseLib2/Level0/SystemV6X5500.h \
+ ../../../BaseLib2/Level0/SystemVX68k.h \
+ ../../../BaseLib2/Level0/SystemRTAI.h \
+ ../../../BaseLib2/Level0/SystemSolaris.h \
+ ../../../BaseLib2/Level0/SystemMacOSX.h \
+ ../../../BaseLib2/Level0/Memory.h ../../../BaseLib2/Level0/FastMath.h \
+ ../../../BaseLib2/Level0/HRT.h ../../../BaseLib2/Level0/Processor.h \
+ ../../../BaseLib2/Level1/ObjectRegistryDataBase.h \
+ ../../../BaseLib2/Level0/StreamInterface.h \
+ ../../../BaseLib2/Level0/TimeoutType.h \
+ ../../../BaseLib2/Level1/GarbageCollectable.h \
+ ../../../BaseLib2/Level1/Object.h ../../../BaseLib2/Level0/System.h \
+ ../../../BaseLib2/Level1/ObjectRegistryItem.h \
+ ../../../BaseLib2/Level0/LinkedListable.h \
+ ../../../BaseLib2/Level0/Iterators.h \
+ ../../../BaseLib2/Level1/ErrorSystemInstructions.h \
+ ../../../BaseLib2/Level0/GenDefs.h \
+ ../../../BaseLib2/Level0/LinkedListHolder.h \
+ ../../../BaseLib2/Level0/LinkedListable.h \
+ ../../../BaseLib2/Level0/FastPollingMutexSem.h \
+ ../../../BaseLib2/Level0/Atomic.h ../../../BaseLib2/Level0/Threads.h \
+ ../../../BaseLib2/Level0/ErrorManagement.h \
+ ../../../BaseLib2/Level0/ExceptionHandlerDefinitions.h \
+ ../../../BaseLib2/Level0/ThreadInitialisationInterface.h \
+ ../../../BaseLib2/Level0/EventSem.h ../../../BaseLib2/Level0/SemCore.h \
+ ../../../BaseLib2/Level0/ProcessorType.h \
+ ../../../BaseLib2/Level0/ThreadsDatabase.h \
+ ../../../BaseLib2/Level1/ErrorSystemInstructionItem.h \
+ ../../../BaseLib2/Level1/ClassStructure.h \
+ ../../../BaseLib2/Level1/ClassStructureEntry.h \
+ ../../../BaseLib2/Level1/BasicTypes.h ../../../BaseLib2/Level0/BString.h \
+ ../../../BaseLib2/Level0/ErrorManagement.h \
+ ../../../BaseLib2/Level0/LoadableLibrary.h \
+ ../../../BaseLib2/Level1/ObjectMacros.h \
+ ../../../BaseLib2/Level1/GCRTemplate.h \
+ ../../../BaseLib2/Level1/GCReference.h \
+ ../../../BaseLib2/Level1/GarbageCollectable.h
+GODBExample1.o: GODBExample1.cpp ../../../BaseLib2/Level1/GCNamedObject.h \
+ ../../../BaseLib2/Level1/GarbageCollectable.h \
+ ../../../BaseLib2/Level1/Object.h ../../../BaseLib2/Level0/System.h \
+ ../../../BaseLib2/Level0/SystemMSC.h \
+ ../../../BaseLib2/Level0/SystemLinux.h \
+ ../../../BaseLib2/Level0/GenDefs.h \
+ ../../../BaseLib2/Level0/SystemVX5100.h \
+ ../../../BaseLib2/Level0/SystemVX5500.h \
+ ../../../BaseLib2/Level0/SystemV6X5100.h \
+ ../../../BaseLib2/Level0/SystemV6X5500.h \
+ ../../../BaseLib2/Level0/SystemVX68k.h \
+ ../../../BaseLib2/Level0/SystemRTAI.h \
+ ../../../BaseLib2/Level0/SystemSolaris.h \
+ ../../../BaseLib2/Level0/SystemMacOSX.h \
+ ../../../BaseLib2/Level0/Memory.h ../../../BaseLib2/Level0/System.h \
+ ../../../BaseLib2/Level1/ObjectRegistryItem.h \
+ ../../../BaseLib2/Level0/LinkedListable.h \
+ ../../../BaseLib2/Level0/Iterators.h \
+ ../../../BaseLib2/Level1/ErrorSystemInstructions.h \
+ ../../../BaseLib2/Level0/GenDefs.h \
+ ../../../BaseLib2/Level0/LinkedListHolder.h \
+ ../../../BaseLib2/Level0/LinkedListable.h \
+ ../../../BaseLib2/Level0/FastPollingMutexSem.h \
+ ../../../BaseLib2/Level0/Atomic.h ../../../BaseLib2/Level0/Sleep.h \
+ ../../../BaseLib2/Level0/FastMath.h ../../../BaseLib2/Level0/HRT.h \
+ ../../../BaseLib2/Level0/Processor.h \
+ ../../../BaseLib2/Level0/TimeoutType.h \
+ ../../../BaseLib2/Level0/Threads.h \
+ ../../../BaseLib2/Level0/ErrorManagement.h \
+ ../../../BaseLib2/Level0/ExceptionHandlerDefinitions.h \
+ ../../../BaseLib2/Level0/ThreadInitialisationInterface.h \
+ ../../../BaseLib2/Level0/EventSem.h ../../../BaseLib2/Level0/SemCore.h \
+ ../../../BaseLib2/Level0/ProcessorType.h \
+ ../../../BaseLib2/Level0/ThreadsDatabase.h \
+ ../../../BaseLib2/Level1/ErrorSystemInstructionItem.h \
+ ../../../BaseLib2/Level1/ClassStructure.h \
+ ../../../BaseLib2/Level1/ClassStructureEntry.h \
+ ../../../BaseLib2/Level1/BasicTypes.h ../../../BaseLib2/Level0/BString.h \
+ ../../../BaseLib2/Level0/ErrorManagement.h \
+ ../../../BaseLib2/Level0/LoadableLibrary.h \
+ ../../../BaseLib2/Level0/StreamInterface.h \
+ ../../../BaseLib2/Level1/ObjectMacros.h \
+ ../../../BaseLib2/Level1/ConfigurationDataBase.h \
+ ../../../BaseLib2/Level1/CDBVirtual.h \
+ ../../../BaseLib2/Level1/CDBTypes.h ../../../BaseLib2/Level0/Iterators.h \
+ ../../../BaseLib2/Level1/GCNamedObject.h \
+ ../../../BaseLib2/Level1/GCRTemplate.h \
+ ../../../BaseLib2/Level1/GCReference.h ../../../BaseLib2/Level0/Atomic.h \
+ ../../../BaseLib2/Level1/ObjectRegistryDataBase.h \
+ ../../../BaseLib2/Level1/CDBNull.h ../../../BaseLib2/Level3/CDB.h \
+ ../../../BaseLib2/Level2/FString.h ../../../BaseLib2/Level2/Streamable.h \
+ ../../../BaseLib2/Level0/CStream.h \
+ ../../../BaseLib2/Level2/CStreamBuffering.h \
+ ../../../BaseLib2/Level1/Object.h \
+ ../../../BaseLib2/Level1/StreamAttributes.h \
+ ../../../BaseLib2/Level3/CDBNodeRef.h ../../../BaseLib2/Level3/CDBNode.h \
+ ../../../BaseLib2/Level1/CDBTypes.h \
+ ../../../BaseLib2/Level1/CDBVirtual.h \
+ ../../../BaseLib2/Level2/CDBExtended.h \
+ ../../../BaseLib2/Level2/CDBDataTypes.h \
+ ../../../BaseLib2/Level2/FString.h \
+ ../../../BaseLib2/Level1/GlobalObjectDataBase.h \
+ ../../../BaseLib2/Level1/GCReferenceContainer.h \
+ ../../../BaseLib2/Level0/MutexSem.h ../../../BaseLib2/Level1/GCRCItem.h \
+ ../../../BaseLib2/Level1/GCNOExtender.h
+HelloWorld.o: HelloWorld.cpp
+LinkedListableExample.o: LinkedListableExample.cpp \
+ ../../../BaseLib2/Level0/ErrorManagement.h \
+ ../../../BaseLib2/Level0/System.h ../../../BaseLib2/Level0/SystemMSC.h \
+ ../../../BaseLib2/Level0/SystemLinux.h \
+ ../../../BaseLib2/Level0/GenDefs.h \
+ ../../../BaseLib2/Level0/SystemVX5100.h \
+ ../../../BaseLib2/Level0/SystemVX5500.h \
+ ../../../BaseLib2/Level0/SystemV6X5100.h \
+ ../../../BaseLib2/Level0/SystemV6X5500.h \
+ ../../../BaseLib2/Level0/SystemVX68k.h \
+ ../../../BaseLib2/Level0/SystemRTAI.h \
+ ../../../BaseLib2/Level0/SystemSolaris.h \
+ ../../../BaseLib2/Level0/SystemMacOSX.h \
+ ../../../BaseLib2/Level0/Memory.h ../../../BaseLib2/Level0/Iterators.h \
+ ../../../BaseLib2/Level0/LinkedListable.h \
+ ../../../BaseLib2/Level0/Iterators.h
+LocalInternetAddressExample.o: LocalInternetAddressExample.cpp \
+ ../../../BaseLib2/Level0/ErrorManagement.h \
+ ../../../BaseLib2/Level0/System.h ../../../BaseLib2/Level0/SystemMSC.h \
+ ../../../BaseLib2/Level0/SystemLinux.h \
+ ../../../BaseLib2/Level0/GenDefs.h \
+ ../../../BaseLib2/Level0/SystemVX5100.h \
+ ../../../BaseLib2/Level0/SystemVX5500.h \
+ ../../../BaseLib2/Level0/SystemV6X5100.h \
+ ../../../BaseLib2/Level0/SystemV6X5500.h \
+ ../../../BaseLib2/Level0/SystemVX68k.h \
+ ../../../BaseLib2/Level0/SystemRTAI.h \
+ ../../../BaseLib2/Level0/SystemSolaris.h \
+ ../../../BaseLib2/Level0/SystemMacOSX.h \
+ ../../../BaseLib2/Level0/Memory.h \
+ ../../../BaseLib2/Level0/InternetAddress.h \
+ ../../../BaseLib2/Level0/FastPollingMutexSem.h \
+ ../../../BaseLib2/Level0/Atomic.h ../../../BaseLib2/Level0/Sleep.h \
+ ../../../BaseLib2/Level0/FastMath.h ../../../BaseLib2/Level0/HRT.h \
+ ../../../BaseLib2/Level0/Processor.h \
+ ../../../BaseLib2/Level0/TimeoutType.h \
+ ../../../BaseLib2/Level0/BString.h \
+ ../../../BaseLib2/Level0/ErrorManagement.h
+SimpleConsole.o: SimpleConsole.cpp \
+ ../../../BaseLib2/Level0/ErrorManagement.h \
+ ../../../BaseLib2/Level0/System.h ../../../BaseLib2/Level0/SystemMSC.h \
+ ../../../BaseLib2/Level0/SystemLinux.h \
+ ../../../BaseLib2/Level0/GenDefs.h \
+ ../../../BaseLib2/Level0/SystemVX5100.h \
+ ../../../BaseLib2/Level0/SystemVX5500.h \
+ ../../../BaseLib2/Level0/SystemV6X5100.h \
+ ../../../BaseLib2/Level0/SystemV6X5500.h \
+ ../../../BaseLib2/Level0/SystemVX68k.h \
+ ../../../BaseLib2/Level0/SystemRTAI.h \
+ ../../../BaseLib2/Level0/SystemSolaris.h \
+ ../../../BaseLib2/Level0/SystemMacOSX.h \
+ ../../../BaseLib2/Level0/Memory.h ../../../BaseLib2/Level2/FString.h \
+ ../../../BaseLib2/Level0/BString.h ../../../BaseLib2/Level2/Streamable.h \
+ ../../../BaseLib2/Level0/System.h ../../../BaseLib2/Level0/CStream.h \
+ ../../../BaseLib2/Level2/CStreamBuffering.h \
+ ../../../BaseLib2/Level0/StreamInterface.h \
+ ../../../BaseLib2/Level0/TimeoutType.h ../../../BaseLib2/Level0/HRT.h \
+ ../../../BaseLib2/Level0/Processor.h ../../../BaseLib2/Level1/Object.h \
+ ../../../BaseLib2/Level1/ObjectRegistryItem.h \
+ ../../../BaseLib2/Level0/LinkedListable.h \
+ ../../../BaseLib2/Level0/Iterators.h \
+ ../../../BaseLib2/Level1/ErrorSystemInstructions.h \
+ ../../../BaseLib2/Level0/GenDefs.h \
+ ../../../BaseLib2/Level0/LinkedListHolder.h \
+ ../../../BaseLib2/Level0/LinkedListable.h \
+ ../../../BaseLib2/Level0/FastPollingMutexSem.h \
+ ../../../BaseLib2/Level0/Atomic.h ../../../BaseLib2/Level0/Sleep.h \
+ ../../../BaseLib2/Level0/FastMath.h ../../../BaseLib2/Level0/Threads.h \
+ ../../../BaseLib2/Level0/ErrorManagement.h \
+ ../../../BaseLib2/Level0/ExceptionHandlerDefinitions.h \
+ ../../../BaseLib2/Level0/ThreadInitialisationInterface.h \
+ ../../../BaseLib2/Level0/EventSem.h ../../../BaseLib2/Level0/SemCore.h \
+ ../../../BaseLib2/Level0/ProcessorType.h \
+ ../../../BaseLib2/Level0/ThreadsDatabase.h \
+ ../../../BaseLib2/Level1/ErrorSystemInstructionItem.h \
+ ../../../BaseLib2/Level1/ClassStructure.h \
+ ../../../BaseLib2/Level1/ClassStructureEntry.h \
+ ../../../BaseLib2/Level1/BasicTypes.h \
+ ../../../BaseLib2/Level0/LoadableLibrary.h \
+ ../../../BaseLib2/Level1/ObjectMacros.h \
+ ../../../BaseLib2/Level1/StreamAttributes.h \
+ ../../../BaseLib2/Level2/Console.h \
+ ../../../BaseLib2/Level0/BasicConsole.h \
+ ../../../BaseLib2/Level2/FString.h
+SimpleFileHandling.o: SimpleFileHandling.cpp \
+ ../../../BaseLib2/Level0/ErrorManagement.h \
+ ../../../BaseLib2/Level0/System.h ../../../BaseLib2/Level0/SystemMSC.h \
+ ../../../BaseLib2/Level0/SystemLinux.h \
+ ../../../BaseLib2/Level0/GenDefs.h \
+ ../../../BaseLib2/Level0/SystemVX5100.h \
+ ../../../BaseLib2/Level0/SystemVX5500.h \
+ ../../../BaseLib2/Level0/SystemV6X5100.h \
+ ../../../BaseLib2/Level0/SystemV6X5500.h \
+ ../../../BaseLib2/Level0/SystemVX68k.h \
+ ../../../BaseLib2/Level0/SystemRTAI.h \
+ ../../../BaseLib2/Level0/SystemSolaris.h \
+ ../../../BaseLib2/Level0/SystemMacOSX.h \
+ ../../../BaseLib2/Level0/Memory.h ../../../BaseLib2/Level2/FString.h \
+ ../../../BaseLib2/Level0/BString.h ../../../BaseLib2/Level2/Streamable.h \
+ ../../../BaseLib2/Level0/System.h ../../../BaseLib2/Level0/CStream.h \
+ ../../../BaseLib2/Level2/CStreamBuffering.h \
+ ../../../BaseLib2/Level0/StreamInterface.h \
+ ../../../BaseLib2/Level0/TimeoutType.h ../../../BaseLib2/Level0/HRT.h \
+ ../../../BaseLib2/Level0/Processor.h ../../../BaseLib2/Level1/Object.h \
+ ../../../BaseLib2/Level1/ObjectRegistryItem.h \
+ ../../../BaseLib2/Level0/LinkedListable.h \
+ ../../../BaseLib2/Level0/Iterators.h \
+ ../../../BaseLib2/Level1/ErrorSystemInstructions.h \
+ ../../../BaseLib2/Level0/GenDefs.h \
+ ../../../BaseLib2/Level0/LinkedListHolder.h \
+ ../../../BaseLib2/Level0/LinkedListable.h \
+ ../../../BaseLib2/Level0/FastPollingMutexSem.h \
+ ../../../BaseLib2/Level0/Atomic.h ../../../BaseLib2/Level0/Sleep.h \
+ ../../../BaseLib2/Level0/FastMath.h ../../../BaseLib2/Level0/Threads.h \
+ ../../../BaseLib2/Level0/ErrorManagement.h \
+ ../../../BaseLib2/Level0/ExceptionHandlerDefinitions.h \
+ ../../../BaseLib2/Level0/ThreadInitialisationInterface.h \
+ ../../../BaseLib2/Level0/EventSem.h ../../../BaseLib2/Level0/SemCore.h \
+ ../../../BaseLib2/Level0/ProcessorType.h \
+ ../../../BaseLib2/Level0/ThreadsDatabase.h \
+ ../../../BaseLib2/Level1/ErrorSystemInstructionItem.h \
+ ../../../BaseLib2/Level1/ClassStructure.h \
+ ../../../BaseLib2/Level1/ClassStructureEntry.h \
+ ../../../BaseLib2/Level1/BasicTypes.h \
+ ../../../BaseLib2/Level0/LoadableLibrary.h \
+ ../../../BaseLib2/Level1/ObjectMacros.h \
+ ../../../BaseLib2/Level1/StreamAttributes.h \
+ ../../../BaseLib2/Level2/File.h ../../../BaseLib2/Level0/BasicFile.h
+SimpleTCPClient.o: SimpleTCPClient.cpp \
+ ../../../BaseLib2/Level0/ErrorManagement.h \
+ ../../../BaseLib2/Level0/System.h ../../../BaseLib2/Level0/SystemMSC.h \
+ ../../../BaseLib2/Level0/SystemLinux.h \
+ ../../../BaseLib2/Level0/GenDefs.h \
+ ../../../BaseLib2/Level0/SystemVX5100.h \
+ ../../../BaseLib2/Level0/SystemVX5500.h \
+ ../../../BaseLib2/Level0/SystemV6X5100.h \
+ ../../../BaseLib2/Level0/SystemV6X5500.h \
+ ../../../BaseLib2/Level0/SystemVX68k.h \
+ ../../../BaseLib2/Level0/SystemRTAI.h \
+ ../../../BaseLib2/Level0/SystemSolaris.h \
+ ../../../BaseLib2/Level0/SystemMacOSX.h \
+ ../../../BaseLib2/Level0/Memory.h ../../../BaseLib2/Level2/FString.h \
+ ../../../BaseLib2/Level0/BString.h ../../../BaseLib2/Level2/Streamable.h \
+ ../../../BaseLib2/Level0/System.h ../../../BaseLib2/Level0/CStream.h \
+ ../../../BaseLib2/Level2/CStreamBuffering.h \
+ ../../../BaseLib2/Level0/StreamInterface.h \
+ ../../../BaseLib2/Level0/TimeoutType.h ../../../BaseLib2/Level0/HRT.h \
+ ../../../BaseLib2/Level0/Processor.h ../../../BaseLib2/Level1/Object.h \
+ ../../../BaseLib2/Level1/ObjectRegistryItem.h \
+ ../../../BaseLib2/Level0/LinkedListable.h \
+ ../../../BaseLib2/Level0/Iterators.h \
+ ../../../BaseLib2/Level1/ErrorSystemInstructions.h \
+ ../../../BaseLib2/Level0/GenDefs.h \
+ ../../../BaseLib2/Level0/LinkedListHolder.h \
+ ../../../BaseLib2/Level0/LinkedListable.h \
+ ../../../BaseLib2/Level0/FastPollingMutexSem.h \
+ ../../../BaseLib2/Level0/Atomic.h ../../../BaseLib2/Level0/Sleep.h \
+ ../../../BaseLib2/Level0/FastMath.h ../../../BaseLib2/Level0/Threads.h \
+ ../../../BaseLib2/Level0/ErrorManagement.h \
+ ../../../BaseLib2/Level0/ExceptionHandlerDefinitions.h \
+ ../../../BaseLib2/Level0/ThreadInitialisationInterface.h \
+ ../../../BaseLib2/Level0/EventSem.h ../../../BaseLib2/Level0/SemCore.h \
+ ../../../BaseLib2/Level0/ProcessorType.h \
+ ../../../BaseLib2/Level0/ThreadsDatabase.h \
+ ../../../BaseLib2/Level1/ErrorSystemInstructionItem.h \
+ ../../../BaseLib2/Level1/ClassStructure.h \
+ ../../../BaseLib2/Level1/ClassStructureEntry.h \
+ ../../../BaseLib2/Level1/BasicTypes.h \
+ ../../../BaseLib2/Level0/LoadableLibrary.h \
+ ../../../BaseLib2/Level1/ObjectMacros.h \
+ ../../../BaseLib2/Level1/StreamAttributes.h \
+ ../../../BaseLib2/Level2/TCPSocket.h \
+ ../../../BaseLib2/Level0/BasicTCPSocket.h \
+ ../../../BaseLib2/Level0/BasicSocket.h \
+ ../../../BaseLib2/Level0/InternetAddress.h \
+ ../../../BaseLib2/Level0/FastPollingMutexSem.h \
+ ../../../BaseLib2/Level0/BString.h \
+ ../../../BaseLib2/Level0/SocketSelect.h \
+ ../../../BaseLib2/Level0/InternetService.h \
+ ../../../BaseLib2/Level0/Endianity.h \
+ ../../../BaseLib2/Level0/SocketSelect.h \
+ ../../../BaseLib2/Level0/InternetService.h \
+ ../../../BaseLib2/Level0/SocketTimer.h
+SimpleTCPServer.o: SimpleTCPServer.cpp \
+ ../../../BaseLib2/Level0/ErrorManagement.h \
+ ../../../BaseLib2/Level0/System.h ../../../BaseLib2/Level0/SystemMSC.h \
+ ../../../BaseLib2/Level0/SystemLinux.h \
+ ../../../BaseLib2/Level0/GenDefs.h \
+ ../../../BaseLib2/Level0/SystemVX5100.h \
+ ../../../BaseLib2/Level0/SystemVX5500.h \
+ ../../../BaseLib2/Level0/SystemV6X5100.h \
+ ../../../BaseLib2/Level0/SystemV6X5500.h \
+ ../../../BaseLib2/Level0/SystemVX68k.h \
+ ../../../BaseLib2/Level0/SystemRTAI.h \
+ ../../../BaseLib2/Level0/SystemSolaris.h \
+ ../../../BaseLib2/Level0/SystemMacOSX.h \
+ ../../../BaseLib2/Level0/Memory.h ../../../BaseLib2/Level2/FString.h \
+ ../../../BaseLib2/Level0/BString.h ../../../BaseLib2/Level2/Streamable.h \
+ ../../../BaseLib2/Level0/System.h ../../../BaseLib2/Level0/CStream.h \
+ ../../../BaseLib2/Level2/CStreamBuffering.h \
+ ../../../BaseLib2/Level0/StreamInterface.h \
+ ../../../BaseLib2/Level0/TimeoutType.h ../../../BaseLib2/Level0/HRT.h \
+ ../../../BaseLib2/Level0/Processor.h ../../../BaseLib2/Level1/Object.h \
+ ../../../BaseLib2/Level1/ObjectRegistryItem.h \
+ ../../../BaseLib2/Level0/LinkedListable.h \
+ ../../../BaseLib2/Level0/Iterators.h \
+ ../../../BaseLib2/Level1/ErrorSystemInstructions.h \
+ ../../../BaseLib2/Level0/GenDefs.h \
+ ../../../BaseLib2/Level0/LinkedListHolder.h \
+ ../../../BaseLib2/Level0/LinkedListable.h \
+ ../../../BaseLib2/Level0/FastPollingMutexSem.h \
+ ../../../BaseLib2/Level0/Atomic.h ../../../BaseLib2/Level0/Sleep.h \
+ ../../../BaseLib2/Level0/FastMath.h ../../../BaseLib2/Level0/Threads.h \
+ ../../../BaseLib2/Level0/ErrorManagement.h \
+ ../../../BaseLib2/Level0/ExceptionHandlerDefinitions.h \
+ ../../../BaseLib2/Level0/ThreadInitialisationInterface.h \
+ ../../../BaseLib2/Level0/EventSem.h ../../../BaseLib2/Level0/SemCore.h \
+ ../../../BaseLib2/Level0/ProcessorType.h \
+ ../../../BaseLib2/Level0/ThreadsDatabase.h \
+ ../../../BaseLib2/Level1/ErrorSystemInstructionItem.h \
+ ../../../BaseLib2/Level1/ClassStructure.h \
+ ../../../BaseLib2/Level1/ClassStructureEntry.h \
+ ../../../BaseLib2/Level1/BasicTypes.h \
+ ../../../BaseLib2/Level0/LoadableLibrary.h \
+ ../../../BaseLib2/Level1/ObjectMacros.h \
+ ../../../BaseLib2/Level1/StreamAttributes.h \
+ ../../../BaseLib2/Level2/TCPSocket.h \
+ ../../../BaseLib2/Level0/BasicTCPSocket.h \
+ ../../../BaseLib2/Level0/BasicSocket.h \
+ ../../../BaseLib2/Level0/InternetAddress.h \
+ ../../../BaseLib2/Level0/FastPollingMutexSem.h \
+ ../../../BaseLib2/Level0/BString.h \
+ ../../../BaseLib2/Level0/SocketSelect.h \
+ ../../../BaseLib2/Level0/InternetService.h \
+ ../../../BaseLib2/Level0/Endianity.h \
+ ../../../BaseLib2/Level0/SocketSelect.h \
+ ../../../BaseLib2/Level0/InternetService.h \
+ ../../../BaseLib2/Level0/SocketTimer.h
+StaticListHolderExample.o: StaticListHolderExample.cpp \
+ ../../../BaseLib2/Level0/ErrorManagement.h \
+ ../../../BaseLib2/Level0/System.h ../../../BaseLib2/Level0/SystemMSC.h \
+ ../../../BaseLib2/Level0/SystemLinux.h \
+ ../../../BaseLib2/Level0/GenDefs.h \
+ ../../../BaseLib2/Level0/SystemVX5100.h \
+ ../../../BaseLib2/Level0/SystemVX5500.h \
+ ../../../BaseLib2/Level0/SystemV6X5100.h \
+ ../../../BaseLib2/Level0/SystemV6X5500.h \
+ ../../../BaseLib2/Level0/SystemVX68k.h \
+ ../../../BaseLib2/Level0/SystemRTAI.h \
+ ../../../BaseLib2/Level0/SystemSolaris.h \
+ ../../../BaseLib2/Level0/SystemMacOSX.h \
+ ../../../BaseLib2/Level0/Memory.h \
+ ../../../BaseLib2/Level0/StaticListHolder.h \
+ ../../../BaseLib2/Level0/TimeoutType.h ../../../BaseLib2/Level0/HRT.h \
+ ../../../BaseLib2/Level0/Processor.h \
+ ../../../BaseLib2/Level0/FastPollingMutexSem.h \
+ ../../../BaseLib2/Level0/Atomic.h ../../../BaseLib2/Level0/Sleep.h \
+ ../../../BaseLib2/Level0/FastMath.h \
+ ../../../BaseLib2/Level0/StaticListTemplate.h \
+ ../../../BaseLib2/Level0/StaticListHolder.h
+ThreadExample1.o: ThreadExample1.cpp ../../../BaseLib2/Level0/Threads.h \
+ ../../../BaseLib2/Level0/System.h ../../../BaseLib2/Level0/SystemMSC.h \
+ ../../../BaseLib2/Level0/SystemLinux.h \
+ ../../../BaseLib2/Level0/GenDefs.h \
+ ../../../BaseLib2/Level0/SystemVX5100.h \
+ ../../../BaseLib2/Level0/SystemVX5500.h \
+ ../../../BaseLib2/Level0/SystemV6X5100.h \
+ ../../../BaseLib2/Level0/SystemV6X5500.h \
+ ../../../BaseLib2/Level0/SystemVX68k.h \
+ ../../../BaseLib2/Level0/SystemRTAI.h \
+ ../../../BaseLib2/Level0/SystemSolaris.h \
+ ../../../BaseLib2/Level0/SystemMacOSX.h \
+ ../../../BaseLib2/Level0/Memory.h \
+ ../../../BaseLib2/Level0/ErrorManagement.h \
+ ../../../BaseLib2/Level0/ExceptionHandlerDefinitions.h \
+ ../../../BaseLib2/Level0/ThreadInitialisationInterface.h \
+ ../../../BaseLib2/Level0/EventSem.h ../../../BaseLib2/Level0/SemCore.h \
+ ../../../BaseLib2/Level0/Iterators.h ../../../BaseLib2/Level0/Sleep.h \
+ ../../../BaseLib2/Level0/FastMath.h ../../../BaseLib2/Level0/HRT.h \
+ ../../../BaseLib2/Level0/Processor.h \
+ ../../../BaseLib2/Level0/TimeoutType.h \
+ ../../../BaseLib2/Level0/ProcessorType.h \
+ ../../../BaseLib2/Level0/ThreadsDatabase.h \
+ ../../../BaseLib2/Level0/Sleep.h
+ThreadExample2.o: ThreadExample2.cpp ../../../BaseLib2/Level0/Threads.h \
+ ../../../BaseLib2/Level0/System.h ../../../BaseLib2/Level0/SystemMSC.h \
+ ../../../BaseLib2/Level0/SystemLinux.h \
+ ../../../BaseLib2/Level0/GenDefs.h \
+ ../../../BaseLib2/Level0/SystemVX5100.h \
+ ../../../BaseLib2/Level0/SystemVX5500.h \
+ ../../../BaseLib2/Level0/SystemV6X5100.h \
+ ../../../BaseLib2/Level0/SystemV6X5500.h \
+ ../../../BaseLib2/Level0/SystemVX68k.h \
+ ../../../BaseLib2/Level0/SystemRTAI.h \
+ ../../../BaseLib2/Level0/SystemSolaris.h \
+ ../../../BaseLib2/Level0/SystemMacOSX.h \
+ ../../../BaseLib2/Level0/Memory.h \
+ ../../../BaseLib2/Level0/ErrorManagement.h \
+ ../../../BaseLib2/Level0/ExceptionHandlerDefinitions.h \
+ ../../../BaseLib2/Level0/ThreadInitialisationInterface.h \
+ ../../../BaseLib2/Level0/EventSem.h ../../../BaseLib2/Level0/SemCore.h \
+ ../../../BaseLib2/Level0/Iterators.h ../../../BaseLib2/Level0/Sleep.h \
+ ../../../BaseLib2/Level0/FastMath.h ../../../BaseLib2/Level0/HRT.h \
+ ../../../BaseLib2/Level0/Processor.h \
+ ../../../BaseLib2/Level0/TimeoutType.h \
+ ../../../BaseLib2/Level0/ProcessorType.h \
+ ../../../BaseLib2/Level0/ThreadsDatabase.h \
+ ../../../BaseLib2/Level0/Sleep.h ../../../BaseLib2/Level0/MutexSem.h \
+ ../../../BaseLib2/Level0/EventSem.h ../../../BaseLib2/Level0/Atomic.h

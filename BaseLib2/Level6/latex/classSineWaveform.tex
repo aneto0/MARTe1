@@ -1,0 +1,71 @@
+\hypertarget{classSineWaveform}{
+\section{SineWaveform Class Reference}
+\label{classSineWaveform}\index{SineWaveform@{SineWaveform}}
+}
+Inheritance diagram for SineWaveform:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classSineWaveform}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classSineWaveform_a9dbdb5198162d1eb402c4fc0f65f5c8e}{
+virtual void {\bfseries Reset} ()}
+\label{classSineWaveform_a9dbdb5198162d1eb402c4fc0f65f5c8e}
+
+\item 
+virtual bool \hyperlink{classSineWaveform_aed05eed95ba2325d32f68523dfa815e9}{ObjectLoadSetup} (ConfigurationDataBase \&cdbData, StreamInterface $\ast$err)
+\item 
+virtual bool \hyperlink{classSineWaveform_a98a9876eedef78a3f4ac1fe2cc5aa1bd}{ProcessHttpMessage} (HttpStream \&hStream)
+\item 
+\hypertarget{classSineWaveform_a919252ac1127ee2bb0c0e2138d32402a}{
+virtual float {\bfseries GetValue} (int32 usecTime)}
+\label{classSineWaveform_a919252ac1127ee2bb0c0e2138d32402a}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classSineWaveform_aed05eed95ba2325d32f68523dfa815e9}{
+\index{SineWaveform@{SineWaveform}!ObjectLoadSetup@{ObjectLoadSetup}}
+\index{ObjectLoadSetup@{ObjectLoadSetup}!SineWaveform@{SineWaveform}}
+\subsubsection[{ObjectLoadSetup}]{\setlength{\rightskip}{0pt plus 5cm}bool SineWaveform::ObjectLoadSetup (
+\begin{DoxyParamCaption}
+\item[{ConfigurationDataBase \&}]{cdbData, }
+\item[{StreamInterface $\ast$}]{err}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}
+\label{classSineWaveform_aed05eed95ba2325d32f68523dfa815e9}
+Loads parameters from a CDB 
+\begin{DoxyParams}{Parameters}
+{\em cdbData} & the CDB \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if the initialisation went ok, False otherwise 
+\end{DoxyReturn}
+\hypertarget{classSineWaveform_a98a9876eedef78a3f4ac1fe2cc5aa1bd}{
+\index{SineWaveform@{SineWaveform}!ProcessHttpMessage@{ProcessHttpMessage}}
+\index{ProcessHttpMessage@{ProcessHttpMessage}!SineWaveform@{SineWaveform}}
+\subsubsection[{ProcessHttpMessage}]{\setlength{\rightskip}{0pt plus 5cm}bool SineWaveform::ProcessHttpMessage (
+\begin{DoxyParamCaption}
+\item[{HttpStream \&}]{hStream}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}
+\label{classSineWaveform_a98a9876eedef78a3f4ac1fe2cc5aa1bd}
+Builds a webpage for the current object 
+\begin{DoxyParams}{Parameters}
+{\em hStream} & the HttpStream to write to \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following files:\begin{DoxyCompactItemize}
+\item 
+SineWaveform.h\item 
+SineWaveform.cpp\end{DoxyCompactItemize}

@@ -1,0 +1,91 @@
+##############################################################
+#
+# Copyright 2011 EFDA | European Fusion Development Agreement
+#
+# Licensed under the EUPL, Version 1.1 or - as soon they 
+# will be approved by the European Commission - subsequent  
+# versions of the EUPL (the "Licence"); 
+# You may not use this work except in compliance with the 
+# Licence. 
+# You may obtain a copy of the Licence at: 
+#  
+# http://ec.europa.eu/idabc/eupl
+#
+# Unless required by applicable law or agreed to in 
+# writing, software distributed under the Licence is 
+# distributed on an "AS IS" basis, 
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
+# express or implied. 
+# See the Licence for the specific language governing 
+# permissions and limitations under the Licence. 
+#
+# $Id$
+#
+#############################################################
+
+vx5100/%.o : %.cpp
+	$(COMPILER) -c $(CFLAGS) $(DEBUG) $(OPTIM)  $*.cpp -o vx5100/$*.o
+#	$(COMPILER) -S $(CFLAGS) $(DEBUG) $(OPTIM)  $*.cpp -o vx5100/$*.s
+
+vx5100/%.o : %.c
+	$(COMPILER) -c $(CFLAGS) $(DEBUG) $(OPTIM)  $*.c -o vx5100/$*.o
+#	$(COMPILER) -S $(CFLAGS) $(DEBUG) $(OPTIM)  $*.c -o vx5100/$*.s
+
+vx5100/%.a : $(OBJS)
+	touch $@
+	rm vx5100/$*.a
+	jldppc -r -nostdlib $(OBJS) -o $@
+
+vx5100/%.exe : vx5100/%.o 
+	touch vx5100/$*.exe
+	echo cannot build executable vx5100/$*.exe use vx5100/$*.ex
+
+vx5100/%.dl : vx5100/%.ex_
+	nmppc vx5100/$*.ex_ | wtxtcl ${WIND_BASE}/ppc/host/src/hutils/munch.tcl -asm ppc > vx5100/$*.ctdt.c
+	$(COMPILER) -c $(CFLAGS) -mstrict-align -fdollars-in-identifiers -fno-builtin vx5100/$*.ctdt.c -o vx5100/$*.ctdt.o
+	jldppc -r -nostdlib vx5100/$*.ctdt.o  vx5100/$*.ex_ -o vx5100/$*.dl
+
+vx5100/%.gam : vx5100/%.ex_
+	nmppc vx5100/$*.ex_ | wtxtcl ${WIND_BASE}/ppc/host/src/hutils/munch.tcl -asm ppc > vx5100/$*.ctdt.c
+	$(COMPILER) -c $(CFLAGS) -mstrict-align -fdollars-in-identifiers -fno-builtin vx5100/$*.ctdt.c -o vx5100/$*.ctdt.o
+	jldppc -r -nostdlib vx5100/$*.ctdt.o  vx5100/$*.ex_ -o vx5100/$*.gam
+
+vx5100/%.ex : vx5100/%.ex_
+	nmppc vx5100/$*.ex_ | wtxtcl ${WIND_BASE}/ppc/host/src/hutils/munch.tcl -asm ppc > vx5100/$*.ctdt.c
+	$(COMPILER) -c $(CFLAGS) -mstrict-align -fdollars-in-identifiers -fno-builtin vx5100/$*.ctdt.c -o vx5100/$*.ctdt.o
+	jldppc -r -nostdlib vx5100/$*.ctdt.o  vx5100/$*.ex_ -o vx5100/$*.ex
+
+vx5100/%.drv : vx5100/%.ex_
+	nmppc vx5100/$*.ex_ | wtxtcl ${WIND_BASE}/ppc/host/src/hutils/munch.tcl -asm ppc > vx5100/$*.ctdt.c
+	$(COMPILER) -c $(CFLAGS) -mstrict-align -fdollars-in-identifiers -fno-builtin vx5100/$*.ctdt.c -o vx5100/$*.ctdt.o
+	jldppc -r -nostdlib vx5100/$*.ctdt.o  vx5100/$*.ex_ -o vx5100/$*.drv
+
+vx5100/%.ex_ : vx5100/%.o $(OBJS)
+	jldppc -r -nostdlib vx5100/$*.o $(OBJS) $(LIBRARIES)  -o vx5100/$*.ex_
+
+depends.vx5100: dependsRaw.vx5100 
+	sed -f $(MAKEDEFAULTDIR)/CreateVX5100Depends.sed dependsRaw.vx5100 >depends.vx5100
+
+dependsRaw.vx5100: 
+	$(COMPILER) $(CFLAGS) $(DEBUG) $(OPTIM) -MM -I. *.c* > dependsRaw.vx5100
+	@mkdir -p temp
+	@mkdir -p vx5100
+
+
+%.spb : 
+	$(MAKE) -C $* -f Makefile.$(TARGET)
+
+
+%.spc : 
+	$(MAKE) -C $* -f Makefile.$(TARGET) clean
+
+
+clean:  $(SUBPROJC)
+	rm -f depends*
+	rm -f $(TARGET)/*$(OBJEXT)
+	rm -f $(TARGET)/*$(DLLEXT)
+	rm -f $(TARGET)/*$(EXEEXT)
+	rm -f $(TARGET)/*$(LIBEXT)
+	rm -f $(TARGET)/*$(GAMEXT)
+	rm -f $(TARGET)/*$(DRVEXT)
+

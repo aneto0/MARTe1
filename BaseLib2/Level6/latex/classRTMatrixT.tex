@@ -1,0 +1,332 @@
+\hypertarget{classRTMatrixT}{
+\section{RTMatrixT$<$ T $>$ Class Template Reference}
+\label{classRTMatrixT}\index{RTMatrixT@{RTMatrixT}}
+}
+
+
+{\ttfamily \#include $<$RTMatrix.h$>$}
+
+Inheritance diagram for RTMatrixT$<$ T $>$:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=3.000000cm]{classRTMatrixT}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classRTMatrixT_a4bfc7209460dcb5d9b469d493d8a69ce}{
+bool {\bfseries Allocate} (const uint32 nRows, const uint32 nColumns)}
+\label{classRTMatrixT_a4bfc7209460dcb5d9b469d493d8a69ce}
+
+\item 
+\hypertarget{classRTMatrixT_a59c3e3816d9ad29ad8627e2b3ab649b6}{
+void {\bfseries DeAllocate} ()}
+\label{classRTMatrixT_a59c3e3816d9ad29ad8627e2b3ab649b6}
+
+\item 
+\hypertarget{classRTMatrixT_a4e61750555a3bd0e48514ddeea3dd9bc}{
+void {\bfseries Initialize} ()}
+\label{classRTMatrixT_a4e61750555a3bd0e48514ddeea3dd9bc}
+
+\item 
+\hypertarget{classRTMatrixT_a8925fff21e6a6dac457100cb6eefa345}{
+void {\bfseries SwapRows} (uint32 row\_\-i, uint32 row\_\-j)}
+\label{classRTMatrixT_a8925fff21e6a6dac457100cb6eefa345}
+
+\item 
+\hypertarget{classRTMatrixT_a8bf66bd097cad0600526c8584e2d493f}{
+{\bfseries RTMatrixT} (const uint32 nRows, const uint32 nColumns)}
+\label{classRTMatrixT_a8bf66bd097cad0600526c8584e2d493f}
+
+\item 
+\hypertarget{classRTMatrixT_a84ca2ac42c1c5b945393cf66d83197b0}{
+{\bfseries RTMatrixT} (const uint32 nRows, const uint32 nColumns, const T $\ast$source)}
+\label{classRTMatrixT_a84ca2ac42c1c5b945393cf66d83197b0}
+
+\item 
+\hypertarget{classRTMatrixT_af9e119ed0da618f2730af309f812277f}{
+{\bfseries RTMatrixT} (const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ T $>$ \&A)}
+\label{classRTMatrixT_af9e119ed0da618f2730af309f812277f}
+
+\item 
+\hyperlink{classRTMatrixT_a469d1e9a31a9e81be88464ab444a0a54}{RTMatrixT} (const uint32 nRows, const uint32 nColumns, const char $\ast$options)
+\item 
+void \hyperlink{classRTMatrixT_ab792ff0825d8c67a79c23b051ee70367}{Zerofy} ()
+\item 
+void \hyperlink{classRTMatrixT_af16471905a590114f6b560fb14b41350}{Onefy} ()
+\item 
+void \hyperlink{classRTMatrixT_a2bc71bcbbc5ede802b23620a543f5762}{Eyefy} ()
+\item 
+void \hyperlink{classRTMatrixT_a1319919a5212715705ff30a4155e1327}{Scale} (const T \&x)
+\item 
+uint32 \hyperlink{classRTMatrixT_a38179933093473554555dcdfb035e8ce}{NRows} () const 
+\item 
+uint32 \hyperlink{classRTMatrixT_a2fcc0950e8b0d4c8d00c92aa8a99d59c}{NColumns} () const 
+\item 
+void \hyperlink{classRTMatrixT_a234c8e2022252db0ff7f9f1a68fb47de}{Clear} ()
+\item 
+const \hyperlink{classRTMatrixRow}{RTMatrixRow}$<$ T $>$ \hyperlink{classRTMatrixT_afd251c8826e3350e7d2cbdf98a15af2c}{operator\mbox{[}$\,$\mbox{]}} (int rowNo)
+\item 
+bool \hyperlink{classRTMatrixT_a32bca77e2956ac200c9d8b5b62a93394}{IsNull} ()
+\item 
+bool \hyperlink{classRTMatrixT_afb183a86036303dba36e56eac881fa38}{Product} (const \hyperlink{classRTMatrixT}{RTMatrixT} \&A, const \hyperlink{classRTMatrixT}{RTMatrixT} \&B)
+\item 
+bool \hyperlink{classRTMatrixT_ad0ef2110e91e93440f1574567a498419}{DotProduct} (const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ T $>$ \&A)
+\item 
+bool \hyperlink{classRTMatrixT_af866c8313cb58740b7a4a99665d8aa71}{Sum} (const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ T $>$ \&A, const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ T $>$ \&B)
+\item 
+bool \hyperlink{classRTMatrixT_a07f4045c3ce877cde806294a336568b2}{Diff} (const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ T $>$ \&A, const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ T $>$ \&B)
+\item 
+bool \hyperlink{classRTMatrixT_afb66d6eacc34946de4c9470fae15bfcf}{Combine} (const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ T $>$ \&A, const T aw, const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ T $>$ \&B, const T bw)
+\item 
+T \hyperlink{classRTMatrixT_a42b86d8bf32b5e42292edff8d6e2bc2b}{MaxAbsRowSumNorm} ()
+\item 
+T \hyperlink{classRTMatrixT_a3a013b9fc461b06dbe2def2eb3318fb5}{MaxAbsColSumNorm} ()
+\item 
+bool \hyperlink{classRTMatrixT_a16014847a3d1982e3d11ed7ec2b22897}{Transpose} (const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ T $>$ \&A)
+\item 
+bool \hyperlink{classRTMatrixT_a8b54fe4f49d5b892afa96e54ea4c8e5f}{Invert} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ T $>$ \&A)
+\item 
+\hypertarget{classRTMatrixT_a0ea9a7f1df85d8eef54009f607a9b029}{
+\hyperlink{classRTMatrixT}{RTMatrixT} \& {\bfseries operator=} (const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ T $>$ \&A)}
+\label{classRTMatrixT_a0ea9a7f1df85d8eef54009f607a9b029}
+
+\item 
+bool \hyperlink{classRTMatrixT_a76c1f212c944b4de47e556172738cc24}{LU} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ T $>$ \&L, \hyperlink{classRTMatrixT}{RTMatrixT}$<$ T $>$ \&U, \hyperlink{classRTMatrixT}{RTMatrixT}$<$ T $>$ \&P)
+\item 
+bool \hyperlink{classRTMatrixT_a9e08c8785510d11b9df86800ca3179a8}{SVD} (\hyperlink{classRTMatrixT}{RTMatrixT}$<$ T $>$ \&U, \hyperlink{classRTMatrixT}{RTMatrixT}$<$ T $>$ \&W, \hyperlink{classRTMatrixT}{RTMatrixT}$<$ T $>$ \&V)
+\item 
+void \hyperlink{classRTMatrixT_afc165d73e0b9ac3caf53ddf241c73337}{Print} (StreamInterface \&s, int maxrow=10)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\subsubsection*{template$<$class T$>$class RTMatrixT$<$ T $>$}
+
+The actual RTMatrix 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classRTMatrixT_a469d1e9a31a9e81be88464ab444a0a54}{
+\index{RTMatrixT@{RTMatrixT}!RTMatrixT@{RTMatrixT}}
+\index{RTMatrixT@{RTMatrixT}!RTMatrixT@{RTMatrixT}}
+\subsubsection[{RTMatrixT}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T$>$ {\bf RTMatrixT}$<$ T $>$::{\bf RTMatrixT} (
+\begin{DoxyParamCaption}
+\item[{const uint32}]{nRows, }
+\item[{const uint32}]{nColumns, }
+\item[{const char $\ast$}]{options}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classRTMatrixT_a469d1e9a31a9e81be88464ab444a0a54}
+Constructor for allocating a zeros,ones,eye matrix todo 
+
+\subsection{Member Function Documentation}
+\hypertarget{classRTMatrixT_a234c8e2022252db0ff7f9f1a68fb47de}{
+\index{RTMatrixT@{RTMatrixT}!Clear@{Clear}}
+\index{Clear@{Clear}!RTMatrixT@{RTMatrixT}}
+\subsubsection[{Clear}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T$>$ void {\bf RTMatrixT}$<$ T $>$::Clear (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classRTMatrixT_a234c8e2022252db0ff7f9f1a68fb47de}
+Set elements of the matrix to zero. \hypertarget{classRTMatrixT_afb66d6eacc34946de4c9470fae15bfcf}{
+\index{RTMatrixT@{RTMatrixT}!Combine@{Combine}}
+\index{Combine@{Combine}!RTMatrixT@{RTMatrixT}}
+\subsubsection[{Combine}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T$>$ bool {\bf RTMatrixT}$<$ T $>$::Combine (
+\begin{DoxyParamCaption}
+\item[{const {\bf RTMatrixT}$<$ T $>$ \&}]{A, }
+\item[{const T}]{aw, }
+\item[{const {\bf RTMatrixT}$<$ T $>$ \&}]{B, }
+\item[{const T}]{bw}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classRTMatrixT_afb66d6eacc34946de4c9470fae15bfcf}
+loads the linear combination of A and B WARNING: Uncoherent notation with the parameters in RTM\_\-\_\-vecComb!!! to restabilish eveness maybe is better to change the definition in that functions set. \hypertarget{classRTMatrixT_a07f4045c3ce877cde806294a336568b2}{
+\index{RTMatrixT@{RTMatrixT}!Diff@{Diff}}
+\index{Diff@{Diff}!RTMatrixT@{RTMatrixT}}
+\subsubsection[{Diff}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T$>$ bool {\bf RTMatrixT}$<$ T $>$::Diff (
+\begin{DoxyParamCaption}
+\item[{const {\bf RTMatrixT}$<$ T $>$ \&}]{A, }
+\item[{const {\bf RTMatrixT}$<$ T $>$ \&}]{B}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classRTMatrixT_a07f4045c3ce877cde806294a336568b2}
+loads the difference of A and B \hypertarget{classRTMatrixT_ad0ef2110e91e93440f1574567a498419}{
+\index{RTMatrixT@{RTMatrixT}!DotProduct@{DotProduct}}
+\index{DotProduct@{DotProduct}!RTMatrixT@{RTMatrixT}}
+\subsubsection[{DotProduct}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T$>$ bool {\bf RTMatrixT}$<$ T $>$::DotProduct (
+\begin{DoxyParamCaption}
+\item[{const {\bf RTMatrixT}$<$ T $>$ \&}]{A}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classRTMatrixT_ad0ef2110e91e93440f1574567a498419}
+this is an element by element product \hypertarget{classRTMatrixT_a2bc71bcbbc5ede802b23620a543f5762}{
+\index{RTMatrixT@{RTMatrixT}!Eyefy@{Eyefy}}
+\index{Eyefy@{Eyefy}!RTMatrixT@{RTMatrixT}}
+\subsubsection[{Eyefy}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T$>$ void {\bf RTMatrixT}$<$ T $>$::Eyefy (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classRTMatrixT_a2bc71bcbbc5ede802b23620a543f5762}
+Set the diagonal entries of the matrix to one, the others to zero. \hypertarget{classRTMatrixT_a8b54fe4f49d5b892afa96e54ea4c8e5f}{
+\index{RTMatrixT@{RTMatrixT}!Invert@{Invert}}
+\index{Invert@{Invert}!RTMatrixT@{RTMatrixT}}
+\subsubsection[{Invert}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T$>$ bool {\bf RTMatrixT}$<$ T $>$::Invert (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ T $>$ \&}]{A}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classRTMatrixT_a8b54fe4f49d5b892afa96e54ea4c8e5f}
+inverts the matrix A \hypertarget{classRTMatrixT_a32bca77e2956ac200c9d8b5b62a93394}{
+\index{RTMatrixT@{RTMatrixT}!IsNull@{IsNull}}
+\index{IsNull@{IsNull}!RTMatrixT@{RTMatrixT}}
+\subsubsection[{IsNull}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T$>$ bool {\bf RTMatrixT}$<$ T $>$::IsNull (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classRTMatrixT_a32bca77e2956ac200c9d8b5b62a93394}
+Returns True if the matrix is the null one. \hypertarget{classRTMatrixT_a76c1f212c944b4de47e556172738cc24}{
+\index{RTMatrixT@{RTMatrixT}!LU@{LU}}
+\index{LU@{LU}!RTMatrixT@{RTMatrixT}}
+\subsubsection[{LU}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T$>$ bool {\bf RTMatrixT}$<$ T $>$::LU (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ T $>$ \&}]{L, }
+\item[{{\bf RTMatrixT}$<$ T $>$ \&}]{U, }
+\item[{{\bf RTMatrixT}$<$ T $>$ \&}]{P}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classRTMatrixT_a76c1f212c944b4de47e556172738cc24}
+LUP Decomposition \hypertarget{classRTMatrixT_a3a013b9fc461b06dbe2def2eb3318fb5}{
+\index{RTMatrixT@{RTMatrixT}!MaxAbsColSumNorm@{MaxAbsColSumNorm}}
+\index{MaxAbsColSumNorm@{MaxAbsColSumNorm}!RTMatrixT@{RTMatrixT}}
+\subsubsection[{MaxAbsColSumNorm}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T$>$ T {\bf RTMatrixT}$<$ T $>$::MaxAbsColSumNorm (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classRTMatrixT_a3a013b9fc461b06dbe2def2eb3318fb5}
+\hypertarget{classRTMatrixT_a42b86d8bf32b5e42292edff8d6e2bc2b}{
+\index{RTMatrixT@{RTMatrixT}!MaxAbsRowSumNorm@{MaxAbsRowSumNorm}}
+\index{MaxAbsRowSumNorm@{MaxAbsRowSumNorm}!RTMatrixT@{RTMatrixT}}
+\subsubsection[{MaxAbsRowSumNorm}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T$>$ T {\bf RTMatrixT}$<$ T $>$::MaxAbsRowSumNorm (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classRTMatrixT_a42b86d8bf32b5e42292edff8d6e2bc2b}
+\hypertarget{classRTMatrixT_a2fcc0950e8b0d4c8d00c92aa8a99d59c}{
+\index{RTMatrixT@{RTMatrixT}!NColumns@{NColumns}}
+\index{NColumns@{NColumns}!RTMatrixT@{RTMatrixT}}
+\subsubsection[{NColumns}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T$>$ uint32 {\bf RTMatrixT}$<$ T $>$::NColumns (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classRTMatrixT_a2fcc0950e8b0d4c8d00c92aa8a99d59c}
+n of columns \hypertarget{classRTMatrixT_a38179933093473554555dcdfb035e8ce}{
+\index{RTMatrixT@{RTMatrixT}!NRows@{NRows}}
+\index{NRows@{NRows}!RTMatrixT@{RTMatrixT}}
+\subsubsection[{NRows}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T$>$ uint32 {\bf RTMatrixT}$<$ T $>$::NRows (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classRTMatrixT_a38179933093473554555dcdfb035e8ce}
+n of rows \hypertarget{classRTMatrixT_af16471905a590114f6b560fb14b41350}{
+\index{RTMatrixT@{RTMatrixT}!Onefy@{Onefy}}
+\index{Onefy@{Onefy}!RTMatrixT@{RTMatrixT}}
+\subsubsection[{Onefy}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T$>$ void {\bf RTMatrixT}$<$ T $>$::Onefy (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classRTMatrixT_af16471905a590114f6b560fb14b41350}
+Set elements of the matrix to one. \hypertarget{classRTMatrixT_afd251c8826e3350e7d2cbdf98a15af2c}{
+\index{RTMatrixT@{RTMatrixT}!operator\mbox{[}\mbox{]}@{operator[]}}
+\index{operator\mbox{[}\mbox{]}@{operator[]}!RTMatrixT@{RTMatrixT}}
+\subsubsection[{operator[]}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T$>$ const {\bf RTMatrixRow}$<$T$>$ {\bf RTMatrixT}$<$ T $>$::operator\mbox{[}$\,$\mbox{]} (
+\begin{DoxyParamCaption}
+\item[{int}]{rowNo}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classRTMatrixT_afd251c8826e3350e7d2cbdf98a15af2c}
+Allow fast access to elements 
+
+Reimplemented in \hyperlink{classMatrixT_a8c84047f97f2d07290a7882884e50397}{MatrixT$<$ T $>$}.
+
+\hypertarget{classRTMatrixT_afc165d73e0b9ac3caf53ddf241c73337}{
+\index{RTMatrixT@{RTMatrixT}!Print@{Print}}
+\index{Print@{Print}!RTMatrixT@{RTMatrixT}}
+\subsubsection[{Print}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T$>$ void {\bf RTMatrixT}$<$ T $>$::Print (
+\begin{DoxyParamCaption}
+\item[{StreamInterface \&}]{s, }
+\item[{int}]{maxrow = {\ttfamily 10}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classRTMatrixT_afc165d73e0b9ac3caf53ddf241c73337}
+just dumps on stream \hypertarget{classRTMatrixT_afb183a86036303dba36e56eac881fa38}{
+\index{RTMatrixT@{RTMatrixT}!Product@{Product}}
+\index{Product@{Product}!RTMatrixT@{RTMatrixT}}
+\subsubsection[{Product}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T$>$ bool {\bf RTMatrixT}$<$ T $>$::Product (
+\begin{DoxyParamCaption}
+\item[{const {\bf RTMatrixT}$<$ T $>$ \&}]{A, }
+\item[{const {\bf RTMatrixT}$<$ T $>$ \&}]{B}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classRTMatrixT_afb183a86036303dba36e56eac881fa38}
+loads the product of A and B \hypertarget{classRTMatrixT_a1319919a5212715705ff30a4155e1327}{
+\index{RTMatrixT@{RTMatrixT}!Scale@{Scale}}
+\index{Scale@{Scale}!RTMatrixT@{RTMatrixT}}
+\subsubsection[{Scale}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T$>$ void {\bf RTMatrixT}$<$ T $>$::Scale (
+\begin{DoxyParamCaption}
+\item[{const T \&}]{x}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classRTMatrixT_a1319919a5212715705ff30a4155e1327}
+scale all the values by x \hypertarget{classRTMatrixT_af866c8313cb58740b7a4a99665d8aa71}{
+\index{RTMatrixT@{RTMatrixT}!Sum@{Sum}}
+\index{Sum@{Sum}!RTMatrixT@{RTMatrixT}}
+\subsubsection[{Sum}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T$>$ bool {\bf RTMatrixT}$<$ T $>$::Sum (
+\begin{DoxyParamCaption}
+\item[{const {\bf RTMatrixT}$<$ T $>$ \&}]{A, }
+\item[{const {\bf RTMatrixT}$<$ T $>$ \&}]{B}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classRTMatrixT_af866c8313cb58740b7a4a99665d8aa71}
+loads the sum of A and B \hypertarget{classRTMatrixT_a9e08c8785510d11b9df86800ca3179a8}{
+\index{RTMatrixT@{RTMatrixT}!SVD@{SVD}}
+\index{SVD@{SVD}!RTMatrixT@{RTMatrixT}}
+\subsubsection[{SVD}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T$>$ bool {\bf RTMatrixT}$<$ T $>$::SVD (
+\begin{DoxyParamCaption}
+\item[{{\bf RTMatrixT}$<$ T $>$ \&}]{U, }
+\item[{{\bf RTMatrixT}$<$ T $>$ \&}]{W, }
+\item[{{\bf RTMatrixT}$<$ T $>$ \&}]{V}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classRTMatrixT_a9e08c8785510d11b9df86800ca3179a8}
+SVD Decomposition \hypertarget{classRTMatrixT_a16014847a3d1982e3d11ed7ec2b22897}{
+\index{RTMatrixT@{RTMatrixT}!Transpose@{Transpose}}
+\index{Transpose@{Transpose}!RTMatrixT@{RTMatrixT}}
+\subsubsection[{Transpose}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T$>$ bool {\bf RTMatrixT}$<$ T $>$::Transpose (
+\begin{DoxyParamCaption}
+\item[{const {\bf RTMatrixT}$<$ T $>$ \&}]{A}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classRTMatrixT_a16014847a3d1982e3d11ed7ec2b22897}
+loads the transposed of A \hypertarget{classRTMatrixT_ab792ff0825d8c67a79c23b051ee70367}{
+\index{RTMatrixT@{RTMatrixT}!Zerofy@{Zerofy}}
+\index{Zerofy@{Zerofy}!RTMatrixT@{RTMatrixT}}
+\subsubsection[{Zerofy}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T$>$ void {\bf RTMatrixT}$<$ T $>$::Zerofy (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classRTMatrixT_ab792ff0825d8c67a79c23b051ee70367}
+Set elements of the matrix to zero. 
+
+The documentation for this class was generated from the following file:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{RTMatrix_8h}{RTMatrix.h}\end{DoxyCompactItemize}

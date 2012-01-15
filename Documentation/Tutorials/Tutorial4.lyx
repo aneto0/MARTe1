@@ -1,0 +1,3909 @@
+#LyX 1.6.10 created this file. For more info see http://www.lyx.org/
+\lyxformat 345
+\begin_document
+\begin_header
+\textclass beamer
+\begin_preamble
+\usepackage[absolute,overlay]{textpos} 
+
+\usetheme{Darmstadt}
+% or ...Singapore Darmstadt
+
+%\usecolortheme{seahorse}
+% or whatever (possibly just delete it)
+\end_preamble
+\use_default_options false
+\language english
+\inputencoding auto
+\font_roman times
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_amsmath 2
+\use_esint 0
+\cite_engine basic
+\use_bibtopic false
+\paperorientation portrait
+\secnumdepth 2
+\tocdepth 2
+\paragraph_separation indent
+\defskip medskip
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\author "" 
+\author "" 
+\end_header
+
+\begin_body
+
+\begin_layout Title
+
+\size large
+BaseLib2 Tutorial Series
+\end_layout
+
+\begin_layout Subtitle
+Configuration Database and Basic Type
+\end_layout
+
+\begin_layout Author
+André Neto
+\end_layout
+
+\begin_layout Date
+August, 2011
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+%
+\backslash
+beamerdefaultoverlayspecification{<+->}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout BeginFrame
+Outline
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset toc
+LatexCommand tableofcontents
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout BeginFrame
+Data driven objects
+\end_layout
+
+\begin_layout Itemize
+All BaseLib2 objects have an entry point for data driven configuration
+\end_layout
+
+\begin_layout Itemize
+You should maximise the amount of data driven inputs to your code
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Avoid hardcoded assumption
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+A large portion of your code will be implemented here
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Always perform checks sooner than later
+\end_layout
+
+\begin_layout Itemize
+Control boundaries
+\end_layout
+
+\begin_layout Itemize
+Allocate memory as soon as possible
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Always check if memory was correcly allocated
+\end_layout
+
+\end_deeper
+\end_deeper
+\begin_layout Itemize
+Log as much as you can
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+Configuration structure
+\end_layout
+
+\begin_layout Itemize
+Configuration data is written using a syntax similar to C
+\end_layout
+
+\begin_layout Itemize
+Data is organised in a tree with values assigned to keys
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+The value can be atomic (leaf)
+\end_layout
+
+\begin_layout Itemize
+or it can be a complex structure (node)
+\end_layout
+
+\end_deeper
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Example}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
++Control = {
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+Class = ControlGAM
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+Controller = {
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+NoPlasmaVelocityGain = 0.0
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+NoPlasmaCurrentGain = 40.0
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+IPWaveform = {
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+Times = {0 120}
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+Amplitudes = {0.5 0.5}
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+Rounding = 50
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+}
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+...
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+Configuration database
+\end_layout
+
+\begin_layout Itemize
+BaseLib2 provides a list of objects and functions to:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+navigate on this tree
+\end_layout
+
+\begin_layout Itemize
+read values from it
+\end_layout
+
+\begin_layout Itemize
+write values to it
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+This can be performed by any class implementing CDBVirtual
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+see ConfigurationDatabase.h and CDBVirtual.h in Level1
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+The default CDBVirtual class used by ConfigurationDatabase is named CDB
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+see CDB.h in Level3
+\end_layout
+
+\end_deeper
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout Section
+Configuration Database
+\end_layout
+
+\begin_layout BeginFrame
+CDBVirtual.h
+\end_layout
+
+\begin_layout Itemize
+Any CDBVirtual can be populated by reading a configuration stream (this
+ is usually a file or a tcp stream)
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Read and write stream}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\series bold
+\size tiny
+\color black
+bool ReadFromStream(StreamInterface &s,StreamInterface *e=NULL,SortFilterFn
+ *s=NULL);
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\series bold
+\size tiny
+bool WriteToStream(StreamInterface &s,StreamInterface *e=NULL,CDBWriteMode
+ m=CDBWM_Tree);
+\end_layout
+
+\begin_layout Standard
+\begin_inset space \thinspace{}
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Navigate}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\series bold
+\size tiny
+bool Move(const char *subTreeName);
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\series bold
+\size tiny
+bool MoveToChildren(int childNumber=0);
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\series bold
+\size tiny
+bool MoveToFather(int steps = 1);
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\series bold
+\size tiny
+bool AddChildAndMove(const char *subTreeName,SortFilterFn *s=NULL);
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\series bold
+\size tiny
+int NumberOfChildren();
+\end_layout
+
+\begin_layout Standard
+\begin_inset space \thinspace{}
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Read and write data}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\series bold
+\size tiny
+bool GetArrayDims(int *size,int &maxDim,const char *configName,CDBArrayIndexingM
+ode cdbaim = CDBAIM_Flexible);
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\series bold
+\size tiny
+bool ReadArray (void *array,const CDBTYPE &valueType,const int *size,int
+ nDim,const char *configName);
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\series bold
+\size tiny
+bool WriteArray(const void *array,const CDBTYPE &valueType,const int *size,int
+ nDim,const char *configName,SortFilterFn *sorter=NULL);
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+Reading and writing data syntax
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+\series bold
+\size small
+bool ReadArray (void *array,const CDBTYPE &valueType,const int *size,int
+ nDim,const char *configName);
+\end_layout
+
+\begin_layout Itemize
+*array is a pointer to the place where data will be stored
+\end_layout
+
+\begin_layout Itemize
+valueType is the type of data to be read (int, float, FString)
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+See CDBTypes.h in Level1
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+nDim is the array dimension (0 for scalar, 1 for vector, 2 for matrix, ...)
+\end_layout
+
+\begin_layout Itemize
+size is a pointer to an array with nDim entries, each with the size of each
+ direction
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+scalar: nDim = 0 and size = NULL
+\end_layout
+
+\begin_layout Itemize
+vector: nDim = 1 and size[0] is the number of elements
+\end_layout
+
+\begin_layout Itemize
+matrix: nDim = 2 and size[0] is the number of rows and size[1] the number
+ of vectors
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+configName is the parameter name
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+Reading and writing data syntax
+\end_layout
+
+\begin_layout Itemize
+Get the dimensions and the number of elements using:
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+\series bold
+\size tiny
+bool GetArrayDims(int *size,int &maxDim,const char *configName,CDBArrayIndexingM
+ode cdbaim = CDBAIM_Flexible)
+\end_layout
+
+\begin_layout Itemize
+*size is a pointer to the place where all sizes will be stored
+\end_layout
+
+\begin_layout Itemize
+maxDim is the number of dimensions to be tested (number of elements in size)
+\end_layout
+
+\begin_layout Itemize
+configName is the parameter name
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+ConfigurationDataBase Example
+\end_layout
+
+\begin_layout FrameSubtitle
+(BaseLib2/Documentation/Tutorials/examples/CDBExample1.cpp)
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Example code}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+//Configuration stored in an FString (usually this is a file or a tcp stream)
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+FString cdbTxt =
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+"MySimpleClass = {
+\backslash
+n"
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+"
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+MyInt = 10
+\backslash
+n"
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+"
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+MyFloat = 5.0
+\backslash
+n"
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+"
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+MyString = 
+\backslash
+"A string
+\backslash
+"
+\backslash
+n"
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+"
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+MyFloatArray = {-1.234 1.789 0.1233 1e2}
+\backslash
+n"
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+"
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+MyStringArray = {
+\backslash
+"AAA
+\backslash
+" 
+\backslash
+"BBB
+\backslash
+" 
+\backslash
+"CCC
+\backslash
+" ABC}
+\backslash
+n"
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+"
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+MyFloatMatrix = {
+\backslash
+n"
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+"
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+0 = {0.123 -1e3}
+\backslash
+n"
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+"
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+1 = {12345 .233}
+\backslash
+n"
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+"
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+2 = {-1 1.32}
+\backslash
+n"
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+"
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+}
+\backslash
+n"
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+"}
+\backslash
+n";
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+ConfigurationDataBase Example
+\end_layout
+
+\begin_layout FrameSubtitle
+(BaseLib2/Documentation/Tutorials/examples/CDBExample1.cpp)
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Example code}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+OBJECT_DLL(SimpleClass)
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+class SimpleClass : public GarbageCollectable, public Object{
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+OBJECT_DLL_STUFF(SimpleClass)
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+private:
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+int32 myInt;
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+float myFloat;
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+FString myString;
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+float *myFloatArray;
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+FString *myStringArray;
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+float *myFloatMatrix;
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+/**
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+\begin_inset space ~
+\end_inset
+
+* Configure an object using a configuration database
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+\begin_inset space ~
+\end_inset
+
+*/
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+bool ObjectLoadSetup(ConfigurationDataBase &cdb,StreamInterface *err){
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+//Move to the place in the cdb
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+if(!cdb->Move("MySimpleClass")){
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+AssertErrorCondition(FatalError, "Could not move to MySimpleClass");
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+return False;
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+}
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+ConfigurationDataBase Example
+\end_layout
+
+\begin_layout FrameSubtitle
+(BaseLib2/Documentation/Tutorials/examples/CDBExample1.cpp)
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Example code}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//Read the int value.
+ Notice that scalar values can be read by passing NULL and 0 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//for the size and dim of the array
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+if(!cdb->ReadArray(&myInt, CDBTYPE_int32, NULL, 0, "MyInt")){
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+AssertErrorCondition(Warning, "MyInt was not defined.
+ Using default of %d", myInt);
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+}
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+if(!cdb->ReadArray(&myFloat, CDBTYPE_float, NULL, 0, "MyFloat")){
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+AssertErrorCondition(Warning, "MyFloat was not defined.
+ Using default of %f", myFloat);
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+}
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+if(!cdb->ReadArray(&myString, CDBTYPE_FString, NULL, 0, "MyString")){
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+AssertErrorCondition(Warning, "MyString was not defined.
+ Using default of %s", myString.Buffer());
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+}
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+ConfigurationDataBase Example
+\end_layout
+
+\begin_layout FrameSubtitle
+(BaseLib2/Documentation/Tutorials/examples/CDBExample1.cpp)
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Example code}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//In order to read a proper array first get the array dimensions (1=vector,
+ 2=matrix, ...) and the size
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//of each dimension
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//Notice that the initialisation value of arrayDimension is also the maximum
+ number of dimensions searched
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//by the ReadArray function
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+int32 arrayDimension = 2;
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//Just put 2 to recycle later for matrix.
+ 1 would be enough for vector
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+int32 arraySize[2];
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+if(cdb->GetArrayDims(arraySize, arrayDimension, "MyFloatArray")){
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+if(arrayDimension == 1){
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+AssertErrorCondition(Information, "MyFloatArray dimension is 1 as expected");
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+AssertErrorCondition(Information, "MyFloatArray has %d elements", arraySize[0]);
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+//Try to allocate memory
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+myFloatArray = (float *)malloc(arraySize[0] * sizeof(float));
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+if(myFloatArray == NULL){
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+AssertErrorCondition(FatalError, "Failed to allocate %d bytes for myFloatArray",
+ (arraySize[0] * sizeof(float)));
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+return False;
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+}
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+//Do the actual reading of values
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+if(!cdb->ReadArray(myFloatArray, CDBTYPE_float, arraySize, arrayDimension,
+ "MyFloatArray")){
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+AssertErrorCondition(FatalError, "Failed reading data to MyFloatArray");
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+return False;
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+}
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+CDBExtended
+\end_layout
+
+\begin_layout Itemize
+The CDBExtended class provides an easier way of reading/writing values
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Provides a dedicated function for each data type
+\end_layout
+
+\begin_layout Itemize
+Specify default values
+\end_layout
+
+\begin_layout Itemize
+See CDBExtended.h in Level2
+\end_layout
+
+\end_deeper
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Example functions are}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+bool ReadInt32(int32 &value,const char *configName,int32 defaultValue =
+ 0);
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+bool ReadFloat(float &value,const char *configName,float defaultValue =
+ 0);
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+bool ReadInt32Array(int32 *value,int *size,int nDim,const char *configName);
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+bool ReadFloatArray(float *value,int *size,int nDim,const char *configName);
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+CDBExtended example
+\end_layout
+
+\begin_layout FrameSubtitle
+(BaseLib2/Documentation/Tutorials/examples/CDBExample2.cpp)
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Example code}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+...
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+if(!cdbe.ReadInt32(myInt, "MyInt", 1234)){
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+...
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+if(!cdbe.ReadFloat(myFloat, "MyFloat", 1.234)){ 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+...
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+int32 arrayDimension = 2; 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+int32 arraySize[2]; 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+if(cdbe->GetArrayDims(arraySize, arrayDimension, "MyFloatArray")){
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+...
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+if(!cdbe.ReadFloatArray(myFloatArray, arraySize, arrayDimension, "MyFloatArray"))
+{
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+...
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+GlobalObjectDataBase
+\end_layout
+
+\begin_layout Itemize
+Central pillar of any BaseLib2 application
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Unique instance for each application (see GlobalObjectDataBase.h in Level1)
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Contains a reference to all the instantiated objects
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+It is a GCReferenceContainer
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+You can use all the GCReferenceContainer functions (Size(), Find(), ...)
+\end_layout
+
+\end_deeper
+\end_deeper
+\begin_layout Itemize
+Objects are automatically created by providing a ConfigurationDataBase
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+All nodes starting with a 
+\series bold
++
+\series default
+ and with a 
+\series bold
+Class = 
+\series default
+\shape italic
+className
+\shape default
+ attribute will be automatically created
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+className can also take the shared object library name where the class exists
+\end_layout
+
+\begin_layout Itemize
+The syntax is 
+\shape italic
+sharedLibraryName::className 
+\shape default
+(e.g.
+ 
+\family typewriter
+Class=MySharedLibrary::MyClass
+\family default
+)
+\end_layout
+
+\end_deeper
+\end_deeper
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+GlobalObjectDataBase
+\end_layout
+
+\begin_layout Itemize
+All objects that are automatically created, have their ObjectLoadSetup called
+\end_layout
+
+\begin_layout Itemize
+Objects inherinting from GCNamedObject have their name automatically set
+ as
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+The string between the + and the = (e.g.
+ 
+\family typewriter
+\series bold
++MyObj={
+\family default
+\series default
+, would be named MyObj)...
+\end_layout
+
+\begin_layout Itemize
+...or the value of a 
+\family typewriter
+\series bold
+Name=
+\family default
+\series default
+ parameter (if set)
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+GCReferenceContainers and objects inherinting from GCReferenceContainer
+ have their children automatically created
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+GlobalObjectDataBase example
+\end_layout
+
+\begin_layout FrameSubtitle
+(BaseLib2/Documentation/Tutorials/examples/CDBExample3.cpp)
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Example code}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+...
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+//Inherit from GCNamedObject in order to automatically retrieve the name
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+OBJECT_DLL(SimpleClass)
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+class SimpleClass : public GCNamedObject{
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+...
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+bool ObjectLoadSetup(ConfigurationDataBase &cdb,StreamInterface *err){
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+//Automatically read the object name
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+GCNamedObject::ObjectLoadSetup(cdb, err);
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+...
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+//Configuration stored in an FString (usually this is a file or a tcp stream)
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+//Notice the + and the Class = 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+FString cdbTxt =
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+"+MySimpleClass1 = {
+\backslash
+n"
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+"
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+Class = SimpleClass
+\backslash
+n"
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+"
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+MyInt = 10
+\backslash
+n"
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+...
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+"
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+}
+\backslash
+n"
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+"}
+\backslash
+n";
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+GlobalObjectDataBase example
+\end_layout
+
+\begin_layout FrameSubtitle
+(BaseLib2/Documentation/Tutorials/examples/GODBExample1.cpp)
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Example code}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+...
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+//Inherit from GCNamedObject in order to automatically retrieve the name
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+OBJECT_DLL(SimpleClass)
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+class SimpleClass : public GCNamedObject{
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+...
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+bool ObjectLoadSetup(ConfigurationDataBase &cdb,StreamInterface *err){
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+//Automatically read the object name
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+GCNamedObject::ObjectLoadSetup(cdb, err);
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+...
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+//Configuration stored in an FString (usually this is a file or a tcp stream)
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+//Notice the + and the Class = 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+FString cdbTxt =
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+"+MySimpleClass1 = {
+\backslash
+n"
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+"
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+Class = SimpleClass
+\backslash
+n"
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+"
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+MyInt = 10
+\backslash
+n"
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+...
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+"
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+}
+\backslash
+n"
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+"}
+\backslash
+n";
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+GlobalObjectDataBase example
+\end_layout
+
+\begin_layout FrameSubtitle
+(BaseLib2/Documentation/Tutorials/examples/GODBExample1.cpp)
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Example code}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//Create the configuration database and load from a string
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+ConfigurationDataBase cdb;
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+if(!cdb->ReadFromStream(cdbTxt)){
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+CStaticAssertErrorCondition(FatalError, "Failed reading from stream!");
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+return -1;
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+}
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//Let the GlobalObjectDataBase automatically create the objects
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+if(!GetGlobalObjectDataBase()->ObjectLoadSetup(cdb, NULL)){
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+CStaticAssertErrorCondition(FatalError, "Failed to load cdb");
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+return -1;
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+}
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//We can now look for the MyGCRef in the GlobalObjectDataBase
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+GCRTemplate<GCReferenceContainer> ref = GetGlobalObjectDataBase()->Find("MyGCRef
+C");
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+if(ref.IsValid()){
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+CStaticAssertErrorCondition(Information, "Found MyGCRefC as expected");
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+CStaticAssertErrorCondition(Information, "Number of children inside MyGCRefC
+ is: %d", ref->Size());
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+}
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+else{
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+CStaticAssertErrorCondition(FatalError, "Could not find MyGCRefC");
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+}
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//List all the objects
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+GCRCLister lister;
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+GetGlobalObjectDataBase()->Iterate(&lister,GCFT_Recurse);
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout Section
+Basic Types
+\end_layout
+
+\begin_layout BeginFrame
+Basic types definition
+\end_layout
+
+\begin_layout Itemize
+Provide unified way of describing a data type
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Signed, unsigned
+\end_layout
+
+\begin_layout Itemize
+Floating point, integer
+\end_layout
+
+\begin_layout Itemize
+Number of bits
+\end_layout
+
+\begin_layout Itemize
+Most common data types already defined
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+BTDInteger, BTDFloat, ...
+\end_layout
+
+\begin_layout Itemize
+See BasicTypes.h
+\end_layout
+
+\end_deeper
+\end_deeper
+\begin_layout Itemize
+Very useful to do arithmetic which depend on the type size
+\end_layout
+
+\begin_layout Itemize
+Automatically converts data types in all the supported platforms
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Very useful when you don't know the input type but want to have a generic
+ function (see BTConvert)
+\end_layout
+
+\end_deeper
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+Basic types example
+\end_layout
+
+\begin_layout FrameSubtitle
+(BaseLib2/Documentation/Tutorials/examples/BTDExample1.cpp)
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Example code}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//Print information about a BasicTypeDescriptor
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+void PrintBTDInfo(BasicTypeDescriptor &btd){
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+FString name;
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+BTConvertToString(btd, name);
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+CStaticAssertErrorCondition(Information, "Number of bytes in %s is %d (%d)",
+ name.Buffer(), btd.ByteSize(), btd.BitSize());
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+}
+\end_layout
+
+\begin_layout AlertBlock
+...
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//Print information regarding a 32 bit integer
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+BasicTypeDescriptor anInt32 = BTDInt32;
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+PrintBTDInfo(anInt32);
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//BasicTypeDescriptors can also be created from a string (for instance in
+ a cfg file!)
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+BasicTypeDescriptor btdFloat;
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+BTConvertFromString(btdFloat, "float");
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+PrintBTDInfo(btdFloat);
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//Convert between two types
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+int32 in = 123456789;
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+double out;
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//Very useful if you don't know the input type and want to convert to something
+ using a generic call
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+BTConvert(1, BTDDouble, &out, BTDInt32, &in);
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+CStaticAssertErrorCondition(Information, "Converted %d to %lf", in, out);
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+Training ideas
+\end_layout
+
+\begin_layout Enumerate
+Design a PID object which allows the gains to be configured 
+\end_layout
+
+\begin_layout Enumerate
+Design a coil model object that allows to configure a coil inductance and
+ resistance
+\end_layout
+
+\begin_layout Enumerate
+Write an application which receives a configuration file as input and automatica
+lly creates and configures several PID and Model objects
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+You can also use GCReferenceContainers to organise and make collections
+ of different PID objects
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+After loading the application, list all the objects and print their main
+ configuration values
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\end_body
+\end_document

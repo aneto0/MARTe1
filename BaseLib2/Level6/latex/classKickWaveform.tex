@@ -1,0 +1,178 @@
+\hypertarget{classKickWaveform}{
+\section{KickWaveform Class Reference}
+\label{classKickWaveform}\index{KickWaveform@{KickWaveform}}
+}
+
+
+{\ttfamily \#include $<$KickWaveform.h$>$}
+
+Inheritance diagram for KickWaveform:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classKickWaveform}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classKickWaveform_a50fb828c1dd190b225e8e5f3631d6c36}{KickWaveform} ()
+\item 
+virtual \hyperlink{classKickWaveform_abe3fa01aac1a6a058630ace1744aa4f7}{$\sim$KickWaveform} ()
+\item 
+virtual void \hyperlink{classKickWaveform_a639370dfec04827ac91b8a38352432fa}{Reset} ()
+\item 
+virtual bool \hyperlink{classKickWaveform_aed9ccfd8e61b91743d2e74ac1273ffc3}{ObjectLoadSetup} (ConfigurationDataBase \&cdbData, StreamInterface $\ast$err)
+\item 
+virtual bool \hyperlink{classKickWaveform_a20044c2d0e8026b0957755b4128d1f92}{ProcessHttpMessage} (HttpStream \&hStream)
+\item 
+virtual float \hyperlink{classKickWaveform_a7a5fc20993a5a2b94481029f07a6118b}{GetValue} (int32 usecTime)
+\item 
+virtual int32 \hyperlink{classKickWaveform_a20cba441dd9e51c80b507a695b1b728f}{GetKickMode} ()
+\item 
+virtual bool \hyperlink{classKickWaveform_a65a2d2cc5a46daea138ee8212dfb9de0}{IsCompleted} (int32 relativeUsecTime)
+\item 
+\hypertarget{classKickWaveform_ab6d00b178ac4162f844231d85a3a8fe3}{
+virtual void {\bfseries SetWindowStart} (int32 usecTime)}
+\label{classKickWaveform_ab6d00b178ac4162f844231d85a3a8fe3}
+
+\item 
+\hypertarget{classKickWaveform_a88b8c9147808284eff71bd550333912b}{
+void {\bfseries SetResetUsecTime} (int32 usecTime)}
+\label{classKickWaveform_a88b8c9147808284eff71bd550333912b}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+The Garbage Collectable and Named \hyperlink{classKickWaveform}{KickWaveform} 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classKickWaveform_a50fb828c1dd190b225e8e5f3631d6c36}{
+\index{KickWaveform@{KickWaveform}!KickWaveform@{KickWaveform}}
+\index{KickWaveform@{KickWaveform}!KickWaveform@{KickWaveform}}
+\subsubsection[{KickWaveform}]{\setlength{\rightskip}{0pt plus 5cm}KickWaveform::KickWaveform (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classKickWaveform_a50fb828c1dd190b225e8e5f3631d6c36}
+Constructor \hypertarget{classKickWaveform_abe3fa01aac1a6a058630ace1744aa4f7}{
+\index{KickWaveform@{KickWaveform}!$\sim$KickWaveform@{$\sim$KickWaveform}}
+\index{$\sim$KickWaveform@{$\sim$KickWaveform}!KickWaveform@{KickWaveform}}
+\subsubsection[{$\sim$KickWaveform}]{\setlength{\rightskip}{0pt plus 5cm}virtual KickWaveform::$\sim$KickWaveform (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline, virtual\mbox{]}}}}
+\label{classKickWaveform_abe3fa01aac1a6a058630ace1744aa4f7}
+Deconstructor 
+
+\subsection{Member Function Documentation}
+\hypertarget{classKickWaveform_a20cba441dd9e51c80b507a695b1b728f}{
+\index{KickWaveform@{KickWaveform}!GetKickMode@{GetKickMode}}
+\index{GetKickMode@{GetKickMode}!KickWaveform@{KickWaveform}}
+\subsubsection[{GetKickMode}]{\setlength{\rightskip}{0pt plus 5cm}virtual int32 KickWaveform::GetKickMode (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline, virtual\mbox{]}}}}
+\label{classKickWaveform_a20cba441dd9e51c80b507a695b1b728f}
+Used to find out what is the KickMode of the current window \begin{DoxyReturn}{Returns}
+the kick mode 
+\end{DoxyReturn}
+\hypertarget{classKickWaveform_a7a5fc20993a5a2b94481029f07a6118b}{
+\index{KickWaveform@{KickWaveform}!GetValue@{GetValue}}
+\index{GetValue@{GetValue}!KickWaveform@{KickWaveform}}
+\subsubsection[{GetValue}]{\setlength{\rightskip}{0pt plus 5cm}float KickWaveform::GetValue (
+\begin{DoxyParamCaption}
+\item[{int32}]{usecTime}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}
+\label{classKickWaveform_a7a5fc20993a5a2b94481029f07a6118b}
+Returns the value of the kickwaveform at a certain time. 
+\begin{DoxyParams}{Parameters}
+{\em usecTime} & current time in microseconds \\
+\hline
+{\em startUsecTime} & start time of the GCNKickWaveform \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The value of the waveform at the specified time. If usecTime is before or after the start or end time of the waveform, the first or last value is held. 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{classWaveformInterface}{WaveformInterface}.
+
+\hypertarget{classKickWaveform_a65a2d2cc5a46daea138ee8212dfb9de0}{
+\index{KickWaveform@{KickWaveform}!IsCompleted@{IsCompleted}}
+\index{IsCompleted@{IsCompleted}!KickWaveform@{KickWaveform}}
+\subsubsection[{IsCompleted}]{\setlength{\rightskip}{0pt plus 5cm}virtual bool KickWaveform::IsCompleted (
+\begin{DoxyParamCaption}
+\item[{int32}]{relativeUsecTime}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline, virtual\mbox{]}}}}
+\label{classKickWaveform_a65a2d2cc5a46daea138ee8212dfb9de0}
+Used to find out if the \hyperlink{classKickWaveform}{KickWaveform} is completed 
+\begin{DoxyParams}{Parameters}
+{\em usecTime} & current time in microseconds \\
+\hline
+{\em startUsecTime} & start time of the GCNKickWaveform \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if the \hyperlink{classKickWaveform}{KickWaveform} (for the given startUsecTime and usecTime is completed, False otherwise 
+\end{DoxyReturn}
+\hypertarget{classKickWaveform_aed9ccfd8e61b91743d2e74ac1273ffc3}{
+\index{KickWaveform@{KickWaveform}!ObjectLoadSetup@{ObjectLoadSetup}}
+\index{ObjectLoadSetup@{ObjectLoadSetup}!KickWaveform@{KickWaveform}}
+\subsubsection[{ObjectLoadSetup}]{\setlength{\rightskip}{0pt plus 5cm}bool KickWaveform::ObjectLoadSetup (
+\begin{DoxyParamCaption}
+\item[{ConfigurationDataBase \&}]{cdbData, }
+\item[{StreamInterface $\ast$}]{err}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}
+\label{classKickWaveform_aed9ccfd8e61b91743d2e74ac1273ffc3}
+Loads parameters from a CDB 
+\begin{DoxyParams}{Parameters}
+{\em cdbData} & the CDB \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if the initialisation went ok, False otherwise 
+\end{DoxyReturn}
+\hypertarget{classKickWaveform_a20044c2d0e8026b0957755b4128d1f92}{
+\index{KickWaveform@{KickWaveform}!ProcessHttpMessage@{ProcessHttpMessage}}
+\index{ProcessHttpMessage@{ProcessHttpMessage}!KickWaveform@{KickWaveform}}
+\subsubsection[{ProcessHttpMessage}]{\setlength{\rightskip}{0pt plus 5cm}bool KickWaveform::ProcessHttpMessage (
+\begin{DoxyParamCaption}
+\item[{HttpStream \&}]{hStream}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}
+\label{classKickWaveform_a20044c2d0e8026b0957755b4128d1f92}
+Builds a webpage for the current object 
+\begin{DoxyParams}{Parameters}
+{\em hStream} & the HttpStream to write to \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True 
+\end{DoxyReturn}
+\hypertarget{classKickWaveform_a639370dfec04827ac91b8a38352432fa}{
+\index{KickWaveform@{KickWaveform}!Reset@{Reset}}
+\index{Reset@{Reset}!KickWaveform@{KickWaveform}}
+\subsubsection[{Reset}]{\setlength{\rightskip}{0pt plus 5cm}virtual void KickWaveform::Reset (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline, virtual\mbox{]}}}}
+\label{classKickWaveform_a639370dfec04827ac91b8a38352432fa}
+Reset function. Resets the internal states and waveforms. To be called in the PREPULSE phase. 
+
+Implements \hyperlink{classWaveformInterface}{WaveformInterface}.
+
+
+
+The documentation for this class was generated from the following files:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{KickWaveform_8h}{KickWaveform.h}\item 
+KickWaveform.cpp\end{DoxyCompactItemize}

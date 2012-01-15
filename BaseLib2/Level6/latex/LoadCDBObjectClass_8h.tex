@@ -1,0 +1,94 @@
+\hypertarget{LoadCDBObjectClass_8h}{
+\section{LoadCDBObjectClass.h File Reference}
+\label{LoadCDBObjectClass_8h}\index{LoadCDBObjectClass.h@{LoadCDBObjectClass.h}}
+}
+{\ttfamily \#include \char`\"{}System.h\char`\"{}}\par
+{\ttfamily \#include \char`\"{}Object.h\char`\"{}}\par
+{\ttfamily \#include \char`\"{}Matrix.h\char`\"{}}\par
+{\ttfamily \#include \char`\"{}ConfigurationDataBase.h\char`\"{}}\par
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \hyperlink{LoadCDBObjectClass_8h_ac31d19f7ab773fe433c37c7ae36984e2}{LoadDimension} (ConfigurationDataBase \&conf, const char $\ast$name, int \&dimension, int $\ast$\&sizeObject, Streamable \&error)
+\item 
+bool \hyperlink{LoadCDBObjectClass_8h_a6c9f41870a361d19923330c93fafe3dc}{LoadRTMatrixObject} (ConfigurationDataBase \&conf, const char $\ast$name, RTMatrixF \&matrix, Streamable \&error, int $\ast$sizeStrict=NULL)
+\item 
+bool \hyperlink{LoadCDBObjectClass_8h_afd90ba0ad046e07908e9ecbffa8506bf}{LoadMatrixObject} (ConfigurationDataBase \&conf, const char $\ast$name, MatrixF \&matrix, Streamable \&error, int $\ast$sizeStrict=NULL)
+\item 
+bool \hyperlink{LoadCDBObjectClass_8h_a43884b96750ba85d8ca647c88c40c52e}{LoadVectorObject} (ConfigurationDataBase \&conf, const char $\ast$name, void $\ast$\&dataList, int \&dimension, CDBTYPE CDBtype, Streamable \&error, int sizeStrict=-\/1)
+\item 
+bool \hyperlink{LoadCDBObjectClass_8h_a700e2c4fbaee4f0c754973e0e8bde91d}{LoadSingleObject} (ConfigurationDataBase \&conf, const char $\ast$name, void $\ast$\&dataList, CDBTYPE CDBtype, Streamable \&error)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+
+
+\subsection{Function Documentation}
+\hypertarget{LoadCDBObjectClass_8h_ac31d19f7ab773fe433c37c7ae36984e2}{
+\index{LoadCDBObjectClass.h@{LoadCDBObjectClass.h}!LoadDimension@{LoadDimension}}
+\index{LoadDimension@{LoadDimension}!LoadCDBObjectClass.h@{LoadCDBObjectClass.h}}
+\subsubsection[{LoadDimension}]{\setlength{\rightskip}{0pt plus 5cm}bool LoadDimension (
+\begin{DoxyParamCaption}
+\item[{ConfigurationDataBase \&}]{conf, }
+\item[{const char $\ast$}]{name, }
+\item[{int \&}]{dimension, }
+\item[{int $\ast$\&}]{sizeObject, }
+\item[{Streamable \&}]{error}
+\end{DoxyParamCaption}
+)}}
+\label{LoadCDBObjectClass_8h_ac31d19f7ab773fe433c37c7ae36984e2}
+\hypertarget{LoadCDBObjectClass_8h_afd90ba0ad046e07908e9ecbffa8506bf}{
+\index{LoadCDBObjectClass.h@{LoadCDBObjectClass.h}!LoadMatrixObject@{LoadMatrixObject}}
+\index{LoadMatrixObject@{LoadMatrixObject}!LoadCDBObjectClass.h@{LoadCDBObjectClass.h}}
+\subsubsection[{LoadMatrixObject}]{\setlength{\rightskip}{0pt plus 5cm}bool LoadMatrixObject (
+\begin{DoxyParamCaption}
+\item[{ConfigurationDataBase \&}]{conf, }
+\item[{const char $\ast$}]{name, }
+\item[{MatrixF \&}]{matrix, }
+\item[{Streamable \&}]{error, }
+\item[{int $\ast$}]{sizeStrict = {\ttfamily NULL}}
+\end{DoxyParamCaption}
+)}}
+\label{LoadCDBObjectClass_8h_afd90ba0ad046e07908e9ecbffa8506bf}
+\hypertarget{LoadCDBObjectClass_8h_a6c9f41870a361d19923330c93fafe3dc}{
+\index{LoadCDBObjectClass.h@{LoadCDBObjectClass.h}!LoadRTMatrixObject@{LoadRTMatrixObject}}
+\index{LoadRTMatrixObject@{LoadRTMatrixObject}!LoadCDBObjectClass.h@{LoadCDBObjectClass.h}}
+\subsubsection[{LoadRTMatrixObject}]{\setlength{\rightskip}{0pt plus 5cm}bool LoadRTMatrixObject (
+\begin{DoxyParamCaption}
+\item[{ConfigurationDataBase \&}]{conf, }
+\item[{const char $\ast$}]{name, }
+\item[{RTMatrixF \&}]{matrix, }
+\item[{Streamable \&}]{error, }
+\item[{int $\ast$}]{sizeStrict = {\ttfamily NULL}}
+\end{DoxyParamCaption}
+)}}
+\label{LoadCDBObjectClass_8h_a6c9f41870a361d19923330c93fafe3dc}
+\hypertarget{LoadCDBObjectClass_8h_a700e2c4fbaee4f0c754973e0e8bde91d}{
+\index{LoadCDBObjectClass.h@{LoadCDBObjectClass.h}!LoadSingleObject@{LoadSingleObject}}
+\index{LoadSingleObject@{LoadSingleObject}!LoadCDBObjectClass.h@{LoadCDBObjectClass.h}}
+\subsubsection[{LoadSingleObject}]{\setlength{\rightskip}{0pt plus 5cm}bool LoadSingleObject (
+\begin{DoxyParamCaption}
+\item[{ConfigurationDataBase \&}]{conf, }
+\item[{const char $\ast$}]{name, }
+\item[{void $\ast$\&}]{dataList, }
+\item[{CDBTYPE}]{CDBtype, }
+\item[{Streamable \&}]{error}
+\end{DoxyParamCaption}
+)}}
+\label{LoadCDBObjectClass_8h_a700e2c4fbaee4f0c754973e0e8bde91d}
+\hypertarget{LoadCDBObjectClass_8h_a43884b96750ba85d8ca647c88c40c52e}{
+\index{LoadCDBObjectClass.h@{LoadCDBObjectClass.h}!LoadVectorObject@{LoadVectorObject}}
+\index{LoadVectorObject@{LoadVectorObject}!LoadCDBObjectClass.h@{LoadCDBObjectClass.h}}
+\subsubsection[{LoadVectorObject}]{\setlength{\rightskip}{0pt plus 5cm}bool LoadVectorObject (
+\begin{DoxyParamCaption}
+\item[{ConfigurationDataBase \&}]{conf, }
+\item[{const char $\ast$}]{name, }
+\item[{void $\ast$\&}]{dataList, }
+\item[{int \&}]{dimension, }
+\item[{CDBTYPE}]{CDBtype, }
+\item[{Streamable \&}]{error, }
+\item[{int}]{sizeStrict = {\ttfamily -\/1}}
+\end{DoxyParamCaption}
+)}}
+\label{LoadCDBObjectClass_8h_a43884b96750ba85d8ca647c88c40c52e}

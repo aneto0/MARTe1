@@ -1,0 +1,87 @@
+#############################################################
+#
+# Copyright 2011 EFDA | European Fusion Development Agreement
+#
+# Licensed under the EUPL, Version 1.1 or - as soon they 
+# will be approved by the European Commission - subsequent  
+# versions of the EUPL (the "Licence"); 
+# You may not use this work except in compliance with the 
+# Licence. 
+# You may obtain a copy of the Licence at: 
+#  
+# http://ec.europa.eu/idabc/eupl
+#
+# Unless required by applicable law or agreed to in 
+# writing, software distributed under the Licence is 
+# distributed on an "AS IS" basis, 
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
+# express or implied. 
+# See the Licence for the specific language governing 
+# permissions and limitations under the Licence. 
+#
+# $Id$
+#
+#############################################################
+#!/bin/sh
+# 1. Copy this file to /etc/init.d/
+# 2. Change RELAY_LOC AND BASELIB2_LOC to the correct locations
+# 3. Run: /sbin/chkconfig --add RelayLoggerService
+# 4. Check if everything is ok by running: /sbin/chkconfig --list | grep RelayLoggerService
+# 5. Run: /sbin/chkconfig --level 3 RelayLoggerService on
+# 6. Run: /sbin/chkconfig --level 5 RelayLoggerService on
+# 7. Recheck everything by running: /sbin/chkconfig --list | grep RelayLoggerService
+# DESCRIPTION
+# 
+# chkconfig: - 98 35
+# description: Starts and stops the RelayLogger server
+
+LOCK_FILE=/var/lock/relaylogger
+RELAY_LOC=/home/jet/code/BaseLib2/BaseLibTools/RelayLogger/linux/RelayLogger.ex
+BASELIB2_LOC=/home/jet/code/BaseLib2/linux
+
+start() {
+        if [ -f $LOCK_FILE ]; then
+        echo $"Another instance of the RelayLogger already appears to be to running. If you sure that this isn't the case remove the lock file: /var/lock/relaylogger and start the service again!"
+        exit 1
+        fi
+        echo $"Starting RelayLoggerService"
+	export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$BASELIB2_LOC
+	$RELAY_LOC & 
+	echo $!> $LOCK_FILE
+}
+
+stop() {
+        echo $"Shutting down RelayLogger Service"
+        if [ -f $LOCK_FILE ]; then
+        kill -TERM `cat $LOCK_FILE`
+        rm -f $LOCK_FILE
+        fi
+}
+
+case "$1" in
+  start)
+        start
+        ;;
+  stop)
+        stop
+        ;;
+  restart|reload)
+        stop
+        sleep 20
+        start
+        ;;
+  condrestart)
+        ;;
+  status)
+        if [ -f $LOCK_FILE ]; then
+        echo $"running..."
+        else
+        echo $"stopped..."
+        fi
+        ;;
+  *)
+        echo $"Usage: $0 {start|stop|restart|condrestart|status}"
+        exit 1
+esac
+
+exit $RETVAL

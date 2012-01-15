@@ -1,0 +1,199 @@
+linux/BasicTypes.o: BasicTypes.cpp BasicTypes.h ../Level0/System.h \
+ ../Level0/SystemMSC.h ../Level0/SystemLinux.h ../Level0/GenDefs.h \
+ ../Level0/SystemVX5100.h ../Level0/SystemVX5500.h \
+ ../Level0/SystemV6X5100.h ../Level0/SystemV6X5500.h \
+ ../Level0/SystemVX68k.h ../Level0/SystemRTAI.h ../Level0/SystemSolaris.h \
+ ../Level0/SystemMacOSX.h ../Level0/Memory.h ../Level0/System.h \
+ ../Level0/GenDefs.h ../Level0/BString.h ../Level0/ErrorManagement.h \
+ ../Level0/StreamInterface.h ../Level0/TimeoutType.h ../Level0/HRT.h \
+ ../Level0/Processor.h
+linux/GarbageCollectable.o: GarbageCollectable.cpp GarbageCollectable.h \
+ Object.h ../Level0/System.h ../Level0/SystemMSC.h \
+ ../Level0/SystemLinux.h ../Level0/GenDefs.h ../Level0/SystemVX5100.h \
+ ../Level0/SystemVX5500.h ../Level0/SystemV6X5100.h \
+ ../Level0/SystemV6X5500.h ../Level0/SystemVX68k.h ../Level0/SystemRTAI.h \
+ ../Level0/SystemSolaris.h ../Level0/SystemMacOSX.h ../Level0/Memory.h \
+ ../Level0/System.h ObjectRegistryItem.h ../Level0/LinkedListable.h \
+ ../Level0/Iterators.h ErrorSystemInstructions.h ../Level0/GenDefs.h \
+ ../Level0/LinkedListHolder.h ../Level0/LinkedListable.h \
+ ../Level0/FastPollingMutexSem.h ../Level0/Atomic.h ../Level0/Sleep.h \
+ ../Level0/FastMath.h ../Level0/HRT.h ../Level0/Processor.h \
+ ../Level0/TimeoutType.h ../Level0/Threads.h ../Level0/ErrorManagement.h \
+ ../Level0/ExceptionHandlerDefinitions.h \
+ ../Level0/ThreadInitialisationInterface.h ../Level0/EventSem.h \
+ ../Level0/SemCore.h ../Level0/ProcessorType.h \
+ ../Level0/ThreadsDatabase.h ErrorSystemInstructionItem.h \
+ ClassStructure.h ClassStructureEntry.h BasicTypes.h ../Level0/BString.h \
+ ../Level0/ErrorManagement.h ../Level0/LoadableLibrary.h \
+ ../Level0/StreamInterface.h ObjectMacros.h ../Level0/MutexSem.h
+linux/GCNamedObject.o: GCNamedObject.cpp GCNamedObject.h GarbageCollectable.h \
+ Object.h ../Level0/System.h ../Level0/SystemMSC.h \
+ ../Level0/SystemLinux.h ../Level0/GenDefs.h ../Level0/SystemVX5100.h \
+ ../Level0/SystemVX5500.h ../Level0/SystemV6X5100.h \
+ ../Level0/SystemV6X5500.h ../Level0/SystemVX68k.h ../Level0/SystemRTAI.h \
+ ../Level0/SystemSolaris.h ../Level0/SystemMacOSX.h ../Level0/Memory.h \
+ ../Level0/System.h ObjectRegistryItem.h ../Level0/LinkedListable.h \
+ ../Level0/Iterators.h ErrorSystemInstructions.h ../Level0/GenDefs.h \
+ ../Level0/LinkedListHolder.h ../Level0/LinkedListable.h \
+ ../Level0/FastPollingMutexSem.h ../Level0/Atomic.h ../Level0/Sleep.h \
+ ../Level0/FastMath.h ../Level0/HRT.h ../Level0/Processor.h \
+ ../Level0/TimeoutType.h ../Level0/Threads.h ../Level0/ErrorManagement.h \
+ ../Level0/ExceptionHandlerDefinitions.h \
+ ../Level0/ThreadInitialisationInterface.h ../Level0/EventSem.h \
+ ../Level0/SemCore.h ../Level0/ProcessorType.h \
+ ../Level0/ThreadsDatabase.h ErrorSystemInstructionItem.h \
+ ClassStructure.h ClassStructureEntry.h BasicTypes.h ../Level0/BString.h \
+ ../Level0/ErrorManagement.h ../Level0/LoadableLibrary.h \
+ ../Level0/StreamInterface.h ObjectMacros.h ConfigurationDataBase.h \
+ CDBVirtual.h CDBTypes.h ../Level0/Iterators.h GCRTemplate.h \
+ GCReference.h ../Level0/Atomic.h ObjectRegistryDataBase.h CDBNull.h
+linux/GCRCItem.o: GCRCItem.cpp GCRCItem.h ../Level0/System.h \
+ ../Level0/SystemMSC.h ../Level0/SystemLinux.h ../Level0/GenDefs.h \
+ ../Level0/SystemVX5100.h ../Level0/SystemVX5500.h \
+ ../Level0/SystemV6X5100.h ../Level0/SystemV6X5500.h \
+ ../Level0/SystemVX68k.h ../Level0/SystemRTAI.h ../Level0/SystemSolaris.h \
+ ../Level0/SystemMacOSX.h ../Level0/Memory.h ../Level0/System.h \
+ ../Level0/LinkedListable.h ../Level0/Iterators.h GCRTemplate.h \
+ GCReference.h ../Level0/Atomic.h ../Level0/Sleep.h ../Level0/FastMath.h \
+ ../Level0/HRT.h ../Level0/Processor.h ObjectRegistryDataBase.h \
+ ../Level0/StreamInterface.h ../Level0/TimeoutType.h GarbageCollectable.h \
+ Object.h ObjectRegistryItem.h ErrorSystemInstructions.h \
+ ../Level0/GenDefs.h ../Level0/LinkedListHolder.h \
+ ../Level0/LinkedListable.h ../Level0/FastPollingMutexSem.h \
+ ../Level0/Atomic.h ../Level0/Threads.h ../Level0/ErrorManagement.h \
+ ../Level0/ExceptionHandlerDefinitions.h \
+ ../Level0/ThreadInitialisationInterface.h ../Level0/EventSem.h \
+ ../Level0/SemCore.h ../Level0/ProcessorType.h \
+ ../Level0/ThreadsDatabase.h ErrorSystemInstructionItem.h \
+ ClassStructure.h ClassStructureEntry.h BasicTypes.h ../Level0/BString.h \
+ ../Level0/ErrorManagement.h ../Level0/LoadableLibrary.h ObjectMacros.h \
+ GlobalObjectDataBase.h GCReferenceContainer.h GCNamedObject.h \
+ ../Level0/MutexSem.h GCNOExtender.h ../Level0/Iterators.h
+linux/GCReferenceContainer.o: GCReferenceContainer.cpp GCReferenceContainer.h \
+ ../Level0/LinkedListable.h ../Level0/System.h ../Level0/SystemMSC.h \
+ ../Level0/SystemLinux.h ../Level0/GenDefs.h ../Level0/SystemVX5100.h \
+ ../Level0/SystemVX5500.h ../Level0/SystemV6X5100.h \
+ ../Level0/SystemV6X5500.h ../Level0/SystemVX68k.h ../Level0/SystemRTAI.h \
+ ../Level0/SystemSolaris.h ../Level0/SystemMacOSX.h ../Level0/Memory.h \
+ ../Level0/Iterators.h GCRTemplate.h GCReference.h ../Level0/Atomic.h \
+ ../Level0/Sleep.h ../Level0/FastMath.h ../Level0/HRT.h \
+ ../Level0/Processor.h ObjectRegistryDataBase.h \
+ ../Level0/StreamInterface.h ../Level0/TimeoutType.h GarbageCollectable.h \
+ Object.h ../Level0/System.h ObjectRegistryItem.h \
+ ErrorSystemInstructions.h ../Level0/GenDefs.h \
+ ../Level0/LinkedListHolder.h ../Level0/LinkedListable.h \
+ ../Level0/FastPollingMutexSem.h ../Level0/Atomic.h ../Level0/Threads.h \
+ ../Level0/ErrorManagement.h ../Level0/ExceptionHandlerDefinitions.h \
+ ../Level0/ThreadInitialisationInterface.h ../Level0/EventSem.h \
+ ../Level0/SemCore.h ../Level0/ProcessorType.h \
+ ../Level0/ThreadsDatabase.h ErrorSystemInstructionItem.h \
+ ClassStructure.h ClassStructureEntry.h BasicTypes.h ../Level0/BString.h \
+ ../Level0/ErrorManagement.h ../Level0/LoadableLibrary.h ObjectMacros.h \
+ GCNamedObject.h ../Level0/MutexSem.h GCRCItem.h GCNOExtender.h \
+ ConfigurationDataBase.h CDBVirtual.h CDBTypes.h ../Level0/Iterators.h \
+ CDBNull.h GlobalObjectDataBase.h ../Level0/MuxLock.h \
+ ../Level0/MutexSem.h
+linux/GCReference.o: GCReference.cpp GCReference.h ../Level0/Atomic.h \
+ ../Level0/GenDefs.h ../Level0/Sleep.h ../Level0/System.h \
+ ../Level0/SystemMSC.h ../Level0/SystemLinux.h ../Level0/SystemVX5100.h \
+ ../Level0/SystemVX5500.h ../Level0/SystemV6X5100.h \
+ ../Level0/SystemV6X5500.h ../Level0/SystemVX68k.h ../Level0/SystemRTAI.h \
+ ../Level0/SystemSolaris.h ../Level0/SystemMacOSX.h ../Level0/Memory.h \
+ ../Level0/FastMath.h ../Level0/HRT.h ../Level0/Processor.h \
+ ObjectRegistryDataBase.h ../Level0/StreamInterface.h \
+ ../Level0/TimeoutType.h GarbageCollectable.h Object.h ../Level0/System.h \
+ ObjectRegistryItem.h ../Level0/LinkedListable.h ../Level0/Iterators.h \
+ ErrorSystemInstructions.h ../Level0/GenDefs.h \
+ ../Level0/LinkedListHolder.h ../Level0/LinkedListable.h \
+ ../Level0/FastPollingMutexSem.h ../Level0/Atomic.h ../Level0/Threads.h \
+ ../Level0/ErrorManagement.h ../Level0/ExceptionHandlerDefinitions.h \
+ ../Level0/ThreadInitialisationInterface.h ../Level0/EventSem.h \
+ ../Level0/SemCore.h ../Level0/ProcessorType.h \
+ ../Level0/ThreadsDatabase.h ErrorSystemInstructionItem.h \
+ ClassStructure.h ClassStructureEntry.h BasicTypes.h ../Level0/BString.h \
+ ../Level0/ErrorManagement.h ../Level0/LoadableLibrary.h ObjectMacros.h \
+ GCRTemplate.h GCNamedObject.h GlobalObjectDataBase.h \
+ GCReferenceContainer.h ../Level0/MutexSem.h GCRCItem.h GCNOExtender.h \
+ ../Level0/Iterators.h ConfigurationDataBase.h CDBVirtual.h CDBTypes.h \
+ CDBNull.h
+linux/GlobalObjectDataBase.o: GlobalObjectDataBase.cpp GlobalObjectDataBase.h \
+ GCReferenceContainer.h ../Level0/LinkedListable.h ../Level0/System.h \
+ ../Level0/SystemMSC.h ../Level0/SystemLinux.h ../Level0/GenDefs.h \
+ ../Level0/SystemVX5100.h ../Level0/SystemVX5500.h \
+ ../Level0/SystemV6X5100.h ../Level0/SystemV6X5500.h \
+ ../Level0/SystemVX68k.h ../Level0/SystemRTAI.h ../Level0/SystemSolaris.h \
+ ../Level0/SystemMacOSX.h ../Level0/Memory.h ../Level0/Iterators.h \
+ GCRTemplate.h GCReference.h ../Level0/Atomic.h ../Level0/Sleep.h \
+ ../Level0/FastMath.h ../Level0/HRT.h ../Level0/Processor.h \
+ ObjectRegistryDataBase.h ../Level0/StreamInterface.h \
+ ../Level0/TimeoutType.h GarbageCollectable.h Object.h ../Level0/System.h \
+ ObjectRegistryItem.h ErrorSystemInstructions.h ../Level0/GenDefs.h \
+ ../Level0/LinkedListHolder.h ../Level0/LinkedListable.h \
+ ../Level0/FastPollingMutexSem.h ../Level0/Atomic.h ../Level0/Threads.h \
+ ../Level0/ErrorManagement.h ../Level0/ExceptionHandlerDefinitions.h \
+ ../Level0/ThreadInitialisationInterface.h ../Level0/EventSem.h \
+ ../Level0/SemCore.h ../Level0/ProcessorType.h \
+ ../Level0/ThreadsDatabase.h ErrorSystemInstructionItem.h \
+ ClassStructure.h ClassStructureEntry.h BasicTypes.h ../Level0/BString.h \
+ ../Level0/ErrorManagement.h ../Level0/LoadableLibrary.h ObjectMacros.h \
+ GCNamedObject.h ../Level0/MutexSem.h GCRCItem.h GCNOExtender.h \
+ ../Level0/Iterators.h
+linux/Object.o: Object.cpp ObjectMacros.h Object.h ../Level0/System.h \
+ ../Level0/SystemMSC.h ../Level0/SystemLinux.h ../Level0/GenDefs.h \
+ ../Level0/SystemVX5100.h ../Level0/SystemVX5500.h \
+ ../Level0/SystemV6X5100.h ../Level0/SystemV6X5500.h \
+ ../Level0/SystemVX68k.h ../Level0/SystemRTAI.h ../Level0/SystemSolaris.h \
+ ../Level0/SystemMacOSX.h ../Level0/Memory.h ../Level0/System.h \
+ ObjectRegistryItem.h ../Level0/LinkedListable.h ../Level0/Iterators.h \
+ ErrorSystemInstructions.h ../Level0/GenDefs.h \
+ ../Level0/LinkedListHolder.h ../Level0/LinkedListable.h \
+ ../Level0/FastPollingMutexSem.h ../Level0/Atomic.h ../Level0/Sleep.h \
+ ../Level0/FastMath.h ../Level0/HRT.h ../Level0/Processor.h \
+ ../Level0/TimeoutType.h ../Level0/Threads.h ../Level0/ErrorManagement.h \
+ ../Level0/ExceptionHandlerDefinitions.h \
+ ../Level0/ThreadInitialisationInterface.h ../Level0/EventSem.h \
+ ../Level0/SemCore.h ../Level0/ProcessorType.h \
+ ../Level0/ThreadsDatabase.h ErrorSystemInstructionItem.h \
+ ClassStructure.h ClassStructureEntry.h BasicTypes.h ../Level0/BString.h \
+ ../Level0/ErrorManagement.h ../Level0/LoadableLibrary.h \
+ ../Level0/StreamInterface.h ObjectRegistryDataBase.h
+linux/ObjectRegistryDataBase.o: ObjectRegistryDataBase.cpp \
+ ObjectRegistryDataBase.h ../Level0/StreamInterface.h ../Level0/System.h \
+ ../Level0/SystemMSC.h ../Level0/SystemLinux.h ../Level0/GenDefs.h \
+ ../Level0/SystemVX5100.h ../Level0/SystemVX5500.h \
+ ../Level0/SystemV6X5100.h ../Level0/SystemV6X5500.h \
+ ../Level0/SystemVX68k.h ../Level0/SystemRTAI.h ../Level0/SystemSolaris.h \
+ ../Level0/SystemMacOSX.h ../Level0/Memory.h ../Level0/TimeoutType.h \
+ ../Level0/HRT.h ../Level0/Processor.h ObjectRegistryItem.h \
+ ../Level0/System.h ../Level0/LinkedListable.h ../Level0/Iterators.h \
+ ErrorSystemInstructions.h ../Level0/GenDefs.h \
+ ../Level0/LinkedListHolder.h ../Level0/LinkedListable.h \
+ ../Level0/FastPollingMutexSem.h ../Level0/Atomic.h ../Level0/Sleep.h \
+ ../Level0/FastMath.h ../Level0/Threads.h ../Level0/ErrorManagement.h \
+ ../Level0/ExceptionHandlerDefinitions.h \
+ ../Level0/ThreadInitialisationInterface.h ../Level0/EventSem.h \
+ ../Level0/SemCore.h ../Level0/ProcessorType.h \
+ ../Level0/ThreadsDatabase.h ErrorSystemInstructionItem.h \
+ ClassStructure.h ClassStructureEntry.h BasicTypes.h ../Level0/BString.h \
+ ../Level0/ErrorManagement.h ../Level0/LoadableLibrary.h \
+ StreamAttributes.h ../Level0/PrintfStreamInterface.h \
+ ../Level0/StreamInterface.h
+linux/ObjectRegistryItem.o: ObjectRegistryItem.cpp ../Level0/System.h \
+ ../Level0/SystemMSC.h ../Level0/SystemLinux.h ../Level0/GenDefs.h \
+ ../Level0/SystemVX5100.h ../Level0/SystemVX5500.h \
+ ../Level0/SystemV6X5100.h ../Level0/SystemV6X5500.h \
+ ../Level0/SystemVX68k.h ../Level0/SystemRTAI.h ../Level0/SystemSolaris.h \
+ ../Level0/SystemMacOSX.h ../Level0/Memory.h ../Level0/System.h \
+ ObjectRegistryItem.h ../Level0/LinkedListable.h ../Level0/Iterators.h \
+ ErrorSystemInstructions.h ../Level0/GenDefs.h \
+ ../Level0/LinkedListHolder.h ../Level0/LinkedListable.h \
+ ../Level0/FastPollingMutexSem.h ../Level0/Atomic.h ../Level0/Sleep.h \
+ ../Level0/FastMath.h ../Level0/HRT.h ../Level0/Processor.h \
+ ../Level0/TimeoutType.h ../Level0/Threads.h ../Level0/ErrorManagement.h \
+ ../Level0/ExceptionHandlerDefinitions.h \
+ ../Level0/ThreadInitialisationInterface.h ../Level0/EventSem.h \
+ ../Level0/SemCore.h ../Level0/ProcessorType.h \
+ ../Level0/ThreadsDatabase.h ErrorSystemInstructionItem.h \
+ ClassStructure.h ClassStructureEntry.h BasicTypes.h ../Level0/BString.h \
+ ../Level0/ErrorManagement.h ../Level0/LoadableLibrary.h \
+ ObjectRegistryDataBase.h ../Level0/StreamInterface.h

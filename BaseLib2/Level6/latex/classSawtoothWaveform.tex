@@ -1,0 +1,115 @@
+\hypertarget{classSawtoothWaveform}{
+\section{SawtoothWaveform Class Reference}
+\label{classSawtoothWaveform}\index{SawtoothWaveform@{SawtoothWaveform}}
+}
+Inheritance diagram for SawtoothWaveform:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classSawtoothWaveform}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classSawtoothWaveform_a077928022f41def9a00fbb3e7baf4ecf}{SawtoothWaveform} ()
+\item 
+virtual void \hyperlink{classSawtoothWaveform_a2e5bced67f51dcb46398ce187461ca61}{Reset} ()
+\item 
+bool \hyperlink{classSawtoothWaveform_a41ffb78c8effe6bf2db7d44194084364}{ObjectLoadSetup} (ConfigurationDataBase \&cdbData, StreamInterface $\ast$err)
+\item 
+float \hyperlink{classSawtoothWaveform_a9c07e8ba3e7c2e2fc4b8169de7c1684a}{GetValue} (int32 usecTime)
+\item 
+virtual bool \hyperlink{classSawtoothWaveform_a30516307b4cf8f3c3ef71174e626b739}{ProcessHttpMessage} (HttpStream \&hStream)
+\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classSawtoothWaveform_a077928022f41def9a00fbb3e7baf4ecf}{
+\index{SawtoothWaveform@{SawtoothWaveform}!SawtoothWaveform@{SawtoothWaveform}}
+\index{SawtoothWaveform@{SawtoothWaveform}!SawtoothWaveform@{SawtoothWaveform}}
+\subsubsection[{SawtoothWaveform}]{\setlength{\rightskip}{0pt plus 5cm}SawtoothWaveform::SawtoothWaveform (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classSawtoothWaveform_a077928022f41def9a00fbb3e7baf4ecf}
+Constructor 
+
+\subsection{Member Function Documentation}
+\hypertarget{classSawtoothWaveform_a9c07e8ba3e7c2e2fc4b8169de7c1684a}{
+\index{SawtoothWaveform@{SawtoothWaveform}!GetValue@{GetValue}}
+\index{GetValue@{GetValue}!SawtoothWaveform@{SawtoothWaveform}}
+\subsubsection[{GetValue}]{\setlength{\rightskip}{0pt plus 5cm}float SawtoothWaveform::GetValue (
+\begin{DoxyParamCaption}
+\item[{int32}]{usecTime}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline, virtual\mbox{]}}}}
+\label{classSawtoothWaveform_a9c07e8ba3e7c2e2fc4b8169de7c1684a}
+Get the current value of the waveform 
+\begin{DoxyParams}{Parameters}
+{\em usecTime} & current time in microseconds \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the value of the waveform 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{classWaveformInterface}{WaveformInterface}.
+
+\hypertarget{classSawtoothWaveform_a41ffb78c8effe6bf2db7d44194084364}{
+\index{SawtoothWaveform@{SawtoothWaveform}!ObjectLoadSetup@{ObjectLoadSetup}}
+\index{ObjectLoadSetup@{ObjectLoadSetup}!SawtoothWaveform@{SawtoothWaveform}}
+\subsubsection[{ObjectLoadSetup}]{\setlength{\rightskip}{0pt plus 5cm}bool SawtoothWaveform::ObjectLoadSetup (
+\begin{DoxyParamCaption}
+\item[{ConfigurationDataBase \&}]{cdbData, }
+\item[{StreamInterface $\ast$}]{err}
+\end{DoxyParamCaption}
+)}}
+\label{classSawtoothWaveform_a41ffb78c8effe6bf2db7d44194084364}
+Loads object's parameters from a CDB 
+\begin{DoxyParams}{Parameters}
+{\em cdbData} & the CDB to load configuration from \\
+\hline
+{\em err} & the StreamInterface to write errors to (not used) \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if initialised correctly, False otherwise 
+\end{DoxyReturn}
+\hypertarget{classSawtoothWaveform_a30516307b4cf8f3c3ef71174e626b739}{
+\index{SawtoothWaveform@{SawtoothWaveform}!ProcessHttpMessage@{ProcessHttpMessage}}
+\index{ProcessHttpMessage@{ProcessHttpMessage}!SawtoothWaveform@{SawtoothWaveform}}
+\subsubsection[{ProcessHttpMessage}]{\setlength{\rightskip}{0pt plus 5cm}bool SawtoothWaveform::ProcessHttpMessage (
+\begin{DoxyParamCaption}
+\item[{HttpStream \&}]{hStream}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}
+\label{classSawtoothWaveform_a30516307b4cf8f3c3ef71174e626b739}
+Builds a webpage for the current object 
+\begin{DoxyParams}{Parameters}
+{\em hStream} & the HttpStream to write to \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True 
+\end{DoxyReturn}
+\hypertarget{classSawtoothWaveform_a2e5bced67f51dcb46398ce187461ca61}{
+\index{SawtoothWaveform@{SawtoothWaveform}!Reset@{Reset}}
+\index{Reset@{Reset}!SawtoothWaveform@{SawtoothWaveform}}
+\subsubsection[{Reset}]{\setlength{\rightskip}{0pt plus 5cm}virtual void SawtoothWaveform::Reset (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline, virtual\mbox{]}}}}
+\label{classSawtoothWaveform_a2e5bced67f51dcb46398ce187461ca61}
+Resets the GCNSawtoothWaveform 
+
+Implements \hyperlink{classWaveformInterface}{WaveformInterface}.
+
+
+
+The documentation for this class was generated from the following files:\begin{DoxyCompactItemize}
+\item 
+SawtoothWaveform.h\item 
+SawtoothWaveform.cpp\end{DoxyCompactItemize}

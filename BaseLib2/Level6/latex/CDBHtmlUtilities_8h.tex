@@ -1,0 +1,89 @@
+\hypertarget{CDBHtmlUtilities_8h}{
+\section{CDBHtmlUtilities.h File Reference}
+\label{CDBHtmlUtilities_8h}\index{CDBHtmlUtilities.h@{CDBHtmlUtilities.h}}
+}
+
+
+Utility implementations to provide the interface between a CDB and HTML.  
+
+
+{\ttfamily \#include \char`\"{}ConfigurationDataBase.h\char`\"{}}\par
+{\ttfamily \#include \char`\"{}HttpStream.h\char`\"{}}\par
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef int \hyperlink{CDBHtmlUtilities_8h_a3c31a4130c52d0728f5c691565de650b}{CDBHUMode}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \hyperlink{CDBHtmlUtilities_8h_ac7581a96cbcabcc302ed6649be4b66da}{CDBHUHtmlObjectSubView} (ConfigurationDataBase \&cdb\_\-, const char $\ast$title\_\-, HttpStream \&hStream, \hyperlink{CDBHtmlUtilities_8h_a3c31a4130c52d0728f5c691565de650b}{CDBHUMode} mode)
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const \hyperlink{CDBHtmlUtilities_8h_a3c31a4130c52d0728f5c691565de650b}{CDBHUMode} \hyperlink{CDBHtmlUtilities_8h_afcb8e89ba86e30c1e19cd5b933c23a7c}{CDBHUHOSUV\_\-Header} = 0x1
+\item 
+const \hyperlink{CDBHtmlUtilities_8h_a3c31a4130c52d0728f5c691565de650b}{CDBHUMode} \hyperlink{CDBHtmlUtilities_8h_a4e266d67a4f8ef6f5ce94453c1463d51}{CDBHUHOSUV\_\-Script} = 0x2
+\item 
+const \hyperlink{CDBHtmlUtilities_8h_a3c31a4130c52d0728f5c691565de650b}{CDBHUMode} \hyperlink{CDBHtmlUtilities_8h_a96593681b579cd1c2c19580e2c3d1e9d}{CDBHUHOSUV\_\-Body} = 0x4
+\item 
+const \hyperlink{CDBHtmlUtilities_8h_a3c31a4130c52d0728f5c691565de650b}{CDBHUMode} \hyperlink{CDBHtmlUtilities_8h_adb2dc40b6ce57efa7e80f8e35578a15f}{CDBHUHOSUV\_\-FullBody} = 0x8
+\item 
+const \hyperlink{CDBHtmlUtilities_8h_a3c31a4130c52d0728f5c691565de650b}{CDBHUMode} \hyperlink{CDBHtmlUtilities_8h_a609a3980c4f7ad725c9611205e49a3a9}{CDBHUHOSUV\_\-NoBack} = 0x10
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Utility implementations to provide the interface between a CDB and HTML. 
+
+\subsection{Typedef Documentation}
+\hypertarget{CDBHtmlUtilities_8h_a3c31a4130c52d0728f5c691565de650b}{
+\index{CDBHtmlUtilities.h@{CDBHtmlUtilities.h}!CDBHUMode@{CDBHUMode}}
+\index{CDBHUMode@{CDBHUMode}!CDBHtmlUtilities.h@{CDBHtmlUtilities.h}}
+\subsubsection[{CDBHUMode}]{\setlength{\rightskip}{0pt plus 5cm}typedef int {\bf CDBHUMode}}}
+\label{CDBHtmlUtilities_8h_a3c31a4130c52d0728f5c691565de650b}
+to specify what part of the webpage to produce 
+
+\subsection{Function Documentation}
+\hypertarget{CDBHtmlUtilities_8h_ac7581a96cbcabcc302ed6649be4b66da}{
+\index{CDBHtmlUtilities.h@{CDBHtmlUtilities.h}!CDBHUHtmlObjectSubView@{CDBHUHtmlObjectSubView}}
+\index{CDBHUHtmlObjectSubView@{CDBHUHtmlObjectSubView}!CDBHtmlUtilities.h@{CDBHtmlUtilities.h}}
+\subsubsection[{CDBHUHtmlObjectSubView}]{\setlength{\rightskip}{0pt plus 5cm}bool CDBHUHtmlObjectSubView (
+\begin{DoxyParamCaption}
+\item[{ConfigurationDataBase \&}]{cdb\_\-, }
+\item[{const char $\ast$}]{title\_\-, }
+\item[{HttpStream \&}]{hStream, }
+\item[{{\bf CDBHUMode}}]{mode}
+\end{DoxyParamCaption}
+)}}
+\label{CDBHtmlUtilities_8h_ac7581a96cbcabcc302ed6649be4b66da}
+allows implementing a browsing functionality for CDBVirtual derived databases 
+
+\subsection{Variable Documentation}
+\hypertarget{CDBHtmlUtilities_8h_a96593681b579cd1c2c19580e2c3d1e9d}{
+\index{CDBHtmlUtilities.h@{CDBHtmlUtilities.h}!CDBHUHOSUV\_\-Body@{CDBHUHOSUV\_\-Body}}
+\index{CDBHUHOSUV\_\-Body@{CDBHUHOSUV\_\-Body}!CDBHtmlUtilities.h@{CDBHtmlUtilities.h}}
+\subsubsection[{CDBHUHOSUV\_\-Body}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf CDBHUMode} {\bf CDBHUHOSUV\_\-Body} = 0x4}}
+\label{CDBHtmlUtilities_8h_a96593681b579cd1c2c19580e2c3d1e9d}
+the body part without BODY statement \hypertarget{CDBHtmlUtilities_8h_adb2dc40b6ce57efa7e80f8e35578a15f}{
+\index{CDBHtmlUtilities.h@{CDBHtmlUtilities.h}!CDBHUHOSUV\_\-FullBody@{CDBHUHOSUV\_\-FullBody}}
+\index{CDBHUHOSUV\_\-FullBody@{CDBHUHOSUV\_\-FullBody}!CDBHtmlUtilities.h@{CDBHtmlUtilities.h}}
+\subsubsection[{CDBHUHOSUV\_\-FullBody}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf CDBHUMode} {\bf CDBHUHOSUV\_\-FullBody} = 0x8}}
+\label{CDBHtmlUtilities_8h_adb2dc40b6ce57efa7e80f8e35578a15f}
+the body part with BODY statement \hypertarget{CDBHtmlUtilities_8h_afcb8e89ba86e30c1e19cd5b933c23a7c}{
+\index{CDBHtmlUtilities.h@{CDBHtmlUtilities.h}!CDBHUHOSUV\_\-Header@{CDBHUHOSUV\_\-Header}}
+\index{CDBHUHOSUV\_\-Header@{CDBHUHOSUV\_\-Header}!CDBHtmlUtilities.h@{CDBHtmlUtilities.h}}
+\subsubsection[{CDBHUHOSUV\_\-Header}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf CDBHUMode} {\bf CDBHUHOSUV\_\-Header} = 0x1}}
+\label{CDBHtmlUtilities_8h_afcb8e89ba86e30c1e19cd5b933c23a7c}
+all the header \hypertarget{CDBHtmlUtilities_8h_a609a3980c4f7ad725c9611205e49a3a9}{
+\index{CDBHtmlUtilities.h@{CDBHtmlUtilities.h}!CDBHUHOSUV\_\-NoBack@{CDBHUHOSUV\_\-NoBack}}
+\index{CDBHUHOSUV\_\-NoBack@{CDBHUHOSUV\_\-NoBack}!CDBHtmlUtilities.h@{CDBHtmlUtilities.h}}
+\subsubsection[{CDBHUHOSUV\_\-NoBack}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf CDBHUMode} {\bf CDBHUHOSUV\_\-NoBack} = 0x10}}
+\label{CDBHtmlUtilities_8h_a609a3980c4f7ad725c9611205e49a3a9}
+the body part has no Back statement \hypertarget{CDBHtmlUtilities_8h_a4e266d67a4f8ef6f5ce94453c1463d51}{
+\index{CDBHtmlUtilities.h@{CDBHtmlUtilities.h}!CDBHUHOSUV\_\-Script@{CDBHUHOSUV\_\-Script}}
+\index{CDBHUHOSUV\_\-Script@{CDBHUHOSUV\_\-Script}!CDBHtmlUtilities.h@{CDBHtmlUtilities.h}}
+\subsubsection[{CDBHUHOSUV\_\-Script}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf CDBHUMode} {\bf CDBHUHOSUV\_\-Script} = 0x2}}
+\label{CDBHtmlUtilities_8h_a4e266d67a4f8ef6f5ce94453c1463d51}
+just the script part of the header 

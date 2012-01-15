@@ -1,0 +1,71 @@
+##############################################################
+#
+# Copyright 2011 EFDA | European Fusion Development Agreement
+#
+# Licensed under the EUPL, Version 1.1 or - as soon they 
+# will be approved by the European Commission - subsequent  
+# versions of the EUPL (the "Licence"); 
+# You may not use this work except in compliance with the 
+# Licence. 
+# You may obtain a copy of the Licence at: 
+#  
+# http://ec.europa.eu/idabc/eupl
+#
+# Unless required by applicable law or agreed to in 
+# writing, software distributed under the Licence is 
+# distributed on an "AS IS" basis, 
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
+# express or implied. 
+# See the Licence for the specific language governing 
+# permissions and limitations under the Licence. 
+#
+# $Id$
+#
+#############################################################
+WIND_BASE=/common/vxworks-6.8; export WIND_BASE
+
+# Sunos4 or Solaris2 tools ?
+# Probably obsolete for WB/VxWorks 6.8        
+if [ `uname -r | cut -c 1,1` = 4 ]; then
+	WIND_HOST_TYPE=sun4-sunos4; export WIND_HOST_TYPE
+else    
+	WIND_HOST_TYPE=sun4-solaris2; export WIND_HOST_TYPE
+fi
+	        
+# Probably obsolete
+WIND_REGISTRY=gen-off-3;            export WIND_REGISTRY
+
+# PPCC Modification ...
+MUNCH_BASE=${WIND_BASE}/ppc             export MUNCH_BASE
+        
+# VW is for backward compatiblity with 5.1.1 tree root.
+# Status for VxWorks 6.8 unknown
+VW=${WIND_BASE}/target; export VW
+        
+# The following variable located the base 
+VX_HEADER_BASE=${WIND_BASE}/target/h; export VX_HEADER_BASE
+
+# VX_TOOLS includes the path to e.g. nmppc
+#VX_TOOLS=${WIND_BASE}/ppc/host/${WIND_HOST_TYPE}/bin; export VX_TOOLS
+VX_TOOLS=${WIND_BASE}/utilities-1.0/${WIND_HOST_TYPE}/bin; export VX_TOOLS
+
+# VX_COMPILERS includes the path to e.g. jccppc
+VX_COMPILERS=${WIND_BASE}/gnu/4.1.2-vxworks-6.8/${WIND_HOST_TYPE}/bin; export VX_COMPILERS
+
+# For tornado dev.
+#       PATH=${WIND_BASE}/host/${WIND_HOST_TYPE}/bin:$PATH; export PATH
+VXDSET=TRUE;export VXDSET
+
+VXSAVEDPATH=$PATH;export VXSAVEDPATH
+PATH=${VX_COMPILERS}:${VX_TOOLS}:$PATH; export PATH
+
+# Private PPCCCompiler copies removed for VxWorks 6.8
+# Reinstated to map ccppc to g++ppc in jccppc6
+PATH=/home/vxworks/.PPCCCompilersSettings/vxworks6.8:$PATH; export PATH
+
+VXSAVEDLIBPATH=${LD_LIBRARY_PATH};export VXSAVEDLIBPATH
+LD_LIBRARY_PATH=${WIND_BASE}/ppc/host/${WIND_HOST_TYPE}/lib:${LD_LIBRARY_PATH};\
+export LD_LIBRARY_PATH
+VXSAVEMAN=$MANPATH; export VXSAVEMAN
+MANPATH=${WIND_BASE}/host/man:${WIND_BASE}/target/man:${MANPATH}; export MANPATH
+

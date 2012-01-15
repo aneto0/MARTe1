@@ -1,0 +1,149 @@
+\hypertarget{classHttpGCRCBrowser}{
+\section{HttpGCRCBrowser Class Reference}
+\label{classHttpGCRCBrowser}\index{HttpGCRCBrowser@{HttpGCRCBrowser}}
+}
+
+
+{\ttfamily \#include $<$HttpGCRCBrowser.h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual const char $\ast$ \hyperlink{classHttpGCRCBrowser_a7c92191d1e87a9dc6ec09981be496fd1}{Title} ()
+\item 
+\hypertarget{classHttpGCRCBrowser_aa1aecf3ed830811a3fe6cbc156c07070}{
+virtual void {\bfseries SetTitle} (const char $\ast$\hyperlink{classHttpGCRCBrowser_a6c59a7dfbebcc1939a60fe4d379630a7}{title})}
+\label{classHttpGCRCBrowser_aa1aecf3ed830811a3fe6cbc156c07070}
+
+\item 
+\hyperlink{classHttpGCRCBrowser_a311b5a73c2444740ad635e3563ec202b}{HttpGCRCBrowser} ()
+\item 
+\hyperlink{classHttpGCRCBrowser_a28ae6e58aa3dbccd438ac827d1f25ec4}{$\sim$HttpGCRCBrowser} ()
+\item 
+virtual bool \hyperlink{classHttpGCRCBrowser_ab18338af4c81014e455b7b563e8e4a7e}{ObjectSaveSetup} (ConfigurationDataBase \&info, StreamInterface $\ast$err)
+\item 
+virtual bool \hyperlink{classHttpGCRCBrowser_ad2e25b201c478115c72d2c1529069360}{ObjectLoadSetup} (ConfigurationDataBase \&info, StreamInterface $\ast$err)
+\end{DoxyCompactItemize}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual bool \hyperlink{classHttpGCRCBrowser_a3f93d5e83175c5ebaf8d8811cbfe1828}{ProcessHttpMessage} (HttpStream \&hStream)
+\item 
+void \hyperlink{classHttpGCRCBrowser_abca6ebb2d9a86a3c2ef6da34719fbe15}{ObjectSubView} (GCRTemplate$<$ GCReferenceContainer $>$ current, const char $\ast$relativePath, const char $\ast$absolutePath, const char $\ast$selector, int level, StreamInterface \&answer)
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+BString \hyperlink{classHttpGCRCBrowser_a6c59a7dfbebcc1939a60fe4d379630a7}{title}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+allows browsing a CDB via the MenuSystem 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classHttpGCRCBrowser_a311b5a73c2444740ad635e3563ec202b}{
+\index{HttpGCRCBrowser@{HttpGCRCBrowser}!HttpGCRCBrowser@{HttpGCRCBrowser}}
+\index{HttpGCRCBrowser@{HttpGCRCBrowser}!HttpGCRCBrowser@{HttpGCRCBrowser}}
+\subsubsection[{HttpGCRCBrowser}]{\setlength{\rightskip}{0pt plus 5cm}HttpGCRCBrowser::HttpGCRCBrowser (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classHttpGCRCBrowser_a311b5a73c2444740ad635e3563ec202b}
+\hypertarget{classHttpGCRCBrowser_a28ae6e58aa3dbccd438ac827d1f25ec4}{
+\index{HttpGCRCBrowser@{HttpGCRCBrowser}!$\sim$HttpGCRCBrowser@{$\sim$HttpGCRCBrowser}}
+\index{$\sim$HttpGCRCBrowser@{$\sim$HttpGCRCBrowser}!HttpGCRCBrowser@{HttpGCRCBrowser}}
+\subsubsection[{$\sim$HttpGCRCBrowser}]{\setlength{\rightskip}{0pt plus 5cm}HttpGCRCBrowser::$\sim$HttpGCRCBrowser (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classHttpGCRCBrowser_a28ae6e58aa3dbccd438ac827d1f25ec4}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classHttpGCRCBrowser_ad2e25b201c478115c72d2c1529069360}{
+\index{HttpGCRCBrowser@{HttpGCRCBrowser}!ObjectLoadSetup@{ObjectLoadSetup}}
+\index{ObjectLoadSetup@{ObjectLoadSetup}!HttpGCRCBrowser@{HttpGCRCBrowser}}
+\subsubsection[{ObjectLoadSetup}]{\setlength{\rightskip}{0pt plus 5cm}bool HttpGCRCBrowser::ObjectLoadSetup (
+\begin{DoxyParamCaption}
+\item[{ConfigurationDataBase \&}]{info, }
+\item[{StreamInterface $\ast$}]{err}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}
+\label{classHttpGCRCBrowser_ad2e25b201c478115c72d2c1529069360}
+initialise an object from a set of configs The parameter Root determine the subtree of GODB to broswe. Omitting it means the whole tree RootIsHttpRoot can be set to 1 if Root is the same as that of the Http service. This will mean that security will apply correctly and further browsing will work \hypertarget{classHttpGCRCBrowser_ab18338af4c81014e455b7b563e8e4a7e}{
+\index{HttpGCRCBrowser@{HttpGCRCBrowser}!ObjectSaveSetup@{ObjectSaveSetup}}
+\index{ObjectSaveSetup@{ObjectSaveSetup}!HttpGCRCBrowser@{HttpGCRCBrowser}}
+\subsubsection[{ObjectSaveSetup}]{\setlength{\rightskip}{0pt plus 5cm}virtual bool HttpGCRCBrowser::ObjectSaveSetup (
+\begin{DoxyParamCaption}
+\item[{ConfigurationDataBase \&}]{info, }
+\item[{StreamInterface $\ast$}]{err}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline, virtual\mbox{]}}}}
+\label{classHttpGCRCBrowser_ab18338af4c81014e455b7b563e8e4a7e}
+save an object content into a set of configs \hypertarget{classHttpGCRCBrowser_abca6ebb2d9a86a3c2ef6da34719fbe15}{
+\index{HttpGCRCBrowser@{HttpGCRCBrowser}!ObjectSubView@{ObjectSubView}}
+\index{ObjectSubView@{ObjectSubView}!HttpGCRCBrowser@{HttpGCRCBrowser}}
+\subsubsection[{ObjectSubView}]{\setlength{\rightskip}{0pt plus 5cm}void HttpGCRCBrowser::ObjectSubView (
+\begin{DoxyParamCaption}
+\item[{GCRTemplate$<$ GCReferenceContainer $>$}]{current, }
+\item[{const char $\ast$}]{relativePath, }
+\item[{const char $\ast$}]{absolutePath, }
+\item[{const char $\ast$}]{selector, }
+\item[{int}]{level, }
+\item[{StreamInterface \&}]{answer}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}protected\mbox{]}}}}
+\label{classHttpGCRCBrowser_abca6ebb2d9a86a3c2ef6da34719fbe15}
+
+
+reference to object own page
+
+reference to CDB page 
+
+\hypertarget{classHttpGCRCBrowser_a3f93d5e83175c5ebaf8d8811cbfe1828}{
+\index{HttpGCRCBrowser@{HttpGCRCBrowser}!ProcessHttpMessage@{ProcessHttpMessage}}
+\index{ProcessHttpMessage@{ProcessHttpMessage}!HttpGCRCBrowser@{HttpGCRCBrowser}}
+\subsubsection[{ProcessHttpMessage}]{\setlength{\rightskip}{0pt plus 5cm}bool HttpGCRCBrowser::ProcessHttpMessage (
+\begin{DoxyParamCaption}
+\item[{HttpStream \&}]{hStream}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}protected, virtual\mbox{]}}}}
+\label{classHttpGCRCBrowser_a3f93d5e83175c5ebaf8d8811cbfe1828}
+The HTTP entry point 
+
+see if a structure view is requested
+
+see if a structure view is requested
+
+see if a structure view is requested
+
+see if a structure view is requested
+
+The pointer to the current position 
+
+\hypertarget{classHttpGCRCBrowser_a7c92191d1e87a9dc6ec09981be496fd1}{
+\index{HttpGCRCBrowser@{HttpGCRCBrowser}!Title@{Title}}
+\index{Title@{Title}!HttpGCRCBrowser@{HttpGCRCBrowser}}
+\subsubsection[{Title}]{\setlength{\rightskip}{0pt plus 5cm}virtual const char$\ast$ HttpGCRCBrowser::Title (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline, virtual\mbox{]}}}}
+\label{classHttpGCRCBrowser_a7c92191d1e87a9dc6ec09981be496fd1}
+to be able to choose the labelling policy 
+
+\subsection{Member Data Documentation}
+\hypertarget{classHttpGCRCBrowser_a6c59a7dfbebcc1939a60fe4d379630a7}{
+\index{HttpGCRCBrowser@{HttpGCRCBrowser}!title@{title}}
+\index{title@{title}!HttpGCRCBrowser@{HttpGCRCBrowser}}
+\subsubsection[{title}]{\setlength{\rightskip}{0pt plus 5cm}BString {\bf HttpGCRCBrowser::title}\hspace{0.3cm}{\ttfamily  \mbox{[}protected\mbox{]}}}}
+\label{classHttpGCRCBrowser_a6c59a7dfbebcc1939a60fe4d379630a7}
+a specific title, distinct from the object name 
+
+The documentation for this class was generated from the following files:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{HttpGCRCBrowser_8h}{HttpGCRCBrowser.h}\item 
+HttpGCRCBrowser.cpp\end{DoxyCompactItemize}

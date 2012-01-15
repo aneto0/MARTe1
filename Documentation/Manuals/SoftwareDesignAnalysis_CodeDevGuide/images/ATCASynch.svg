@@ -1,0 +1,3380 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="719.26636"
+   height="567.06488"
+   id="svg2"
+   sodipodi:version="0.32"
+   inkscape:version="0.46"
+   sodipodi:docname="ATCASynch.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape"
+   version="1.0">
+  <defs
+     id="defs4">
+    <marker
+       inkscape:stockid="Arrow2Mstart"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow2Mstart"
+       style="overflow:visible">
+      <path
+         id="path5339"
+         style="font-size:12px;fill-rule:evenodd;stroke-width:0.625;stroke-linejoin:round"
+         d="M 8.7185878,4.0337352 L -2.2072895,0.016013256 L 8.7185884,-4.0017078 C 6.97309,-1.6296469 6.9831476,1.6157441 8.7185878,4.0337352 z"
+         transform="scale(0.6,0.6)" />
+    </marker>
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 526.18109 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="744.09448 : 526.18109 : 1"
+       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
+       id="perspective10" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     gridtolerance="10000"
+     guidetolerance="10"
+     objecttolerance="10"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.61973781"
+     inkscape:cx="154.15056"
+     inkscape:cy="125.38646"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1280"
+     inkscape:window-height="727"
+     inkscape:window-x="0"
+     inkscape:window-y="25">
+    <inkscape:grid
+       type="xygrid"
+       id="grid3179"
+       units="mm"
+       visible="true"
+       enabled="true" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(40.552994,6.4375353)">
+    <g
+       id="g5031"
+       transform="translate(85.825577,-287.42014)">
+      <rect
+         y="585.22845"
+         x="401.16342"
+         height="246.9539"
+         width="93.256401"
+         id="rect5033"
+         style="opacity:1;fill:#c8c8c8;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+      <rect
+         y="585.22845"
+         x="206.22748"
+         height="246.9539"
+         width="93.256401"
+         id="rect5035"
+         style="opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+      <rect
+         y="585.22845"
+         x="303.69543"
+         height="246.9539"
+         width="93.256401"
+         id="rect5037"
+         style="opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+      <rect
+         y="585.22845"
+         x="498.63141"
+         height="246.9539"
+         width="93.256401"
+         id="rect5039"
+         style="opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+      <text
+         id="text5041"
+         y="616.48718"
+         x="311.69873"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           y="616.48718"
+           x="311.69873"
+           id="tspan5043"
+           sodipodi:role="line">18050</tspan></text>
+      <text
+         id="text5045"
+         y="616.48718"
+         x="409.04935"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           y="616.48718"
+           x="409.04935"
+           id="tspan5047"
+           sodipodi:role="line">17900</tspan></text>
+      <text
+         id="text5049"
+         y="616.48718"
+         x="506.37659"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           y="616.48718"
+           x="506.37659"
+           id="tspan5051"
+           sodipodi:role="line">17950</tspan></text>
+      <text
+         id="text5053"
+         y="614.48718"
+         x="214.37155"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           y="614.48718"
+           x="214.37155"
+           id="tspan5055"
+           sodipodi:role="line">18000</tspan></text>
+      <path
+         id="path5057"
+         d="M 207.03628,627.39828 C 299.16226,627.39828 299.16226,627.39828 299.16226,627.39828"
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         id="path5059"
+         d="M 401.65825,627.39828 C 493.78424,627.39828 493.78424,627.39828 493.78424,627.39828"
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         id="path5061"
+         d="M 498.98541,627.39828 C 591.11139,627.39828 591.11139,627.39828 591.11139,627.39828"
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         id="path5063"
+         d="M 304.33107,627.39828 C 396.45706,627.39828 396.45706,627.39828 396.45706,627.39828"
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <text
+         transform="matrix(0,-1,1,0,0,0)"
+         id="text5065"
+         y="244.26584"
+         x="-709.37335"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           style="text-align:center;text-anchor:middle"
+           y="244.26584"
+           x="-709.37335"
+           id="tspan5067"
+           sodipodi:role="line">32 ADCs</tspan><tspan
+           style="text-align:center;text-anchor:middle"
+           id="tspan5069"
+           y="274.26584"
+           x="-709.37335"
+           sodipodi:role="line">100 us ago</tspan></text>
+      <text
+         transform="matrix(0,-1,1,0,0,0)"
+         id="text5071"
+         y="341.7338"
+         x="-708.98077"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           style="text-align:center;text-anchor:middle"
+           y="341.7338"
+           x="-708.98077"
+           id="tspan5073"
+           sodipodi:role="line">32 ADCs</tspan><tspan
+           style="text-align:center;text-anchor:middle"
+           id="tspan5075"
+           y="371.7338"
+           x="-708.98077"
+           sodipodi:role="line">50 us ago</tspan></text>
+      <text
+         transform="matrix(0,-1,1,0,0,0)"
+         id="text5077"
+         y="439.20178"
+         x="-708.9339"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           style="text-align:center;text-anchor:middle"
+           y="439.20178"
+           x="-708.9339"
+           id="tspan5079"
+           sodipodi:role="line">32 ADCs</tspan><tspan
+           style="text-align:center;text-anchor:middle"
+           id="tspan5081"
+           y="469.20178"
+           x="-708.9339"
+           sodipodi:role="line">200  us ago</tspan></text>
+      <text
+         transform="matrix(0,-1,1,0,0,0)"
+         id="text5083"
+         y="536.66974"
+         x="-709.37335"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           style="text-align:center;text-anchor:middle"
+           y="536.66974"
+           x="-709.37335"
+           id="tspan5085"
+           sodipodi:role="line">32 ADCs</tspan><tspan
+           id="tspan5087"
+           style="text-align:center;text-anchor:middle"
+           y="566.66974"
+           x="-709.37335"
+           sodipodi:role="line">150 us ago</tspan><tspan
+           style="text-align:center;text-anchor:middle"
+           id="tspan5089"
+           y="596.66974"
+           x="-709.37335"
+           sodipodi:role="line" /></text>
+      <path
+         id="path5091"
+         d="M 207.4785,790.94231 C 299.60448,790.94231 299.60448,790.94231 299.60448,790.94231"
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         id="path5093"
+         d="M 402.10047,790.94231 C 494.22646,790.94231 494.22646,790.94231 494.22646,790.94231"
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         id="path5095"
+         d="M 499.42763,790.94231 C 591.55361,790.94231 591.55361,790.94231 591.55361,790.94231"
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         id="path5097"
+         d="M 304.77329,790.94231 C 396.89928,790.94231 396.89928,790.94231 396.89928,790.94231"
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <text
+         id="text5099"
+         y="818.48712"
+         x="311.69873"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           y="818.48712"
+           x="311.69873"
+           id="tspan5101"
+           sodipodi:role="line">18050</tspan></text>
+      <text
+         id="text5103"
+         y="818.48712"
+         x="409.04935"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           y="818.48712"
+           x="409.04935"
+           id="tspan5105"
+           sodipodi:role="line">17900</tspan></text>
+      <text
+         id="text5107"
+         y="818.48712"
+         x="506.37659"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           y="818.48712"
+           x="506.37659"
+           id="tspan5109"
+           sodipodi:role="line">17950</tspan></text>
+      <text
+         id="text5111"
+         y="818.48712"
+         x="214.37155"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           y="818.48712"
+           x="214.37155"
+           id="tspan5113"
+           sodipodi:role="line">18000</tspan></text>
+    </g>
+    <g
+       id="g5115"
+       transform="translate(82.428061,-284.52994)">
+      <rect
+         y="585.22845"
+         x="401.16342"
+         height="246.9539"
+         width="93.256401"
+         id="rect5117"
+         style="opacity:1;fill:#c8c8c8;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+      <rect
+         y="585.22845"
+         x="206.22748"
+         height="246.9539"
+         width="93.256401"
+         id="rect5119"
+         style="opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+      <rect
+         y="585.22845"
+         x="303.69543"
+         height="246.9539"
+         width="93.256401"
+         id="rect5121"
+         style="opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+      <rect
+         y="585.22845"
+         x="498.63141"
+         height="246.9539"
+         width="93.256401"
+         id="rect5123"
+         style="opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+      <text
+         id="text5125"
+         y="616.48718"
+         x="311.69873"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           y="616.48718"
+           x="311.69873"
+           id="tspan5127"
+           sodipodi:role="line">18050</tspan></text>
+      <text
+         id="text5129"
+         y="616.48718"
+         x="409.04935"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           y="616.48718"
+           x="409.04935"
+           id="tspan5131"
+           sodipodi:role="line">17900</tspan></text>
+      <text
+         id="text5133"
+         y="616.48718"
+         x="506.37659"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           y="616.48718"
+           x="506.37659"
+           id="tspan5135"
+           sodipodi:role="line">17950</tspan></text>
+      <text
+         id="text5137"
+         y="614.48718"
+         x="214.37155"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           y="614.48718"
+           x="214.37155"
+           id="tspan5139"
+           sodipodi:role="line">18000</tspan></text>
+      <path
+         id="path5141"
+         d="M 207.03628,627.39828 C 299.16226,627.39828 299.16226,627.39828 299.16226,627.39828"
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         id="path5143"
+         d="M 401.65825,627.39828 C 493.78424,627.39828 493.78424,627.39828 493.78424,627.39828"
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         id="path5145"
+         d="M 498.98541,627.39828 C 591.11139,627.39828 591.11139,627.39828 591.11139,627.39828"
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         id="path5147"
+         d="M 304.33107,627.39828 C 396.45706,627.39828 396.45706,627.39828 396.45706,627.39828"
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <text
+         transform="matrix(0,-1,1,0,0,0)"
+         id="text5149"
+         y="244.26584"
+         x="-709.37335"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           style="text-align:center;text-anchor:middle"
+           y="244.26584"
+           x="-709.37335"
+           id="tspan5151"
+           sodipodi:role="line">32 ADCs</tspan><tspan
+           style="text-align:center;text-anchor:middle"
+           id="tspan5153"
+           y="274.26584"
+           x="-709.37335"
+           sodipodi:role="line">100 us ago</tspan></text>
+      <text
+         transform="matrix(0,-1,1,0,0,0)"
+         id="text5155"
+         y="341.7338"
+         x="-708.98077"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           style="text-align:center;text-anchor:middle"
+           y="341.7338"
+           x="-708.98077"
+           id="tspan5157"
+           sodipodi:role="line">32 ADCs</tspan><tspan
+           style="text-align:center;text-anchor:middle"
+           id="tspan5159"
+           y="371.7338"
+           x="-708.98077"
+           sodipodi:role="line">50 us ago</tspan></text>
+      <text
+         transform="matrix(0,-1,1,0,0,0)"
+         id="text5161"
+         y="439.20178"
+         x="-708.9339"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           style="text-align:center;text-anchor:middle"
+           y="439.20178"
+           x="-708.9339"
+           id="tspan5163"
+           sodipodi:role="line">32 ADCs</tspan><tspan
+           style="text-align:center;text-anchor:middle"
+           id="tspan5165"
+           y="469.20178"
+           x="-708.9339"
+           sodipodi:role="line">200  us ago</tspan></text>
+      <text
+         transform="matrix(0,-1,1,0,0,0)"
+         id="text5167"
+         y="536.66974"
+         x="-709.37335"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           style="text-align:center;text-anchor:middle"
+           y="536.66974"
+           x="-709.37335"
+           id="tspan5169"
+           sodipodi:role="line">32 ADCs</tspan><tspan
+           id="tspan5171"
+           style="text-align:center;text-anchor:middle"
+           y="566.66974"
+           x="-709.37335"
+           sodipodi:role="line">150 us ago</tspan><tspan
+           style="text-align:center;text-anchor:middle"
+           id="tspan5173"
+           y="596.66974"
+           x="-709.37335"
+           sodipodi:role="line" /></text>
+      <path
+         id="path5175"
+         d="M 207.4785,790.94231 C 299.60448,790.94231 299.60448,790.94231 299.60448,790.94231"
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         id="path5177"
+         d="M 402.10047,790.94231 C 494.22646,790.94231 494.22646,790.94231 494.22646,790.94231"
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         id="path5179"
+         d="M 499.42763,790.94231 C 591.55361,790.94231 591.55361,790.94231 591.55361,790.94231"
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         id="path5181"
+         d="M 304.77329,790.94231 C 396.89928,790.94231 396.89928,790.94231 396.89928,790.94231"
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <text
+         id="text5183"
+         y="818.48712"
+         x="311.69873"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           y="818.48712"
+           x="311.69873"
+           id="tspan5185"
+           sodipodi:role="line">18050</tspan></text>
+      <text
+         id="text5187"
+         y="818.48712"
+         x="409.04935"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           y="818.48712"
+           x="409.04935"
+           id="tspan5189"
+           sodipodi:role="line">17900</tspan></text>
+      <text
+         id="text5191"
+         y="818.48712"
+         x="506.37659"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           y="818.48712"
+           x="506.37659"
+           id="tspan5193"
+           sodipodi:role="line">17950</tspan></text>
+      <text
+         id="text5195"
+         y="818.48712"
+         x="214.37155"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           y="818.48712"
+           x="214.37155"
+           id="tspan5197"
+           sodipodi:role="line">18000</tspan></text>
+    </g>
+    <rect
+       style="opacity:1;fill:#c8c8c8;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect5199"
+       width="93.256401"
+       height="246.9539"
+       x="479.98132"
+       y="304.60645" />
+    <rect
+       style="opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect5201"
+       width="93.256401"
+       height="246.9539"
+       x="285.61591"
+       y="303.60809" />
+    <rect
+       style="opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect5203"
+       width="93.256401"
+       height="246.9539"
+       x="382.51337"
+       y="304.60645" />
+    <rect
+       style="opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect5205"
+       width="93.256401"
+       height="246.9539"
+       x="577.44934"
+       y="304.60645" />
+    <text
+       xml:space="preserve"
+       style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+       x="390.51666"
+       y="335.86523"
+       id="text5207"><tspan
+         sodipodi:role="line"
+         id="tspan5209"
+         x="390.51666"
+         y="335.86523">18050</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+       x="487.86725"
+       y="335.86523"
+       id="text5211"><tspan
+         sodipodi:role="line"
+         id="tspan5213"
+         x="487.86725"
+         y="335.86523">17900</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+       x="585.19452"
+       y="335.86523"
+       id="text5215"><tspan
+         sodipodi:role="line"
+         id="tspan5217"
+         x="585.19452"
+         y="335.86523">17950</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+       x="293.18948"
+       y="333.86523"
+       id="text5219"><tspan
+         sodipodi:role="line"
+         id="tspan5221"
+         x="293.18948"
+         y="333.86523">18000</tspan></text>
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 285.8542,346.77634 C 377.98018,346.77634 377.98018,346.77634 377.98018,346.77634"
+       id="path5223" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 480.47617,346.77634 C 572.60216,346.77634 572.60216,346.77634 572.60216,346.77634"
+       id="path5225" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 577.80333,346.77634 C 669.92931,346.77634 669.92931,346.77634 669.92931,346.77634"
+       id="path5227" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 383.14899,346.77634 C 475.27498,346.77634 475.27498,346.77634 475.27498,346.77634"
+       id="path5229" />
+    <text
+       xml:space="preserve"
+       style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+       x="-428.7514"
+       y="323.08377"
+       id="text5231"
+       transform="matrix(0,-1,1,0,0,0)"><tspan
+         sodipodi:role="line"
+         id="tspan5233"
+         x="-428.7514"
+         y="323.08377"
+         style="text-align:center;text-anchor:middle">32 ADCs</tspan><tspan
+         sodipodi:role="line"
+         x="-428.7514"
+         y="353.08377"
+         id="tspan5235"
+         style="text-align:center;text-anchor:middle">100 us ago</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+       x="-428.35883"
+       y="420.55173"
+       id="text5237"
+       transform="matrix(0,-1,1,0,0,0)"><tspan
+         sodipodi:role="line"
+         id="tspan5239"
+         x="-428.35883"
+         y="420.55173"
+         style="text-align:center;text-anchor:middle">32 ADCs</tspan><tspan
+         sodipodi:role="line"
+         x="-428.35883"
+         y="450.55173"
+         id="tspan5241"
+         style="text-align:center;text-anchor:middle">50 us ago</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+       x="-428.31195"
+       y="518.01971"
+       id="text5243"
+       transform="matrix(0,-1,1,0,0,0)"><tspan
+         sodipodi:role="line"
+         id="tspan5245"
+         x="-428.31195"
+         y="518.01971"
+         style="text-align:center;text-anchor:middle">32 ADCs</tspan><tspan
+         sodipodi:role="line"
+         x="-428.31195"
+         y="548.01971"
+         id="tspan5247"
+         style="text-align:center;text-anchor:middle">200  us ago</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+       x="-428.7514"
+       y="615.48767"
+       id="text5249"
+       transform="matrix(0,-1,1,0,0,0)"><tspan
+         sodipodi:role="line"
+         id="tspan5251"
+         x="-428.7514"
+         y="615.48767"
+         style="text-align:center;text-anchor:middle">32 ADCs</tspan><tspan
+         sodipodi:role="line"
+         x="-428.7514"
+         y="645.48767"
+         style="text-align:center;text-anchor:middle"
+         id="tspan5253">150 us ago</tspan><tspan
+         sodipodi:role="line"
+         x="-428.7514"
+         y="675.48767"
+         id="tspan5255"
+         style="text-align:center;text-anchor:middle" /></text>
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 286.29642,510.32037 C 378.4224,510.32037 378.4224,510.32037 378.4224,510.32037"
+       id="path5257" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 480.91839,510.32037 C 573.04438,510.32037 573.04438,510.32037 573.04438,510.32037"
+       id="path5259" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 578.24555,510.32037 C 670.37153,510.32037 670.37153,510.32037 670.37153,510.32037"
+       id="path5261" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 383.59121,510.32037 C 475.7172,510.32037 475.7172,510.32037 475.7172,510.32037"
+       id="path5263" />
+    <text
+       xml:space="preserve"
+       style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+       x="390.51666"
+       y="537.86517"
+       id="text5265"><tspan
+         sodipodi:role="line"
+         id="tspan5267"
+         x="390.51666"
+         y="537.86517">18050</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+       x="487.86725"
+       y="537.86517"
+       id="text5269"><tspan
+         sodipodi:role="line"
+         id="tspan5271"
+         x="487.86725"
+         y="537.86517">17900</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+       x="585.19452"
+       y="537.86517"
+       id="text5273"><tspan
+         sodipodi:role="line"
+         id="tspan5275"
+         x="585.19452"
+         y="537.86517">17950</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+       x="293.18948"
+       y="537.86517"
+       id="text5277"><tspan
+         sodipodi:role="line"
+         id="tspan5279"
+         x="293.18948"
+         y="537.86517">18000</tspan></text>
+    <g
+       id="g4947"
+       transform="translate(76.010014,-278.64002)">
+      <rect
+         y="585.22845"
+         x="401.16342"
+         height="246.9539"
+         width="93.256401"
+         id="rect4949"
+         style="opacity:1;fill:#c8c8c8;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+      <rect
+         y="585.22845"
+         x="206.22748"
+         height="246.9539"
+         width="93.256401"
+         id="rect4951"
+         style="opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+      <rect
+         y="585.22845"
+         x="303.69543"
+         height="246.9539"
+         width="93.256401"
+         id="rect4953"
+         style="opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+      <rect
+         y="585.22845"
+         x="498.63141"
+         height="246.9539"
+         width="93.256401"
+         id="rect4955"
+         style="opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+      <text
+         id="text4957"
+         y="616.48718"
+         x="311.69873"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           y="616.48718"
+           x="311.69873"
+           id="tspan4959"
+           sodipodi:role="line">18050</tspan></text>
+      <text
+         id="text4961"
+         y="616.48718"
+         x="409.04935"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           y="616.48718"
+           x="409.04935"
+           id="tspan4963"
+           sodipodi:role="line">17900</tspan></text>
+      <text
+         id="text4965"
+         y="616.48718"
+         x="506.37659"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           y="616.48718"
+           x="506.37659"
+           id="tspan4967"
+           sodipodi:role="line">17950</tspan></text>
+      <text
+         id="text4969"
+         y="614.48718"
+         x="214.37155"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           y="614.48718"
+           x="214.37155"
+           id="tspan4971"
+           sodipodi:role="line">18000</tspan></text>
+      <path
+         id="path4973"
+         d="M 207.03628,627.39828 C 299.16226,627.39828 299.16226,627.39828 299.16226,627.39828"
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         id="path4975"
+         d="M 401.65825,627.39828 C 493.78424,627.39828 493.78424,627.39828 493.78424,627.39828"
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         id="path4977"
+         d="M 498.98541,627.39828 C 591.11139,627.39828 591.11139,627.39828 591.11139,627.39828"
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         id="path4979"
+         d="M 304.33107,627.39828 C 396.45706,627.39828 396.45706,627.39828 396.45706,627.39828"
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <text
+         transform="matrix(0,-1,1,0,0,0)"
+         id="text4981"
+         y="244.26584"
+         x="-709.37335"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           style="text-align:center;text-anchor:middle"
+           y="244.26584"
+           x="-709.37335"
+           id="tspan4983"
+           sodipodi:role="line">32 ADCs</tspan><tspan
+           style="text-align:center;text-anchor:middle"
+           id="tspan4985"
+           y="274.26584"
+           x="-709.37335"
+           sodipodi:role="line">100 us ago</tspan></text>
+      <text
+         transform="matrix(0,-1,1,0,0,0)"
+         id="text4987"
+         y="341.7338"
+         x="-708.98077"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           style="text-align:center;text-anchor:middle"
+           y="341.7338"
+           x="-708.98077"
+           id="tspan4989"
+           sodipodi:role="line">32 ADCs</tspan><tspan
+           style="text-align:center;text-anchor:middle"
+           id="tspan4991"
+           y="371.7338"
+           x="-708.98077"
+           sodipodi:role="line">50 us ago</tspan></text>
+      <text
+         transform="matrix(0,-1,1,0,0,0)"
+         id="text4993"
+         y="439.20178"
+         x="-708.9339"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           style="text-align:center;text-anchor:middle"
+           y="439.20178"
+           x="-708.9339"
+           id="tspan4995"
+           sodipodi:role="line">32 ADCs</tspan><tspan
+           style="text-align:center;text-anchor:middle"
+           id="tspan4997"
+           y="469.20178"
+           x="-708.9339"
+           sodipodi:role="line">200  us ago</tspan></text>
+      <text
+         transform="matrix(0,-1,1,0,0,0)"
+         id="text4999"
+         y="536.66974"
+         x="-709.37335"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           style="text-align:center;text-anchor:middle"
+           y="536.66974"
+           x="-709.37335"
+           id="tspan5001"
+           sodipodi:role="line">32 ADCs</tspan><tspan
+           id="tspan5003"
+           style="text-align:center;text-anchor:middle"
+           y="566.66974"
+           x="-709.37335"
+           sodipodi:role="line">150 us ago</tspan><tspan
+           style="text-align:center;text-anchor:middle"
+           id="tspan5005"
+           y="596.66974"
+           x="-709.37335"
+           sodipodi:role="line" /></text>
+      <path
+         id="path5007"
+         d="M 207.4785,790.94231 C 299.60448,790.94231 299.60448,790.94231 299.60448,790.94231"
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         id="path5009"
+         d="M 402.10047,790.94231 C 494.22646,790.94231 494.22646,790.94231 494.22646,790.94231"
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         id="path5011"
+         d="M 499.42763,790.94231 C 591.55361,790.94231 591.55361,790.94231 591.55361,790.94231"
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         id="path5013"
+         d="M 304.77329,790.94231 C 396.89928,790.94231 396.89928,790.94231 396.89928,790.94231"
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <text
+         id="text5015"
+         y="818.48712"
+         x="311.69873"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           y="818.48712"
+           x="311.69873"
+           id="tspan5017"
+           sodipodi:role="line">18050</tspan></text>
+      <text
+         id="text5019"
+         y="818.48712"
+         x="409.04935"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           y="818.48712"
+           x="409.04935"
+           id="tspan5021"
+           sodipodi:role="line">17900</tspan></text>
+      <text
+         id="text5023"
+         y="818.48712"
+         x="506.37659"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           y="818.48712"
+           x="506.37659"
+           id="tspan5025"
+           sodipodi:role="line">17950</tspan></text>
+      <text
+         id="text5027"
+         y="818.48712"
+         x="214.37155"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           y="818.48712"
+           x="214.37155"
+           id="tspan5029"
+           sodipodi:role="line">18000</tspan></text>
+    </g>
+    <g
+       id="g4904"
+       transform="translate(72.327254,-275.46457)">
+      <rect
+         y="585.22845"
+         x="401.16342"
+         height="246.9539"
+         width="93.256401"
+         id="rect4738"
+         style="opacity:1;fill:#c8c8c8;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+      <rect
+         y="585.22845"
+         x="206.22748"
+         height="246.9539"
+         width="93.256401"
+         id="rect4740"
+         style="opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+      <rect
+         y="585.22845"
+         x="303.69543"
+         height="246.9539"
+         width="93.256401"
+         id="rect4742"
+         style="opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+      <rect
+         y="585.22845"
+         x="498.63141"
+         height="246.9539"
+         width="93.256401"
+         id="rect4744"
+         style="opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+      <text
+         id="text4746"
+         y="616.48718"
+         x="311.69873"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           y="616.48718"
+           x="311.69873"
+           id="tspan4748"
+           sodipodi:role="line">18050</tspan></text>
+      <text
+         id="text4750"
+         y="616.48718"
+         x="409.04935"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           y="616.48718"
+           x="409.04935"
+           id="tspan4752"
+           sodipodi:role="line">17900</tspan></text>
+      <text
+         id="text4754"
+         y="616.48718"
+         x="506.37659"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           y="616.48718"
+           x="506.37659"
+           id="tspan4756"
+           sodipodi:role="line">17950</tspan></text>
+      <text
+         id="text4758"
+         y="614.48718"
+         x="214.37155"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           y="614.48718"
+           x="214.37155"
+           id="tspan4760"
+           sodipodi:role="line">18000</tspan></text>
+      <path
+         id="path4762"
+         d="M 207.03628,627.39828 C 299.16226,627.39828 299.16226,627.39828 299.16226,627.39828"
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         id="path4764"
+         d="M 401.65825,627.39828 C 493.78424,627.39828 493.78424,627.39828 493.78424,627.39828"
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         id="path4766"
+         d="M 498.98541,627.39828 C 591.11139,627.39828 591.11139,627.39828 591.11139,627.39828"
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         id="path4768"
+         d="M 304.33107,627.39828 C 396.45706,627.39828 396.45706,627.39828 396.45706,627.39828"
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <text
+         transform="matrix(0,-1,1,0,0,0)"
+         id="text4770"
+         y="244.26584"
+         x="-709.37335"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           style="text-align:center;text-anchor:middle"
+           y="244.26584"
+           x="-709.37335"
+           id="tspan4772"
+           sodipodi:role="line">32 ADCs</tspan><tspan
+           style="text-align:center;text-anchor:middle"
+           id="tspan4774"
+           y="274.26584"
+           x="-709.37335"
+           sodipodi:role="line">100 us ago</tspan></text>
+      <text
+         transform="matrix(0,-1,1,0,0,0)"
+         id="text4776"
+         y="341.7338"
+         x="-708.98077"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           style="text-align:center;text-anchor:middle"
+           y="341.7338"
+           x="-708.98077"
+           id="tspan4778"
+           sodipodi:role="line">32 ADCs</tspan><tspan
+           style="text-align:center;text-anchor:middle"
+           id="tspan4780"
+           y="371.7338"
+           x="-708.98077"
+           sodipodi:role="line">50 us ago</tspan></text>
+      <text
+         transform="matrix(0,-1,1,0,0,0)"
+         id="text4782"
+         y="439.20178"
+         x="-708.9339"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           style="text-align:center;text-anchor:middle"
+           y="439.20178"
+           x="-708.9339"
+           id="tspan4784"
+           sodipodi:role="line">32 ADCs</tspan><tspan
+           style="text-align:center;text-anchor:middle"
+           id="tspan4786"
+           y="469.20178"
+           x="-708.9339"
+           sodipodi:role="line">200  us ago</tspan></text>
+      <text
+         transform="matrix(0,-1,1,0,0,0)"
+         id="text4788"
+         y="536.66974"
+         x="-709.37335"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           style="text-align:center;text-anchor:middle"
+           y="536.66974"
+           x="-709.37335"
+           id="tspan4790"
+           sodipodi:role="line">32 ADCs</tspan><tspan
+           id="tspan4792"
+           style="text-align:center;text-anchor:middle"
+           y="566.66974"
+           x="-709.37335"
+           sodipodi:role="line">150 us ago</tspan><tspan
+           style="text-align:center;text-anchor:middle"
+           id="tspan4794"
+           y="596.66974"
+           x="-709.37335"
+           sodipodi:role="line" /></text>
+      <path
+         id="path4796"
+         d="M 207.4785,790.94231 C 299.60448,790.94231 299.60448,790.94231 299.60448,790.94231"
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         id="path4798"
+         d="M 402.10047,790.94231 C 494.22646,790.94231 494.22646,790.94231 494.22646,790.94231"
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         id="path4800"
+         d="M 499.42763,790.94231 C 591.55361,790.94231 591.55361,790.94231 591.55361,790.94231"
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         id="path4802"
+         d="M 304.77329,790.94231 C 396.89928,790.94231 396.89928,790.94231 396.89928,790.94231"
+         style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <text
+         id="text4804"
+         y="818.48712"
+         x="311.69873"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           y="818.48712"
+           x="311.69873"
+           id="tspan4806"
+           sodipodi:role="line">18050</tspan></text>
+      <text
+         id="text4808"
+         y="818.48712"
+         x="409.04935"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           y="818.48712"
+           x="409.04935"
+           id="tspan4810"
+           sodipodi:role="line">17900</tspan></text>
+      <text
+         id="text4812"
+         y="818.48712"
+         x="506.37659"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           y="818.48712"
+           x="506.37659"
+           id="tspan4814"
+           sodipodi:role="line">17950</tspan></text>
+      <text
+         id="text4816"
+         y="818.48712"
+         x="214.37155"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           y="818.48712"
+           x="214.37155"
+           id="tspan4818"
+           sodipodi:role="line">18000</tspan></text>
+    </g>
+    <g
+       id="g4312"
+       transform="matrix(-1,0,0,1,541.23412,182.42473)"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       inkscape:export-xdpi="100"
+       inkscape:export-ydpi="100">
+      <rect
+         transform="scale(-1,1)"
+         y="199.06012"
+         x="-533.95764"
+         height="47.646008"
+         width="85.403214"
+         id="rect4314"
+         style="fill:#008000;fill-opacity:1;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         transform="scale(-1,1)"
+         y="183.77742"
+         x="-538.45251"
+         height="78.211372"
+         width="4.4949064"
+         id="rect4316"
+         style="fill:#666666;fill-opacity:1;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <path
+         id="path4318"
+         d="M 526.74889,203.43422 L 526.74889,211.53628 L 512.82592,211.53628 L 512.82592,203.43422 L 526.74889,203.43422 z M 526.74889,213.69944 L 526.74889,221.80153 L 512.82592,221.80153 L 512.82592,213.69944 L 526.74889,213.69944 z M 526.55222,223.96469 L 526.55222,232.06677 L 512.58993,232.06677 L 512.58993,223.96469 L 526.55222,223.96469 z M 526.55222,234.22993 L 526.55222,242.33199 L 512.58993,242.33199 L 512.58993,234.22993 L 526.55222,234.22993 z"
+         style="fill:#cccccc;fill-opacity:1;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <path
+         id="path4320"
+         d="M 505.91217,203.43422 L 505.91217,211.53628 L 491.9892,211.53628 L 491.9892,203.43422 L 505.91217,203.43422 z M 505.91217,213.69944 L 505.91217,221.80153 L 491.9892,221.80153 L 491.9892,213.69944 L 505.91217,213.69944 z M 505.71552,223.96469 L 505.71552,232.06677 L 491.75321,232.06677 L 491.75321,223.96469 L 505.71552,223.96469 z M 505.71552,234.22993 L 505.71552,242.33199 L 491.75321,242.33199 L 491.75321,234.22993 L 505.71552,234.22993 z"
+         style="fill:#cccccc;fill-opacity:1;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <path
+         id="path4322"
+         d="M 485.07548,203.43422 L 485.07548,211.53628 L 471.15251,211.53628 L 471.15251,203.43422 L 485.07548,203.43422 z M 485.07548,213.69944 L 485.07548,221.80153 L 471.15251,221.80153 L 471.15251,213.69944 L 485.07548,213.69944 z M 484.87883,223.96469 L 484.87883,232.06677 L 470.91655,232.06677 L 470.91655,223.96469 L 484.87883,223.96469 z M 484.87883,234.22993 L 484.87883,242.33199 L 470.91655,242.33199 L 470.91655,234.22993 L 484.87883,234.22993 z"
+         style="fill:#cccccc;fill-opacity:1;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="203.74637"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4324"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="205.41209"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4326"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="207.08189"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4328"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="208.74759"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4330"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="210.42285"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4332"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="212.0885"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4334"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="213.75833"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4336"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="215.42406"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4338"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="217.07753"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4340"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="218.74321"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4342"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="220.41306"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4344"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="222.07878"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4346"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="223.75401"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4348"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="225.41969"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4350"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="227.08949"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4352"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="228.75522"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4354"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="230.43082"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4356"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="232.10057"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4358"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="233.7663"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4360"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="235.44157"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4362"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="237.10721"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4364"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="238.77705"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4366"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="240.44278"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4368"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+    </g>
+    <g
+       id="g4370"
+       transform="matrix(-1,0,0,1,535.20433,185.1338)"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       inkscape:export-xdpi="100"
+       inkscape:export-ydpi="100">
+      <rect
+         transform="scale(-1,1)"
+         y="199.06012"
+         x="-533.95764"
+         height="47.646008"
+         width="85.403214"
+         id="rect4372"
+         style="fill:#008000;fill-opacity:1;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         transform="scale(-1,1)"
+         y="183.77742"
+         x="-538.45251"
+         height="78.211372"
+         width="4.4949064"
+         id="rect4374"
+         style="fill:#666666;fill-opacity:1;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <path
+         id="path4376"
+         d="M 526.74889,203.43422 L 526.74889,211.53628 L 512.82592,211.53628 L 512.82592,203.43422 L 526.74889,203.43422 z M 526.74889,213.69944 L 526.74889,221.80153 L 512.82592,221.80153 L 512.82592,213.69944 L 526.74889,213.69944 z M 526.55222,223.96469 L 526.55222,232.06677 L 512.58993,232.06677 L 512.58993,223.96469 L 526.55222,223.96469 z M 526.55222,234.22993 L 526.55222,242.33199 L 512.58993,242.33199 L 512.58993,234.22993 L 526.55222,234.22993 z"
+         style="fill:#cccccc;fill-opacity:1;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <path
+         id="path4378"
+         d="M 505.91217,203.43422 L 505.91217,211.53628 L 491.9892,211.53628 L 491.9892,203.43422 L 505.91217,203.43422 z M 505.91217,213.69944 L 505.91217,221.80153 L 491.9892,221.80153 L 491.9892,213.69944 L 505.91217,213.69944 z M 505.71552,223.96469 L 505.71552,232.06677 L 491.75321,232.06677 L 491.75321,223.96469 L 505.71552,223.96469 z M 505.71552,234.22993 L 505.71552,242.33199 L 491.75321,242.33199 L 491.75321,234.22993 L 505.71552,234.22993 z"
+         style="fill:#cccccc;fill-opacity:1;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <path
+         id="path4380"
+         d="M 485.07548,203.43422 L 485.07548,211.53628 L 471.15251,211.53628 L 471.15251,203.43422 L 485.07548,203.43422 z M 485.07548,213.69944 L 485.07548,221.80153 L 471.15251,221.80153 L 471.15251,213.69944 L 485.07548,213.69944 z M 484.87883,223.96469 L 484.87883,232.06677 L 470.91655,232.06677 L 470.91655,223.96469 L 484.87883,223.96469 z M 484.87883,234.22993 L 484.87883,242.33199 L 470.91655,242.33199 L 470.91655,234.22993 L 484.87883,234.22993 z"
+         style="fill:#cccccc;fill-opacity:1;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="203.74637"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4382"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="205.41209"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4384"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="207.08189"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4386"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="208.74759"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4388"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="210.42285"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4390"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="212.0885"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4392"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="213.75833"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4394"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="215.42406"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4396"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="217.07753"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4398"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="218.74321"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4400"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="220.41306"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4402"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="222.07878"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4404"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="223.75401"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4406"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="225.41969"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4408"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="227.08949"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4410"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="228.75522"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4412"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="230.43082"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4414"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="232.10057"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4416"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="233.7663"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4418"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="235.44157"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4420"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="237.10721"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4422"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="238.77705"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4424"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="240.44278"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4426"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+    </g>
+    <g
+       id="g4428"
+       transform="matrix(-1,0,0,1,530.24598,189.26539)"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       inkscape:export-xdpi="100"
+       inkscape:export-ydpi="100">
+      <rect
+         transform="scale(-1,1)"
+         y="199.06012"
+         x="-533.95764"
+         height="47.646008"
+         width="85.403214"
+         id="rect4430"
+         style="fill:#008000;fill-opacity:1;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         transform="scale(-1,1)"
+         y="183.77742"
+         x="-538.45251"
+         height="78.211372"
+         width="4.4949064"
+         id="rect4432"
+         style="fill:#666666;fill-opacity:1;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <path
+         id="path4434"
+         d="M 526.74889,203.43422 L 526.74889,211.53628 L 512.82592,211.53628 L 512.82592,203.43422 L 526.74889,203.43422 z M 526.74889,213.69944 L 526.74889,221.80153 L 512.82592,221.80153 L 512.82592,213.69944 L 526.74889,213.69944 z M 526.55222,223.96469 L 526.55222,232.06677 L 512.58993,232.06677 L 512.58993,223.96469 L 526.55222,223.96469 z M 526.55222,234.22993 L 526.55222,242.33199 L 512.58993,242.33199 L 512.58993,234.22993 L 526.55222,234.22993 z"
+         style="fill:#cccccc;fill-opacity:1;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <path
+         id="path4436"
+         d="M 505.91217,203.43422 L 505.91217,211.53628 L 491.9892,211.53628 L 491.9892,203.43422 L 505.91217,203.43422 z M 505.91217,213.69944 L 505.91217,221.80153 L 491.9892,221.80153 L 491.9892,213.69944 L 505.91217,213.69944 z M 505.71552,223.96469 L 505.71552,232.06677 L 491.75321,232.06677 L 491.75321,223.96469 L 505.71552,223.96469 z M 505.71552,234.22993 L 505.71552,242.33199 L 491.75321,242.33199 L 491.75321,234.22993 L 505.71552,234.22993 z"
+         style="fill:#cccccc;fill-opacity:1;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <path
+         id="path4438"
+         d="M 485.07548,203.43422 L 485.07548,211.53628 L 471.15251,211.53628 L 471.15251,203.43422 L 485.07548,203.43422 z M 485.07548,213.69944 L 485.07548,221.80153 L 471.15251,221.80153 L 471.15251,213.69944 L 485.07548,213.69944 z M 484.87883,223.96469 L 484.87883,232.06677 L 470.91655,232.06677 L 470.91655,223.96469 L 484.87883,223.96469 z M 484.87883,234.22993 L 484.87883,242.33199 L 470.91655,242.33199 L 470.91655,234.22993 L 484.87883,234.22993 z"
+         style="fill:#cccccc;fill-opacity:1;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="203.74637"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4440"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="205.41209"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4442"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="207.08189"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4444"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="208.74759"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4446"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="210.42285"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4448"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="212.0885"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4450"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="213.75833"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4452"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="215.42406"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4454"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="217.07753"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4456"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="218.74321"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4458"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="220.41306"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4460"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="222.07878"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4462"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="223.75401"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4464"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="225.41969"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4466"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="227.08949"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4468"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="228.75522"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4470"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="230.43082"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4472"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="232.10057"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4474"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="233.7663"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4476"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="235.44157"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4478"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="237.10721"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4480"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="238.77705"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4482"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="240.44278"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4484"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+    </g>
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 78.967666,412.59437 C 82.328086,411.71426 88.465586,410.31242 94.941346,410.31242 C 101.68339,410.31242 108.25247,412.97456 112.056,414.87633 C 116.66024,417.17845 120.42779,418.6842 123.46578,421.72219 C 126.95178,425.20819 128.51432,427.91171 131.45262,430.85001 C 134.86501,434.2624 139.07482,434.66111 142.86239,436.5549 C 147.19234,438.71987 149.78612,441.13827 154.27216,442.25978 C 159.47996,443.56173 161.10979,445.39541 166.82291,446.82369 C 172.95959,448.35786 175.98853,449.10565 182.7966,449.10565 C 189.06136,449.10565 193.3367,451.45543 197.6293,452.52858 C 202.60472,453.77243 209.58508,452.52858 214.74396,452.52858 C 221.96517,452.52858 226.48905,451.87426 232.9996,450.24662 C 238.61884,448.84182 243.2279,445.70296 247.8323,443.40076 C 251.66723,441.4833 254.97963,437.75502 258.1011,435.41392 C 261.37216,432.96062 267.45024,431.30984 270.65185,429.70903 C 275.66513,427.20239 282.1256,425.12913 286.62553,424.00415 C 287.6228,423.75483 288.79015,426.16876 288.90749,426.2861"
+       id="path5293" />
+    <g
+       id="g4254"
+       transform="matrix(-1,0,0,1,524.62163,192.58529)"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       inkscape:export-xdpi="100"
+       inkscape:export-ydpi="100">
+      <rect
+         transform="scale(-1,1)"
+         y="199.06012"
+         x="-533.95764"
+         height="47.646008"
+         width="85.403214"
+         id="rect4256"
+         style="fill:#008000;fill-opacity:1;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         transform="scale(-1,1)"
+         y="183.77742"
+         x="-538.45251"
+         height="78.211372"
+         width="4.4949064"
+         id="rect4258"
+         style="fill:#666666;fill-opacity:1;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <path
+         id="path4260"
+         d="M 526.74889,203.43422 L 526.74889,211.53628 L 512.82592,211.53628 L 512.82592,203.43422 L 526.74889,203.43422 z M 526.74889,213.69944 L 526.74889,221.80153 L 512.82592,221.80153 L 512.82592,213.69944 L 526.74889,213.69944 z M 526.55222,223.96469 L 526.55222,232.06677 L 512.58993,232.06677 L 512.58993,223.96469 L 526.55222,223.96469 z M 526.55222,234.22993 L 526.55222,242.33199 L 512.58993,242.33199 L 512.58993,234.22993 L 526.55222,234.22993 z"
+         style="fill:#cccccc;fill-opacity:1;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <path
+         id="path4262"
+         d="M 505.91217,203.43422 L 505.91217,211.53628 L 491.9892,211.53628 L 491.9892,203.43422 L 505.91217,203.43422 z M 505.91217,213.69944 L 505.91217,221.80153 L 491.9892,221.80153 L 491.9892,213.69944 L 505.91217,213.69944 z M 505.71552,223.96469 L 505.71552,232.06677 L 491.75321,232.06677 L 491.75321,223.96469 L 505.71552,223.96469 z M 505.71552,234.22993 L 505.71552,242.33199 L 491.75321,242.33199 L 491.75321,234.22993 L 505.71552,234.22993 z"
+         style="fill:#cccccc;fill-opacity:1;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <path
+         id="path4264"
+         d="M 485.07548,203.43422 L 485.07548,211.53628 L 471.15251,211.53628 L 471.15251,203.43422 L 485.07548,203.43422 z M 485.07548,213.69944 L 485.07548,221.80153 L 471.15251,221.80153 L 471.15251,213.69944 L 485.07548,213.69944 z M 484.87883,223.96469 L 484.87883,232.06677 L 470.91655,232.06677 L 470.91655,223.96469 L 484.87883,223.96469 z M 484.87883,234.22993 L 484.87883,242.33199 L 470.91655,242.33199 L 470.91655,234.22993 L 484.87883,234.22993 z"
+         style="fill:#cccccc;fill-opacity:1;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="203.74637"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4266"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="205.41209"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4268"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="207.08189"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4270"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="208.74759"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4272"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="210.42285"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4274"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="212.0885"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4276"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="213.75833"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4278"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="215.42406"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4280"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="217.07753"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4282"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="218.74321"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4284"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="220.41306"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4286"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="222.07878"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4288"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="223.75401"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4290"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="225.41969"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4292"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="227.08949"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4294"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="228.75522"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4296"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="230.43082"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4298"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="232.10057"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4300"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="233.7663"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4302"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="235.44157"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4304"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="237.10721"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4306"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="238.77705"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4308"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="240.44278"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4310"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+    </g>
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 74.121802,417.15828 C 77.482222,416.27817 83.619722,414.87633 90.095482,414.87633 C 96.837522,414.87633 103.4066,417.53847 107.21014,419.44024 C 111.81438,421.74236 115.58193,423.24811 118.61992,426.2861 C 122.10592,429.7721 123.66846,432.47562 126.60676,435.41392 C 130.01915,438.82631 134.22896,439.22502 138.01653,441.11881 C 142.34648,443.28378 144.94027,445.70218 149.42631,446.82369 C 154.63411,448.12564 156.26394,449.95932 161.97706,451.3876 C 168.11374,452.92177 171.14268,453.66956 177.95075,453.66956 C 184.21551,453.66956 188.49085,456.01934 192.78345,457.09249 C 197.75887,458.33634 204.73923,457.09249 209.89811,457.09249 C 217.11932,457.09249 221.6432,456.43817 228.15375,454.81053 C 233.77299,453.40573 238.38205,450.26687 242.98645,447.96467 C 246.82138,446.04721 250.13378,442.31893 253.25525,439.97783 C 256.52631,437.52453 262.60439,435.87375 265.806,434.27294 C 270.81928,431.7663 277.27975,429.69304 281.77968,428.56806 C 282.77695,428.31874 283.9443,430.73267 284.06164,430.85001"
+       id="path5291" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 67.839848,420.58121 C 71.200268,419.7011 77.337768,418.29926 83.813528,418.29926 C 90.555568,418.29926 97.124648,420.9614 100.92819,422.86317 C 105.53243,425.16529 109.29998,426.67104 112.33797,429.70903 C 115.82397,433.19503 117.38651,435.89855 120.32481,438.83685 C 123.7372,442.24924 127.94701,442.64795 131.73458,444.54174 C 136.06452,446.70671 138.6583,449.12511 143.14434,450.24662 C 148.35214,451.54857 149.98197,453.38225 155.69509,454.81053 C 161.83177,456.3447 164.86071,457.09249 171.66878,457.09249 C 177.93354,457.09249 182.20888,459.44227 186.50148,460.51542 C 191.4769,461.75927 198.45726,460.51542 203.61614,460.51542 C 210.83735,460.51542 215.36123,459.8611 221.87178,458.23346 C 227.49102,456.82866 232.10008,453.6898 236.70448,451.3876 C 240.53941,449.47014 243.85181,445.74186 246.97328,443.40076 C 250.24434,440.94746 256.32242,439.29668 259.52403,437.69587 C 264.53731,435.18923 270.99778,433.11597 275.49771,431.99099 C 276.49498,431.74167 277.66233,434.1556 277.77967,434.27294"
+       id="path5289" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 84.954507,409.45668 C 88.314927,408.57657 94.452427,407.17473 100.92819,407.17473 C 107.67022,407.17473 114.2393,409.83687 118.04285,411.73864 C 122.64709,414.04076 126.41464,415.54651 129.45263,418.5845 C 132.93863,422.0705 134.50117,424.77402 137.43947,427.71232 C 140.85186,431.12471 145.06167,431.52342 148.84924,433.41721 C 153.17919,435.58218 155.77297,438.00058 160.25901,439.12209 C 165.46681,440.42404 167.09664,442.25772 172.80976,443.686 C 178.94644,445.22017 181.97538,445.96796 188.78345,445.96796 C 195.04821,445.96796 199.32355,448.31774 203.61615,449.39089 C 208.59157,450.63474 215.57193,449.39089 220.73081,449.39089 C 227.95202,449.39089 232.4759,448.73657 238.98645,447.10893 C 244.60569,445.70413 249.21475,442.56527 253.81915,440.26307 C 257.65408,438.34561 260.96648,434.61733 264.08795,432.27623 C 267.35901,429.82293 273.43709,428.17215 276.6387,426.57134 C 281.65198,424.0647 288.11245,421.99144 292.61238,420.86646 C 293.60965,420.61714 294.777,423.03107 294.89434,423.14841"
+       id="path5295" />
+    <g
+       id="g4196"
+       transform="matrix(-1,0,0,1,518.59184,195.29436)"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       inkscape:export-xdpi="100"
+       inkscape:export-ydpi="100">
+      <rect
+         transform="scale(-1,1)"
+         y="199.06012"
+         x="-533.95764"
+         height="47.646008"
+         width="85.403214"
+         id="rect4198"
+         style="fill:#008000;fill-opacity:1;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         transform="scale(-1,1)"
+         y="183.77742"
+         x="-538.45251"
+         height="78.211372"
+         width="4.4949064"
+         id="rect4200"
+         style="fill:#666666;fill-opacity:1;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <path
+         id="path4202"
+         d="M 526.74889,203.43422 L 526.74889,211.53628 L 512.82592,211.53628 L 512.82592,203.43422 L 526.74889,203.43422 z M 526.74889,213.69944 L 526.74889,221.80153 L 512.82592,221.80153 L 512.82592,213.69944 L 526.74889,213.69944 z M 526.55222,223.96469 L 526.55222,232.06677 L 512.58993,232.06677 L 512.58993,223.96469 L 526.55222,223.96469 z M 526.55222,234.22993 L 526.55222,242.33199 L 512.58993,242.33199 L 512.58993,234.22993 L 526.55222,234.22993 z"
+         style="fill:#cccccc;fill-opacity:1;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <path
+         id="path4204"
+         d="M 505.91217,203.43422 L 505.91217,211.53628 L 491.9892,211.53628 L 491.9892,203.43422 L 505.91217,203.43422 z M 505.91217,213.69944 L 505.91217,221.80153 L 491.9892,221.80153 L 491.9892,213.69944 L 505.91217,213.69944 z M 505.71552,223.96469 L 505.71552,232.06677 L 491.75321,232.06677 L 491.75321,223.96469 L 505.71552,223.96469 z M 505.71552,234.22993 L 505.71552,242.33199 L 491.75321,242.33199 L 491.75321,234.22993 L 505.71552,234.22993 z"
+         style="fill:#cccccc;fill-opacity:1;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <path
+         id="path4206"
+         d="M 485.07548,203.43422 L 485.07548,211.53628 L 471.15251,211.53628 L 471.15251,203.43422 L 485.07548,203.43422 z M 485.07548,213.69944 L 485.07548,221.80153 L 471.15251,221.80153 L 471.15251,213.69944 L 485.07548,213.69944 z M 484.87883,223.96469 L 484.87883,232.06677 L 470.91655,232.06677 L 470.91655,223.96469 L 484.87883,223.96469 z M 484.87883,234.22993 L 484.87883,242.33199 L 470.91655,242.33199 L 470.91655,234.22993 L 484.87883,234.22993 z"
+         style="fill:#cccccc;fill-opacity:1;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="203.74637"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4208"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="205.41209"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4210"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="207.08189"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4212"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="208.74759"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4214"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="210.42285"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4216"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="212.0885"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4218"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="213.75833"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4220"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="215.42406"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4222"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="217.07753"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4224"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="218.74321"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4226"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="220.41306"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4228"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="222.07878"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4230"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="223.75401"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4232"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="225.41969"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4234"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="227.08949"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4236"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="228.75522"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4238"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="230.43082"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4240"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="232.10057"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4242"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="233.7663"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4244"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="235.44157"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4246"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="237.10721"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4248"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="238.77705"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4250"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="240.44278"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect4252"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+    </g>
+    <rect
+       style="fill:#f0f0f0;fill-opacity:1;fill-rule:evenodd;stroke:#646464;stroke-width:2.16656399;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect3315"
+       width="288.06693"
+       height="288.06693"
+       x="163.558"
+       y="-5.3542533" />
+    <rect
+       style="opacity:1;fill:#c8c8c8;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect3157"
+       width="93.256401"
+       height="246.9539"
+       x="470.02316"
+       y="312.67346" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 90.659392,406.88949 C 94.019812,406.00938 100.15731,404.60754 106.63307,404.60754 C 113.37511,404.60754 119.9442,407.26968 123.74774,409.17145 C 128.35198,411.47357 132.11953,412.97932 135.15752,416.01731 C 138.64352,419.50331 140.20606,422.20683 143.14436,425.14513 C 146.55675,428.55752 150.76656,428.95623 154.55413,430.85002 C 158.88408,433.01499 161.47786,435.43339 165.9639,436.5549 C 171.1717,437.85685 172.80153,439.69053 178.51465,441.11881 C 184.65133,442.65298 187.68027,443.40077 194.48834,443.40077 C 200.7531,443.40077 205.02844,445.75055 209.32104,446.8237 C 214.29646,448.06755 221.27682,446.8237 226.4357,446.8237 C 233.65691,446.8237 238.18079,446.16938 244.69134,444.54174 C 250.31058,443.13694 254.91964,439.99808 259.52404,437.69588 C 263.35897,435.77842 266.67137,432.05014 269.79284,429.70904 C 273.0639,427.25574 279.14198,425.60496 282.34359,424.00415 C 287.35687,421.49751 293.81734,419.42425 298.31727,418.29927 C 299.31454,418.04995 300.48189,420.46388 300.59923,420.58122"
+       id="path5297" />
+    <rect
+       style="opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect2383"
+       width="93.256401"
+       height="246.9539"
+       x="275.08722"
+       y="312.67346" />
+    <rect
+       style="opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect3155"
+       width="93.256401"
+       height="246.9539"
+       x="372.55518"
+       y="312.67346" />
+    <rect
+       style="opacity:1;fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect3159"
+       width="93.256401"
+       height="246.9539"
+       x="567.49115"
+       y="312.67346" />
+    <text
+       xml:space="preserve"
+       style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+       x="380.55847"
+       y="343.93222"
+       id="text3161"><tspan
+         sodipodi:role="line"
+         id="tspan3163"
+         x="380.55847"
+         y="343.93222">18050</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+       x="477.90909"
+       y="343.93222"
+       id="text3165"><tspan
+         sodipodi:role="line"
+         id="tspan3167"
+         x="477.90909"
+         y="343.93222">17900</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+       x="575.23633"
+       y="343.93222"
+       id="text3169"><tspan
+         sodipodi:role="line"
+         id="tspan3171"
+         x="575.23633"
+         y="343.93222">17950</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+       x="283.23129"
+       y="341.93222"
+       id="text3173"><tspan
+         sodipodi:role="line"
+         id="tspan3175"
+         x="283.23129"
+         y="341.93222">18000</tspan></text>
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 275.89602,354.84335 C 368.022,354.84335 368.022,354.84335 368.022,354.84335"
+       id="path3181" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 470.51799,354.84335 C 562.64398,354.84335 562.64398,354.84335 562.64398,354.84335"
+       id="path3183" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 567.84515,354.84335 C 659.97113,354.84335 659.97113,354.84335 659.97113,354.84335"
+       id="path3185" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 373.19081,354.84335 C 465.3168,354.84335 465.3168,354.84335 465.3168,354.84335"
+       id="path3187" />
+    <text
+       xml:space="preserve"
+       style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+       x="-436.81839"
+       y="313.12558"
+       id="text3189"
+       transform="matrix(0,-1,1,0,0,0)"><tspan
+         sodipodi:role="line"
+         id="tspan3191"
+         x="-436.81839"
+         y="313.12558"
+         style="text-align:center;text-anchor:middle">32 ADCs</tspan><tspan
+         sodipodi:role="line"
+         x="-436.81839"
+         y="343.12558"
+         id="tspan3537"
+         style="text-align:center;text-anchor:middle">100 us ago</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+       x="-436.42581"
+       y="410.59354"
+       id="text3193"
+       transform="matrix(0,-1,1,0,0,0)"><tspan
+         sodipodi:role="line"
+         id="tspan3195"
+         x="-436.42581"
+         y="410.59354"
+         style="text-align:center;text-anchor:middle">32 ADCs</tspan><tspan
+         sodipodi:role="line"
+         x="-436.42581"
+         y="440.59354"
+         id="tspan3539"
+         style="text-align:center;text-anchor:middle">50 us ago</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+       x="-436.37894"
+       y="508.06152"
+       id="text3197"
+       transform="matrix(0,-1,1,0,0,0)"><tspan
+         sodipodi:role="line"
+         id="tspan3199"
+         x="-436.37894"
+         y="508.06152"
+         style="text-align:center;text-anchor:middle">32 ADCs</tspan><tspan
+         sodipodi:role="line"
+         x="-436.37894"
+         y="538.06152"
+         id="tspan3541"
+         style="text-align:center;text-anchor:middle">200  us ago</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+       x="-436.81839"
+       y="605.52948"
+       id="text3201"
+       transform="matrix(0,-1,1,0,0,0)"><tspan
+         sodipodi:role="line"
+         id="tspan3203"
+         x="-436.81839"
+         y="605.52948"
+         style="text-align:center;text-anchor:middle">32 ADCs</tspan><tspan
+         sodipodi:role="line"
+         x="-436.81839"
+         y="635.52948"
+         style="text-align:center;text-anchor:middle"
+         id="tspan3547">150 us ago</tspan><tspan
+         sodipodi:role="line"
+         x="-436.81839"
+         y="665.52948"
+         id="tspan3543"
+         style="text-align:center;text-anchor:middle" /></text>
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 276.33824,518.38738 C 368.46422,518.38738 368.46422,518.38738 368.46422,518.38738"
+       id="path3205" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 470.96021,518.38738 C 563.0862,518.38738 563.0862,518.38738 563.0862,518.38738"
+       id="path3207" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 568.28737,518.38738 C 660.41335,518.38738 660.41335,518.38738 660.41335,518.38738"
+       id="path3209" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 373.63303,518.38738 C 465.75902,518.38738 465.75902,518.38738 465.75902,518.38738"
+       id="path3211" />
+    <text
+       xml:space="preserve"
+       style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+       x="380.55847"
+       y="545.93219"
+       id="text3213"><tspan
+         sodipodi:role="line"
+         id="tspan3215"
+         x="380.55847"
+         y="545.93219">18050</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+       x="477.90909"
+       y="545.93219"
+       id="text3217"><tspan
+         sodipodi:role="line"
+         id="tspan3219"
+         x="477.90909"
+         y="545.93219">17900</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+       x="575.23633"
+       y="545.93219"
+       id="text3221"><tspan
+         sodipodi:role="line"
+         id="tspan3223"
+         x="575.23633"
+         y="545.93219">17950</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+       x="283.23129"
+       y="545.93219"
+       id="text3225"><tspan
+         sodipodi:role="line"
+         id="tspan3227"
+         x="283.23129"
+         y="545.93219">18000</tspan></text>
+    <rect
+       style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#d1d1d1;stroke-width:3.2598536;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect3251"
+       width="104.13601"
+       height="104.13601"
+       x="196.38762"
+       y="25.585739" />
+    <text
+       xml:space="preserve"
+       style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+       x="248.87164"
+       y="71.390076"
+       id="text3253"><tspan
+         sodipodi:role="line"
+         id="tspan3255"
+         x="248.87164"
+         y="71.390076"
+         style="font-size:20px;text-align:center;text-anchor:middle">Core #1</tspan><tspan
+         sodipodi:role="line"
+         x="248.87164"
+         y="96.390076"
+         id="tspan3429"
+         style="font-size:20px;font-style:italic;text-align:center;text-anchor:middle">Linux</tspan></text>
+    <rect
+       style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#d1d1d1;stroke-width:3.2598536;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect3257"
+       width="104.13601"
+       height="104.13601"
+       x="314.65927"
+       y="25.585739" />
+    <text
+       xml:space="preserve"
+       style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+       x="367.23703"
+       y="56.390072"
+       id="text3259"><tspan
+         sodipodi:role="line"
+         id="tspan3261"
+         x="367.23703"
+         y="56.390072"
+         style="font-size:20px;text-align:center;text-anchor:middle">Core #2</tspan><tspan
+         sodipodi:role="line"
+         x="367.23703"
+         y="81.390076"
+         id="tspan3461"
+         style="font-size:20px;text-align:center;text-anchor:middle">MARTe</tspan><tspan
+         sodipodi:role="line"
+         x="367.23703"
+         y="106.39008"
+         id="tspan3463"
+         style="font-size:20px;text-align:center;text-anchor:middle">Services</tspan></text>
+    <rect
+       style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#d1d1d1;stroke-width:3.2598536;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect3263"
+       width="104.13601"
+       height="104.13601"
+       x="196.38762"
+       y="147.63667" />
+    <text
+       xml:space="preserve"
+       style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+       x="248.25641"
+       y="178.44101"
+       id="text3265"><tspan
+         sodipodi:role="line"
+         id="tspan3267"
+         x="248.25641"
+         y="178.44101"
+         style="font-size:20px;text-align:center;text-anchor:middle">Core #3</tspan><tspan
+         sodipodi:role="line"
+         x="248.25641"
+         y="203.44101"
+         id="tspan3465"
+         style="font-size:20px;text-align:center;text-anchor:middle">MARTe</tspan><tspan
+         sodipodi:role="line"
+         x="248.25641"
+         y="228.44101"
+         id="tspan3467"
+         style="font-size:20px;text-align:center;text-anchor:middle">Services</tspan></text>
+    <rect
+       style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#ff0000;stroke-width:3.2598536;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect3269"
+       width="104.13601"
+       height="104.13601"
+       x="314.65927"
+       y="147.63667" />
+    <text
+       xml:space="preserve"
+       style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+       x="366.65402"
+       y="194.48495"
+       id="text3271"><tspan
+         sodipodi:role="line"
+         id="tspan3273"
+         x="366.65402"
+         y="194.48495"
+         style="font-size:20px;text-align:center;text-anchor:middle">Core #4</tspan><tspan
+         sodipodi:role="line"
+         x="366.65402"
+         y="219.48495"
+         id="tspan3475"
+         style="font-size:20px;text-align:center;text-anchor:middle">RT-Thread</tspan></text>
+    <rect
+       style="opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#ff0000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate"
+       id="rect3497"
+       width="93.195114"
+       height="42.38084"
+       x="470.07675"
+       y="312.54401" />
+    <path
+       sodipodi:type="arc"
+       id="path3501"
+       style="fill:#000000;stroke:none"
+       sodipodi:cx="201.05392"
+       sodipodi:cy="206.36011"
+       sodipodi:rx="1.5"
+       sodipodi:ry="1.5"
+       d="M 202.55392,206.36011 A 1.5,1.5 0 1 1 199.55392,206.36011 A 1.5,1.5 0 1 1 202.55392,206.36011 z" />
+    <path
+       sodipodi:type="arc"
+       id="path3505"
+       style="fill:#000000;stroke:none"
+       sodipodi:cx="201.43274"
+       sodipodi:cy="206.23386"
+       sodipodi:rx="1.5"
+       sodipodi:ry="1.5"
+       d="M 202.93274,206.23386 A 1.5,1.5 0 1 1 199.93274,206.23386 A 1.5,1.5 0 1 1 202.93274,206.23386 z" />
+    <g
+       id="g3524"
+       transform="translate(-7.9946938,35.594631)">
+      <g
+         transform="matrix(8.1182722e-2,0.9966992,-0.9966992,8.1182722e-2,700.8691,-383.65032)"
+         id="g3519">
+        <path
+           sodipodi:type="spiral"
+           style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           id="path3499"
+           sodipodi:cx="367.69553"
+           sodipodi:cy="228.83382"
+           sodipodi:expansion="1"
+           sodipodi:revolution="3"
+           sodipodi:radius="16.567734"
+           sodipodi:argument="-17.934456"
+           sodipodi:t0="0"
+           d="M 367.69553,228.83382 C 368.202,229.49223 367.05787,229.84137 366.60119,229.67561 C 365.36363,229.2264 365.37168,227.56724 366.01194,226.64515 C 367.15721,224.99576 369.5592,225.09833 370.97852,226.30843 C 373.06143,228.0843 372.85493,231.31514 371.0627,233.21114 C 368.67395,235.73821 364.58911,235.42255 362.22387,233.04279 C 359.24745,230.04811 359.67464,225.09873 362.64476,222.26783 C 366.24198,218.83922 372.0613,219.37912 375.35585,222.94125 C 379.23836,227.13911 378.58506,233.83154 374.42988,237.58847 C 369.63256,241.92599 362.06501,241.15888 357.84654,236.40997 C 353.05325,231.01395 353.93445,222.56992 359.27758,217.8905 C 365.27177,212.6409 374.59323,213.63637 379.73317,219.57408 C 385.43948,226.16605 384.3296,236.36566 377.79706,241.96579"
+           transform="matrix(-0.972548,-0.2327023,0.2327023,-0.972548,837.37249,529.62341)" />
+        <path
+           style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           d="M 520.39918,205.53631 C 527.48579,205.53631 527.48579,205.53631 527.48579,205.53631"
+           id="path3509" />
+        <path
+           style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+           d="M 527.11079,211.62292 C 527.11079,204.53632 527.11079,204.53632 527.11079,204.53632"
+           id="path3511" />
+      </g>
+      <rect
+         y="136.98505"
+         x="497.52106"
+         height="54.25"
+         width="54.25"
+         id="rect3517"
+         style="opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#ff0000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+    </g>
+    <path
+       sodipodi:type="arc"
+       id="path3531"
+       style="fill:#000000;stroke:none"
+       sodipodi:cx="207.52528"
+       sodipodi:cy="115.79739"
+       sodipodi:rx="1.5"
+       sodipodi:ry="1.5"
+       d="M 209.02528,115.79739 A 1.5,1.5 0 1 1 206.02528,115.79739 A 1.5,1.5 0 1 1 209.02528,115.79739 z" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#ff0000;stroke-width:2.0147984;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 419.67476,199.70468 C 490.11499,199.70468 490.11499,199.70468 490.11499,199.70468"
+       id="path3533" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#ff0000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 516.67431,227.21106 C 516.67431,311.91656 516.67431,311.91656 516.67431,311.91656"
+       id="path3535" />
+    <g
+       id="g3601"
+       transform="translate(-3.7e-6,11.295105)">
+      <text
+         id="text3573"
+         y="46.876217"
+         x="43.386551"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           style="font-size:20px;text-align:center;text-anchor:middle"
+           id="tspan3579"
+           y="46.876217"
+           x="43.386551"
+           sodipodi:role="line">network</tspan><tspan
+           style="font-size:20px;text-align:center;text-anchor:middle"
+           id="tspan3585"
+           y="71.876221"
+           x="46.570145"
+           sodipodi:role="line">and other </tspan><tspan
+           style="font-size:20px;font-weight:bold;text-align:center;text-anchor:middle"
+           id="tspan3581"
+           y="96.876221"
+           x="43.386551"
+           sodipodi:role="line">I/O interrupts</tspan></text>
+      <rect
+         y="15.551186"
+         x="-39.676117"
+         height="101.61491"
+         width="167.1019"
+         id="rect3577"
+         style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.75374651;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+    </g>
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.0147984;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 127.31005,77.653744 C 197.75029,77.653744 197.75029,77.653744 197.75029,77.653744"
+       id="path3594" />
+    <g
+       id="g3608"
+       transform="translate(526.93406,7.7511592)">
+      <text
+         id="text3610"
+         y="46.876217"
+         x="43.386551"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           style="font-size:20px;text-align:center;text-anchor:middle"
+           id="tspan3612"
+           y="46.876217"
+           x="43.386551"
+           sodipodi:role="line">HTTP server</tspan><tspan
+           style="font-size:20px;text-align:center;text-anchor:middle"
+           id="tspan3614"
+           y="71.876221"
+           x="43.386551"
+           sodipodi:role="line">Logger</tspan><tspan
+           style="font-size:20px;text-align:center;text-anchor:middle"
+           id="tspan3616"
+           y="96.876221"
+           x="43.386551"
+           sodipodi:role="line">...</tspan></text>
+      <rect
+         y="15.551186"
+         x="-39.676117"
+         height="101.61491"
+         width="167.1019"
+         id="rect3618"
+         style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.75374651;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+    </g>
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.0147984;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 416.93343,74.109798 C 487.37367,74.109798 487.37367,74.109798 487.37367,74.109798"
+       id="path3620" />
+    <text
+       xml:space="preserve"
+       style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+       x="394.27435"
+       y="278.63626"
+       id="text3755"><tspan
+         sodipodi:role="line"
+         id="tspan3757"
+         x="394.27435"
+         y="278.63626"
+         style="font-weight:bold">CPU</tspan></text>
+    <g
+       id="g5770"
+       transform="matrix(-1,0,0,1,513.63349,199.42595)"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       inkscape:export-xdpi="100"
+       inkscape:export-ydpi="100">
+      <rect
+         transform="scale(-1,1)"
+         y="199.06012"
+         x="-533.95764"
+         height="47.646008"
+         width="85.403214"
+         id="rect3446"
+         style="fill:#008000;fill-opacity:1;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         transform="scale(-1,1)"
+         y="183.77742"
+         x="-538.45251"
+         height="78.211372"
+         width="4.4949064"
+         id="rect3448"
+         style="fill:#666666;fill-opacity:1;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <path
+         id="rect3450"
+         d="M 526.74889,203.43422 L 526.74889,211.53628 L 512.82592,211.53628 L 512.82592,203.43422 L 526.74889,203.43422 z M 526.74889,213.69944 L 526.74889,221.80153 L 512.82592,221.80153 L 512.82592,213.69944 L 526.74889,213.69944 z M 526.55222,223.96469 L 526.55222,232.06677 L 512.58993,232.06677 L 512.58993,223.96469 L 526.55222,223.96469 z M 526.55222,234.22993 L 526.55222,242.33199 L 512.58993,242.33199 L 512.58993,234.22993 L 526.55222,234.22993 z"
+         style="fill:#cccccc;fill-opacity:1;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <path
+         id="path3459"
+         d="M 505.91217,203.43422 L 505.91217,211.53628 L 491.9892,211.53628 L 491.9892,203.43422 L 505.91217,203.43422 z M 505.91217,213.69944 L 505.91217,221.80153 L 491.9892,221.80153 L 491.9892,213.69944 L 505.91217,213.69944 z M 505.71552,223.96469 L 505.71552,232.06677 L 491.75321,232.06677 L 491.75321,223.96469 L 505.71552,223.96469 z M 505.71552,234.22993 L 505.71552,242.33199 L 491.75321,242.33199 L 491.75321,234.22993 L 505.71552,234.22993 z"
+         style="fill:#cccccc;fill-opacity:1;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <path
+         id="path3461"
+         d="M 485.07548,203.43422 L 485.07548,211.53628 L 471.15251,211.53628 L 471.15251,203.43422 L 485.07548,203.43422 z M 485.07548,213.69944 L 485.07548,221.80153 L 471.15251,221.80153 L 471.15251,213.69944 L 485.07548,213.69944 z M 484.87883,223.96469 L 484.87883,232.06677 L 470.91655,232.06677 L 470.91655,223.96469 L 484.87883,223.96469 z M 484.87883,234.22993 L 484.87883,242.33199 L 470.91655,242.33199 L 470.91655,234.22993 L 484.87883,234.22993 z"
+         style="fill:#cccccc;fill-opacity:1;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="203.74637"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect3463"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="205.41209"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect3467"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="207.08189"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect3469"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="208.74759"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect3471"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="210.42285"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect3473"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="212.0885"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect3475"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="213.75833"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect3477"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="215.42406"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect3479"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="217.07753"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect3500"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="218.74321"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect3502"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="220.41306"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect3504"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="222.07878"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect3506"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="223.75401"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect3510"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="225.41969"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect3512"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="227.08949"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect3514"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="228.75522"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect3516"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="230.43082"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect3544"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="232.10057"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect3546"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="233.7663"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect3548"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="235.44157"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect3550"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="237.10721"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect3552"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="238.77705"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect3554"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+      <rect
+         y="240.44278"
+         x="447.88727"
+         height="1.5770677"
+         width="5.032516"
+         id="rect3556"
+         style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         inkscape:export-xdpi="100"
+         inkscape:export-ydpi="100" />
+    </g>
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 104.96991,430.1476 C 108.33033,429.26749 114.46783,427.86565 120.94359,427.86565 C 127.68563,427.86565 134.25471,430.52779 138.05825,432.42956 C 142.66249,434.73168 146.43004,436.23743 149.46803,439.27542 C 152.95403,442.76142 154.51657,445.46494 157.45487,448.40324 C 160.86726,451.81563 165.07707,452.21434 168.86464,454.10813 C 173.19459,456.2731 175.78837,458.6915 180.27441,459.81301 C 185.48221,461.11496 187.11204,462.94864 192.82516,464.37692 C 198.96184,465.91109 201.99078,466.65888 208.79885,466.65888 C 215.06361,466.65888 219.33895,469.00866 223.63155,470.08181 C 228.60697,471.32566 235.58733,470.08181 240.74621,470.08181 C 247.96742,470.08181 252.4913,469.42749 259.00185,467.79985 C 264.62109,466.39505 269.23015,463.25619 273.83455,460.95399 C 277.66948,459.03653 280.98188,455.30825 284.10335,452.96715 C 287.37441,450.51385 293.45249,448.86307 296.6541,447.26226 C 301.66738,444.75562 308.12785,442.68236 312.62778,441.55738 C 313.62505,441.30806 314.7924,443.72199 314.90974,443.83933"
+       id="path5287"
+       transform="translate(-40.552994,-6.4375353)" />
+    <g
+       id="g5301"
+       transform="translate(14.832705,28.524433)">
+      <text
+         id="text4192"
+         y="493.69965"
+         x="-19.164387"
+         style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           y="493.69965"
+           x="-19.164387"
+           id="tspan4194"
+           sodipodi:role="line">Master board</tspan></text>
+      <rect
+         y="468.87845"
+         x="-26.496655"
+         height="31.74786"
+         width="173.84032"
+         id="rect5299"
+         style="opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#ff0000;stroke-width:2.36418343;stroke-linecap:butt;stroke-linejoin:miter;marker:none;marker-start:none;marker-mid:none;marker-end:none;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;visibility:visible;display:inline;overflow:visible;enable-background:accumulate" />
+    </g>
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#ff0000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;marker-start:url(#Arrow2Mstart);stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 24.906783,419.54181 C 77.003595,497.02903 77.003595,497.02903 77.003595,497.02903"
+       id="path6605" />
+  </g>
+</svg>
