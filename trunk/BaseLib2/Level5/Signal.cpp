@@ -24,7 +24,7 @@
 
 #include "Signal.h"
 
-OBJECTLOADREGISTER(Signal,"$Id: Signal.cpp,v 1.9 2009/10/05 13:17:09 ppcc_dev Exp $")
+OBJECTLOADREGISTER(Signal,"$Id$")
 
 /** re-allocate memory
     returns False on error  */

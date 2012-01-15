@@ -61,4 +61,4 @@ bool ConstantWaveform::ProcessHttpMessage(HttpStream &hStream) {
 }
 
 
-OBJECTLOADREGISTER(ConstantWaveform,"$Id: ConstantWaveform.cpp,v 1.1 2009/08/07 19:34:01 rvitelli Exp $")
+OBJECTLOADREGISTER(ConstantWaveform,"$Id$")

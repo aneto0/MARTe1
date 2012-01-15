@@ -54,7 +54,7 @@ public:
 
 class CDBGroupNode;
 OBJECT_DLL(CDBGroupNode)
-#define CDBGroupNodeVersion "$Id: CDBGroupNode.h,v 1.6 2011/10/20 18:25:23 aneto Exp $"
+#define CDBGroupNodeVersion "$Id$"
 
 class CDBGroupNode: public CDBNode{
 

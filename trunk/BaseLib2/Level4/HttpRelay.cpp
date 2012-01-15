@@ -135,4 +135,4 @@ bool HttpRelay::ProcessHttpMessage(HttpStream &hStream) {
     return True;
 };
 
-OBJECTLOADREGISTER(HttpRelay, "$Id: HttpRelay.cpp,v 1.2 2011/08/02 08:01:20 danielv Exp $")
+OBJECTLOADREGISTER(HttpRelay, "$Id$")

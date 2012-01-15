@@ -377,4 +377,4 @@ bool DIRMProcessHttpMessage(
 }
 
 
-OBJECTLOADREGISTER(DirectoryMenuBrowser,"$Id: DirectoryMenuBrowser.cpp,v 1.3 2008/09/25 08:33:30 fpiccolo Exp $")
+OBJECTLOADREGISTER(DirectoryMenuBrowser,"$Id$")

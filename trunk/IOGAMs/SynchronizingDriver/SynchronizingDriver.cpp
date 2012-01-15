@@ -120,5 +120,5 @@ SynchronizingDriver::SynchronizingDriver(){
 }
 
 
-OBJECTLOADREGISTER(SynchronizingDriver,"$Id: SynchronizingDriver.cpp,v 1.4 2008/12/09 10:55:26 fpiccolo Exp $")
+OBJECTLOADREGISTER(SynchronizingDriver,"$Id$")
 

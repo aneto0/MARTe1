@@ -665,4 +665,4 @@ bool UDPDrv::ProcessHttpMessage(HttpStream &hStream) {
     hStream.Printf("</body></html>\n");
 
 }
-OBJECTLOADREGISTER(UDPDrv, "$Id: UDPDrv.cpp,v 1.1 2011/10/16 16:33:21 aneto Exp $")
+OBJECTLOADREGISTER(UDPDrv, "$Id$")

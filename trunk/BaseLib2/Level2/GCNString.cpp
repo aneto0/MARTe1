@@ -24,5 +24,5 @@
 
 #include "GCNString.h"
 
-OBJECTLOADREGISTER(GCNString,"$Id: GCNString.cpp,v 1.1 2007/12/10 13:42:25 fisa Exp $")
+OBJECTLOADREGISTER(GCNString,"$Id$")
 

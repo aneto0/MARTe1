@@ -25,9 +25,9 @@
 #include "CDBStringDataNode.h"
 #include "Object.h"
 
-OBJECTREGISTER(CDBDataNode,"$Id: CDBStringDataNode.cpp,v 1.23 2011/10/20 18:25:23 aneto Exp $")
+OBJECTREGISTER(CDBDataNode,"$Id$")
 
-OBJECTLOADREGISTER(CDBStringDataNode,"$Id: CDBStringDataNode.cpp,v 1.23 2011/10/20 18:25:23 aneto Exp $")
+OBJECTLOADREGISTER(CDBStringDataNode,"$Id$")
 
 static inline char *StrLimitedDup(const char *s, int size){
 

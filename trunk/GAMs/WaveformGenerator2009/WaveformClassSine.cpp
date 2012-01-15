@@ -94,5 +94,5 @@ bool WaveformClassSine::ProcessHttpMessage(HttpStream &hStream) {
 }
 
 
-OBJECTLOADREGISTER(WaveformClassSine,"$Id: WaveformClassSine.cpp,v 1.4 2009/10/28 16:10:56 lzabeo Exp $")
+OBJECTLOADREGISTER(WaveformClassSine,"$Id$")
 

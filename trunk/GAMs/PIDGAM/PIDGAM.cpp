@@ -402,4 +402,4 @@ bool PIDGAM::ProcessHttpMessage(HttpStream &hStream) {
     hStream.WriteReplyHeader(True);
     return True;
 }
-OBJECTLOADREGISTER(PIDGAM,"$Id: PIDGAM.cpp,v 1.18 2011/12/02 13:57:47 dalves Exp $")
+OBJECTLOADREGISTER(PIDGAM,"$Id$")

@@ -44,7 +44,7 @@ public:
     virtual ~SimpleClass(){}
 };
 //Usually a version id is set as the second argument
-OBJECTLOADREGISTER(SimpleClass, "$Id: GCReferenceContainerExample.cpp,v 1.1 2011/07/14 09:41:53 aneto Exp $")
+OBJECTLOADREGISTER(SimpleClass, "$Id$")
 
 /**
  * A simple class inheriting from GCNamedObject so that it can be
@@ -60,7 +60,7 @@ public:
     virtual ~SimpleNamedObject(){}
 };
 //Usually a version id is set as the second argument
-OBJECTLOADREGISTER(SimpleNamedObject, "$Id: GCReferenceContainerExample.cpp,v 1.1 2011/07/14 09:41:53 aneto Exp $")
+OBJECTLOADREGISTER(SimpleNamedObject, "$Id$")
 
 int main(int argc, char *argv[]){
     //Output logging messages to the console

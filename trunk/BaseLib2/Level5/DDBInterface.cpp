@@ -916,5 +916,5 @@ bool  DDBIDumpMenu  (StreamInterface &in,StreamInterface &out,void *userData){
 
 
 
-OBJECTREGISTER(DDBInterface,"$Id: DDBInterface.cpp,v 1.33 2010/11/03 12:55:37 astephen Exp $")
+OBJECTREGISTER(DDBInterface,"$Id$")
 

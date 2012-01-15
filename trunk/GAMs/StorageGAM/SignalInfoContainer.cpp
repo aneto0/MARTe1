@@ -93,4 +93,4 @@ bool SignalInfoContainer::AddSignal(FString alias, uint32 maxNumberOfCycles2Acqu
     
     return True;
 }
-OBJECTLOADREGISTER(SignalInfoContainer, "$Id: SignalInfoContainer.cpp,v 1.4 2011/04/11 10:51:46 dalves Exp $")
+OBJECTLOADREGISTER(SignalInfoContainer, "$Id$")

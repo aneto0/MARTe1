@@ -27,7 +27,7 @@
 #include "FString.h"
 #include "HtmlStream.h"
 
-OBJECTLOADREGISTER(HttpClassListResource,"$Id: HttpClassListResource.cpp,v 1.4 2008/02/04 14:11:57 fisa Exp $")
+OBJECTLOADREGISTER(HttpClassListResource,"$Id$")
 
 
 bool HttpClassListResource::ProcessHttpMessage(HttpStream &hStream){

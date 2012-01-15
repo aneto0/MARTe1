@@ -25,7 +25,7 @@
 #include "Parser.h"
 #include "LexicalAnalyzer.h"
 
-OBJECTREGISTER(Parser,"$Id: Parser.cpp,v 1.3 2010/01/22 16:53:12 aneto Exp $")
+OBJECTREGISTER(Parser,"$Id$")
 
 bool ParserParse(Parser &parser,Streamable &stream,Streamable *err,int errorLevel){
     parser.InitTokens();

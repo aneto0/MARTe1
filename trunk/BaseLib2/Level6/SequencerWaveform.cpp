@@ -204,4 +204,4 @@ float SequencerWaveform::GetValue(int32 usecTime) {
 
 
 
-OBJECTLOADREGISTER(SequencerWaveform,"$Id: SequencerWaveform.cpp,v 1.2 2009/08/11 12:48:25 rvitelli Exp $")
+OBJECTLOADREGISTER(SequencerWaveform,"$Id$")

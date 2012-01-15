@@ -141,4 +141,4 @@ bool OperationCondition::IsTrue() {
     
     return conditionResult;
 }
-OBJECTLOADREGISTER(OperationCondition, "$Id: OperationCondition.cpp,v 1.2 2011/04/04 14:28:21 dalves Exp $")
+OBJECTLOADREGISTER(OperationCondition, "$Id$")

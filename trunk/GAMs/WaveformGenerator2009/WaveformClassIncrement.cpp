@@ -93,4 +93,4 @@ bool WaveformClassIncrement::ProcessHttpMessage(HttpStream &hStream) {
     return True;
 }
 
-OBJECTLOADREGISTER(WaveformClassIncrement,"$Id: WaveformClassIncrement.cpp,v 1.3 2011/08/10 16:07:37 ppcc_dev Exp $")
+OBJECTLOADREGISTER(WaveformClassIncrement,"$Id$")

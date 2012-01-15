@@ -96,4 +96,4 @@ void GenericTimerDrv::UserTimerServiceRoutine() {
   
 }
 
-OBJECTLOADREGISTER(GenericTimerDrv,"$Id: GenericTimerDrv.cpp,v 1.4 2011/02/11 10:38:18 astephen Exp $")
+OBJECTLOADREGISTER(GenericTimerDrv,"$Id$")

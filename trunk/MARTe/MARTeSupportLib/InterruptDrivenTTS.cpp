@@ -43,4 +43,4 @@ bool   InterruptDrivenTTS::ObjectDescription(StreamInterface &s,bool full,Stream
 }
 
 
-OBJECTLOADREGISTER(InterruptDrivenTTS,"$Id: InterruptDrivenTTS.cpp,v 1.5 2009/07/22 14:25:23 ppcc_dev Exp $")
+OBJECTLOADREGISTER(InterruptDrivenTTS,"$Id$")

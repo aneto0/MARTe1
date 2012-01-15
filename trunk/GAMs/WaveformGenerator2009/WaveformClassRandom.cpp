@@ -89,7 +89,7 @@ bool WaveformClassRandom::ProcessHttpMessage(HttpStream &hStream) {
     return True;
 }
 
-OBJECTLOADREGISTER(WaveformClassRandom,"$Id: WaveformClassRandom.cpp,v 1.4 2011/07/21 14:19:41 aneto Exp $")
+OBJECTLOADREGISTER(WaveformClassRandom,"$Id$")
 
 
 

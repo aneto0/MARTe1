@@ -52,5 +52,5 @@ bool DDBIDObjectLoadSetup(DDBInterfaceDescriptor&     ddbid,
 
 
 
-OBJECTREGISTER(DDBInterfaceDescriptor,"$Id: DDBInterfaceDescriptor.cpp,v 1.4 2007/05/04 15:25:48 fpiccolo Exp $")
+OBJECTREGISTER(DDBInterfaceDescriptor,"$Id$")
 

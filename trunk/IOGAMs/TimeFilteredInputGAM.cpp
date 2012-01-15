@@ -94,4 +94,4 @@ bool TimeFilteredInputGAM::ObjectSaveSetup(ConfigurationDataBase &info, StreamIn
 }
 
 
-OBJECTLOADREGISTER(TimeFilteredInputGAM,"$Id: TimeFilteredInputGAM.cpp,v 1.3 2008/12/09 16:20:53 fpiccolo Exp $")
+OBJECTLOADREGISTER(TimeFilteredInputGAM,"$Id$")

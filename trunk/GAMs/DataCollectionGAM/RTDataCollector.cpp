@@ -264,4 +264,4 @@ void RTDataCollector::HTMLInfo(HttpStream &hStream) {
     dataStorage.HTMLInfo(hStream);
 }
 
-OBJECTREGISTER(RTDataCollector,"$Id: RTDataCollector.cpp,v 1.11 2011/07/01 14:55:30 aneto Exp $")
+OBJECTREGISTER(RTDataCollector,"$Id$")

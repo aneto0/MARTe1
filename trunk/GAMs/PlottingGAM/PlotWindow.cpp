@@ -310,4 +310,4 @@ bool PlotWindow::AppendJsDataString(FString &jsDataString) {
 
     return True;
 }
-OBJECTLOADREGISTER(PlotWindow, "$Id: PlotWindow.cpp,v 1.13 2011/06/29 14:52:25 dalves Exp $")
+OBJECTLOADREGISTER(PlotWindow, "$Id$")

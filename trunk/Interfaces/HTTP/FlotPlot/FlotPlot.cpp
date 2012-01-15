@@ -31,7 +31,7 @@
 #include "HtmlStream.h"
 #include "Signal.h"
 
-OBJECTLOADREGISTER(FlotPlot, "$Id: FlotPlot.cpp,v 1.4 2011/07/22 09:55:01 aneto Exp $")
+OBJECTLOADREGISTER(FlotPlot, "$Id$")
 /** The HTTP entry point */
 bool
 FlotPlot::ProcessHttpMessage(HttpStream &hStream) {

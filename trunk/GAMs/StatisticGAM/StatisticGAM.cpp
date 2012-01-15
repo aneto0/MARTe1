@@ -198,4 +198,4 @@ bool StatisticGAM::Execute(GAM_FunctionNumbers functionNumber){
 
 
 
-OBJECTLOADREGISTER(StatisticGAM,"$Id: StatisticGAM.cpp,v 1.7 2008/09/04 11:29:37 ppcc_dev Exp $")
+OBJECTLOADREGISTER(StatisticGAM,"$Id$")

@@ -28,7 +28,7 @@
 
 static const double pi = 3.1415926535897;
 
-OBJECTREGISTER(Filter,"$Id: Filter.cpp,v 1.3 2011/02/11 10:22:11 astephen Exp $")
+OBJECTREGISTER(Filter,"$Id$")
 
 bool FilterResize(Filter &f,int inputSize,int outputSize){
     return f.Resize(inputSize,outputSize);

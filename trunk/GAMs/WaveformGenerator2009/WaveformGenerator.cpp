@@ -183,4 +183,4 @@ bool WaveformGenerator::Execute(GAM_FunctionNumbers functionNumber){
     return True;
 }
 
-OBJECTLOADREGISTER(WaveformGenerator,"$Id: WaveformGenerator.cpp,v 1.12 2011/08/10 16:09:13 ppcc_dev Exp $")
+OBJECTLOADREGISTER(WaveformGenerator,"$Id$")

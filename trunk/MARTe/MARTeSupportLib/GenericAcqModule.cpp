@@ -55,5 +55,5 @@ bool GQMObjectSaveSetup(GenericAcqModule &gqm,ConfigurationDataBase &info,Stream
     return True;
 }
 
-OBJECTREGISTER(GenericAcqModule,"$Id: GenericAcqModule.cpp,v 1.5 2011/04/04 14:12:02 aneto Exp $")
+OBJECTREGISTER(GenericAcqModule,"$Id$")
 

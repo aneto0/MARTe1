@@ -80,7 +80,7 @@ void MCCInit(MultiClientClass &mcc){
 }
 
 
-//OBJECTREGISTER(MultiClientClass,"$Id: MultiClientClass.cpp,v 1.6 2010/01/05 09:34:01 aneto Exp $")
+//OBJECTREGISTER(MultiClientClass,"$Id$")
 
 void MCCListener(void *arg){
     MultiClientClass *info = (MultiClientClass *)arg;

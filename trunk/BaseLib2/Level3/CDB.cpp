@@ -31,7 +31,7 @@
 #include "CDBLinkNode.h"
 #include "ObjectRegistryDataBase.h"
 
-OBJECTLOADREGISTER(CDB,"$Id: CDB.cpp,v 1.23 2011/10/20 18:25:22 aneto Exp $")
+OBJECTLOADREGISTER(CDB,"$Id$")
 
 int32 CDBC_SortFilterFn(LinkedListable *data1,LinkedListable *data2){
     CDBNode *cfg1 = (CDBNode *)data1;

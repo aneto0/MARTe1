@@ -24,7 +24,7 @@
 #include "UDPLoggerFile.h"
 #include "Sleep.h"
 
-OBJECTLOADREGISTER(UDPLoggerFile, "$Id: UDPLoggerFile.cpp,v 1.4 2008/05/29 10:28:55 aneto Exp $")
+OBJECTLOADREGISTER(UDPLoggerFile, "$Id$")
 
 
 /** This function will be called whenever there is a new message to process available*/

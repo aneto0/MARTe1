@@ -284,5 +284,5 @@ bool GAMUpdatePersistentCDB(GAM &gam, ConfigurationDataBase &cdb){
     return cdbe->MoveToFather();
 }
 
-OBJECTREGISTER(GAM,"$Id: GAM.cpp,v 1.16 2011/01/05 11:02:00 aneto Exp $")
+OBJECTREGISTER(GAM,"$Id$")
 

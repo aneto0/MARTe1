@@ -25,7 +25,7 @@
 #include "MMCDB.h"
 #include "BasicTypes.h"
 
-OBJECTLOADREGISTER(MMCDB,"$Id: MMCDB.cpp,v 1.7 2011/10/20 18:25:44 aneto Exp $")
+OBJECTLOADREGISTER(MMCDB,"$Id$")
 
 
 /** get the last path position*/

@@ -31,7 +31,7 @@
 #include "HttpStream.h"
 #include "Endianity.h"
 
-OBJECTLOADREGISTER(HttpDigestRealm,"$Id: HttpDigestRealm.cpp,v 1.2 2007/09/12 14:22:36 fpiccolo Exp $")
+OBJECTLOADREGISTER(HttpDigestRealm,"$Id$")
 
 static bool SearchKey(const char *key,const char *name,FString &value){
     value.SetSize(0);

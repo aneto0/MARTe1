@@ -56,4 +56,4 @@ float ScaleAndOffset::Evaluate() {
 
     return (offset + scale*inputData[0]);
 }
-OBJECTLOADREGISTER(ScaleAndOffset, "$Id: ScaleAndOffset.cpp,v 1.2 2011/04/04 14:28:21 dalves Exp $")
+OBJECTLOADREGISTER(ScaleAndOffset, "$Id$")

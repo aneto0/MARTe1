@@ -32,7 +32,7 @@
 #include "Signal.h"
 #include "Matrix.h"
 
-OBJECTLOADREGISTER(SignalArchiver, "$Id: SignalArchiver.cpp,v 1.5 2011/11/24 11:11:02 aneto Exp $")
+OBJECTLOADREGISTER(SignalArchiver, "$Id$")
 
 void SignalArchivingFn(void *args){
     SignalArchiver *sa = (SignalArchiver *)args;

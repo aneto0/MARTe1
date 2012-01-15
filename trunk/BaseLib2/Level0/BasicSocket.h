@@ -34,7 +34,7 @@
 #include "ErrorManagement.h"
 #include "TimeoutType.h"
 
-#define BasicSocketVersion "$Id: BasicSocket.h,v 1.7 2008/10/10 13:33:43 rvitelli Exp $"
+#define BasicSocketVersion "$Id$"
 
 class BasicSocket;
 /** Implements basic generic socket functions */

@@ -28,7 +28,7 @@
 #include "FString.h"
 
 
-OBJECTREGISTER(RemoteConsole,"$Id: RemoteConsole.cpp,v 1.8 2008/11/11 14:04:43 fpiccolo Exp $")
+OBJECTREGISTER(RemoteConsole,"$Id$")
 
 
 void RemoteConsoleInit(RemoteConsole &con){

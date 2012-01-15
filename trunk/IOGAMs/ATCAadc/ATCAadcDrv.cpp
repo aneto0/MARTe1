@@ -835,4 +835,4 @@ bool ATCAadcDrv::ProcessHttpMessage(HttpStream &hStream) {
     return True;
 }
 
-OBJECTLOADREGISTER(ATCAadcDrv,"$Id: ATCAadcDrv.cpp,v 1.48 2010/02/09 14:50:59 ppcc_dev Exp $")
+OBJECTLOADREGISTER(ATCAadcDrv,"$Id$")

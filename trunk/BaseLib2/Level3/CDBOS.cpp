@@ -25,5 +25,5 @@
 #include "CDBVirtual.h"
 #include "CDBOS.h"
 
-OBJECTLOADREGISTER(CDBOS,"$Id: CDBOS.cpp,v 1.2 2008/09/19 11:00:28 rvitelli Exp $")
+OBJECTLOADREGISTER(CDBOS,"$Id$")
 

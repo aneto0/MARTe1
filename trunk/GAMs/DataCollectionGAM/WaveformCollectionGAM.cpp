@@ -349,4 +349,4 @@ bool WaveformCollectionGAM::ProcessMessage(GCRTemplate<MessageEnvelope> envelope
     return False;
 }
 
-OBJECTLOADREGISTER(WaveformCollectionGAM,"$Id: WaveformCollectionGAM.cpp,v 1.4 2009/06/29 17:50:04 rvitelli Exp $")
+OBJECTLOADREGISTER(WaveformCollectionGAM,"$Id$")

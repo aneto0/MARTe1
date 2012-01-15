@@ -30,7 +30,7 @@
 #include "BasicTCPSocket.h"
 #include "FString.h"
 
-OBJECTREGISTER(HttpStream,"$Id: HttpStream.cpp,v 1.19 2011/12/07 09:16:27 aneto Exp $")
+OBJECTREGISTER(HttpStream,"$Id$")
 
 
 /** initialise to empty */

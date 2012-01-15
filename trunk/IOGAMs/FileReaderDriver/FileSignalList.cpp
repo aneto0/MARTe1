@@ -186,5 +186,5 @@ void *FileSignalList::GetNextSample(uint32 usecTime){
     return (sampleCounter == -1) ? data : ((char *) data) + sampleCounter * (numberOfSignals *  signalType.ByteSize());
 }
 
-OBJECTLOADREGISTER(FileSignalList,"$Id: FileSignalList.cpp,v 1.2 2011/09/07 12:07:43 aneto Exp $")
+OBJECTLOADREGISTER(FileSignalList,"$Id$")
 

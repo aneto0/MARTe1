@@ -172,4 +172,4 @@ bool LinuxTimerDrv::Poll(){
     return True;
 }
 
-OBJECTLOADREGISTER(LinuxTimerDrv,"$Id: LinuxTimerDrv.cpp,v 1.24 2011/07/21 15:04:59 aneto Exp $")
+OBJECTLOADREGISTER(LinuxTimerDrv,"$Id$")

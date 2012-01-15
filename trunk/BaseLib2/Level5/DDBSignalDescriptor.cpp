@@ -58,7 +58,7 @@ void DDBSD2(DDBSignalDescriptor *ddbsd, const DDBSignalDescriptor& descriptor){
     ddbsd->storingProperties = descriptor.SignalStoringProperties();
 }
 
-OBJECTREGISTER(DDBSignalDescriptor,"$Id: DDBSignalDescriptor.cpp,v 1.9 2008/06/04 16:25:02 fpiccolo Exp $")
+OBJECTREGISTER(DDBSignalDescriptor,"$Id$")
 
 void DDBSignalDescriptor::Print(StreamInterface& s) const {
 

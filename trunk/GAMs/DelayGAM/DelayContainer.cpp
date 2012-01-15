@@ -204,4 +204,4 @@ bool DelayContainer::ProcessMessage(GCRTemplate<MessageEnvelope> envelope) {
 	
     return True;
 }
-OBJECTLOADREGISTER(DelayContainer, "$Id: DelayContainer.cpp,v 1.4 2011/01/10 16:53:50 dalves Exp $")
+OBJECTLOADREGISTER(DelayContainer, "$Id$")

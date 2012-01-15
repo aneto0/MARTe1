@@ -26,7 +26,7 @@
 #include "SXMemory.h"
 #include "FString.h"
 
-OBJECTLOADREGISTER(UDPLoggerRelay, "$Id: UDPLoggerRelay.cpp,v 1.5 2008/04/15 17:30:29 aneto Exp $")
+OBJECTLOADREGISTER(UDPLoggerRelay, "$Id$")
 
 void UDPLoggerRelay::AddMessageToHistoryQueue(GCRTemplate<LoggerMessage> loggerMsg){ 
     while(historyMessageQ.Size() > maxHistoryQueueMessages){        

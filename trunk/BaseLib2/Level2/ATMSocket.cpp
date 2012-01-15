@@ -25,5 +25,5 @@
 #include "ATMSocket.h"
 #include "InternetAddress.h"
 
-OBJECTREGISTER(ATMSocket,"$Id: ATMSocket.cpp,v 1.4 2007/09/11 13:27:02 fisa Exp $")
+OBJECTREGISTER(ATMSocket,"$Id$")
 

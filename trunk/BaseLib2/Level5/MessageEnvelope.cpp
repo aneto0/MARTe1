@@ -26,7 +26,7 @@
 #include "MessageEnvelope.h"
 #include "CDBExtended.h"
 
-OBJECTLOADREGISTER(MessageEnvelope,"$Id: MessageEnvelope.cpp,v 1.13 2009/04/07 09:17:54 fisa Exp $");
+OBJECTLOADREGISTER(MessageEnvelope,"$Id$");
 
 
 bool

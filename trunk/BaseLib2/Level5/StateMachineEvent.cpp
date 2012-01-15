@@ -29,7 +29,7 @@
 #include "MessageDispatcher.h"
 #include "CDBExtended.h"
 
-OBJECTLOADREGISTER(StateMachineEvent,"$Id: StateMachineEvent.cpp,v 1.7 2008/05/12 17:19:34 fisa Exp $")
+OBJECTLOADREGISTER(StateMachineEvent,"$Id$")
 
 
 bool SMEObjectLoadSetup(StateMachineEvent &sme,ConfigurationDataBase &info,StreamInterface *err){

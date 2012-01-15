@@ -77,5 +77,5 @@ bool SharedMemoryDrv::WriteData(uint32 usecTime, const int32* buffer){
     return True;
 }
 
-OBJECTLOADREGISTER(SharedMemoryDrv, "$Id: SharedMemoryDrv.cpp,v 1.1 2011/09/16 16:42:43 aneto Exp $")
+OBJECTLOADREGISTER(SharedMemoryDrv, "$Id$")
 

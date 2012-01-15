@@ -28,7 +28,7 @@
 #include "File.h"
 #include "Directory.h"
 
-OBJECTLOADREGISTER(HttpDirectoryResource,"$Id: HttpDirectoryResource.cpp,v 1.8 2008/10/24 15:37:34 rvitelli Exp $")
+OBJECTLOADREGISTER(HttpDirectoryResource,"$Id$")
 
 bool checkExtension(FString &fname,const char *extension){
     if (extension == NULL) return False;

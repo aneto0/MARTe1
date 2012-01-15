@@ -30,7 +30,7 @@
 #include "CDBHtmlUtilities.h"
 
 
-OBJECTLOADREGISTER(HttpGCRCBrowser,"$Id: HttpGCRCBrowser.cpp,v 1.9 2011/09/16 15:15:10 aneto Exp $")
+OBJECTLOADREGISTER(HttpGCRCBrowser,"$Id$")
 
 
 bool HttpGCRCBrowser::ObjectLoadSetup(

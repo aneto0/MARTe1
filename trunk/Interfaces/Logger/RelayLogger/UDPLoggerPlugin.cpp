@@ -26,7 +26,7 @@
 #include "ObjectMacros.h"
 
 
-OBJECTLOADREGISTER(UDPLoggerPlugin, "$Id: UDPLoggerPlugin.cpp,v 1.1 2008/03/31 14:41:10 aneto Exp $")     
+OBJECTLOADREGISTER(UDPLoggerPlugin, "$Id$")     
                
 void UDPLoggerPluginReceiver(void *args){
     UDPLoggerPlugin *plugin = (UDPLoggerPlugin *)args;

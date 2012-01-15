@@ -482,4 +482,4 @@ bool WebStatisticGAM::ProcessHttpMessage(HttpStream &hStream){
 }
 
 
-OBJECTLOADREGISTER(WebStatisticGAM,"$Id: WebStatisticGAM.cpp,v 1.28 2011/02/17 11:33:20 ppcc_dev Exp $")
+OBJECTLOADREGISTER(WebStatisticGAM,"$Id$")

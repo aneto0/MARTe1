@@ -25,7 +25,7 @@
 #include "Endianity.h"
 #include "SXMemory.h"
 
-OBJECTREGISTER(LoggerMessage,"$Id: LoggerMessage.cpp,v 1.7 2011/09/13 09:45:39 aneto Exp $")
+OBJECTREGISTER(LoggerMessage,"$Id$")
 bool LoggerMessage::LoadFromMessage(const char *sourceAddress, char *buffer, uint32 size){
     Reset();    
     if(!LoadFromText(buffer, size)){

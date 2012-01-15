@@ -110,4 +110,4 @@ bool AcquisitionTrigger::AddSignal(FString alias, DDBInputInterface *ddbii) {
     return (signalInfoContainer.AddSignal(alias, maxNumberOfCycles2Acquire, cyclesPerAcqTrigger, ddbii));
 }
 
-OBJECTLOADREGISTER(AcquisitionTrigger, "$Id: AcquisitionTrigger.cpp,v 1.6 2011/04/11 10:51:46 dalves Exp $")
+OBJECTLOADREGISTER(AcquisitionTrigger, "$Id$")

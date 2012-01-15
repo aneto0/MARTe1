@@ -104,4 +104,4 @@ bool RTDataPool::ObjectDescription(StreamInterface &s,bool full,StreamInterface 
 }
 
 
-OBJECTREGISTER(RTDataPool,"$Id: RTDataPool.cpp,v 1.2 2008/02/22 11:16:37 fpiccolo Exp $")
+OBJECTREGISTER(RTDataPool,"$Id$")

@@ -1550,4 +1550,4 @@ bool RealTimeThread::CreatePerformanceMonitors4Gams(ConfigurationDataBase &info)
     return True;
 }
 
-OBJECTLOADREGISTER(RealTimeThread,"$Id: RealTimeThread.cpp,v 1.40 2011/09/10 07:43:36 aneto Exp $")
+OBJECTLOADREGISTER(RealTimeThread,"$Id$")

@@ -125,4 +125,4 @@ bool FilterContainer::Execute(GAM_FunctionNumbers execFlag) {
 
     return True;
 }
-OBJECTLOADREGISTER(FilterContainer, "$Id: FilterContainer.cpp,v 1.3 2011/04/09 21:41:57 dalves Exp $")
+OBJECTLOADREGISTER(FilterContainer, "$Id$")

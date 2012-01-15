@@ -74,7 +74,7 @@ bool WaveformClassTime::ProcessHttpMessage(HttpStream &hStream) {
     return True;
 }
 
-OBJECTLOADREGISTER(WaveformClassTime,"$Id: WaveformClassTime.cpp,v 1.2 2009/10/28 16:10:56 lzabeo Exp $")
+OBJECTLOADREGISTER(WaveformClassTime,"$Id$")
 
 
 

@@ -861,4 +861,4 @@ MARTeContainer::MARTeContainer(){
     marteStaticMenu->Insert(level1Menu);
 }
 
-OBJECTLOADREGISTER(MARTeContainer,"$Id: MARTeContainer.cpp,v 1.38 2011/10/21 17:03:38 aneto Exp $")
+OBJECTLOADREGISTER(MARTeContainer,"$Id$")

@@ -293,4 +293,4 @@ void ExpressionParser::Parse(GCRTemplate<UnaryOperation> previousUnaryNode) {
     }
 }
 
-OBJECTLOADREGISTER(ExpressionParser, "$Id: ExpressionParser.cpp,v 1.1 2010/08/20 06:32:54 dalves Exp $")
+OBJECTLOADREGISTER(ExpressionParser, "$Id$")

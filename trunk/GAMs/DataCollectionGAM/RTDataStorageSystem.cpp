@@ -431,4 +431,4 @@ void RTDataStorageSystem::HTMLInfo(HttpStream &hStream) {
     hStream.Printf("<h2>Total already read Samples = %d</h2>\n", CLOCKInit.nOfReadSamples);
 }
 
-OBJECTREGISTER(RTDataStorageSystem,"$Id: RTDataStorageSystem.cpp,v 1.14 2011/02/11 07:59:31 astephen Exp $")
+OBJECTREGISTER(RTDataStorageSystem,"$Id$")

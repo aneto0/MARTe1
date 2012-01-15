@@ -29,7 +29,7 @@
 #include "FastPollingMutexSem.h"
 
 
-OBJECTREGISTER(HttpClient,"$Id: HttpClient.cpp,v 1.7 2008/12/09 11:25:12 aneto Exp $")
+OBJECTREGISTER(HttpClient,"$Id$")
 
 bool HttpClient::Connect(TimeoutType mSecTimeout){
     socket.Close();

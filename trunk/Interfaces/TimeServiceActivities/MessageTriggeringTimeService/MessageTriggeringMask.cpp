@@ -118,5 +118,5 @@ bool MessageTriggeringMask::ObjectLoadSetup(ConfigurationDataBase &info,StreamIn
     return True;
 }
 
-OBJECTLOADREGISTER(MessageTriggeringMask, "$Id: MessageTriggeringMask.cpp,v 1.3 2011/12/06 09:29:52 aneto Exp $")
+OBJECTLOADREGISTER(MessageTriggeringMask, "$Id$")
 

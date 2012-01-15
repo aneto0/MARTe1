@@ -98,4 +98,4 @@ bool TimeInputGAM::ObjectSaveSetup(ConfigurationDataBase &info, StreamInterface 
 }
 
 
-OBJECTLOADREGISTER(TimeInputGAM,"$Id: TimeInputGAM.cpp,v 1.8 2008/12/09 16:20:53 fpiccolo Exp $")
+OBJECTLOADREGISTER(TimeInputGAM,"$Id$")

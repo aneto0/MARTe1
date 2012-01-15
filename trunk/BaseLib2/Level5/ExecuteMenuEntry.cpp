@@ -24,7 +24,7 @@
 
 #include "ExecuteMenuEntry.h"
 
-OBJECTLOADREGISTER(ExecuteMenuEntry,"$Id: ExecuteMenuEntry.cpp,v 1.1 2008/05/13 16:05:38 fpiccolo Exp $")
+OBJECTLOADREGISTER(ExecuteMenuEntry,"$Id$")
 
 
 bool ExecuteMenuAction(StreamInterface &in,StreamInterface &out,void *userData){

@@ -24,6 +24,6 @@
 
 #include "MenuEntry.h"
 
-OBJECTLOADREGISTER(MenuEntry,"$Id: MenuEntry.cpp,v 1.1 2007/04/11 16:43:26 fisa Exp $")
+OBJECTLOADREGISTER(MenuEntry,"$Id$")
 
 

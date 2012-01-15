@@ -27,7 +27,7 @@
 #include "HtmlStream.h"
 #include "SXNull.h"
 
-OBJECTLOADREGISTER(MenuContainer,"$Id: MenuContainer.cpp,v 1.6 2008/09/22 17:17:34 fpiccolo Exp $")
+OBJECTLOADREGISTER(MenuContainer,"$Id$")
 
 bool MCProcessHttpMessage(
                         MenuContainer &mc,

@@ -31,7 +31,7 @@
 
 const uint32 GCRC_MAX_NUMBER_OF_OBJECTS = 10000;
 
-OBJECTLOADREGISTER(GCReferenceContainer,"$Id: GCReferenceContainer.cpp,v 1.28 2011/01/13 09:45:25 dalves Exp $")
+OBJECTLOADREGISTER(GCReferenceContainer,"$Id$")
 
 // set to 1 to use HARD REFERENCES WHEN POSSIBLE
 // the downside is that one cannot save the object

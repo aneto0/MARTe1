@@ -207,4 +207,4 @@ bool Waveform::ProcessHttpMessage(HttpStream &hStream) {
 }
 
 
-OBJECTLOADREGISTER(Waveform,"$Id: Waveform.cpp,v 1.4 2009/10/16 13:49:23 rvitelli Exp $")
+OBJECTLOADREGISTER(Waveform,"$Id$")

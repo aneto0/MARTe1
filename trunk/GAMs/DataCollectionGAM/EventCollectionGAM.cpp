@@ -295,4 +295,4 @@ bool EventCollectionGAM::ProcessMessage(GCRTemplate<MessageEnvelope> envelope){
     return False;
 }
 
-OBJECTLOADREGISTER(EventCollectionGAM,"$Id: EventCollectionGAM.cpp,v 1.2 2009/01/14 13:09:21 fpiccolo Exp $")
+OBJECTLOADREGISTER(EventCollectionGAM,"$Id$")

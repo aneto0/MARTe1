@@ -595,4 +595,4 @@ bool InputGAM::ProcessHttpMessage(HttpStream &hStream){
     return inputModule->ProcessHttpMessage(hStream);
 }
 
-OBJECTLOADREGISTER(InputGAM,"$Id: InputGAM.cpp,v 1.16 2011/09/07 10:17:40 aneto Exp $")
+OBJECTLOADREGISTER(InputGAM,"$Id$")

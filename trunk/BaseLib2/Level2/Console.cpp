@@ -25,7 +25,7 @@
 #include "Console.h"
 #include "FString.h"
 
-OBJECTREGISTER(Console,"$Id: Console.cpp,v 1.14 2007/09/11 13:27:02 fisa Exp $")
+OBJECTREGISTER(Console,"$Id$")
 
 bool ConsoleSSWrite(Console &con,const void* buffer, uint32 &size,TimeoutType msecTimeout){
     switch (con.selectedStream){

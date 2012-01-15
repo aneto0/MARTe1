@@ -464,4 +464,4 @@ int32 ATCAadcDrv::GetData(uint32 usecTime, int32 *buffer){
 }
 
 
-OBJECTLOADREGISTER(ATCAadcDrv,"$Id: ATCAadcDrvNoExtClkTrg.cpp,v 1.1 2008/11/21 14:12:49 ppcc_dev Exp $")
+OBJECTLOADREGISTER(ATCAadcDrv,"$Id$")

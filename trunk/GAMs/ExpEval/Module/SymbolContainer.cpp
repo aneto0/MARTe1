@@ -167,4 +167,4 @@ GCRTemplate<Node> SymbolContainer::BuildOperation(const char *opStr, GCRTemplate
 	
 }
 
-OBJECTLOADREGISTER(SymbolContainer,"$Id: SymbolContainer.cpp,v 1.1 2010/08/20 06:33:05 dalves Exp $")
+OBJECTLOADREGISTER(SymbolContainer,"$Id$")

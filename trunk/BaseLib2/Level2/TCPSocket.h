@@ -32,7 +32,7 @@
 #include "Streamable.h"
 #include "SocketTimer.h"
 
-#define TCPSocketVersion "$Id: TCPSocket.h,v 1.8 2007/09/12 14:22:36 fpiccolo Exp $"
+#define TCPSocketVersion "$Id$"
 
 class TCPSocket;
 

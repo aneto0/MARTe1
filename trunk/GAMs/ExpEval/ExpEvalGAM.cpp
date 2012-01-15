@@ -213,4 +213,4 @@ bool ExpEvalGAM::Execute(GAM_FunctionNumbers execFlag) {
     return True;
 }
 
-OBJECTLOADREGISTER(ExpEvalGAM,"$Id: ExpEvalGAM.cpp,v 1.4 2011/07/08 13:50:57 aneto Exp $")
+OBJECTLOADREGISTER(ExpEvalGAM,"$Id$")

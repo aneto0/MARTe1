@@ -35,7 +35,7 @@
 
 class CDBLinkNode;
 OBJECT_DLL(CDBLinkNode)
-#define CDBLinkNodeVersion "$Id: CDBLinkNode.h,v 1.4 2006/08/10 17:17:56 fisa Exp $"
+#define CDBLinkNodeVersion "$Id$"
 
 class CDBLinkNode: public CDBStringDataNode{
 OBJECT_DLL_STUFF(CDBLinkNode)
