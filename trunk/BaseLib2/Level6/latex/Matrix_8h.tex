@@ -1,0 +1,220 @@
+\hypertarget{Matrix_8h}{
+\section{Matrix.h File Reference}
+\label{Matrix_8h}\index{Matrix.h@{Matrix.h}}
+}
+{\ttfamily \#include \char`\"{}RTMatrix.h\char`\"{}}\par
+{\ttfamily \#include \char`\"{}CDBExtended.h\char`\"{}}\par
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classMatrixRow}{MatrixRow$<$ T $>$}
+\item 
+class \hyperlink{classMatrixT}{MatrixT$<$ T $>$}
+\end{DoxyCompactItemize}
+\subsection*{Defines}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{Matrix_8h_a6cf3b0c398cc10929939dbec7a5f25c8}{MatrixI}~\hyperlink{classMatrixT}{MatrixT}$<$int   $>$
+\item 
+\#define \hyperlink{Matrix_8h_ab15e6f336584fcd2354211b6badcf7c4}{MatrixF}~\hyperlink{classMatrixT}{MatrixT}$<$float $>$
+\item 
+\#define \hyperlink{Matrix_8h_aec5d28b40c83f648b7c1ab95cd133684}{MatrixD}~\hyperlink{classMatrixT}{MatrixT}$<$double$>$
+\item 
+\#define \hyperlink{Matrix_8h_a8b7eba79f133b192eb94a28f6e9a5ad8}{rows\_\-of}(a)~(sizeof(a)/sizeof(a\mbox{[}0\mbox{]}))
+\item 
+\#define \hyperlink{Matrix_8h_acc74cc4b70ffa191684626495b66de04}{columns\_\-of}(a)~(sizeof(a\mbox{[}0\mbox{]})/sizeof(a\mbox{[}0\mbox{]}\mbox{[}0\mbox{]}))
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\footnotesize template$<$class T1 , class T2 $>$ }\\bool \hyperlink{Matrix_8h_af7c43b3a468333fc61609c7953a83301}{RTMCopy} (\hyperlink{classMatrixT}{MatrixT}$<$ T1 $>$ \&dest, const \hyperlink{classMatrixT}{MatrixT}$<$ T2 $>$ \&src)
+\item 
+{\footnotesize template$<$class T1 , class T2 $>$ }\\bool \hyperlink{Matrix_8h_a38e68d771702be078f44896da7d15b1d}{RTMLoad} (\hyperlink{classMatrixT}{MatrixT}$<$ T1 $>$ \&dest, const T2 $\ast$src, const uint32 nRows, const uint32 nColumns)
+\item 
+{\footnotesize template$<$class T1 , class T2 $>$ }\\bool \hyperlink{Matrix_8h_ad8c41e4e4566a4d2a081a7a6caad6f96}{RTMSave} (\hyperlink{classMatrixT}{MatrixT}$<$ T1 $>$ \&src, T2 $\ast$dest, const uint32 nRows, const uint32 nColumns)
+\item 
+{\footnotesize template$<$class T $>$ }\\const \hyperlink{classMatrixT}{MatrixT}$<$ T $>$ \hyperlink{Matrix_8h_ae8123a0b5426d09e906c966324af8951}{operator$\ast$} (const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ T $>$ \&A, const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ T $>$ \&B)
+\item 
+{\footnotesize template$<$class T $>$ }\\const \hyperlink{classMatrixT}{MatrixT}$<$ T $>$ \hyperlink{Matrix_8h_ac7230f9c251ba11703d15a67ad82868a}{operator$\ast$} (const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ T $>$ \&A, T x)
+\item 
+{\footnotesize template$<$class T $>$ }\\const \hyperlink{classMatrixT}{MatrixT}$<$ T $>$ \hyperlink{Matrix_8h_a05fff7e1f34032929d863406c6fb5bcd}{operator$\ast$} (T x, const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ T $>$ \&A)
+\item 
+{\footnotesize template$<$class T $>$ }\\const \hyperlink{classMatrixT}{MatrixT}$<$ T $>$ \hyperlink{Matrix_8h_a71915c6e5e95aed14398c173b70a8129}{operator+} (const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ T $>$ \&A, const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ T $>$ \&B)
+\item 
+{\footnotesize template$<$class T $>$ }\\const \hyperlink{classMatrixT}{MatrixT}$<$ T $>$ \hyperlink{Matrix_8h_a03d66af185f79af56cfe3be97402e394}{operator-\/} (const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ T $>$ \&A, const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ T $>$ \&B)
+\item 
+{\footnotesize template$<$class T $>$ }\\const \hyperlink{classMatrixT}{MatrixT}$<$ T $>$ \hyperlink{Matrix_8h_abdbb04e00c02eff1d51224f1b7c723c5}{operator/} (T a, const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ T $>$ \&A)
+\item 
+{\footnotesize template$<$class T $>$ }\\const \hyperlink{classMatrixT}{MatrixT}$<$ T $>$ \hyperlink{Matrix_8h_a964767e02386065542022f52d79bd025}{operator/} (const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ T $>$ \&A, const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ T $>$ \&B)
+\item 
+{\footnotesize template$<$class T $>$ }\\const \hyperlink{classMatrixT}{MatrixT}$<$ T $>$ \hyperlink{Matrix_8h_a4fbb12b127da79e6be666da78b7f9967}{operator$\sim$} (const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ T $>$ \&A)
+\item 
+bool \hyperlink{Matrix_8h_abbdacf9aa292d7d26977d2beef2724da}{ReadRTMatrixF} (ConfigurationDataBase \&cdb\_\-, MatrixF \&matrix, const char $\ast$configName)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+
+
+\subsection{Define Documentation}
+\hypertarget{Matrix_8h_acc74cc4b70ffa191684626495b66de04}{
+\index{Matrix.h@{Matrix.h}!columns\_\-of@{columns\_\-of}}
+\index{columns\_\-of@{columns\_\-of}!Matrix.h@{Matrix.h}}
+\subsubsection[{columns\_\-of}]{\setlength{\rightskip}{0pt plus 5cm}\#define columns\_\-of(
+\begin{DoxyParamCaption}
+\item[{}]{a}
+\end{DoxyParamCaption}
+)~(sizeof(a\mbox{[}0\mbox{]})/sizeof(a\mbox{[}0\mbox{]}\mbox{[}0\mbox{]}))}}
+\label{Matrix_8h_acc74cc4b70ffa191684626495b66de04}
+\hypertarget{Matrix_8h_aec5d28b40c83f648b7c1ab95cd133684}{
+\index{Matrix.h@{Matrix.h}!MatrixD@{MatrixD}}
+\index{MatrixD@{MatrixD}!Matrix.h@{Matrix.h}}
+\subsubsection[{MatrixD}]{\setlength{\rightskip}{0pt plus 5cm}\#define MatrixD~{\bf MatrixT}$<$double$>$}}
+\label{Matrix_8h_aec5d28b40c83f648b7c1ab95cd133684}
+\hypertarget{Matrix_8h_ab15e6f336584fcd2354211b6badcf7c4}{
+\index{Matrix.h@{Matrix.h}!MatrixF@{MatrixF}}
+\index{MatrixF@{MatrixF}!Matrix.h@{Matrix.h}}
+\subsubsection[{MatrixF}]{\setlength{\rightskip}{0pt plus 5cm}\#define MatrixF~{\bf MatrixT}$<$float $>$}}
+\label{Matrix_8h_ab15e6f336584fcd2354211b6badcf7c4}
+\hypertarget{Matrix_8h_a6cf3b0c398cc10929939dbec7a5f25c8}{
+\index{Matrix.h@{Matrix.h}!MatrixI@{MatrixI}}
+\index{MatrixI@{MatrixI}!Matrix.h@{Matrix.h}}
+\subsubsection[{MatrixI}]{\setlength{\rightskip}{0pt plus 5cm}\#define MatrixI~{\bf MatrixT}$<$int   $>$}}
+\label{Matrix_8h_a6cf3b0c398cc10929939dbec7a5f25c8}
+\hypertarget{Matrix_8h_a8b7eba79f133b192eb94a28f6e9a5ad8}{
+\index{Matrix.h@{Matrix.h}!rows\_\-of@{rows\_\-of}}
+\index{rows\_\-of@{rows\_\-of}!Matrix.h@{Matrix.h}}
+\subsubsection[{rows\_\-of}]{\setlength{\rightskip}{0pt plus 5cm}\#define rows\_\-of(
+\begin{DoxyParamCaption}
+\item[{}]{a}
+\end{DoxyParamCaption}
+)~(sizeof(a)/sizeof(a\mbox{[}0\mbox{]}))}}
+\label{Matrix_8h_a8b7eba79f133b192eb94a28f6e9a5ad8}
+
+
+\subsection{Function Documentation}
+\hypertarget{Matrix_8h_ae8123a0b5426d09e906c966324af8951}{
+\index{Matrix.h@{Matrix.h}!operator$\ast$@{operator$\ast$}}
+\index{operator$\ast$@{operator$\ast$}!Matrix.h@{Matrix.h}}
+\subsubsection[{operator$\ast$}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T $>$ const {\bf MatrixT}$<$T$>$ operator$\ast$ (
+\begin{DoxyParamCaption}
+\item[{const {\bf RTMatrixT}$<$ T $>$ \&}]{A, }
+\item[{const {\bf RTMatrixT}$<$ T $>$ \&}]{B}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{Matrix_8h_ae8123a0b5426d09e906c966324af8951}
+\hypertarget{Matrix_8h_ac7230f9c251ba11703d15a67ad82868a}{
+\index{Matrix.h@{Matrix.h}!operator$\ast$@{operator$\ast$}}
+\index{operator$\ast$@{operator$\ast$}!Matrix.h@{Matrix.h}}
+\subsubsection[{operator$\ast$}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T $>$ const {\bf MatrixT}$<$T$>$ operator$\ast$ (
+\begin{DoxyParamCaption}
+\item[{const {\bf RTMatrixT}$<$ T $>$ \&}]{A, }
+\item[{T}]{x}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{Matrix_8h_ac7230f9c251ba11703d15a67ad82868a}
+\hypertarget{Matrix_8h_a05fff7e1f34032929d863406c6fb5bcd}{
+\index{Matrix.h@{Matrix.h}!operator$\ast$@{operator$\ast$}}
+\index{operator$\ast$@{operator$\ast$}!Matrix.h@{Matrix.h}}
+\subsubsection[{operator$\ast$}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T $>$ const {\bf MatrixT}$<$T$>$ operator$\ast$ (
+\begin{DoxyParamCaption}
+\item[{T}]{x, }
+\item[{const {\bf RTMatrixT}$<$ T $>$ \&}]{A}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{Matrix_8h_a05fff7e1f34032929d863406c6fb5bcd}
+\hypertarget{Matrix_8h_a71915c6e5e95aed14398c173b70a8129}{
+\index{Matrix.h@{Matrix.h}!operator+@{operator+}}
+\index{operator+@{operator+}!Matrix.h@{Matrix.h}}
+\subsubsection[{operator+}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T $>$ const {\bf MatrixT}$<$T$>$ operator+ (
+\begin{DoxyParamCaption}
+\item[{const {\bf RTMatrixT}$<$ T $>$ \&}]{A, }
+\item[{const {\bf RTMatrixT}$<$ T $>$ \&}]{B}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{Matrix_8h_a71915c6e5e95aed14398c173b70a8129}
+\hypertarget{Matrix_8h_a03d66af185f79af56cfe3be97402e394}{
+\index{Matrix.h@{Matrix.h}!operator-\/@{operator-\/}}
+\index{operator-\/@{operator-\/}!Matrix.h@{Matrix.h}}
+\subsubsection[{operator-\/}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T $>$ const {\bf MatrixT}$<$T$>$ operator-\/ (
+\begin{DoxyParamCaption}
+\item[{const {\bf RTMatrixT}$<$ T $>$ \&}]{A, }
+\item[{const {\bf RTMatrixT}$<$ T $>$ \&}]{B}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{Matrix_8h_a03d66af185f79af56cfe3be97402e394}
+difference \hypertarget{Matrix_8h_abdbb04e00c02eff1d51224f1b7c723c5}{
+\index{Matrix.h@{Matrix.h}!operator/@{operator/}}
+\index{operator/@{operator/}!Matrix.h@{Matrix.h}}
+\subsubsection[{operator/}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T $>$ const {\bf MatrixT}$<$T$>$ operator/ (
+\begin{DoxyParamCaption}
+\item[{T}]{a, }
+\item[{const {\bf RTMatrixT}$<$ T $>$ \&}]{A}
+\end{DoxyParamCaption}
+)}}
+\label{Matrix_8h_abdbb04e00c02eff1d51224f1b7c723c5}
+A$^\wedge$-\/1 $\ast$ a \hypertarget{Matrix_8h_a964767e02386065542022f52d79bd025}{
+\index{Matrix.h@{Matrix.h}!operator/@{operator/}}
+\index{operator/@{operator/}!Matrix.h@{Matrix.h}}
+\subsubsection[{operator/}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T $>$ const {\bf MatrixT}$<$T$>$ operator/ (
+\begin{DoxyParamCaption}
+\item[{const {\bf RTMatrixT}$<$ T $>$ \&}]{A, }
+\item[{const {\bf RTMatrixT}$<$ T $>$ \&}]{B}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{Matrix_8h_a964767e02386065542022f52d79bd025}
+ratio of A$\ast$ B$^\wedge$-\/1 \hypertarget{Matrix_8h_a4fbb12b127da79e6be666da78b7f9967}{
+\index{Matrix.h@{Matrix.h}!operator$\sim$@{operator$\sim$}}
+\index{operator$\sim$@{operator$\sim$}!Matrix.h@{Matrix.h}}
+\subsubsection[{operator$\sim$}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T $>$ const {\bf MatrixT}$<$T$>$ operator$\sim$ (
+\begin{DoxyParamCaption}
+\item[{const {\bf RTMatrixT}$<$ T $>$ \&}]{A}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{Matrix_8h_a4fbb12b127da79e6be666da78b7f9967}
+transpose \hypertarget{Matrix_8h_abbdacf9aa292d7d26977d2beef2724da}{
+\index{Matrix.h@{Matrix.h}!ReadRTMatrixF@{ReadRTMatrixF}}
+\index{ReadRTMatrixF@{ReadRTMatrixF}!Matrix.h@{Matrix.h}}
+\subsubsection[{ReadRTMatrixF}]{\setlength{\rightskip}{0pt plus 5cm}bool ReadRTMatrixF (
+\begin{DoxyParamCaption}
+\item[{ConfigurationDataBase \&}]{cdb\_\-, }
+\item[{MatrixF \&}]{matrix, }
+\item[{const char $\ast$}]{configName}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{Matrix_8h_abbdacf9aa292d7d26977d2beef2724da}
+\hypertarget{Matrix_8h_af7c43b3a468333fc61609c7953a83301}{
+\index{Matrix.h@{Matrix.h}!RTMCopy@{RTMCopy}}
+\index{RTMCopy@{RTMCopy}!Matrix.h@{Matrix.h}}
+\subsubsection[{RTMCopy}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T1 , class T2 $>$ bool RTMCopy (
+\begin{DoxyParamCaption}
+\item[{{\bf MatrixT}$<$ T1 $>$ \&}]{dest, }
+\item[{const {\bf MatrixT}$<$ T2 $>$ \&}]{src}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{Matrix_8h_af7c43b3a468333fc61609c7953a83301}
+copies a matrix \hypertarget{Matrix_8h_a38e68d771702be078f44896da7d15b1d}{
+\index{Matrix.h@{Matrix.h}!RTMLoad@{RTMLoad}}
+\index{RTMLoad@{RTMLoad}!Matrix.h@{Matrix.h}}
+\subsubsection[{RTMLoad}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T1 , class T2 $>$ bool RTMLoad (
+\begin{DoxyParamCaption}
+\item[{{\bf MatrixT}$<$ T1 $>$ \&}]{dest, }
+\item[{const T2 $\ast$}]{src, }
+\item[{const uint32}]{nRows, }
+\item[{const uint32}]{nColumns}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{Matrix_8h_a38e68d771702be078f44896da7d15b1d}
+loads a packed array of data as floats \hypertarget{Matrix_8h_ad8c41e4e4566a4d2a081a7a6caad6f96}{
+\index{Matrix.h@{Matrix.h}!RTMSave@{RTMSave}}
+\index{RTMSave@{RTMSave}!Matrix.h@{Matrix.h}}
+\subsubsection[{RTMSave}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T1 , class T2 $>$ bool RTMSave (
+\begin{DoxyParamCaption}
+\item[{{\bf MatrixT}$<$ T1 $>$ \&}]{src, }
+\item[{T2 $\ast$}]{dest, }
+\item[{const uint32}]{nRows, }
+\item[{const uint32}]{nColumns}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{Matrix_8h_ad8c41e4e4566a4d2a081a7a6caad6f96}
+saves the matrix into a packed array of data 

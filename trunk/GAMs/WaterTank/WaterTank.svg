@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN"
+    "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<svg onload="initShapes(evt)"
+     xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink">
+    <script type="text/javascript">
+	var svgns = "http://www.w3.org/2000/svg";
+        var water;
+        var waterText;
+        var WATER_TANK_WIDTH  = 100;
+        var WATER_TANK_HEIGHT = 150;
+        var WATER_TANK_X      = 5;
+        var WATER_TANK_Y      = 5;
+        var MM_TO_PIXEL       = 3;
+        var request = new XMLHttpRequest();
+
+        function initShapes(evt) {
+            if ( window.svgDocument == null )
+                svgDocument = evt.target.ownerDocument;
+            //The water itself
+            water = svgDocument.createElementNS(svgns, "rect");
+            water.setAttributeNS(null, "x", WATER_TANK_X);
+            water.setAttributeNS(null, "y", WATER_TANK_HEIGHT);
+            water.setAttributeNS(null, "width", WATER_TANK_WIDTH);
+            water.setAttributeNS(null, "height", 0);
+            water.setAttributeNS(null, "fill", "blue");
+            
+            svgDocument.documentElement.appendChild(water);
+            //draw the water tank
+            var watertank = svgDocument.createElementNS(svgns, "polyline");            
+            var coords    = "";
+            coords += WATER_TANK_X + "," + WATER_TANK_Y + " " + WATER_TANK_X + "," + (WATER_TANK_Y + WATER_TANK_HEIGHT) + " ";
+            coords += (WATER_TANK_X + WATER_TANK_WIDTH) + "," + (WATER_TANK_Y + WATER_TANK_HEIGHT) + " ";
+            coords += (WATER_TANK_X + WATER_TANK_WIDTH) + "," + WATER_TANK_Y;
+            watertank.setAttributeNS(null, "points", coords);
+            watertank.setAttributeNS(null, "fill", "none");
+            watertank.setAttributeNS(null, "stroke", "red");
+            watertank.setAttributeNS(null, "stroke-width", 4);
+            svgDocument.documentElement.appendChild(watertank);
+
+            var textBase = svgDocument.createElementNS(svgns, "rect");
+            textBase.setAttributeNS(null, "x", WATER_TANK_X - 2);
+            textBase.setAttributeNS(null, "y", (WATER_TANK_Y + WATER_TANK_HEIGHT) + 2);
+            textBase.setAttributeNS(null, "width", WATER_TANK_WIDTH + 4);
+            textBase.setAttributeNS(null, "height", WATER_TANK_HEIGHT / 3);
+            textBase.setAttributeNS(null, "fill", "black");
+            svgDocument.documentElement.appendChild(textBase);
+
+            waterText = svgDocument.createElementNS(svgns, "text");
+            waterText.setAttributeNS(null, "x", WATER_TANK_X + 2);
+            waterText.setAttributeNS(null, "y", (WATER_TANK_Y + WATER_TANK_HEIGHT) + 6 + 25);
+            waterText.setAttributeNS(null, "fill", "white");
+            waterText.setAttributeNS(null, "font-size", "18");
+            var wt = svgDocument.createTextNode("2 cm");
+            waterText.appendChild(wt);
+            svgDocument.documentElement.appendChild(waterText);
+
+            timedUpdate();
+        }
+
+        function timedUpdate(){
+            var url = "?TankHeight";
+            request.open('GET', url, true);
+            request.onreadystatechange = updateImage;
+            request.send(null);
+            window.setTimeout(timedUpdate, 250);
+        }
+
+        function updateImage() {
+            if(request.readyState == 4){
+                var height   = parseFloat(request.responseText);
+                var heightPx = height * 10 * MM_TO_PIXEL;
+                water.setAttributeNS(null, "y", (WATER_TANK_Y + WATER_TANK_HEIGHT - heightPx));
+                water.setAttributeNS(null, "height", heightPx);
+
+                waterText.childNodes.item(0).nodeValue = height.toFixed(2) + " cm";
+            }
+        }
+    </script>
+</svg>
+
+

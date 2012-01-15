@@ -1,0 +1,141 @@
+\hypertarget{classSignalMessageInterface}{
+\section{SignalMessageInterface Class Reference}
+\label{classSignalMessageInterface}\index{SignalMessageInterface@{SignalMessageInterface}}
+}
+Inheritance diagram for SignalMessageInterface:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classSignalMessageInterface}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classSignalMessageInterface_ad30c68bf40274ca07f78f2a282ecd9c3}{
+virtual bool {\bfseries ObjectLoadSetup} (ConfigurationDataBase \&info, StreamInterface $\ast$err)}
+\label{classSignalMessageInterface_ad30c68bf40274ca07f78f2a282ecd9c3}
+
+\item 
+virtual bool \hyperlink{classSignalMessageInterface_ae9f04a9f88929ffc4b9761a41d13cec7}{ProcessMessage} (GCRTemplate$<$ MessageEnvelope $>$ envelope)
+\end{DoxyCompactItemize}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+GCRTemplate$<$ SignalInterface $>$ \hyperlink{classSignalMessageInterface_a9ae57567143070dd72e8789d7ba02ab1}{GetSignal} (const char $\ast$signalName)
+\item 
+void \hyperlink{classSignalMessageInterface_a9236f714b5eb1164637662c4eb607e98}{RemoveIllegalCharacters} (FString \&toBuild, FString \&signalName, const char $\ast$illegalCharacters)
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+ConfigurationDataBase \hyperlink{classSignalMessageInterface_a4444ccf4557431cbd475af82a8131d58}{signalDataBase}
+\end{DoxyCompactItemize}
+\subsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+GCRTemplate$<$ SignalInterface $>$ \hyperlink{classSignalMessageInterface_a5ac0c04a16d02b3b32e4657030fc37a7}{SMIGetSignal} (\hyperlink{classSignalMessageInterface}{SignalMessageInterface} \&smi, const char $\ast$signalName)
+\item 
+bool \hyperlink{classSignalMessageInterface_ace687065e8ad1504bbfa067e025560b9}{SMIProcessMessage} (\hyperlink{classSignalMessageInterface}{SignalMessageInterface} \&smi, GCRTemplate$<$ MessageEnvelope $>$ envelope)
+\end{DoxyCompactItemize}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classSignalMessageInterface_a9ae57567143070dd72e8789d7ba02ab1}{
+\index{SignalMessageInterface@{SignalMessageInterface}!GetSignal@{GetSignal}}
+\index{GetSignal@{GetSignal}!SignalMessageInterface@{SignalMessageInterface}}
+\subsubsection[{GetSignal}]{\setlength{\rightskip}{0pt plus 5cm}GCRTemplate$<$SignalInterface$>$ SignalMessageInterface::GetSignal (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{signalName}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline, protected\mbox{]}}}}
+\label{classSignalMessageInterface_a9ae57567143070dd72e8789d7ba02ab1}
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classSignalMessageInterface_a5ac0c04a16d02b3b32e4657030fc37a7}{SMIGetSignal} 
+\end{DoxySeeAlso}
+\hypertarget{classSignalMessageInterface_ae9f04a9f88929ffc4b9761a41d13cec7}{
+\index{SignalMessageInterface@{SignalMessageInterface}!ProcessMessage@{ProcessMessage}}
+\index{ProcessMessage@{ProcessMessage}!SignalMessageInterface@{SignalMessageInterface}}
+\subsubsection[{ProcessMessage}]{\setlength{\rightskip}{0pt plus 5cm}virtual bool SignalMessageInterface::ProcessMessage (
+\begin{DoxyParamCaption}
+\item[{GCRTemplate$<$ MessageEnvelope $>$}]{envelope}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline, virtual\mbox{]}}}}
+\label{classSignalMessageInterface_ae9f04a9f88929ffc4b9761a41d13cec7}
+This interface operates on Messages with code 0 The meaningful contents are AUTODETECT it first wipes the list of signal searches for GAMS with MessageHandlerInterface that reply to the question LISTSIGNALS with a user message ADDSIGNAL containing a number of GCNString objects (one for each signal) The object name should match the signal name.... The string should contain the name of the signal the type and size This is a processed version of the signalName Any non CDB valid character are replaced by \#XX wher XX is the hex Name = SIGNALNAME\par
+ DataType=TYPE\par
+ MaxSize=SIZE\par
+ Dimensions= \{ d1 d2 ... \} // opzionale (This is a CDB compatible format) TYPE is the string rapresentation of the BasicType SIZE is the max number of object that will be returned This information is then converted in CDB format and stored in the signalDataBase 
+
+Reimplemented in \hyperlink{classSignalArchiver_a09622d82d9e4a388bd26d75353a10d98}{SignalArchiver}.
+
+\hypertarget{classSignalMessageInterface_a9236f714b5eb1164637662c4eb607e98}{
+\index{SignalMessageInterface@{SignalMessageInterface}!RemoveIllegalCharacters@{RemoveIllegalCharacters}}
+\index{RemoveIllegalCharacters@{RemoveIllegalCharacters}!SignalMessageInterface@{SignalMessageInterface}}
+\subsubsection[{RemoveIllegalCharacters}]{\setlength{\rightskip}{0pt plus 5cm}void SignalMessageInterface::RemoveIllegalCharacters (
+\begin{DoxyParamCaption}
+\item[{FString \&}]{toBuild, }
+\item[{FString \&}]{signalName, }
+\item[{const char $\ast$}]{illegalCharacters}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline, protected\mbox{]}}}}
+\label{classSignalMessageInterface_a9236f714b5eb1164637662c4eb607e98}
+Removes illegal characters from signal names 
+\begin{DoxyParams}{Parameters}
+{\em toBuild} & an FString without the illegal characters \\
+\hline
+{\em signalName} & the original signal name \\
+\hline
+{\em illegalCharacters} & the characters to be removed \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Friends And Related Function Documentation}
+\hypertarget{classSignalMessageInterface_a5ac0c04a16d02b3b32e4657030fc37a7}{
+\index{SignalMessageInterface@{SignalMessageInterface}!SMIGetSignal@{SMIGetSignal}}
+\index{SMIGetSignal@{SMIGetSignal}!SignalMessageInterface@{SignalMessageInterface}}
+\subsubsection[{SMIGetSignal}]{\setlength{\rightskip}{0pt plus 5cm}GCRTemplate$<$SignalInterface$>$ SMIGetSignal (
+\begin{DoxyParamCaption}
+\item[{{\bf SignalMessageInterface} \&}]{smi, }
+\item[{const char $\ast$}]{signalName}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}friend\mbox{]}}}}
+\label{classSignalMessageInterface_a5ac0c04a16d02b3b32e4657030fc37a7}
+C function definitions retrieves from cache or from the collectors 
+\begin{DoxyParams}{Parameters}
+{\em smi} & the \hyperlink{classSignalMessageInterface}{SignalMessageInterface} object \\
+\hline
+{\em signalName} & the signal name as returned by the listing AUTODETECT method \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the signal data 
+\end{DoxyReturn}
+\hypertarget{classSignalMessageInterface_ace687065e8ad1504bbfa067e025560b9}{
+\index{SignalMessageInterface@{SignalMessageInterface}!SMIProcessMessage@{SMIProcessMessage}}
+\index{SMIProcessMessage@{SMIProcessMessage}!SignalMessageInterface@{SignalMessageInterface}}
+\subsubsection[{SMIProcessMessage}]{\setlength{\rightskip}{0pt plus 5cm}bool SMIProcessMessage (
+\begin{DoxyParamCaption}
+\item[{{\bf SignalMessageInterface} \&}]{smi, }
+\item[{GCRTemplate$<$ MessageEnvelope $>$}]{envelope}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}friend\mbox{]}}}}
+\label{classSignalMessageInterface_ace687065e8ad1504bbfa067e025560b9}
+Handles the message requests
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classSignalMessageInterface_ae9f04a9f88929ffc4b9761a41d13cec7}{SignalMessageInterface::ProcessMessage} 
+\end{DoxySeeAlso}
+
+
+\subsection{Member Data Documentation}
+\hypertarget{classSignalMessageInterface_a4444ccf4557431cbd475af82a8131d58}{
+\index{SignalMessageInterface@{SignalMessageInterface}!signalDataBase@{signalDataBase}}
+\index{signalDataBase@{signalDataBase}!SignalMessageInterface@{SignalMessageInterface}}
+\subsubsection[{signalDataBase}]{\setlength{\rightskip}{0pt plus 5cm}ConfigurationDataBase {\bf SignalMessageInterface::signalDataBase}\hspace{0.3cm}{\ttfamily  \mbox{[}protected\mbox{]}}}}
+\label{classSignalMessageInterface_a4444ccf4557431cbd475af82a8131d58}
+The database with the signals 
+
+The documentation for this class was generated from the following file:\begin{DoxyCompactItemize}
+\item 
+SignalMessageInterface.h\end{DoxyCompactItemize}

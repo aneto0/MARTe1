@@ -1,0 +1,170 @@
+//******************************************************************************
+//      $Log: MARTeService.cpp,v $
+//      Revision 1.1  2009/04/21 14:08:52  aneto
+//      MARTe startup as service support
+//
+//******************************************************************************
+
+
+#include "MARTeService.h"
+#include "File.h"
+#include "ConfigurationDataBase.h"
+#include "GCReferenceContainer.h"
+#include "MenuContainer.h"
+#include "GlobalObjectDataBase.h"
+#include "LoggerService.h"
+
+const char *cfgName = "MARTe-Startup.cfg";
+
+void SSStart(const char *name)
+{
+    GCRTemplate<Message> gcrtm(GCFT_Create);
+    gcrtm->Init(0,"START");
+
+    GCRTemplate<MessageEnvelope> gcrtme(GCFT_Create);
+
+    gcrtme->PrepareMessageEnvelope(gcrtm,name,MDRF_None,NULL);
+
+    MessageHandler::SendMessage(gcrtme);
+
+}
+
+void SSStop(const char *name)
+{
+    GCRTemplate<Message> gcrtm(GCFT_Create);
+    gcrtm->Init(0,"STOP");
+
+    GCRTemplate<MessageEnvelope> gcrtme(GCFT_Create);
+
+    gcrtme->PrepareMessageEnvelope(gcrtm,name,MDRF_None,NULL);
+
+    MessageHandler::SendMessage(gcrtme);
+
+}
+
+/** replace this with the main of the application */
+bool MARTeService::ServiceInit(){
+
+    File config;
+    if(!config.OpenRead(cfgName)){
+        printf("Failed opening file %s\n",cfgName);
+        return False;
+    }
+
+    FString err;
+    if (!cdb->ReadFromStream(config,&err)){
+        printf("Init: cdb.ReadFromStream failed: %s",err.Buffer());
+        return False;
+    }
+
+
+    return True;
+}
+
+/** replace this with the start service */
+bool MARTeService::ServiceStart(){
+    File config;
+
+    if(!config.OpenRead((char *)cfgName)){
+        CStaticAssertErrorCondition(FatalError, "InitGlobalContainer:: Failed opening file %s\n", cfgName);
+        return False;
+    }
+
+    // Bufferize cfg file - should solve slowness in RTAI
+    FString cfg_buffer;
+    cfg_buffer.SetSize(80000);
+    config.Seek(0);
+    config.GetToken(cfg_buffer,"");
+    config.Close();
+    cfg_buffer.Seek(0);
+
+    ConfigurationDataBase cdb;
+    cdb->ReadFromStream(cfg_buffer);
+
+    CDBExtended info(cdb);
+    
+    FString logAddress;
+    if(!info.ReadFString(logAddress,"LoggerAddress","localhost")){
+        CStaticAssertErrorCondition(Warning, "No LoggerAddress specified, using localhost as default");	
+    }
+    
+    int32 logPort;
+    if(!info.ReadInt32(logPort,"LoggerPort",32767)){
+        CStaticAssertErrorCondition(Warning, "No LoggerPort specified, using 32767 as default");    	
+    }
+
+    LSSetUserAssembleErrorMessageFunction(LSAssembleErrorMessage);
+    LSSetRemoteLogger(logAddress.Buffer(),logPort);
+    LSStartService();
+
+    CStaticAssertErrorCondition(Information, "InitGlobalContainer:: Loading MARTe with file %s \n", cfgName);
+
+    if(!GetGlobalObjectDataBase()->ObjectLoadSetup(cdb,NULL)){
+        CStaticAssertErrorCondition(FatalError, "InitGlobalContainer::GetGlobalObjectDataBase().ObjectLoadSetup(cdb,NULL) Failed\n");
+        return False;
+    }
+
+    CStaticAssertErrorCondition(Information, "InitGlobalContainer:: Successfully initialized MARTe\n");
+
+    GCRTemplate<Message> gcrtm(GCFT_Create);
+    gcrtm->Init(0 ,"START");
+    GCRTemplate<MessageEnvelope> gcrtme(GCFT_Create);
+
+    bool ret = True;
+    ret &= gcrtme->PrepareMessageEnvelope(gcrtm,"StateMachine");
+    ret &= MessageHandler::SendMessage(gcrtme);
+    if(!ret){
+        printf("StartMARTeActivities:  Failed to send START message to StateMachine\n");
+        CStaticAssertErrorCondition(FatalError, "StartMARTeActivities:  Failed to send START message to StateMachine\n");
+    }
+
+    return ret;
+}
+
+/** replace this with the stop service */
+bool MARTeService::ServiceStop(){
+    GCRTemplate<Message> gcrtm(GCFT_Create);
+    gcrtm->Init(0 ,"STOP");
+    GCRTemplate<MessageEnvelope> gcrtme(GCFT_Create);
+
+    bool ret = True;
+    ret &= gcrtme->PrepareMessageEnvelope(gcrtm,"StateMachine");
+    ret &= MessageHandler::SendMessage(gcrtme);
+    if(!ret){
+        printf("StartMARTeActivities:  Failed to send START message to StateMachine\n");
+        CStaticAssertErrorCondition(FatalError, "StartMARTeActivities:  Failed to send START message to StateMachine\n");
+    }
+
+    SleepSec(2.0);
+
+    return ret;
+}
+
+int main(int argc,char **argv){
+    FString serviceName;
+    serviceName = argv[0];
+    char *p = serviceName.BufferReference();
+
+    // find the end
+    int pos = serviceName.Size();
+    while (pos > 0){
+        if (p[pos] == '.') p[pos] = 0;
+        if ((p[pos] == '\\') || (p[pos] == '/')){
+            pos++;
+            break;
+        }
+        pos--;
+    }
+
+    MARTeService ms(p+pos,p+pos);
+
+#ifdef _LINUX
+if(argc > 1){
+    cfgName = argv[1];
+}   
+#endif
+    if (ms.Main(argc,argv)) return 0;
+
+    return -1;
+}
+

@@ -1,0 +1,129 @@
+\hypertarget{classFilter}{
+\section{Filter Class Reference}
+\label{classFilter}\index{Filter@{Filter}}
+}
+
+
+{\ttfamily \#include $<$Filter.h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classFilter_a502ee334d42eac3edbaf32b599f9c35e}{$\sim$Filter} ()
+\item 
+\hyperlink{classFilter_ad15994c30d497afd567a6445446a249e}{Filter} ()
+\item 
+bool \hyperlink{classFilter_a263b709bcb913eb32cbfd1fc16a2366e}{Init} (ConfigurationDataBase \&cdb)
+\item 
+void \hyperlink{classFilter_a1c94aa934f9c9af784ff08ea0318f66b}{Reset} (float input=0.0, float output=0.0)
+\item 
+float \hyperlink{classFilter_a2d6f2a0b780dc773c963b041606c99ab}{Process} (float input)
+\end{DoxyCompactItemize}
+\subsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+bool \hyperlink{classFilter_a228905a165c62822dc1f87333293ba2e}{FilterInit} (\hyperlink{classFilter}{Filter} \&f, ConfigurationDataBase \&cdb)
+\item 
+bool \hyperlink{classFilter_ab0da466039250753f8c6c878c4f4cdac}{FilterResize} (\hyperlink{classFilter}{Filter} \&f, int inputSize, int outputSize)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+implements a single input single output filter. Initialisation is performed via CDB 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classFilter_a502ee334d42eac3edbaf32b599f9c35e}{
+\index{Filter@{Filter}!$\sim$Filter@{$\sim$Filter}}
+\index{$\sim$Filter@{$\sim$Filter}!Filter@{Filter}}
+\subsubsection[{$\sim$Filter}]{\setlength{\rightskip}{0pt plus 5cm}Filter::$\sim$Filter (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classFilter_a502ee334d42eac3edbaf32b599f9c35e}
+\hypertarget{classFilter_ad15994c30d497afd567a6445446a249e}{
+\index{Filter@{Filter}!Filter@{Filter}}
+\index{Filter@{Filter}!Filter@{Filter}}
+\subsubsection[{Filter}]{\setlength{\rightskip}{0pt plus 5cm}Filter::Filter (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classFilter_ad15994c30d497afd567a6445446a249e}
+constructor 
+
+\subsection{Member Function Documentation}
+\hypertarget{classFilter_a263b709bcb913eb32cbfd1fc16a2366e}{
+\index{Filter@{Filter}!Init@{Init}}
+\index{Init@{Init}!Filter@{Filter}}
+\subsubsection[{Init}]{\setlength{\rightskip}{0pt plus 5cm}bool Filter::Init (
+\begin{DoxyParamCaption}
+\item[{ConfigurationDataBase \&}]{cdb}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classFilter_a263b709bcb913eb32cbfd1fc16a2366e}
+Numerator = \{a0 a1 a2....\} Denominator= \{b0 b1 ..... \}
+
+OR
+
+0 = \{a0 a1 a2....\} b0 assumed to be 1 1 = \{-\/b1 -\/b2..... \}
+
+OR
+
+Poles = \{p0 p1 ... \} =$>$ p0 p1 which means -\/-\/-\/-\/-\/-\/ $\ast$ -\/-\/-\/-\/-\/-\/ S + p0 S + p1
+
+Zeros = \{z0 z1 ... \} S + z0 S + z1 whic means -\/-\/-\/-\/-\/-\/ $\ast$ -\/-\/-\/-\/-\/-\/ z0 z1 SamplingTime = 1e-\/3
+
+Gain = g which multiplies the whole expression
+
+The conversion uses the following equation between S and Z uses 2 (1-\/Z$^\wedge$-\/1) S = -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/ T (1+Z$^\wedge$-\/1)
+
+The first two filter configuration are already expressed in z domain, The last one is expressed in s domain and the \hyperlink{classFilter}{Filter} class discretizes the transfer function using Tustin. \hypertarget{classFilter_a2d6f2a0b780dc773c963b041606c99ab}{
+\index{Filter@{Filter}!Process@{Process}}
+\index{Process@{Process}!Filter@{Filter}}
+\subsubsection[{Process}]{\setlength{\rightskip}{0pt plus 5cm}float Filter::Process (
+\begin{DoxyParamCaption}
+\item[{float}]{input}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classFilter_a2d6f2a0b780dc773c963b041606c99ab}
+\hypertarget{classFilter_a1c94aa934f9c9af784ff08ea0318f66b}{
+\index{Filter@{Filter}!Reset@{Reset}}
+\index{Reset@{Reset}!Filter@{Filter}}
+\subsubsection[{Reset}]{\setlength{\rightskip}{0pt plus 5cm}void Filter::Reset (
+\begin{DoxyParamCaption}
+\item[{float}]{input = {\ttfamily 0.0}, }
+\item[{float}]{output = {\ttfamily 0.0}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classFilter_a1c94aa934f9c9af784ff08ea0318f66b}
+
+
+\subsection{Friends And Related Function Documentation}
+\hypertarget{classFilter_a228905a165c62822dc1f87333293ba2e}{
+\index{Filter@{Filter}!FilterInit@{FilterInit}}
+\index{FilterInit@{FilterInit}!Filter@{Filter}}
+\subsubsection[{FilterInit}]{\setlength{\rightskip}{0pt plus 5cm}bool FilterInit (
+\begin{DoxyParamCaption}
+\item[{{\bf Filter} \&}]{f, }
+\item[{ConfigurationDataBase \&}]{cdb}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}friend\mbox{]}}}}
+\label{classFilter_a228905a165c62822dc1f87333293ba2e}
+\hypertarget{classFilter_ab0da466039250753f8c6c878c4f4cdac}{
+\index{Filter@{Filter}!FilterResize@{FilterResize}}
+\index{FilterResize@{FilterResize}!Filter@{Filter}}
+\subsubsection[{FilterResize}]{\setlength{\rightskip}{0pt plus 5cm}bool FilterResize (
+\begin{DoxyParamCaption}
+\item[{{\bf Filter} \&}]{f, }
+\item[{int}]{inputSize, }
+\item[{int}]{outputSize}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}friend\mbox{]}}}}
+\label{classFilter_ab0da466039250753f8c6c878c4f4cdac}
+
+
+The documentation for this class was generated from the following files:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{Filter_8h}{Filter.h}\item 
+Filter.cpp\end{DoxyCompactItemize}

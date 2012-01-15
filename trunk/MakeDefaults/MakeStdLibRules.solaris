@@ -1,0 +1,81 @@
+##############################################################
+#
+# Copyright 2011 EFDA | European Fusion Development Agreement
+#
+# Licensed under the EUPL, Version 1.1 or - as soon they 
+# will be approved by the European Commission - subsequent  
+# versions of the EUPL (the "Licence"); 
+# You may not use this work except in compliance with the 
+# Licence. 
+# You may obtain a copy of the Licence at: 
+#  
+# http://ec.europa.eu/idabc/eupl
+#
+# Unless required by applicable law or agreed to in 
+# writing, software distributed under the Licence is 
+# distributed on an "AS IS" basis, 
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
+# express or implied. 
+# See the Licence for the specific language governing 
+# permissions and limitations under the Licence. 
+#
+# $Id$
+#
+#############################################################
+
+solaris/%.o : %.cpp
+	$(COMPILER) -c $(CFLAGS) $(DEBUG) $(OPTIM)  $*.cpp -o solaris/$*.o
+#	$(COMPILER) -S $(CFLAGS) $*.cpp -o solaris/$*.s
+
+solaris/%.o : %.c
+	$(COMPILER) -c $(CFLAGS) $(DEBUG) $(OPTIM)  $*.c -o solaris/$*.o
+#	$(COMPILER) -S $(CFLAGS) $*.c -o solaris/$*.s
+
+solaris/%.a : $(OBJS)
+	touch $@
+	rm solaris/$*.a
+	ld -r $(OBJS) -o $@
+
+solaris/%.so : $(OBJS) solaris/%.o
+	gcc -shared -Wl $(LIBRARIES) -o $@ $(OBJS)  solaris/$*.o
+	touch solaris/lib$*.so
+	rm  solaris/lib$*.so
+	ln -fns $*.so solaris/lib$*.so
+
+
+solaris/%.exe : solaris/%.o 
+	touch solaris/$*.exe
+	echo cannot build executable solaris/$*.exe use solaris/$*.ex
+
+solaris/%.ex : solaris/%.o $(OBJS)
+	 gcc solaris/$*.o $(OBJS) $(LIBRARIES) -o solaris/$*.ex
+
+depends.solaris: dependsRaw.solaris 
+	sed -f $(MAKEDEFAULTDIR)/CreateSolarisDepends.sed dependsRaw.solaris >depends.solaris
+
+dependsRaw.solaris: 
+	$(COMPILER) $(CFLAGS) $(DEBUG) $(OPTIM) -MM -I. *.c* > dependsRaw.solaris
+	@mkdir -p temp
+	@mkdir -p solaris
+
+%.spb : 
+	$(MAKE) -C $* -f Makefile.$(TARGET)
+
+
+%.spc : 
+	$(MAKE) -C $* -f Makefile.$(TARGET) clean
+
+
+clean:  $(SUBPROJC)
+	rm -f depends*
+	rm -f $(TARGET)/*$(OBJEXT)
+	rm -f $(TARGET)/*$(DLLEXT)
+	rm -f $(TARGET)/*$(EXEEXT)
+	rm -f $(TARGET)/*$(LIBEXT)
+	rm -f $(TARGET)/*$(GAMEXT)
+	rm -f $(TARGET)/*$(DRVEXT)
+
+
+solaris/%.gam : solaris/%.o $(OBJS)
+
+	$(COMPILER) -shared -fPIC $(OBJS) $(LIBRARIES) solaris/$*.o -o $@

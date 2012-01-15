@@ -1,0 +1,95 @@
+\hypertarget{classSignalArchiver}{
+\section{SignalArchiver Class Reference}
+\label{classSignalArchiver}\index{SignalArchiver@{SignalArchiver}}
+}
+Inheritance diagram for SignalArchiver:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classSignalArchiver}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual \hyperlink{classSignalArchiver_a68e2febb702e5ef39599b2e4a7934169}{$\sim$SignalArchiver} ()
+\item 
+\hyperlink{classSignalArchiver_adf6593128ebb50107f6861096702cc35}{SignalArchiver} ()
+\item 
+virtual bool \hyperlink{classSignalArchiver_a149116390dd9f9e511c4704480a48352}{ProcessHttpMessage} (HttpStream \&hStream)
+\item 
+\hypertarget{classSignalArchiver_a6b33d4d213c862228a60140de0d72a30}{
+virtual bool {\bfseries ObjectLoadSetup} (ConfigurationDataBase \&info, StreamInterface $\ast$err)}
+\label{classSignalArchiver_a6b33d4d213c862228a60140de0d72a30}
+
+\item 
+virtual bool \hyperlink{classSignalArchiver_a09622d82d9e4a388bd26d75353a10d98}{ProcessMessage} (GCRTemplate$<$ MessageEnvelope $>$ envelope)
+\end{DoxyCompactItemize}
+\subsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{classSignalArchiver_ab48b650b85581a0ea28f252b1650bf8b}{SignalArchivingFn} (void $\ast$args)
+\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classSignalArchiver_a68e2febb702e5ef39599b2e4a7934169}{
+\index{SignalArchiver@{SignalArchiver}!$\sim$SignalArchiver@{$\sim$SignalArchiver}}
+\index{$\sim$SignalArchiver@{$\sim$SignalArchiver}!SignalArchiver@{SignalArchiver}}
+\subsubsection[{$\sim$SignalArchiver}]{\setlength{\rightskip}{0pt plus 5cm}virtual SignalArchiver::$\sim$SignalArchiver (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline, virtual\mbox{]}}}}
+\label{classSignalArchiver_a68e2febb702e5ef39599b2e4a7934169}
+\hypertarget{classSignalArchiver_adf6593128ebb50107f6861096702cc35}{
+\index{SignalArchiver@{SignalArchiver}!SignalArchiver@{SignalArchiver}}
+\index{SignalArchiver@{SignalArchiver}!SignalArchiver@{SignalArchiver}}
+\subsubsection[{SignalArchiver}]{\setlength{\rightskip}{0pt plus 5cm}SignalArchiver::SignalArchiver (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classSignalArchiver_adf6593128ebb50107f6861096702cc35}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classSignalArchiver_a149116390dd9f9e511c4704480a48352}{
+\index{SignalArchiver@{SignalArchiver}!ProcessHttpMessage@{ProcessHttpMessage}}
+\index{ProcessHttpMessage@{ProcessHttpMessage}!SignalArchiver@{SignalArchiver}}
+\subsubsection[{ProcessHttpMessage}]{\setlength{\rightskip}{0pt plus 5cm}virtual bool SignalArchiver::ProcessHttpMessage (
+\begin{DoxyParamCaption}
+\item[{HttpStream \&}]{hStream}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline, virtual\mbox{]}}}}
+\label{classSignalArchiver_a149116390dd9f9e511c4704480a48352}
+The HTTP entry point (it is delegated to an HttpDirectoryResource \hypertarget{classSignalArchiver_a09622d82d9e4a388bd26d75353a10d98}{
+\index{SignalArchiver@{SignalArchiver}!ProcessMessage@{ProcessMessage}}
+\index{ProcessMessage@{ProcessMessage}!SignalArchiver@{SignalArchiver}}
+\subsubsection[{ProcessMessage}]{\setlength{\rightskip}{0pt plus 5cm}virtual bool SignalArchiver::ProcessMessage (
+\begin{DoxyParamCaption}
+\item[{GCRTemplate$<$ MessageEnvelope $>$}]{envelope}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline, virtual\mbox{]}}}}
+\label{classSignalArchiver_a09622d82d9e4a388bd26d75353a10d98}
+Processes the incoming message and checks for the content. If the code is relativeDirectoryPathMessageCode then it will set the relativeDirectoryPath = to the message content If the content is STORESIGNALS, data storage is triggered, otherwise \hyperlink{classSignalMessageInterface_ae9f04a9f88929ffc4b9761a41d13cec7}{SignalMessageInterface::ProcessMessage} is called 
+
+Reimplemented from \hyperlink{classSignalMessageInterface_ae9f04a9f88929ffc4b9761a41d13cec7}{SignalMessageInterface}.
+
+
+
+\subsection{Friends And Related Function Documentation}
+\hypertarget{classSignalArchiver_ab48b650b85581a0ea28f252b1650bf8b}{
+\index{SignalArchiver@{SignalArchiver}!SignalArchivingFn@{SignalArchivingFn}}
+\index{SignalArchivingFn@{SignalArchivingFn}!SignalArchiver@{SignalArchiver}}
+\subsubsection[{SignalArchivingFn}]{\setlength{\rightskip}{0pt plus 5cm}void SignalArchivingFn (
+\begin{DoxyParamCaption}
+\item[{void $\ast$}]{args}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}friend\mbox{]}}}}
+\label{classSignalArchiver_ab48b650b85581a0ea28f252b1650bf8b}
+Thread which stores the signals, to avoid blocking the messaging mechanism 
+
+The documentation for this class was generated from the following files:\begin{DoxyCompactItemize}
+\item 
+SignalArchiver.h\item 
+SignalArchiver.cpp\end{DoxyCompactItemize}

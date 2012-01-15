@@ -1,0 +1,35 @@
+\chapter{Comments}
+
+TODO \\
+
+\begin{itemize}
+ \item HTTP to XML redesing ( HTTP Iterface must be redesigned for generalization )
+ \item configuration database must continue support to cfg files but must be go to xml (supports different configuration file types)
+ \item streaming to MDSplus
+ \item is a good choice to adopt RTTi instead of the GCFilippo support?
+ \item group all stuff toghetr with a choerent directory hierical (no levels) with stronger architectures and os support
+ \item When XML is done, enable graphical configuration
+ \item Switching to exception catching? (try...catch)
+ \item code inlining e del codice scritto negli .h ok le performance ma quanto codice ce? quanto codice duplicate?
+ \item cleanup the code and file hierical redesign (MARTe, MARTe/MarteSupportLib)
+\end{itemize}
+
+Direi che l'architettura è davvero eccezionale.
+Or ora sto dedicando del tempo per:
+-eventuali altri confronti con altri prodotti commerciali/open source;
+-approfondimento di altri linguaggi di programmazione a msg, vedi Smalltalk e ObjC;
+in questo modo posso scrivere vantaggi e svantaggi della BaseLib rispetto a questi.
+
+Dal mio punto di vista sarebbe molto interessante poter fare un refeactoring
+della BaseLib per poterla esporre anche come prodotto open source.
+Vorrei riorganizzarla:
+- definendo con più chiarezza le interfaccie (molte sono classi astratte), in modo
+da SOTTOLINEARE quello che l'aspetto component del sistema;
+- far discendere tutte le classi da Object togliendo eventuali loop di inheritance
+(che ora come ora non ci sono perchè tu non derivi tutto da Object, ma potrebbero nascere),
+in questo modo, assumendo che Object sappia mandare e ricevere messaggi, tutti gli
+oggetti possono mandare e ricevere messaggi (come in ObjC) perchè sono figli di Object,
+il codice non sarebbe neanche duplicato.
+- riorganizzazione delle directory dei sorgenti.
+
+-se gli oggetti avessero anche una completa reflection combinando un db online ed uno offline potresti conoscere tutti i metodi di ogni oggetto e quindi avere una shell tipo VxWorks di debug non solo in kernel

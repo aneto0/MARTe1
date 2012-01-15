@@ -1,0 +1,454 @@
+linux/BasicTypesRegistration.o: BasicTypesRegistration.cpp \
+ ../Level1/ClassStructure.h ../Level1/ClassStructureEntry.h \
+ ../Level0/GenDefs.h ../Level1/BasicTypes.h ../Level0/System.h \
+ ../Level0/SystemMSC.h ../Level0/SystemLinux.h ../Level0/GenDefs.h \
+ ../Level0/SystemVX5100.h ../Level0/SystemVX5500.h \
+ ../Level0/SystemV6X5100.h ../Level0/SystemV6X5500.h \
+ ../Level0/SystemVX68k.h ../Level0/SystemRTAI.h ../Level0/SystemSolaris.h \
+ ../Level0/SystemMacOSX.h ../Level0/Memory.h ../Level0/System.h \
+ ../Level0/BString.h ../Level0/ErrorManagement.h \
+ ../Level1/ObjectRegistryItem.h ../Level0/LinkedListable.h \
+ ../Level0/Iterators.h ../Level1/ErrorSystemInstructions.h \
+ ../Level0/LinkedListHolder.h ../Level0/LinkedListable.h \
+ ../Level0/FastPollingMutexSem.h ../Level0/Atomic.h ../Level0/Sleep.h \
+ ../Level0/FastMath.h ../Level0/HRT.h ../Level0/Processor.h \
+ ../Level0/TimeoutType.h ../Level0/Threads.h ../Level0/ErrorManagement.h \
+ ../Level0/ExceptionHandlerDefinitions.h \
+ ../Level0/ThreadInitialisationInterface.h ../Level0/EventSem.h \
+ ../Level0/SemCore.h ../Level0/ProcessorType.h \
+ ../Level0/ThreadsDatabase.h ../Level1/ErrorSystemInstructionItem.h \
+ ../Level1/ClassStructure.h ../Level0/LoadableLibrary.h \
+ ../Level1/ObjectMacros.h ../Level1/BasicTypes.h
+linux/CDBCInterface.o: CDBCInterface.cpp CDBCInterface.h \
+ ../Level1/ObjectRegistryDataBase.h ../Level0/StreamInterface.h \
+ ../Level0/System.h ../Level0/SystemMSC.h ../Level0/SystemLinux.h \
+ ../Level0/GenDefs.h ../Level0/SystemVX5100.h ../Level0/SystemVX5500.h \
+ ../Level0/SystemV6X5100.h ../Level0/SystemV6X5500.h \
+ ../Level0/SystemVX68k.h ../Level0/SystemRTAI.h ../Level0/SystemSolaris.h \
+ ../Level0/SystemMacOSX.h ../Level0/Memory.h ../Level0/TimeoutType.h \
+ ../Level0/HRT.h ../Level0/Processor.h ../Level0/ErrorManagement.h CDB.h \
+ ../Level0/System.h ../Level0/Iterators.h ../Level2/FString.h \
+ ../Level0/BString.h ../Level2/Streamable.h ../Level0/CStream.h \
+ ../Level2/CStreamBuffering.h ../Level1/Object.h \
+ ../Level1/ObjectRegistryItem.h ../Level0/LinkedListable.h \
+ ../Level0/Iterators.h ../Level1/ErrorSystemInstructions.h \
+ ../Level0/GenDefs.h ../Level0/LinkedListHolder.h \
+ ../Level0/LinkedListable.h ../Level0/FastPollingMutexSem.h \
+ ../Level0/Atomic.h ../Level0/Sleep.h ../Level0/FastMath.h \
+ ../Level0/Threads.h ../Level0/ErrorManagement.h \
+ ../Level0/ExceptionHandlerDefinitions.h \
+ ../Level0/ThreadInitialisationInterface.h ../Level0/EventSem.h \
+ ../Level0/SemCore.h ../Level0/ProcessorType.h \
+ ../Level0/ThreadsDatabase.h ../Level1/ErrorSystemInstructionItem.h \
+ ../Level1/ClassStructure.h ../Level1/ClassStructureEntry.h \
+ ../Level1/BasicTypes.h ../Level0/LoadableLibrary.h \
+ ../Level1/ObjectMacros.h ../Level1/StreamAttributes.h CDBNodeRef.h \
+ CDBNode.h ../Level0/Atomic.h ../Level1/CDBTypes.h ../Level1/CDBVirtual.h \
+ ../Level1/CDBTypes.h ../Level1/GCNamedObject.h \
+ ../Level1/GarbageCollectable.h ../Level1/Object.h \
+ ../Level2/CDBExtended.h ../Level1/ConfigurationDataBase.h \
+ ../Level1/CDBVirtual.h ../Level1/GCRTemplate.h ../Level1/GCReference.h \
+ ../Level1/ObjectRegistryDataBase.h ../Level1/CDBNull.h \
+ ../Level2/CDBDataTypes.h ../Level2/FString.h ../Level2/SXMemory.h \
+ ../Level2/CDBDataTypes.h LexicalAnalyzer.h ../Level0/StaticQueueHolder.h \
+ ../Level0/StaticStackHolder.h ../Level0/StaticListHolder.h \
+ ../Level0/FastPollingMutexSem.h
+linux/CDB.o: CDB.cpp ../Level1/CDBVirtual.h ../Level0/System.h \
+ ../Level0/SystemMSC.h ../Level0/SystemLinux.h ../Level0/GenDefs.h \
+ ../Level0/SystemVX5100.h ../Level0/SystemVX5500.h \
+ ../Level0/SystemV6X5100.h ../Level0/SystemV6X5500.h \
+ ../Level0/SystemVX68k.h ../Level0/SystemRTAI.h ../Level0/SystemSolaris.h \
+ ../Level0/SystemMacOSX.h ../Level0/Memory.h ../Level0/System.h \
+ ../Level0/BString.h ../Level1/CDBTypes.h ../Level1/BasicTypes.h \
+ ../Level0/GenDefs.h ../Level0/ErrorManagement.h ../Level0/Iterators.h \
+ ../Level1/GCNamedObject.h ../Level1/GarbageCollectable.h \
+ ../Level1/Object.h ../Level1/ObjectRegistryItem.h \
+ ../Level0/LinkedListable.h ../Level0/Iterators.h \
+ ../Level1/ErrorSystemInstructions.h ../Level0/LinkedListHolder.h \
+ ../Level0/LinkedListable.h ../Level0/FastPollingMutexSem.h \
+ ../Level0/Atomic.h ../Level0/Sleep.h ../Level0/FastMath.h \
+ ../Level0/HRT.h ../Level0/Processor.h ../Level0/TimeoutType.h \
+ ../Level0/Threads.h ../Level0/ErrorManagement.h \
+ ../Level0/ExceptionHandlerDefinitions.h \
+ ../Level0/ThreadInitialisationInterface.h ../Level0/EventSem.h \
+ ../Level0/SemCore.h ../Level0/ProcessorType.h \
+ ../Level0/ThreadsDatabase.h ../Level1/ErrorSystemInstructionItem.h \
+ ../Level1/ClassStructure.h ../Level1/ClassStructureEntry.h \
+ ../Level0/LoadableLibrary.h ../Level0/StreamInterface.h \
+ ../Level1/ObjectMacros.h CDB.h ../Level2/FString.h \
+ ../Level2/Streamable.h ../Level0/CStream.h ../Level2/CStreamBuffering.h \
+ ../Level1/Object.h ../Level1/StreamAttributes.h CDBNodeRef.h CDBNode.h \
+ ../Level0/Atomic.h ../Level1/CDBTypes.h ../Level2/CDBExtended.h \
+ ../Level1/ConfigurationDataBase.h ../Level1/CDBVirtual.h \
+ ../Level1/GCRTemplate.h ../Level1/GCReference.h \
+ ../Level1/ObjectRegistryDataBase.h ../Level1/CDBNull.h \
+ ../Level2/CDBDataTypes.h ../Level2/FString.h CDBCore.h CDBGroupNode.h \
+ CDBLinkNode.h CDBStringDataNode.h ../Level0/MutexSem.h \
+ ../Level1/ObjectRegistryDataBase.h
+linux/CDBGroupNode.o: CDBGroupNode.cpp CDB.h ../Level0/System.h \
+ ../Level0/SystemMSC.h ../Level0/SystemLinux.h ../Level0/GenDefs.h \
+ ../Level0/SystemVX5100.h ../Level0/SystemVX5500.h \
+ ../Level0/SystemV6X5100.h ../Level0/SystemV6X5500.h \
+ ../Level0/SystemVX68k.h ../Level0/SystemRTAI.h ../Level0/SystemSolaris.h \
+ ../Level0/SystemMacOSX.h ../Level0/Memory.h ../Level0/System.h \
+ ../Level0/Iterators.h ../Level2/FString.h ../Level0/BString.h \
+ ../Level2/Streamable.h ../Level0/CStream.h ../Level2/CStreamBuffering.h \
+ ../Level0/StreamInterface.h ../Level0/TimeoutType.h ../Level0/HRT.h \
+ ../Level0/Processor.h ../Level1/Object.h ../Level1/ObjectRegistryItem.h \
+ ../Level0/LinkedListable.h ../Level0/Iterators.h \
+ ../Level1/ErrorSystemInstructions.h ../Level0/GenDefs.h \
+ ../Level0/LinkedListHolder.h ../Level0/LinkedListable.h \
+ ../Level0/FastPollingMutexSem.h ../Level0/Atomic.h ../Level0/Sleep.h \
+ ../Level0/FastMath.h ../Level0/Threads.h ../Level0/ErrorManagement.h \
+ ../Level0/ExceptionHandlerDefinitions.h \
+ ../Level0/ThreadInitialisationInterface.h ../Level0/EventSem.h \
+ ../Level0/SemCore.h ../Level0/ProcessorType.h \
+ ../Level0/ThreadsDatabase.h ../Level1/ErrorSystemInstructionItem.h \
+ ../Level1/ClassStructure.h ../Level1/ClassStructureEntry.h \
+ ../Level1/BasicTypes.h ../Level0/ErrorManagement.h \
+ ../Level0/LoadableLibrary.h ../Level1/ObjectMacros.h \
+ ../Level1/StreamAttributes.h CDBNodeRef.h CDBNode.h ../Level0/Atomic.h \
+ ../Level1/CDBTypes.h ../Level1/CDBVirtual.h ../Level1/CDBTypes.h \
+ ../Level1/GCNamedObject.h ../Level1/GarbageCollectable.h \
+ ../Level1/Object.h ../Level2/CDBExtended.h \
+ ../Level1/ConfigurationDataBase.h ../Level1/CDBVirtual.h \
+ ../Level1/GCRTemplate.h ../Level1/GCReference.h \
+ ../Level1/ObjectRegistryDataBase.h ../Level1/CDBNull.h \
+ ../Level2/CDBDataTypes.h ../Level2/FString.h CDBGroupNode.h \
+ CDBLinkNode.h CDBStringDataNode.h ../Level1/ObjectRegistryDataBase.h \
+ CDBObjectNode.h
+linux/CDBLinkNode.o: CDBLinkNode.cpp CDBLinkNode.h ../Level2/FString.h \
+ ../Level0/BString.h ../Level0/System.h ../Level0/SystemMSC.h \
+ ../Level0/SystemLinux.h ../Level0/GenDefs.h ../Level0/SystemVX5100.h \
+ ../Level0/SystemVX5500.h ../Level0/SystemV6X5100.h \
+ ../Level0/SystemV6X5500.h ../Level0/SystemVX68k.h ../Level0/SystemRTAI.h \
+ ../Level0/SystemSolaris.h ../Level0/SystemMacOSX.h ../Level0/Memory.h \
+ ../Level2/Streamable.h ../Level0/System.h ../Level0/CStream.h \
+ ../Level2/CStreamBuffering.h ../Level0/StreamInterface.h \
+ ../Level0/TimeoutType.h ../Level0/HRT.h ../Level0/Processor.h \
+ ../Level1/Object.h ../Level1/ObjectRegistryItem.h \
+ ../Level0/LinkedListable.h ../Level0/Iterators.h \
+ ../Level1/ErrorSystemInstructions.h ../Level0/GenDefs.h \
+ ../Level0/LinkedListHolder.h ../Level0/LinkedListable.h \
+ ../Level0/FastPollingMutexSem.h ../Level0/Atomic.h ../Level0/Sleep.h \
+ ../Level0/FastMath.h ../Level0/Threads.h ../Level0/ErrorManagement.h \
+ ../Level0/ExceptionHandlerDefinitions.h \
+ ../Level0/ThreadInitialisationInterface.h ../Level0/EventSem.h \
+ ../Level0/SemCore.h ../Level0/ProcessorType.h \
+ ../Level0/ThreadsDatabase.h ../Level1/ErrorSystemInstructionItem.h \
+ ../Level1/ClassStructure.h ../Level1/ClassStructureEntry.h \
+ ../Level1/BasicTypes.h ../Level0/ErrorManagement.h \
+ ../Level0/LoadableLibrary.h ../Level1/ObjectMacros.h \
+ ../Level1/StreamAttributes.h CDBStringDataNode.h CDBNode.h \
+ ../Level0/Atomic.h ../Level1/CDBTypes.h ../Level1/CDBVirtual.h \
+ ../Level1/CDBTypes.h ../Level0/Iterators.h ../Level1/GCNamedObject.h \
+ ../Level1/GarbageCollectable.h ../Level1/Object.h CDBNodeRef.h
+linux/CDBNode.o: CDBNode.cpp CDBNode.h ../Level2/FString.h ../Level0/BString.h \
+ ../Level0/System.h ../Level0/SystemMSC.h ../Level0/SystemLinux.h \
+ ../Level0/GenDefs.h ../Level0/SystemVX5100.h ../Level0/SystemVX5500.h \
+ ../Level0/SystemV6X5100.h ../Level0/SystemV6X5500.h \
+ ../Level0/SystemVX68k.h ../Level0/SystemRTAI.h ../Level0/SystemSolaris.h \
+ ../Level0/SystemMacOSX.h ../Level0/Memory.h ../Level2/Streamable.h \
+ ../Level0/System.h ../Level0/CStream.h ../Level2/CStreamBuffering.h \
+ ../Level0/StreamInterface.h ../Level0/TimeoutType.h ../Level0/HRT.h \
+ ../Level0/Processor.h ../Level1/Object.h ../Level1/ObjectRegistryItem.h \
+ ../Level0/LinkedListable.h ../Level0/Iterators.h \
+ ../Level1/ErrorSystemInstructions.h ../Level0/GenDefs.h \
+ ../Level0/LinkedListHolder.h ../Level0/LinkedListable.h \
+ ../Level0/FastPollingMutexSem.h ../Level0/Atomic.h ../Level0/Sleep.h \
+ ../Level0/FastMath.h ../Level0/Threads.h ../Level0/ErrorManagement.h \
+ ../Level0/ExceptionHandlerDefinitions.h \
+ ../Level0/ThreadInitialisationInterface.h ../Level0/EventSem.h \
+ ../Level0/SemCore.h ../Level0/ProcessorType.h \
+ ../Level0/ThreadsDatabase.h ../Level1/ErrorSystemInstructionItem.h \
+ ../Level1/ClassStructure.h ../Level1/ClassStructureEntry.h \
+ ../Level1/BasicTypes.h ../Level0/ErrorManagement.h \
+ ../Level0/LoadableLibrary.h ../Level1/ObjectMacros.h \
+ ../Level1/StreamAttributes.h ../Level0/Atomic.h ../Level1/CDBTypes.h \
+ ../Level1/CDBVirtual.h ../Level1/CDBTypes.h ../Level0/Iterators.h \
+ ../Level1/GCNamedObject.h ../Level1/GarbageCollectable.h \
+ ../Level1/Object.h CDB.h CDBNodeRef.h ../Level2/CDBExtended.h \
+ ../Level1/ConfigurationDataBase.h ../Level1/CDBVirtual.h \
+ ../Level1/GCRTemplate.h ../Level1/GCReference.h \
+ ../Level1/ObjectRegistryDataBase.h ../Level1/CDBNull.h \
+ ../Level2/CDBDataTypes.h ../Level2/FString.h LexicalAnalyzer.h \
+ ../Level0/StaticQueueHolder.h ../Level0/StaticStackHolder.h \
+ ../Level0/StaticListHolder.h ../Level0/FastPollingMutexSem.h
+linux/CDBNodeRef.o: CDBNodeRef.cpp CDBNodeRef.h CDBNode.h ../Level2/FString.h \
+ ../Level0/BString.h ../Level0/System.h ../Level0/SystemMSC.h \
+ ../Level0/SystemLinux.h ../Level0/GenDefs.h ../Level0/SystemVX5100.h \
+ ../Level0/SystemVX5500.h ../Level0/SystemV6X5100.h \
+ ../Level0/SystemV6X5500.h ../Level0/SystemVX68k.h ../Level0/SystemRTAI.h \
+ ../Level0/SystemSolaris.h ../Level0/SystemMacOSX.h ../Level0/Memory.h \
+ ../Level2/Streamable.h ../Level0/System.h ../Level0/CStream.h \
+ ../Level2/CStreamBuffering.h ../Level0/StreamInterface.h \
+ ../Level0/TimeoutType.h ../Level0/HRT.h ../Level0/Processor.h \
+ ../Level1/Object.h ../Level1/ObjectRegistryItem.h \
+ ../Level0/LinkedListable.h ../Level0/Iterators.h \
+ ../Level1/ErrorSystemInstructions.h ../Level0/GenDefs.h \
+ ../Level0/LinkedListHolder.h ../Level0/LinkedListable.h \
+ ../Level0/FastPollingMutexSem.h ../Level0/Atomic.h ../Level0/Sleep.h \
+ ../Level0/FastMath.h ../Level0/Threads.h ../Level0/ErrorManagement.h \
+ ../Level0/ExceptionHandlerDefinitions.h \
+ ../Level0/ThreadInitialisationInterface.h ../Level0/EventSem.h \
+ ../Level0/SemCore.h ../Level0/ProcessorType.h \
+ ../Level0/ThreadsDatabase.h ../Level1/ErrorSystemInstructionItem.h \
+ ../Level1/ClassStructure.h ../Level1/ClassStructureEntry.h \
+ ../Level1/BasicTypes.h ../Level0/ErrorManagement.h \
+ ../Level0/LoadableLibrary.h ../Level1/ObjectMacros.h \
+ ../Level1/StreamAttributes.h ../Level0/Atomic.h ../Level1/CDBTypes.h \
+ ../Level1/CDBVirtual.h ../Level1/CDBTypes.h ../Level0/Iterators.h \
+ ../Level1/GCNamedObject.h ../Level1/GarbageCollectable.h \
+ ../Level1/Object.h CDBGroupNode.h CDBLinkNode.h CDBStringDataNode.h
+linux/CDBObjectNode.o: CDBObjectNode.cpp CDB.h ../Level0/System.h \
+ ../Level0/SystemMSC.h ../Level0/SystemLinux.h ../Level0/GenDefs.h \
+ ../Level0/SystemVX5100.h ../Level0/SystemVX5500.h \
+ ../Level0/SystemV6X5100.h ../Level0/SystemV6X5500.h \
+ ../Level0/SystemVX68k.h ../Level0/SystemRTAI.h ../Level0/SystemSolaris.h \
+ ../Level0/SystemMacOSX.h ../Level0/Memory.h ../Level0/System.h \
+ ../Level0/Iterators.h ../Level2/FString.h ../Level0/BString.h \
+ ../Level2/Streamable.h ../Level0/CStream.h ../Level2/CStreamBuffering.h \
+ ../Level0/StreamInterface.h ../Level0/TimeoutType.h ../Level0/HRT.h \
+ ../Level0/Processor.h ../Level1/Object.h ../Level1/ObjectRegistryItem.h \
+ ../Level0/LinkedListable.h ../Level0/Iterators.h \
+ ../Level1/ErrorSystemInstructions.h ../Level0/GenDefs.h \
+ ../Level0/LinkedListHolder.h ../Level0/LinkedListable.h \
+ ../Level0/FastPollingMutexSem.h ../Level0/Atomic.h ../Level0/Sleep.h \
+ ../Level0/FastMath.h ../Level0/Threads.h ../Level0/ErrorManagement.h \
+ ../Level0/ExceptionHandlerDefinitions.h \
+ ../Level0/ThreadInitialisationInterface.h ../Level0/EventSem.h \
+ ../Level0/SemCore.h ../Level0/ProcessorType.h \
+ ../Level0/ThreadsDatabase.h ../Level1/ErrorSystemInstructionItem.h \
+ ../Level1/ClassStructure.h ../Level1/ClassStructureEntry.h \
+ ../Level1/BasicTypes.h ../Level0/ErrorManagement.h \
+ ../Level0/LoadableLibrary.h ../Level1/ObjectMacros.h \
+ ../Level1/StreamAttributes.h CDBNodeRef.h CDBNode.h ../Level0/Atomic.h \
+ ../Level1/CDBTypes.h ../Level1/CDBVirtual.h ../Level1/CDBTypes.h \
+ ../Level1/GCNamedObject.h ../Level1/GarbageCollectable.h \
+ ../Level1/Object.h ../Level2/CDBExtended.h \
+ ../Level1/ConfigurationDataBase.h ../Level1/CDBVirtual.h \
+ ../Level1/GCRTemplate.h ../Level1/GCReference.h \
+ ../Level1/ObjectRegistryDataBase.h ../Level1/CDBNull.h \
+ ../Level2/CDBDataTypes.h ../Level2/FString.h CDBObjectNode.h \
+ CDBGroupNode.h CDBLinkNode.h CDBStringDataNode.h \
+ ../Level1/ObjectRegistryDataBase.h
+linux/CDBOS.o: CDBOS.cpp ../Level1/CDBVirtual.h ../Level0/System.h \
+ ../Level0/SystemMSC.h ../Level0/SystemLinux.h ../Level0/GenDefs.h \
+ ../Level0/SystemVX5100.h ../Level0/SystemVX5500.h \
+ ../Level0/SystemV6X5100.h ../Level0/SystemV6X5500.h \
+ ../Level0/SystemVX68k.h ../Level0/SystemRTAI.h ../Level0/SystemSolaris.h \
+ ../Level0/SystemMacOSX.h ../Level0/Memory.h ../Level0/System.h \
+ ../Level0/BString.h ../Level1/CDBTypes.h ../Level1/BasicTypes.h \
+ ../Level0/GenDefs.h ../Level0/ErrorManagement.h ../Level0/Iterators.h \
+ ../Level1/GCNamedObject.h ../Level1/GarbageCollectable.h \
+ ../Level1/Object.h ../Level1/ObjectRegistryItem.h \
+ ../Level0/LinkedListable.h ../Level0/Iterators.h \
+ ../Level1/ErrorSystemInstructions.h ../Level0/LinkedListHolder.h \
+ ../Level0/LinkedListable.h ../Level0/FastPollingMutexSem.h \
+ ../Level0/Atomic.h ../Level0/Sleep.h ../Level0/FastMath.h \
+ ../Level0/HRT.h ../Level0/Processor.h ../Level0/TimeoutType.h \
+ ../Level0/Threads.h ../Level0/ErrorManagement.h \
+ ../Level0/ExceptionHandlerDefinitions.h \
+ ../Level0/ThreadInitialisationInterface.h ../Level0/EventSem.h \
+ ../Level0/SemCore.h ../Level0/ProcessorType.h \
+ ../Level0/ThreadsDatabase.h ../Level1/ErrorSystemInstructionItem.h \
+ ../Level1/ClassStructure.h ../Level1/ClassStructureEntry.h \
+ ../Level0/LoadableLibrary.h ../Level0/StreamInterface.h \
+ ../Level1/ObjectMacros.h CDBOS.h ../Level1/GCRTemplate.h \
+ ../Level1/GCReference.h ../Level0/Atomic.h \
+ ../Level1/ObjectRegistryDataBase.h CDBOSStream.h \
+ ../Level1/GCNamedObject.h ../Level2/Streamable.h ../Level0/CStream.h \
+ ../Level2/CStreamBuffering.h ../Level1/Object.h \
+ ../Level1/StreamAttributes.h ../Level1/BasicTypes.h SegmentedName.h \
+ ../Level0/MutexSem.h
+linux/CDBStringDataNode.o: CDBStringDataNode.cpp CDBStringDataNode.h CDBNode.h \
+ ../Level2/FString.h ../Level0/BString.h ../Level0/System.h \
+ ../Level0/SystemMSC.h ../Level0/SystemLinux.h ../Level0/GenDefs.h \
+ ../Level0/SystemVX5100.h ../Level0/SystemVX5500.h \
+ ../Level0/SystemV6X5100.h ../Level0/SystemV6X5500.h \
+ ../Level0/SystemVX68k.h ../Level0/SystemRTAI.h ../Level0/SystemSolaris.h \
+ ../Level0/SystemMacOSX.h ../Level0/Memory.h ../Level2/Streamable.h \
+ ../Level0/System.h ../Level0/CStream.h ../Level2/CStreamBuffering.h \
+ ../Level0/StreamInterface.h ../Level0/TimeoutType.h ../Level0/HRT.h \
+ ../Level0/Processor.h ../Level1/Object.h ../Level1/ObjectRegistryItem.h \
+ ../Level0/LinkedListable.h ../Level0/Iterators.h \
+ ../Level1/ErrorSystemInstructions.h ../Level0/GenDefs.h \
+ ../Level0/LinkedListHolder.h ../Level0/LinkedListable.h \
+ ../Level0/FastPollingMutexSem.h ../Level0/Atomic.h ../Level0/Sleep.h \
+ ../Level0/FastMath.h ../Level0/Threads.h ../Level0/ErrorManagement.h \
+ ../Level0/ExceptionHandlerDefinitions.h \
+ ../Level0/ThreadInitialisationInterface.h ../Level0/EventSem.h \
+ ../Level0/SemCore.h ../Level0/ProcessorType.h \
+ ../Level0/ThreadsDatabase.h ../Level1/ErrorSystemInstructionItem.h \
+ ../Level1/ClassStructure.h ../Level1/ClassStructureEntry.h \
+ ../Level1/BasicTypes.h ../Level0/ErrorManagement.h \
+ ../Level0/LoadableLibrary.h ../Level1/ObjectMacros.h \
+ ../Level1/StreamAttributes.h ../Level0/Atomic.h ../Level1/CDBTypes.h \
+ ../Level1/CDBVirtual.h ../Level1/CDBTypes.h ../Level0/Iterators.h \
+ ../Level1/GCNamedObject.h ../Level1/GarbageCollectable.h \
+ ../Level1/Object.h
+linux/EAFile.o: EAFile.cpp ../Level2/File.h ../Level0/System.h \
+ ../Level0/SystemMSC.h ../Level0/SystemLinux.h ../Level0/GenDefs.h \
+ ../Level0/SystemVX5100.h ../Level0/SystemVX5500.h \
+ ../Level0/SystemV6X5100.h ../Level0/SystemV6X5500.h \
+ ../Level0/SystemVX68k.h ../Level0/SystemRTAI.h ../Level0/SystemSolaris.h \
+ ../Level0/SystemMacOSX.h ../Level0/Memory.h ../Level0/System.h \
+ ../Level2/Streamable.h ../Level0/CStream.h ../Level2/CStreamBuffering.h \
+ ../Level0/StreamInterface.h ../Level0/TimeoutType.h ../Level0/HRT.h \
+ ../Level0/Processor.h ../Level1/Object.h ../Level1/ObjectRegistryItem.h \
+ ../Level0/LinkedListable.h ../Level0/Iterators.h \
+ ../Level1/ErrorSystemInstructions.h ../Level0/GenDefs.h \
+ ../Level0/LinkedListHolder.h ../Level0/LinkedListable.h \
+ ../Level0/FastPollingMutexSem.h ../Level0/Atomic.h ../Level0/Sleep.h \
+ ../Level0/FastMath.h ../Level0/Threads.h ../Level0/ErrorManagement.h \
+ ../Level0/ExceptionHandlerDefinitions.h \
+ ../Level0/ThreadInitialisationInterface.h ../Level0/EventSem.h \
+ ../Level0/SemCore.h ../Level0/ProcessorType.h \
+ ../Level0/ThreadsDatabase.h ../Level1/ErrorSystemInstructionItem.h \
+ ../Level1/ClassStructure.h ../Level1/ClassStructureEntry.h \
+ ../Level1/BasicTypes.h ../Level0/BString.h ../Level0/ErrorManagement.h \
+ ../Level0/LoadableLibrary.h ../Level1/ObjectMacros.h \
+ ../Level1/StreamAttributes.h ../Level0/BasicFile.h EAFile.h \
+ ../Level2/Streamable.h StreamConfigurationDataBase.h ../Level2/FString.h \
+ ../Level2/CDBExtended.h ../Level1/ConfigurationDataBase.h \
+ ../Level1/CDBVirtual.h ../Level1/CDBTypes.h ../Level0/Iterators.h \
+ ../Level1/GCNamedObject.h ../Level1/GarbageCollectable.h \
+ ../Level1/Object.h ../Level1/GCRTemplate.h ../Level1/GCReference.h \
+ ../Level0/Atomic.h ../Level1/ObjectRegistryDataBase.h \
+ ../Level1/CDBNull.h ../Level2/CDBDataTypes.h ../Level1/CDBTypes.h \
+ ../Level2/FString.h
+linux/LexicalAnalyzer.o: LexicalAnalyzer.cpp LexicalAnalyzer.h \
+ ../Level0/System.h ../Level0/SystemMSC.h ../Level0/SystemLinux.h \
+ ../Level0/GenDefs.h ../Level0/SystemVX5100.h ../Level0/SystemVX5500.h \
+ ../Level0/SystemV6X5100.h ../Level0/SystemV6X5500.h \
+ ../Level0/SystemVX68k.h ../Level0/SystemRTAI.h ../Level0/SystemSolaris.h \
+ ../Level0/SystemMacOSX.h ../Level0/Memory.h ../Level0/System.h \
+ ../Level2/FString.h ../Level0/BString.h ../Level2/Streamable.h \
+ ../Level0/CStream.h ../Level2/CStreamBuffering.h \
+ ../Level0/StreamInterface.h ../Level0/TimeoutType.h ../Level0/HRT.h \
+ ../Level0/Processor.h ../Level1/Object.h ../Level1/ObjectRegistryItem.h \
+ ../Level0/LinkedListable.h ../Level0/Iterators.h \
+ ../Level1/ErrorSystemInstructions.h ../Level0/GenDefs.h \
+ ../Level0/LinkedListHolder.h ../Level0/LinkedListable.h \
+ ../Level0/FastPollingMutexSem.h ../Level0/Atomic.h ../Level0/Sleep.h \
+ ../Level0/FastMath.h ../Level0/Threads.h ../Level0/ErrorManagement.h \
+ ../Level0/ExceptionHandlerDefinitions.h \
+ ../Level0/ThreadInitialisationInterface.h ../Level0/EventSem.h \
+ ../Level0/SemCore.h ../Level0/ProcessorType.h \
+ ../Level0/ThreadsDatabase.h ../Level1/ErrorSystemInstructionItem.h \
+ ../Level1/ClassStructure.h ../Level1/ClassStructureEntry.h \
+ ../Level1/BasicTypes.h ../Level0/ErrorManagement.h \
+ ../Level0/LoadableLibrary.h ../Level1/ObjectMacros.h \
+ ../Level1/StreamAttributes.h ../Level0/StaticQueueHolder.h \
+ ../Level0/StaticStackHolder.h ../Level0/StaticListHolder.h \
+ ../Level0/FastPollingMutexSem.h
+linux/ObjectIOTools.o: ObjectIOTools.cpp ObjectIOTools.h ../Level1/Object.h \
+ ../Level0/System.h ../Level0/SystemMSC.h ../Level0/SystemLinux.h \
+ ../Level0/GenDefs.h ../Level0/SystemVX5100.h ../Level0/SystemVX5500.h \
+ ../Level0/SystemV6X5100.h ../Level0/SystemV6X5500.h \
+ ../Level0/SystemVX68k.h ../Level0/SystemRTAI.h ../Level0/SystemSolaris.h \
+ ../Level0/SystemMacOSX.h ../Level0/Memory.h ../Level0/System.h \
+ ../Level1/ObjectRegistryItem.h ../Level0/LinkedListable.h \
+ ../Level0/Iterators.h ../Level1/ErrorSystemInstructions.h \
+ ../Level0/GenDefs.h ../Level0/LinkedListHolder.h \
+ ../Level0/LinkedListable.h ../Level0/FastPollingMutexSem.h \
+ ../Level0/Atomic.h ../Level0/Sleep.h ../Level0/FastMath.h \
+ ../Level0/HRT.h ../Level0/Processor.h ../Level0/TimeoutType.h \
+ ../Level0/Threads.h ../Level0/ErrorManagement.h \
+ ../Level0/ExceptionHandlerDefinitions.h \
+ ../Level0/ThreadInitialisationInterface.h ../Level0/EventSem.h \
+ ../Level0/SemCore.h ../Level0/ProcessorType.h \
+ ../Level0/ThreadsDatabase.h ../Level1/ErrorSystemInstructionItem.h \
+ ../Level1/ClassStructure.h ../Level1/ClassStructureEntry.h \
+ ../Level1/BasicTypes.h ../Level0/BString.h ../Level0/ErrorManagement.h \
+ ../Level0/LoadableLibrary.h ../Level0/StreamInterface.h \
+ ../Level1/ObjectMacros.h EAFile.h ../Level2/Streamable.h \
+ ../Level0/CStream.h ../Level2/CStreamBuffering.h \
+ ../Level1/StreamAttributes.h ../Level2/File.h ../Level2/Streamable.h \
+ ../Level0/BasicFile.h StreamConfigurationDataBase.h ../Level2/FString.h \
+ ../Level2/CDBExtended.h ../Level1/ConfigurationDataBase.h \
+ ../Level1/CDBVirtual.h ../Level1/CDBTypes.h ../Level0/Iterators.h \
+ ../Level1/GCNamedObject.h ../Level1/GarbageCollectable.h \
+ ../Level1/Object.h ../Level1/GCRTemplate.h ../Level1/GCReference.h \
+ ../Level0/Atomic.h ../Level1/ObjectRegistryDataBase.h \
+ ../Level1/CDBNull.h ../Level2/CDBDataTypes.h ../Level1/CDBTypes.h \
+ ../Level2/FString.h CDB.h CDBNodeRef.h CDBNode.h ../Level1/CDBVirtual.h \
+ ../Level1/ObjectRegistryDataBase.h
+linux/ObjectRegistryTools.o: ObjectRegistryTools.cpp ../Level1/Object.h \
+ ../Level0/System.h ../Level0/SystemMSC.h ../Level0/SystemLinux.h \
+ ../Level0/GenDefs.h ../Level0/SystemVX5100.h ../Level0/SystemVX5500.h \
+ ../Level0/SystemV6X5100.h ../Level0/SystemV6X5500.h \
+ ../Level0/SystemVX68k.h ../Level0/SystemRTAI.h ../Level0/SystemSolaris.h \
+ ../Level0/SystemMacOSX.h ../Level0/Memory.h ../Level0/System.h \
+ ../Level1/ObjectRegistryItem.h ../Level0/LinkedListable.h \
+ ../Level0/Iterators.h ../Level1/ErrorSystemInstructions.h \
+ ../Level0/GenDefs.h ../Level0/LinkedListHolder.h \
+ ../Level0/LinkedListable.h ../Level0/FastPollingMutexSem.h \
+ ../Level0/Atomic.h ../Level0/Sleep.h ../Level0/FastMath.h \
+ ../Level0/HRT.h ../Level0/Processor.h ../Level0/TimeoutType.h \
+ ../Level0/Threads.h ../Level0/ErrorManagement.h \
+ ../Level0/ExceptionHandlerDefinitions.h \
+ ../Level0/ThreadInitialisationInterface.h ../Level0/EventSem.h \
+ ../Level0/SemCore.h ../Level0/ProcessorType.h \
+ ../Level0/ThreadsDatabase.h ../Level1/ErrorSystemInstructionItem.h \
+ ../Level1/ClassStructure.h ../Level1/ClassStructureEntry.h \
+ ../Level1/BasicTypes.h ../Level0/BString.h ../Level0/ErrorManagement.h \
+ ../Level0/LoadableLibrary.h ../Level0/StreamInterface.h \
+ ../Level1/ObjectMacros.h ../Level2/FString.h ../Level2/Streamable.h \
+ ../Level0/CStream.h ../Level2/CStreamBuffering.h \
+ ../Level1/StreamAttributes.h ../Level1/ObjectRegistryDataBase.h \
+ ObjectRegistryTools.h
+linux/Parser.o: Parser.cpp Parser.h ../Level0/System.h ../Level0/SystemMSC.h \
+ ../Level0/SystemLinux.h ../Level0/GenDefs.h ../Level0/SystemVX5100.h \
+ ../Level0/SystemVX5500.h ../Level0/SystemV6X5100.h \
+ ../Level0/SystemV6X5500.h ../Level0/SystemVX68k.h ../Level0/SystemRTAI.h \
+ ../Level0/SystemSolaris.h ../Level0/SystemMacOSX.h ../Level0/Memory.h \
+ ../Level0/System.h ../Level1/Object.h ../Level1/ObjectRegistryItem.h \
+ ../Level0/LinkedListable.h ../Level0/Iterators.h \
+ ../Level1/ErrorSystemInstructions.h ../Level0/GenDefs.h \
+ ../Level0/LinkedListHolder.h ../Level0/LinkedListable.h \
+ ../Level0/FastPollingMutexSem.h ../Level0/Atomic.h ../Level0/Sleep.h \
+ ../Level0/FastMath.h ../Level0/HRT.h ../Level0/Processor.h \
+ ../Level0/TimeoutType.h ../Level0/Threads.h ../Level0/ErrorManagement.h \
+ ../Level0/ExceptionHandlerDefinitions.h \
+ ../Level0/ThreadInitialisationInterface.h ../Level0/EventSem.h \
+ ../Level0/SemCore.h ../Level0/ProcessorType.h \
+ ../Level0/ThreadsDatabase.h ../Level1/ErrorSystemInstructionItem.h \
+ ../Level1/ClassStructure.h ../Level1/ClassStructureEntry.h \
+ ../Level1/BasicTypes.h ../Level0/BString.h ../Level0/ErrorManagement.h \
+ ../Level0/LoadableLibrary.h ../Level0/StreamInterface.h \
+ ../Level1/ObjectMacros.h ../Level2/FString.h ../Level2/Streamable.h \
+ ../Level0/CStream.h ../Level2/CStreamBuffering.h \
+ ../Level1/StreamAttributes.h ../Level2/Streamable.h \
+ ../Level0/StaticStackHolder.h ../Level0/StaticListHolder.h \
+ ../Level0/FastPollingMutexSem.h ../Level0/StaticQueueHolder.h \
+ ../Level0/StaticStackHolder.h LexicalAnalyzer.h
+linux/StreamConfigurationDataBase.o: StreamConfigurationDataBase.cpp \
+ StreamConfigurationDataBase.h ../Level0/System.h ../Level0/SystemMSC.h \
+ ../Level0/SystemLinux.h ../Level0/GenDefs.h ../Level0/SystemVX5100.h \
+ ../Level0/SystemVX5500.h ../Level0/SystemV6X5100.h \
+ ../Level0/SystemV6X5500.h ../Level0/SystemVX68k.h ../Level0/SystemRTAI.h \
+ ../Level0/SystemSolaris.h ../Level0/SystemMacOSX.h ../Level0/Memory.h \
+ ../Level0/System.h ../Level2/FString.h ../Level0/BString.h \
+ ../Level2/Streamable.h ../Level0/CStream.h ../Level2/CStreamBuffering.h \
+ ../Level0/StreamInterface.h ../Level0/TimeoutType.h ../Level0/HRT.h \
+ ../Level0/Processor.h ../Level1/Object.h ../Level1/ObjectRegistryItem.h \
+ ../Level0/LinkedListable.h ../Level0/Iterators.h \
+ ../Level1/ErrorSystemInstructions.h ../Level0/GenDefs.h \
+ ../Level0/LinkedListHolder.h ../Level0/LinkedListable.h \
+ ../Level0/FastPollingMutexSem.h ../Level0/Atomic.h ../Level0/Sleep.h \
+ ../Level0/FastMath.h ../Level0/Threads.h ../Level0/ErrorManagement.h \
+ ../Level0/ExceptionHandlerDefinitions.h \
+ ../Level0/ThreadInitialisationInterface.h ../Level0/EventSem.h \
+ ../Level0/SemCore.h ../Level0/ProcessorType.h \
+ ../Level0/ThreadsDatabase.h ../Level1/ErrorSystemInstructionItem.h \
+ ../Level1/ClassStructure.h ../Level1/ClassStructureEntry.h \
+ ../Level1/BasicTypes.h ../Level0/ErrorManagement.h \
+ ../Level0/LoadableLibrary.h ../Level1/ObjectMacros.h \
+ ../Level1/StreamAttributes.h ../Level2/CDBExtended.h \
+ ../Level1/ConfigurationDataBase.h ../Level1/CDBVirtual.h \
+ ../Level1/CDBTypes.h ../Level0/Iterators.h ../Level1/GCNamedObject.h \
+ ../Level1/GarbageCollectable.h ../Level1/Object.h \
+ ../Level1/GCRTemplate.h ../Level1/GCReference.h ../Level0/Atomic.h \
+ ../Level1/ObjectRegistryDataBase.h ../Level1/CDBNull.h \
+ ../Level2/CDBDataTypes.h ../Level1/CDBTypes.h ../Level2/FString.h

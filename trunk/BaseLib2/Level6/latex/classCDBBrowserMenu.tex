@@ -1,0 +1,157 @@
+\hypertarget{classCDBBrowserMenu}{
+\section{CDBBrowserMenu Class Reference}
+\label{classCDBBrowserMenu}\index{CDBBrowserMenu@{CDBBrowserMenu}}
+}
+
+
+{\ttfamily \#include $<$CDBBrowserMenu.h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual const char $\ast$ \hyperlink{classCDBBrowserMenu_a60b762702881e68c3e8e24cf6d2f8aa8}{Title} ()
+\item 
+\hypertarget{classCDBBrowserMenu_abdbb85ea44d7b6f93db922311a6401a3}{
+virtual void {\bfseries SetTitle} (const char $\ast$\hyperlink{classCDBBrowserMenu_a398c0c3251532f4b924001c2b4fe3427}{title})}
+\label{classCDBBrowserMenu_abdbb85ea44d7b6f93db922311a6401a3}
+
+\item 
+\hyperlink{classCDBBrowserMenu_abc789c1da32237b02438a1555e4f1e0b}{CDBBrowserMenu} ()
+\item 
+\hyperlink{classCDBBrowserMenu_a1b3621101f19a48ef37c213b0751393c}{$\sim$CDBBrowserMenu} ()
+\item 
+bool \hyperlink{classCDBBrowserMenu_aa81bfa7140426c04ce743cbe0a0f8bf5}{LinkTo} (const char $\ast$cdbName, ConfigurationDataBase \&cdb)
+\item 
+virtual bool \hyperlink{classCDBBrowserMenu_a9c5c708189ef3f7cc9d5131a0e38006e}{TextMenu} (StreamInterface \&in, StreamInterface \&out)
+\item 
+virtual bool \hyperlink{classCDBBrowserMenu_a8c8b793d08fd4e836fd8f9f54faf1e8e}{ObjectSaveSetup} (ConfigurationDataBase \&info, StreamInterface $\ast$err)
+\item 
+virtual bool \hyperlink{classCDBBrowserMenu_a7284f261814bba2876c344495ff89475}{ObjectLoadSetup} (ConfigurationDataBase \&info, StreamInterface $\ast$err)
+\end{DoxyCompactItemize}
+\subsection*{Protected Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual bool \hyperlink{classCDBBrowserMenu_a70984d895ae73fb90e3886cd6467bd8c}{ProcessHttpMessage} (HttpStream \&hStream)
+\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+BString \hyperlink{classCDBBrowserMenu_a398c0c3251532f4b924001c2b4fe3427}{title}
+\end{DoxyCompactItemize}
+\subsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+bool \hyperlink{classCDBBrowserMenu_a0f2e4df78baa29b840ff920877e3a35b}{CDB2Setup} (\hyperlink{classCDBBrowserMenu}{CDBBrowserMenu} \&cdbBrowse, const char $\ast$cdbName, ConfigurationDataBase \&cdbRef)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+allows browsing a CDB via the MenuSystem 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classCDBBrowserMenu_abc789c1da32237b02438a1555e4f1e0b}{
+\index{CDBBrowserMenu@{CDBBrowserMenu}!CDBBrowserMenu@{CDBBrowserMenu}}
+\index{CDBBrowserMenu@{CDBBrowserMenu}!CDBBrowserMenu@{CDBBrowserMenu}}
+\subsubsection[{CDBBrowserMenu}]{\setlength{\rightskip}{0pt plus 5cm}CDBBrowserMenu::CDBBrowserMenu (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classCDBBrowserMenu_abc789c1da32237b02438a1555e4f1e0b}
+\hypertarget{classCDBBrowserMenu_a1b3621101f19a48ef37c213b0751393c}{
+\index{CDBBrowserMenu@{CDBBrowserMenu}!$\sim$CDBBrowserMenu@{$\sim$CDBBrowserMenu}}
+\index{$\sim$CDBBrowserMenu@{$\sim$CDBBrowserMenu}!CDBBrowserMenu@{CDBBrowserMenu}}
+\subsubsection[{$\sim$CDBBrowserMenu}]{\setlength{\rightskip}{0pt plus 5cm}CDBBrowserMenu::$\sim$CDBBrowserMenu (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classCDBBrowserMenu_a1b3621101f19a48ef37c213b0751393c}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classCDBBrowserMenu_aa81bfa7140426c04ce743cbe0a0f8bf5}{
+\index{CDBBrowserMenu@{CDBBrowserMenu}!LinkTo@{LinkTo}}
+\index{LinkTo@{LinkTo}!CDBBrowserMenu@{CDBBrowserMenu}}
+\subsubsection[{LinkTo}]{\setlength{\rightskip}{0pt plus 5cm}bool CDBBrowserMenu::LinkTo (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{cdbName, }
+\item[{ConfigurationDataBase \&}]{cdb}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classCDBBrowserMenu_aa81bfa7140426c04ce743cbe0a0f8bf5}
+Sets the database to browse \hypertarget{classCDBBrowserMenu_a7284f261814bba2876c344495ff89475}{
+\index{CDBBrowserMenu@{CDBBrowserMenu}!ObjectLoadSetup@{ObjectLoadSetup}}
+\index{ObjectLoadSetup@{ObjectLoadSetup}!CDBBrowserMenu@{CDBBrowserMenu}}
+\subsubsection[{ObjectLoadSetup}]{\setlength{\rightskip}{0pt plus 5cm}virtual bool CDBBrowserMenu::ObjectLoadSetup (
+\begin{DoxyParamCaption}
+\item[{ConfigurationDataBase \&}]{info, }
+\item[{StreamInterface $\ast$}]{err}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline, virtual\mbox{]}}}}
+\label{classCDBBrowserMenu_a7284f261814bba2876c344495ff89475}
+initialise an object from a set of configs \hypertarget{classCDBBrowserMenu_a8c8b793d08fd4e836fd8f9f54faf1e8e}{
+\index{CDBBrowserMenu@{CDBBrowserMenu}!ObjectSaveSetup@{ObjectSaveSetup}}
+\index{ObjectSaveSetup@{ObjectSaveSetup}!CDBBrowserMenu@{CDBBrowserMenu}}
+\subsubsection[{ObjectSaveSetup}]{\setlength{\rightskip}{0pt plus 5cm}virtual bool CDBBrowserMenu::ObjectSaveSetup (
+\begin{DoxyParamCaption}
+\item[{ConfigurationDataBase \&}]{info, }
+\item[{StreamInterface $\ast$}]{err}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline, virtual\mbox{]}}}}
+\label{classCDBBrowserMenu_a8c8b793d08fd4e836fd8f9f54faf1e8e}
+save an object content into a set of configs \hypertarget{classCDBBrowserMenu_a70984d895ae73fb90e3886cd6467bd8c}{
+\index{CDBBrowserMenu@{CDBBrowserMenu}!ProcessHttpMessage@{ProcessHttpMessage}}
+\index{ProcessHttpMessage@{ProcessHttpMessage}!CDBBrowserMenu@{CDBBrowserMenu}}
+\subsubsection[{ProcessHttpMessage}]{\setlength{\rightskip}{0pt plus 5cm}virtual bool CDBBrowserMenu::ProcessHttpMessage (
+\begin{DoxyParamCaption}
+\item[{HttpStream \&}]{hStream}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline, protected, virtual\mbox{]}}}}
+\label{classCDBBrowserMenu_a70984d895ae73fb90e3886cd6467bd8c}
+The HTTP entry point \hypertarget{classCDBBrowserMenu_a9c5c708189ef3f7cc9d5131a0e38006e}{
+\index{CDBBrowserMenu@{CDBBrowserMenu}!TextMenu@{TextMenu}}
+\index{TextMenu@{TextMenu}!CDBBrowserMenu@{CDBBrowserMenu}}
+\subsubsection[{TextMenu}]{\setlength{\rightskip}{0pt plus 5cm}virtual bool CDBBrowserMenu::TextMenu (
+\begin{DoxyParamCaption}
+\item[{StreamInterface \&}]{in, }
+\item[{StreamInterface \&}]{out}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline, virtual\mbox{]}}}}
+\label{classCDBBrowserMenu_a9c5c708189ef3f7cc9d5131a0e38006e}
+\hypertarget{classCDBBrowserMenu_a60b762702881e68c3e8e24cf6d2f8aa8}{
+\index{CDBBrowserMenu@{CDBBrowserMenu}!Title@{Title}}
+\index{Title@{Title}!CDBBrowserMenu@{CDBBrowserMenu}}
+\subsubsection[{Title}]{\setlength{\rightskip}{0pt plus 5cm}virtual const char$\ast$ CDBBrowserMenu::Title (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline, virtual\mbox{]}}}}
+\label{classCDBBrowserMenu_a60b762702881e68c3e8e24cf6d2f8aa8}
+to be able to choose the labelling policy 
+
+\subsection{Friends And Related Function Documentation}
+\hypertarget{classCDBBrowserMenu_a0f2e4df78baa29b840ff920877e3a35b}{
+\index{CDBBrowserMenu@{CDBBrowserMenu}!CDB2Setup@{CDB2Setup}}
+\index{CDB2Setup@{CDB2Setup}!CDBBrowserMenu@{CDBBrowserMenu}}
+\subsubsection[{CDB2Setup}]{\setlength{\rightskip}{0pt plus 5cm}bool CDB2Setup (
+\begin{DoxyParamCaption}
+\item[{{\bf CDBBrowserMenu} \&}]{cdbBrowse, }
+\item[{const char $\ast$}]{cdbName, }
+\item[{ConfigurationDataBase \&}]{cdbRef}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}friend\mbox{]}}}}
+\label{classCDBBrowserMenu_a0f2e4df78baa29b840ff920877e3a35b}
+
+
+\subsection{Member Data Documentation}
+\hypertarget{classCDBBrowserMenu_a398c0c3251532f4b924001c2b4fe3427}{
+\index{CDBBrowserMenu@{CDBBrowserMenu}!title@{title}}
+\index{title@{title}!CDBBrowserMenu@{CDBBrowserMenu}}
+\subsubsection[{title}]{\setlength{\rightskip}{0pt plus 5cm}BString {\bf CDBBrowserMenu::title}\hspace{0.3cm}{\ttfamily  \mbox{[}protected\mbox{]}}}}
+\label{classCDBBrowserMenu_a398c0c3251532f4b924001c2b4fe3427}
+a specific title, distinct from the object name 
+
+The documentation for this class was generated from the following file:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{CDBBrowserMenu_8h}{CDBBrowserMenu.h}\end{DoxyCompactItemize}

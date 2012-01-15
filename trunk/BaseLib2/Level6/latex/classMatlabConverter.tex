@@ -1,0 +1,254 @@
+\hypertarget{classMatlabConverter}{
+\section{MatlabConverter Class Reference}
+\label{classMatlabConverter}\index{MatlabConverter@{MatlabConverter}}
+}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classMatlabConverter_ae231df5f9ce670b05ad9025084e7ee48}{MatlabConverter} (Streamable $\ast$out)
+\item 
+int \hyperlink{classMatlabConverter_a41c2cbd92d7f8c9ad4f5f2cff09ba3c6}{CalculateDimension} (MatrixF \&mat, const char $\ast$variableName)
+\item 
+int \hyperlink{classMatlabConverter_aaf250197b07b0ea5c03b5227736947ee}{CalculateDimension} (MatrixD \&mat, const char $\ast$variableName)
+\item 
+int \hyperlink{classMatlabConverter_ae19203f53f8ec927af2c949f2f59b194}{CalculateDimension} (MatrixI \&mat, const char $\ast$variableName)
+\item 
+int \hyperlink{classMatlabConverter_a4abba9a7dd19d6b3c66934c2448c3825}{CalculateDimension} (const char $\ast$$\ast$listOfStrings, int nStrings, const char $\ast$variableName)
+\item 
+int \hyperlink{classMatlabConverter_a0eec9381ea2acc2fc13bd1c8fdac680c}{CalculateDimensionFloat} (const char $\ast$variableName)
+\item 
+int \hyperlink{classMatlabConverter_ade1e325d7a5ecc800959631d424431d2}{CalculateDimensionDouble} (const char $\ast$variableName)
+\item 
+bool \hyperlink{classMatlabConverter_a5d72106d3b7ae4cfa2c4109b18b8bd17}{Save} (float value, const char $\ast$variableName)
+\item 
+bool \hyperlink{classMatlabConverter_afa0e6c9e09a491717d5229e4b08d15b0}{Save} (double value, const char $\ast$variableName)
+\item 
+bool \hyperlink{classMatlabConverter_aa02883e0f36920d6e5baa1acafe48b2f}{Save} (MatrixF \&mat, const char $\ast$variableName)
+\item 
+bool \hyperlink{classMatlabConverter_a98c7d90bf3257d2ab9737b8823570b0f}{Save} (MatrixD \&mat, const char $\ast$variableName)
+\item 
+bool \hyperlink{classMatlabConverter_a1b7aaf580f2edfea7d41ac1d8ffd8d39}{Save} (MatrixI \&mat, const char $\ast$variableName)
+\item 
+bool \hyperlink{classMatlabConverter_aeab22d25ec1b0550cfd7de1b401f32a6}{Save} (const char $\ast$$\ast$listOfStrings, int nStrings, const char $\ast$variableName)
+\item 
+bool \hyperlink{classMatlabConverter_aeef921aa4ec5d6e6a5d02fda1a84422f}{InitStructure} (const char $\ast$nameStruct, const char $\ast$$\ast$listField, int nFields, int totalDimension)
+\item 
+bool \hyperlink{classMatlabConverter_aa4122955ba117021dc9d08d148ed31ed}{InitCell} (const char $\ast$nameCell, int nFields, int totalDimension)
+\end{DoxyCompactItemize}
+\subsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classMatlabConverter_a0bbc5f54e71e79c28941ea3bf59472ff}{
+bool {\bfseries MCSaveF} (\hyperlink{classMatlabConverter}{MatlabConverter} \&mc, float value, const char $\ast$variableName)}
+\label{classMatlabConverter_a0bbc5f54e71e79c28941ea3bf59472ff}
+
+\item 
+\hypertarget{classMatlabConverter_a47bf295200d42fd7f28923fd6e1acaa3}{
+bool {\bfseries MCSaveD} (\hyperlink{classMatlabConverter}{MatlabConverter} \&mc, double value, const char $\ast$variableName)}
+\label{classMatlabConverter_a47bf295200d42fd7f28923fd6e1acaa3}
+
+\item 
+\hypertarget{classMatlabConverter_aa8c8d361346d6aa95488c2582d3a9c20}{
+bool {\bfseries MCSaveMF} (\hyperlink{classMatlabConverter}{MatlabConverter} \&mc, MatrixF \&mat, const char $\ast$variableName)}
+\label{classMatlabConverter_aa8c8d361346d6aa95488c2582d3a9c20}
+
+\item 
+bool \hyperlink{classMatlabConverter_a10f6a83594f4db66392e6f5f3661e570}{MCSaveMD} (\hyperlink{classMatlabConverter}{MatlabConverter} \&mc, MatrixD \&mat, const char $\ast$variableName)
+\item 
+\hypertarget{classMatlabConverter_a7aaec595471ddd504f18d7fbc57d1d99}{
+bool {\bfseries MCSaveMI} (\hyperlink{classMatlabConverter}{MatlabConverter} \&mc, MatrixI \&mat, const char $\ast$variableName)}
+\label{classMatlabConverter_a7aaec595471ddd504f18d7fbc57d1d99}
+
+\item 
+bool \hyperlink{classMatlabConverter_a885c79a3a662eef92348655319e90e47}{MCSaveS} (\hyperlink{classMatlabConverter}{MatlabConverter} \&mc, const char $\ast$$\ast$listOfStrings, int nStrings, const char $\ast$variableName)
+\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classMatlabConverter_ae231df5f9ce670b05ad9025084e7ee48}{
+\index{MatlabConverter@{MatlabConverter}!MatlabConverter@{MatlabConverter}}
+\index{MatlabConverter@{MatlabConverter}!MatlabConverter@{MatlabConverter}}
+\subsubsection[{MatlabConverter}]{\setlength{\rightskip}{0pt plus 5cm}MatlabConverter::MatlabConverter (
+\begin{DoxyParamCaption}
+\item[{Streamable $\ast$}]{out}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classMatlabConverter_ae231df5f9ce670b05ad9025084e7ee48}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classMatlabConverter_a41c2cbd92d7f8c9ad4f5f2cff09ba3c6}{
+\index{MatlabConverter@{MatlabConverter}!CalculateDimension@{CalculateDimension}}
+\index{CalculateDimension@{CalculateDimension}!MatlabConverter@{MatlabConverter}}
+\subsubsection[{CalculateDimension}]{\setlength{\rightskip}{0pt plus 5cm}int MatlabConverter::CalculateDimension (
+\begin{DoxyParamCaption}
+\item[{MatrixF \&}]{mat, }
+\item[{const char $\ast$}]{variableName}
+\end{DoxyParamCaption}
+)}}
+\label{classMatlabConverter_a41c2cbd92d7f8c9ad4f5f2cff09ba3c6}
+\hypertarget{classMatlabConverter_aaf250197b07b0ea5c03b5227736947ee}{
+\index{MatlabConverter@{MatlabConverter}!CalculateDimension@{CalculateDimension}}
+\index{CalculateDimension@{CalculateDimension}!MatlabConverter@{MatlabConverter}}
+\subsubsection[{CalculateDimension}]{\setlength{\rightskip}{0pt plus 5cm}int MatlabConverter::CalculateDimension (
+\begin{DoxyParamCaption}
+\item[{MatrixD \&}]{mat, }
+\item[{const char $\ast$}]{variableName}
+\end{DoxyParamCaption}
+)}}
+\label{classMatlabConverter_aaf250197b07b0ea5c03b5227736947ee}
+\hypertarget{classMatlabConverter_a4abba9a7dd19d6b3c66934c2448c3825}{
+\index{MatlabConverter@{MatlabConverter}!CalculateDimension@{CalculateDimension}}
+\index{CalculateDimension@{CalculateDimension}!MatlabConverter@{MatlabConverter}}
+\subsubsection[{CalculateDimension}]{\setlength{\rightskip}{0pt plus 5cm}int MatlabConverter::CalculateDimension (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$$\ast$}]{listOfStrings, }
+\item[{int}]{nStrings, }
+\item[{const char $\ast$}]{variableName}
+\end{DoxyParamCaption}
+)}}
+\label{classMatlabConverter_a4abba9a7dd19d6b3c66934c2448c3825}
+\hypertarget{classMatlabConverter_ae19203f53f8ec927af2c949f2f59b194}{
+\index{MatlabConverter@{MatlabConverter}!CalculateDimension@{CalculateDimension}}
+\index{CalculateDimension@{CalculateDimension}!MatlabConverter@{MatlabConverter}}
+\subsubsection[{CalculateDimension}]{\setlength{\rightskip}{0pt plus 5cm}int MatlabConverter::CalculateDimension (
+\begin{DoxyParamCaption}
+\item[{MatrixI \&}]{mat, }
+\item[{const char $\ast$}]{variableName}
+\end{DoxyParamCaption}
+)}}
+\label{classMatlabConverter_ae19203f53f8ec927af2c949f2f59b194}
+\hypertarget{classMatlabConverter_ade1e325d7a5ecc800959631d424431d2}{
+\index{MatlabConverter@{MatlabConverter}!CalculateDimensionDouble@{CalculateDimensionDouble}}
+\index{CalculateDimensionDouble@{CalculateDimensionDouble}!MatlabConverter@{MatlabConverter}}
+\subsubsection[{CalculateDimensionDouble}]{\setlength{\rightskip}{0pt plus 5cm}int MatlabConverter::CalculateDimensionDouble (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{variableName}
+\end{DoxyParamCaption}
+)}}
+\label{classMatlabConverter_ade1e325d7a5ecc800959631d424431d2}
+\hypertarget{classMatlabConverter_a0eec9381ea2acc2fc13bd1c8fdac680c}{
+\index{MatlabConverter@{MatlabConverter}!CalculateDimensionFloat@{CalculateDimensionFloat}}
+\index{CalculateDimensionFloat@{CalculateDimensionFloat}!MatlabConverter@{MatlabConverter}}
+\subsubsection[{CalculateDimensionFloat}]{\setlength{\rightskip}{0pt plus 5cm}int MatlabConverter::CalculateDimensionFloat (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{variableName}
+\end{DoxyParamCaption}
+)}}
+\label{classMatlabConverter_a0eec9381ea2acc2fc13bd1c8fdac680c}
+\hypertarget{classMatlabConverter_aa4122955ba117021dc9d08d148ed31ed}{
+\index{MatlabConverter@{MatlabConverter}!InitCell@{InitCell}}
+\index{InitCell@{InitCell}!MatlabConverter@{MatlabConverter}}
+\subsubsection[{InitCell}]{\setlength{\rightskip}{0pt plus 5cm}bool MatlabConverter::InitCell (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{nameCell, }
+\item[{int}]{nFields, }
+\item[{int}]{totalDimension}
+\end{DoxyParamCaption}
+)}}
+\label{classMatlabConverter_aa4122955ba117021dc9d08d148ed31ed}
+\hypertarget{classMatlabConverter_aeef921aa4ec5d6e6a5d02fda1a84422f}{
+\index{MatlabConverter@{MatlabConverter}!InitStructure@{InitStructure}}
+\index{InitStructure@{InitStructure}!MatlabConverter@{MatlabConverter}}
+\subsubsection[{InitStructure}]{\setlength{\rightskip}{0pt plus 5cm}bool MatlabConverter::InitStructure (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{nameStruct, }
+\item[{const char $\ast$$\ast$}]{listField, }
+\item[{int}]{nFields, }
+\item[{int}]{totalDimension}
+\end{DoxyParamCaption}
+)}}
+\label{classMatlabConverter_aeef921aa4ec5d6e6a5d02fda1a84422f}
+\hypertarget{classMatlabConverter_a1b7aaf580f2edfea7d41ac1d8ffd8d39}{
+\index{MatlabConverter@{MatlabConverter}!Save@{Save}}
+\index{Save@{Save}!MatlabConverter@{MatlabConverter}}
+\subsubsection[{Save}]{\setlength{\rightskip}{0pt plus 5cm}bool MatlabConverter::Save (
+\begin{DoxyParamCaption}
+\item[{MatrixI \&}]{mat, }
+\item[{const char $\ast$}]{variableName}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classMatlabConverter_a1b7aaf580f2edfea7d41ac1d8ffd8d39}
+\hypertarget{classMatlabConverter_aeab22d25ec1b0550cfd7de1b401f32a6}{
+\index{MatlabConverter@{MatlabConverter}!Save@{Save}}
+\index{Save@{Save}!MatlabConverter@{MatlabConverter}}
+\subsubsection[{Save}]{\setlength{\rightskip}{0pt plus 5cm}bool MatlabConverter::Save (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$$\ast$}]{listOfStrings, }
+\item[{int}]{nStrings, }
+\item[{const char $\ast$}]{variableName}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classMatlabConverter_aeab22d25ec1b0550cfd7de1b401f32a6}
+\hypertarget{classMatlabConverter_a98c7d90bf3257d2ab9737b8823570b0f}{
+\index{MatlabConverter@{MatlabConverter}!Save@{Save}}
+\index{Save@{Save}!MatlabConverter@{MatlabConverter}}
+\subsubsection[{Save}]{\setlength{\rightskip}{0pt plus 5cm}bool MatlabConverter::Save (
+\begin{DoxyParamCaption}
+\item[{MatrixD \&}]{mat, }
+\item[{const char $\ast$}]{variableName}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classMatlabConverter_a98c7d90bf3257d2ab9737b8823570b0f}
+\hypertarget{classMatlabConverter_a5d72106d3b7ae4cfa2c4109b18b8bd17}{
+\index{MatlabConverter@{MatlabConverter}!Save@{Save}}
+\index{Save@{Save}!MatlabConverter@{MatlabConverter}}
+\subsubsection[{Save}]{\setlength{\rightskip}{0pt plus 5cm}bool MatlabConverter::Save (
+\begin{DoxyParamCaption}
+\item[{float}]{value, }
+\item[{const char $\ast$}]{variableName}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classMatlabConverter_a5d72106d3b7ae4cfa2c4109b18b8bd17}
+\hypertarget{classMatlabConverter_aa02883e0f36920d6e5baa1acafe48b2f}{
+\index{MatlabConverter@{MatlabConverter}!Save@{Save}}
+\index{Save@{Save}!MatlabConverter@{MatlabConverter}}
+\subsubsection[{Save}]{\setlength{\rightskip}{0pt plus 5cm}bool MatlabConverter::Save (
+\begin{DoxyParamCaption}
+\item[{MatrixF \&}]{mat, }
+\item[{const char $\ast$}]{variableName}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classMatlabConverter_aa02883e0f36920d6e5baa1acafe48b2f}
+\hypertarget{classMatlabConverter_afa0e6c9e09a491717d5229e4b08d15b0}{
+\index{MatlabConverter@{MatlabConverter}!Save@{Save}}
+\index{Save@{Save}!MatlabConverter@{MatlabConverter}}
+\subsubsection[{Save}]{\setlength{\rightskip}{0pt plus 5cm}bool MatlabConverter::Save (
+\begin{DoxyParamCaption}
+\item[{double}]{value, }
+\item[{const char $\ast$}]{variableName}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classMatlabConverter_afa0e6c9e09a491717d5229e4b08d15b0}
+
+
+\subsection{Friends And Related Function Documentation}
+\hypertarget{classMatlabConverter_a10f6a83594f4db66392e6f5f3661e570}{
+\index{MatlabConverter@{MatlabConverter}!MCSaveMD@{MCSaveMD}}
+\index{MCSaveMD@{MCSaveMD}!MatlabConverter@{MatlabConverter}}
+\subsubsection[{MCSaveMD}]{\setlength{\rightskip}{0pt plus 5cm}bool MCSaveMD (
+\begin{DoxyParamCaption}
+\item[{{\bf MatlabConverter} \&}]{mc, }
+\item[{MatrixD \&}]{mat, }
+\item[{const char $\ast$}]{variableName}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}friend\mbox{]}}}}
+\label{classMatlabConverter_a10f6a83594f4db66392e6f5f3661e570}
+\hypertarget{classMatlabConverter_a885c79a3a662eef92348655319e90e47}{
+\index{MatlabConverter@{MatlabConverter}!MCSaveS@{MCSaveS}}
+\index{MCSaveS@{MCSaveS}!MatlabConverter@{MatlabConverter}}
+\subsubsection[{MCSaveS}]{\setlength{\rightskip}{0pt plus 5cm}bool MCSaveS (
+\begin{DoxyParamCaption}
+\item[{{\bf MatlabConverter} \&}]{mc, }
+\item[{const char $\ast$$\ast$}]{listOfStrings, }
+\item[{int}]{nStrings, }
+\item[{const char $\ast$}]{variableName}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}friend\mbox{]}}}}
+\label{classMatlabConverter_a885c79a3a662eef92348655319e90e47}
+
+
+The documentation for this class was generated from the following files:\begin{DoxyCompactItemize}
+\item 
+MatlabConverter.h\item 
+MatlabConverter.cpp\end{DoxyCompactItemize}

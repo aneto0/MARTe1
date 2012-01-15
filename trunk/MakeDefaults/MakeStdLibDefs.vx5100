@@ -1,0 +1,52 @@
+##############################################################
+#
+# Copyright 2011 EFDA | European Fusion Development Agreement
+#
+# Licensed under the EUPL, Version 1.1 or - as soon they 
+# will be approved by the European Commission - subsequent  
+# versions of the EUPL (the "Licence"); 
+# You may not use this work except in compliance with the 
+# Licence. 
+# You may obtain a copy of the Licence at: 
+#  
+# http://ec.europa.eu/idabc/eupl
+#
+# Unless required by applicable law or agreed to in 
+# writing, software distributed under the Licence is 
+# distributed on an "AS IS" basis, 
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
+# express or implied. 
+# See the Licence for the specific language governing 
+# permissions and limitations under the Licence. 
+#
+# $Id$
+#
+#############################################################
+
+EXEEXT=.ex
+DLLEXT=.dl
+LIBEXT=.a
+OBJEXT=.o
+ASMEXT=.s
+DRVEXT=.drv
+GAMEXT=.gam
+
+OBJS=   $(OBJSX:%.x=vx5100/%.o) 
+OBJS2=  $(OBJSX2:%.x=vx5100/%.o) 
+OBJS3=  $(OBJSX3:%.x=vx5100/%.o) 
+
+SUBPROJ = $(SPB:%.x=%.spb)
+SUBPROJC = $(SPB:%.x=%.spc)
+SUBPROJ2 = $(SPB2:%.x=%.spb)
+SUBPROJC += $(SPB2:%.x=%.spc)
+
+COMPILER = jccppc -mcpu=7400 
+MAKE     = make
+
+#-maltivec -mabi=altivec
+DEBUG = -g
+OPTIM = 
+LFLAGS =  
+CFLAGS =  -D_VXWORKS -D_VX5100 -frtti -fno-exceptions -Wnon-virtual-dtor
+
+.SUFFIXES:   .c  .cpp  .o .a .lib .exe .ex .ex_ .dll .gam

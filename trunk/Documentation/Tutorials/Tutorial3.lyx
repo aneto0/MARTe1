@@ -1,0 +1,1397 @@
+#LyX 1.6.10 created this file. For more info see http://www.lyx.org/
+\lyxformat 345
+\begin_document
+\begin_header
+\textclass beamer
+\begin_preamble
+\usepackage[absolute,overlay]{textpos} 
+
+\usetheme{Darmstadt}
+% or ...Singapore Darmstadt
+
+%\usecolortheme{seahorse}
+% or whatever (possibly just delete it)
+\end_preamble
+\use_default_options false
+\language english
+\inputencoding auto
+\font_roman times
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_amsmath 2
+\use_esint 0
+\cite_engine basic
+\use_bibtopic false
+\paperorientation portrait
+\secnumdepth 2
+\tocdepth 2
+\paragraph_separation indent
+\defskip medskip
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\author "" 
+\author "" 
+\end_header
+
+\begin_body
+
+\begin_layout Title
+
+\size large
+BaseLib2 Tutorial Series
+\end_layout
+
+\begin_layout Subtitle
+Objects, Garbage Collection and Templates
+\end_layout
+
+\begin_layout Author
+André Neto
+\end_layout
+
+\begin_layout Date
+July, 2011
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+%
+\backslash
+beamerdefaultoverlayspecification{<+->}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout BeginFrame
+Outline
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset toc
+LatexCommand tableofcontents
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout BeginFrame
+Garbage collection
+\end_layout
+
+\begin_layout Itemize
+Good
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Avoid misuse of pointers
+\end_layout
+
+\begin_layout Itemize
+Avoid memory leaks
+\end_layout
+
+\begin_layout Itemize
+Force good housekeeping
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+At the price of
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Having to use the BaseLib2 development model
+\end_layout
+
+\begin_layout Itemize
+Your object must be GarbageCollectable (see GarbageCollectable.h in Level1)
+\end_layout
+
+\begin_layout Itemize
+Create the objects using a special syntax (no 
+\series bold
+new
+\series default
+ operator)
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+The garbage collection mechanism tracks the number of references for a given
+ object
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+When this goes to zero the object is automatically destroyed
+\end_layout
+
+\end_deeper
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout Section
+Garbage Collector
+\end_layout
+
+\begin_layout Subsection
+GCReference
+\end_layout
+
+\begin_layout BeginFrame
+GCReference
+\end_layout
+
+\begin_layout Itemize
+The GCReference (
+\series bold
+G
+\series default
+arbage
+\series bold
+C
+\series default
+ollectableReference) is one of the key classes of BaseLib2
+\end_layout
+
+\begin_layout Itemize
+It contains the pointer to your object
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Tracks the number of instances
+\end_layout
+
+\begin_layout Itemize
+Deletes the object when no longer used
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Is capable of constructing an object by its class name (more on this later)
+\end_layout
+
+\begin_layout Itemize
+Enables to query if its pointer object is valid
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Although the GCReference exists it doesn't mean the pointer object is valid!
+ (see example later)
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Provides the mechanism behind automatic object creation using data driven
+ configurations (more on this in a later tutorial)
+\end_layout
+
+\begin_layout Itemize
+The GCRTemplate (
+\series bold
+G
+\series default
+arbage
+\series bold
+C
+\series default
+ollectable
+\series bold
+R
+\series default
+eferenceTemplate) is a templated version of GCReference
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+GCReference.h and GCRTemplate.h
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Most important functions are}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+virtual bool ObjectLoadSetup( ConfigurationDataBase & info, StreamInterface
+ * err, bool createOnly=False);
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+virtual bool ObjectSaveSetup( ConfigurationDataBase & info, StreamInterface
+ * err);
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+virtual bool IsValid() const;
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+inline int32 NumberOfReferences() const;
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+inline GarbageCollectable* operator->() const;
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+inline bool operator==(const GCReference& reference) const;
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+inline bool operator!=(const GCReference& reference) const;
+\end_layout
+
+\begin_layout Itemize
+Access these functions using the 
+\begin_inset Quotes eld
+\end_inset
+
+.
+\begin_inset Quotes erd
+\end_inset
+
+ operator 
+\end_layout
+
+\begin_layout Itemize
+Access your object functions using the 
+\begin_inset Quotes eld
+\end_inset
+
+->
+\begin_inset Quotes erd
+\end_inset
+
+ operator
+\end_layout
+
+\begin_layout Itemize
+Create new instance by using the flag GCFT_Create
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+GCReference Example
+\end_layout
+
+\begin_layout FrameSubtitle
+(BaseLib2/Documentation/Tutorials/examples/GCReferenceExample1.cpp)
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Example code}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+/**
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+* A simple class implementing GarbageCollectable so that it can be 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+* tracked by a GCReference
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+*/
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+class SimpleClass : public GarbageCollectable{ 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+public:
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+...
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+}
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+GCRTemplate<SimpleClass> simpleClassRef1;
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//It should not be valid
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+if(!simpleClassRef1.IsValid()){
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+...
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//Objects are created using GCFT_Create
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+GCRTemplate<SimpleClass> simpleClassRef2(GCFT_Create);
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//This reference should be valid
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+if(simpleClassRef2.IsValid()){
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+...
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//Now put another reference pointing to the same object
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+simpleClassRef1 = simpleClassRef2;
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//Object variables and functions are access using the -> operator 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+simpleClassRef2->uniqueID = 123456789;
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+Creating objects by name
+\end_layout
+
+\begin_layout Itemize
+Objects can be automatically created by the class name
+\end_layout
+
+\begin_layout Itemize
+In order to use this functionality:
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+the class must inherit from Object (see Object.h) 
+\end_layout
+
+\begin_layout Itemize
+3 macros must be called (see ObjectMacros.h)
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+OBJECT_DLL, OBJECT_DLL_STUFF and OBJECTLOADREGISTER
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+the details behind these macros are quite complicated...
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+create a series of hidden functions based on the class name...
+\end_layout
+
+\begin_layout Itemize
+...which add the class name to a database when the application starts...
+\end_layout
+
+\begin_layout Itemize
+...can then be accessed in run-time to actually create and manage the class...
+\end_layout
+
+\begin_layout Itemize
+...and get live information about it (class name, id, ...)
+\end_layout
+
+\end_deeper
+\end_deeper
+\begin_layout Itemize
+This is the mechanism behind data-driven object creation which is another
+ BaseLib2 very important feature
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+Object creation by name Example
+\end_layout
+
+\begin_layout FrameSubtitle
+(BaseLib2/Documentation/Tutorials/examples/GCReferenceExample2.cpp)
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Example code}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size footnotesize
+//These macros create a series of hidden functions 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size footnotesize
+//which allow to automatically create the object 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size footnotesize
+OBJECT_DLL(SimpleClass)
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size footnotesize
+class SimpleClass : public GarbageCollectable, public Object{
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size footnotesize
+OBJECT_DLL_STUFF(SimpleClass)
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size footnotesize
+public:
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size footnotesize
+...
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size footnotesize
+};
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size footnotesize
+//Usually a version id is set as the second argument
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size footnotesize
+OBJECTLOADREGISTER(SimpleClass, "$Id: GCReferenceExample2.cpp,v 1.1 2011/07/14
+ 09:42:40 aneto Exp $")
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size footnotesize
+//Try to create the object by name 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size footnotesize
+GCRTemplate<SimpleClass> simpleClassRef1("SimpleClass");
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size footnotesize
+//It should be valid
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size footnotesize
+if(simpleClassRef1.IsValid()){
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size footnotesize
+...
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+GCNamedObject and GCReferenceContainer
+\end_layout
+
+\begin_layout Itemize
+The GCNamedObject (
+\series bold
+G
+\series default
+arbage
+\series bold
+C
+\series default
+ollectableObject) is also widely used
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Stores the object name
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+The GCReferenceContainer (
+\series bold
+G
+\series default
+arbage
+\series bold
+C
+\series default
+ollectableReferenceContainer) is a container for GarbageCollectable references
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Find and retrieve objects by name and index or by using iterators
+\end_layout
+
+\end_deeper
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Most important functions of GCReferenceContainer are}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+inline GCReference Find(const char * name,GCFlagType recurse...);
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+inline GCReference Find( SearchFilterT<GCReference> * selector...);
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+inline bool Insert( GCReference gc, int position = -1);
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+inline GCReference Remove( const char * name, GCFlagType recurse...);
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+inline GCReference Remove( int index);
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+bool Iterate( IteratorT<GCReference> * iterator,...);
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+GCNamedObject and GCReferenceContainer Example (1)
+\end_layout
+
+\begin_layout FrameSubtitle
+(BaseLib2/Documentation/Tutorials/examples/GCReferenceContainerExample.cpp)
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Example code}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+class SimpleNamedObject : public GCNamedObject{
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+OBJECT_DLL_STUFF(SimpleNamedObject)
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+public:
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+SimpleNamedObject(){
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+...
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+GCRTemplate<SimpleNamedObject> simpleNamedObj("SimpleNamedObject");
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+//Because it is a named object, we can associate a name to it
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+simpleNamedObj->SetObjectName("myObject");
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+//One way of verifying if an object is of given type
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+GCRTemplate<GCNamedObject> namedObj = simpleNamedObj;
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+//If this is valid (and in this case it is) then the reference is valid...
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+if(namedObj.IsValid()){
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+...
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+//A SimpleClass if not of type GCNamedObject
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+GCRTemplate<SimpleClass> simpleClassObj2 = simpleNamedObj;
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+//So it should not be valid...
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+if(!simpleClassObj2.IsValid()){
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+...
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+GCNamedObject and GCReferenceContainer Example (2)
+\end_layout
+
+\begin_layout FrameSubtitle
+(BaseLib2/Documentation/Tutorials/examples/GCReferenceContainerExample.cpp)
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Example code}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+//Create a GCReferenceContainer to store our references
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+GCReferenceContainer gcRefContainer;
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+if(!gcRefContainer.Insert(namedObj)){
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+...
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+if(!gcRefContainer.Insert(simpleClassObj)) {
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+...
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+//Query the size of the container
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+CStaticAssertErrorCondition(Information, "The size of the gcRefContainer
+ is: %d", gcRefContainer.Size());
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+//Look for objects based on name
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+GCRTemplate<SimpleNamedObject> myObject3 = gcRefContainer.Find("myObject2");
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+//Look for objects based on index
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+//By using the IsValid the type of the object can be tested
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+int32 i=0;
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+for(i=0; i<gcRefContainer.Size(); i++){
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+GCRTemplate<SimpleClass> obj = gcRefContainer.Find(i);
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+if(obj.IsValid()){
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+...
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout Section
+Objects error management
+\end_layout
+
+\begin_layout BeginFrame
+AssertErrorCondition
+\end_layout
+
+\begin_layout Itemize
+When using BaseLib2 objects you should log using the method AssertErrorCondition
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+More debugging information is automatically extracted (class name and object
+ pointer)
+\end_layout
+
+\end_deeper
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{AssertErrorCondition}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+Output using AssertErrorCondition:
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+|TM=4e3bf2ac|C=SimpleClass|O=0894b298|T=b785e6d0|E=00000001|D=Creating a
+ SimpleClass 
+\end_layout
+
+\begin_layout AlertBlock
+Output using CStaticAssertErrorCondition:
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size scriptsize
+|TM=4e3bf2ac|T=b785e6d0|E=00000001|D=Creating a SimpleClass
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout Section
+Training
+\end_layout
+
+\begin_layout BeginFrame
+Training ideas (1/3)
+\end_layout
+
+\begin_layout Enumerate
+Write a class named Shape
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+This class must inherit from GCNamedObject
+\end_layout
+
+\begin_layout Enumerate
+It has a pure virtual method named Area which returns a float
+\end_layout
+
+\begin_layout Enumerate
+It has a pure virtual method named SetAttributes which receives an FString
+ with the shape attributes separated by 
+\begin_inset Quotes eld
+\end_inset
+
+,
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+Write 3 classes, named Circle, Square and Rectangle which inherit from Shape
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+Implement in each of these the Area and SetAttributes
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+The Attributes will be separated by 
+\begin_inset Quotes eld
+\end_inset
+
+,
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+The number of attributes will depend on the class (1 for circle and square,
+ 2 for rectangle)
+\end_layout
+
+\end_deeper
+\end_deeper
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+Training ideas (2/3)
+\end_layout
+
+\begin_layout Enumerate
+Write an application which has a TCPServer listening on a given port
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+Client will send the requests encoded as 
+\begin_inset Quotes eld
+\end_inset
+
+order|ClassName|ObjectName|ShapeAttributes)
+\begin_inset Quotes erd
+\end_inset
+
+
+\end_layout
+
+\begin_layout Enumerate
+The order will be a single char which can be
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+c, for create object
+\end_layout
+
+\begin_layout Enumerate
+d, for delete object
+\end_layout
+
+\begin_layout Enumerate
+l, for list objects
+\end_layout
+
+\begin_layout Enumerate
+e.g.
+ c|Circle|myCircle|1
+\end_layout
+
+\begin_layout Enumerate
+e.g.
+ c|Rectangle|myRectangle|2,3
+\end_layout
+
+\begin_layout Enumerate
+e.g.
+ d|Rectangle|myRectangle
+\end_layout
+
+\end_deeper
+\end_deeper
+\begin_layout Enumerate
+For each create order
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+Create the object by ClassName
+\end_layout
+
+\begin_layout Enumerate
+Give the object the ObjectName
+\end_layout
+
+\begin_layout Enumerate
+Set the ShapeAttributes
+\end_layout
+
+\begin_layout Enumerate
+Add the created object to a GCReferenceContainer
+\end_layout
+
+\end_deeper
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+Training ideas (3/3)
+\end_layout
+
+\begin_layout Enumerate
+For each delete order
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+Search for the object name in the GCReferenceContainer and remove it
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+For each list order
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+Using an iterator, loop inside all the elements of the GCReferenceContainer
+ and print
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+Name
+\end_layout
+
+\begin_layout Enumerate
+Area
+\end_layout
+
+\end_deeper
+\end_deeper
+\begin_layout EndFrame
+
+\end_layout
+
+\end_body
+\end_document

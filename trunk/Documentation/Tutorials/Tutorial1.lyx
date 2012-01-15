@@ -1,0 +1,3909 @@
+#LyX 1.6.10 created this file. For more info see http://www.lyx.org/
+\lyxformat 345
+\begin_document
+\begin_header
+\textclass beamer
+\begin_preamble
+\usepackage[absolute,overlay]{textpos} 
+
+\usetheme{Darmstadt}
+% or ...Singapore Darmstadt
+
+%\usecolortheme{seahorse}
+% or whatever (possibly just delete it)
+\end_preamble
+\use_default_options false
+\language english
+\inputencoding auto
+\font_roman times
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_amsmath 2
+\use_esint 0
+\cite_engine basic
+\use_bibtopic false
+\paperorientation portrait
+\secnumdepth 2
+\tocdepth 2
+\paragraph_separation indent
+\defskip medskip
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\author "" 
+\author "" 
+\end_header
+
+\begin_body
+
+\begin_layout Standard
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+This file is a solution template for:
+\end_layout
+
+\begin_layout Itemize
+Talk at a conference/colloquium.
+ 
+\end_layout
+
+\begin_layout Itemize
+Talk length is about 20min.
+ 
+\end_layout
+
+\begin_layout Itemize
+Style is ornate.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+Copyright 2004 by Till Tantau <tantau@users.sourceforge.net>.
+ 
+\end_layout
+
+\begin_layout Plain Layout
+In principle, this file can be redistributed and/or modified under the terms
+ of the GNU Public License, version 2.
+ However, this file is supposed to be a template to be modified for your
+ own needs.
+ For this reason, if you use this file as a template and not specifically
+ distribute it as part of a another package/program, the author grants the
+ extra permission to freely copy and modify this file as you see fit and
+ even to delete this copyright notice.
+ 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Title
+
+\size large
+BaseLib2 Tutorial Series
+\end_layout
+
+\begin_layout Subtitle
+Lists and Iterators
+\end_layout
+
+\begin_layout Author
+André Neto
+\end_layout
+
+\begin_layout Date
+June 13, 2011
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+If you wish to uncover everything in a step-wise fashion, uncomment the
+ following command:
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+%
+\backslash
+beamerdefaultoverlayspecification{<+->}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout BeginFrame
+Outline
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset toc
+LatexCommand tableofcontents
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+Structuring a talk is a difficult task and the following structure may not
+ be suitable.
+ Here are some rules that apply for this solution: 
+\end_layout
+
+\begin_layout Itemize
+Exactly two or three sections (other than the summary).
+ 
+\end_layout
+
+\begin_layout Itemize
+At *most* three subsections per section.
+ 
+\end_layout
+
+\begin_layout Itemize
+Talk about 30s to 2min per frame.
+ So there should be between about 15 and 30 frames, all told.
+\end_layout
+
+\begin_layout Itemize
+A conference audience is likely to know very little of what you are going
+ to talk about.
+ So *simplify*! 
+\end_layout
+
+\begin_layout Itemize
+In a 20min talk, getting the main ideas across is hard enough.
+ Leave out details, even if it means being less precise than you think necessary.
+ 
+\end_layout
+
+\begin_layout Itemize
+If you omit details that are vital to the proof/implementation, just say
+ so once.
+ Everybody will be happy with that.
+ 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout BeginFrame
+What are lists good for?
+\end_layout
+
+\begin_layout Itemize
+Containers of information
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Simple types (floats, integers,...)
+\end_layout
+
+\begin_layout Itemize
+Complex types (structures, classes)
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Good for abstraction
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+A container of mammals will know how to store Humans and Dolphins
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+The lists discussed here are quite low-level
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Later you will use easier/smarter versions of these
+\end_layout
+
+\begin_layout Itemize
+Nevertheless these are the base classes for the more sophisticated versions
+ 
+\end_layout
+
+\end_deeper
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout Section
+Lists
+\end_layout
+
+\begin_layout Subsection
+Static lists
+\end_layout
+
+\begin_layout BeginFrame
+Static Lists
+\end_layout
+
+\begin_layout Itemize
+Container of elements with a given size
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+This size is given by the minimum number of bytes required to store the
+ element , divided by the size of a pointer, both for the target architecture
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+e.g.
+ 32 bit integers in a 32 bit architecture, the element size is 1
+\end_layout
+
+\begin_layout Itemize
+e.g.
+ 64 bit integers in a 32 bit architecture, the element size is 2
+\end_layout
+
+\end_deeper
+\end_deeper
+\begin_layout Itemize
+Most important operations are: 
+\series bold
+add
+\series default
+, 
+\series bold
+extract
+\series default
+, 
+\series bold
+peek
+\series default
+, 
+\series bold
+delete
+\series default
+ and 
+\series bold
+find
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+extract returns the element and removes it from the list
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+All elements must have the same size and, consequently, usually are from
+ the same data type
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+StaticListHolder.h
+\end_layout
+
+\begin_layout Itemize
+The father of all static lists is named StaticListHolder
+\end_layout
+
+\begin_layout Itemize
+Multi-thread access can be protected with built-in semaphore
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Most important functions are}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+uint32 ListSize();
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+bool ListAdd(const intptr *element,int position = SLH_EndOfList);
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+bool ListExtract(intptr *element=NULL,int position = SLH_EndOfList);
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+bool ListPeek(intptr *element=NULL,int position = SLH_EndOfList);
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+bool ListDelete(const intptr *element);
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+int ListFind(const intptr *element);
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+void SetAccessTimeout();
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+StaticListHolder example
+\end_layout
+
+\begin_layout FrameSubtitle
+(BaseLib2/Documentation/Tutorials/examples/StaticListHolderExample.cpp)
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Source}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//32 bit floating point elements to insert in the list 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+float f1 = 1.23; 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+float f2 = 3210;
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+float f3 = -1.23;
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+//The constructor receives the elements size...
+ All elements must have the same size.
+ 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+StaticListHolder slh(1);
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+//Add
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+slh.ListAdd((const intptr *) &f1); 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+slh.ListAdd((const intptr *) &f2);
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//Remove the second element and copy the value to retrivedValue 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+float retrivedValue; 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+if(!slh.ListExtract((intptr *) &retrivedValue, 1)){ 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+CStaticAssertErrorCondition(FatalError, "Failed to retrieve the second element
+ on the list!"); 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+return -1; 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+}
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//Print the value (which I already now it was a float) 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+CStaticAssertErrorCondition(Information, "The value of the second element
+ in the list is %f", retrivedValue);
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+CStaticAssertErrorCondition(Information, "My list holder size is: %d", slh.ListSi
+ze()); 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//Search for an element int32 elementPos = slh.ListFind((const intptr *)&f3);
+ 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+CStaticAssertErrorCondition(Information, "Value %f is in position: %d",
+ f3, elementPos);
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+Other static lists
+\end_layout
+
+\begin_layout Itemize
+The StaticQueueHolder and the StaticStackHolder are just specialisations/renames
+ of StaticListHolder to ease the implementations of queues and stacks
+\end_layout
+
+\begin_layout Itemize
+The StaticListTemplate allows the direct usage of templates in a StaticListHolde
+r
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Most important functions StaticQueueHolder}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+uint32 QueueSize();
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+void QueueAdd(const intptr *element);
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+bool QueueExtract(intptr *element);
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+bool QueuePeek(intptr *element, uint32 index);
+\end_layout
+
+\begin_layout Standard
+\begin_inset space ~
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Most important functions StaticStackHolder}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+uint32 StackDepth();
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+void StackPush(const intptr *element);
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+bool StackPop(intptr *element);
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+bool StackPeek(intptr *element,int position);
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout Subsection
+Linked lists
+\end_layout
+
+\begin_layout BeginFrame
+Introduction
+\end_layout
+
+\begin_layout Itemize
+Lists where each element, or node, contains a reference to the next element
+ (in the singly case as in BaseLib2 implementation)
+\end_layout
+
+\begin_layout Itemize
+Can be linear...
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename Singly-linked-list.svg
+	display false
+	scale 30
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+...or circular
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename Circularly-linked-list.svg
+	display false
+	scale 30
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Doubly implementations where a reference to the previous node is also stored,
+ are not available in BaseLib2
+\end_layout
+
+\begin_layout Itemize
+Very easy and fast to add or remove a node
+\end_layout
+
+\begin_layout Itemize
+Random access might require scanning all elements
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+Iterators and filters
+\end_layout
+
+\begin_layout Itemize
+Helper objects to cycle through a given container
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Replace the classic 
+\shape italic
+while and for
+\shape default
+...
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Greatly simplifies code and leverages on re-usage
+\end_layout
+
+\begin_layout Itemize
+Filters automatically allow to sort and search for entries, without always
+ repeating the same iterative code
+\end_layout
+
+\begin_layout Itemize
+You're expected to implement a call-back with the action to be performed
+ for each of the entries
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+
+\series bold
+Do
+\series default
+, when iterating through all the elements
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Compare
+\series default
+, when sorting elements
+\end_layout
+
+\begin_layout Itemize
+
+\series bold
+Test
+\series default
+, when filtering elements
+\end_layout
+
+\end_deeper
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+LinkedListable.h
+\end_layout
+
+\begin_layout Itemize
+Singly linked list
+\end_layout
+
+\begin_layout Itemize
+Enables to insert and set the next node
+\end_layout
+
+\begin_layout Itemize
+Extract and delete nodes
+\end_layout
+
+\begin_layout Itemize
+Iterate, Sort and Filter for nodes
+\end_layout
+
+\begin_layout Itemize
+Multi-thread access can be protected with built-in semaphore
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Most important functions are}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+uint32 Size();
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+bool BSort(SortFilter *sorter);//other templates available
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+bool Insert(LinkedListable *p);//other templates available
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+bool Add(LinkedListable *p);//end of the queue
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+LinkedListable *Search(SearchFilter *filter);//other templates available
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+LinkedListable *Extract(LinkedListable *p);//other templates available
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+void Iterate(Iterator *it);//other templates available
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+Iterators.h
+\end_layout
+
+\begin_layout Itemize
+Must create a class which inherits from one of these to provide the required
+ functionality (template versions also available)
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Iterate}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+class Iterator{
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+virtual void Do (LinkedListable *data)=0;
+\end_layout
+
+\begin_layout Standard
+\begin_inset space \thinspace{}
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Search}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+class SearchFilter{
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+virtual bool Test (LinkedListable *data)=0;
+\end_layout
+
+\begin_layout Standard
+\begin_inset space \thinspace{}
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Sort}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+class SortFilter{
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+virtual int32 Compare(LinkedListable *data1,LinkedListable *data2)=0;
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout Section
+LinkedListable Example
+\end_layout
+
+\begin_layout Subsection
+Auxiliary classes
+\end_layout
+
+\begin_layout BeginFrame
+The simple Human
+\end_layout
+
+\begin_layout FrameSubtitle
+(BaseLib2/Documentation/Tutorials/examples/LinkedListableExample.cpp)
+\end_layout
+
+\begin_layout Itemize
+
+\size scriptsize
+LinkedListable is a Human defined by a name and an height
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Human class source}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+class Human : public LinkedListable{
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+...
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+public: Human(const char *n, float h){
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+height = h; 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+if(n != NULL){ 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+name = (char *)malloc(strlen(n) + 1); 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+strcpy(name, n); 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+} 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+else{ 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+name = NULL; 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+} 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+}
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+virtual ~Human(){ 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+if(name != NULL){ 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+free((void *&)name); 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+}
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+}
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+const char *Name(){ 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+return name; 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+}
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+float Height(){ 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+return height; 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+} 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+};
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+Human iterator
+\end_layout
+
+\begin_layout FrameSubtitle
+(BaseLib2/Documentation/Tutorials/examples/LinkedListableExample.cpp)
+\end_layout
+
+\begin_layout Itemize
+This function will be called for every element in the list (to the right
+ of the calling node)
+\end_layout
+
+\begin_layout Itemize
+For each Human, print the name and the height
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Iterator class source}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+class HumanIterator : public Iterator{
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+virtual void Do(LinkedListable *data){ 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+Human *h = dynamic_cast<Human *>(data); 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+if(h == NULL){ 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+return; 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+} 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+CStaticAssertErrorCondition(Information, "My name is %s and my height is
+ %f", h->Name(), h->Height()); 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+} 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+};
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+Human sorter
+\end_layout
+
+\begin_layout FrameSubtitle
+(BaseLib2/Documentation/Tutorials/examples/LinkedListableExample.cpp)
+\end_layout
+
+\begin_layout Itemize
+Compare two LinkedListables and return a value less than, equal to, or greater
+ than zero if data1 is found, respectively, to be less than, to match, or
+ be greater than data2
+\end_layout
+
+\begin_layout Itemize
+Order humans by name
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Notice the direct usage of strcmp
+\end_layout
+
+\end_deeper
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Sorter class source}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+class HumanSorter : public SortFilter{ 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+virtual int32 Compare(LinkedListable *data1,LinkedListable *data2){ 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+Human *h1 = dynamic_cast<Human *>(data1); 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+Human *h2 = dynamic_cast<Human *>(data2);
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+if((h1 == NULL) || (h2 == NULL)){
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+return 0; 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+} 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+return strcmp(h1->Name(), h2->Name()); 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+}
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+};
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+Human search
+\end_layout
+
+\begin_layout FrameSubtitle
+(BaseLib2/Documentation/Tutorials/examples/LinkedListableExample.cpp)
+\end_layout
+
+\begin_layout Itemize
+Returns True if the test data satisfies the search condition
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Search for humans whose name start by a configurable character
+\end_layout
+
+\end_deeper
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Search class source}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+class HumanSearchFilter : public SearchFilter{ 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+private: 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+char firstChar; 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+public: 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+HumanSearchFilter(char fc){ 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+firstChar = fc; 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+}
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+bool Test(LinkedListable *data){ 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+Human *h = dynamic_cast<Human *>(data); 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+if(h == NULL){ 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+return False; 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+} 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+if(h->Name() == NULL){ 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+return False; 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+} 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+return h->Name()[0] == firstChar; 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+} 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+}; 
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout Subsection
+The full example
+\end_layout
+
+\begin_layout BeginFrame
+Node creation
+\end_layout
+
+\begin_layout FrameSubtitle
+(BaseLib2/Documentation/Tutorials/examples/LinkedListableExample.cpp)
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Create the nodes}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+...
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//Create a root node
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+LinkedListable root;
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//Create some humans and link them 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+Human tim("Tim", 1.75); 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+root.Insert(&tim); 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+Human tom("Tom", 1.85); 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+tim.Insert(&tom); 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+Human john("John", 1.66);
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+tom.Insert(&john);
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+Human sue("Sue", 1.78); 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+john.Insert(&sue); 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+Human sam("Sam", 1.88); 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+sue.Insert(&sam);
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+...
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+Classic iteration vs iterator
+\end_layout
+
+\begin_layout FrameSubtitle
+(BaseLib2/Documentation/Tutorials/examples/LinkedListableExample.cpp)
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Classic iteration}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//Cycle through all the humans and print their name and height 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+LinkedListable *list = &root; 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+int32 i=0; 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+while(list != NULL){ 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+Human *h = dynamic_cast<Human *>(list); 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+if(h != NULL){ 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+CStaticAssertErrorCondition(Information, "[%d]:My name is %s and my height
+ is %f", i, h->Name(), h->Height()); 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+} 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+list = list->Next(); 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+i++; 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+}
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+\size tiny
+\begin_inset space \thinspace{}
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Using the iterator}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+...
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//Repeat the same exercise but using an iterator 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//reset the list to the starting point 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+list = &root; 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//Create the iterator and iterate
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+HumanIterator hi; 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+CStaticAssertErrorCondition(Information, "Printing from iterator"); 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+list->Iterate(&hi);
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+Sorting and searching
+\end_layout
+
+\begin_layout FrameSubtitle
+(BaseLib2/Documentation/Tutorials/examples/LinkedListableExample.cpp)
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Sorting}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//Sort by name 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//reset the list to the starting point 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+list = &root; 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//Create the sorter 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+HumanSorter sorter; 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+list->BSort(&sorter);
+\end_layout
+
+\begin_layout Standard
+
+\family typewriter
+\size tiny
+\begin_inset space \thinspace{}
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Searching}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//Create a search filter for all the names starting with a T 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+HumanSearchFilter humanSearchT('T'); 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+CStaticAssertErrorCondition(Information, "Printing only names starting with
+ a T");
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//reset the list to the starting point 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+list = &root; 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+LinkedListable *found = list; 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+while(found != NULL && list != NULL){ 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+found = list->Search(&humanSearchT); 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+if(found != NULL){ 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+Human *h = dynamic_cast<Human *>(found);
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+CStaticAssertErrorCondition(Information, "My name is %s and my height is
+ %f", h->Name(), h->Height()); 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+list = found->Next(); 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+} 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+}
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+Training ideas
+\end_layout
+
+\begin_layout Enumerate
+Replicate the StaticListHolderExample but using the StaticListTemplate
+\end_layout
+
+\begin_layout Enumerate
+Add the possibility of sorting by height to the LinkedListableExample
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\end_body
+\end_document

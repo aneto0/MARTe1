@@ -1,0 +1,87 @@
+##############################################################
+#
+# Copyright 2011 EFDA | European Fusion Development Agreement
+#
+# Licensed under the EUPL, Version 1.1 or - as soon they 
+# will be approved by the European Commission - subsequent  
+# versions of the EUPL (the "Licence"); 
+# You may not use this work except in compliance with the 
+# Licence. 
+# You may obtain a copy of the Licence at: 
+#  
+# http://ec.europa.eu/idabc/eupl
+#
+# Unless required by applicable law or agreed to in 
+# writing, software distributed under the Licence is 
+# distributed on an "AS IS" basis, 
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
+# express or implied. 
+# See the Licence for the specific language governing 
+# permissions and limitations under the Licence. 
+#
+# $Id$
+#
+#############################################################
+
+macosx/%.o : %.cpp
+	$(COMPILER) -c $(OPTIM) $(CFLAGS) $(CFLAGSPEC) $(DEBUG)  $*.cpp -o macosx/$*.o
+#	$(COMPILER) -S $(OPTIM) $(CFLAGS) $(CFLAGSPEC) $(DEBUG)  $*.cpp -o macosx/$*.s
+
+macosx/%.o : %.c
+	$(COMPILER) -c $(CFLAGS) $(CFLAGSPEC) $(DEBUG) $(OPTIM)  $*.c -o macosx/$*.o
+#	$(COMPILER) -S $(CFLAGS) $(CFLAGSPEC) $(DEBUG) $(OPTIM)  $*.c -o macosx/$*.s
+
+macosx/%.a : $(OBJS)
+	touch $@
+	rm macosx/$*.a
+	ld -r $(OBJS) -o $@
+
+macosx/%.dylib : macosx/%.o $(OBJS)
+	$(COMPILER) -shared-libgcc -dynamiclib -fPIC $(OBJS) $(LIBRARIES) macosx/$*.o -o $@
+	touch macosx/lib$*.dylib
+	rm  macosx/lib$*.dylib
+	ln -fns $*.dylib macosx/lib$*.dylib
+
+%.ifo :  %.h
+	$(COMPILER) -E -I$(CINTSYSDIR)/src  -I$(CINTSYSDIR) $(CFLAGS) $(DEBUG) $(OPTIM)  $*.h > temp/temp.pp
+	cint  -i temp/temp.pp $(MAKEDEFAULTDIR)/MakeIfo.cxx $* > $*.ifo
+
+%.sinfo.cpp :  %.h
+	$(COMPILER) -D_CINT -E -I$(CINTSYSDIR)/src  -I$(CINTSYSDIR) $(CFLAGS) $(DEBUG) $(OPTIM)  $*.h > temp/temp.pp
+	cint   -i  $(MAKEDEFAULTDIR)/MakeIfo.cxx $* > $*.sinfo.cpp
+
+macosx/%.exe : macosx/%.o 
+	touch macosx/$*.exe
+	echo cannot build executable macosx/$*.exe use macosx/$*.ex
+
+macosx/%.ex : macosx/%.o $(OBJS)
+	$(COMPILER) macosx/$*.o $(OBJS) $(LIBRARIES)  -o macosx/$*.ex
+
+depends.macosx: dependsRaw.macosx 
+	sed -f $(MAKEDEFAULTDIR)/CreateMacOSXDepends.sed dependsRaw.macosx >depends.macosx
+
+dependsRaw.macosx: 
+	$(COMPILER) $(CFLAGS) $(CFLAGSPEC) $(DEBUG) $(OPTIM) -MM -I. *.c* > dependsRaw.macosx
+	@mkdir -p temp
+	@mkdir -p macosx
+
+macosx/%.gam : macosx/%.o $(OBJS)
+	$(COMPILER) -shared-libgcc -dynamiclib -fPIC $(OBJS) $(LIBRARIES) macosx/$*.o -o $@
+
+macosx/%.drv : macosx/%.o $(OBJS)
+	$(COMPILER) -shared-libgcc -dynamiclib -fPIC $(OBJS) $(LIBRARIES) macosx/$*.o -o $@
+
+%.spb : 
+	$(MAKE) -C $* -f Makefile.$(TARGET)
+
+
+%.spc : 
+	$(MAKE) -C $* -f Makefile.$(TARGET) clean
+
+
+clean:  $(SUBPROJC)
+	rm -f depends*
+	rm -f $(TARGET)/*$(OBJEXT)
+	rm -f $(TARGET)/*$(DLLEXT)
+	rm -f $(TARGET)/*$(EXEEXT)
+	rm -f $(TARGET)/*$(LIBEXT)

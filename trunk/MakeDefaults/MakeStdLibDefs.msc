@@ -1,0 +1,63 @@
+#############################################################
+#
+# Copyright 2011 EFDA | European Fusion Development Agreement
+#
+# Licensed under the EUPL, Version 1.1 or - as soon they 
+# will be approved by the European Commission - subsequent  
+# versions of the EUPL (the "Licence"); 
+# You may not use this work except in compliance with the 
+# Licence. 
+# You may obtain a copy of the Licence at: 
+#  
+# http://ec.europa.eu/idabc/eupl
+#
+# Unless required by applicable law or agreed to in 
+# writing, software distributed under the Licence is 
+# distributed on an "AS IS" basis, 
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
+# express or implied. 
+# See the Licence for the specific language governing 
+# permissions and limitations under the Licence. 
+#
+# $Id$
+#
+#############################################################
+
+EXEEXT=.exe
+LIBEXT=.lib
+OBJEXT=.obj
+DLLEXT=.dll
+DRVEXT=.drv
+GAMEXT=.gam
+
+OBJS=   $(OBJSX:%.x=msc/%.obj) 
+OBJS2=  $(OBJSX2:%.x=msc/%.obj) 
+OBJS3=  $(OBJSX3:%.x=msc/%.obj) 
+
+PP=   $(PPX:%.x=msc/%.pp) 
+
+#OBJS += $(OBJSXRTTI:%.x=msc/%.rtti.obj) 
+
+OBJS_=  $(OBJSX:%.x=msc\\%.obj) 
+OBJS2_= $(OBJSX2:%.x=msc\\%.obj) 
+OBJS3_= $(OBJSX3:%.x=msc\\%.obj) 
+
+SUBPROJ = $(SPB:%.x=%.spb)
+SUBPROJ2 = $(SPB2:%.x=%.spb)
+SUBPROJC = $(SPB:%.x=%.spc)
+SUBPROJC += $(SPB2:%.x=%.spc)
+
+MAKE     =   make
+COMPILER =   cl 
+FCOMPILER =  f77
+DEBUG    =   -Zi
+OPTIM    =   -O2 -G6 -Ob2
+CFLAGSPEC=   -MD -GR
+LFLAGS   =   -D_WIN32 
+LOPTS    =  
+CFLAGS   =   -W1 -D_WIN32 
+FFLAGS   =   
+FOPTS    =   -optimize:4
+
+.SUFFIXES:     .cpp .obj  .o .a .lib .exe 
+

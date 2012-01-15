@@ -1,0 +1,3872 @@
+#LyX 1.6.10 created this file. For more info see http://www.lyx.org/
+\lyxformat 345
+\begin_document
+\begin_header
+\textclass beamer
+\begin_preamble
+\usepackage[absolute,overlay]{textpos} 
+
+\usetheme{Darmstadt}
+% or ...Singapore Darmstadt
+
+%\usecolortheme{seahorse}
+% or whatever (possibly just delete it)
+\end_preamble
+\use_default_options false
+\language english
+\inputencoding auto
+\font_roman times
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_amsmath 2
+\use_esint 0
+\cite_engine basic
+\use_bibtopic false
+\paperorientation portrait
+\secnumdepth 2
+\tocdepth 2
+\paragraph_separation indent
+\defskip medskip
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\author "" 
+\author "" 
+\end_header
+
+\begin_body
+
+\begin_layout Standard
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+This file is a solution template for:
+\end_layout
+
+\begin_layout Itemize
+Talk at a conference/colloquium.
+ 
+\end_layout
+
+\begin_layout Itemize
+Talk length is about 20min.
+ 
+\end_layout
+
+\begin_layout Itemize
+Style is ornate.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+Copyright 2004 by Till Tantau <tantau@users.sourceforge.net>.
+ 
+\end_layout
+
+\begin_layout Plain Layout
+In principle, this file can be redistributed and/or modified under the terms
+ of the GNU Public License, version 2.
+ However, this file is supposed to be a template to be modified for your
+ own needs.
+ For this reason, if you use this file as a template and not specifically
+ distribute it as part of a another package/program, the author grants the
+ extra permission to freely copy and modify this file as you see fit and
+ even to delete this copyright notice.
+ 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\end_layout
+
+\begin_layout Title
+
+\size large
+BaseLib2 Tutorial Series
+\end_layout
+
+\begin_layout Subtitle
+Introduction and threading
+\end_layout
+
+\begin_layout Author
+André Neto
+\end_layout
+
+\begin_layout Date
+May 25, 2011
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+If you wish to uncover everything in a step-wise fashion, uncomment the
+ following command:
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+%
+\backslash
+beamerdefaultoverlayspecification{<+->}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout BeginFrame
+Outline
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset toc
+LatexCommand tableofcontents
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Note Note
+status collapsed
+
+\begin_layout Plain Layout
+Structuring a talk is a difficult task and the following structure may not
+ be suitable.
+ Here are some rules that apply for this solution: 
+\end_layout
+
+\begin_layout Itemize
+Exactly two or three sections (other than the summary).
+ 
+\end_layout
+
+\begin_layout Itemize
+At *most* three subsections per section.
+ 
+\end_layout
+
+\begin_layout Itemize
+Talk about 30s to 2min per frame.
+ So there should be between about 15 and 30 frames, all told.
+\end_layout
+
+\begin_layout Itemize
+A conference audience is likely to know very little of what you are going
+ to talk about.
+ So *simplify*! 
+\end_layout
+
+\begin_layout Itemize
+In a 20min talk, getting the main ideas across is hard enough.
+ Leave out details, even if it means being less precise than you think necessary.
+ 
+\end_layout
+
+\begin_layout Itemize
+If you omit details that are vital to the proof/implementation, just say
+ so once.
+ Everybody will be happy with that.
+ 
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Subsection
+BaseLib2
+\end_layout
+
+\begin_layout BeginFrame
+Design ideas
+\end_layout
+
+\begin_layout Itemize
+Multi-platform C++ library, code once run everywhere approach 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Very important when developing complex codes for real-time applications
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Designed to provide all the basic ingredients required to develop a real-time
+ application
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Does not ensure real-time by itself 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Only when executing in a real-time OS...
+\end_layout
+
+\begin_layout Itemize
+..and if the code was carefully written
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+...
+ but provides all the interfaces to quickly enable real-time features when
+ the real-time OS is available
+\end_layout
+
+\end_deeper
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+Layers
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Graphics
+	filename BaseLib2_L3_4_5_6_v2.eps
+	display false
+	height 80theight%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+Note on other libraries
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Dependencies}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+BaseLib2 was designed to work without any dependencies
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+This also applies to the C++ stdlib and you should avoid mixing the two
+\end_layout
+
+\end_deeper
+\end_deeper
+\begin_layout Standard
+\begin_inset space ~
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Real-time codes}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+be extremely careful when
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+you have to depend on libraries that you don't maintain (open-source or
+ not)
+\end_layout
+
+\begin_layout Itemize
+link with libraries that were not designed to work in real-time operating
+ systems (VxWorks)
+\end_layout
+
+\end_deeper
+\end_deeper
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout Subsection
+Minimum requirements
+\end_layout
+
+\begin_layout BeginFrame
+Background
+\end_layout
+
+\begin_layout Enumerate
+Knowledge of any C style-like syntax language
+\end_layout
+
+\begin_layout Enumerate
+Knowledge of C++ (or at least object oriented)
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+Thinking in C++ 2nd Edition by Bruce Eckel (free on the web)
+\end_layout
+
+\begin_layout Enumerate
+http://www.mindview.net/Books/TICPP/ThinkingInCPP2e.html
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+If you know Java, you'll find similitudes in the style...
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+Environment
+\end_layout
+
+\begin_layout Enumerate
+Any of the supported operating systems
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+Linux, Mac OS X, MS Windows, Solaris, VxWorks
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+C++ compiler
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+GNU Compiler Collection (gcc)
+\end_layout
+
+\begin_layout Enumerate
+For MS Windows use Cygwin (http://www.cygwin.com/) and visual studio compiler
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+CVS
+\end_layout
+
+\begin_layout Enumerate
+Text editor
+\end_layout
+
+\begin_layout Enumerate
+(The material for this tutorial should run in any jac machine) 
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+Getting the source
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{CVS user}
+\end_layout
+
+\end_inset
+
+If you don't have a CVS username let me know
+\end_layout
+
+\begin_layout ExampleBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Instructions}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout ExampleBlock
+
+\family typewriter
+\size tiny
+export CVSROOT=:pserver:aneto@cvsppcc.jet.uk:2401/home/ppcc-dev/CVS_REPOSITORY
+\end_layout
+
+\begin_layout ExampleBlock
+
+\family typewriter
+\size tiny
+cvs login
+\end_layout
+
+\begin_layout ExampleBlock
+
+\family typewriter
+\size tiny
+cvs co MakeDefaults BaseLib2 MARTe
+\end_layout
+
+\begin_layout ExampleBlock
+
+\family typewriter
+\size tiny
+cvs logout
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout Subsection
+Compiling
+\end_layout
+
+\begin_layout BeginFrame
+Makefile structure
+\end_layout
+
+\begin_layout Itemize
+Each binary container (executable or library) has 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Makefile.inc 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+lists all the objects that are to be compiled for the given target
+\end_layout
+
+\begin_layout Itemize
+contains what are the expected outputs (executable, static library, dynamic
+ library)
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Makefile for each operating system (also known as target)
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+name is always Makefile.osname (e.g.
+ Makefile.linux Makefile.solaris)
+\end_layout
+
+\end_deeper
+\end_deeper
+\begin_layout Itemize
+The MakeDefaults directory contains the compilation instructions for the
+ different operating systems
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+You don't have to change these
+\end_layout
+
+\end_deeper
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+Makefile.inc acronyms
+\end_layout
+
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="10" columns="2">
+<features>
+<column alignment="left" valignment="top" width="0">
+<column alignment="left" valignment="top" width="8cm">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size scriptsize
+Acronym
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size scriptsize
+Meaning
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size scriptsize
+CFLAGS
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size scriptsize
+Extra compilation flags to be sent to the compiler
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size scriptsize
+OBJSX
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size scriptsize
+List of objects to be compiled
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size scriptsize
+MAKEDEFAULTDIR
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size scriptsize
+The location of the MakeDefault directory
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size scriptsize
+TARGET
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size scriptsize
+The operating system identifier (linux, macosx, rtai, v6x5100, v6x5500,
+ vx5100, vx5500)
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size scriptsize
+OBJS
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size scriptsize
+Compiles all OBJSX
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size scriptsize
+DLLEXT
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size scriptsize
+Produce a dynamic library
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size scriptsize
+LIBEXT
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size scriptsize
+Produce a static library
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size scriptsize
+EXEEXT
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size scriptsize
+Produce an executable
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size scriptsize
+LIBRARIES
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size scriptsize
+Other libraries to link
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\shape italic
+There are others, but these are the most important...
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+Makefile.inc example
+\end_layout
+
+\begin_layout ExampleBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Makefile.inc}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout ExampleBlock
+
+\family typewriter
+\size scriptsize
+OBJSX=MessageTriggeringMask.x
+\end_layout
+
+\begin_layout ExampleBlock
+
+\family typewriter
+\size scriptsize
+MAKEDEFAULTDIR=../../../MakeDefaults
+\end_layout
+
+\begin_layout ExampleBlock
+
+\family typewriter
+\size scriptsize
+include $(MAKEDEFAULTDIR)/MakeStdLibDefs.$(TARGET)
+\end_layout
+
+\begin_layout ExampleBlock
+
+\family typewriter
+\size scriptsize
+CFLAGS+= -I.
+ 
+\end_layout
+
+\begin_layout ExampleBlock
+
+\family typewriter
+\size scriptsize
+CFLAGS+= -I../../../BaseLib2/Level0 
+\end_layout
+
+\begin_layout ExampleBlock
+
+\family typewriter
+\size scriptsize
+CFLAGS+= -I../../../BaseLib2/Level1 
+\end_layout
+
+\begin_layout ExampleBlock
+
+\family typewriter
+\size scriptsize
+CFLAGS+= -I../../../BaseLib2/Level2 
+\end_layout
+
+\begin_layout ExampleBlock
+
+\family typewriter
+\size scriptsize
+CFLAGS+= -I../../../BaseLib2/Level3 
+\end_layout
+
+\begin_layout ExampleBlock
+
+\family typewriter
+\size scriptsize
+CFLAGS+= -I../../../BaseLib2/Level4 
+\end_layout
+
+\begin_layout ExampleBlock
+
+\family typewriter
+\size scriptsize
+CFLAGS+= -I../../../BaseLib2/Level5 
+\end_layout
+
+\begin_layout ExampleBlock
+
+\family typewriter
+\size scriptsize
+CFLAGS+= -I../../../BaseLib2/Level6 
+\end_layout
+
+\begin_layout ExampleBlock
+
+\family typewriter
+\size scriptsize
+CFLAGS+= -I../../../BaseLib2/LoggerService 
+\end_layout
+
+\begin_layout ExampleBlock
+
+\family typewriter
+\size scriptsize
+CFLAGS+= -I../../MarteSupportLib
+\end_layout
+
+\begin_layout ExampleBlock
+
+\family typewriter
+\size scriptsize
+all: $(OBJS) 
+\backslash
+ 
+\end_layout
+
+\begin_layout ExampleBlock
+
+\family typewriter
+\size scriptsize
+$(TARGET)/MessageTriggeringTimeService$(DLLEXT) 
+\end_layout
+
+\begin_layout ExampleBlock
+
+\family typewriter
+\size scriptsize
+echo $(OBJS)
+\end_layout
+
+\begin_layout ExampleBlock
+
+\family typewriter
+\size scriptsize
+include depends.$(TARGET)
+\end_layout
+
+\begin_layout ExampleBlock
+
+\family typewriter
+\size scriptsize
+include $(MAKEDEFAULTDIR)/MakeStdLibRules.$(TARGET)
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+Makefile.os
+\end_layout
+
+\begin_layout Itemize
+Usually only specifies the target and includes the Makefile.inc
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+when required, OS dependent libraries are also set here
+\end_layout
+
+\end_deeper
+\begin_layout ExampleBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Makefile.linux (example)}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout ExampleBlock
+
+\family typewriter
+\size scriptsize
+TARGET=linux
+\end_layout
+
+\begin_layout ExampleBlock
+
+\family typewriter
+\size scriptsize
+include Makefile.inc
+\end_layout
+
+\begin_layout ExampleBlock
+
+\family typewriter
+\size scriptsize
+LIBRARIES += -L../../../BaseLib2/$(TARGET) -lBaseLib2 -L../../MarteSupportLib/$(TARGET)
+ -lMarteSupLib
+\end_layout
+
+\begin_layout ExampleBlock
+
+\family typewriter
+\size scriptsize
+OPTIM=
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout Subsection
+Key files
+\end_layout
+
+\begin_layout BeginFrame
+BaseLib2 type definitions (see GenDefs.h)
+\end_layout
+
+\begin_layout Itemize
+
+\size tiny
+Each type has the same meaning in all operating systems where your code
+ might run
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+
+\size tiny
+(float and double were not redefined)
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+\align center
+\begin_inset Tabular
+<lyxtabular version="3" rows="12" columns="2">
+<features>
+<column alignment="left" valignment="top" width="0">
+<column alignment="left" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size scriptsize
+Type
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size scriptsize
+Meaning
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size scriptsize
+int8
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size scriptsize
+signed 8 bit integer
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size scriptsize
+uint8
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size scriptsize
+unsigned 8 bit integer
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size scriptsize
+int16
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size scriptsize
+signed 16 bit integer
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size scriptsize
+uint16
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size scriptsize
+unsigned 16 bit integer
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size scriptsize
+int32
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size scriptsize
+signed 32 bit integer
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size scriptsize
+uint32
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size scriptsize
+unsigned 32 bit integer
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size scriptsize
+int64
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size scriptsize
+signed 64 bit integer
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size scriptsize
+uint64
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size scriptsize
+unsigned 64 bit integer
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\shape italic
+\size scriptsize
+float
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size scriptsize
+IEEE-754 single precision floating point number
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\shape italic
+\size scriptsize
+double
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size scriptsize
+IEEE-754 double precision floating point number
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size scriptsize
+intptr
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family typewriter
+\size scriptsize
+large enough to store an integer pointer in any architecture
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+SystemXYZ.h
+\end_layout
+
+\begin_layout Itemize
+Contains special definitions which are very OS dependent
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Handles for files
+\end_layout
+
+\begin_layout Itemize
+Some low-level functions that might not be available in this OS
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Includes all the header files that are OS dependent
+\end_layout
+
+\begin_layout Itemize
+e.g.
+ see: SystemLinux.h, SystemVX5100.h, ...
+\end_layout
+
+\begin_layout Itemize
+System.h includes all these files
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+Endianity.h
+\end_layout
+
+\begin_layout Itemize
+Endianness defines in what order data is stored in the computer memory
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+little-endian (named Intel in this file): MSB in highest address 
+\end_layout
+
+\begin_layout Itemize
+big-endian (named Motorola in this file): MSB in lowest address 
+\end_layout
+
+\end_deeper
+\begin_layout ExampleBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Example}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout ExampleBlock
+
+\size tiny
+Decimal: 2864434397
+\end_layout
+
+\begin_layout ExampleBlock
+
+\size tiny
+Hex:0xAABBCCDD
+\end_layout
+
+\begin_layout ExampleBlock
+
+\size tiny
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="5">
+<features>
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size tiny
+Address
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size tiny
+n
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size tiny
+n+1
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size tiny
+n+2
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size tiny
+n+3
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size tiny
+Little-endian
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size tiny
+DD
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size tiny
+CC
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size tiny
+BB
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size tiny
+AA
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size tiny
+Big-endian
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size tiny
+AA
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size tiny
+BB
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size tiny
+CC
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size tiny
+DD
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+
+\size scriptsize
+Depends on the computer architecture and even in the programming language
+ (Java is always big-endian)
+\end_layout
+
+\begin_layout Itemize
+
+\size scriptsize
+Very useful when you have to convert data from other data sources (I/O,
+ network, ...) to the endianity of your environment
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+ErrorManagement.h
+\end_layout
+
+\begin_layout Itemize
+Defines unified way of logging information
+\end_layout
+
+\begin_layout Itemize
+Higher level code decides how this information should be displayed (file,
+ network, ...)
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{CStaticAssertErrorCondition}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+CStaticAssertErrorCondition(EMFErrorType errorCode,const char *errorDescription,...
+)
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset Tabular
+<lyxtabular version="3" rows="5" columns="1">
+<features>
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size scriptsize
+errorCodes
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size scriptsize
+Information
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size scriptsize
+Warning
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size scriptsize
+FatalError
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size scriptsize
+InitialisationError
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset space ~
+\end_inset
+
+
+\end_layout
+
+\begin_layout ExampleBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Example}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout ExampleBlock
+
+\series bold
+\size scriptsize
+CStaticAssertErrorCondition(
+\series default
+Information
+\series bold
+,
+\begin_inset Quotes erd
+\end_inset
+
+Hello %d times
+\begin_inset Quotes erd
+\end_inset
+
+,10)
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout Section
+Threading
+\end_layout
+
+\begin_layout Subsection
+Thread management
+\end_layout
+
+\begin_layout BeginFrame
+Basic ideas
+\end_layout
+
+\begin_layout Itemize
+Threads enable you to run code in 
+\shape italic
+parallel
+\end_layout
+
+\begin_layout Itemize
+Threads are selfish by nature and try to run while there is some work to
+ be completed
+\end_layout
+
+\begin_layout Itemize
+Scheduler divides and arbitrates CPU time amongst threads
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Several rules and scheduling schemes are available (Round-robin, FIFO, ...)
+\end_layout
+
+\begin_layout Itemize
+Real-time operating system are usually not fair and give more time to the
+ threads with higher priority
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+When threads have 
+\family typewriter
+\shape italic
+nothing to do
+\family default
+\shape default
+, control should be voluntarily returned to the scheduler
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Until something happens
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+wait on a semaphore
+\end_layout
+
+\begin_layout Itemize
+poll a resource (hum...)
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Sleep for a defined amount of time
+\end_layout
+
+\end_deeper
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+Creating threads
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Threads::BeginThread}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\size scriptsize
+Threads::BeginThread
+\series bold
+\color black
+(ThreadFunctionType function,void *parameters,uint32 stacksize,const char
+ *name,ExceptionHandlerBehaviour ehb,ProcessorType runOnCPUs)
+\end_layout
+
+\begin_layout AlertBlock
+
+\size scriptsize
+\begin_inset Tabular
+<lyxtabular version="3" rows="7" columns="3">
+<features>
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size scriptsize
+Parameter
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size scriptsize
+Description
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size tiny
+Default value
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size scriptsize
+function
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size scriptsize
+The function to be called by the thread
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size tiny
+-
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size scriptsize
+parameters
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size scriptsize
+Parameter to be passed to the thread
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size tiny
+NULL
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size scriptsize
+stacksize
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size scriptsize
+Stack size 
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size tiny
+Depends on arch.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size scriptsize
+name
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size scriptsize
+Thread name
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size tiny
+NULL
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size scriptsize
+ehb
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size scriptsize
+Not implemented
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size tiny
+XH_NotHandled
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size scriptsize
+runOnCPUs
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size scriptsize
+CPU mask where thread can run
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\size tiny
+2 in multi-core, 1 otherwise
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset space ~
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{ThreadFunctionType}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\size tiny
+typedef void (*ThreadFunctionType)(void *parameters);
+\end_layout
+
+\begin_layout AlertBlock
+
+\size tiny
+e.g.
+ void MyThreadCallBack(void *myParameters){}
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+Sleep.h
+\end_layout
+
+\begin_layout Itemize
+Voluntarily return control to scheduler
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Real-time OS should provide better precision (in particular for 
+\series bold
+\color black
+SleepNoMore
+\series default
+)
+\end_layout
+
+\begin_layout Itemize
+Other similar functions are available
+\end_layout
+
+\end_deeper
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Sleep}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+void SleepSec(double sec);
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+void SleepNoMore(double sec);
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+void SleepAtLeast(double sec);
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+Threads example
+\end_layout
+
+\begin_layout FrameSubtitle
+(BaseLib2/Documentation/Tutorials/examples/ThreadExample1.cpp)
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Source}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//Shared variable to be incremented by the threads
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+static int32 sharedVariable = 0;
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+//Thread function call back
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+void IncrementDecrementFunction(void *threadID){
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+...
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+sharedVariable++; 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+ComplexAnalysis((thisThreadID + 1) * 1e-3);
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+sharedVariable--;
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+...
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+}
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+int main(int argc, char *argv[]){
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\color inherit
+//Output logging messages to the console 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\color black
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\color inherit
+LSSetUserAssembleErrorMessageFunction(NULL);
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+...
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+for(i=0; i<numberOfThreads; i++){ 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+Threads::BeginThread(IncrementDecrementFunction, (int32 *)i, THREADS_DEFAULT_STA
+CKSIZE, NULL, XH_NotHandled, 0x1); 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+}
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+...
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+CStaticAssertErrorCondition(Information, "Value of sharedVariable = %d",
+ sharedVariable);
+\end_layout
+
+\begin_layout Itemize
+Several threads chaotically increment and decrement a shared variable
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout Subsection
+Protecting resources
+\end_layout
+
+\begin_layout BeginFrame
+Concepts
+\end_layout
+
+\begin_layout Itemize
+Extremely important when shared resources are accessed by different threads
+\end_layout
+
+\begin_layout Itemize
+Usually protected using semaphores
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Mutex types, guarantees that only a single thread can be accessing a shared
+ resource at a time
+\end_layout
+
+\begin_layout Itemize
+Event types, collection of threads wait for an event to happen, after which
+ are all allowed to interact with the resource
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+Atomic types, guarantee the atomicity of some operations in variables
+\end_layout
+
+\begin_layout Itemize
+All are important and to be used accordingly to the context
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+Atomic.h
+\end_layout
+
+\begin_layout Itemize
+Enables integer variables to be increment, decremented or exchanged in a
+ thread safe way
+\end_layout
+
+\begin_layout Itemize
+Can be used if you need to test a given variable, without the burden of
+ a semaphore
+\end_layout
+
+\begin_layout Itemize
+Very good for spinlock-like implementations
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Most important functions}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+void Increment(volatile *intXYZ)
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+void Decrement(volatile *intXYZ)
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+intXYZ Exchange(volatile *intXYZ, intXYZ newValue) //Returns the old value
+\end_layout
+
+\begin_layout AlertBlock
+
+\series bold
+\size scriptsize
+\color black
+bool TestAndSet(volatile *intXYZ) //Checks if a given variable is not zero
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+Atomic example
+\end_layout
+
+\begin_layout FrameSubtitle
+(BaseLib2/Documentation/Tutorials/examples/AtomicExample1.cpp)
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Source}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//Shared lock
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+static int32 locked = 0;
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+....
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+int32 a = 3; 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+int32 b = 4;
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//Exchange
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+if(b = Atomic::Exchange(&a, b)){ 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+CStaticAssertErrorCondition(FatalError, "Failed to exchange the contents
+ of a and b!"); 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+} 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+CStaticAssertErrorCondition(Information, "After exchanging a=%d b=%d", a,
+ b); 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//Atomic increment 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+Atomic::Increment(&a);
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//Lock again CStaticAssertErrorCondition(Information, "locked should now
+ be 1 locked = %d", locked); 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//Create thread to perform the unlock 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+CStaticAssertErrorCondition(Information, "Going to wait for thread to unlock");
+ 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+Threads::BeginThread(UnlockWithTestAndSet);
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+//Spin lock 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+while(!Atomic::TestAndSet(&locked));
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+Mutex Semaphores
+\end_layout
+
+\begin_layout Itemize
+
+\size scriptsize
+Protects a shared resource 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+
+\size scriptsize
+Only one thread can interact with it at the same time
+\end_layout
+
+\begin_layout Itemize
+
+\size scriptsize
+Can be a variable
+\end_layout
+
+\begin_layout Itemize
+
+\size scriptsize
+Can be a block of code
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+
+\size scriptsize
+Two types of Mutex available (both with timeout)
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+
+\size scriptsize
+MutexSem (driven by the scheduler)
+\end_layout
+
+\begin_layout Itemize
+
+\size scriptsize
+FastPollingMutexSem (spinlocks in a variable)
+\end_layout
+
+\end_deeper
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Most important in MutexSem.h}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\series bold
+\size tiny
+\color black
+bool Create(bool locked = False)
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\series bold
+\size tiny
+\color black
+bool Lock(TimeoutType msecTimeout = TTInfiniteWait) //notice and check against
+ the timeout
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\series bold
+\size tiny
+\color black
+bool UnLock()
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\series bold
+\size tiny
+bool Close()
+\end_layout
+
+\begin_layout Standard
+\begin_inset space ~
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Most important in FastPollingMutexSem.h}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\series bold
+\size tiny
+\color black
+bool Create(bool locked = False)
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\series bold
+\size tiny
+\color black
+bool FastLock(TimeoutType msecTimeout = TTInfiniteWait)
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\series bold
+\size tiny
+\color black
+bool FastUnLock()
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\series bold
+\size tiny
+bool FastTryLock()
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\series bold
+\size tiny
+bool Close()
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+Event Semaphores
+\end_layout
+
+\begin_layout Itemize
+Collection of threads wait for resource to be available
+\end_layout
+
+\begin_layout Itemize
+Usually driven by an event
+\end_layout
+
+\begin_layout Itemize
+Timeout can be specified
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Most important functions for EventSem}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\series bold
+\size tiny
+\color black
+bool Create()
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\series bold
+\size tiny
+\color black
+bool Reset()
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\series bold
+\size tiny
+\color black
+bool Wait(TimeoutType msecTimeout = TTInfiniteWait)
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\series bold
+\size tiny
+bool Post()
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\series bold
+\size tiny
+bool Close()
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+Semaphore example
+\end_layout
+
+\begin_layout FrameSubtitle
+(BaseLib2/Documentation/Tutorials/examples/ThreadExample2.cpp)
+\end_layout
+
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Source}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+void IncrementDecrementFunction(void *threadID){ 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+int32 thisThreadID = (int32)threadID;
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+CStaticAssertErrorCondition(Information, "Thread with id = %d waiting for
+ event sem", thisThreadID); 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+if(!eventSem.Wait()){ 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+CStaticAssertErrorCondition(FatalError, "Thread with id = %d failed to wait
+ in event sem (timeout?)", thisThreadID); 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+}
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+...
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+//The mutex protects this region of code 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+if(!mutexSem.Lock()){ 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+CStaticAssertErrorCondition(FatalError, "Thread with id = %d failed to wait
+ in mutex sem (timeout?)", thisThreadID); 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+} 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+sharedVariable++; 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+ComplexAnalysis((thisThreadID + 1) * 1e-3); 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+sharedVariable--; 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+exitAfterCalls--; 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+//Unprotect here
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+if(!mutexSem.UnLock()){ 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+CStaticAssertErrorCondition(FatalError, "Thread with id = %d failed to unlock
+ mutex sem", thisThreadID); 
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\size tiny
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset space ~
+\end_inset
+
+}
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout Subsection
+Measuring execution time
+\end_layout
+
+\begin_layout BeginFrame
+High Resolution Timer (HRT.h)
+\end_layout
+
+\begin_layout Itemize
+Enables to have access to the CPU high resolution timer counter
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Perfect tool to measure time elapsed between two points
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+Multiply number of elapsed ticks (HRTCounter) times the period (HRTPeriod)
+\end_layout
+
+\end_deeper
+\end_deeper
+\begin_layout AlertBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Most important functions}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\series bold
+\size tiny
+int64 HRT::HRTCounter()
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\series bold
+\size tiny
+int64 HRT::HRTFrequency()
+\end_layout
+
+\begin_layout AlertBlock
+
+\family typewriter
+\series bold
+\size tiny
+int64 HRT::HRTPeriod()
+\end_layout
+
+\begin_layout ExampleBlock
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+{Example}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout ExampleBlock
+
+\family typewriter
+\series bold
+\size tiny
+int64 countsAtT1 = HRT::HRTCounter();
+\end_layout
+
+\begin_layout ExampleBlock
+
+\family typewriter
+\size tiny
+...
+\end_layout
+
+\begin_layout ExampleBlock
+
+\family typewriter
+\size tiny
+CStaticAssertErrorCondition(Information, 
+\begin_inset Quotes eld
+\end_inset
+
+Time elapsed = %f
+\begin_inset Quotes erd
+\end_inset
+
+, ((HRT::HRTCounter() - 
+\series bold
+countsAt
+\series default
+T1) * HRT::HRTPeriod());
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\begin_layout BeginFrame
+Training ideas
+\end_layout
+
+\begin_layout Enumerate
+Create a program where a thread adjusts its Sleep time to be as precise
+ as possible
+\end_layout
+
+\begin_deeper
+\begin_layout Enumerate
+This means that you should measure how long the thread is actually sleeping
+ and dynamically adjust the sleep value
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+Rewrite ThreadExample2 using FastPollingMutexSems
+\end_layout
+
+\begin_layout Enumerate
+Rewrite ThreadExample2 using Atomic spinlocks
+\end_layout
+
+\begin_layout EndFrame
+
+\end_layout
+
+\end_body
+\end_document

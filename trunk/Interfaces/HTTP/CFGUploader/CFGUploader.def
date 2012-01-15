@@ -1,0 +1,6 @@
+LIBRARY    CFGUploader
+DESCRIPTION "CFGUploader"
+EXPORTS
+
+Get_private_CFGUploaderInfo @1
+

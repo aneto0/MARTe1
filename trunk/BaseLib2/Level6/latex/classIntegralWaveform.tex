@@ -1,0 +1,71 @@
+\hypertarget{classIntegralWaveform}{
+\section{IntegralWaveform Class Reference}
+\label{classIntegralWaveform}\index{IntegralWaveform@{IntegralWaveform}}
+}
+Inheritance diagram for IntegralWaveform:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classIntegralWaveform}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classIntegralWaveform_a4586b9513a71ac52a5412402a6f39ba7}{
+virtual void {\bfseries Reset} ()}
+\label{classIntegralWaveform_a4586b9513a71ac52a5412402a6f39ba7}
+
+\item 
+virtual bool \hyperlink{classIntegralWaveform_a5c22fc22e29ab3589821de1bdabfe45a}{ObjectLoadSetup} (ConfigurationDataBase \&cdbData, StreamInterface $\ast$err)
+\item 
+virtual bool \hyperlink{classIntegralWaveform_a7b2d5fe30d954a19ac551bb9afff0124}{ProcessHttpMessage} (HttpStream \&hStream)
+\item 
+\hypertarget{classIntegralWaveform_a9a35249283d5fa2d0979d74315035fc9}{
+virtual float {\bfseries GetValue} (int32 usecTime)}
+\label{classIntegralWaveform_a9a35249283d5fa2d0979d74315035fc9}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classIntegralWaveform_a5c22fc22e29ab3589821de1bdabfe45a}{
+\index{IntegralWaveform@{IntegralWaveform}!ObjectLoadSetup@{ObjectLoadSetup}}
+\index{ObjectLoadSetup@{ObjectLoadSetup}!IntegralWaveform@{IntegralWaveform}}
+\subsubsection[{ObjectLoadSetup}]{\setlength{\rightskip}{0pt plus 5cm}bool IntegralWaveform::ObjectLoadSetup (
+\begin{DoxyParamCaption}
+\item[{ConfigurationDataBase \&}]{cdbData, }
+\item[{StreamInterface $\ast$}]{err}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}
+\label{classIntegralWaveform_a5c22fc22e29ab3589821de1bdabfe45a}
+Loads parameters from a CDB 
+\begin{DoxyParams}{Parameters}
+{\em cdbData} & the CDB \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if the initialisation went ok, False otherwise 
+\end{DoxyReturn}
+\hypertarget{classIntegralWaveform_a7b2d5fe30d954a19ac551bb9afff0124}{
+\index{IntegralWaveform@{IntegralWaveform}!ProcessHttpMessage@{ProcessHttpMessage}}
+\index{ProcessHttpMessage@{ProcessHttpMessage}!IntegralWaveform@{IntegralWaveform}}
+\subsubsection[{ProcessHttpMessage}]{\setlength{\rightskip}{0pt plus 5cm}bool IntegralWaveform::ProcessHttpMessage (
+\begin{DoxyParamCaption}
+\item[{HttpStream \&}]{hStream}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}
+\label{classIntegralWaveform_a7b2d5fe30d954a19ac551bb9afff0124}
+Builds a webpage for the current object 
+\begin{DoxyParams}{Parameters}
+{\em hStream} & the HttpStream to write to \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following files:\begin{DoxyCompactItemize}
+\item 
+IntegralWaveform.h\item 
+IntegralWaveform.cpp\end{DoxyCompactItemize}

@@ -1,0 +1,276 @@
+\hypertarget{classMMCDBItem}{
+\section{MMCDBItem Class Reference}
+\label{classMMCDBItem}\index{MMCDBItem@{MMCDBItem}}
+}
+
+
+{\ttfamily \#include $<$MMCDBItem.h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classMMCDBItem_a5f21296ebd80095d96c390aad01f5b7e}{MMCDBItem} ()
+\item 
+virtual \hyperlink{classMMCDBItem_aec530e395b9a972b206b807045ff051b}{$\sim$MMCDBItem} ()
+\item 
+bool \hyperlink{classMMCDBItem_a92e272cb66d8ab4509892326311a8262}{Init} (void $\ast$address, const char $\ast$className, const char $\ast$variableName, int numberOfDimensions=0, int $\ast$dimensions=NULL)
+\item 
+bool \hyperlink{classMMCDBItem_a31ad65be84e9d192532773231eb36fc5}{Populate} (int index=-\/1)
+\item 
+bool \hyperlink{classMMCDBItem_a6f45b1839b2b805c1328c787acc2cef3}{UnPopulate} ()
+\item 
+bool \hyperlink{classMMCDBItem_a18f846f8b9a456dab99d401cc2fd9bc9}{IsPointer} ()
+\item 
+bool \hyperlink{classMMCDBItem_a61c6d4bddc781d3345e136741cf68e2c}{IsArray} ()
+\item 
+int \hyperlink{classMMCDBItem_a56c0686b4bb5deb388213c0da61fb14b}{NumberOfElements} ()
+\item 
+\hyperlink{classMMCDBItem}{MMCDBItem} $\ast$ \hyperlink{classMMCDBItem_a2ac885747c9810eb0ef55e8912156c87}{GetElement} (int index)
+\item 
+\hyperlink{classMMCDBItem}{MMCDBItem} $\ast$ \hyperlink{classMMCDBItem_a81e24c00a86b8f42c9f009f516c53738}{GetElement} (const char $\ast$name)
+\item 
+int \hyperlink{classMMCDBItem_a6910fb0f2f7287e514975174d9cc9c0e}{GetElementPosition} (\hyperlink{classMMCDBItem}{MMCDBItem} $\ast$mmcdbi)
+\item 
+void \hyperlink{classMMCDBItem_a2fe0e3359d9652946fb1e395f0536d1e}{Show} (Streamable \&s, const char $\ast$indent)
+\item 
+const char $\ast$ \hyperlink{classMMCDBItem_ae43063e2a6556e6f4b6c858ec764f7c0}{ClassName} () const 
+\item 
+const char $\ast$ \hyperlink{classMMCDBItem_a205f85f04d59e7db319727b450188ac4}{VariableName} () const 
+\item 
+void $\ast$ \hyperlink{classMMCDBItem_a231848e8fa7b83b8dd42c56acdc5517b}{Address} () const 
+\item 
+bool \hyperlink{classMMCDBItem_abb0bf898f79c3b621c17831fe0a3546d}{IsFinal} ()
+\item 
+int \hyperlink{classMMCDBItem_a42360b33f820463deba48a5f1cb350cf}{NumberOfArrayDimensions} ()
+\item 
+int $\ast$ \hyperlink{classMMCDBItem_af524a914ed2d2bf5834c39c415c912f9}{GetArrayDimensions} ()
+\item 
+int \hyperlink{classMMCDBItem_a143a8229802e60e3a994e1b50b5ee2c9}{TotalSize} (int fromDim=0)
+\item 
+bool \hyperlink{classMMCDBItem_ad5109b07c9777048677ea966ea33ef6a}{IsFloat} ()
+\item 
+int \hyperlink{classMMCDBItem_a4d498ad1b2cf3d00a848275da1c10d8f}{ElementSize} ()
+\end{DoxyCompactItemize}
+\subsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classMMCDBItem_a5d19313b8a1f99ced936931ecef35a69}{
+class \hyperlink{classMMCDBItem_a5d19313b8a1f99ced936931ecef35a69}{MMCDB}}
+\label{classMMCDBItem_a5d19313b8a1f99ced936931ecef35a69}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Used by \hyperlink{classMMCDB}{MMCDB} as element of a path. It is a contianer of elements of the same type 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classMMCDBItem_a5f21296ebd80095d96c390aad01f5b7e}{
+\index{MMCDBItem@{MMCDBItem}!MMCDBItem@{MMCDBItem}}
+\index{MMCDBItem@{MMCDBItem}!MMCDBItem@{MMCDBItem}}
+\subsubsection[{MMCDBItem}]{\setlength{\rightskip}{0pt plus 5cm}MMCDBItem::MMCDBItem (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}
+\label{classMMCDBItem_a5f21296ebd80095d96c390aad01f5b7e}
+\hypertarget{classMMCDBItem_aec530e395b9a972b206b807045ff051b}{
+\index{MMCDBItem@{MMCDBItem}!$\sim$MMCDBItem@{$\sim$MMCDBItem}}
+\index{$\sim$MMCDBItem@{$\sim$MMCDBItem}!MMCDBItem@{MMCDBItem}}
+\subsubsection[{$\sim$MMCDBItem}]{\setlength{\rightskip}{0pt plus 5cm}virtual MMCDBItem::$\sim$MMCDBItem (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline, virtual\mbox{]}}}}
+\label{classMMCDBItem_aec530e395b9a972b206b807045ff051b}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classMMCDBItem_a231848e8fa7b83b8dd42c56acdc5517b}{
+\index{MMCDBItem@{MMCDBItem}!Address@{Address}}
+\index{Address@{Address}!MMCDBItem@{MMCDBItem}}
+\subsubsection[{Address}]{\setlength{\rightskip}{0pt plus 5cm}void$\ast$ MMCDBItem::Address (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classMMCDBItem_a231848e8fa7b83b8dd42c56acdc5517b}
+\hypertarget{classMMCDBItem_ae43063e2a6556e6f4b6c858ec764f7c0}{
+\index{MMCDBItem@{MMCDBItem}!ClassName@{ClassName}}
+\index{ClassName@{ClassName}!MMCDBItem@{MMCDBItem}}
+\subsubsection[{ClassName}]{\setlength{\rightskip}{0pt plus 5cm}const char$\ast$ MMCDBItem::ClassName (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classMMCDBItem_ae43063e2a6556e6f4b6c858ec764f7c0}
+\hypertarget{classMMCDBItem_a4d498ad1b2cf3d00a848275da1c10d8f}{
+\index{MMCDBItem@{MMCDBItem}!ElementSize@{ElementSize}}
+\index{ElementSize@{ElementSize}!MMCDBItem@{MMCDBItem}}
+\subsubsection[{ElementSize}]{\setlength{\rightskip}{0pt plus 5cm}int MMCDBItem::ElementSize (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classMMCDBItem_a4d498ad1b2cf3d00a848275da1c10d8f}
+in bytes \hypertarget{classMMCDBItem_af524a914ed2d2bf5834c39c415c912f9}{
+\index{MMCDBItem@{MMCDBItem}!GetArrayDimensions@{GetArrayDimensions}}
+\index{GetArrayDimensions@{GetArrayDimensions}!MMCDBItem@{MMCDBItem}}
+\subsubsection[{GetArrayDimensions}]{\setlength{\rightskip}{0pt plus 5cm}int$\ast$ MMCDBItem::GetArrayDimensions (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classMMCDBItem_af524a914ed2d2bf5834c39c415c912f9}
+\hypertarget{classMMCDBItem_a2ac885747c9810eb0ef55e8912156c87}{
+\index{MMCDBItem@{MMCDBItem}!GetElement@{GetElement}}
+\index{GetElement@{GetElement}!MMCDBItem@{MMCDBItem}}
+\subsubsection[{GetElement}]{\setlength{\rightskip}{0pt plus 5cm}{\bf MMCDBItem}$\ast$ MMCDBItem::GetElement (
+\begin{DoxyParamCaption}
+\item[{int}]{index}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classMMCDBItem_a2ac885747c9810eb0ef55e8912156c87}
+returns also fake entries for pointers \hypertarget{classMMCDBItem_a81e24c00a86b8f42c9f009f516c53738}{
+\index{MMCDBItem@{MMCDBItem}!GetElement@{GetElement}}
+\index{GetElement@{GetElement}!MMCDBItem@{MMCDBItem}}
+\subsubsection[{GetElement}]{\setlength{\rightskip}{0pt plus 5cm}{\bf MMCDBItem}$\ast$ MMCDBItem::GetElement (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{name}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classMMCDBItem_a81e24c00a86b8f42c9f009f516c53738}
+returns also fake entries for pointers \hypertarget{classMMCDBItem_a6910fb0f2f7287e514975174d9cc9c0e}{
+\index{MMCDBItem@{MMCDBItem}!GetElementPosition@{GetElementPosition}}
+\index{GetElementPosition@{GetElementPosition}!MMCDBItem@{MMCDBItem}}
+\subsubsection[{GetElementPosition}]{\setlength{\rightskip}{0pt plus 5cm}int MMCDBItem::GetElementPosition (
+\begin{DoxyParamCaption}
+\item[{{\bf MMCDBItem} $\ast$}]{mmcdbi}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classMMCDBItem_a6910fb0f2f7287e514975174d9cc9c0e}
+-\/1 for not found \hypertarget{classMMCDBItem_a92e272cb66d8ab4509892326311a8262}{
+\index{MMCDBItem@{MMCDBItem}!Init@{Init}}
+\index{Init@{Init}!MMCDBItem@{MMCDBItem}}
+\subsubsection[{Init}]{\setlength{\rightskip}{0pt plus 5cm}bool MMCDBItem::Init (
+\begin{DoxyParamCaption}
+\item[{void $\ast$}]{address, }
+\item[{const char $\ast$}]{className, }
+\item[{const char $\ast$}]{variableName, }
+\item[{int}]{numberOfDimensions = {\ttfamily 0}, }
+\item[{int $\ast$}]{dimensions = {\ttfamily NULL}}
+\end{DoxyParamCaption}
+)}}
+\label{classMMCDBItem_a92e272cb66d8ab4509892326311a8262}
+the last three parameters are only necessary to handle packed structures \hypertarget{classMMCDBItem_a61c6d4bddc781d3345e136741cf68e2c}{
+\index{MMCDBItem@{MMCDBItem}!IsArray@{IsArray}}
+\index{IsArray@{IsArray}!MMCDBItem@{MMCDBItem}}
+\subsubsection[{IsArray}]{\setlength{\rightskip}{0pt plus 5cm}bool MMCDBItem::IsArray (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classMMCDBItem_a61c6d4bddc781d3345e136741cf68e2c}
+\hypertarget{classMMCDBItem_abb0bf898f79c3b621c17831fe0a3546d}{
+\index{MMCDBItem@{MMCDBItem}!IsFinal@{IsFinal}}
+\index{IsFinal@{IsFinal}!MMCDBItem@{MMCDBItem}}
+\subsubsection[{IsFinal}]{\setlength{\rightskip}{0pt plus 5cm}bool MMCDBItem::IsFinal (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classMMCDBItem_abb0bf898f79c3b621c17831fe0a3546d}
+cannot be broken down into smaller parts or we don't need to \hypertarget{classMMCDBItem_ad5109b07c9777048677ea966ea33ef6a}{
+\index{MMCDBItem@{MMCDBItem}!IsFloat@{IsFloat}}
+\index{IsFloat@{IsFloat}!MMCDBItem@{MMCDBItem}}
+\subsubsection[{IsFloat}]{\setlength{\rightskip}{0pt plus 5cm}bool MMCDBItem::IsFloat (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classMMCDBItem_ad5109b07c9777048677ea966ea33ef6a}
+for elementary types whether this is a float or double \hypertarget{classMMCDBItem_a18f846f8b9a456dab99d401cc2fd9bc9}{
+\index{MMCDBItem@{MMCDBItem}!IsPointer@{IsPointer}}
+\index{IsPointer@{IsPointer}!MMCDBItem@{MMCDBItem}}
+\subsubsection[{IsPointer}]{\setlength{\rightskip}{0pt plus 5cm}bool MMCDBItem::IsPointer (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classMMCDBItem_a18f846f8b9a456dab99d401cc2fd9bc9}
+whether this is a pointer \hypertarget{classMMCDBItem_a42360b33f820463deba48a5f1cb350cf}{
+\index{MMCDBItem@{MMCDBItem}!NumberOfArrayDimensions@{NumberOfArrayDimensions}}
+\index{NumberOfArrayDimensions@{NumberOfArrayDimensions}!MMCDBItem@{MMCDBItem}}
+\subsubsection[{NumberOfArrayDimensions}]{\setlength{\rightskip}{0pt plus 5cm}int MMCDBItem::NumberOfArrayDimensions (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classMMCDBItem_a42360b33f820463deba48a5f1cb350cf}
+\hypertarget{classMMCDBItem_a56c0686b4bb5deb388213c0da61fb14b}{
+\index{MMCDBItem@{MMCDBItem}!NumberOfElements@{NumberOfElements}}
+\index{NumberOfElements@{NumberOfElements}!MMCDBItem@{MMCDBItem}}
+\subsubsection[{NumberOfElements}]{\setlength{\rightskip}{0pt plus 5cm}int MMCDBItem::NumberOfElements (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classMMCDBItem_a56c0686b4bb5deb388213c0da61fb14b}
+\hypertarget{classMMCDBItem_a31ad65be84e9d192532773231eb36fc5}{
+\index{MMCDBItem@{MMCDBItem}!Populate@{Populate}}
+\index{Populate@{Populate}!MMCDBItem@{MMCDBItem}}
+\subsubsection[{Populate}]{\setlength{\rightskip}{0pt plus 5cm}bool MMCDBItem::Populate (
+\begin{DoxyParamCaption}
+\item[{int}]{index = {\ttfamily -\/1}}
+\end{DoxyParamCaption}
+)}}
+\label{classMMCDBItem_a31ad65be84e9d192532773231eb36fc5}
+in case of a structure creates virtaul view of the structure in case of an arry does nothing if (index $>$ 0) then it will populate one array row.
+
+populate elements 
+
+nop need 
+
+\hypertarget{classMMCDBItem_a2fe0e3359d9652946fb1e395f0536d1e}{
+\index{MMCDBItem@{MMCDBItem}!Show@{Show}}
+\index{Show@{Show}!MMCDBItem@{MMCDBItem}}
+\subsubsection[{Show}]{\setlength{\rightskip}{0pt plus 5cm}void MMCDBItem::Show (
+\begin{DoxyParamCaption}
+\item[{Streamable \&}]{s, }
+\item[{const char $\ast$}]{indent}
+\end{DoxyParamCaption}
+)}}
+\label{classMMCDBItem_a2fe0e3359d9652946fb1e395f0536d1e}
+\hypertarget{classMMCDBItem_a143a8229802e60e3a994e1b50b5ee2c9}{
+\index{MMCDBItem@{MMCDBItem}!TotalSize@{TotalSize}}
+\index{TotalSize@{TotalSize}!MMCDBItem@{MMCDBItem}}
+\subsubsection[{TotalSize}]{\setlength{\rightskip}{0pt plus 5cm}int MMCDBItem::TotalSize (
+\begin{DoxyParamCaption}
+\item[{int}]{fromDim = {\ttfamily 0}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classMMCDBItem_a143a8229802e60e3a994e1b50b5ee2c9}
+total number of elements of array \hypertarget{classMMCDBItem_a6f45b1839b2b805c1328c787acc2cef3}{
+\index{MMCDBItem@{MMCDBItem}!UnPopulate@{UnPopulate}}
+\index{UnPopulate@{UnPopulate}!MMCDBItem@{MMCDBItem}}
+\subsubsection[{UnPopulate}]{\setlength{\rightskip}{0pt plus 5cm}bool MMCDBItem::UnPopulate (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classMMCDBItem_a6f45b1839b2b805c1328c787acc2cef3}
+de-\/populate elements \hypertarget{classMMCDBItem_a205f85f04d59e7db319727b450188ac4}{
+\index{MMCDBItem@{MMCDBItem}!VariableName@{VariableName}}
+\index{VariableName@{VariableName}!MMCDBItem@{MMCDBItem}}
+\subsubsection[{VariableName}]{\setlength{\rightskip}{0pt plus 5cm}const char$\ast$ MMCDBItem::VariableName (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classMMCDBItem_a205f85f04d59e7db319727b450188ac4}
+
+
+The documentation for this class was generated from the following files:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{MMCDBItem_8h}{MMCDBItem.h}\item 
+MMCDBItem.cpp\end{DoxyCompactItemize}

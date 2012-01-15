@@ -1,0 +1,745 @@
+;
+; Copyright 2011 EFDA | European Fusion Development Agreement
+;
+; Licensed under the EUPL, Version 1.1 or - as soon they 
+; will be approved by the European Commission - subsequent  
+; versions of the EUPL (the "Licence"); 
+; You may not use this work except in compliance with the 
+; Licence. 
+; You may obtain a copy of the Licence at: 
+;  
+; http://ec.europa.eu/idabc/eupl
+;
+; Unless required by applicable law or agreed to in 
+; writing, software distributed under the Licence is 
+; distributed on an "AS IS" basis, 
+; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
+; express or implied. 
+; See the Licence for the specific language governing 
+; permissions and limitations under the Licence. 
+;
+; $Id$
+;
+
+LIBRARY    BASELIB2
+DESCRIPTION "BASELIB2"
+EXPORTS
+
+; Level 0
+
+VCAssertErrorCondition                   @    1
+VCStaticAssertErrorCondition             @    2
+CStaticAssertErrorCondition              @    3
+VCISRAssertErrorCondition                @    4
+CISRStaticAssertErrorCondition           @    5
+VCAssertPlatformErrorCondition           @    6
+LSSetUserAssembleErrorMessageFunction    @    7
+LSSetUserAssembleISRErrorMessageFunction @    8
+CStaticAssertPlatformErrorCondition      @    9
+VCAssertSocketErrorCondition             @   10
+LSGetUserAssembleErrorMessageFunction    @   11
+EMFErrorName                             @   12
+
+MEMORYMalloc                             @   50
+MEMORYFree                               @   51
+MEMORYRealloc                            @   52
+MEMORYDisplayAllocationStatistics        @   53
+MEMORYStrDup                             @   54
+MEMORYAllocationStatistics               @   55
+MEMORYCheck                              @   56
+
+TimerConfigTimer                         @   70
+TimerConfigAndStartTimer                 @   71
+TimerGetTimerUsecPeriod                  @   72
+TimerResetTimer                          @   73
+TimerInit                                @   74
+TimerStartTimer                          @   75
+TimerStopTimer                           @   76
+TimerShowStats                           @   77
+TimerCServiceRoutine                     @   78
+
+ProcessorClockRate                       @  101
+ProcessorClockCycle                      @  102
+ProcessorName                            @  103
+ProcessorFamily                          @  104
+ProcessorCharacteristic                  @  105
+ProcessorReScanCPU                       @  106
+
+GetSleepFrequency                        @  151
+SetSleepGranularity                      @  152
+GetSleepGranularity                      @  153
+GetDateSeconds                           @  154
+ResynchronizeClock                       @  155
+
+ThreadsSetPriorityLevel                  @  200
+ThreadsBeginThread                       @  201
+ThreadsThreadId                          @  202
+ThreadsKill                              @  203
+ThreadsIsAlive                           @  204
+ThreadsSetNormalClass                    @  205
+ThreadsSetRealTimeClass                  @  206
+ThreadsSetIdleClass                      @  207
+ThreadsSetHighClass                      @  208
+ThreadsSetInitialisationInterfaceConstructor  @  209
+ThreadsGetInitialisationInterface        @  210
+ThreadProtectedExecute                   @  211
+GetHttpRelayURL                          @  212
+SetLoggerServerURL                       @  213
+
+TDB_NewEntry                             @  220
+TDB_RemoveEntry                          @  221
+TDB_GetTII                               @  222
+TDB_Lock                                 @  223
+TDB_UnLock                               @  224
+TDB_NumberOfThreads                      @  225
+TDB_GetThreadID                          @  226
+TDB_Find                                 @  227
+TDB_GetInfo                              @  228
+TDB_GetName                              @  229
+
+
+HRTSystemMsecTime                        @  260
+HRTClockRate                             @  261
+HRTClockCycle                            @  262
+HRTMSecTics                              @  263
+
+MainHandler                              @  301
+
+SMInit                                   @  351
+SMCreate                                 @  352
+SMOpenExisting                           @  353
+SMDispose                                @  354
+SMGive                                   @  355
+
+SemNameDataBaseErase                     @  401
+SemNameDataBaseList                      @  402
+SemNameDataBaseAdd                       @  403
+SemNameDataBaseUseExisting2              @  404
+SemNameDataBaseUseExisting               @  405
+SemNameDataBaseDelete                    @  406
+
+CPrintInt32                              @  451
+CPrintDouble                             @  452
+CPrintString                             @  453
+VCPrintf                                 @  454
+CGetToken                                @  455
+CSkipTokens                              @  456
+CGetCStringToken                         @  457
+CDestructiveGetCStringToken              @  458
+CGetCSToken                              @  459
+CRead                                    @  460
+CWrite                                   @  461
+CPrintf                                  @  462
+bl2_vsprintf                             @  463
+bl2_sprintf                              @  464
+bl2_vsnprintf                            @  465
+bl2_snprintf                             @  466
+CGetStringToken                          @  467
+
+SocketInit                               @  501
+GetLocalAddress                          @  502
+GetLocalIpNumber                         @  503
+GetLocalAddressAsNumber                  @  504
+GetHostName                              @  505
+
+FileOpen                                 @  651
+FileLock                                 @  652
+FileUnLock                               @  653
+FileSetMaxNumberOfFiles                  @  654
+FileEraseFile                            @  655
+FileSetFileName                          @  656
+FileRead                                 @  657
+FileWrite                                @  658
+FileSize                                 @  659
+FileSeek                                 @  660
+FilePosition                             @  661
+FileSetSize                              @  662
+FileRelativeSeek                         @  663
+FilePositionSeek                         @  664
+Get_private_FileInfo                     @  670
+
+ConsoleWrite                             @  751
+ConsoleRead                              @  752
+ConsoleSetTitleBar                       @  753
+ConsoleSetCursorPosition                 @  754
+ConsoleSetSize                           @  755
+ConsoleGetCursorPosition                 @  756
+ConsoleGetSize                           @  757
+RemoteConsoleInit                        @  758
+RemoteConsoleFinish                      @  759
+RemoteConsoleWrite                       @  760
+RemoteConsoleRead                        @  761
+RCConsoleThread                          @  762
+RCRemoteThread                           @  763
+RemoteConsoleClient                      @  764
+ConsoleSetColour                         @  765
+ConsoleClear                             @  766
+ConsoleOpen                              @  767
+ConsoleClose                             @  768
+Get_private_ConsoleInfo                  @  769
+Get_private_RemoteConsoleInfo            @  770
+ConsoleShow                              @  771
+SANameToStreamModes                      @  772
+ConsoleSetWindowSize                     @  773
+ConsoleGetWindowSize                     @  774
+SAColorsToRGB                            @  775
+ConsolePlotChar                          @  776
+
+ATMWrite                                 @  851
+ATMRead                                  @  852
+ATMOpen                                  @  853
+ATMSetVCI                                @  854
+
+ProcessorTypeSetDefaultCPUs              @  900
+ProcessorTypeGetDefaultCPUs              @  901
+
+; Level 1
+
+ObjectRegistryDataBaseAdd                @ 1001
+DisplayRegisteredClasses                 @ 1002
+ObjectRegistryDataBaseFind               @ 1003
+ObjectRegistryDataBaseFindByCode         @ 1004
+ObjectRegistryDataBaseFindByExtension    @ 1005
+ObjectRegistryDataBaseList               @ 1006
+ObjectRegistryDataBaseDelete             @ 1007
+ObjectRegistryDataBaseFindStructure      @ 1008
+ORIInit                                  @ 1009
+ORISetup                                 @ 1010
+ORIFinish                                @ 1011
+ORISetupStructure                        @ 1012
+NameToClassId                            @ 1013
+
+OBJObjectSave                            @ 1051
+OBJObjectLoadCreate                      @ 1053
+OBJObjectCreateByName                    @ 1054
+OBJObjectCreateById                      @ 1055
+OBJObjectReadFlags                       @ 1056
+OBJEnableAllocationMonitoring            @ 1059
+OBJDeleteFun                             @ 1060
+OBJNewFun                                @ 1061
+OBJSetGlobalOnErrorBehaviour             @ 1062
+OBJSetThreadOnErrorBehaviour             @ 1063
+OBJSetClassOnErrorBehaviour              @ 1064
+OBJSetObjectOnErrorBehaviour             @ 1065
+OBJGetGlobalInstructions                 @ 1066
+OBJGetGlobalErrorAction                  @ 1067
+Get_private_ObjectInfo                   @ 1068
+Get_private_GCNamedObjectInfo            @ 1069
+
+GCRConstructor                           @ 1100
+
+GCRCFind                                 @ 1110
+GCRCObjectLoadSetup                      @ 1111
+GCRCObjectSaveSetup                      @ 1112
+Get_private_GCReferenceContainerInfo     @ 1113
+_GetGlobalObjectDataBase                 @ 1114
+GCRCInsert                               @ 1115
+GCRCIterate                              @ 1116
+GCRObjectLoadSetup                       @ 1117
+GCRObjectSaveSetup                       @ 1118
+GlobalObjectDataBaseEnableDebugging      @ 1119
+GCNOObjectLoadSetup                      @ 1120
+GCRCILReference                          @ 1121
+GCNOObjectSaveSetup                      @ 1122
+
+BTConvertToString                        @ 1201
+BTConvertFromString                      @ 1202
+BTConvert                                @ 1203
+StringToInt64                            @ 1204
+Int64ToString                            @ 1205
+IntToInt                                 @ 1206
+IntToInt64                               @ 1207
+IntToInt32                               @ 1208
+Int64ToInt                               @ 1209
+Int32ToInt                               @ 1210
+
+GCDecrement                              @ 1901
+GCIncrement                              @ 1902
+
+
+; Level 2
+
+CStreamBufferingReadFN                   @ 2013
+CStreamBufferingWriteFN                  @ 2014
+CStreamBufferingSeekFN                   @ 2015
+Get_private_StreamableInfo               @ 2016
+StreamCompleteRead                       @ 2017
+StreamCompleteWrite                      @ 2018
+
+FSAlloc                                  @ 2100
+FSRead                                   @ 2101
+FSWrite                                  @ 2102
+Get_private_GCNStringInfo                @ 2103
+
+Get_private_ATMSocketInfo                @ 2155
+Get_private_UDPSocketInfo                @ 2156
+Get_private_TCPSocketInfo                @ 2157
+
+ConsoleSSWrite                           @ 2251
+ConsoleSSRead                            @ 2252
+
+SerialCommitSettings                     @ 2301
+SerialToggleControlBits                  @ 2302
+SerialQueryCommStatus                    @ 2303
+SerialWrite                              @ 2304
+SerialRead                               @ 2305
+SerialOpen                               @ 2306
+SerialClose                              @ 2307
+TestSerial                               @ 2308
+SerialObjectLoadSetup                    @ 2309
+
+Get_private_SerialInfo                   @ 2900
+Get_private_BufferedStreamInfo		 @ 2901
+
+; Level 3
+
+Get_private_CDBInfo                      @ 3001
+CDBC_SortNumFilterFn                     @ 3002
+CDBC_SortFilterFn                        @ 3003
+Get_private_CDBNodeInfo                  @ 3004
+Get_private_CDBGroupNodeInfo             @ 3005
+Get_private_CDBStringDataNodeInfo        @ 3006
+Get_private_CDBLinkNodeInfo              @ 3007
+TestCDB                                  @ 3008
+TestCDB2                                 @ 3009
+TestCDB3                                 @ 3010
+TestCDB4                                 @ 3011
+TestCDB5                                 @ 3012
+TestCDB6                                 @ 3013
+TestCDB7                                 @ 3014
+LATokenizeInput                          @ 3015
+ParserParse                              @ 3016
+Get_private_ParserInfo                   @ 3017
+FindCDBTYPEFromCDBDataType               @ 3018
+CDBCICreate                              @ 3019
+CDBCIDestroy                             @ 3020
+CDBCIClean                               @ 3021
+CDBCILoad                                @ 3022
+CDBCISave                                @ 3023
+CDBCIMove                                @ 3024
+CDBCIReadArray                           @ 3025
+CDBCIWriteArray                          @ 3026
+CDBCIFree                                @ 3027
+TestCDB8                                 @ 3028
+TestCDB9                                 @ 3029
+TestBTInt2Int                            @ 3030
+TestBTAny2String                         @ 3031
+
+EAFileOpen                               @ 3050
+EAFileAddStream                          @ 3051
+EAFileClose                              @ 3052
+Get_private_EAFileInfo                   @ 3053
+
+ObjectRegistryEvaluateAddress            @ 3101
+Get_private_StreamConfigurationDataBaseInfo  @ 3102
+
+Get_float__ORI__                         @ 3201
+Get_double__ORI__                        @ 3202
+Get_int__ORI__                           @ 3203
+Get_long__ORI__                          @ 3204
+Get_long_int__ORI__                      @ 3205
+Get_unsigned_int__ORI__                  @ 3206
+Get_unsigned_long__ORI__                 @ 3207
+Get_unsigned_long_int__ORI__             @ 3208
+Get_short__ORI__                         @ 3209
+Get_short_int__ORI__                     @ 3210
+Get_unsigned_short__ORI__                @ 3211
+Get_unsigned_short_int__ORI__            @ 3212
+Get_char__ORI__                          @ 3213
+Get_unsigned_char__ORI__                 @ 3214
+Get_uint64__ORI__                        @ 3215
+Get_uint32__ORI__                        @ 3216
+Get_uint16__ORI__                        @ 3217
+Get_uint8__ORI__                         @ 3218
+Get_int64__ORI__                         @ 3219
+Get_int32__ORI__                         @ 3220
+Get_int16__ORI__                         @ 3221
+Get_int8__ORI__                          @ 3222
+
+; Level 4
+
+md5                                      @ 4000
+;MD5Encode                                @ 4001
+;MD5CodeString                            @ 4002
+;MD5Code                                  @ 4003
+;MD5Crypt                                 @ 4004
+;MD5EnCrypt                               @ 4005
+;MD5Verify                                @ 4006
+B64Encode                                @ 4007
+B64Decode                                @ 4008
+
+MCCService                               @ 4151
+MCCListener                              @ 4152
+MCCListenerThread                        @ 4153
+MCCStart                                 @ 4154
+MCCStop                                  @ 4155
+MCCInit                                  @ 4156
+
+;MLLHListInsertSortedFn                   @ 4201
+;MLLHListInsertSorted                     @ 4202
+;MLLHListExtractSearchFn                  @ 4203
+;MLLHListDeleteSearchFn                   @ 4204
+;MLLHListExtractSearch                    @ 4205
+;MLLHListDeleteSearch                     @ 4206
+;MLLHListSearchFn                         @ 4207
+;MLLHListSearch                           @ 4208
+;MLLHListBSortFn                          @ 4209
+;MLLHListBSort                            @ 4210
+;MLLHListIterateFn                        @ 4211
+;MLLHListExtractN                         @ 4212
+;MLLHListIterate                          @ 4213
+;MLLHListExtract                          @ 4214
+;MLLHListDelete                           @ 4215
+;2MLLHPop                                  @ 4216
+
+RTMPrint_I                               @ 4251
+RTMPrint_F                               @ 4252
+RTMPrint_D                               @ 4253
+RTMAllocate_I                            @ 4254
+RTMAllocate_F                            @ 4255
+RTMAllocate_D                            @ 4256
+REFMAllocate_I                           @ 4257
+REFMAllocate_F                           @ 4258
+REFMAllocate_D                           @ 4259
+REFMDeAllocate_I                         @ 4260
+REFMDeAllocate_F                         @ 4261
+REFMDeAllocate_D                         @ 4262
+MAReAllocate_I                           @ 4263
+MAReAllocate_F                           @ 4264
+MAReAllocate_D                           @ 4265
+
+RTM__vecCopy_F                           @ 4301
+RTM__vecSum_F                            @ 4302
+RTM__vecDiff_F                           @ 4303
+RTM__vecComb_F                           @ 4304
+RTM__vecScale_F                          @ 4305
+RTM__vecCopy_FI                          @ 4306
+RTM__vecCopy_FD                          @ 4307
+RTM__vecIsNull_F                         @ 4308
+RTM__vecCopy_D                           @ 4309
+RTM__vecSum_D                            @ 4310
+RTM__vecDiff_D                           @ 4311
+RTM__vecComb_D                           @ 4312
+RTM__vecScale_D                          @ 4313
+RTM__vecCopy_DF                          @ 4314
+RTM__vecCopy_DI                          @ 4315
+RTM__vecIsNull_D                         @ 4316
+RTM__vecCopy_I                           @ 4317
+RTM__vecSum_I                            @ 4318
+RTM__vecDiff_I                           @ 4319
+RTM__vecComb_I                           @ 4320
+RTM__vecScale_I                          @ 4321
+RTM__vecCopy_IF                          @ 4322
+RTM__vecCopy_ID                          @ 4323
+RTM__vecIsNull_I                         @ 4324
+
+RTMProduct_UIII                          @ 4351
+RTMProduct_UFFF                          @ 4352
+RTMProduct_UDDD                          @ 4353
+RTMVProduct_UIII                         @ 4354
+RTMVProduct_UFFF                         @ 4355
+RTMVProduct_UDDD                         @ 4356
+RTMVProductAcc_UIII                      @ 4357
+RTMVProductAcc_UFFF                      @ 4358
+RTMVProductAcc_UDDD                      @ 4359
+RTMDotProduct_UII                        @ 4360
+RTMDotProduct_UFF                        @ 4361
+RTMDotProduct_UDD                        @ 4362
+
+RTMTranspose_UII                         @ 4401
+RTMTranspose_UFF                         @ 4402
+RTMTranspose_UDD                         @ 4403
+RTMInvert_UFF                            @ 4404
+RTMInvert_UDF                            @ 4405
+RTMInvert_UDD                            @ 4406
+RTMLU_FFFF                               @ 4407
+RTMLU_DDDD                               @ 4408
+RTMSVD_FFFF                              @ 4409
+RTMSVD_DDDD                              @ 4410
+
+RTMZerofy_I                              @ 4451
+RTMZerofy_F                              @ 4452
+RTMZerofy_D                              @ 4453
+RTMOnefy_I                               @ 4454
+RTMOnefy_F                               @ 4455
+RTMOnefy_D                               @ 4456
+RTMEyefy_I                               @ 4457
+RTMEyefy_F                               @ 4458
+RTMEyefy_D                               @ 4459
+RTMIsNull_I                              @ 4460
+RTMIsNull_F                              @ 4461
+RTMIsNull_D                              @ 4462
+
+RTMScale_II                              @ 4501
+RTMScale_FF                              @ 4502
+RTMScale_DD                              @ 4503
+RTMMax_I                                 @ 4504
+RTMMax_F                                 @ 4505
+RTMMax_D                                 @ 4506
+RTMMin_I                                 @ 4507
+RTMMin_F                                 @ 4508
+RTMMin_D                                 @ 4509
+RTMCombine_UIIII                         @ 4510
+RTMCombine_UFFFF                         @ 4511
+RTMCombine_UDDDD                         @ 4512
+
+RTMMaxAbsRowSumNorm_I                    @ 4551
+RTMMaxAbsRowSumNorm_F                    @ 4552
+RTMMaxAbsRowSumNorm_D                    @ 4553
+RTMMaxAbsColSumNorm_I                    @ 4554
+RTMMaxAbsColSumNorm_F                    @ 4555
+RTMMaxAbsColSumNorm_D                    @ 4556
+
+FilterInit                               @ 4601
+FilterResize                             @ 4602
+Get_private_FilterInfo                   @ 4603
+
+;HCAddRealmKey                            @ 4800
+;HCAddProxy                               @ 4801
+;HCSetTimeout                             @ 4802
+;HCGet                                    @ 4803
+;HOHttpOptions                            @ 4804
+;HODestructor                             @ 4805
+;HOParse                                  @ 4806
+
+HSUserServiceThreadEx                    @ 4834
+HSUserListenerInitialize                 @ 4835
+HSUserListenerTerminate                  @ 4836
+HSUserListenerThread                     @ 4837
+HSObjectLoadSetup                        @ 4838
+;HRTry                                    @ 4840
+;HRStandardCheck                          @ 4841
+;HRSecurityCheck                          @ 4842
+;HRFilterCommands                         @ 4843
+;HRObjectLoadSetup                        @ 4844
+;HGRHtmlObjectSubView                     @ 4850
+;HGRObjectLoadSetup                       @ 4851
+;HDRHtmlObjectSubView                     @ 4852
+HSWWrite                                 @ 4853
+HSWriteHeader                            @ 4854
+HSWFlush                                 @ 4855
+
+
+Get_private_HttpBasicServiceInfo         @ 4880
+Get_private_HttpServiceInfo              @ 4881
+Get_private_HttpGroupResourceInfo        @ 4883
+Get_private_HttpDirectoryResourceInfo    @ 4884
+Get_private_HttpClassListResourceInfo    @ 4885
+Get_private_HttpClientInfo               @ 4886
+Get_private_HttpFramedResourceInfo       @ 4887
+Get_private_HttpErrorLogResourceInfo     @ 4888
+Get_private_HttpServiceRelayResourceInfo @ 4890
+Get_private_HttpThreadListResourceInfo   @ 4891
+
+URLLoad                                  @ 4901
+HttpClientGet                            @ 4902
+
+; Level5
+
+;CDBBrowse                                @ 5051
+;CDBSetup                                 @ 5052
+;CDBBMTestInit                            @ 5053
+;CDBBMHtmlObjectSubView                   @ 5054
+OBMSetup                                 @ 5071
+OBMBrowse                                @ 5072
+MenuSystemTextMenu                       @ 5101
+; MenuSystemHtmlObjectSubView              @ 5102
+
+DDBIAMObjectSaveSetup                    @ 5501
+DDBIAddSignal                            @ 5502
+DDBCreateLink                            @ 5503
+DDBAddInterface                          @ 5504
+DDBCreateLinkToGAM                       @ 5505
+DDBAddGAMInterface                       @ 5506
+DDBCheckAndAllocate                      @ 5507
+DDBPrint                                 @ 5508
+DDBIObjectLoadSetup                      @ 5509
+DDBIObjectSaveSetup                      @ 5510
+Get_private_DDBInterfaceInfo             @ 5511
+DDBIDObjectLoadSetup                     @ 5512
+DDBIFinalise                             @ 5513
+DDBIFind                                 @ 5514
+Get_private_DDBInterfaceDescriptorInfo   @ 5515
+DDBSD					 @ 5516
+DDBSD2					 @ 5517
+DDBISignalsList				 @ 5518
+DDBIBufferWordSize			 @ 5519
+DDBObjectLoadSetup                       @ 5520
+DDBObjectSaveSetup                       @ 5521
+DDBISignalRename                         @ 5522
+
+GAMAddInputInterface                     @ 5620
+GAMAddOutputInterface                    @ 5621
+GAMAddIOInterface                        @ 5622
+GAMFinaliseInterfaces                    @ 5623
+GAMRemapInterfaces                       @ 5624
+GAMGetPersistentCDB                      @ 5625
+GAMUpdatePersistentCDB                   @ 5626
+
+SMObjectLoadSetup                        @ 5601
+SMObjectSaveSetup                        @ 5602
+SMProcessMessage                         @ 5603
+SMSObjectLoadSetup                       @ 5604
+SMSObjectSaveSetup                       @ 5605
+SMEObjectLoadSetup                       @ 5606
+SMEObjectSaveSetup                       @ 5607
+SMProcessHttpMessage                     @ 5608
+
+MessageHandlerThreadFN                   @ 5703
+MSGObjectLoadSetup                       @ 5705
+MSGObjectSaveSetup                       @ 5706
+MSGGetUniqueId                           @ 5707
+MSGEObjectLoadSetup                      @ 5711
+MSGEObjectSaveSetup                      @ 5712
+MSGEPrepareMessageEnvelope               @ 5713
+MSGEPrepareReply                         @ 5714
+MDRObjectLoadSetup                       @ 5715
+MDRObjectSaveSetup                       @ 5716
+GlobalMessageDispatcher                  @ 5717
+MDRPrepareMDR                            @ 5718
+MCProcessHttpMessage                     @ 5719
+;MSHSendMessageAndWait                    @ 5720
+;MSHProcessMessage                        @ 5721
+SendMenuMessage                          @ 5722
+ExecuteMenuAction                        @ 5723
+SSMHIProcessMessage                      @ 5730
+MHHandleMessage                          @ 5740
+MHConstructor                            @ 5741
+MHSendMessage                            @ 5742
+MHSendMessageAndWait                     @ 5743
+MBProcessMessage2                        @ 5751
+MBObjectLoadSetup                        @ 5752
+MBObjectSaveSetup                        @ 5753
+MessageServerThreadFN                    @ 5754
+MSObjectLoadSetup                        @ 5755 
+MSObjectSaveSetup                        @ 5756
+MHSendMessageRemotely                    @ 5757
+
+
+Get_private_CDBBrowserMenuInfo           @ 5902
+Get_private_MMCDBInfo                    @ 5903
+Get_private_GAMInfo                      @ 5904
+Get_private_DDBInfo                      @ 5906
+Get_private_MessageInfo                  @ 5907
+Get_private_MessageEnvelopeInfo          @ 5908
+Get_private_MenuContainerInfo            @ 5909
+Get_private_MenuEntryInfo                @ 5910
+Get_private_MessageDeliveryRequestInfo   @ 5911
+Get_private_MessageDispatcherInfo        @ 5912
+Get_private_StateMachineInfo             @ 5913
+Get_private_StateMachineStateInfo        @ 5914
+Get_private_StateMachineEventInfo        @ 5915
+Get_private_HttpMessageSendResourceInfo  @ 5916
+Get_private_HttpDigestRealmInfo          @ 5917
+Get_private_HttpLocalSecurityBasicRealmInfo   @ 5918
+Get_private_SignalInfo                   @ 5919
+Get_private_SendMessageMenuEntryInfo     @ 5920
+Get_private_ExecuteMenuEntryInfo         @ 5921
+
+DDBBrowseMenu				 @ 5930
+DDBDumpMenu                              @ 5931
+DIRMenuSystemTextMenu                    @ 5932
+DIRMProcessHttpMessage                   @ 5933
+Get_private_DirectoryMenuBrowserInfo     @ 5934
+
+
+; Level 6
+
+ExceptionHandlerInstallTIIC              @ 6001
+
+CDB2Setup                                @ 6101
+CDB2Browse                               @ 6102
+;CDBBM2HtmlObjectSubView                  @ 6103
+CDBHUHtmlObjectSubView                   @ 6104
+
+LoadDimension                            @ 6600
+LoadMatrixObject                         @ 6601
+LoadVectorObject                         @ 6602
+LoadSingleObject                         @ 6603
+LoadRTMatrixObject                       @ 6604
+
+B2C_CreateGODBObject			         @ 6701
+B2C_CreateAndInitialiseGODBObject        @ 6702
+B2C_InitialiseGODBObject                 @ 6703
+B2C_DeleteGODBSubTree                    @ 6704
+B2C_ListGODBNodes                        @ 6705
+B2C_ShowGODBSubTree                      @ 6706
+B2C_SendMessageToGODBObject              @ 6707
+
+SMIGetSignal                             @ 6801
+SMIProcessMessage                        @ 6802
+
+MCSaveF                                  @ 6850
+MCSaveD                                  @ 6851
+MCSaveMF                                 @ 6852
+MCSaveMD                                 @ 6853
+MCSaveMI                                 @ 6854
+MCSaveS                                  @ 6855
+
+Get_private_SignalArchiverInfo           @ 6890
+Get_private_HttpGCRCBrowserInfo          @ 6901
+
+; LoggerService
+
+ESIInit                                  @ 9001
+ESILoad                                  @ 9002
+ESISend                                  @ 9003
+ESIFromBuffer                            @ 9004
+ESIComposeToText                         @ 9005
+GetLogStream                             @ 9006
+EndLogStream                             @ 9007
+LSStartService                           @ 9008
+LSStopService                            @ 9009
+LSProcessPendingErrors                   @ 9010
+;LSSetRemoteLogger                        @ 9011
+WSAMain                                  @ 9012
+LSAssembleErrorMessage                   @ 9013
+; ...
+
+
+
+;
+;ODBFObjectDescription                 @ 268
+;ODBFAdd                               @ 269
+;ODBFAddById                           @ 270
+;FSODBLoadCreateDirectoryInfo          @ 271
+;FSODBGetObject                        @ 272
+;FSODBReturnObject                     @ 273
+;FSODBAddObject                        @ 274
+;FSODBSetFolder                        @ 275
+;FSODBAddFolder                        @ 276
+;
+;PPEExplainParameter                   @ 290
+;HelpMsg                               @ 291
+;FullHelpMsg                           @ 292
+;PPParse                               @ 293
+;PPSyntax                              @ 294
+;PPFullSyntax                          @ 295
+;
+;GrabGlobalConfiguration               @ 311
+;ReturnGlobalConfiguration             @ 312
+;SAInit                                @ 313
+;SALoadParameters                      @ 314
+;SALoadEnvironment                     @ 315
+;SALoadConfiguration                   @ 316
+;SAInitialize                          @ 317
+;SAVersionsInfo                        @ 318
+;SAConfigLoad                          @ 319
+;
+;
+;
+;;Get_private_ObjectDataBaseFolderInfo  @ 501
+;Get_private_StandardApplicationInfo   @ 503
+;
+;
+;SSAddUser                             @ 1151
+;SSLoad                                @ 1152
+;SSVerify                              @ 1153
+;SSVerify2                             @ 1154
+;SSGetId                               @ 1155
+;SSGetName                             @ 1156
+;
+;ThreadIPTLS                           @ 2500
+;
+;
+

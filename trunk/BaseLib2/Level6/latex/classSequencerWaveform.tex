@@ -1,0 +1,71 @@
+\hypertarget{classSequencerWaveform}{
+\section{SequencerWaveform Class Reference}
+\label{classSequencerWaveform}\index{SequencerWaveform@{SequencerWaveform}}
+}
+Inheritance diagram for SequencerWaveform:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{classSequencerWaveform}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{classSequencerWaveform_a5e0baeafd599b64460e85cec2320155d}{
+virtual void {\bfseries Reset} ()}
+\label{classSequencerWaveform_a5e0baeafd599b64460e85cec2320155d}
+
+\item 
+virtual bool \hyperlink{classSequencerWaveform_a866ae8324e1e035eac1d99ca73efd587}{ObjectLoadSetup} (ConfigurationDataBase \&cdbData, StreamInterface $\ast$err)
+\item 
+virtual bool \hyperlink{classSequencerWaveform_a72ad2420ff153ff20d66399a2a59dbc6}{ProcessHttpMessage} (HttpStream \&hStream)
+\item 
+\hypertarget{classSequencerWaveform_a70e5009fba42d9fde521879ecfbcf5c8}{
+virtual float {\bfseries GetValue} (int32 usecTime)}
+\label{classSequencerWaveform_a70e5009fba42d9fde521879ecfbcf5c8}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classSequencerWaveform_a866ae8324e1e035eac1d99ca73efd587}{
+\index{SequencerWaveform@{SequencerWaveform}!ObjectLoadSetup@{ObjectLoadSetup}}
+\index{ObjectLoadSetup@{ObjectLoadSetup}!SequencerWaveform@{SequencerWaveform}}
+\subsubsection[{ObjectLoadSetup}]{\setlength{\rightskip}{0pt plus 5cm}bool SequencerWaveform::ObjectLoadSetup (
+\begin{DoxyParamCaption}
+\item[{ConfigurationDataBase \&}]{cdbData, }
+\item[{StreamInterface $\ast$}]{err}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}
+\label{classSequencerWaveform_a866ae8324e1e035eac1d99ca73efd587}
+Loads parameters from a CDB 
+\begin{DoxyParams}{Parameters}
+{\em cdbData} & the CDB \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if the initialisation went ok, False otherwise 
+\end{DoxyReturn}
+\hypertarget{classSequencerWaveform_a72ad2420ff153ff20d66399a2a59dbc6}{
+\index{SequencerWaveform@{SequencerWaveform}!ProcessHttpMessage@{ProcessHttpMessage}}
+\index{ProcessHttpMessage@{ProcessHttpMessage}!SequencerWaveform@{SequencerWaveform}}
+\subsubsection[{ProcessHttpMessage}]{\setlength{\rightskip}{0pt plus 5cm}bool SequencerWaveform::ProcessHttpMessage (
+\begin{DoxyParamCaption}
+\item[{HttpStream \&}]{hStream}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}
+\label{classSequencerWaveform_a72ad2420ff153ff20d66399a2a59dbc6}
+Builds a webpage for the current object 
+\begin{DoxyParams}{Parameters}
+{\em hStream} & the HttpStream to write to \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following files:\begin{DoxyCompactItemize}
+\item 
+SequencerWaveform.h\item 
+SequencerWaveform.cpp\end{DoxyCompactItemize}

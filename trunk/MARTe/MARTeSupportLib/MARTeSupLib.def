@@ -1,0 +1,26 @@
+LIBRARY    MARTeSupLib
+DESCRIPTION "Marte support library"
+EXPORTS
+
+GQMObjectLoadSetup                             @   1
+GQMObjectSaveSetup                             @   2
+TTSIObjectLoadSetup                            @   3
+TTSIObjectDescription                          @   4
+TTSITrigger                                    @   5
+TTSIStart                                      @   6
+TTSIStop                                       @   7
+
+
+Get_private_GenericAcqModuleInfo               @ 900
+Get_private_TimeTriggeringServiceInterfaceInfo @ 901
+Get_private_InputModulesServiceInfo            @ 902
+Get_private_SSMServiceClassInfo                @ 903
+Get_private_MPICTimerInfo                      @ 904
+Get_private_TimeServiceActivityInfo            @ 905
+Get_private_MARTeMenuInfo                      @ 906
+Get_private_InterruptDrivenTTSInfo             @ 907
+Get_private_DataPollingDrivenTTSInfo           @ 908
+
+
+
+

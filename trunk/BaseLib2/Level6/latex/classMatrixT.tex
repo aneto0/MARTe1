@@ -1,0 +1,199 @@
+\hypertarget{classMatrixT}{
+\section{MatrixT$<$ T $>$ Class Template Reference}
+\label{classMatrixT}\index{MatrixT@{MatrixT}}
+}
+
+
+{\ttfamily \#include $<$Matrix.h$>$}
+
+Inheritance diagram for MatrixT$<$ T $>$:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=3.000000cm]{classMatrixT}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{classMatrixT_a714fbd6bfdec6d76066eae21e86f693c}{ReSize} (uint32 nRows, uint32 nColumns)
+\item 
+\hyperlink{classMatrixT_ab9d90c99b98b11471a01695b145c6415}{MatrixT} ()
+\item 
+\hyperlink{classMatrixT_a1273ec656bc69793f67e7feccdfd37f6}{MatrixT} (uint32 nRows, uint32 nColumns)
+\item 
+\hyperlink{classMatrixT_a0619cdab01425d05a7f2bb2d253091f5}{MatrixT} (uint32 nRows, uint32 nColumns, const T $\ast$source)
+\item 
+\hyperlink{classMatrixT_abbdff52c78a71a6d1a743f07f08c525e}{MatrixT} (const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ T $>$ \&A)
+\item 
+\hyperlink{classMatrixT_aceea7e277d78309b8934a0b93e13c904}{MatrixT} (const \hyperlink{classMatrixT}{MatrixT} \&A)
+\item 
+\hyperlink{classMatrixT_a8292b69becb7cf206d75e699767e68b3}{$\sim$MatrixT} ()
+\item 
+\hyperlink{classMatrixT}{MatrixT} \& \hyperlink{classMatrixT_a157b5b4b281c2ab15a5e0797150e6a5d}{operator=} (const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ T $>$ \&A)
+\item 
+\hyperlink{classMatrixT}{MatrixT} \& \hyperlink{classMatrixT_afe5a46a81564d716c0a70cb14aff80c9}{operator=} (const \hyperlink{classMatrixT}{MatrixT}$<$ T $>$ \&A)
+\item 
+const \hyperlink{classMatrixRow}{MatrixRow}$<$ T $>$ \hyperlink{classMatrixT_a8c84047f97f2d07290a7882884e50397}{operator\mbox{[}$\,$\mbox{]}} (int rowNo)
+\item 
+bool \hyperlink{classMatrixT_a34f8d56e92dad7d8eafd64afcd3c81f4}{operator$\ast$=} (const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ T $>$ \&A)
+\item 
+void \hyperlink{classMatrixT_adc5f8700b8cdab6c65b3659b90eb550c}{operator$\ast$=} (T x)
+\item 
+bool const \hyperlink{classMatrixT_a3383eabbe87a7ebe255b3d409f005f9d}{operator+=} (const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ T $>$ \&A)
+\item 
+bool \hyperlink{classMatrixT_a87aae833ab29686ae8bbaab0cb9c379f}{operator-\/=} (const \hyperlink{classRTMatrixT}{RTMatrixT}$<$ T $>$ \&A)
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\subsubsection*{template$<$class T$>$class MatrixT$<$ T $>$}
+
+this is an extension of RTMatrix with algebraic capabilities 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classMatrixT_ab9d90c99b98b11471a01695b145c6415}{
+\index{MatrixT@{MatrixT}!MatrixT@{MatrixT}}
+\index{MatrixT@{MatrixT}!MatrixT@{MatrixT}}
+\subsubsection[{MatrixT}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T$>$ {\bf MatrixT}$<$ T $>$::{\bf MatrixT} (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classMatrixT_ab9d90c99b98b11471a01695b145c6415}
+\hypertarget{classMatrixT_a1273ec656bc69793f67e7feccdfd37f6}{
+\index{MatrixT@{MatrixT}!MatrixT@{MatrixT}}
+\index{MatrixT@{MatrixT}!MatrixT@{MatrixT}}
+\subsubsection[{MatrixT}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T$>$ {\bf MatrixT}$<$ T $>$::{\bf MatrixT} (
+\begin{DoxyParamCaption}
+\item[{uint32}]{nRows, }
+\item[{uint32}]{nColumns}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classMatrixT_a1273ec656bc69793f67e7feccdfd37f6}
+\hypertarget{classMatrixT_a0619cdab01425d05a7f2bb2d253091f5}{
+\index{MatrixT@{MatrixT}!MatrixT@{MatrixT}}
+\index{MatrixT@{MatrixT}!MatrixT@{MatrixT}}
+\subsubsection[{MatrixT}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T$>$ {\bf MatrixT}$<$ T $>$::{\bf MatrixT} (
+\begin{DoxyParamCaption}
+\item[{uint32}]{nRows, }
+\item[{uint32}]{nColumns, }
+\item[{const T $\ast$}]{source}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classMatrixT_a0619cdab01425d05a7f2bb2d253091f5}
+\hypertarget{classMatrixT_abbdff52c78a71a6d1a743f07f08c525e}{
+\index{MatrixT@{MatrixT}!MatrixT@{MatrixT}}
+\index{MatrixT@{MatrixT}!MatrixT@{MatrixT}}
+\subsubsection[{MatrixT}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T$>$ {\bf MatrixT}$<$ T $>$::{\bf MatrixT} (
+\begin{DoxyParamCaption}
+\item[{const {\bf RTMatrixT}$<$ T $>$ \&}]{A}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classMatrixT_abbdff52c78a71a6d1a743f07f08c525e}
+\hypertarget{classMatrixT_aceea7e277d78309b8934a0b93e13c904}{
+\index{MatrixT@{MatrixT}!MatrixT@{MatrixT}}
+\index{MatrixT@{MatrixT}!MatrixT@{MatrixT}}
+\subsubsection[{MatrixT}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T$>$ {\bf MatrixT}$<$ T $>$::{\bf MatrixT} (
+\begin{DoxyParamCaption}
+\item[{const {\bf MatrixT}$<$ T $>$ \&}]{A}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classMatrixT_aceea7e277d78309b8934a0b93e13c904}
+\hypertarget{classMatrixT_a8292b69becb7cf206d75e699767e68b3}{
+\index{MatrixT@{MatrixT}!$\sim$MatrixT@{$\sim$MatrixT}}
+\index{$\sim$MatrixT@{$\sim$MatrixT}!MatrixT@{MatrixT}}
+\subsubsection[{$\sim$MatrixT}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T$>$ {\bf MatrixT}$<$ T $>$::$\sim${\bf MatrixT} (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classMatrixT_a8292b69becb7cf206d75e699767e68b3}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classMatrixT_a34f8d56e92dad7d8eafd64afcd3c81f4}{
+\index{MatrixT@{MatrixT}!operator$\ast$=@{operator$\ast$=}}
+\index{operator$\ast$=@{operator$\ast$=}!MatrixT@{MatrixT}}
+\subsubsection[{operator$\ast$=}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T$>$ bool {\bf MatrixT}$<$ T $>$::operator$\ast$= (
+\begin{DoxyParamCaption}
+\item[{const {\bf RTMatrixT}$<$ T $>$ \&}]{A}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classMatrixT_a34f8d56e92dad7d8eafd64afcd3c81f4}
+\hypertarget{classMatrixT_adc5f8700b8cdab6c65b3659b90eb550c}{
+\index{MatrixT@{MatrixT}!operator$\ast$=@{operator$\ast$=}}
+\index{operator$\ast$=@{operator$\ast$=}!MatrixT@{MatrixT}}
+\subsubsection[{operator$\ast$=}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T$>$ void {\bf MatrixT}$<$ T $>$::operator$\ast$= (
+\begin{DoxyParamCaption}
+\item[{T}]{x}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classMatrixT_adc5f8700b8cdab6c65b3659b90eb550c}
+\hypertarget{classMatrixT_a3383eabbe87a7ebe255b3d409f005f9d}{
+\index{MatrixT@{MatrixT}!operator+=@{operator+=}}
+\index{operator+=@{operator+=}!MatrixT@{MatrixT}}
+\subsubsection[{operator+=}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T$>$ bool const {\bf MatrixT}$<$ T $>$::operator+= (
+\begin{DoxyParamCaption}
+\item[{const {\bf RTMatrixT}$<$ T $>$ \&}]{A}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classMatrixT_a3383eabbe87a7ebe255b3d409f005f9d}
+\hypertarget{classMatrixT_a87aae833ab29686ae8bbaab0cb9c379f}{
+\index{MatrixT@{MatrixT}!operator-\/=@{operator-\/=}}
+\index{operator-\/=@{operator-\/=}!MatrixT@{MatrixT}}
+\subsubsection[{operator-\/=}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T$>$ bool {\bf MatrixT}$<$ T $>$::operator-\/= (
+\begin{DoxyParamCaption}
+\item[{const {\bf RTMatrixT}$<$ T $>$ \&}]{A}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classMatrixT_a87aae833ab29686ae8bbaab0cb9c379f}
+-\/= \hypertarget{classMatrixT_a157b5b4b281c2ab15a5e0797150e6a5d}{
+\index{MatrixT@{MatrixT}!operator=@{operator=}}
+\index{operator=@{operator=}!MatrixT@{MatrixT}}
+\subsubsection[{operator=}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T$>$ {\bf MatrixT}\& {\bf MatrixT}$<$ T $>$::operator= (
+\begin{DoxyParamCaption}
+\item[{const {\bf RTMatrixT}$<$ T $>$ \&}]{A}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classMatrixT_a157b5b4b281c2ab15a5e0797150e6a5d}
+
+
+Reimplemented from \hyperlink{classRTMatrixT}{RTMatrixT$<$ T $>$}.
+
+\hypertarget{classMatrixT_afe5a46a81564d716c0a70cb14aff80c9}{
+\index{MatrixT@{MatrixT}!operator=@{operator=}}
+\index{operator=@{operator=}!MatrixT@{MatrixT}}
+\subsubsection[{operator=}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T$>$ {\bf MatrixT}\& {\bf MatrixT}$<$ T $>$::operator= (
+\begin{DoxyParamCaption}
+\item[{const {\bf MatrixT}$<$ T $>$ \&}]{A}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classMatrixT_afe5a46a81564d716c0a70cb14aff80c9}
+\hypertarget{classMatrixT_a8c84047f97f2d07290a7882884e50397}{
+\index{MatrixT@{MatrixT}!operator\mbox{[}\mbox{]}@{operator[]}}
+\index{operator\mbox{[}\mbox{]}@{operator[]}!MatrixT@{MatrixT}}
+\subsubsection[{operator[]}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T$>$ const {\bf MatrixRow}$<$T$>$ {\bf MatrixT}$<$ T $>$::operator\mbox{[}$\,$\mbox{]} (
+\begin{DoxyParamCaption}
+\item[{int}]{rowNo}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classMatrixT_a8c84047f97f2d07290a7882884e50397}
+Allow fast access to elements 
+
+Reimplemented from \hyperlink{classRTMatrixT_afd251c8826e3350e7d2cbdf98a15af2c}{RTMatrixT$<$ T $>$}.
+
+\hypertarget{classMatrixT_a714fbd6bfdec6d76066eae21e86f693c}{
+\index{MatrixT@{MatrixT}!ReSize@{ReSize}}
+\index{ReSize@{ReSize}!MatrixT@{MatrixT}}
+\subsubsection[{ReSize}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class T$>$ void {\bf MatrixT}$<$ T $>$::ReSize (
+\begin{DoxyParamCaption}
+\item[{uint32}]{nRows, }
+\item[{uint32}]{nColumns}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classMatrixT_a714fbd6bfdec6d76066eae21e86f693c}
+
+
+The documentation for this class was generated from the following file:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{Matrix_8h}{Matrix.h}\end{DoxyCompactItemize}

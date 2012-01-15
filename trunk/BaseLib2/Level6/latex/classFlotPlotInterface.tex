@@ -1,0 +1,108 @@
+\hypertarget{classFlotPlotInterface}{
+\section{FlotPlotInterface Class Reference}
+\label{classFlotPlotInterface}\index{FlotPlotInterface@{FlotPlotInterface}}
+}
+
+
+Provides web plotting with zoom to BaseLib2 classes.  
+
+
+
+
+{\ttfamily \#include $<$FlotPlotInterface.h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual \hyperlink{classFlotPlotInterface_a1abecd17218f3063cea03fc7579d7bdf}{$\sim$FlotPlotInterface} ()
+\item 
+\hyperlink{classFlotPlotInterface_ae63ae90db79db792b5f9e96d81f0ad05}{FlotPlotInterface} ()
+\item 
+virtual bool \hyperlink{classFlotPlotInterface_aff4a6245a440da563bc32175646b4dca}{ProcessHttpMessage} (HttpStream \&hStream)
+\item 
+virtual bool \hyperlink{classFlotPlotInterface_a6eda02b2d2919a2e7e23c594ddee68d2}{GetSignalData} (FString xxSignalName, FString yySignalName, GCRTemplate$<$ SignalInterface $>$ \&xxSignal, GCRTemplate$<$ SignalInterface $>$ \&yySignal)=0
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Provides web plotting with zoom to BaseLib2 classes. 
+
+This class is capable of plotting data using using flot: \href{http://code.google.com/p/flot/}{\tt http://code.google.com/p/flot/} It has to be extended by a signal provider implementing the GetSignalData method
+
+The url arguments are:\par
+ SignalList=mandatory comma separated signal names\par
+ xxSignal=optional signal name for the xx axis\par
+ xxMultiplier=a multiplier for the xx values\par
+ yyMultiplier=a multiplier for the yy values\par
+ drawLines=true to draw the lines between the points (fast)\par
+ drawPoints=true to draw a circle around each point (slow)\par
+ Width=optional width of the chart (default 600)\par
+ Height=optional height of the chart (default 300)\par
+ example:http://localhost:8084/BROWSE/FlotPlot/?SignalList=CYCLETIME,TIMERRELATIVEUSECTIME\&xxSignal=TIME\&xxMultiplier=1e-\/6\&yyMultiplier=1e6\par
+
+
+It also expects to find the flot scripts in the URL \href{http://.../FLOT_DIR/}{\tt http://.../FLOT\_\-DIR/} 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classFlotPlotInterface_a1abecd17218f3063cea03fc7579d7bdf}{
+\index{FlotPlotInterface@{FlotPlotInterface}!$\sim$FlotPlotInterface@{$\sim$FlotPlotInterface}}
+\index{$\sim$FlotPlotInterface@{$\sim$FlotPlotInterface}!FlotPlotInterface@{FlotPlotInterface}}
+\subsubsection[{$\sim$FlotPlotInterface}]{\setlength{\rightskip}{0pt plus 5cm}virtual FlotPlotInterface::$\sim$FlotPlotInterface (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline, virtual\mbox{]}}}}
+\label{classFlotPlotInterface_a1abecd17218f3063cea03fc7579d7bdf}
+\hypertarget{classFlotPlotInterface_ae63ae90db79db792b5f9e96d81f0ad05}{
+\index{FlotPlotInterface@{FlotPlotInterface}!FlotPlotInterface@{FlotPlotInterface}}
+\index{FlotPlotInterface@{FlotPlotInterface}!FlotPlotInterface@{FlotPlotInterface}}
+\subsubsection[{FlotPlotInterface}]{\setlength{\rightskip}{0pt plus 5cm}FlotPlotInterface::FlotPlotInterface (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inline\mbox{]}}}}
+\label{classFlotPlotInterface_ae63ae90db79db792b5f9e96d81f0ad05}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classFlotPlotInterface_a6eda02b2d2919a2e7e23c594ddee68d2}{
+\index{FlotPlotInterface@{FlotPlotInterface}!GetSignalData@{GetSignalData}}
+\index{GetSignalData@{GetSignalData}!FlotPlotInterface@{FlotPlotInterface}}
+\subsubsection[{GetSignalData}]{\setlength{\rightskip}{0pt plus 5cm}virtual bool FlotPlotInterface::GetSignalData (
+\begin{DoxyParamCaption}
+\item[{FString}]{xxSignalName, }
+\item[{FString}]{yySignalName, }
+\item[{GCRTemplate$<$ SignalInterface $>$ \&}]{xxSignal, }
+\item[{GCRTemplate$<$ SignalInterface $>$ \&}]{yySignal}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}pure virtual\mbox{]}}}}
+\label{classFlotPlotInterface_a6eda02b2d2919a2e7e23c594ddee68d2}
+Retrieve a signal based on the name 
+\begin{DoxyParams}{Parameters}
+{\em xxSignalName} & the signal name \\
+\hline
+{\em yySignalName} & the signal yy data encoded in a SignalInterface \\
+\hline
+{\em xxSignal} & the signal xx data (usually time) encoded in a SignalInterface \\
+\hline
+{\em yySignal} & the signal yy data encoded in a SignalInterface \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True if at least the yySignal data is valid 
+\end{DoxyReturn}
+\hypertarget{classFlotPlotInterface_aff4a6245a440da563bc32175646b4dca}{
+\index{FlotPlotInterface@{FlotPlotInterface}!ProcessHttpMessage@{ProcessHttpMessage}}
+\index{ProcessHttpMessage@{ProcessHttpMessage}!FlotPlotInterface@{FlotPlotInterface}}
+\subsubsection[{ProcessHttpMessage}]{\setlength{\rightskip}{0pt plus 5cm}bool FlotPlotInterface::ProcessHttpMessage (
+\begin{DoxyParamCaption}
+\item[{HttpStream \&}]{hStream}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}virtual\mbox{]}}}}
+\label{classFlotPlotInterface_aff4a6245a440da563bc32175646b4dca}
+The HTTP entry point 
+
+The documentation for this class was generated from the following files:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{FlotPlotInterface_8h}{FlotPlotInterface.h}\item 
+\hyperlink{FlotPlotInterface_8cpp}{FlotPlotInterface.cpp}\end{DoxyCompactItemize}
