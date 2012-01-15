@@ -111,5 +111,5 @@ bool DDBItemBrowseMenu(StreamInterface &in,StreamInterface &out,void *userData){
 }
 
 
-OBJECTREGISTER(DDBItem,"$Id: DDBItem.cpp,v 1.8 2008/06/18 16:33:31 fpiccolo Exp $")
+OBJECTREGISTER(DDBItem,"$Id$")
 

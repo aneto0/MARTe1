@@ -185,4 +185,4 @@ void EventTrigger::Flush() {
         acqTrigger[i]->Flush();
     }
 }
-OBJECTLOADREGISTER(EventTrigger, "$Id: EventTrigger.cpp,v 1.4 2011/04/09 15:42:21 dalves Exp $")
+OBJECTLOADREGISTER(EventTrigger, "$Id$")

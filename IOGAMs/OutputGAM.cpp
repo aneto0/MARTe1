@@ -352,4 +352,4 @@ bool OutputGAM::ObjectSaveSetup(ConfigurationDataBase &info, StreamInterface *er
 }
 
 
-OBJECTLOADREGISTER(OutputGAM,"$Id: OutputGAM.cpp,v 1.10 2011/09/07 10:14:11 aneto Exp $")
+OBJECTLOADREGISTER(OutputGAM,"$Id$")

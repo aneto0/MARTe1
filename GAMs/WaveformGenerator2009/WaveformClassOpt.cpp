@@ -157,7 +157,7 @@ bool WaveformClassOpt::ProcessHttpMessage(HttpStream &hStream) {
     return True;
 }
 
-OBJECTLOADREGISTER(WaveformClassOpt,"$Id: WaveformClassOpt.cpp,v 1.5 2010/12/22 11:14:08 dalves Exp $")
+OBJECTLOADREGISTER(WaveformClassOpt,"$Id$")
 
 
 

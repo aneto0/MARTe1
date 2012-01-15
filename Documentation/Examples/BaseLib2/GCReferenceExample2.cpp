@@ -50,7 +50,7 @@ public:
     virtual ~SimpleClass(){}
 };
 //Usually a version id is set as the second argument
-OBJECTLOADREGISTER(SimpleClass, "$Id: GCReferenceExample2.cpp,v 1.3 2011/08/05 13:41:59 aneto Exp $")
+OBJECTLOADREGISTER(SimpleClass, "$Id$")
 
 int main(int argc, char *argv[]){
     //Output logging messages to the console

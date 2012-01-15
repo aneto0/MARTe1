@@ -27,7 +27,7 @@
 #include "HtmlStream.h"
 #include "HttpUtilities.h"
 
-OBJECTLOADREGISTER(CDBBrowserMenu,"$Id: CDBBrowserMenu.cpp,v 1.6 2008/11/10 13:32:12 fisa Exp $")
+OBJECTLOADREGISTER(CDBBrowserMenu,"$Id$")
 
 
 

@@ -32,7 +32,7 @@
 #include "BasicSocket.h"
 #include "Sleep.h"
 
-#define BasicUDPSocketVersion "$Id: BasicUDPSocket.h,v 1.3 2011/02/01 12:01:16 dalves Exp $"
+#define BasicUDPSocketVersion "$Id$"
 
 class BasicUDPSocket: public BasicSocket {
 public:

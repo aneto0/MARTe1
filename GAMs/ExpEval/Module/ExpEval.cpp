@@ -166,4 +166,4 @@ bool ExpEval::ObjectLoadSetup(ConfigurationDataBase &cdbData, StreamInterface *e
     return True;
 }
 
-OBJECTLOADREGISTER(ExpEval,"$Id: ExpEval.cpp,v 1.3 2011/07/08 13:50:58 aneto Exp $")
+OBJECTLOADREGISTER(ExpEval,"$Id$")

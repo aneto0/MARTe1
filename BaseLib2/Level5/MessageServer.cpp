@@ -32,7 +32,7 @@
 #include "TCPSocket.h"
 
 
-OBJECTLOADREGISTER(MessageServer,"$Id: MessageServer.cpp,v 1.2 2009/06/08 14:31:15 aneto Exp $")
+OBJECTLOADREGISTER(MessageServer,"$Id$")
 
 int32 MSServerPort = 0;
 

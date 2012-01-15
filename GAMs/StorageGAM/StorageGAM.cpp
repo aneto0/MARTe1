@@ -491,4 +491,4 @@ bool StorageGAM::ProcessHttpMessage(HttpStream &hStream) {
     // hStream.Printf("</table></body></html>");
     return True;
 }
-OBJECTLOADREGISTER(StorageGAM,"$Id: StorageGAM.cpp,v 1.11 2011/04/11 10:51:46 dalves Exp $")
+OBJECTLOADREGISTER(StorageGAM,"$Id$")

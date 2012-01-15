@@ -99,4 +99,4 @@ const FString &SignalInformation::GetDDBSignalName() {
 const BasicTypeDescriptor &SignalInformation::GetBasicTypeDescriptor() {
     return btd;
 };
-OBJECTLOADREGISTER(SignalInformation, "$Id: SignalInformation.cpp,v 1.2 2011/04/11 10:52:40 dalves Exp $")
+OBJECTLOADREGISTER(SignalInformation, "$Id$")

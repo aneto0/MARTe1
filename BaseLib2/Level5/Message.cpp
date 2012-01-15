@@ -26,7 +26,7 @@
 #include "FastPollingMutexSem.h"
 #include "CDBExtended.h"
 
-OBJECTLOADREGISTER(Message,"$Id: Message.cpp,v 1.8 2007/11/30 16:12:30 fpiccolo Exp $");
+OBJECTLOADREGISTER(Message,"$Id$");
 
 bool MSGObjectLoadSetup(
             Message &               msg,

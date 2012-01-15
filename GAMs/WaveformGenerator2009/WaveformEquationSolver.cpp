@@ -98,6 +98,6 @@ float WaveformEquationSolver::GetValue(int32 usecTime){
 }
 
 
-OBJECTLOADREGISTER(WaveformEquationSolver,"$Id: WaveformEquationSolver.cpp,v 1.2 2009/10/28 16:10:56 lzabeo Exp $")
+OBJECTLOADREGISTER(WaveformEquationSolver,"$Id$")
 
 

@@ -25,7 +25,7 @@
 #include "File.h"
 #include "EAFile.h"
 
-OBJECTREGISTER(EAFile,"$Id: EAFile.cpp,v 1.5 2007/09/11 13:28:04 fisa Exp $")
+OBJECTREGISTER(EAFile,"$Id$")
 
 bool EAFileOpen(EAFile &f,const char *name){
     f.GetCDB()->CleanUp();

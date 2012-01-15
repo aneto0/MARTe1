@@ -68,5 +68,5 @@ int32 SimulationTimerDrv::GetData(uint32 usecTime, int32 *buffer, int32 bufferNu
     return 1;
 }
 
-OBJECTLOADREGISTER(SimulationTimerDrv,"$Id: SimulationTimerDrv.cpp,v 1.2 2011/05/16 15:56:41 aneto Exp $")
+OBJECTLOADREGISTER(SimulationTimerDrv,"$Id$")
 

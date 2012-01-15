@@ -147,4 +147,4 @@ bool FilteredInputGAM::Execute(GAM_FunctionNumbers functionNumber){
     return True;
 }
 
-OBJECTLOADREGISTER(FilteredInputGAM,"$Id: FilteredInputGAM.cpp,v 1.4 2011/02/10 14:06:00 dalves Exp $")
+OBJECTLOADREGISTER(FilteredInputGAM,"$Id$")

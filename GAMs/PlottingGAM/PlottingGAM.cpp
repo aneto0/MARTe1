@@ -159,4 +159,4 @@ bool PlottingGAM::ProcessHttpMessage(HttpStream &hStream) {
 
     return True;
 }
-OBJECTLOADREGISTER(PlottingGAM, "$Id: PlottingGAM.cpp,v 1.11 2011/02/17 14:06:37 ppcc_dev Exp $")
+OBJECTLOADREGISTER(PlottingGAM, "$Id$")

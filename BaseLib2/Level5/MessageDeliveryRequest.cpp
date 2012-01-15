@@ -29,7 +29,7 @@
 #include "MDRFlags.h"
 
 
-OBJECTLOADREGISTER(MessageDeliveryRequest,"$Id: MessageDeliveryRequest.cpp,v 1.11 2008/05/09 15:46:32 fpiccolo Exp $");
+OBJECTLOADREGISTER(MessageDeliveryRequest,"$Id$");
 
 
 bool

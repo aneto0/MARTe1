@@ -176,7 +176,7 @@ bool HttpMessageSendResource::ProcessHttpMessage(HttpStream &hStream){
 
 
 
-OBJECTLOADREGISTER(HttpMessageSendResource,"$Id: HttpMessageSendResource.cpp,v 1.3 2007/11/27 16:09:03 fisa Exp $")
+OBJECTLOADREGISTER(HttpMessageSendResource,"$Id$")
 
 
 

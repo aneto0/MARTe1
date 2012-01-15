@@ -24,7 +24,7 @@
 
 #include "SendMessageMenuEntry.h"
 
-OBJECTLOADREGISTER(SendMessageMenuEntry,"$Id: SendMessageMenuEntry.cpp,v 1.1 2008/05/13 16:05:38 fpiccolo Exp $")
+OBJECTLOADREGISTER(SendMessageMenuEntry,"$Id$")
 
 bool SendMenuMessage(StreamInterface &in,StreamInterface &out,void *userData){
     if(userData ==  NULL) return False;

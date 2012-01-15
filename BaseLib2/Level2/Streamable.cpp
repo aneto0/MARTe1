@@ -28,7 +28,7 @@
 #include "HRT.h"
 #include "Sleep.h"
 
-OBJECTREGISTER(Streamable,"$Id: Streamable.cpp,v 1.9 2007/08/29 11:19:24 fisa Exp $")
+OBJECTREGISTER(Streamable,"$Id$")
 
 #if defined(_VXWORKS)
 

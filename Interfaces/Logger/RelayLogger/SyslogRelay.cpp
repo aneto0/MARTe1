@@ -24,7 +24,7 @@
 #include "SyslogRelay.h"
 #include "Sleep.h"
 
-OBJECTLOADREGISTER(SyslogRelay, "$Id: SyslogRelay.cpp,v 1.2 2011/09/21 08:19:46 dalves Exp $")
+OBJECTLOADREGISTER(SyslogRelay, "$Id$")
 
 /** This function will be called whenever there is a new message to process available*/
 void SyslogRelay::ProcessMessage(GCRTemplate<LoggerMessage> loggerMsg){

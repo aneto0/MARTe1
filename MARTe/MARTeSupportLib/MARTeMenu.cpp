@@ -27,7 +27,7 @@
 #include "CDBExtended.h"
 #include "HtmlStream.h"
 
-OBJECTLOADREGISTER(MARTeMenu,"$Id: MARTeMenu.cpp,v 1.3 2008/09/22 17:21:45 fpiccolo Exp $")
+OBJECTLOADREGISTER(MARTeMenu,"$Id$")
 
 MARTeMenu::MARTeMenu(){}
 

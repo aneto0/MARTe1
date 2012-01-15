@@ -78,4 +78,4 @@ bool DelayGAM::Execute(GAM_FunctionNumbers execFlag) {
 
     return True;
 }
-OBJECTLOADREGISTER(DelayGAM, "$Id: DelayGAM.cpp,v 1.3 2011/01/05 14:06:32 dalves Exp $")
+OBJECTLOADREGISTER(DelayGAM, "$Id$")

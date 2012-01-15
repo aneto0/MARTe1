@@ -49,7 +49,7 @@ public:
 
 };
 
-OBJECTLOADREGISTER(HttpFrameLink,"$Id: HttpFramedResource.cpp,v 1.6 2008/01/21 13:48:40 fisa Exp $")
+OBJECTLOADREGISTER(HttpFrameLink,"$Id$")
 
 
 /** Simply list the content of a GCReferenceContainer*/
@@ -138,7 +138,7 @@ bool HttpFramedResource::ProcessHttpMessage(HttpStream &hStream){
 
 
 
-OBJECTLOADREGISTER(HttpFramedResource,"$Id: HttpFramedResource.cpp,v 1.6 2008/01/21 13:48:40 fisa Exp $")
+OBJECTLOADREGISTER(HttpFramedResource,"$Id$")
 
 
 

@@ -70,5 +70,5 @@ int32 FileReadDrv::GetData(uint32 usecTime, int32 *ibuffer, int32 bufferNumber){
     return 1;
 }
 
-OBJECTLOADREGISTER(FileReadDrv,"$Id: FileReadDrv.cpp,v 1.1 2011/04/06 11:30:36 aneto Exp $")
+OBJECTLOADREGISTER(FileReadDrv,"$Id$")
 

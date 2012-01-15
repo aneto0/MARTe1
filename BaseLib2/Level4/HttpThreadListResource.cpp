@@ -26,7 +26,7 @@
 #include "HttpUtilities.h"
 #include "HtmlStream.h"
 
-OBJECTLOADREGISTER(HttpThreadListResource,"$Id: HttpThreadListResource.cpp,v 1.5 2011/02/07 15:35:04 dalves Exp $")
+OBJECTLOADREGISTER(HttpThreadListResource,"$Id$")
 
 void HttpThreadListResource::PrintThreadStateAsString(HtmlStream &hmStream, uint32 threadState){
     BString str = "Unknown";

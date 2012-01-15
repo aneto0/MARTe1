@@ -674,4 +674,4 @@ bool ATMDrv::ProcessHttpMessage(HttpStream &hStream) {
     hStream.Printf("</body></html>\n");
 
 }
-OBJECTLOADREGISTER(ATMDrv, "$Id: ATMDrv.cpp,v 1.25 2011/09/16 10:30:32 ppcc_dev Exp $")
+OBJECTLOADREGISTER(ATMDrv, "$Id$")

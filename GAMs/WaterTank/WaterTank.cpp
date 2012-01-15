@@ -210,4 +210,4 @@ bool WaterTank::ProcessHttpMessage(HttpStream &hStream) {
 }
 
 
-OBJECTLOADREGISTER(WaterTank, "$Id: WaterTank.cpp,v 1.2 2010/04/19 14:38:25 aneto Exp $")
+OBJECTLOADREGISTER(WaterTank, "$Id$")

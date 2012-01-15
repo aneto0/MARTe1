@@ -227,7 +227,7 @@ bool WaveformClassPoints::ProcessHttpMessage(HttpStream &hStream) {
 
 
 
-OBJECTLOADREGISTER(WaveformClassPoints,"$Id: WaveformClassPoints.cpp,v 1.4 2009/10/28 16:10:56 lzabeo Exp $")
+OBJECTLOADREGISTER(WaveformClassPoints,"$Id$")
 
 
 

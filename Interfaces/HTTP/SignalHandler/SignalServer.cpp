@@ -35,7 +35,7 @@
     A generic signal
  */
 
-OBJECTLOADREGISTER(SignalServer, "$Id: SignalServer.cpp,v 1.6 2011/05/25 07:44:59 aneto Exp $")
+OBJECTLOADREGISTER(SignalServer, "$Id$")
 
 
 /** The HTTP entry point */

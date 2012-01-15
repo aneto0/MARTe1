@@ -25,7 +25,7 @@
 #include "HttpService.h"
 
 
-OBJECTLOADREGISTER(HttpService,"$Id: HttpService.cpp,v 1.2 2008/05/08 13:24:53 fpiccolo Exp $")
+OBJECTLOADREGISTER(HttpService,"$Id$")
 
 /** the function to be implemented by the user application */
 bool HttpService::ProcessMessage(GCRTemplate<MessageEnvelope> envelope){

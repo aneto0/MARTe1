@@ -311,5 +311,5 @@ StreamingDriverReceiver::StreamingDriverReceiver(){
 }
 
 
-OBJECTLOADREGISTER(StreamingDriverReceiver,"$Id: StreamingDriverReceiver.cpp,v 1.14 2011/09/16 16:51:33 aneto Exp $")
+OBJECTLOADREGISTER(StreamingDriverReceiver,"$Id$")
 

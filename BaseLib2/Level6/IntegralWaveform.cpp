@@ -91,4 +91,4 @@ bool IntegralWaveform::ProcessHttpMessage(HttpStream &hStream) {
 
 
 
-OBJECTLOADREGISTER(IntegralWaveform,"$Id: IntegralWaveform.cpp,v 1.3 2009/08/11 12:48:25 rvitelli Exp $")
+OBJECTLOADREGISTER(IntegralWaveform,"$Id$")

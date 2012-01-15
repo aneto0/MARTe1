@@ -160,4 +160,4 @@ float SineWaveform::Phase(int32 usecTime) {
 }
 
 
-OBJECTLOADREGISTER(SineWaveform,"$Id: SineWaveform.cpp,v 1.6 2010/02/26 14:18:08 dalves Exp $")
+OBJECTLOADREGISTER(SineWaveform,"$Id$")

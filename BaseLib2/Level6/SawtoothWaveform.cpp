@@ -92,4 +92,4 @@ bool SawtoothWaveform::ProcessHttpMessage(HttpStream &hStream) {
 
 
 
-OBJECTLOADREGISTER(SawtoothWaveform,"$Id: SawtoothWaveform.cpp,v 1.2 2009/10/16 13:48:59 rvitelli Exp $")
+OBJECTLOADREGISTER(SawtoothWaveform,"$Id$")

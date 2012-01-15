@@ -30,7 +30,7 @@
 #include "SocketTimer.h"
 
 
-#define UDPSocketVersion "$Id: UDPSocket.h,v 1.7 2007/09/12 14:22:36 fpiccolo Exp $"
+#define UDPSocketVersion "$Id$"
 
 class UDPSocket;
 

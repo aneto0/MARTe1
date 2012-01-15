@@ -26,7 +26,7 @@
 #include "MessageEnvelope.h"
 #include "Message.h"
 
-OBJECTLOADREGISTER(CFGUploader,"$Id: CFGUploader.cpp,v 1.7 2011/11/14 15:15:25 aneto Exp $")
+OBJECTLOADREGISTER(CFGUploader,"$Id$")
 
 bool CFGUploader::PrintHTTPForm(HtmlStream &hmStream){
     hmStream.SSPrintf(HtmlTagStreamMode, "form enctype=\"multipart/form-data\" method=\"post\"");

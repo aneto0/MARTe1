@@ -28,7 +28,7 @@
 #include "LexicalAnalyzer.h"
 
 
-OBJECTREGISTER(CDBNode,"$Id: CDBNode.cpp,v 1.17 2011/10/20 18:25:23 aneto Exp $")
+OBJECTREGISTER(CDBNode,"$Id$")
 
 int32 CDBNode::counter = 0;
 

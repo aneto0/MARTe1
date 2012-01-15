@@ -176,5 +176,5 @@ bool MessageTriggeringTimeService::ObjectLoadSetup(ConfigurationDataBase &info,S
     return True;
 }
 
-OBJECTLOADREGISTER(MessageTriggeringTimeService, "$Id: MessageTriggeringTimeService.cpp,v 1.2 2011/08/02 07:57:24 danielv Exp $")
+OBJECTLOADREGISTER(MessageTriggeringTimeService, "$Id$")
 

@@ -26,7 +26,7 @@
 #include "ConfigurationDataBase.h"
 #include "Serial.h"
 
-OBJECTREGISTER(Serial,"$Id: Serial.cpp,v 1.7 2008/01/18 11:49:38 aneto Exp $")
+OBJECTREGISTER(Serial,"$Id$")
 
 
 #if defined (_OS2)

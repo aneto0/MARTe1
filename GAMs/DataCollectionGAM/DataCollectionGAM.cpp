@@ -354,4 +354,4 @@ bool DataCollectionGAM::ProcessHttpMessage(HttpStream &hStream) {
     return True;
 }
 
-OBJECTLOADREGISTER(DataCollectionGAM,"$Id: DataCollectionGAM.cpp,v 1.24 2011/09/14 14:36:26 ppcc_dev Exp $")
+OBJECTLOADREGISTER(DataCollectionGAM,"$Id$")

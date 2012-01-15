@@ -25,7 +25,7 @@
 #include "MMCDBItem.h"
 #include "System.h"
 
-OBJECTREGISTER(MMCDBItem,"$Id: MMCDBItem.cpp,v 1.4 2008/11/10 13:33:40 fisa Exp $")
+OBJECTREGISTER(MMCDBItem,"$Id$")
 
 static ClassStructure Pointer__CS__("*",sizeof(void *),0 ,NULL);
 

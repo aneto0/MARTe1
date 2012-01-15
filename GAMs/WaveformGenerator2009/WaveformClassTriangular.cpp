@@ -102,4 +102,4 @@ bool WaveformClassTriangular::ProcessHttpMessage(HttpStream &hStream){
     return True;
 }
 
-OBJECTLOADREGISTER(WaveformClassTriangular,"$Id: WaveformClassTriangular.cpp,v 1.5 2009/10/28 16:10:56 lzabeo Exp $")
+OBJECTLOADREGISTER(WaveformClassTriangular,"$Id$")

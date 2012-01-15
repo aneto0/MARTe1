@@ -200,7 +200,7 @@ public:
     }
 
 };
-OBJECTLOADREGISTER(SimpleClass, "$Id: CDBExample3.cpp,v 1.1 2011/08/09 13:46:19 aneto Exp $")
+OBJECTLOADREGISTER(SimpleClass, "$Id$")
 
 int main(int argc, char *argv[]){
     //Output logging messages to the console

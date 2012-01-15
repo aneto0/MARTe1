@@ -25,7 +25,7 @@
 #include "MessageBroker.h"
 #include "CDBExtended.h"
 
-OBJECTLOADREGISTER(MessageBroker,"$Id: MessageBroker.cpp,v 1.2 2009/04/23 10:12:51 aneto Exp $")
+OBJECTLOADREGISTER(MessageBroker,"$Id$")
 
 bool MBProcessMessage2(
             MessageBroker&                  mb,

@@ -104,4 +104,4 @@ bool InputModulesService::ObjectLoadSetup(ConfigurationDataBase &info,StreamInte
     return True;
 }
 
-OBJECTLOADREGISTER(InputModulesService,"$Id: InputModulesService.cpp,v 1.3 2011/05/20 15:02:15 aneto Exp $")
+OBJECTLOADREGISTER(InputModulesService,"$Id$")

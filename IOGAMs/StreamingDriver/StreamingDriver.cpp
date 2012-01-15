@@ -299,5 +299,5 @@ StreamingDriver::StreamingDriver(){
 }
 
 
-OBJECTLOADREGISTER(StreamingDriver,"$Id: StreamingDriver.cpp,v 1.9 2011/09/07 16:02:52 aneto Exp $")
+OBJECTLOADREGISTER(StreamingDriver,"$Id$")
 

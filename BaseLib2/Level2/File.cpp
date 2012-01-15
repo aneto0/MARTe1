@@ -24,5 +24,5 @@
 
 #include "File.h"
 
-OBJECTREGISTER(File,"$Id: File.cpp,v 1.6 2007/09/11 13:27:02 fisa Exp $")
+OBJECTREGISTER(File,"$Id$")
 

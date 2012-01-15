@@ -372,5 +372,5 @@ ConfigurationDataBase cdb;
 
 
 
-OBJECTLOADREGISTER(DDB,"$Id: DDB.cpp,v 1.18 2010/01/22 16:54:07 aneto Exp $")
+OBJECTLOADREGISTER(DDB,"$Id$")
 

@@ -121,7 +121,7 @@ bool HttpGroupResource::ProcessHttpMessage(HttpStream &hStream){
 
 
 
-OBJECTLOADREGISTER(HttpGroupResource,"$Id: HttpGroupResource.cpp,v 1.12 2008/04/25 16:42:54 fisa Exp $")
+OBJECTLOADREGISTER(HttpGroupResource,"$Id$")
 
 
 

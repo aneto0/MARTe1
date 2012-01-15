@@ -194,6 +194,6 @@ bool TriggerObj::ObjectLoadSetup(ConfigurationDataBase &cdbData, StreamInterface
     return True;
 }
 
-OBJECTLOADREGISTER(TriggerObj,"$Id: TriggerObj.cpp,v 1.2 2009/10/28 16:10:56 lzabeo Exp $")
+OBJECTLOADREGISTER(TriggerObj,"$Id$")
 
 

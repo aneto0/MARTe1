@@ -25,7 +25,7 @@
 #include "HttpLocalSecurityBasicRealm.h"
 #include "Base64Codec.h"
 
-OBJECTLOADREGISTER(HttpLocalSecurityBasicRealm,"$Id: HttpLocalSecurityBasicRealm.cpp,v 1.1 2007/08/29 12:47:11 fisa Exp $")
+OBJECTLOADREGISTER(HttpLocalSecurityBasicRealm,"$Id$")
 
 
 /** This tool only supports basic security */

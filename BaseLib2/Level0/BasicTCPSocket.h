@@ -35,7 +35,7 @@
 #include "InternetService.h"
 #include "Sleep.h"
 
-#define BasicTCPSocketVersion "$Id: BasicTCPSocket.h,v 1.13 2011/07/12 08:56:40 dalves Exp $"
+#define BasicTCPSocketVersion "$Id$"
 class BasicTCPSocket: public BasicSocket {
 public:
 

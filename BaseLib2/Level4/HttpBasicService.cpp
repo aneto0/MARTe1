@@ -358,6 +358,6 @@ bool HSObjectLoadSetup(
     return ret;
 }
 
-OBJECTREGISTER(HttpBasicService,"$Id: HttpBasicService.cpp,v 1.12 2011/11/25 11:41:13 aneto Exp $")
+OBJECTREGISTER(HttpBasicService,"$Id$")
 
 

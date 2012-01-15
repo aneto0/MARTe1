@@ -63,4 +63,4 @@ bool DigitalFilterGAM::Execute(GAM_FunctionNumbers execFlag) {
 
     return True;
 }
-OBJECTLOADREGISTER(DigitalFilterGAM, "$Id: DigitalFilterGAM.cpp,v 1.6 2011/06/27 15:39:33 dalves Exp $")
+OBJECTLOADREGISTER(DigitalFilterGAM, "$Id$")

@@ -25,7 +25,7 @@
 #include "GCNamedObject.h"
 #include "ConfigurationDataBase.h"
 
-OBJECTREGISTER(GCNamedObject,"$Id: GCNamedObject.cpp,v 1.6 2011/05/25 17:04:38 aneto Exp $")
+OBJECTREGISTER(GCNamedObject,"$Id$")
 
 bool GCNOObjectLoadSetup(
                     GCNamedObject &                 gcno,

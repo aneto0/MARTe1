@@ -25,7 +25,7 @@
 #include "StateMachineState.h"
 #include "StateMachine.h"
 
-OBJECTLOADREGISTER(StateMachineState,"$Id: StateMachineState.cpp,v 1.7 2008/05/12 17:45:11 fisa Exp $")
+OBJECTLOADREGISTER(StateMachineState,"$Id$")
 
 bool SMSObjectLoadSetup(StateMachineState &sms,ConfigurationDataBase &info,StreamInterface *err){
 

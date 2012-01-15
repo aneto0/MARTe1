@@ -57,4 +57,4 @@ bool TimeServiceActivity::ObjectDescription(StreamInterface &s,bool full,StreamI
     return True;
 }
 
-OBJECTREGISTER(TimeServiceActivity,"$Id: TimeServiceActivity.cpp,v 1.3 2011/05/20 15:03:46 aneto Exp $")
+OBJECTREGISTER(TimeServiceActivity,"$Id$")

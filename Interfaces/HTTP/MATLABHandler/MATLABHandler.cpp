@@ -31,7 +31,7 @@
 #include "Signal.h"
 #include "MATLABHandler.h"
 
-OBJECTLOADREGISTER(MATLABHandler,"$Id: MATLABHandler.cpp,v 1.9 2011/09/14 10:16:42 ppcc_dev Exp $")
+OBJECTLOADREGISTER(MATLABHandler,"$Id$")
 
 bool MATLABHandler::SaveSingleSignal(const char* signalName, MatlabConverter &mc, const char* matlabVarName) {
     GCRTemplate<GCNamedObject> signalGCO = GetSignal(signalName);

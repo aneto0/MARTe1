@@ -217,7 +217,7 @@ bool HttpServiceRelayResource::ProcessHttpMessage(HttpStream &hStream){
 
 }
 
-OBJECTLOADREGISTER(HttpServiceRelayResource,"$Id: HttpServiceRelayResource.cpp,v 1.4 2008/05/08 13:24:53 fpiccolo Exp $")
+OBJECTLOADREGISTER(HttpServiceRelayResource,"$Id$")
 
 
 

@@ -35,7 +35,7 @@
 class CDBObjectNode;
 OBJECT_DLL(CDBObjectNode)
 
-#define CDBObjectNodeVersion "$Id: CDBObjectNode.h,v 1.2 2006/08/21 17:19:33 fisa Exp $"
+#define CDBObjectNodeVersion "$Id$"
 
 class CDBObjectNode: public CDBGroupNode{
 

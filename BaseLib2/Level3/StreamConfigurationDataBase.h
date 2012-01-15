@@ -33,7 +33,7 @@
 #include "FString.h"
 #include "CDBExtended.h"
 
-#define StreamConfigurationDataBaseVersion "$Id: StreamConfigurationDataBase.h,v 1.8 2007/08/22 13:40:25 fisa Exp $"
+#define StreamConfigurationDataBaseVersion "$Id$"
 
 class StreamConfigurationDataBase;
 

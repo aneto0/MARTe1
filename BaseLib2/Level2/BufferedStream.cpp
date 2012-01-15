@@ -24,5 +24,5 @@
 
 #include "BufferedStream.h"
 
-OBJECTREGISTER(BufferedStream,"$Id: BufferedStream.cpp,v 1.2 2006/10/16 09:13:44 fisa Exp $")
+OBJECTREGISTER(BufferedStream,"$Id$")
 

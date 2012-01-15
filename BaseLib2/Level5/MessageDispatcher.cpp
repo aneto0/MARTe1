@@ -26,7 +26,7 @@
 #include "FastPollingMutexSem.h"
 #include "GlobalObjectDataBase.h"
 
-OBJECTLOADREGISTER(MessageDispatcher,"$Id: MessageDispatcher.cpp,v 1.10 2008/09/26 08:27:10 fpiccolo Exp $")
+OBJECTLOADREGISTER(MessageDispatcher,"$Id$")
 
 
 static FastPollingMutexSem mux;

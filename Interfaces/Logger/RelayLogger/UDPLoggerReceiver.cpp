@@ -27,7 +27,7 @@
 #include "UDPLoggerPlugin.h"
 
 
-OBJECTLOADREGISTER(UDPLoggerReceiver,"$Id: UDPLoggerReceiver.cpp,v 1.3 2008/04/01 15:39:53 aneto Exp $")
+OBJECTLOADREGISTER(UDPLoggerReceiver,"$Id$")
 
 void UDPMessageReceiver(void *args){
     UDPLoggerReceiver *loggerRec = (UDPLoggerReceiver *)args;

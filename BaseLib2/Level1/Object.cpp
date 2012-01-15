@@ -212,4 +212,4 @@ void Object::VAssertErrorCondition(EMFErrorType errorCode,const char *errorDescr
 #endif
 
 
-OBJECTREGISTER(Object,"$Id: Object.cpp,v 1.11 2011/02/11 08:51:03 astephen Exp $")
+OBJECTREGISTER(Object,"$Id$")

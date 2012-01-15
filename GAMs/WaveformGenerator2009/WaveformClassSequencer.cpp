@@ -196,4 +196,4 @@ bool WaveformClassSequencer::ProcessHttpMessage(HttpStream &hStream) {
 }
 
 
-OBJECTLOADREGISTER(WaveformClassSequencer,"$Id: WaveformClassSequencer.cpp,v 1.4 2010/04/19 15:33:56 ppcc_dev Exp $")
+OBJECTLOADREGISTER(WaveformClassSequencer,"$Id$")

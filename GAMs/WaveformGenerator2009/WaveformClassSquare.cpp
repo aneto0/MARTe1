@@ -112,5 +112,5 @@ bool WaveformClassSquare::ProcessHttpMessage(HttpStream &hStream) {
     return True;
 }
 
-OBJECTLOADREGISTER(WaveformClassSquare,"$Id: WaveformClassSquare.cpp,v 1.3 2009/10/28 16:10:56 lzabeo Exp $")
+OBJECTLOADREGISTER(WaveformClassSquare,"$Id$")
 

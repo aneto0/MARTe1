@@ -1142,5 +1142,5 @@ bool SrTrATCADrv::ProcessHttpMessage(HttpStream &hStream){
     hStream.Printf("</BODY></HTML>");
     return True;
 }
-OBJECTLOADREGISTER(SrTrATCADrv, "$Id: SrTrATCADrv.cpp,v 1.7 2011/12/13 21:01:17 aneto Exp $")
+OBJECTLOADREGISTER(SrTrATCADrv, "$Id$")
 

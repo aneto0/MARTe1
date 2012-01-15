@@ -27,7 +27,7 @@
 #include "CDBExtended.h"
 #include "HtmlStream.h"
 
-OBJECTLOADREGISTER(StateMachine,"$Id: StateMachine.cpp,v 1.15 2009/02/05 16:02:06 aneto Exp $")
+OBJECTLOADREGISTER(StateMachine,"$Id$")
 
 bool SMObjectLoadSetup(StateMachine &sm,ConfigurationDataBase &info,StreamInterface *err){
 

@@ -34,4 +34,4 @@ bool   DataPollingDrivenTTS::ObjectDescription(StreamInterface &s,bool full,Stre
 }
 
 
-OBJECTLOADREGISTER(DataPollingDrivenTTS,"$Id: DataPollingDrivenTTS.cpp,v 1.2 2008/08/14 16:41:08 fpiccolo Exp $")
+OBJECTLOADREGISTER(DataPollingDrivenTTS,"$Id$")
