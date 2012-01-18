@@ -518,6 +518,36 @@ public:
 #endif
     }
 
+    /**
+     * Atomic addition
+     */
+    static inline void Add (volatile int32 *p, int32 value) {
+#if (defined(_RTAI) || defined(_LINUX) || defined(_MACOSX))
+        asm volatile (
+                "lock addl %1, (%0)"
+                : /* output */
+                :"r" (p), "ir" (value) /* input */
+        );
+#else
+    #error not available in this O.S. Contributions are welcome
+#endif
+    }
+
+    /**
+     * Atomic subtraction
+     */
+    static inline void Sub (volatile int32 *p, int32 value) {
+#if (defined(_RTAI) || defined(_LINUX) || defined(_MACOSX))
+        asm volatile (
+                "lock subl %1, (%0)"
+                : /* output */
+                :"r" (p), "ir" (value) /* input */
+        );
+#else
+    #error not available in this O.S. Contributions are welcome
+#endif
+    }
+
 };
 
 #endif
