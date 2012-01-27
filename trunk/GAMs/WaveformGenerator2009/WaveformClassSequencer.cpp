@@ -116,42 +116,26 @@ bool WaveformClassSequencer::ObjectLoadSetup(ConfigurationDataBase &cdbData, Str
 ///
 float WaveformClassSequencer::GetValue(int32 usecTime) {
 
-//     if( !WaveformGenericClass::Execute(usecTime) ) return 0.0;
-
-//     if( usecTime < 0.0 ) return 0.0;
-
-//     if( currentWaveformIndex == numberOfWaveforms ) return 0.0;
-
-//     if( usecTime >= timeWindowsUsecTime[currentWaveformIndex][0] ){
-//         if( usecTime < timeWindowsUsecTime[currentWaveformIndex][1] ){
-//             return waveforms[currentWaveformIndex]->GetValue(usecTime) * gain + offsetValue;
-//         }else{
-//             currentWaveformIndex++;
-//             if( currentWaveformIndex == numberOfWaveforms ) return 0.0;
-//             if( usecTime >= timeWindowsUsecTime[currentWaveformIndex][0] ){
-//                 if( usecTime < timeWindowsUsecTime[currentWaveformIndex][1] ){
-//                     return waveforms[currentWaveformIndex]->GetValue(usecTime) * gain + offsetValue;
-//                 }
-//             }
-//         }
-//     }
-
     if( !WaveformGenericClass::Execute(usecTime) ) return 0.0;
 
     if( usecTime < 0.0 ) return 0.0;
 
-    int32 currentWaveformIndex = 0;
+    if( currentWaveformIndex == numberOfWaveforms ) return 0.0;
 
-    while(currentWaveformIndex < numberOfWaveforms) {
-      if( usecTime >= timeWindowsUsecTime[currentWaveformIndex][0] ){
+    if( usecTime >= timeWindowsUsecTime[currentWaveformIndex][0] ){
         if( usecTime < timeWindowsUsecTime[currentWaveformIndex][1] ){
-	  return (waveforms[currentWaveformIndex]->GetValue(usecTime) * gain + offsetValue);
-        } else {
-	  currentWaveformIndex++;
-	}
-      }
+            return waveforms[currentWaveformIndex]->GetValue(usecTime) * gain + offsetValue;
+        }else{
+            currentWaveformIndex++;
+            if( currentWaveformIndex == numberOfWaveforms ) return 0.0;
+            if( usecTime >= timeWindowsUsecTime[currentWaveformIndex][0] ){
+                if( usecTime < timeWindowsUsecTime[currentWaveformIndex][1] ){
+                    return waveforms[currentWaveformIndex]->GetValue(usecTime) * gain + offsetValue;
+                }
+            }
+        }
     }
-    
+
     return 0.0;
 }
 
