@@ -36,6 +36,7 @@ CFLAGS+= -I../../BaseLib2/Level3
 CFLAGS+= -I../../BaseLib2/Level4
 CFLAGS+= -I../../BaseLib2/Level5
 CFLAGS+= -I../../BaseLib2/Level6
+CFLAGS+= -I../../Interfaces/ConfigurationLibrary
 
 all: $(OBJS) \
 	$(TARGET)/DelayGAM$(GAMEXT)
