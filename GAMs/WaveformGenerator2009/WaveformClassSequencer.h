@@ -45,14 +45,14 @@ private:
     GCRTemplate<WaveformInterface>*       waveforms;
 
     /** */
-    //    int32                                 currentWaveformIndex;
+    int32                                 currentWaveformIndex;
 
 public:
 
     /** */
     WaveformClassSequencer() {
         numberOfWaveforms         = 0;
-	//        currentWaveformIndex      = 0;
+	currentWaveformIndex      = 0;
         waveforms                 = NULL;
     }
 
@@ -65,7 +65,7 @@ public:
     WaveformClassSequencer(const WaveformClassSequencer &wave) : WaveformGenericClass(wave) {
         this->numberOfWaveforms    = wave.numberOfWaveforms;
         this->timeWindowsUsecTime  = wave.timeWindowsUsecTime;
-	//        this->currentWaveformIndex = wave.currentWaveformIndex;
+	this->currentWaveformIndex = wave.currentWaveformIndex;
 
         if( wave.waveforms != NULL && wave.numberOfWaveforms > 0 ) {
             this->waveforms = new GCRTemplate<WaveformInterface>[numberOfWaveforms];
@@ -87,7 +87,7 @@ public:
         for( i = 0; i < numberOfWaveforms; i++ ){
             waveforms[i]->Reset();
         }
-        //currentWaveformIndex = 0;
+        currentWaveformIndex = 0;
     }
 
     /**
