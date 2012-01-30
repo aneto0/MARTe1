@@ -1,16 +1,26 @@
-//******************************************************************************
-//
-//      MARTe
-//      $Log: MARTe.h,v $
-//      Revision 1.2  2006/05/25 09:12:17  asopp
-//      Added little modifications to several files.
-//
-//      Revision 1.1  2006/05/24 11:24:13  asopp
-//      *** empty log message ***
-//
-//******************************************************************************
-
-
+/*
+ * Copyright 2011 EFDA | European Fusion Development Agreement
+ *
+ * Licensed under the EUPL, Version 1.1 or - as soon they 
+   will be approved by the European Commission - subsequent  
+   versions of the EUPL (the "Licence"); 
+ * You may not use this work except in compliance with the 
+   Licence. 
+ * You may obtain a copy of the Licence at: 
+ *  
+ * http://ec.europa.eu/idabc/eupl
+ *
+ * Unless required by applicable law or agreed to in 
+   writing, software distributed under the Licence is 
+   distributed on an "AS IS" basis, 
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
+   express or implied. 
+ * See the Licence for the specific language governing 
+   permissions and limitations under the Licence. 
+ *
+ * $Id$
+ *
+**/
 #if !defined(_MARTE_H_)
 #define _MARTE_H_
 
