@@ -1,53 +1,26 @@
-//******************************************************************************
-//
-//      MARTe
-//      $Log: MARTe.cpp,v $
-//      Revision 1.14  2011/02/18 13:28:16  ppcc_dev
-//      Hard termination on win32. Win32 expert to review
-//
-//      Revision 1.13  2010/02/09 15:07:06  aneto
-//      Allow to specify in what CPUs should the default threads be set
-//
-//      Revision 1.12  2009/02/05 15:57:11  aneto
-//      Added 2 seconds sleep in order to avoid the exit of MARTe when the config file loading fails
-//
-//      Revision 1.11  2009/01/07 14:30:09  aneto
-//      External configuration file loading in VxWorks
-//
-//      Revision 1.10  2009/01/07 13:48:11  aneto
-//      VxWorks support
-//
-//      Revision 1.9  2009/01/06 11:05:36  fpiccolo
-//      Minor modifications to allow starting the menu on RTAI as it is done for VxWorks
-//
-//      Revision 1.8  2008/10/07 12:40:52  rvitelli
-//      Corrected init problem with DisplayGAM and Java
-//
-//      Revision 1.7  2008/07/24 12:44:03  rvitelli
-//      Added support for Logger settings in cfg file.
-//
-//      Revision 1.6  2008/07/23 11:06:18  rvitelli
-//      added Seek(0)
-//
-//      Revision 1.5  2008/07/18 08:18:48  rvitelli
-//      Solved problem with RTAI slowness
-//      while loading cfg file (added buffering).
-//
-//      Revision 1.4  2008/07/16 15:12:35  rvitelli
-//      Added support for argc and argv
-//
-//      Revision 1.3  2008/07/03 08:36:35  aneto
-//      Added #ifdefs for RTAI.
-//
-//      Revision 1.2  2008/05/20 16:26:28  fisa
-//      a few more features
-//      works on a PC
-//
-//      Revision 1.1  2008/05/09 13:07:44  fpiccolo
-//      Work in progress.
-//
-//******************************************************************************
-
+/*
+ * Copyright 2011 EFDA | European Fusion Development Agreement
+ *
+ * Licensed under the EUPL, Version 1.1 or - as soon they 
+   will be approved by the European Commission - subsequent  
+   versions of the EUPL (the "Licence"); 
+ * You may not use this work except in compliance with the 
+   Licence. 
+ * You may obtain a copy of the Licence at: 
+ *  
+ * http://ec.europa.eu/idabc/eupl
+ *
+ * Unless required by applicable law or agreed to in 
+   writing, software distributed under the Licence is 
+   distributed on an "AS IS" basis, 
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
+   express or implied. 
+ * See the Licence for the specific language governing 
+   permissions and limitations under the Licence. 
+ *
+ * $Id$
+ *
+**/
 #include "System.h"
 #include "File.h"
 #include "FString.h"
@@ -57,6 +30,7 @@
 #include "GlobalObjectDataBase.h"
 #include "Sleep.h"
 #include "EventSem.h"
+#include "StateMachine.h"
 
 #include "Message.h"
 #include "MessageEnvelope.h"
@@ -203,21 +177,26 @@ extern "C"{
 
 
     int StartMARTeActivities(){
-
-        GCRTemplate<Message> gcrtm(GCFT_Create);
-        gcrtm->Init(0 ,"START");
-        GCRTemplate<MessageEnvelope> gcrtme(GCFT_Create);
-
         bool ret = True;
-        ret &= gcrtme->PrepareMessageEnvelope(gcrtm,"StateMachine");
-        ret &= MessageHandler::SendMessage(gcrtme);
-        if(!ret){
-            printf("StartMARTeActivities:  Failed to send START message to StateMachine\n");
-            CStaticAssertErrorCondition(FatalError, "StartMARTeActivities:  Failed to send START message to StateMachine\n");
-        }
+        //Look for all state machines and send a START message
+        int32 i=0;
+        for(i=0; i<GetGlobalObjectDataBase()->Size(); i++){
+            GCRTemplate<StateMachine> sm = GetGlobalObjectDataBase()->Find(i);
+            if(sm.IsValid()){
+                GCRTemplate<Message> gcrtm(GCFT_Create);
+                gcrtm->Init(0 ,"START");
+                GCRTemplate<MessageEnvelope> gcrtme(GCFT_Create);
 
+                ret &= gcrtme->PrepareMessageEnvelope(gcrtm, sm->Name());
+                ret &= MessageHandler::SendMessage(gcrtme);
+                if(!ret){
+                    printf("StartMARTeActivities:  Failed to send START message to %s\n", sm->Name());
+                    CStaticAssertErrorCondition(FatalError, "StartMARTeActivities:  Failed to send START message to %s\n", sm->Name());
+                }
+            }
+        }
         return ret;
-    };
+    }
 
 
     int StopMARTeActivities(){
