@@ -422,3 +422,17 @@ char *rtai_strpbrk(const char *cs, const char *ct)
 	}
 	return NULL;
 }
+char *rtai_strcasestr(const char *haystack, const char *needle)
+{
+	size_t hay_len = rtai_strlen(haystack);
+	size_t needle_len = rtai_strlen(needle);
+	while (hay_len >= needle_len) {
+		if (rtai_strncmp(haystack, needle, needle_len) == 0) 
+		    return (char *) haystack;
+
+		haystack++;
+		hay_len--;
+	}
+	return NULL;
+}
+

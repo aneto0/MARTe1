@@ -63,6 +63,7 @@
 #define atof rtai_atof
 #define strncat rtai_strncat
 #define strpbrk rtai_strpbrk
+#define strcasestr rtai_strcasestr
 //TODO Check if ok
 #define strtol simple_strtol
 

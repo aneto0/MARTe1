@@ -29,7 +29,7 @@
 #include "linux_version.h"
 #include <linux/types.h>
 #endif
-
+#include <stddef.h>
 #if defined(__cplusplus)
 extern "C"
 {
@@ -41,7 +41,6 @@ void *realloc(void *data, size_t newSize);
 void *rtai_memcpy(void *dest, const void *src, size_t n);
 void *rtai_memset(void *src, int c, size_t n);
 int rtai_memcmp(const void *cs, const void *ct, size_t count);
-
 size_t rtai_strlen(const char *s);
 int rtai_strcmp(const char * cs,const char * ct);
 char *rtai_strchr(const char *s, int c);    
@@ -52,6 +51,7 @@ char *rtai_strcat(char *dest, const char *src);
 int rtai_strncmp(const char *cs, const char *ct, size_t count);    
 char *srtai_trncat(char *dest, const char *src, size_t n);
 double rtai_strtod(const char *nptr, char **endptr);
+char *rtai_strcasestr(const char *haystack, const char *needle);
 int rtai_toupper(int c);
 int rtai_tolower(int c);
 int rtai_atoi(const char *nptr);
@@ -60,6 +60,7 @@ double rtai_atof(const char *str);
 char *rtai_strncat(char *dest, const char *src, size_t count);
 char *rtai_strpbrk(const char *cs, const char *ct);
 long simple_strtol(const char *cp, char **endp, unsigned int base);
+
 #if defined(__cplusplus)
 }
 #endif

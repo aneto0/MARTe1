@@ -76,7 +76,7 @@ void SignalArchiver::GetDateTimeString(FString &timeStr){
 #ifndef _RTAI
     sprintf(stime,"%s",ctime((const time_t*)&errorTime));
 #else
-    ctime(stime, 64, errorTime);
+ ctime(stime, 64, (const long int*)errorTime);    
 #endif
     stime[strlen(stime)-1]=0;
     char *c = stime;
