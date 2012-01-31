@@ -177,7 +177,7 @@ void SrTrATCADrv::RTDataCallback(void* arg){
         //Give a non real-time tick
         if(!rtThreadEventSem.ResetWait(offlineMSecTick)){
             int32 i = 0;
-            latestRTDataPacket.usecTime += 2000;
+            latestRTDataPacket.usecTime += offlineMSecTick * 1000;
             if(latestRTDataPacket.usecTime >= 4000000000u){
                 latestRTDataPacket.usecTime = 0;
             }
