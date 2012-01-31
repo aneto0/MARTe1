@@ -21,6 +21,24 @@
  * $Id$
  *
 **/
+#ifndef _PCIE_ATCA_ADC_IOCTL_H_
+#define _PCIE_ATCA_ADC_IOCTL_H_
+
+/*
+ * IOCTL definitions
+ */
+#define PCIE_ATCA_ADC_IOCT_MAGIC 0xEA  // /* Please use a different 8-bit number in your code */
+/*See  /Documentation/ioctl-number.txt*/
+
+/* S means "Set": thru a pointer
+ * T means "Tell": directly with the argument value
+ * G menas "Get": reply by setting thru a pointer
+ * Q means "Qry": response is on the return value
+ * X means "eXchange": G and S atomically
+ * H means "sHift": T and Q atomically
+ */
+
+
 #define PCIE_ATCA_ADC_IOCT_ACQ_ENABLE         _IO(PCIE_ATCA_ADC_IOCT_MAGIC, 1)
 #define PCIE_ATCA_ADC_IOCT_ACQ_DISABLE        _IO(PCIE_ATCA_ADC_IOCT_MAGIC, 2)
 #define PCIE_ATCA_ADC_IOCT_NUM_BOARDS         _IOR(PCIE_ATCA_ADC_IOCT_MAGIC, 3, u_int32_t)
