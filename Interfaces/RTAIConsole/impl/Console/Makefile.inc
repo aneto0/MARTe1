@@ -26,20 +26,20 @@ OBJSX=Shell.x FileLogger.x ReaderThread.x CommandHistory.x Autocomplete.x\
 	Wildcards.x VarManager.x AliasManager.x
 
 
-MAKEDEFAULTDIR=../../../MakeDefaults
+MAKEDEFAULTDIR=../../../../MakeDefaults
 
 include $(MAKEDEFAULTDIR)/MakeStdLibDefs.$(TARGET)
 
 CFLAGS+= -I.
-CFLAGS+= -I../../../BaseLib2/
-CFLAGS+= -I../../../BaseLib2/Level0
-CFLAGS+= -I../../../BaseLib2/Level1
-CFLAGS+= -I../../../BaseLib2/Level2
-CFLAGS+= -I../../../BaseLib2/Level3
-CFLAGS+= -I../../../BaseLib2/Level4
-CFLAGS+= -I../../../BaseLib2/Level5
-CFLAGS+= -I../../../BaseLib2/Level6
-CFLAGS+= -I../../../BaseLib2/LoggerService
+CFLAGS+= -I../../../../BaseLib2/
+CFLAGS+= -I../../../../BaseLib2/Level0
+CFLAGS+= -I../../../../BaseLib2/Level1
+CFLAGS+= -I../../../../BaseLib2/Level2
+CFLAGS+= -I../../../../BaseLib2/Level3
+CFLAGS+= -I../../../../BaseLib2/Level4
+CFLAGS+= -I../../../../BaseLib2/Level5
+CFLAGS+= -I../../../../BaseLib2/Level6
+CFLAGS+= -I../../../../BaseLib2/LoggerService
 CFLAGS+= -I../../
 
 CFLAGS+= -DUSE_PTHREAD

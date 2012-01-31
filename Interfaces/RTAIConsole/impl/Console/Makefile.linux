@@ -28,15 +28,15 @@ include Makefile.inc
 
 OPTIM =
 
-#LIBRARIES   += ../../../BaseLib2/Level0/$(TARGET)/BaseLib0S$(LIBEXT)
-#LIBRARIES   += ../../../BaseLib2/Level1/$(TARGET)/BaseLib1S$(LIBEXT)
-#LIBRARIES   += ../../../BaseLib2/Level2/$(TARGET)/BaseLib2S$(LIBEXT)
-#LIBRARIES   += ../../../BaseLib2/Level3/$(TARGET)/BaseLib3S$(LIBEXT)
+#LIBRARIES   += ../../../../BaseLib2/Level0/$(TARGET)/BaseLib0S$(LIBEXT)
+#LIBRARIES   += ../../../../BaseLib2/Level1/$(TARGET)/BaseLib1S$(LIBEXT)
+#LIBRARIES   += ../../../../BaseLib2/Level2/$(TARGET)/BaseLib2S$(LIBEXT)
+#LIBRARIES   += ../../../../BaseLib2/Level3/$(TARGET)/BaseLib3S$(LIBEXT)
 LIBRARIES   += ../../api/$(TARGET)/RTAIConsoleAPI$(LIBEXT)
 LIBRARIES   += -L/usr/realtime/lib/
-#LIBRARIES   += ../../../BaseLib2/Level4/$(TARGET)/BaseLib4S$(LIBEXT)
-#LIBRARIES   += ../../../BaseLib2/Level5/$(TARGET)/BaseLib5S$(LIBEXT)
-#LIBRARIES   += ../../../BaseLib2/Level6/$(TARGET)/BaseLib6S$(LIBEXT)
-#LIBRARIES   += ../../../BaseLib2/LoggerService/$(TARGET)/LoggerService$(LIBEXT)
+#LIBRARIES   += ../../../../BaseLib2/Level4/$(TARGET)/BaseLib4S$(LIBEXT)
+#LIBRARIES   += ../../../../BaseLib2/Level5/$(TARGET)/BaseLib5S$(LIBEXT)
+#LIBRARIES   += ../../../../BaseLib2/Level6/$(TARGET)/BaseLib6S$(LIBEXT)
+#LIBRARIES   += ../../../../BaseLib2/LoggerService/$(TARGET)/LoggerService$(LIBEXT)
 
-LIBRARIES += -lm -llxrt -L../../../BaseLib2/$(TARGET) -lBaseLib2
+LIBRARIES += -lm -llxrt -L../../../../BaseLib2/$(TARGET) -lBaseLib2
