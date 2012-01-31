@@ -24,7 +24,7 @@
 #############################################################
 OBJSX=RTAIConsoleAPI.x
 
-MAKEDEFAULTDIR=../../MakeDefaults
+MAKEDEFAULTDIR=../../../MakeDefaults
 
 include $(MAKEDEFAULTDIR)/MakeStdLibDefs.$(TARGET)
 
