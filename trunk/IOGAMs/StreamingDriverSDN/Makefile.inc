@@ -38,6 +38,7 @@ CFLAGS+= -I../../BaseLib2/Level4
 CFLAGS+= -I../../BaseLib2/Level5
 CFLAGS+= -I../../BaseLib2/Level6
 CFLAGS+= -I../../MARTe/MARTeSupportLib
+CFLAGS+= -I$(CODAC_ROOT)/include
 CFLAGS+= -D_MARTE
 
 all:  $(OBJS) $(TARGET)/StreamingDriverSDN$(GAMEXT) \
