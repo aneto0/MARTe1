@@ -26,7 +26,7 @@ TARGET=linux
 
 include Makefile.inc
 
-LIBRARIES   += -L../../$(TARGET) -lBaseLib2
+LIBRARIES   += -L../../../BaseLib2/$(TARGET) -lBaseLib2
 
 
 OPTIM= -O2 -finline-functions
