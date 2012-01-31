@@ -21,7 +21,7 @@
  * $Id$
  *
 **/
-ifndef FCOMM_K_IMPORTS_H
+#ifndef FCOMM_K_IMPORTS_H
 #define	FCOMM_K_IMPORTS_H
 
 #if defined(_RTAI)

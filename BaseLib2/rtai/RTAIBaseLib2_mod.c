@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2011 EFDA | European Fusion Development Agreement
  *
@@ -21,6 +22,7 @@
  * $Id$
  *
 **/
+
 #include <linux/kernel.h>
 #include <linux/init.h>
 #include <linux/module.h>
@@ -67,6 +69,24 @@ void MEMORYAllocationStatistics(void);
 EXPORT_SYMBOL(MEMORYAllocationStatistics);
 void MEMORYCheck(void);
 EXPORT_SYMBOL(MEMORYCheck);
+void TimerConfigTimer(void);
+EXPORT_SYMBOL(TimerConfigTimer);
+void TimerConfigAndStartTimer(void);
+EXPORT_SYMBOL(TimerConfigAndStartTimer);
+void TimerGetTimerUsecPeriod(void);
+EXPORT_SYMBOL(TimerGetTimerUsecPeriod);
+void TimerResetTimer(void);
+EXPORT_SYMBOL(TimerResetTimer);
+void TimerInit(void);
+EXPORT_SYMBOL(TimerInit);
+void TimerStartTimer(void);
+EXPORT_SYMBOL(TimerStartTimer);
+void TimerStopTimer(void);
+EXPORT_SYMBOL(TimerStopTimer);
+void TimerShowStats(void);
+EXPORT_SYMBOL(TimerShowStats);
+void TimerCServiceRoutine(void);
+EXPORT_SYMBOL(TimerCServiceRoutine);
 void ProcessorClockRate(void);
 EXPORT_SYMBOL(ProcessorClockRate);
 void ProcessorClockCycle(void);
@@ -201,6 +221,8 @@ void bl2_vsnprintf(void);
 EXPORT_SYMBOL(bl2_vsnprintf);
 void bl2_snprintf(void);
 EXPORT_SYMBOL(bl2_snprintf);
+void CGetStringToken(void);
+EXPORT_SYMBOL(CGetStringToken);
 void SocketInit(void);
 EXPORT_SYMBOL(SocketInit);
 void GetLocalAddress(void);
@@ -301,6 +323,10 @@ void ATMOpen(void);
 EXPORT_SYMBOL(ATMOpen);
 void ATMSetVCI(void);
 EXPORT_SYMBOL(ATMSetVCI);
+void ProcessorTypeSetDefaultCPUs(void);
+EXPORT_SYMBOL(ProcessorTypeSetDefaultCPUs);
+void ProcessorTypeGetDefaultCPUs(void);
+EXPORT_SYMBOL(ProcessorTypeGetDefaultCPUs);
 void ObjectRegistryDataBaseAdd(void);
 EXPORT_SYMBOL(ObjectRegistryDataBaseAdd);
 void DisplayRegisteredClasses(void);
@@ -409,6 +435,8 @@ void Int32ToInt(void);
 EXPORT_SYMBOL(Int32ToInt);
 void GCDecrement(void);
 EXPORT_SYMBOL(GCDecrement);
+void GCIncrement(void);
+EXPORT_SYMBOL(GCIncrement);
 void CStreamBufferingReadFN(void);
 EXPORT_SYMBOL(CStreamBufferingReadFN);
 void CStreamBufferingWriteFN(void);
@@ -957,6 +985,8 @@ void MSObjectLoadSetup(void);
 EXPORT_SYMBOL(MSObjectLoadSetup);
 void MSObjectSaveSetup(void);
 EXPORT_SYMBOL(MSObjectSaveSetup);
+void MHSendMessageRemotely(void);
+EXPORT_SYMBOL(MHSendMessageRemotely);
 void Get_private_CDBBrowserMenuInfo(void);
 EXPORT_SYMBOL(Get_private_CDBBrowserMenuInfo);
 void Get_private_MMCDBInfo(void);
@@ -1037,6 +1067,24 @@ void B2C_ShowGODBSubTree(void);
 EXPORT_SYMBOL(B2C_ShowGODBSubTree);
 void B2C_SendMessageToGODBObject(void);
 EXPORT_SYMBOL(B2C_SendMessageToGODBObject);
+void SMIGetSignal(void);
+EXPORT_SYMBOL(SMIGetSignal);
+void SMIProcessMessage(void);
+EXPORT_SYMBOL(SMIProcessMessage);
+void MCSaveF(void);
+EXPORT_SYMBOL(MCSaveF);
+void MCSaveD(void);
+EXPORT_SYMBOL(MCSaveD);
+void MCSaveMF(void);
+EXPORT_SYMBOL(MCSaveMF);
+void MCSaveMD(void);
+EXPORT_SYMBOL(MCSaveMD);
+void MCSaveMI(void);
+EXPORT_SYMBOL(MCSaveMI);
+void MCSaveS(void);
+EXPORT_SYMBOL(MCSaveS);
+void Get_private_SignalArchiverInfo(void);
+EXPORT_SYMBOL(Get_private_SignalArchiverInfo);
 void Get_private_HttpGCRCBrowserInfo(void);
 EXPORT_SYMBOL(Get_private_HttpGCRCBrowserInfo);
 void ESIInit(void);
@@ -1063,6 +1111,30 @@ void WSAMain(void);
 EXPORT_SYMBOL(WSAMain);
 void LSAssembleErrorMessage(void);
 EXPORT_SYMBOL(LSAssembleErrorMessage);
+
+/*
+ * Copyright 2011 EFDA | European Fusion Development Agreement
+ *
+ * Licensed under the EUPL, Version 1.1 or - as soon they 
+   will be approved by the European Commission - subsequent  
+   versions of the EUPL (the "Licence"); 
+ * You may not use this work except in compliance with the 
+   Licence. 
+ * You may obtain a copy of the Licence at: 
+ *  
+ * http://ec.europa.eu/idabc/eupl
+ *
+ * Unless required by applicable law or agreed to in 
+   writing, software distributed under the Licence is 
+   distributed on an "AS IS" basis, 
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
+   express or implied. 
+ * See the Licence for the specific language governing 
+   permissions and limitations under the Licence. 
+ *
+ * $Id$
+ *
+**/
 
 int init_func(void)
 {

@@ -28,6 +28,9 @@
  */
 #if !defined( BASIC_SOCKET_H)
 #define BASIC_SOCKET_H
+#ifndef EINTR
+#define EINTR 4
+#endif
 
 #include "System.h"
 #include "InternetAddress.h"
