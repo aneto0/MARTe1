@@ -196,6 +196,10 @@ inline int strcasecmp(const char *s1, const char *s2 ){
     return 1;
 }
 
+//
+// The strcasestr() function is a non-standard extension and is not provided by VxWorks
+// Note that a copy of this function is also provided in the Solaris system header.
+//
 // s1 = haystack, s2 = needle
 inline char *strcasestr(const char *s1, const char *s2 ){
 
@@ -203,6 +207,7 @@ inline char *strcasestr(const char *s1, const char *s2 ){
     int    ndIdx;
     int    s1Len;
     int    s2Len;
+    int    match = 0;
 
     s1Len = strlen(s1);
     s2Len = strlen(s2);
@@ -220,10 +225,17 @@ inline char *strcasestr(const char *s1, const char *s2 ){
 	    register char c2 = toupper(s2[ndIdx]);
 	    result &= (c1 == c2);
 	}
-	if(result) break;
+	if(result) {
+	  match = 1;
+	  break; 
+	}
     }
 
-    return ((char *)(&s1[hsIdx]));
+    if (match) {
+      return ((char *)(&s1[hsIdx]));
+    } else {
+      return NULL;
+    }
 }
 
 // check endianity!!!

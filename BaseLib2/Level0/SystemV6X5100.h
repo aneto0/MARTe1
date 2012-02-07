@@ -210,6 +210,49 @@ inline int strcasecmp(const char *s1, const char *s2 ){
     return 1;
 }
 
+//
+// The strcasestr() function is a non-standard extension and is not provided by VxWorks
+// Note that a copy of this function is also provided in the Solaris system header.
+//
+// s1 = haystack, s2 = needle
+inline char *strcasestr(const char *s1, const char *s2 ){
+
+    int    hsIdx;
+    int    ndIdx;
+    int    s1Len;
+    int    s2Len;
+    int    match = 0;
+
+    s1Len = strlen(s1);
+    s2Len = strlen(s2);
+
+    if (s1 == s2) {
+	return (char *)s1;
+    }
+
+    if ((s1 == NULL) || (s2 == NULL) || (s2Len > s1Len)) return NULL;
+
+    for(hsIdx = 0 ; hsIdx < s1Len-s2Len+1 ; hsIdx++) {
+        int result = 1;
+	for(ndIdx = 0 ; ndIdx < s2Len ; ndIdx++) {
+	    register char c1 = toupper(s1[hsIdx+ndIdx]);
+	    register char c2 = toupper(s2[ndIdx]);
+	    result &= (c1 == c2);
+	}
+	if(result) {
+	  match = 1;
+	  break; 
+	}
+    }
+
+    if (match) {
+      return ((char *)(&s1[hsIdx]));
+    } else {
+      return NULL;
+    }
+}
+
+
 // check endianity!!!
 #define IEEE_FLOAT_NAN 0x7fC00000
 #define IEEE_FLOAT_INF 0x7f800000
