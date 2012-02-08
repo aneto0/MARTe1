@@ -583,12 +583,19 @@ void *SharedMemoryAlloc(uint32 key, uint32 size, uint32 permMask){
 void SharedMemoryFree(void *address){
 #if (defined(_RTAI))
     rt_named_free(address);
-#elif (defined(_LINUX) || defined(_SOLARIS) || defined(_MACOSX))
+#elif (defined(_LINUX) || defined(_MACOSX))
     int32 ret = shmdt(address);
     if(ret == -1){
         int32 err = errno;
         CStaticAssertErrorCondition(FatalError, "SharedMemoryFree: %s\n", strerror(err));
     }
+#elif (defined(_SOLARIS) )
+    int32 ret = shmdt((char *)address);
+    if(ret == -1){
+        int32 err = errno;
+        CStaticAssertErrorCondition(FatalError, "SharedMemoryFree: %s\n", strerror(err));
+    }
+
 #else
 
 #endif

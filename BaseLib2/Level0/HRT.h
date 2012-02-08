@@ -67,6 +67,11 @@ static inline uint32 HRTRead32() {
     );
 
     return time;
+#elif defined(_SOLARIS)    
+    uint64 perf;
+    uint32 *pperf = (uint32 *)&perf;
+    perf = gethrtime();
+    return pperf[1];
 #else
 #endif
 }
@@ -130,6 +135,10 @@ static inline int64 HRTRead64 () {
         pout[1] = b;
     }
     return time;
+#elif defined(_SOLARIS)    
+    uint64 perf;
+    perf = gethrtime();
+    return perf;
 #else
     return 0;
 #endif

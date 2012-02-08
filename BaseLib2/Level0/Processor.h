@@ -37,6 +37,8 @@
 #define FAMILY_MOTOROLA_68K  0x20010000
 /** Defines the Processor Family for the PPC */
 #define FAMILY_MOTOROLA_PPC  0x20020000
+/** Defines the Processor Family for the Sparc */
+#define FAMILY_SPARC         0x40010000
 
 /** @name Intel related defines
     @{

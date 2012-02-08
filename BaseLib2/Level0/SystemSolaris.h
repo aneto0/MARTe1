@@ -50,6 +50,7 @@
 #include <math.h>
 #include <ctype.h>
 #include <typeinfo>
+#include <sys/time.h>
 
 #if defined USE_PTHREAD
 #include <pthread.h>
