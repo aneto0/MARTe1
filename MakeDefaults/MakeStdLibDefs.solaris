@@ -49,4 +49,4 @@ CFLAGS = -D_SOLARIS -DUSE_PTHREAD -fPIC -frtti -g  -z text -z defs
 
 .SUFFIXES:   .c  .cpp  .o .a .exe .ex .ex_ .so .gam
 
-LIBRARIES =  -lm -ldl -lsocket -lnsl -lpthread -lrt
+LIBRARIES =  -lm -ldl -lsocket -lnsl -lpthread -lrt -lkstat
