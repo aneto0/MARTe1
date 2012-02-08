@@ -528,6 +528,11 @@ public:
                 : /* output */
                 :"r" (p), "ir" (value) /* input */
         );
+#elif defined(_SOLARIS)
+// This is not appropriate .... but works for the moment...
+    Atomic::PrivateLock();
+    *p = *p + value;
+    Atomic::PrivateUnLock();
 #else
     #error not available in this O.S. Contributions are welcome
 #endif
@@ -543,6 +548,11 @@ public:
                 : /* output */
                 :"r" (p), "ir" (value) /* input */
         );
+#elif defined(_SOLARIS)
+// This is not appropriate .... but works for the moment...
+    Atomic::PrivateLock();
+    *p = *p - value;
+    Atomic::PrivateUnLock();
 #else
     #error not available in this O.S. Contributions are welcome
 #endif

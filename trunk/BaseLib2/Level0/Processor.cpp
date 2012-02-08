@@ -29,8 +29,12 @@
 #if defined(_MACOSX)
 #include <sys/sysctl.h>
 #endif
+#if defined(_SOLARIS)
+#include <kstat.h>
+#include <inttypes.h>
+#endif
 
-#if defined(INTEL_PLATFORM)
+#if defined(INTEL_PLATFORM) || defined(_SOLARIS)
 
 uint32 Processor_mSecTics;
 uint64 Processor_HRTFrequency;
@@ -99,6 +103,26 @@ static inline void CPUID_(uint32 code,uint32 &A,uint32 &B,uint32 &C,uint32 &D){
 }
 #endif
 
+#if defined(_SOLARIS)
+// kstat utility function.
+static inline int knp_as_int(kstat_named_t * knp)
+{
+  switch (knp->data_type) {
+  case KSTAT_DATA_CHAR:
+    return (int) knp->value.c;
+  case KSTAT_DATA_INT32:
+    return (int) knp->value.i32;
+  case KSTAT_DATA_UINT32:
+    return (int) knp->value.ui32;
+  case KSTAT_DATA_INT64:
+    return (int) knp->value.i64;
+  case KSTAT_DATA_UINT64:
+    return (int) knp->value.ui64;
+  }
+  return 0;
+}
+
+#endif
 
 static class HRTCalibrator{
 public:
@@ -184,6 +208,28 @@ public:
 
 	//Processor_HRTFrequency = (int64)2000000000;
 	//Processor_HRTPeriod    = (double)(1.0/((double)Processor_HRTFrequency));
+#elif defined(_SOLARIS)
+        Processor_HRTFrequency = 0;
+        Processor_HRTPeriod    = 0;
+
+	kstat_ctl_t   *kc;
+	kstat_t       *ksp;
+	kstat_named_t *knp;
+
+	kc = kstat_open();
+  
+	ksp = kstat_lookup(kc, "cpu_info", -1, NULL);
+	kstat_read(kc, ksp, (void *)NULL);
+	knp = (kstat_named_t *)kstat_data_lookup(ksp, "clock_MHz");
+	kstat_close(kc);
+	
+	double f = (double) knp_as_int(knp);
+
+	if(f != 0){
+	  f *= 1.0e6;
+	  Processor_HRTFrequency = (int64)f;
+	  Processor_HRTPeriod    = 1.0 / f;
+	}
 #else
 #error static class HRT constructor missing
 #endif
@@ -223,7 +269,7 @@ public:
 
 
 uint64 ProcessorClockRate(){
-#if defined(INTEL_PLATFORM) || defined(_MACOSX)
+#if defined(INTEL_PLATFORM) || defined(_MACOSX) || defined(_SOLARIS)
     return Processor_HRTFrequency;
 #elif defined(_VX5500) || defined(_V6X5500)
     return 1000000000;
@@ -237,7 +283,7 @@ uint64 ProcessorClockRate(){
 
 /// the clock period in seconds
 double ProcessorClockCycle(){
-#if defined(INTEL_PLATFORM) || defined(_MACOSX)
+#if defined(INTEL_PLATFORM) || defined(_MACOSX) || defined(_SOLARIS)
     return Processor_HRTPeriod;
 #elif defined(_VX5500) || defined(_V6X5500)
     return 1e-9;
@@ -274,6 +320,8 @@ uint32 ProcessorFamily(){
     return FAMILY_MOTOROLA_PPC;
 #elif defined(_VX68K)
     return FAMILY_MOTOROLA_68K;
+#elif defined(_SOLARIS)
+    return FAMILY_SPARC;
 #else
 #endif
 }
