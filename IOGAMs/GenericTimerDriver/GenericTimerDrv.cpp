@@ -56,9 +56,9 @@ bool GenericTimerDrv::ObjectLoadSetup(ConfigurationDataBase &info,StreamInterfac
     return False;
   }
 
-
-  if((int32)(GetTimerUsecPeriod()) != timerUsecPeriod) {
-    AssertErrorCondition(InitialisationError,"GenericTimerDrv::ObjectLoadSetup: %s error in Timer::ConfigAndStartTimer(), caught on the readback",Name());
+  int32 timerUsecPeriodCheck = (int32)GetTimerUsecPeriod();
+  if(timerUsecPeriodCheck != timerUsecPeriod) {
+      AssertErrorCondition(InitialisationError, "GenericTimerDrv::ObjectLoadSetup: %s : requested usec period was %d but obtained %d (granularity issue?)", Name(), timerUsecPeriod, timerUsecPeriodCheck);
     return False;
   }
 
