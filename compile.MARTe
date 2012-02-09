@@ -54,6 +54,26 @@ compileList=""
 #echo "target = " $target
 #echo "mode = " $makeMode
 
+#Prints the success statement in green
+function echoSuccess(){
+
+    echo -en "\033[0;32m"
+    echo "$1 compiled without errors or warnings"
+    echo -en "\033[0;0m"
+}
+
+#Prints the error statement and the shows the errors in red 
+function echoError(){
+
+    echo -en "\033[0;31m"
+    echo "$1 did not compile"
+    echo "$1 error filename:" $2
+    echo "**********************************************************************"
+    cat $2
+    echo "**********************************************************************"
+    echo -en "\033[0;0m"
+}
+
 function getCompileList(){
 
 	lineIgnore_0='^#'
@@ -66,10 +86,10 @@ function getCompileList(){
 
 function testCompileList(){
 
-	GAM_in=${1}
+	module_in=${1}
 	
-	for gam_ in $compileList; do
-	    if [ $GAM_in = $gam_ ]; then
+	for module_ in $compileList; do
+	    if [ $module_in = $module_ ]; then
 		return 1;
 	    fi
 	done
@@ -79,59 +99,58 @@ function testCompileList(){
 
 #1 - target
 #2 - mode
-function compileGAMs(){
+function compileModules(){
 
-	targetGAMs=${1}
+	targetModules=${1}
 	depth=${2}	
 	
 	if [ -n "$4" ]; then
 		echo ".$3. Is not empty"
-		makeGAMs=$3
-		folderGAMs=$4
+		makeModules=$3
+		folderModules=$4
 	else
-		makeGAMs=""
-		folderGAMs=$3		
+		makeModules=""
+		folderModules=$3		
 	fi	
 
-	gamlist=$(find . -maxdepth $depth -type d  | sort -n);
-#	echo "gamlist" $gamlist
+	moduleList=$(find . -maxdepth $depth -type d  | sort -n);
 	workdir=$(pwd)
 	
-	for gam in $gamlist; do
-	    gam=${gam:2}
-	    cd $gam
+	for module in $moduleList; do
+	    module=${module:2}
+	    cd $module
 		    
-	    if [ -n "$gam" ]; then
+	    if [ -n "$module" ]; then
 	    
-	    	testTarget $gam
+	    	testTarget $module
 	    	isTarget=$?
 	    	    		
 	    	if [ $isTarget -eq 0 ]; then	    	   	
-			testCompileList $gam
-			gamInList=$?
+			testCompileList $module
+			moduleInList=$?
 
 
-			if [ $gamInList -eq 1 ]; then
-			    if [ -f Makefile.$targetGAMs ]; then
-				echo Compiling $gam
-				make -f Makefile.${targetGAMs} ${makeGAMs} 3>&1 1>&2 2>&3 | tee $basedir/${folderGAMs}-$gam.err
+			if [ $moduleInList -eq 1 ]; then
+			    if [ -f Makefile.$targetModules ]; then
+				echo Compiling $module
+				make -f Makefile.${targetModules} ${makeModules} 3>&1 1>&2 2>&3 | tee $basedir/${folderModules}-$module.$target.err
 	#			echo "Next GAM"
 	#			read
 			   else
 					if [ -f Makefile ]; then
-						echo Compiling $gam
-						make -f Makefile ${makeGAMs} 3>&1 1>&2 2>&3 | tee $basedir/${folderGAMs}-$gam.err		
+						echo Compiling $module
+						make -f Makefile ${makeModules} 3>&1 1>&2 2>&3 | tee $basedir/${folderModules}-$module.$target.err		
 					fi		
-#				echo "GAM .$gam. doesn't have Makefile."${targetGAMs}
-	#			echo "" > $basedir/$gam.notgam
+#				echo "GAM .$module. doesn't have Makefile."${targetModules}
+	#			echo "" > $basedir/$module.notgam
 			    fi
 		       else	       		
-		       		if [ -f Makefile -o -f Makefile.$targetGAMs ]; then
-			   		echo "" > $basedir/${folderGAMs}-$gam.ignore
+		       		if [ -f Makefile -o -f Makefile.$targetModules ]; then
+			   		echo "" > $basedir/${folderModules}-$module.ignore
 			   	fi
 		       fi
 #		else
-#			echo "target dir: " $gam
+#			echo "target dir: " $module
 #			read
 		fi
 	    fi
@@ -161,52 +180,57 @@ function testMakeModes(){
 	return 0;
 }
 
-function getGAMList(){
+function getList(){
 
-	name="'"$1"*.err'"
+	name="'"$1"*.$target.err'"
 	if [ $2 = "err" ]; then
 		command="find . -maxdepth 1 -type f -size +0k -name ${name} | sort -n"
-		text="with errors (not compiled):"
+		text="that did not compile cleanly:"
+        mode="\033[0;31m"
 	else
 
 		if [ $2 = "ignore" ]; then
 			name="'"$1"*.ignore'"
 			command="find . -maxdepth 1 -type f -name ${name} | sort -n"
 			text="ignored on compilation:"
+            mode="\033[0;33m"
 		else		
 			command="find . -maxdepth 1 -type f -size 0k -name ${name} | sort -n"
-			text="successfull compiled:"
+            mode="\033[0;32m"
+			text="compiled without errors or warnings"
 		fi
 	fi
 
-	gams=`eval $command`
+	modules=`eval $command`
 
+    echo -ne $mode
 	echo "$1 $text"
 
 	count=0
-	for gam in $gams; do
-	    gam=${gam:2}
-	    gam=${gam/"$1-"/""}
-	    gam=${gam/".err"/""}
-	    gam=${gam/".ignore"/""}
-	    out=$out""$gam
-	    echo "    " $gam	    
+	for module in $modules; do
+	    module=${module:2}
+	    module=${module/"$1-"/""}
+	    module=${module/".$target.err"/""}
+	    module=${module/".ignore"/""}
+	    out=$out""$module
+	    echo "    " $module
 	    count=$(( $count + 1))
 
 	    if [ $2 = "err" ]; then
-		echo "    ""    ""Error file" $1"-"$gam".err"
+		echo "    ""    ""Error file" $1"-"$module".$target.err"
 	    else
 		if [ $2 = "ignore" ]; then
-			rm -rf $1"-"$gam".ignore"
+			rm -rf $1"-"$module".ignore"
 		else
-			rm -rf $1"-"$gam".err"	
+			rm -rf $1"-"$module".$target.err"	
 		fi	
 	    fi
 
 	done
 
-	echo "$count GAMs in range"
+	echo "$count $1 in range"
 	
+    echo -ne "\033[0;0m"
 }
 
 if [ $nargs -ge 2 ]; then
@@ -243,7 +267,7 @@ if [ $nargs -ge 2 ]; then
 		exit
 	fi	
 
-	rm -f *.err
+	rm -f *.$target.err
 	rm -f *.ignore
 
 	getCompileList
@@ -251,55 +275,55 @@ if [ $nargs -ge 2 ]; then
 	cd $basedir
 	cd $BaseLib2_dir
 	echo "Compiling Baselib2 in dir" $BaseLib2_dir
-	make -f Makefile.$target $makeMode 3>&1 1>&2 2>&3 | tee $basedir/BaseLib2.err
+	make -f Makefile.$target $makeMode 3>&1 1>&2 2>&3 | tee $basedir/BaseLib2.$target.err
 	echo "Baselib compilation finished"
 
 	cd $basedir	
 	cd $MARTe_dir
 	echo "Compiling MARTe in dir" $MARTe_dir
-	make -f Makefile.$target $makeMode 3>&1 1>&2 2>&3 | tee $basedir/MARTe.err
+	make -f Makefile.$target $makeMode 3>&1 1>&2 2>&3 | tee $basedir/MARTe.$target.err
 	echo "MARTe compilation finished"
 
 	cd $basedir	
 	cd $IOGAMs_dir
 	echo "Compiling IOGAMs in dir" $MARTe_dir
-	make -f Makefile.$target $makeMode 3>&1 1>&2 2>&3 | tee $basedir/IOGAMs.err
+	make -f Makefile.$target $makeMode 3>&1 1>&2 2>&3 | tee $basedir/IOGAMs.$target.err
 	echo "IOGAMs compilation finished"
 
 	cd $basedir
 	cd $GAMs_dir
 	echo "Compiling GAMs in dir" $GAMs_dir
-	compileGAMs $target 1 $makeMode "GAMs"
+	compileModules $target 1 $makeMode "GAMs"
 	echo "GAMs compilation finished"
 
 	cd $basedir
 	cd $IOGAMs_dir
 	echo "Compiling IOGAMs in dir" $IOGAMs_dir
-	compileGAMs $target 1 $makeMode "IOGAMs"
+	compileModules $target 1 $makeMode "IOGAMs"
 	echo "IOGAMs compilation finished"
 
 	cd $basedir
 	cd $Interfaces_dir
 	echo "Compiling Interfaces in dir" $Interfaces_dir
-	compileGAMs $target 1 $makeMode "Interfaces"
+	compileModules $target 1 $makeMode "Interfaces"
 	echo "Interfaces compilation finished"
 
 	cd $basedir
 	cd $InterfaceHTTP_dir
 	echo "Compiling Interfaces HTTP in dir" $InterfaceHTTP_dir
-	compileGAMs $target 1 $makeMode "Interfaces-HTTP"
+	compileModules $target 1 $makeMode "Interfaces-HTTP"
 	echo "Interfaces HTTP compilation finished"
 
 	cd $basedir
 	cd $InterfaceLogger_dir
 	echo "Compiling Interfaces Logger in dir" $InterfaceLogger_dir
-	compileGAMs $target 1 $makeMode "Interfaces-Logger"
+	compileModules $target 1 $makeMode "Interfaces-Logger"
 	echo "Interfaces Logger compilation finished"
 	
 	cd $basedir
 	cd $InterfaceTimeServiceActivities_dir
 	echo "Compiling Interfaces Time Service Activities in dir" $InterfaceTimeServiceActivities_dir
-	compileGAMs $target 1 $makeMode "Interfaces-TimeServiceActivities"
+	compileModules $target 1 $makeMode "Interfaces-TimeServiceActivities"
 	echo "Interfaces Time Service Activities compilation finished"
 
 	echo ""
@@ -308,55 +332,49 @@ if [ $nargs -ge 2 ]; then
 	echo "********************************Report********************************"
 	
 	cd $basedir
-	BaseLib2Error=$(find . -maxdepth 1 -type f -size +0k -name 'BaseLib2.err' | sort -n);
+	BaseLib2Error=$(find . -maxdepth 1 -type f -size +0k -name 'BaseLib2.$target.err' | sort -n);
 	if [ -n "$BaseLib2Error" ]; then
-		echo "BaseLib2 not compiled"
-		echo "BaseLib2 error file" ${BaseLib2Error:2}
-		cat ${BaseLib2Error:2}
+        echoError "BaseLib2" ${BaseLib2Error:2}
 	else
-		echo "BaseLib2 compiled successfull"
-		rm -rf "BaseLib2.err"
+        echoSuccess "BaseLib2"
+		rm -rf "BaseLib2.$target.err"
 	fi
 
-	MARTeError=$(find . -maxdepth 1 -type f -size +0k -name 'MARTe.err' | sort -n);
+	MARTeError=$(find . -maxdepth 1 -type f -size +0k -name 'MARTe.$target.err' | sort -n);
 	if [ -n "$MARTeError" ]; then
-		echo "MARTe not compiled"
-		echo "MARTe error file" ${MARTeError:2}
-		cat ${MARTeError:2}
+        echoError "MARTe" ${MARTeError:2}
 	else
-		echo "MARTe compiled successfull"
-		rm -rf "MARTe.err"
+        echoSuccess "MARTe"
+		rm -rf "MARTe.$target.err"
 	fi
 
-	IOGAMsError=$(find . -maxdepth 1 -type f -size +0k -name 'IOGAMs.err' | sort -n);
+	IOGAMsError=$(find . -maxdepth 1 -type f -size +0k -name 'IOGAMs.$target.err' | sort -n);
 	if [ -n "$IOGAMsError" ]; then
-		echo "IOGAMs not compiled"
-		echo "IOGAMs error file" ${IOGAMsError:2}
-		cat ${IOGAMsError:2}
+		echoError "IOGAMs" ${IOGAMsError:2}
 	else
-		echo "IOGAMs compiled successfull"
-		rm -rf "IOGAMs.err"
+		echoSuccess "IOGAMs"
+		rm -rf "IOGAMs.$target.err"
 	fi
 	
 	echo ""	
-	getGAMList "GAMs" "success"
+	getList "GAMs" "success"
 	echo ""
-	getGAMList "GAMs" "err"
+	getList "GAMs" "err"
 	echo ""	
-	getGAMList "GAMs" "ignore"
+	getList "GAMs" "ignore"
 	echo ""	
-	getGAMList "IOGAMs" "success"
+	getList "IOGAMs" "success"
 	echo ""
-	getGAMList "IOGAMs" "err"
+	getList "IOGAMs" "err"
 	echo ""
-	getGAMList "IOGAMs" "ignore"
+	getList "IOGAMs" "ignore"
 
 	echo ""	
-	getGAMList "Interfaces" "success"
+	getList "Interfaces" "success"
 	echo ""
-	getGAMList "Interfaces" "err"
+	getList "Interfaces" "err"
 	echo ""
-	getGAMList "Interfaces" "ignore"
+	getList "Interfaces" "ignore"
 
 else
 	echo "Invalid number of arguments ["$nargs"]. Usage: compile.MARTe <target> <configFile> <makeMode>"
