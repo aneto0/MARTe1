@@ -80,9 +80,9 @@ bool WaveformPeriodicClass::Execute(int32 actTimeUsec){
     {   // Calculate the integral of the phase for sweeping option
 
         if( oldUsecTime == -1 ){
-            integratedFrequency  = frequency*(actTimeUsec-tStartUsecLocal)/100000.0-phase;
+            integratedFrequency  = frequency*(actTimeUsec-tStartUsecLocal)*1.0e-6 + phase;
         }else{
-            integratedFrequency += (frequency+oldFrequency)*(actTimeUsec-oldUsecTime)*0.0000005;
+            integratedFrequency += (frequency+oldFrequency)*(actTimeUsec-oldUsecTime)*0.5e-6;
         }
 
         // Update data for sweeping option
