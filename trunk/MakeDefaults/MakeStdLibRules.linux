@@ -40,7 +40,8 @@ linux/%.a : $(OBJS)
 	ld -r $(OBJS) -o $@
 
 linux/%.so : linux/%.o $(OBJS)
-	$(COMPILER) -shared -fPIC $(OBJS) $(LIBRARIES) linux/$*.o -o $@
+#	$(COMPILER) -shared -fPIC $(OBJS) $(LIBRARIES) linux/$*.o -o $@
+	$(COMPILER) -shared -fPIC $(OBJS) linux/$*.o $(LIBRARIES) -o $@
 	touch linux/lib$*.so
 	rm  linux/lib$*.so
 	ln -fns $*.so linux/lib$*.so
