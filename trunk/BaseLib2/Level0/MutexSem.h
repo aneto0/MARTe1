@@ -52,9 +52,10 @@ public:
 
     /** */
     bool Init(){
-        if(pthread_mutexattr_init(&mutexAttributes) != 0)                         return False;
-        if(pthread_mutexattr_settype(&mutexAttributes,PTHREAD_MUTEX_RECURSIVE)!=0)return False;
-        if(pthread_mutex_init(&mutexHandle,&mutexAttributes)!=0)                  return False;
+        if(pthread_mutexattr_init(&mutexAttributes) != 0)                              return False;
+        if(pthread_mutexattr_setprotocol(&mutexAttributes, PTHREAD_PRIO_INHERIT) != 0) return False;
+        if(pthread_mutexattr_settype(&mutexAttributes,PTHREAD_MUTEX_RECURSIVE)!=0)     return False;
+        if(pthread_mutex_init(&mutexHandle,&mutexAttributes)!=0)                       return False;
         return True;
     }
 
