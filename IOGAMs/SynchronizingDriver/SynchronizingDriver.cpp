@@ -58,8 +58,8 @@ int32 SynchronizingDriver::GetData(uint32 usecTime, int32 *buffer, int32 bufferN
     // If all buffers have been read, update the readBuffer pointer and return False
     int32 *localPointer = readBufferGetData +  bufferNumber*NumberOfInputs();
     if(localPointer < memoryBuffer) {
-        int32 difference =  (memoryBuffer - localPointer)/sizeof(int32); 
-        localPointer     =   endOfMemoryBuffer - difference; 
+        int32 difference = memoryBuffer      - localPointer;
+        localPointer     = endOfMemoryBuffer - difference; 
     }
 
     /* Copy data to local buffer */
