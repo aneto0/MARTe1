@@ -116,9 +116,14 @@ bool FilteredInputGAM::Execute(GAM_FunctionNumbers functionNumber){
             inputModule->PulseStart();
     }
     // Reset the output
-    int sig;
+    int sig = 0;
     for(sig = 0; sig < output->BufferWordSize(); sig++){
-        floatBuffer[sig] = 0.0; 
+        if(!needsCalibration[sig]){
+            floatBuffer[sig] = 0.0;
+        }
+        else{
+            intBuffer[sig] = 0;
+        }
     }
     
     // Copy the data in the buffer and peform filtering activities 
@@ -127,24 +132,27 @@ bool FilteredInputGAM::Execute(GAM_FunctionNumbers functionNumber){
             AssertErrorCondition(FatalError,"InputGAM::Execute:: Module %s GetData Failed for driver %s",Name(), inputModule->Name());
             return False;
         }
-        
+       
+        int32 *intB = (int32 *)buffer;
+        for(sig = 0; sig < output->BufferWordSize(); sig++){
+            if(!needsCalibration[sig]){
+                // If the signal is a float filter it
+                floatBuffer[sig] += buffer[sig]*filterCoefficients[i];
+            }
+            // If the signal is an integer, do not filter and keep the latest value
+            else if(i == 0){
+                intBuffer[sig] = intB[sig];
+            }
+        }
+
         for(sig = 0; sig < output->BufferWordSize(); sig++){
             floatBuffer[sig] += buffer[sig]*filterCoefficients[i]; 
         }
     }
     
-    // Copy last value of integer entries in the DDB
-    for(sig = 0; sig < output->BufferWordSize(); sig++){
-        int32 *intB = (int32 *)buffer;
-        if(inputModule->GetData(time,(int32 *)buffer,0) == -1){
-            AssertErrorCondition(FatalError,"InputGAM::Execute:: Module %s GetData Failed for driver %s",Name(), inputModule->Name());
-            return False;
-        }
-        if(needsCalibration[sig])  intBuffer[sig] = intB[sig];
-    }
-
     output->Write();
     return True;
 }
 
 OBJECTLOADREGISTER(FilteredInputGAM,"$Id$")
+
