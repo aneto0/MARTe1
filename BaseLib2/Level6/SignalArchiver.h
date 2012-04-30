@@ -78,6 +78,11 @@ OBJECT_DLL_STUFF(SignalArchiver)
     int32   relativeDirectoryPathMessageCode;
 
     /**
+     * Store the extension?
+     */
+    bool     writeExtension;
+
+    /**
      * Renders the signals
      */
     HttpDirectoryResource httpDirResource;
@@ -144,6 +149,7 @@ public:
         storageMode                      = MATLAB;
         archiveTID                       = 0;
         relativeDirectoryPathMessageCode = -1;
+        writeExtension                   = True;
         archiveSem.Create();
     }
 
@@ -194,6 +200,9 @@ public:
 
         cdbx.ReadFString(relativeDirectoryPath, "RelativeDirectoryPath");
         cdbx.ReadInt32(relativeDirectoryPathMessageCode, "RelativeDirectoryPathMessageCode");
+        FString writeExtensionStr;
+        cdbx.ReadFString(writeExtensionStr, "WriteExtension", "yes");
+        writeExtension = (writeExtensionStr != "no");
         return httpDirResource.ObjectLoadSetup(cdbx, err);
     }
 

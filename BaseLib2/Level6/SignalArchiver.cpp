@@ -134,14 +134,16 @@ bool SignalArchiver::StoreSignals(){
 
                     File outputFile;
                     //Add the correct extension
-                    if(storageMode == MATLAB){
-                        filename.Printf(".mat");
-                    }
-                    else if(storageMode == TEXT){
-                        filename.Printf(".txt");
-                    }
-                    else{
-                        filename.Printf(".bin");
+                    if(writeExtension){
+                        if(storageMode == MATLAB){
+                            filename.Printf(".mat");
+                        }
+                        else if(storageMode == TEXT){
+                            filename.Printf(".txt");
+                        }
+                        else{
+                            filename.Printf(".bin");
+                        }
                     }
                     if(!outputFile.OpenWrite(filename.Buffer())){
                         AssertErrorCondition(FatalError, "%s::StoreSignals: Could not open file %s", Name(), filename.Buffer());
