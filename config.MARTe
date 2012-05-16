@@ -52,10 +52,11 @@ UDPDriver
 #Interfaces
 ConfigurationLibrary
 CFGUploader
-#FlotPlot
-#MATLABHandler
+FlotPlot
+MATLABHandler
 SignalHandler
 JTLogger
+#EPICSLib
 #RelayLogger
 MessageTriggeringTimeService
 
