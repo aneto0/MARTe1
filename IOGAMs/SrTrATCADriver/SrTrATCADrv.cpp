@@ -107,7 +107,7 @@ SrTrATCADrv::~SrTrATCADrv(){
     }
     if(Threads::IsAlive(rtThreadId)) {
         AssertErrorCondition(Warning,"SrTrATCADrv::~SrTrATCADrv: %s: Had To Kill Thread %d",Name(), rtThreadId);
-        Threads::Kill(memoryDownloadThreadId);
+        Threads::Kill(rtThreadId);
         rtThreadId = 0;
     }
     else{
@@ -138,7 +138,7 @@ void SrTrATCADrv::MemoryDownloadCallback(void* arg){
 
     // Set Thread priority
     if(memoryDownloadThreadPriority) {
-        Threads::SetRealTimeClass();
+        //Threads::SetRealTimeClass();
         Threads::SetPriorityLevel(memoryDownloadThreadPriority);
     }
 
@@ -167,7 +167,7 @@ void SrTrATCADrv::RTDataCallback(void* arg){
     // Set Thread priority
     if(rtThreadPriority) {
         Threads::SetRealTimeClass();
-        Threads::SetPriorityLevel(memoryDownloadThreadPriority);
+        Threads::SetPriorityLevel(rtThreadPriority);
     }
     int64 lastCounterTime = 0;
     int64 oneMinCounterTime = HRT::HRTFrequency()*60;
@@ -185,12 +185,17 @@ void SrTrATCADrv::RTDataCallback(void* arg){
                 triggerService[i].Trigger();
             }
         }
+        //Unchecked and later confirmed with a semaphore (in order not to allow any more acquisition during a stop)
         while(rtAcquisitionInProgress){
             if(!rtThreadKeepRunning){
                 break;
             }
             //RT logic
             dmaPathMux.Lock();
+            if(!rtAcquisitionInProgress){
+                dmaPathMux.UnLock();
+                break;
+            }
             int32 ret = read(device, &latestRTDataPacket, sizeof(RTDataPacket));
             if(ret == -1) {
                 AssertErrorCondition(FatalError, "SrTrATCADrv::RTDataCallback: read error");
@@ -808,9 +813,13 @@ bool SrTrATCADrv::StartAcquisition(){
 }
 
 bool SrTrATCADrv::StopAcquisition(){
+    dmaPathMux.Lock();
+    if(!rtAcquisitionInProgress){
+        dmaPathMux.UnLock();
+        return True;
+    }
     acquisitionInProgress   = False;
     rtAcquisitionInProgress = False;
-    dmaPathMux.Lock();
     if(ioctl(device, PCIE_SRTR_IOCT_ACQ_DISABLE) < 0){
         AssertErrorCondition(FatalError,"SrTrATCADrv::StopAcquisition: %s Failed to stop the acquisition", Name());
         dmaPathMux.UnLock();
@@ -828,6 +837,9 @@ bool SrTrATCADrv::StopAcquisition(){
 }
 
 bool SrTrATCADrv::StoreRamData(){
+    if(numberOfConnectedChannels < 1){
+        return True;
+    }
     //Offset in the memory
     int32  offsetJump              = 0x80000000 / numberOfConnectedChannels;
     //Current channel offset
@@ -853,8 +865,10 @@ bool SrTrATCADrv::StoreRamData(){
     for(i=0; i<N_CHANNELS; i++){
         if(!channelConnected[i]){
             AssertErrorCondition(Information, "SrTrATCADrv::StoreRamData: %s Channel %d is not connected, no data will be stored", Name(), i);
+            continue;
         }
-
+        //Allow some time for the thread to sleep between saving channels
+        SleepSec(1.0);
         //Try to open the file to sink the data into
         FString absoluteFileLocation = "";
         absoluteFileLocation.Printf("/%s/%s/%s", baseDirectoryRamData.Buffer(), relativeDirectoryRamData.Buffer(), channelRamDataFilename[i].Buffer());
