@@ -201,6 +201,12 @@ void __thread_decl DataDiscombobulation(void* data){
     storage->Discombobulate();
     
     storage->acceptingMessages = True;
+
+    GCRTemplate<Message> gcrtm(GCFT_Create);
+    gcrtm->Init(0x703, "DISCOMBOBULATION_COMPLETED");
+    GCRTemplate<MessageEnvelope> gcrtme(GCFT_Create);
+    gcrtme->PrepareMessageEnvelope(gcrtm, "StateMachine", MDRF_None);
+    MessageHandler::SendMessage(gcrtme);
 }
 
 bool StorageGAM::Discombobulate() {
