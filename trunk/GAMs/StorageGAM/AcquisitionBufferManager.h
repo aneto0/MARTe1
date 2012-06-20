@@ -123,7 +123,7 @@ public:
     /// Set the start address of the memory copy from
     /// the circ to the lin buffer
     void Mark(int32 cycleOffset) {
-        char *markPtrAux = (char *)(circularBuffer.WritePtr()) + cycleOffset*bytesPerCycle;
+        char *markPtrAux = (char *)(circularBuffer.WritePtr()) + (int32)(cycleOffset*bytesPerCycle);
         if(markPtrAux < circularBuffer.DataBuffer()) {
             CStaticAssertErrorCondition(FatalError, "AcquisitionBufferManager::Store: markPtr < data buffer pointer");
         } else {
@@ -134,7 +134,7 @@ public:
     /// Set the end address of the memory copy from
     /// the circ to the lin buffer
     void Store(int32 cycleOffset) {
-        storePtr = (char *)(circularBuffer.WritePtr()) + cycleOffset*bytesPerCycle;
+        storePtr = (char *)(circularBuffer.WritePtr()) + (int32)(cycleOffset*bytesPerCycle);
         if(storePtr <= markPtr) {
             CStaticAssertErrorCondition(FatalError, "AcquisitionBufferManager::Store: storePtr <= markPtr");
         } else {
