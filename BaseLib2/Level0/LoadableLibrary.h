@@ -124,7 +124,7 @@ public:
 #elif (defined(_LINUX) || defined(_SOLARIS) || defined(_MACOSX))
         if (module != 0) Close();
 
-        module = dlopen(dllName, RTLD_LAZY|RTLD_GLOBAL);
+        module = dlopen(dllName, RTLD_NOW|RTLD_GLOBAL);
         if (module==NULL) return False;
         return True;
 #elif (defined (_WIN32) || defined(_RSXNT))
