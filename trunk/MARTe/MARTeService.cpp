@@ -21,6 +21,9 @@
  * $Id$
  *
 **/
+#if (defined(_LINUX) || defined(_SOLARIS))
+#include <sys/mman.h>
+#endif
 #include "MARTeService.h"
 #include "File.h"
 #include "ConfigurationDataBase.h"
@@ -156,6 +159,12 @@ bool MARTeService::ServiceStop(){
 }
 
 int main(int argc,char **argv){
+#if (defined(_LINUX) || defined(_SOLARIS))
+    if(mlockall(MCL_CURRENT|MCL_FUTURE) != 0){
+        printf("Failed to do mlockall\n\n");
+        return -1;
+    }
+#endif
     FString serviceName;
     serviceName = argv[0];
     char *p = serviceName.BufferReference();
@@ -174,11 +183,16 @@ int main(int argc,char **argv){
     MARTeService ms(p+pos,p+pos);
 
 #ifdef _LINUX
-if(argc > 1){
-    cfgName = argv[1];
-}   
+    if(argc > 1){
+        cfgName = argv[1];
+    }   
 #endif
-    if (ms.Main(argc,argv)) return 0;
+    if (ms.Main(argc,argv)){
+#if (defined(_LINUX) || defined(_SOLARIS))
+        munlockall();
+#endif
+        return 0;
+    }
 
     return -1;
 }
