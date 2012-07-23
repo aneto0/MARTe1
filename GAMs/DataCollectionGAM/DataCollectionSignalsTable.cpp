@@ -97,38 +97,38 @@ bool DataCollectionSignalsTable::Initialize(const DDBInterface &ddbInterface, Co
             float *cal0 = NULL;
             float *cal1 = NULL;
 
-            if(descriptor->SignalTypeCode() == BTDInt32){
+            
                 // Read Calibration Factors
-                cal0 = (float *)malloc(signalSize*sizeof(float));
-                if(cal0 == NULL){
+            cal0 = (float *)malloc(signalSize*sizeof(float));
+            if(cal0 == NULL){
                     CStaticAssertErrorCondition(FatalError,"DataCollectionSignalsTable::Initialize: Failed allocating space cal0 for signal %s (%s)", ddbName.Buffer(), jpfSignalName.Buffer());
                     return False;
-                }
-                cal1 = (float *)malloc(signalSize*sizeof(float));
-                if(cal1 == NULL){
+            }
+            cal1 = (float *)malloc(signalSize*sizeof(float));
+            if(cal1 == NULL){
                     CStaticAssertErrorCondition(FatalError,"DataCollectionSignalsTable::Initialize: Failed allocating space cal1 for signal %s (%s)", ddbName.Buffer(), jpfSignalName.Buffer());
                     free((void*&)cal0);
                     return False;
-                }
+            }
 
-                int dims    = 1;
-                int size[2] = {signalSize,1};
-                if(!cdb.ReadFloatArray(cal0,size,dims,"Cal0")){
-                    CStaticAssertErrorCondition(FatalError,"DataCollectionSignalsTable::Initialize: No Cal0 has been specified for signal %s (%s). Assuming 0.0", ddbName.Buffer(), jpfSignalName.Buffer());
-                    for(int i = 0; i < signalSize; i++){
-                        cal0[i] = 0.0;
-                    }
-                }
-                dims = 1;
-                size[0] = signalSize;
-                size[1] = 1;
-                if(!cdb.ReadFloatArray(cal1,size,dims,"Cal1")){
-                    CStaticAssertErrorCondition(FatalError,"DataCollectionSignalsTable::Initialize: No Cal1 has been specified for signal %s (%s). Assuming 1.0", ddbName.Buffer(), jpfSignalName.Buffer());
-                    for(int i = 0; i < signalSize; i++){
+            int dims    = 1;
+            int size[2] = {signalSize,1};
+            if(!cdb.ReadFloatArray(cal0,size,dims,"Cal0")){
+                CStaticAssertErrorCondition(FatalError,"DataCollectionSignalsTable::Initialize: No Cal0 has been specified for signal %s (%s). Assuming 0.0", ddbName.Buffer(), jpfSignalName.Buffer());
+                for(int i = 0; i < signalSize; i++){
+                       cal0[i] = 0.0;
+                  }
+            }
+            dims = 1;
+            size[0] = signalSize;
+            size[1] = 1;
+            if(!cdb.ReadFloatArray(cal1,size,dims,"Cal1")){
+                   CStaticAssertErrorCondition(FatalError,"DataCollectionSignalsTable::Initialize: No Cal1 has been specified for signal %s (%s). Assuming 1.0", ddbName.Buffer(), jpfSignalName.Buffer());
+                   for(int i = 0; i < signalSize; i++){
                         cal1[i] = 1.0;
                     }
-                }
             }
+            
 
             for(int j = 0; j < signalSize; j++){
                 FString  newJpfName;
