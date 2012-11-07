@@ -533,6 +533,12 @@ public:
     Atomic::PrivateLock();
     *p = *p + value;
     Atomic::PrivateUnLock();
+#elif defined(_WIN32)
+    __asm  {
+        mov   ebx,p
+        mov   eax,p
+        lock add DWORD PTR[ebx], eax
+    }
 #else
     #error not available in this O.S. Contributions are welcome
 #endif
@@ -553,6 +559,12 @@ public:
     Atomic::PrivateLock();
     *p = *p - value;
     Atomic::PrivateUnLock();
+#elif defined(_WIN32)
+    __asm  {
+        mov   ebx,p
+        mov   eax,p
+        lock add DWORD PTR[ebx], eax
+    }
 #else
     #error not available in this O.S. Contributions are welcome
 #endif
