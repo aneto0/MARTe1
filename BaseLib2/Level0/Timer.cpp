@@ -111,10 +111,10 @@ bool TimerConfigTimer(Timer &t, int32 usec, int32 cpuMask) {
   }
 
   /* Configure Timer Values */
-  t.timeVals.it_interval.tv_sec  = 0;
-  t.timeVals.it_interval.tv_usec = usec;
-  t.timeVals.it_value.tv_sec     = 0;
-  t.timeVals.it_value.tv_usec    = usec;
+  t.timeVals.it_interval.tv_sec  = usec / 1000000;
+  t.timeVals.it_interval.tv_usec = usec % 1000000;
+  t.timeVals.it_value.tv_sec     = usec / 1000000;
+  t.timeVals.it_value.tv_usec    = usec % 1000000;
 #endif
 
   /** Set timer status */
@@ -237,7 +237,7 @@ void TimerShowStats(Timer &t) {
 #else
   printf("Timer Counter                  = %lld\n", t.GetTimerCounter());
   printf("Timer mean cycle time          = %f (usecs)\n", t.timerMeanTicks*HRT::HRTPeriod()*1e6);
-  printf("Timer std deviation cycle time = %f (usecs)\n", sqrt(t.timerVarTicks2)*HRT::HRTPeriod()*1e6);
+  printf("Timer std deviation cycle time = %f (usecs)\n", sqrt((double)t.timerVarTicks2)*HRT::HRTPeriod()*1e6);
   printf("Timer max cycle time           = %f (usecs)\n", t.timerMaxTicks*HRT::HRTPeriod()*1e6);
   printf("Timer min cycle time           = %f (usecs)\n", t.timerMinTicks*HRT::HRTPeriod()*1e6);
 #endif
