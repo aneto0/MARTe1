@@ -1,0 +1,7 @@
+telnet localhost 9090
+
+StateMachine|1793|PULSE_SETUP_COMPLETED
+StateMachine|1800|TRIGGER
+StateMachine|1801|END_PULSE
+StateMachine|1795|COLLECTIONCOMPLETED
+
