@@ -1,3 +1,0 @@
-Simpliest way to test is to use netcat
-nc localhost 10010 < MARTe-ConfigurationHandler.cfg 
-
