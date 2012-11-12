@@ -67,8 +67,9 @@ extern "C"{
     int main(int argc, char *argv[]){
 #if (defined(_LINUX) || defined(_SOLARIS))
         if(mlockall(MCL_CURRENT|MCL_FUTURE) != 0){
-            printf("Failed to do mlockall\n\n");
-            return -1;
+            CStaticAssertErrorCondition(FatalError, "MARTe:: Failed to mlockall. RT performance might be compromised");
+            printf("MARTe:: Failed to mlockall. RT performance might be compromised");
+            //return -1;
         }
 #endif
         if (argc>2) return 0;
