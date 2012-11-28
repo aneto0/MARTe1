@@ -158,6 +158,19 @@ function compileModules(){
 	done
 }
 	
+function extractFiles(){	
+
+	moduleList=$(find *.zip -maxdepth 1 -type f  | sort -n);	
+	for module in $moduleList; do   
+	    unzip $module 3>&1 1>&2 2>&3 | tee $basedir/extract-$module.$target.err
+	done
+	
+	moduleList=$(find *.tar.gz -maxdepth 1 -type f  | sort -n);		
+	for module in $moduleList; do
+	    tar -xvf $module 3>&1 1>&2 2>&3 | tee $basedir/extract-$module.$target.err
+	done
+}
+
 function testTarget(){
 
 	for i in ${targetList[@]}; do
@@ -201,7 +214,7 @@ function getList(){
 		fi
 	fi
 
-	modules=`eval $command`
+	modules=`eval $command`       
 
     echo -ne $mode
 	echo "$1 $text"
@@ -326,6 +339,10 @@ if [ $nargs -ge 2 ]; then
 	compileModules $target 1 $makeMode "Interfaces-TimeServiceActivities"
 	echo "Interfaces Time Service Activities compilation finished"
 
+	cd $basedir
+        cd "3rdPartyLibs"
+        extractFiles
+        
 	echo ""
 	echo "*************************Compilation Finished*************************"
 	echo ""
@@ -356,6 +373,12 @@ if [ $nargs -ge 2 ]; then
 		rm -rf "IOGAMs.$target.err"
 	fi
 	
+	#Remove empty files
+	extractError=$(find . -maxdepth 1 -type f -size 0k -name "extract-*.$target.err" | sort -n);
+	for file in $extractError; do   
+            rm -rf $file
+	done
+		
 	echo ""	
 	getList "GAMs" "success"
 	echo ""
@@ -375,6 +398,9 @@ if [ $nargs -ge 2 ]; then
 	getList "Interfaces" "err"
 	echo ""
 	getList "Interfaces" "ignore"
+
+	echo ""
+	getList "extract" "err"
 
 else
 	echo "Invalid number of arguments ["$nargs"]. Usage: compile.MARTe <target> <configFile> <makeMode>"
