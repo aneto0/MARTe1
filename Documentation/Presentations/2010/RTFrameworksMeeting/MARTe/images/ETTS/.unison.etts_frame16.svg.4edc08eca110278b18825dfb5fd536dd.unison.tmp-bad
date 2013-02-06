@@ -1,0 +1,1702 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="1119.5132"
+   height="1126.2761"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.47 r22583"
+   sodipodi:docname="etts_frame16.svg"
+   inkscape:export-filename="/home/andre/IST/EFDA/FeedbackControlGroup/RTFrameworksMeeting/MARTe/images/ETTS/png/etts_frame16.png"
+   inkscape:export-xdpi="100"
+   inkscape:export-ydpi="100">
+  <defs
+     id="defs4">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 526.18109 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="744.09448 : 526.18109 : 1"
+       inkscape:persp3d-origin="372.04724 : 350.78739 : 1"
+       id="perspective10" />
+    <inkscape:perspective
+       id="perspective3858"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective3883"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4361"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4425"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4447"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective3008"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <filter
+       color-interpolation-filters="sRGB"
+       id="f">
+      <feGaussianBlur
+         id="feGaussianBlur6382"
+         result="blur"
+         in="SourceAlpha"
+         stdDeviation="10" />
+      <feOffset
+         id="feOffset6384"
+         result="off"
+         dy="10"
+         dx="10"
+         in="blur" />
+      <feBlend
+         mode="normal"
+         id="feBlend6386"
+         result="blend"
+         in2="off"
+         in="SourceGraphic" />
+      <feMerge
+         id="feMerge6388">
+        <feMergeNode
+           id="feMergeNode6390"
+           in="blend" />
+      </feMerge>
+    </filter>
+    <filter
+       color-interpolation-filters="sRGB"
+       id="filter3018">
+      <feGaussianBlur
+         id="feGaussianBlur3020"
+         result="blur"
+         in="SourceAlpha"
+         stdDeviation="10" />
+      <feOffset
+         id="feOffset3022"
+         result="off"
+         dy="10"
+         dx="10"
+         in="blur" />
+      <feBlend
+         mode="normal"
+         id="feBlend3024"
+         result="blend"
+         in2="off"
+         in="SourceGraphic" />
+      <feMerge
+         id="feMerge3026">
+        <feMergeNode
+           id="feMergeNode3028"
+           in="blend" />
+      </feMerge>
+    </filter>
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#shadowGradient"
+       id="radialGradient7329"
+       gradientUnits="userSpaceOnUse"
+       cx="32.5"
+       cy="29.5"
+       fx="32.5"
+       fy="29.5"
+       r="26.5" />
+    <radialGradient
+       id="shadowGradient"
+       cx="32.5"
+       cy="29.5"
+       fx="32.5"
+       fy="29.5"
+       r="26.5"
+       gradientUnits="userSpaceOnUse">
+      <stop
+         id="stop7027"
+         stop-color="#C0C0C0"
+         offset="0.0" />
+      <stop
+         id="stop7029"
+         stop-color="#C0C0C0"
+         offset="0.88" />
+      <stop
+         id="stop7031"
+         stop-opacity="0.0"
+         stop-color="#C0C0C0"
+         offset="1.0" />
+    </radialGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#fieldGradient"
+       id="linearGradient7331"
+       gradientUnits="userSpaceOnUse"
+       x1="42.986301"
+       y1="7.0127001"
+       x2="22.0144"
+       y2="51.987099" />
+    <linearGradient
+       y2="51.987099"
+       x2="22.0144"
+       y1="7.0127001"
+       x1="42.986301"
+       gradientUnits="userSpaceOnUse"
+       id="fieldGradient">
+      <stop
+         id="stop7017"
+         stop-color="#BCD6FE"
+         offset="0.0" />
+      <stop
+         id="stop7019"
+         stop-color="#6787D3"
+         offset="1.0" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#edgeGradient"
+       id="linearGradient7333"
+       gradientUnits="userSpaceOnUse"
+       x1="55.454102"
+       y1="42.752899"
+       x2="9.5471001"
+       y2="16.248501" />
+    <linearGradient
+       y2="16.248501"
+       x2="9.5471001"
+       y1="42.752899"
+       x1="55.454102"
+       gradientUnits="userSpaceOnUse"
+       id="edgeGradient">
+      <stop
+         id="stop7022"
+         stop-color="#3057A7"
+         offset="0.0" />
+      <stop
+         id="stop7024"
+         stop-color="#5A7AC6"
+         offset="1.0" />
+    </linearGradient>
+    <inkscape:perspective
+       id="perspective4062"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4090"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4112"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4112-8"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4153"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4180"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4202"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <inkscape:perspective
+       id="perspective4224"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.49497475"
+     inkscape:cx="772.06838"
+     inkscape:cy="766.25156"
+     inkscape:document-units="px"
+     inkscape:current-layer="g4167"
+     showgrid="true"
+     inkscape:window-width="1280"
+     inkscape:window-height="949"
+     inkscape:window-x="0"
+     inkscape:window-y="25"
+     inkscape:window-maximized="1">
+    <inkscape:grid
+       type="xygrid"
+       id="grid2816"
+       empspacing="5"
+       visible="true"
+       enabled="true"
+       snapvisiblegridlinesonly="true" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(355.42969,56.911255)">
+    <path
+       style="fill:none;stroke:#ff0000;stroke-width:4.80000019;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 215,507.36218 c 60,-80 60,-80 60,-80"
+       id="path4385" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:4.44999409;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 29.26746,52.362183 c 0,109.999997 0,109.999997 0,109.999997"
+       id="path4143-7" />
+    <path
+       style="fill:none;stroke:#001480;stroke-width:7.46199989;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m -308.33508,192.36218 232.33508,0 76.7716,50.50763"
+       id="path4030-0-2" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:4.81099987;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 29.26746,317.79075 c 0,128.57143 0,128.57143 0,128.57143"
+       id="path4143" />
+    <text
+       xml:space="preserve"
+       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#001480;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans"
+       x="-358"
+       y="412.36218"
+       id="text5379-0-4-0"><tspan
+         sodipodi:role="line"
+         id="tspan5381-5-9-4"
+         x="-358"
+         y="412.36218"
+         style="font-weight:bold;fill:#ff0000;fill-opacity:1;-inkscape-font-specification:Sans Bold">Realtime Thread</tspan></text>
+    <path
+       style="fill:none;stroke:#001480;stroke-width:7.46199989;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m -345.69985,425.60945 232.33508,0 76.7716,50.50763"
+       id="path4030-0" />
+    <g
+       id="g4167"
+       transform="translate(11.078983,-18)">
+      <rect
+         y="31.441772"
+         x="-41.811523"
+         height="40"
+         width="120"
+         id="rect2820"
+         style="fill:none;stroke:#001480;stroke-width:6;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+      <text
+         id="text3594"
+         y="62.362183"
+         x="-20"
+         style="font-size:20px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans"
+         xml:space="preserve"><tspan
+           style="font-size:30px"
+           y="62.362183"
+           x="-20"
+           id="tspan3596"
+           sodipodi:role="line">0011</tspan></text>
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#001480;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans"
+       x="-318"
+       y="-35.637817"
+       id="text5379-0"><tspan
+         sodipodi:role="line"
+         id="tspan5381-5"
+         x="-318"
+         y="-35.637817"
+         style="font-weight:bold;fill:#ff0000;fill-opacity:1;-inkscape-font-specification:Sans Bold">Time source</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#001480;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans"
+       x="-334"
+       y="138.36218"
+       id="text5379-0-8"><tspan
+         sodipodi:role="line"
+         id="tspan5381-5-3"
+         x="-334"
+         y="138.36218"
+         style="font-weight:bold;fill:#ff0000;fill-opacity:1;-inkscape-font-specification:Sans Bold">External Time </tspan><tspan
+         sodipodi:role="line"
+         x="-334"
+         y="173.36218"
+         style="font-weight:bold;fill:#ff0000;fill-opacity:1;-inkscape-font-specification:Sans Bold"
+         id="tspan3909">Triggering Service</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:28px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#001480;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans"
+       x="160.59317"
+       y="-31.392712"
+       id="text5379-0-4"><tspan
+         sodipodi:role="line"
+         id="tspan5381-5-9"
+         x="160.59317"
+         y="-31.392712"
+         style="font-weight:bold;fill:#ff0000;fill-opacity:1;-inkscape-font-specification:Sans Bold">Time Input GAM</tspan></text>
+    <path
+       style="fill:none;stroke:#ff0000;stroke-width:4.81099987;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 275.39201,408.86991 0,-199.15498 201.29069,0"
+       id="path7767"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       inkscape:export-xdpi="100"
+       inkscape:export-ydpi="100" />
+    <rect
+       style="fill:none;stroke:#001480;stroke-width:7.46248627;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="rect3783"
+       width="131.52632"
+       height="124.06384"
+       x="478.72037"
+       y="148.1364"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       inkscape:export-xdpi="100"
+       inkscape:export-ydpi="100" />
+    <g
+       id="g4080"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       inkscape:export-xdpi="100"
+       inkscape:export-ydpi="100"
+       transform="translate(111.89499,-191.13131)">
+      <rect
+         inkscape:export-ydpi="100"
+         inkscape:export-xdpi="100"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         y="1086.4542"
+         x="366.82538"
+         height="124.06384"
+         width="131.52632"
+         id="rect4296"
+         style="fill:none;stroke:#001480;stroke-width:7.46248627;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
+      <g
+         id="g4072">
+        <path
+           style="fill:#cccccc;fill-opacity:1;stroke:#686868;stroke-width:2;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+           d="m 398.9884,1159.405 0,18.2438 0,0.096 0.0119,0 c 0.28633,3.4226 15.2059,6.1807 33.55243,6.1807 18.34653,0 33.26611,-2.7581 33.55244,-6.1807 l 0.0835,0 0,-18.3393 -67.20032,0 z"
+           id="path5466"
+           inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+           inkscape:export-xdpi="100"
+           inkscape:export-ydpi="100" />
+        <path
+           sodipodi:type="arc"
+           style="fill:#cccccc;fill-opacity:1;stroke:#686868;stroke-width:2;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+           id="path5468"
+           sodipodi:cx="212"
+           sodipodi:cy="510.36218"
+           sodipodi:rx="124"
+           sodipodi:ry="40"
+           d="m 336,510.36218 c 0,22.09139 -55.51669,40 -124,40 -68.48331,0 -124,-17.90861 -124,-40 0,-22.09139 55.51669,-40 124,-40 68.48331,0 124,17.90861 124,40 z"
+           transform="matrix(0.27238,0,0,0.157102,374.844,1078.7558)"
+           inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+           inkscape:export-xdpi="100"
+           inkscape:export-ydpi="100" />
+        <path
+           style="fill:#cccccc;fill-opacity:1;stroke:#686868;stroke-width:2;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+           d="m 398.9884,1139.6033 0,18.2439 0,0.095 0.0119,0 c 0.28633,3.4227 15.2059,6.1807 33.55243,6.1807 18.34653,0 33.26611,-2.758 33.55244,-6.1807 l 0.0835,0 0,-18.3393 -67.20032,0 z"
+           id="path5472"
+           inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+           inkscape:export-xdpi="100"
+           inkscape:export-ydpi="100" />
+        <path
+           sodipodi:type="arc"
+           style="fill:#cccccc;fill-opacity:1;stroke:#686868;stroke-width:2;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+           id="path5474"
+           sodipodi:cx="212"
+           sodipodi:cy="510.36218"
+           sodipodi:rx="124"
+           sodipodi:ry="40"
+           d="m 336,510.36218 c 0,22.09139 -55.51669,40 -124,40 -68.48331,0 -124,-17.90861 -124,-40 0,-22.09139 55.51669,-40 124,-40 68.48331,0 124,17.90861 124,40 z"
+           transform="matrix(0.27238,0,0,0.157102,374.844,1058.9542)"
+           inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+           inkscape:export-xdpi="100"
+           inkscape:export-ydpi="100" />
+        <path
+           style="fill:#cccccc;fill-opacity:1;stroke:#686868;stroke-width:2;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+           d="m 398.9884,1119.8017 0,18.2438 0,0.096 0.0119,0 c 0.28633,3.4226 15.2059,6.1807 33.55243,6.1807 18.34653,0 33.26611,-2.7581 33.55244,-6.1807 l 0.0835,0 0,-18.3393 -67.20032,0 z"
+           id="path5478"
+           inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+           inkscape:export-xdpi="100"
+           inkscape:export-ydpi="100" />
+        <path
+           sodipodi:type="arc"
+           style="fill:#cccccc;fill-opacity:1;stroke:#686868;stroke-width:9.6683321;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+           id="path5480"
+           sodipodi:cx="212"
+           sodipodi:cy="510.36218"
+           sodipodi:rx="124"
+           sodipodi:ry="40"
+           d="m 336,510.36218 c 0,22.09139 -55.51669,40 -124,40 -68.48331,0 -124,-17.90861 -124,-40 0,-22.09139 55.51669,-40 124,-40 68.48331,0 124,17.90861 124,40 z"
+           transform="matrix(0.27238,0,0,0.157102,374.844,1039.1525)"
+           inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+           inkscape:export-xdpi="100"
+           inkscape:export-ydpi="100" />
+      </g>
+    </g>
+    <rect
+       inkscape:export-ydpi="100"
+       inkscape:export-xdpi="100"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       style="fill:#008000;fill-opacity:1;stroke:none"
+       id="rect5394"
+       width="85.403214"
+       height="47.646008"
+       x="-585.52124"
+       y="635.14655"
+       transform="scale(-1,1)" />
+    <rect
+       inkscape:export-ydpi="100"
+       inkscape:export-xdpi="100"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       style="fill:#666666;fill-opacity:1;stroke:none"
+       id="rect5396"
+       width="4.4949064"
+       height="78.211372"
+       x="-590.01611"
+       y="619.86395"
+       transform="scale(-1,1)" />
+    <path
+       inkscape:export-ydpi="100"
+       inkscape:export-xdpi="100"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       style="fill:#cccccc;fill-opacity:1;stroke:none"
+       d="m 578.31252,639.52073 0,8.10206 -13.92297,0 0,-8.10206 13.92297,0 z m 0,10.26522 0,8.10209 -13.92297,0 0,-8.10209 13.92297,0 z m -0.19667,10.26525 0,8.10209 -13.96228,0 0,-8.10209 13.96228,0 z m 0,10.26524 0,8.10206 -13.96228,0 0,-8.10206 13.96228,0 z"
+       id="path5398" />
+    <path
+       inkscape:export-ydpi="100"
+       inkscape:export-xdpi="100"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       style="fill:#cccccc;fill-opacity:1;stroke:none"
+       d="m 557.4758,639.52073 0,8.10206 -13.92297,0 0,-8.10206 13.92297,0 z m 0,10.26522 0,8.10209 -13.92297,0 0,-8.10209 13.92297,0 z m -0.19664,10.26525 0,8.10209 -13.96231,0 0,-8.10209 13.96231,0 z m 0,10.26524 0,8.10206 -13.96231,0 0,-8.10206 13.96231,0 z"
+       id="path5400" />
+    <path
+       inkscape:export-ydpi="100"
+       inkscape:export-xdpi="100"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       style="fill:#cccccc;fill-opacity:1;stroke:none"
+       d="m 536.63911,639.52073 0,8.10206 -13.92297,0 0,-8.10206 13.92297,0 z m 0,10.26522 0,8.10209 -13.92297,0 0,-8.10209 13.92297,0 z m -0.19664,10.26525 0,8.10209 -13.96229,0 0,-8.10209 13.96229,0 z m 0,10.26524 0,8.10206 -13.96229,0 0,-8.10206 13.96229,0 z"
+       id="path5402" />
+    <rect
+       inkscape:export-ydpi="100"
+       inkscape:export-xdpi="100"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="rect5404"
+       width="5.032516"
+       height="1.5770677"
+       x="499.4509"
+       y="639.83295" />
+    <rect
+       inkscape:export-ydpi="100"
+       inkscape:export-xdpi="100"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="rect5406"
+       width="5.032516"
+       height="1.5770677"
+       x="499.4509"
+       y="641.4986" />
+    <rect
+       inkscape:export-ydpi="100"
+       inkscape:export-xdpi="100"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="rect5408"
+       width="5.032516"
+       height="1.5770677"
+       x="499.4509"
+       y="643.1684" />
+    <rect
+       inkscape:export-ydpi="100"
+       inkscape:export-xdpi="100"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="rect5410"
+       width="5.032516"
+       height="1.5770677"
+       x="499.4509"
+       y="644.83405" />
+    <rect
+       inkscape:export-ydpi="100"
+       inkscape:export-xdpi="100"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="rect5412"
+       width="5.032516"
+       height="1.5770677"
+       x="499.4509"
+       y="646.50934" />
+    <rect
+       inkscape:export-ydpi="100"
+       inkscape:export-xdpi="100"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="rect5414"
+       width="5.032516"
+       height="1.5770677"
+       x="499.4509"
+       y="648.17499" />
+    <rect
+       inkscape:export-ydpi="100"
+       inkscape:export-xdpi="100"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="rect5416"
+       width="5.032516"
+       height="1.5770677"
+       x="499.4509"
+       y="649.84491" />
+    <rect
+       inkscape:export-ydpi="100"
+       inkscape:export-xdpi="100"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="rect5418"
+       width="5.032516"
+       height="1.5770677"
+       x="499.4509"
+       y="651.51056" />
+    <rect
+       inkscape:export-ydpi="100"
+       inkscape:export-xdpi="100"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="rect5420"
+       width="5.032516"
+       height="1.5770677"
+       x="499.4509"
+       y="653.164" />
+    <rect
+       inkscape:export-ydpi="100"
+       inkscape:export-xdpi="100"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="rect5422"
+       width="5.032516"
+       height="1.5770677"
+       x="499.4509"
+       y="654.82965" />
+    <rect
+       inkscape:export-ydpi="100"
+       inkscape:export-xdpi="100"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="rect5424"
+       width="5.032516"
+       height="1.5770677"
+       x="499.4509"
+       y="656.49957" />
+    <rect
+       inkscape:export-ydpi="100"
+       inkscape:export-xdpi="100"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="rect5426"
+       width="5.032516"
+       height="1.5770677"
+       x="499.4509"
+       y="658.16522" />
+    <rect
+       inkscape:export-ydpi="100"
+       inkscape:export-xdpi="100"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="rect5428"
+       width="5.032516"
+       height="1.5770677"
+       x="499.4509"
+       y="659.84052" />
+    <rect
+       inkscape:export-ydpi="100"
+       inkscape:export-xdpi="100"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="rect5430"
+       width="5.032516"
+       height="1.5770677"
+       x="499.4509"
+       y="661.50616" />
+    <rect
+       inkscape:export-ydpi="100"
+       inkscape:export-xdpi="100"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="rect5432"
+       width="5.032516"
+       height="1.5770677"
+       x="499.4509"
+       y="663.17596" />
+    <rect
+       inkscape:export-ydpi="100"
+       inkscape:export-xdpi="100"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="rect5434"
+       width="5.032516"
+       height="1.5770677"
+       x="499.4509"
+       y="664.84174" />
+    <rect
+       inkscape:export-ydpi="100"
+       inkscape:export-xdpi="100"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="rect5436"
+       width="5.032516"
+       height="1.5770677"
+       x="499.4509"
+       y="666.5174" />
+    <rect
+       inkscape:export-ydpi="100"
+       inkscape:export-xdpi="100"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="rect5438"
+       width="5.032516"
+       height="1.5770677"
+       x="499.4509"
+       y="668.18707" />
+    <rect
+       inkscape:export-ydpi="100"
+       inkscape:export-xdpi="100"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="rect5440"
+       width="5.032516"
+       height="1.5770677"
+       x="499.4509"
+       y="669.85284" />
+    <rect
+       inkscape:export-ydpi="100"
+       inkscape:export-xdpi="100"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="rect5442"
+       width="5.032516"
+       height="1.5770677"
+       x="499.4509"
+       y="671.52814" />
+    <rect
+       inkscape:export-ydpi="100"
+       inkscape:export-xdpi="100"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="rect5444"
+       width="5.032516"
+       height="1.5770677"
+       x="499.4509"
+       y="673.19379" />
+    <rect
+       inkscape:export-ydpi="100"
+       inkscape:export-xdpi="100"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="rect5446"
+       width="5.032516"
+       height="1.5770677"
+       x="499.4509"
+       y="674.86359" />
+    <rect
+       inkscape:export-ydpi="100"
+       inkscape:export-xdpi="100"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="rect5448"
+       width="5.032516"
+       height="1.5770677"
+       x="499.4509"
+       y="676.52936" />
+    <rect
+       style="fill:none;stroke:#001480;stroke-width:7.46248627;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="rect4498"
+       width="131.52632"
+       height="124.06384"
+       x="478.72037"
+       y="596.93774"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       inkscape:export-xdpi="100"
+       inkscape:export-ydpi="100" />
+    <g
+       id="g7727"
+       transform="matrix(1,0,0,-1,395.16986,434.16959)"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       inkscape:export-xdpi="100"
+       inkscape:export-ydpi="100">
+      <path
+         d="m -52.492568,-75.607488 c 0,10.56746 8.56661,19.13408 19.13406,19.13408 10.56746,-1e-5 19.13407,-8.56662 19.13407,-19.13408 0,-10.56745 -8.56661,-19.13407 -19.13407,-19.13407 -10.56745,0 -19.13406,8.56662 -19.13406,19.13407 l 0,0 z"
+         style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:4.81066322;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+         id="path7729" />
+      <path
+         d="m 81.152422,-75.607328 -93.12462,0"
+         style="fill:none;stroke:#000000;stroke-width:4.81063986;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible"
+         id="path7731" />
+    </g>
+    <rect
+       style="fill:none;stroke:#001480;stroke-width:7.46248627;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="rect4528"
+       width="131.52632"
+       height="124.06384"
+       x="478.72037"
+       y="447.74515"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       inkscape:export-xdpi="100"
+       inkscape:export-ydpi="100" />
+    <g
+       id="g6807"
+       transform="translate(159.74805,-56.840645)"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       inkscape:export-xdpi="100"
+       inkscape:export-ydpi="100">
+      <g
+         id="g7063"
+         transform="translate(-29.294424,-18.182746)">
+        <rect
+           style="fill:none;stroke:#001480;stroke-width:7.46248627;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+           id="rect6857"
+           width="131.52632"
+           height="124.06384"
+           x="347.76913"
+           y="821.04449"
+           inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+           inkscape:export-xdpi="100"
+           inkscape:export-ydpi="100" />
+        <g
+           transform="matrix(1.6077039,0,0,1.6077039,361.34365,830.8933)"
+           id="g7056">
+          <circle
+             sodipodi:ry="26.5"
+             sodipodi:rx="26.5"
+             sodipodi:cy="29.5"
+             sodipodi:cx="32.5"
+             style="fill:url(#radialGradient7329)"
+             id="shadow"
+             r="26.5"
+             cy="29.5"
+             cx="32.5"
+             transform="matrix(1.0648,0,0,1.06482,-2.1,1.0864)"
+             d="M 59,29.5 C 59,44.135546 47.135546,56 32.5,56 17.864454,56 6,44.135546 6,29.5 6,14.864454 17.864454,3 32.5,3 47.135546,3 59,14.864454 59,29.5 z" />
+          <circle
+             sodipodi:ry="25.799999"
+             sodipodi:rx="25.799999"
+             sodipodi:cy="31"
+             sodipodi:cx="31"
+             style="fill:url(#linearGradient7331);stroke:url(#linearGradient7333);stroke-width:2"
+             id="field"
+             r="25.799999"
+             cx="31"
+             cy="31"
+             d="M 56.799999,31 C 56.799999,45.248946 45.248946,56.799999 31,56.799999 16.751054,56.799999 5.2000008,45.248946 5.2000008,31 5.2000008,16.751054 16.751054,5.2000008 31,5.2000008 45.248946,5.2000008 56.799999,16.751054 56.799999,31 z" />
+          <g
+             style="fill:#ffffff"
+             id="info">
+            <polygon
+               points="23,25 23,25 35,25 35,44 39,44 39,48 23,48 23,44 27,44 27,28 23,28 "
+               id="polygon7036" />
+            <circle
+               sodipodi:ry="4"
+               sodipodi:rx="4"
+               sodipodi:cy="17"
+               sodipodi:cx="31"
+               r="4"
+               cx="31"
+               cy="17"
+               id="circle7038"
+               d="m 35,17 c 0,2.209139 -1.790861,4 -4,4 -2.209139,0 -4,-1.790861 -4,-4 0,-2.209139 1.790861,-4 4,-4 2.209139,0 4,1.790861 4,4 z" />
+          </g>
+        </g>
+      </g>
+    </g>
+    <g
+       id="g3977"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       inkscape:export-xdpi="100"
+       inkscape:export-ydpi="100"
+       transform="translate(111.89499,-191.13131)">
+      <g
+         inkscape:export-ydpi="100"
+         inkscape:export-xdpi="100"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         transform="translate(-60,28)"
+         id="g5770">
+        <rect
+           inkscape:export-ydpi="100"
+           inkscape:export-xdpi="100"
+           inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+           style="fill:#008000;fill-opacity:1;stroke:none"
+           id="rect3446"
+           width="85.403214"
+           height="47.646008"
+           x="-533.95764"
+           y="199.06012"
+           transform="scale(-1,1)" />
+        <rect
+           inkscape:export-ydpi="100"
+           inkscape:export-xdpi="100"
+           inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+           style="fill:#666666;fill-opacity:1;stroke:none"
+           id="rect3448"
+           width="4.4949064"
+           height="78.211372"
+           x="-538.45251"
+           y="183.77742"
+           transform="scale(-1,1)" />
+        <path
+           inkscape:export-ydpi="100"
+           inkscape:export-xdpi="100"
+           inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+           style="fill:#cccccc;fill-opacity:1;stroke:none"
+           d="m 526.74889,203.43422 0,8.10206 -13.92297,0 0,-8.10206 13.92297,0 z m 0,10.26522 0,8.10209 -13.92297,0 0,-8.10209 13.92297,0 z m -0.19667,10.26525 0,8.10208 -13.96229,0 0,-8.10208 13.96229,0 z m 0,10.26524 0,8.10206 -13.96229,0 0,-8.10206 13.96229,0 z"
+           id="rect3450" />
+        <path
+           inkscape:export-ydpi="100"
+           inkscape:export-xdpi="100"
+           inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+           style="fill:#cccccc;fill-opacity:1;stroke:none"
+           d="m 505.91217,203.43422 0,8.10206 -13.92297,0 0,-8.10206 13.92297,0 z m 0,10.26522 0,8.10209 -13.92297,0 0,-8.10209 13.92297,0 z m -0.19665,10.26525 0,8.10208 -13.96231,0 0,-8.10208 13.96231,0 z m 0,10.26524 0,8.10206 -13.96231,0 0,-8.10206 13.96231,0 z"
+           id="path3459" />
+        <path
+           inkscape:export-ydpi="100"
+           inkscape:export-xdpi="100"
+           inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+           style="fill:#cccccc;fill-opacity:1;stroke:none"
+           d="m 485.07548,203.43422 0,8.10206 -13.92297,0 0,-8.10206 13.92297,0 z m 0,10.26522 0,8.10209 -13.92297,0 0,-8.10209 13.92297,0 z m -0.19665,10.26525 0,8.10208 -13.96228,0 0,-8.10208 13.96228,0 z m 0,10.26524 0,8.10206 -13.96228,0 0,-8.10206 13.96228,0 z"
+           id="path3461" />
+        <rect
+           inkscape:export-ydpi="100"
+           inkscape:export-xdpi="100"
+           inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+           style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+           id="rect3463"
+           width="5.032516"
+           height="1.5770677"
+           x="447.88727"
+           y="203.74637" />
+        <rect
+           inkscape:export-ydpi="100"
+           inkscape:export-xdpi="100"
+           inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+           style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+           id="rect3467"
+           width="5.032516"
+           height="1.5770677"
+           x="447.88727"
+           y="205.41209" />
+        <rect
+           inkscape:export-ydpi="100"
+           inkscape:export-xdpi="100"
+           inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+           style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+           id="rect3469"
+           width="5.032516"
+           height="1.5770677"
+           x="447.88727"
+           y="207.08189" />
+        <rect
+           inkscape:export-ydpi="100"
+           inkscape:export-xdpi="100"
+           inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+           style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+           id="rect3471"
+           width="5.032516"
+           height="1.5770677"
+           x="447.88727"
+           y="208.74759" />
+        <rect
+           inkscape:export-ydpi="100"
+           inkscape:export-xdpi="100"
+           inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+           style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+           id="rect3473"
+           width="5.032516"
+           height="1.5770677"
+           x="447.88727"
+           y="210.42285" />
+        <rect
+           inkscape:export-ydpi="100"
+           inkscape:export-xdpi="100"
+           inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+           style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+           id="rect3475"
+           width="5.032516"
+           height="1.5770677"
+           x="447.88727"
+           y="212.0885" />
+        <rect
+           inkscape:export-ydpi="100"
+           inkscape:export-xdpi="100"
+           inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+           style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+           id="rect3477"
+           width="5.032516"
+           height="1.5770677"
+           x="447.88727"
+           y="213.75833" />
+        <rect
+           inkscape:export-ydpi="100"
+           inkscape:export-xdpi="100"
+           inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+           style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+           id="rect3479"
+           width="5.032516"
+           height="1.5770677"
+           x="447.88727"
+           y="215.42406" />
+        <rect
+           inkscape:export-ydpi="100"
+           inkscape:export-xdpi="100"
+           inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+           style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+           id="rect3500"
+           width="5.032516"
+           height="1.5770677"
+           x="447.88727"
+           y="217.07753" />
+        <rect
+           inkscape:export-ydpi="100"
+           inkscape:export-xdpi="100"
+           inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+           style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+           id="rect3502"
+           width="5.032516"
+           height="1.5770677"
+           x="447.88727"
+           y="218.74321" />
+        <rect
+           inkscape:export-ydpi="100"
+           inkscape:export-xdpi="100"
+           inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+           style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+           id="rect3504"
+           width="5.032516"
+           height="1.5770677"
+           x="447.88727"
+           y="220.41306" />
+        <rect
+           inkscape:export-ydpi="100"
+           inkscape:export-xdpi="100"
+           inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+           style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+           id="rect3506"
+           width="5.032516"
+           height="1.5770677"
+           x="447.88727"
+           y="222.07878" />
+        <rect
+           inkscape:export-ydpi="100"
+           inkscape:export-xdpi="100"
+           inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+           style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+           id="rect3510"
+           width="5.032516"
+           height="1.5770677"
+           x="447.88727"
+           y="223.75401" />
+        <rect
+           inkscape:export-ydpi="100"
+           inkscape:export-xdpi="100"
+           inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+           style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+           id="rect3512"
+           width="5.032516"
+           height="1.5770677"
+           x="447.88727"
+           y="225.41969" />
+        <rect
+           inkscape:export-ydpi="100"
+           inkscape:export-xdpi="100"
+           inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+           style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+           id="rect3514"
+           width="5.032516"
+           height="1.5770677"
+           x="447.88727"
+           y="227.08949" />
+        <rect
+           inkscape:export-ydpi="100"
+           inkscape:export-xdpi="100"
+           inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+           style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+           id="rect3516"
+           width="5.032516"
+           height="1.5770677"
+           x="447.88727"
+           y="228.75522" />
+        <rect
+           inkscape:export-ydpi="100"
+           inkscape:export-xdpi="100"
+           inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+           style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+           id="rect3544"
+           width="5.032516"
+           height="1.5770677"
+           x="447.88727"
+           y="230.43082" />
+        <rect
+           inkscape:export-ydpi="100"
+           inkscape:export-xdpi="100"
+           inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+           style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+           id="rect3546"
+           width="5.032516"
+           height="1.5770677"
+           x="447.88727"
+           y="232.10057" />
+        <rect
+           inkscape:export-ydpi="100"
+           inkscape:export-xdpi="100"
+           inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+           style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+           id="rect3548"
+           width="5.032516"
+           height="1.5770677"
+           x="447.88727"
+           y="233.7663" />
+        <rect
+           inkscape:export-ydpi="100"
+           inkscape:export-xdpi="100"
+           inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+           style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+           id="rect3550"
+           width="5.032516"
+           height="1.5770677"
+           x="447.88727"
+           y="235.44157" />
+        <rect
+           inkscape:export-ydpi="100"
+           inkscape:export-xdpi="100"
+           inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+           style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+           id="rect3552"
+           width="5.032516"
+           height="1.5770677"
+           x="447.88727"
+           y="237.10721" />
+        <rect
+           inkscape:export-ydpi="100"
+           inkscape:export-xdpi="100"
+           inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+           style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+           id="rect3554"
+           width="5.032516"
+           height="1.5770677"
+           x="447.88727"
+           y="238.77705" />
+        <rect
+           inkscape:export-ydpi="100"
+           inkscape:export-xdpi="100"
+           inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+           style="fill:#ffff00;fill-opacity:1;stroke:#808000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+           id="rect3556"
+           width="5.032516"
+           height="1.5770677"
+           x="447.88727"
+           y="240.44278" />
+      </g>
+      <rect
+         inkscape:export-ydpi="100"
+         inkscape:export-xdpi="100"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         y="188.8512"
+         x="367.20926"
+         height="124.06384"
+         width="131.52632"
+         id="rect3831"
+         style="fill:none;stroke:#001480;stroke-width:7.46199989;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
+    </g>
+    <path
+       style="fill:#ff0000;fill-opacity:1;stroke:none"
+       d="m 668.30734,38.560253 0,12.633458 -53.6816,0 0,17.1162 53.6816,0 0,12.633457 11.2049,-21.191557 -11.2049,-21.191558 z"
+       id="rect4572"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       inkscape:export-xdpi="100"
+       inkscape:export-ydpi="100" />
+    <path
+       style="fill:#ff0000;fill-opacity:1;stroke:none"
+       d="m 667.65944,160.25956 0,12.63346 -53.6815,0 0,17.1162 53.6815,0 0,12.63346 11.205,-21.19156 -11.205,-21.19156 z"
+       id="path4754"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       inkscape:export-xdpi="100"
+       inkscape:export-ydpi="100" />
+    <path
+       style="fill:#88aa00;fill-opacity:1;stroke:none"
+       d="m 625.18284,217.52536 0,12.6837 53.6816,0 0,17.18425 -53.6816,0 0,12.6837 -11.2049,-21.27582 11.2049,-21.27583 z"
+       id="path4756"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       inkscape:export-xdpi="100"
+       inkscape:export-ydpi="100" />
+    <path
+       style="fill:#ff0000;fill-opacity:1;stroke:none"
+       d="m 667.65944,310.67587 0,12.63346 -53.6815,0 0,17.1162 53.6815,0 0,12.63346 11.205,-21.19156 -11.205,-21.19156 z"
+       id="path4772"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       inkscape:export-xdpi="100"
+       inkscape:export-ydpi="100" />
+    <path
+       style="fill:#88aa00;fill-opacity:1;stroke:none"
+       d="m 625.18284,367.94168 0,12.6837 53.6816,0 0,17.18425 -53.6816,0 0,12.68369 -11.2049,-21.27582 11.2049,-21.27582 z"
+       id="path4774"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       inkscape:export-xdpi="100"
+       inkscape:export-ydpi="100" />
+    <path
+       style="fill:#ff0000;fill-opacity:1;stroke:none"
+       d="m 667.65944,459.86837 0,12.63346 -53.6815,0 0,17.1162 53.6815,0 0,12.63346 11.205,-21.19156 -11.205,-21.19156 z"
+       id="path4778"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       inkscape:export-xdpi="100"
+       inkscape:export-ydpi="100" />
+    <path
+       style="fill:#88aa00;fill-opacity:1;stroke:none"
+       d="m 625.18284,517.13418 0,12.6837 53.6816,0 0,17.18425 -53.6816,0 0,12.6837 -11.2049,-21.27582 11.2049,-21.27583 z"
+       id="path4780"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       inkscape:export-xdpi="100"
+       inkscape:export-ydpi="100" />
+    <path
+       style="fill:#88aa00;fill-opacity:1;stroke:none"
+       d="m 625.18284,637.6938 0,12.68369 53.6816,0 0,17.18426 -53.6816,0 0,12.68369 -11.2049,-21.27582 11.2049,-21.27582 z"
+       id="path4786"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       inkscape:export-xdpi="100"
+       inkscape:export-ydpi="100" />
+    <path
+       style="fill:#88aa00;fill-opacity:1;stroke:none"
+       d="m 625.18284,786.8864 0,12.6837 53.6816,0 0,17.18424 -53.6816,0 0,12.6837 -11.2049,-21.2758 11.2049,-21.27584 z"
+       id="path4792"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       inkscape:export-xdpi="100"
+       inkscape:export-ydpi="100" />
+    <path
+       style="fill:#88aa00;fill-opacity:1;stroke:none"
+       d="m 625.18284,936.07904 0,12.68365 53.6816,0 0,17.1842 -53.6816,0 0,12.68372 -11.2049,-21.27582 11.2049,-21.27575 z"
+       id="path4798"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       inkscape:export-xdpi="100"
+       inkscape:export-ydpi="100" />
+    <path
+       id="path6255"
+       d="m 193.14307,508.55337 c -93.666538,0 -93.666538,0 -93.666538,0"
+       style="fill:#001480;fill-opacity:1;fill-rule:evenodd;stroke:#001480;stroke-width:4.80000019;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       inkscape:export-xdpi="100"
+       inkscape:export-ydpi="100" />
+    <rect
+       style="fill:#cccccc;fill-opacity:1;stroke:#686868;stroke-width:2.45279312;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="rect4568"
+       width="82.456581"
+       height="1121.4906"
+       x="680.40057"
+       y="-53.352104"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       inkscape:export-xdpi="100"
+       inkscape:export-ydpi="100" />
+    <text
+       xml:space="preserve"
+       style="font-size:75.49819946px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#001480;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans"
+       x="446.29697"
+       y="-703.40375"
+       id="text5017"
+       transform="matrix(0,1,-1,0,0,0)"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       inkscape:export-xdpi="100"
+       inkscape:export-ydpi="100"><tspan
+         sodipodi:role="line"
+         id="tspan5019"
+         x="446.29697"
+         y="-703.40375"
+         style="font-size:50px;font-weight:bold;fill:#001480;fill-opacity:1;-inkscape-font-specification:Sans Bold">DDB</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:4.78390265;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 329.76035,436.39213 0.25792,-76.02487 149.36069,0"
+       id="path7786"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       inkscape:export-xdpi="100"
+       inkscape:export-ydpi="100" />
+    <g
+       id="g4023"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       inkscape:export-xdpi="100"
+       inkscape:export-ydpi="100"
+       transform="translate(111.89499,-191.13131)">
+      <rect
+         inkscape:export-ydpi="100"
+         inkscape:export-xdpi="100"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         y="489.68396"
+         x="366.82538"
+         height="124.06384"
+         width="131.52632"
+         id="rect3919"
+         style="fill:none;stroke:#001480;stroke-width:7.46248627;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
+      <g
+         transform="translate(-60,28)"
+         inkscape:export-ydpi="100"
+         inkscape:export-xdpi="100"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         id="g5944">
+        <path
+           style="fill:#001480;fill-opacity:1;fill-rule:evenodd;stroke:#001480;stroke-width:4.04082966;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+           d="m 510.21692,490.60943 c 0,76.74028 0,76.74028 0,76.74028"
+           id="path4163" />
+        <path
+           style="fill:#001480;fill-opacity:1;fill-rule:evenodd;stroke:#001480;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+           d="m 528.35506,528.97957 c -17.7246,0 -17.7246,0 -17.7246,0"
+           id="path4197" />
+        <g
+           id="g5915">
+          <path
+             transform="matrix(1.1673426,0,0,1.1804922,61.296671,275.27175)"
+             d="m 355.125,184.11218 c 0,0.82843 -0.67157,1.5 -1.5,1.5 -0.82843,0 -1.5,-0.67157 -1.5,-1.5 0,-0.82842 0.67157,-1.5 1.5,-1.5 0.82843,0 1.5,0.67158 1.5,1.5 z"
+             sodipodi:ry="1.5"
+             sodipodi:rx="1.5"
+             sodipodi:cy="184.11218"
+             sodipodi:cx="353.625"
+             style="fill:#001480;fill-opacity:1;stroke:none"
+             id="path4092"
+             sodipodi:type="arc" />
+          <path
+             id="path4079"
+             d="m 474.54658,492.61477 c -17.72463,0 -17.72463,0 -17.72463,0"
+             style="fill:#001480;fill-opacity:1;fill-rule:evenodd;stroke:#001480;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+          <path
+             id="path4081"
+             d="m 486.78888,480.06155 c -12.53318,12.6744 -12.53318,12.6744 -12.53318,12.6744"
+             style="fill:#001480;fill-opacity:1;fill-rule:evenodd;stroke:#001480;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+          <path
+             id="path4085"
+             d="m 509.90942,492.61477 c -17.7246,0 -17.7246,0 -17.7246,0"
+             style="fill:#001480;fill-opacity:1;fill-rule:evenodd;stroke:#001480;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+          <path
+             transform="matrix(1.8983312,0,0,1.8983312,-426.31325,404.3667)"
+             d="m 476.5,46.487186 c 0,0.828428 -0.67157,1.5 -1.5,1.5 -0.82843,0 -1.5,-0.671572 -1.5,-1.5 0,-0.828427 0.67157,-1.5 1.5,-1.5 0.82843,0 1.5,0.671573 1.5,1.5 z"
+             sodipodi:ry="1.5"
+             sodipodi:rx="1.5"
+             sodipodi:cy="46.487186"
+             sodipodi:cx="475"
+             style="fill:#001480;fill-opacity:1;stroke:#001480;stroke-width:1.05355692;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+             id="path5145"
+             sodipodi:type="arc" />
+          <path
+             transform="matrix(1.8983312,0,0,1.8983312,-408.20731,404.3667)"
+             d="m 476.5,46.487186 c 0,0.828428 -0.67157,1.5 -1.5,1.5 -0.82843,0 -1.5,-0.671572 -1.5,-1.5 0,-0.828427 0.67157,-1.5 1.5,-1.5 0.82843,0 1.5,0.671573 1.5,1.5 z"
+             sodipodi:ry="1.5"
+             sodipodi:rx="1.5"
+             sodipodi:cy="46.487186"
+             sodipodi:cx="475"
+             style="fill:#001480;fill-opacity:1;stroke:#001480;stroke-width:1.05355692;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+             id="path5157"
+             sodipodi:type="arc" />
+        </g>
+        <g
+           id="g5923">
+          <path
+             id="path5202"
+             d="m 474.54658,516.85433 c -17.72463,0 -17.72463,0 -17.72463,0"
+             style="fill:#001480;fill-opacity:1;fill-rule:evenodd;stroke:#001480;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+          <path
+             id="path5204"
+             d="m 486.78888,504.30111 c -12.53318,12.6744 -12.53318,12.6744 -12.53318,12.6744"
+             style="fill:#001480;fill-opacity:1;fill-rule:evenodd;stroke:#001480;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+          <path
+             id="path5206"
+             d="m 509.90942,516.85433 c -17.7246,0 -17.7246,0 -17.7246,0"
+             style="fill:#001480;fill-opacity:1;fill-rule:evenodd;stroke:#001480;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+          <path
+             transform="matrix(1.8983312,0,0,1.8983312,-426.31325,428.60626)"
+             d="m 476.5,46.487186 c 0,0.828428 -0.67157,1.5 -1.5,1.5 -0.82843,0 -1.5,-0.671572 -1.5,-1.5 0,-0.828427 0.67157,-1.5 1.5,-1.5 0.82843,0 1.5,0.671573 1.5,1.5 z"
+             sodipodi:ry="1.5"
+             sodipodi:rx="1.5"
+             sodipodi:cy="46.487186"
+             sodipodi:cx="475"
+             style="fill:#001480;fill-opacity:1;stroke:#001480;stroke-width:1.05355692;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+             id="path5208"
+             sodipodi:type="arc" />
+          <path
+             transform="matrix(1.8983312,0,0,1.8983312,-408.20731,428.60626)"
+             d="m 476.5,46.487186 c 0,0.828428 -0.67157,1.5 -1.5,1.5 -0.82843,0 -1.5,-0.671572 -1.5,-1.5 0,-0.828427 0.67157,-1.5 1.5,-1.5 0.82843,0 1.5,0.671573 1.5,1.5 z"
+             sodipodi:ry="1.5"
+             sodipodi:rx="1.5"
+             sodipodi:cy="46.487186"
+             sodipodi:cx="475"
+             style="fill:#001480;fill-opacity:1;stroke:#001480;stroke-width:1.05355692;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+             id="path5222"
+             sodipodi:type="arc" />
+        </g>
+        <g
+           id="g5937">
+          <path
+             id="path5212"
+             d="m 474.54658,565.33356 c -17.72463,0 -17.72463,0 -17.72463,0"
+             style="fill:#001480;fill-opacity:1;fill-rule:evenodd;stroke:#001480;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+          <path
+             id="path5214"
+             d="m 486.78888,552.78034 c -12.53318,12.6744 -12.53318,12.6744 -12.53318,12.6744"
+             style="fill:#001480;fill-opacity:1;fill-rule:evenodd;stroke:#001480;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+          <path
+             id="path5216"
+             d="m 509.90942,565.33356 c -17.7246,0 -17.7246,0 -17.7246,0"
+             style="fill:#001480;fill-opacity:1;fill-rule:evenodd;stroke:#001480;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+          <path
+             transform="matrix(1.8983312,0,0,1.8983312,-426.31325,477.08549)"
+             d="m 476.5,46.487186 c 0,0.828428 -0.67157,1.5 -1.5,1.5 -0.82843,0 -1.5,-0.671572 -1.5,-1.5 0,-0.828427 0.67157,-1.5 1.5,-1.5 0.82843,0 1.5,0.671573 1.5,1.5 z"
+             sodipodi:ry="1.5"
+             sodipodi:rx="1.5"
+             sodipodi:cy="46.487186      sodipodi:cx="475"
+             style="fill:#001480;fill-opacity:1;stroke:#001480;stroke-width:1.05355692;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+             id="path5218"
+             sodipodi:type="arc" />
+          <path
+             transform="matrix(1.8983312,0,0,1.8983312,-408.20731,477.08549)"
+             d="m 476.5,46.487186 c 0,0.828428 -0.67157,1.5 -1.5,1.5 -0.82843,0 -1.5,-0.671572 -1.5,-1.5 0,-0.828427 0.67157,-1.5 1.5,-1.5 0.82843,0 1.5,0.671573 1.5,1.5 z"
+             sodipodi:ry="1.5"
+             sodipodi:rx="1.5"
+             sodipodi:cy="46.487186"
+             sodipodi:cx="475"
+             style="fill:#001480;fill-opacity:1;stroke:#001480;stroke-width:1.05355692;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+             id="path5238"
+             sodipodi:type="arc" />
+        </g>
+        <g
+           id="g5930">
+          <path
+             id="path5242"
+             d="m 509.90942,541.09396 c -17.7246,0 -17.7246,0 -17.7246,0"
+             style="fill:#001480;fill-opacity:1;fill-rule:evenodd;stroke:#001480;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+          <path
+             id="path5240"
+             d="m 474.54658,541.09396 c -17.72463,0 -17.72463,0 -17.72463,0"
+             style="fill:#001480;fill-opacity:1;fill-rule:evenodd;stroke:#001480;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+          <path
+             transform="matrix(1.8983312,0,0,1.8983312,-426.31325,452.84589)"
+             d="m 476.5,46.487186 c 0,0.828428 -0.67157,1.5 -1.5,1.5 -0.82843,0 -1.5,-0.671572 -1.5,-1.5 0,-0.828427 0.67157,-1.5 1.5,-1.5 0.82843,0 1.5,0.671573 1.5,1.5 z"
+             sodipodi:ry="1.5"
+             sodipodi:rx="1.5"
+             sodipodi:cy="46.487186"
+             sodipodi:cx="475"
+             style="fill:#001480;fill-opacity:1;stroke:#001480;stroke-width:1.05355692;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+             id="path5244"
+             sodipodi:type="arc" />
+          <path
+             transform="matrix(1.8983312,0,0,1.8983312,-408.20731,452.84589)"
+             d="m 476.5,46.487186 c 0,0.828428 -0.67157,1.5 -1.5,1.5 -0.82843,0 -1.5,-0.671572 -1.5,-1.5 0,-0.828427 0.67157,-1.5 1.5,-1.5 0.82843,0 1.5,0.671573 1.5,1.5 z"
+             sodipodi:ry="1.5"
+             sodipodi:rx="1.5"
+             sodipodi:cy="46.487186"
+             sodipodi:cx="475"
+             style="fill:#001480;fill-opacity:1;stroke:#001480;stroke-width:1.05355692;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+             id="path5246"
+             sodipodi:type="arc" />
+          <path
+             id="path5248"
+             d="m 492.54658,541.09396 c -17.72463,0 -17.72463,0 -17.72463,0"
+             style="fill:#001480;fill-opacity:1;fill-rule:evenodd;stroke:#001480;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+        </g>
+      </g>
+    </g>
+    <path
+       style="fill:#6c5d53;fill-opacity:1;stroke:none"
+       d="m 25.459982,465.62202 0.36133,6.89464 c -2.35333,0.21394 -4.64473,0.65229 -6.84688,1.27269 l -2.13405,-6.60308 -2.81141,0.942 2.13196,6.56346 c -2.20067,0.81102 -4.29817,1.80759 -6.2800001,2.99124 l -3.76091,-5.80261 -2.4591,1.599 3.76088,5.80261 c -1.90811,1.35026 -3.70336,2.86179 -5.32521,4.53054 l -5.12922,-4.61838 -1.95249,2.16846 5.17091996,4.65592 c -1.48394996,1.78234 -2.81158996,3.69798 -3.95113996,5.72999 l -6.16394,-3.13375 -1.3352799,2.57315 6.1639399,3.13377 c -0.97693,2.10451 -1.77646,4.3148 -2.35597,6.59998 l -6.7503299,-1.43422 -0.60543,2.85278 6.7899699,1.43214 c -0.39138,2.27407 -0.58393,4.59824 -0.54796,6.98203 l -6.9342499,0.36341 0.15159,2.89258 6.9342599,-0.36341 c 0.21372,2.37086 0.64871,4.66898 1.27478,6.88649 l -6.6030799,2.13404 0.90032,2.77389 6.5634199,-2.13198 c 0.81106,2.20084 1.84715,4.29596 3.03088,6.27793 l -5.80261,3.76089 1.599,2.45911 5.80262,-3.76088 c 1.34571996,1.90174 2.86629,3.66813 4.52844,5.28558 l -4.65592,5.17093 2.16845996,1.95248 4.61837004,-5.12921 c 1.78741,1.49006 3.73079,2.80568 5.7696101,3.94907 l -3.1337401,6.16394 2.6127701,1.33319 3.13376,-6.16394 c 2.09473,0.97002 4.28487,1.74188 6.55828,2.31842 l -1.43421,6.75033 2.89239,0.60336 1.43423,-6.75035 c 2.25475,0.38679 4.57772,0.5436 6.94033,0.51041 l 0.36341,6.93426 2.93219,-0.15367 -0.3634,-6.93426 c 2.35854,-0.21443 4.64231,-0.61041 6.84894,-1.23308 l 2.13198,6.56345 2.77387,-0.90031 -2.1299,-6.52381 c 2.21955,-0.81477 4.32026,-1.83945 6.31757,-3.03294 l 3.76089,5.80261 2.45912,-1.599 -3.76089,-5.80261 c 1.90294,-1.34747 3.66752,-2.8641 5.28559,-4.52846 l 5.12921,4.61837 1.95248,-2.16845 -5.12922,-4.61837 c 1.49159,-1.78865 2.80473,-3.72909 3.94908,-5.76962 l 6.16394,3.13375 1.3332,-2.61278 -6.16395,-3.13376 c 0.97003,-2.09468 1.74188,-4.28487 2.31842,-6.55827 l 6.78997,1.43216 0.60542,-2.85279 -6.78997,-1.43216 c 0.39086,-2.27077 0.58325,-4.60181 0.54797,-6.98201 l 6.93426,-0.3634 -0.15159,-2.89259 -6.93427,0.36341 c -0.21338,-2.37447 -0.64782,-4.6658 -1.27478,-6.88651 l 6.60307,-2.13402 -0.9003,-2.77389 -6.60307,2.13405 c -0.81514,-2.21193 -1.80181,-4.32889 -2.99332,-6.31963 l 5.80261,-3.76091 -1.59692,-2.41948 -5.80261,3.76088 c -1.35138,-1.90973 -2.86016,-3.70225 -4.53054,-5.32521 l 4.61837,-5.12922 -2.16845,-1.95249 -4.61836,5.12923 c -1.78317,-1.48611 -3.69662,-2.80998 -5.72999,-3.95116 l 3.13375,-6.16394 -2.61279,-1.33319 -3.13375,6.16394 c -2.11112,-0.97818 -4.30745,-1.77766 -6.59999,-2.35597 l 1.43631,-6.71073 -2.85486,-0.64504 -1.43216,6.78998 c -2.2598,-0.38863 -4.57416,-0.58335 -6.94239,-0.55002 l -0.36133,-6.89465 -2.9322,0.15367 z m 3.48665,38.47766 c 3.37465,-0.17688 6.24718,2.44734 6.42404,5.82197 0.17683,3.37464 -2.40773,6.24508 -5.78236,6.42194 -3.37463,0.17687 -6.28472,-2.40563 -6.46157,-5.78027 -0.17686,-3.37462 2.44525,-6.28678 5.81989,-6.46364 z"
+       id="path3889"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       inkscape:export-xdpi="100"
+       inkscape:export-ydpi="100" />
+    <rect
+       style="fill:none;stroke:#458000;stroke-width:7.46248627;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="rect3545"
+       width="131.52632"
+       height="124.06384"
+       x="-36.495701"
+       y="448.18967"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       inkscape:export-xdpi="100"
+       inkscape:export-ydpi="100" />
+    <g
+       id="g6392"
+       transform="matrix(0.1321973,0,0,0.1321973,495.63477,164.00429)"
+       style="filter:url(#f)"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       inkscape:export-xdpi="100"
+       inkscape:export-ydpi="100">
+      <path
+         id="path6394"
+         d="m 155.25669,342.3332 9.34388,-2.53146 27.20881,256.51819 -97.55647,-111.95271 -21.888168,18.26384 -6.482503,-6.9181 32.841264,-29.36345 79.292727,90.06452 -22.75954,-214.08083 z"
+         style="fill:#f5a568" />
+      <path
+         id="path6396"
+         d="M 140.45942,299.19047 34.545764,181.50124 l 3.226814,-2.90395 134.886592,-12.53521 25.82687,-132.097823 3.40609,-3.065293 103.09035,114.552016 -28.02864,29.60441 -3.22661,-3.58536 c 7.32593,-8.3236 11.11313,-15.9227 11.3615,-22.79741 0.248,-6.87469 -2.58567,-13.59861 -8.50095,-20.17178 L 216.89541,62.17182 194.10764,173.85171 67.180401,186.03763 133.16468,259.3581 c 3.76435,4.18276 8.68494,8.0281 14.76191,11.53596 4.20056,2.38418 8.75828,3.3927 13.67321,3.02552 4.91468,-0.3675 11.12169,-2.57372 18.62106,-6.61868 l 2.59921,4.14998 -42.36065,27.73959 z"
+         style="fill:#c871cf" />
+      <path
+         id="path6398"
+         d="m 595.6005,314.48353 c 5.23029,9e-5 9.58096,1.8307 13.05212,5.49184 3.47088,3.66141 5.20645,8.29738 5.20655,13.90799 -10e-5,5.6108 -1.73567,10.24685 -5.20655,13.90799 -3.47116,3.66132 -7.82183,5.49193 -13.05212,5.49184 -5.23047,9e-5 -9.58114,-1.83052 -13.05211,-5.49184 -3.47107,-3.66114 -5.20665,-8.29719 -5.20655,-13.90799 -1e-4,-5.61061 1.73548,-10.24658 5.20655,-13.90799 3.47097,-3.66114 7.82164,-5.49175 13.05211,-5.49184 l 0,0 z m 43.50689,77.74193 c 5.23029,9e-5 9.58097,1.8307 13.05212,5.49193 3.47088,3.66123 5.20646,8.29728 5.20655,13.9079 -9e-5,5.61079 -1.73567,10.24676 -5.20655,13.90799 -3.47115,3.66132 -7.82183,5.49193 -13.05212,5.49184 -5.23046,9e-5 -9.58114,-1.83052 -13.05202,-5.49184 -3.47115,-3.66123 -5.20673,-8.2972 -5.20664,-13.90799 -9e-5,-5.61062 1.73549,-10.24667 5.20664,-13.9079 3.47088,-3.66123 7.82156,-5.49184 13.05202,-5.49193 l 0,0 z m -87.01391,0 c 5.23029,9e-5 9.58105,1.8307 13.05211,5.49193 3.47098,3.66123 5.20655,8.29728 5.20655,13.9079 0,5.61079 -1.73557,10.24676 -5.20655,13.90799 -3.47106,3.66132 -7.82182,5.49193 -13.05211,5.49184 -5.23038,9e-5 -9.58105,-1.83052 -13.05202,-5.49184 -3.47116,-3.66123 -5.20664,-8.2972 -5.20664,-13.90799 0,-5.61062 1.73548,-10.24667 5.20664,-13.9079 3.47097,-3.66123 7.82164,-5.49184 13.05202,-5.49193 l 0,0 z"
+         style="fill:#7a8deb" />
+      <path
+         id="path6400"
+         d="m 464.40823,183.40702 -6.86276,2.58161 c -2.85786,-17.01773 -3.06671,-31.2084 -0.62639,-42.57209 2.44022,-11.36309 7.6315,-20.12428 15.57376,-26.28297 7.94201,-6.1584 26.12931,-14.58537 54.56116,-25.281292 l 97.82812,-35.961177 14.52175,-6.022348 c 1.67898,3.472237 2.64149,5.53477 2.88743,6.188192 l 1.69123,5.239343 3.07406,8.915947 3.22723,8.578819 -23.1634,7.594385 -22.45752,8.727573 c 8.52511,43.984338 17.30571,77.986338 26.34164,102.006428 11.92474,31.7003 27.28277,44.01573 46.0743,36.94673 8.82355,-3.31909 15.95521,-12.62366 21.39549,-27.91334 l 6.00844,1.09714 c -0.97693,23.68329 -3.54111,38.68396 -7.69252,45.002 -4.15189,6.31826 -9.33247,10.6453 -15.54158,12.98105 -26.14445,9.83486 -47.51506,-7.30695 -64.11124,-51.4257 C 607.73254,188.80674 599.6528,150.7174 592.898,99.538807 c -3.88144,1.087233 -6.88407,2.030293 -9.00812,2.829093 -1.96102,0.73779 -4.1362,1.6493 -6.52571,2.73463 l -9.712,3.93311 -17.92393,5.90345 -13.4494,5.89848 c -1.30715,0.49202 -3.46208,1.20948 -6.46485,2.15223 23.11422,83.26228 35.78991,134.68474 38.02721,154.2677 2.23714,19.58303 -2.85351,31.71025 -15.2719,36.38183 -4.7388,1.78267 -9.60203,1.74665 -14.58948,-0.10758 -4.98776,-1.8541 -8.40357,-5.23247 -10.24768,-10.13445 -2.45879,-6.53617 -1.65024,-15.04743 2.42581,-25.53387 6.41853,-17.15009 9.07911,-32.88647 7.98144,-47.20901 -1.09766,-14.32254 -7.79466,-48.73544 -20.0903,-103.23882 l -13.51232,4.24352 c -10.45776,3.93415 -19.36125,9.14889 -26.71055,15.64368 -7.34917,6.49547 -11.82179,18.53001 -13.41799,36.10422 l 0,0 z"
+         style="fill:#6fc584" />
+      <path
+         id="path6402"
+         d="m 475.61953,289.31459 15.61475,17.21642 -102.30739,92.78959 c 7.37766,7.30482 14.67088,13.10611 21.87956,17.40364 7.20875,4.29775 14.54138,6.86515 21.99774,7.70235 7.45651,0.83735 14.99412,-0.39305 22.6129,-3.69114 7.6187,-3.29802 16.54756,-9.59026 26.78659,-18.87673 l 52.39232,-47.5182 15.61468,17.21633 -52.88776,47.96754 c -8.09216,7.33934 -15.5602,13.20964 -22.40403,17.61083 -6.84399,4.40133 -13.67152,7.65908 -20.48272,9.77324 -6.81129,2.11422 -14.38392,2.84964 -22.71797,2.2063 -8.33406,-0.64333 -16.29355,-2.49165 -23.87864,-5.54496 -7.58516,-3.05324 -15.14625,-7.40751 -22.68333,-13.06288 -7.53702,-5.65513 -14.93782,-12.48749 -22.20223,-20.4972 -11.83272,-13.04629 -20.3448,-25.00348 -25.53632,-35.87149 -5.19131,-10.86778 -7.78752,-22.3587 -7.78852,-34.47298 -8.1e-4,-12.1139 2.89938,-23.43539 8.70056,-33.96449 5.80124,-10.52871 15.39025,-21.85929 28.76694,-33.99182 l 50.78212,-46.05779 15.61475,17.21641 -50.90602,46.17017 c -8.17469,7.41433 -14.38927,13.87847 -18.64366,19.39233 -4.25433,5.51425 -7.15689,10.81814 -8.70756,15.91144 -1.55063,5.09369 -2.02399,10.75276 -1.42017,16.9773 0.60396,6.22469 2.57412,12.75272 5.91055,19.58401 3.3365,6.83151 7.90628,13.86123 13.70928,21.08908 l 102.18358,-92.6773 z"
+         style="fill:#f17768" />
+      <path
+         id="path6404"
+         d="m 290.59926,287.38534 33.77232,-113.18701 c 4.42156,-13.51785 9.41682,-25.24029 14.98545,-35.1671 5.56846,-9.9262 10.95833,-17.06701 16.16984,-21.4224 3.78439,-3.19386 8.73083,-5.62554 14.83941,-7.29489 6.10826,-1.66863 11.64621,-1.84499 16.61391,-0.52894 6.53608,1.73248 11.67502,5.43773 15.41682,11.11574 3.74147,5.67873 4.91943,11.13236 3.53395,16.36103 -1.6284,6.14435 -4.66824,10.62019 -9.11961,13.42738 -4.45172,2.80804 -9.2265,3.53624 -14.32455,2.18497 -4.57551,-1.21225 -8.91955,-4.88172 -13.03189,-11.00834 -2.31398,-3.41098 -4.58211,-5.41113 -6.80419,-6.00026 -2.22247,-0.58869 -4.33647,-0.13461 -6.34202,1.36224 -2.00572,1.49747 -3.61483,4.53366 -4.82711,9.10875 -1.42055,5.36 -3.34377,14.99332 -5.76997,28.90014 -9.40135,55.0097 -18.46684,98.98564 -27.19655,131.92809 -2.42513,9.15084 -12.41652,43.15802 -29.97409,102.02184 -6.43896,21.6577 -12.23243,38.24008 -17.38026,49.74708 -6.84092,15.25546 -13.2796,25.82592 -19.3161,31.71111 -6.03661,5.88516 -11.95243,9.59886 -17.74744,11.14111 -5.79498,1.54213 -11.63383,1.53373 -17.51633,-0.025 -6.79767,-1.80154 -11.76457,-5.49611 -14.90065,-11.08386 -3.13606,-5.58787 -3.78599,-11.84601 -1.94996,-18.77436 1.55891,-5.8826 4.47273,-10.147 8.74148,-12.79319 4.26888,-2.64616 8.95243,-3.29365 14.05067,-1.94261 5.2289,1.38568 9.18469,4.67236 11.86708,9.86024 2.68242,5.18776 5.3309,8.12813 7.94547,8.821 2.22228,0.58891 4.29488,0.15878 6.21792,-1.29023 1.92294,-1.44917 3.45599,-4.33065 4.59919,-8.64455 1.45498,-5.49043 2.94519,-13.48979 4.4709,-23.99804 2.73144,-19.28248 6.88652,-41.82517 12.46541,-67.62829 7.05709,-32.96598 13.89404,-61.9331 20.5109,-86.90163 l 0,0 z"
+         style="fill:#946edb" />
+      <path
+         id="path6406"
+         d="m 473.01674,533.41071 c 10.85559,-24.90433 22.74905,-42.14589 35.68053,-51.72469 12.93087,-9.57834 30.57151,-14.36766 52.92194,-14.36797 25.7025,3.1e-4 47.41399,9.25956 65.13479,27.77807 17.72019,18.51898 26.58036,42.54528 26.58082,72.07924 -4.6e-4,29.21502 -8.62124,53.24148 -25.86234,72.07938 -17.24187,18.83806 -36.47901,28.25701 -57.71142,28.25701 -14.20858,0 -27.09975,-4.39024 -38.67382,-13.17071 -11.57438,-8.78033 -25.58311,-27.21914 -42.02619,-55.31661 -10.21743,19.79592 -21.39257,34.0442 -33.52526,42.74467 -12.13316,8.70063 -26.82037,13.05102 -44.06178,13.05087 -22.9889,1.5e-4 -42.42558,-8.22155 -58.31004,-24.66494 -15.88461,-16.44324 -23.82692,-37.67595 -23.82692,-63.69799 0,-26.18143 7.34368,-47.3343 22.03089,-63.45861 14.6872,-16.1237 31.84892,-24.1857 51.48529,-24.186 14.68706,3e-4 27.1793,3.79176 37.47642,11.37468 10.29681,7.58322 21.19256,21.99119 32.68709,43.2236 l 0,0 z m 22.98875,48.61155 c 11.33452,23.78723 22.78905,40.27031 34.36343,49.44987 11.57391,9.17956 25.02402,13.76934 40.35001,13.76919 19.63591,1.5e-4 36.03931,-7.10398 49.21033,-21.31241 13.17025,-14.20827 19.75561,-33.20587 19.75592,-56.99294 -3.1e-4,-23.46753 -6.94475,-42.86421 -20.83348,-58.19035 -13.88935,-15.32553 -29.45472,-22.98845 -46.69598,-22.98875 -11.01575,3e-4 -20.63424,2.83405 -28.85563,8.50108 -8.22185,5.66765 -15.68522,14.64752 -22.39012,26.93991 -3.83161,7.18429 -12.13316,27.45899 -24.90448,60.8244 l 0,0 z M 466.0723,551.84952 c -7.82277,-17.56064 -16.76279,-30.49181 -26.82021,-38.79351 -10.05773,-8.30124 -22.43013,-12.45193 -37.11733,-12.45224 -16.92233,3.1e-4 -31.09075,5.94704 -42.50528,17.84034 -11.41453,11.89362 -17.12187,27.81808 -17.12172,47.77338 -1.5e-4,21.23287 5.62734,38.19505 16.88233,50.88667 11.25483,12.69179 23.98646,19.0376 38.19489,19.03745 15.16598,1.5e-4 28.57609,-6.78475 40.23031,-20.35455 7.50307,-8.94002 16.92202,-30.25243 28.25701,-63.93754 l 0,0 z"
+         style="fill:#6dc5d3" />
+    </g>
+    <g
+       id="g6428"
+       transform="matrix(0.1321973,0,0,0.1321973,495.63474,463.61307)"
+       style="filter:url(#f)"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       inkscape:export-xdpi="100"
+       inkscape:export-ydpi="100">
+      <path
+         id="path6430"
+         d="m 155.25669,342.3332 9.34388,-2.53146 27.20881,256.51819 -97.55647,-111.95271 -21.888168,18.26384 -6.482503,-6.9181 32.841264,-29.36345 79.292727,90.06452 -22.75954,-214.08083 z"
+         style="fill:#f5a568" />
+      <path
+         id="path6432"
+         d="M 140.45942,299.19047 34.545764,181.50124 l 3.226814,-2.90395 134.886592,-12.53521 25.82687,-132.097823 3.40609,-3.065293 103.09035,114.552016 -28.02864,29.60441 -3.22661,-3.58536 c 7.32593,-8.3236 11.11313,-15.9227 11.3615,-22.79741 0.248,-6.87469 -2.58567,-13.59861 -8.50095,-20.17178 L 216.89541,62.17182 194.10764,173.85171 67.180401,186.03763 133.16468,259.3581 c 3.76435,4.18276 8.68494,8.0281 14.76191,11.53596 4.20056,2.38418 8.75828,3.3927 13.67321,3.02552 4.91468,-0.3675 11.12169,-2.57372 18.62106,-6.61868 l 2.59921,4.14998 -42.36065,27.73959 z"
+         style="fill:#c871cf" />
+      <path
+         id="path6434"
+         d="m 595.6005,314.48353 c 5.23029,9e-5 9.58096,1.8307 13.05212,5.49184 3.47088,3.66141 5.20645,8.29738 5.20655,13.90799 -10e-5,5.6108 -1.73567,10.24685 -5.20655,13.90799 -3.47116,3.66132 -7.82183,5.49193 -13.05212,5.49184 -5.23047,9e-5 -9.58114,-1.83052 -13.05211,-5.49184 -3.47107,-3.66114 -5.20665,-8.29719 -5.20655,-13.90799 -1e-4,-5.61061 1.73548,-10.24658 5.20655,-13.90799 3.47097,-3.66114 7.82164,-5.49175 13.05211,-5.49184 l 0,0 z m 43.50689,77.74193 c 5.23029,9e-5 9.58097,1.8307 13.05212,5.49193 3.47088,3.66123 5.20646,8.29728 5.20655,13.9079 -9e-5,5.61079 -1.73567,10.24676 -5.20655,13.90799 -3.47115,3.66132 -7.82183,5.49193 -13.05212,5.49184 -5.23046,9e-5 -9.58114,-1.83052 -13.05202,-5.49184 -3.47115,-3.66123 -5.20673,-8.2972 -5.20664,-13.90799 -9e-5,-5.61062 1.73549,-10.24667 5.20664,-13.9079 3.47088,-3.66123 7.82156,-5.49184 13.05202,-5.49193 l 0,0 z m -87.01391,0 c 5.23029,9e-5 9.58105,1.8307 13.05211,5.49193 3.47098,3.66123 5.20655,8.29728 5.20655,13.9079 0,5.61079 -1.73557,10.24676 -5.20655,13.90799 -3.47106,3.66132 -7.82182,5.49193 -13.05211,5.49184 -5.23038,9e-5 -9.58105,-1.83052 -13.05202,-5.49184 -3.47116,-3.66123 -5.20664,-8.2972 -5.20664,-13.90799 0,-5.61062 1.73548,-10.24667 5.20664,-13.9079 3.47097,-3.66123 7.82164,-5.49184 13.05202,-5.49193 l 0,0 z"
+         style="fill:#7a8deb" />
+      <path
+         id="path6436"
+         d="m 464.40823,183.40702 -6.86276,2.58161 c -2.85786,-17.01773 -3.06671,-31.2084 -0.62639,-42.57209 2.44022,-11.36309 7.6315,-20.12428 15.57376,-26.28297 7.94201,-6.1584 26.12931,-14.58537 54.56116,-25.281292 l 97.82812,-35.961177 14.52175,-6.022348 c 1.67898,3.472237 2.64149,5.53477 2.88743,6.188192 l 1.69123,5.239343 3.07406,8.915947 3.22723,8.578819 -23.1634,7.594385 -22.45752,8.727573 c 8.52511,43.984338 17.30571,77.986338 26.34164,102.006428 11.92474,31.7003 27.28277,44.01573 46.0743,36.94673 8.82355,-3.31909 15.95521,-12.62366 21.39549,-27.91334 l 6.00844,1.09714 c -0.97693,23.68329 -3.54111,38.68396 -7.69252,45.002 -4.15189,6.31826 -9.33247,10.6453 -15.54158,12.98105 -26.14445,9.83486 -47.51506,-7.30695 -64.11124,-51.4257 C 607.73254,188.80674 599.6528,150.7174 592.898,99.538807 c -3.88144,1.087233 -6.88407,2.030293 -9.00812,2.829093 -1.96102,0.73779 -4.1362,1.6493 -6.52571,2.73463 l -9.712,3.93311 -17.92393,5.90345 -13.4494,5.89848 c -1.30715,0.49202 -3.46208,1.20948 -6.46485,2.15223 23.11422,83.26228 35.78991,134.68474 38.02721,154.2677 2.23714,19.58303 -2.85351,31.71025 -15.2719,36.38183 -4.7388,1.78267 -9.60203,1.74665 -14.58948,-0.10758 -4.98776,-1.8541 -8.40357,-5.23247 -10.24768,-10.13445 -2.45879,-6.53617 -1.65024,-15.04743 2.42581,-25.53387 6.41853,-17.15009 9.07911,-32.88647 7.98144,-47.20901 -1.09766,-14.32254 -7.79466,-48.73544 -20.0903,-103.23882 l -13.51232,4.24352 c -10.45776,3.93415 -19.36125,9.14889 -26.71055,15.64368 -7.34917,6.49547 -11.82179,18.53001 -13.41799,36.10422 l 0,0 z"
+         style="fill:#6fc584" />
+      <path
+         id="path6438"
+         d="m 475.61953,289.31459 15.61475,17.21642 -102.30739,92.78959 c 7.37766,7.30482 14.67088,13.10611 21.87956,17.40364 7.20875,4.29775 14.54138,6.86515 21.99774,7.70235 7.45651,0.83735 14.99412,-0.39305 22.6129,-3.69114 7.6187,-3.29802 16.54756,-9.59026 26.78659,-18.87673 l 52.39232,-47.5182 15.61468,17.21633 -52.88776,47.96754 c -8.09216,7.33934 -15.5602,13.20964 -22.40403,17.61083 -6.84399,4.40133 -13.67152,7.65908 -20.48272,9.77324 -6.81129,2.11422 -14.38392,2.84964 -22.71797,2.2063 -8.33406,-0.64333 -16.29355,-2.49165 -23.87864,-5.54496 -7.58516,-3.05324 -15.14625,-7.40751 -22.68333,-13.06288 -7.53702,-5.65513 -14.93782,-12.48749 -22.20223,-20.4972 -11.83272,-13.04629 -20.3448,-25.00348 -25.53632,-35.87149 -5.19131,-10.86778 -7.78752,-22.3587 -7.78852,-34.47298 -8.1e-4,-12.1139 2.89938,-23.43539 8.70056,-33.96449 5.80124,-10.52871 15.39025,-21.85929 28.76694,-33.99182 l 50.78212,-46.05779 15.61475,17.21641 -50.90602,46.17017 c -8.17469,7.41433 -14.38927,13.87847 -18.64366,19.39233 -4.25433,5.51425 -7.15689,10.81814 -8.70756,15.91144 -1.55063,5.09369 -2.02399,10.75276 -1.42017,16.9773 0.60396,6.22469 2.57412,12.75272 5.91055,19.58401 3.3365,6.83151 7.90628,13.86123 13.70928,21.08908 l 102.18358,-92.6773 z"
+         style="fill:#f17768" />
+      <path
+         id="path6440"
+         d="m 290.59926,287.38534 33.77232,-113.18701 c 4.42156,-13.51785 9.41682,-25.24029 14.98545,-35.1671 5.56846,-9.9262 10.95833,-17.06701 16.16984,-21.4224 3.78439,-3.19386 8.73083,-5.62554 14.83941,-7.29489 6.10826,-1.66863 11.64621,-1.84499 16.61391,-0.52894 6.53608,1.73248 11.67502,5.43773 15.41682,11.11574 3.74147,5.67873 4.91943,11.13236 3.53395,16.36103 -1.6284,6.14435 -4.66824,10.62019 -9.11961,13.42738 -4.45172,2.80804 -9.2265,3.53624 -14.32455,2.18497 -4.57551,-1.21225 -8.91955,-4.88172 -13.03189,-11.00834 -2.31398,-3.41098 -4.58211,-5.41113 -6.80419,-6.00026 -2.22247,-0.58869 -4.33647,-0.13461 -6.34202,1.36224 -2.00572,1.49747 -3.61483,4.53366 -4.82711,9.10875 -1.42055,5.36 -3.34377,14.99332 -5.76997,28.90014 -9.40135,55.0097 -18.46684,98.98564 -27.19655,131.92809 -2.42513,9.15084 -12.41652,43.15802 -29.97409,102.02184 -6.43896,21.6577 -12.23243,38.24008 -17.38026,49.74708 -6.84092,15.25546 -13.2796,25.82592 -19.3161,31.71111 -6.03661,5.88516 -11.95243,9.59886 -17.74744,11.14111 -5.79498,1.54213 -11.63383,1.53373 -17.51633,-0.025 -6.79767,-1.80154 -11.76457,-5.49611 -14.90065,-11.08386 -3.13606,-5.58787 -3.78599,-11.84601 -1.94996,-18.77436 1.55891,-5.8826 4.47273,-10.147 8.74148,-12.79319 4.26888,-2.64616 8.95243,-3.29365 14.05067,-1.94261 5.2289,1.38568 9.18469,4.67236 11.86708,9.86024 2.68242,5.18776 5.3309,8.12813 7.94547,8.821 2.22228,0.58891 4.29488,0.15878 6.21792,-1.29023 1.92294,-1.44917 3.45599,-4.33065 4.59919,-8.64455 1.45498,-5.49043 2.94519,-13.48979 4.4709,-23.99804 2.73144,-19.28248 6.88652,-41.82517 12.46541,-67.62829 7.05709,-32.96598 13.89404,-61.9331 20.5109,-86.90163 l 0,0 z"
+         style="fill:#946edb" />
+      <path
+         id="path6442"
+         d="m 473.01674,533.41071 c 10.85559,-24.90433 22.74905,-42.14589 35.68053,-51.72469 12.93087,-9.57834 30.57151,-14.36766 52.92194,-14.36797 25.7025,3.1e-4 47.41399,9.25956 65.13479,27.77807 17.72019,18.51898 26.58036,42.54528 26.58082,72.07924 -4.6e-4,29.21502 -8.62124,53.24148 -25.86234,72.07938 -17.24187,18.83806 -36.47901,28.25701 -57.71142,28.25701 -14.20858,0 -27.09975,-4.39024 -38.67382,-13.17071 -11.57438,-8.78033 -25.58311,-27.21914 -42.02619,-55.31661 -10.21743,19.79592 -21.39257,34.0442 -33.52526,42.74467 -12.13316,8.70063 -26.82037,13.05102 -44.06178,13.05087 -22.9889,1.5e-4 -42.42558,-8.22155 -58.31004,-24.66494 -15.88461,-16.44324 -23.82692,-37.67595 -23.82692,-63.69799 0,-26.18143 7.34368,-47.3343 22.03089,-63.45861 14.6872,-16.1237 31.84892,-24.1857 51.48529,-24.186 14.68706,3e-4 27.1793,3.79176 37.47642,11.37468 10.29681,7.58322 21.19256,21.99119 32.68709,43.2236 l 0,0 z m 22.98875,48.61155 c 11.33452,23.78723 22.78905,40.27031 34.36343,49.44987 11.57391,9.17956 25.02402,13.76934 40.35001,13.76919 19.63591,1.5e-4 36.03931,-7.10398 49.21033,-21.31241 13.17025,-14.20827 19.75561,-33.20587 19.75592,-56.99294 -3.1e-4,-23.46753 -6.94475,-42.86421 -20.83348,-58.19035 -13.88935,-15.32553 -29.45472,-22.98845 -46.69598,-22.98875 -11.01575,3e-4 -20.63424,2.83405 -28.85563,8.50108 -8.22185,5.66765 -15.68522,14.64752 -22.39012,26.93991 -3.83161,7.18429 -12.13316,27.45899 -24.90448,60.8244 l 0,0 z M 466.0723,551.84952 c -7.82277,-17.56064 -16.76279,-30.49181 -26.82021,-38.79351 -10.05773,-8.30124 -22.43013,-12.45193 -37.11733,-12.45224 -16.92233,3.1e-4 -31.09075,5.94704 -42.50528,17.84034 -11.41453,11.89362 -17.12187,27.81808 -17.12172,47.77338 -1.5e-4,21.23287 5.62734,38.19505 16.88233,50.88667 11.25483,12.69179 23.98646,19.0376 38.19489,19.03745 15.16598,1.5e-4 28.57609,-6.78475 40.23031,-20.35455 7.50307,-8.94002 16.92202,-30.25243 28.25701,-63.93754 l 0,0 z"
+         style="fill:#6dc5d3" />
+    </g>
+    <g
+       id="g7678"
+       transform="matrix(0,-1,-1,0,137.46154,388.50742)"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       inkscape:export-xdpi="100"
+       inkscape:export-ydpi="100"
+       style="fill:none;stroke:#000000;stroke-opacity:1">
+      <path
+         d="m -52.492568,-75.607488 c 0,10.56746 8.56661,19.13408 19.13406,19.13408 10.56746,-1e-5 19.13407,-8.56662 19.13407,-19.13408 0,-10.56745 -8.56661,-19.13407 -19.13407,-19.13407 -10.56745,0 -19.13406,8.56662 -19.13406,19.13407 l 0,0 z"
+         style="fill:none;stroke:#000000;stroke-width:4.81066322;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+         id="path7674" />
+    </g>
+    <path
+       id="path7693"
+       style="fill:none;stroke:#000000;stroke-width:4.81063986;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker:none;visibility:visible;display:inline;overflow:visible"
+       d="m 194.40639,507.52687 -93.12459,0"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       inkscape:export-xdpi="100"
+       inkscape:export-ydpi="100" />
+    <path
+       id="path7695"
+       style="fill:#ff0000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:4.81066322;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       d="m 194.76402,507.52673 c 0,10.56746 8.56661,19.13408 19.13406,19.13408 10.56746,-10e-6 19.13407,-8.56662 19.13407,-19.13408 0,-10.56745 -8.56661,-19.13407 -19.13407,-19.13407 -10.56745,0 -19.13406,8.56662 -19.13406,19.13407 l 0,0 z"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       inkscape:export-xdpi="100"
+       inkscape:export-ydpi="100" />
+    <g
+       id="g7715"
+       transform="matrix(0.5,-0.8660254,-0.8660254,-0.5,226.94165,362.49176)"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       inkscape:export-xdpi="100"
+       inkscape:export-ydpi="100"
+       style="fill:#ff0000;fill-opacity:1">
+      <path
+         d="m -52.492568,-75.607488 c 0,10.56746 8.56661,19.13408 19.13406,19.13408 10.56746,-1e-5 19.13407,-8.56662 19.13407,-19.13408 0,-10.56745 -8.56661,-19.13407 -19.13407,-19.13407 -10.56745,0 -19.13406,8.56662 -19.13406,19.13407 l 0,0 z"
+         style="fill:#ff0000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:4.81066322;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+         id="path7717" />
+    </g>
+    <g
+       id="g7721"
+       transform="matrix(0.8660254,-0.5,-0.5,-0.8660254,321.01824,374.72555)"
+       style="fill:none"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       inkscape:export-xdpi="100"
+       inkscape:export-ydpi="100">
+      <path
+         d="m -52.492568,-75.607488 c 0,10.56746 8.56661,19.13408 19.13406,19.13408 10.56746,-1e-5 19.13407,-8.56662 19.13407,-19.13408 0,-10.56745 -8.56661,-19.13407 -19.13407,-19.13407 -10.56745,0 -19.13406,8.56662 -19.13406,19.13407 l 0,0 z"
+         style="fill:none;stroke:#000000;stroke-width:4.81066322;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+         id="path7723" />
+    </g>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:4.81099987;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 213.013,401.40638 0,-342.139409 262.30128,0"
+       id="path7763"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       inkscape:export-xdpi="100"
+       inkscape:export-ydpi="100" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:4.81099987;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 275.39201,611.30803 0,199.15491 201.29069,0"
+       id="path7806"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       inkscape:export-xdpi="100"
+       inkscape:export-ydpi="100" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:4.78390265;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 329.76035,583.78581 0.25792,76.02487 149.36069,0"
+       id="path7814"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       inkscape:export-xdpi="100"
+       inkscape:export-ydpi="100" />
+    <g
+       id="g7816"
+       transform="matrix(0,1,-1,0,137.46154,631.67052)"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       inkscape:export-xdpi="100"
+       inkscape:export-ydpi="100">
+      <path
+         d="m -52.492568,-75.607488 c 0,10.56746 8.56661,19.13408 19.13406,19.13408 10.56746,-1e-5 19.13407,-8.56662 19.13407,-19.13408 0,-10.56745 -8.56661,-19.13407 -19.13407,-19.13407 -10.56745,0 -19.13406,8.56662 -19.13406,19.13407 l 0,0 z"
+         style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:4.81066322;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+         id="path7818" />
+    </g>
+    <g
+       id="g7820"
+       transform="matrix(0.5,0.8660254,-0.8660254,0.5,226.94165,657.68618)"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       inkscape:export-xdpi="100"
+       inkscape:export-ydpi="100">
+      <path
+         d="m -52.492568,-75.607488 c 0,10.56746 8.56661,19.13408 19.13406,19.13408 10.56746,-1e-5 19.13407,-8.56662 19.13407,-19.13408 0,-10.56745 -8.56661,-19.13407 -19.13407,-19.13407 -10.56745,0 -19.13406,8.56662 -19.13406,19.13407 l 0,0 z"
+         style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:4.81066322;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+         id="path7822" />
+    </g>
+    <g
+       id="g7824"
+       transform="matrix(0.8660254,0.5,-0.5,0.8660254,321.01824,645.45239)"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       inkscape:export-xdpi="100"
+       inkscape:export-ydpi="100">
+      <path
+         d="m -52.492568,-75.607488 c 0,10.56746 8.56661,19.13408 19.13406,19.13408 10.56746,-1e-5 19.13407,-8.56662 19.13407,-19.13408 0,-10.56745 -8.56661,-19.13407 -19.13407,-19.13407 -10.56745,0 -19.13406,8.56662 -19.13406,19.13407 l 0,0 z"
+         style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:4.81066322;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+         id="path7826" />
+    </g>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:4.81099987;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 213.013,618.77156 0,342.13933 262.30128,0"
+       id="path7828"
+       inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+       inkscape:export-xdpi="100"
+       inkscape:export-ydpi="100" />
+    <path
+       style="fill:none;stroke:#001480;stroke-width:7.46199989;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 170.89332,-18.145444 232.33508,0 L 480,32.362183"
+       id="path4030" />
+    <g
+       id="g4137"
+       transform="translate(129.26746,150)">
+      <rect
+         y="12.362185"
+         x="-130"
+         height="160"
+         width="60"
+         id="rect4135"
+         style="fill:#000000;fill-opacity:1;stroke:none" />
+      <path
+         inkscape:export-ydpi="100"
+         inkscape:export-xdpi="100"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         d="m -120,42.362183 c 0,10.56746 8.56661,19.13408 19.13406,19.13408 10.56746,-10e-6 19.13407,-8.56662 19.13407,-19.13408 0,-10.56745 -8.56661,-19.13407 -19.13407,-19.13407 -10.56745,0 -19.13406,8.56662 -19.13406,19.13407 l 0,0 z"
+         style="opacity:0.25;fill:#ff0000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:4.81066322;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+         id="path7695-8" />
+      <path
+         inkscape:export-ydpi="100"
+         inkscape:export-xdpi="100"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         d="m -120,92.362183 c 0,10.567457 8.56661,19.134077 19.13406,19.134077 10.56746,-1e-5 19.13407,-8.56662 19.13407,-19.134077 0,-10.56745 -8.56661,-19.13407 -19.13407,-19.13407 -10.56745,0 -19.13406,8.56662 -19.13406,19.13407 l 0,0 z"
+         style="opacity:0.25;fill:#ffff00;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:4.81066322;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+         id="path7695-8-2" />
+      <path
+         inkscape:export-ydpi="100"
+         inkscape:export-xdpi="100"
+         inkscape:export-filename="/home/andre/IST/Presentations/2009/IEEE-NPSS/images/MARTeComponents.png"
+         d="m -120,142.36218 c 0,10.56746 8.56661,19.13408 19.13406,19.13408 10.56746,-1e-5 19.13407,-8.56662 19.13407,-19.13408 0,-10.56744 -8.56661,-19.13406 -19.13407,-19.13406 -10.56745,0 -19.13406,8.56662 -19.13406,19.13407 l 0,0 z"
+         style="fill:#00ff00;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:4.81066322;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+         id="path7695-8-5" />
+    </g>
+    <path
+       style="fill:none;stroke:#001480;stroke-width:7.46199989;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m -342.33508,-19.637817 232.33508,0 76.7716,50.50763"
+       id="path4030-0-2-1" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:4.80000019;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 90,32.362183 c 390,0 390,0 390,0"
+       id="path4143-7-6" />
+  </g>
+</svg>
