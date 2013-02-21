@@ -135,30 +135,34 @@ bool BTConvertFromString(BasicTypeDescriptor &bt,const char *name){
         name +=3;
         bt.type = BTDTInteger;
         bt.flags = BTDSTNone;
-        int bitSize;
-        sscanf(name,"%i", &bitSize);
+        int32 bitSize = sizeof(int) * BYTE_BIT_SIZE;
+        if(strlen(name) != 0){
+            sscanf(name,"%i", &bitSize);
+        }
         bt.size = bitSize;
     } else
     if (strncmp(name,"uint",4)==0){
         name +=4;
         bt.type = BTDTInteger;
         bt.flags = BTDSTUnsigned;
-        int bitSize;
-        sscanf(name,"%i", &bitSize);
+        int32 bitSize = sizeof(unsigned int) * BYTE_BIT_SIZE;
+        if(strlen(name) != 0){
+            sscanf(name,"%i", &bitSize);
+        }
         bt.size = bitSize;
     } else
     if (strcmp(name,"unsigned int")==0){
-        bt.size = 32;
+        bt.size  = sizeof(unsigned int) * BYTE_BIT_SIZE;
         bt.type  = BTDTInteger;
         bt.flags = BTDSTUnsigned;
     } else
     if (strcmp(name,"float")==0){
-        bt.size = 32;
+        bt.size = sizeof(float) * BYTE_BIT_SIZE;
         bt.type = BTDTFloat;
         bt.flags = BTDSTNone;
     } else
     if (strcmp(name,"double")==0){
-        bt.size = 64;
+        bt.size = sizeof(double) * BYTE_BIT_SIZE;
         bt.type = BTDTFloat;
         bt.flags = BTDSTNone;
     } else {
