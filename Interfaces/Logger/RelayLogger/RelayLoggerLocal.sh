@@ -32,13 +32,12 @@ else
 fi
 
 CODE_DIRECTORY=../../..
-LD_LIBRARY_PATH=.:$CODE_DIRECTORY/BaseLib2/linux
-LD_LIBRARY_PATH+=:$CODE_DIRECTORY/BaseLib2/BaseLibTools/RelayLogger/linux
+LD_LIBRARY_PATH=.:linux:$CODE_DIRECTORY/BaseLib2/linux
 
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH
 echo $LD_LIBRARY_PATH
 
-$CODE_DIRECTORY/BaseLib2/BaseLibTools/RelayLogger/linux/RelayLogger.ex -c $1
+./linux/RelayLogger.ex -c $1
 
-#cgdb --args $CODE_DIRECTORY/BaseLib2/BaseLibTools/RelayLogger/linux/RelayLogger.ex -c $1
+#cgdb --args ./linux/RelayLogger.ex -c $1
 
