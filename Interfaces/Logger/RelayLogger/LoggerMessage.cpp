@@ -154,7 +154,7 @@ void LoggerMessage::EncodeToText(StreamInterface &buffer){
 }
 
 void LoggerMessage::FormatMessage(StreamInterface &out){
-    uint32 Time = errorTime;
+    time_t Time = (time_t)errorTime;
     char stime[64];
     sprintf(stime, "%s", ctime((time_t *)&Time));
     stime[strlen(stime)-1]=0;
