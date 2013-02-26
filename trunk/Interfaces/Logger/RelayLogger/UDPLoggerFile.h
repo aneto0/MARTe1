@@ -63,7 +63,7 @@ private:
     FString     simpleName;
 
     void PrintCurrentTime(char *stime){
-        uint32 errorTime = time(NULL);
+        time_t errorTime = time(NULL);
         sprintf(stime,"%s",ctime((time_t *)&errorTime));
         stime[strlen(stime)-1]=0;
         char *c = stime;
