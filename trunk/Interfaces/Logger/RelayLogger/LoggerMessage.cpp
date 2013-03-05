@@ -175,7 +175,7 @@ void LoggerMessage::FormatMessage(StreamInterface &out){
         }
     }
     if((formattedMsgFields & LM_PID) == LM_PID){
-        buffer.Printf("pid=0x%x:", tid);
+        buffer.Printf("pid=0x%x:", pid);
     }
     if((formattedMsgFields & LM_TID) == LM_TID){
         buffer.Printf("tid=0x%x ", tid);
