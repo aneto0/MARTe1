@@ -143,28 +143,84 @@ public:
         threadName.SetSize(0);
         sourceAddress.SetSize(0);
         osErrorMessage.SetSize(0);
-    }
+    }    
     
-    /**
-     * @return the hostname
-     */
-    const FString &GetSourceAddress(){
-        return sourceAddress;
-    }
-    
-    /**
-     * @return the PID
-     */
-    uint32 GetPID(){
-        return pid;
-    }
-
     /**
      * @return the error code
      */
     uint32 GetErrorCode(){
         return errorCode;
     }
+    
+    /**
+     * @return the error time
+     */
+    uint32 GetErrorTime(){
+        return errorTime;
+    }    
+    
+    /**
+     * @return the PID
+     */
+    uint32 GetPID(){
+        return pid;
+    }    
+
+    /**
+     * @return the TID
+     */
+    uint32 GetTID(){
+        return tid;
+    }
+    
+    /**
+     * @return the object ID
+     */
+    uint32 GetObjectID(){
+        return object;
+    }
+
+    /**
+     * @return the system error code
+     */
+    uint32 GetOSErrorCode(){
+        return osErrorCode;
+    }    
+    
+    /**
+     * @return the class name
+     */
+    const FString &GetClassName(){
+        return className;
+    }    
+    
+    /**
+     * @return the error message
+     */
+    const FString &GetErrorMessage(){
+        return errorMessage;
+    }      
+    
+    /**
+     * @return the thread name
+     */
+    const FString &GetThreadName(){
+        return threadName;
+    }    
+
+    /**
+     * @return the hostname
+     */
+    const FString &GetSourceAddress(){
+        return sourceAddress;
+    } 
+    
+    /**
+     * @return the operating error system message
+     */
+    const FString &GetOSErrorMessage(){
+        return osErrorMessage;
+    }     
 };
 
 #endif
