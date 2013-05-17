@@ -100,7 +100,15 @@ bool MARTeService::ServiceStart(){
     cdb->ReadFromStream(cfg_buffer);
 
     CDBExtended info(cdb);
-    
+   
+    int32 defaultCPUs;
+    if(!info.ReadInt32(defaultCPUs, "DefaultCPUs", 0)){
+        CStaticAssertErrorCondition(Warning, "DefaultCPUs were not specified. This can be used to help BaseLib2 decide where to put new threads");    	
+    }
+    else{
+        ProcessorType::SetDefaultCPUs(defaultCPUs);
+    }
+ 
     FString logAddress;
     if(!info.ReadFString(logAddress,"LoggerAddress","localhost")){
         CStaticAssertErrorCondition(Warning, "No LoggerAddress specified, using localhost as default");	
