@@ -47,7 +47,8 @@ CFLAGS+= -I../../../BaseLib2/Level5
 CFLAGS+= -I../../../BaseLib2/Level6
 CFLAGS+= -I../../../BaseLib2/LoggerService
 
-all: $(OaBJS)    \
+all: $(OBJS)    \
+		$(TARGET)/RelayLogger$(DLLEXT) \
 		$(TARGET)/RelayLogger$(EXEEXT) \
 		$(TARGET)/RelayLoggerService$(EXEEXT)
 	echo  $(OBJS)
