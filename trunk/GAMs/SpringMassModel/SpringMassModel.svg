@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN"
+    "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<svg onload="initSVG(evt)"
+     xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink">
+<!--WaterTank svg edited for use with the SpringMassModel GAM-->
+    <script type="text/javascript">
+	var svgns = "http://www.w3.org/2000/svg";
+	var extension1Text;
+	var extension2Text;
+	var forceText;
+	var massHeightPx = 50;
+	var mass1WidthPx = 75;
+	var mass2WidthPx = 50;
+	var spring1LengthPx = 100;
+	var spring2LengthPx = 100;
+	var wallLengthPx = 200;
+	var METRE_TO_PIXEL = 50;
+	var LEFT_MARGIN = 5;
+	var TOP_MARGIN = 5;
+	var request = new XMLHttpRequest();
+	var mass1;
+	var mass2;
+	var spring1;
+	var spring2;
+	var spring1Stiffness;
+	var spring2Stiffness
+
+	function initSVG(evt) {
+		if ( window.svgDocument == null )
+			svgDocument = evt.target.ownerDocument;
+
+		// Get the spring lengths, mass widths, stiffness constants from cfg file
+		var url = "?Parameters";
+		request.open('GET', url, true);
+		request.onreadystatechange = parameterUpdate;
+		request.send(null);
+	}
+
+	function parameterUpdate(){
+		if(request.readyState == 4){
+
+			var parameterString = request.responseText;
+			var parameters = parameterString.split(" ");
+
+			mass1Width = parseFloat(parameters[0]);
+			mass2Width = parseFloat(parameters[1]);
+			spring1Length = parseFloat(parameters[2]);
+			spring2Length = parseFloat(parameters[3]);
+			spring1Stiffness = parseFloat(parameters[4]);
+			spring2Stiffness = parseFloat(parameters[5]);
+
+			mass1WidthPx = mass1Width * METRE_TO_PIXEL;
+			mass2WidthPx = mass2Width * METRE_TO_PIXEL;
+
+			spring1LengthPx = spring1Length * METRE_TO_PIXEL;
+			spring2LengthPx = spring2Length * METRE_TO_PIXEL;
+			
+			request.onreadystatechange = function () {};
+			initShapes();
+		}
+	}   
+
+	function initShapes() {
+
+	// The wall
+		var wall = svgDocument.createElementNS(svgns, "line");
+		wall.setAttributeNS(null, "x1", LEFT_MARGIN);
+		wall.setAttributeNS(null, "y1", TOP_MARGIN);
+		wall.setAttributeNS(null, "x2", LEFT_MARGIN);
+		wall.setAttributeNS(null, "y2", TOP_MARGIN + wallLengthPx);
+		wall.setAttributeNS(null, "stroke", "black");
+		wall.setAttributeNS(null, "stroke-width", 2);
+		svgDocument.documentElement.appendChild(wall);
+
+	// The first mass
+		mass1 = svgDocument.createElementNS(svgns, "rect");
+		mass1.setAttributeNS(null, "x", LEFT_MARGIN + spring1LengthPx);
+		mass1.setAttributeNS(null, "y", TOP_MARGIN + 0.5*wallLengthPx - 0.5*massHeightPx);
+		mass1.setAttributeNS(null, "width", mass1WidthPx);
+		mass1.setAttributeNS(null, "height", massHeightPx);
+		mass1.setAttributeNS(null, "fill", "blue");
+		svgDocument.documentElement.appendChild(mass1);
+
+	// The second mass
+		mass2 = svgDocument.createElementNS(svgns, "rect");
+		mass2.setAttributeNS(null, "x", LEFT_MARGIN + spring1LengthPx + spring2LengthPx + mass1WidthPx );
+		mass2.setAttributeNS(null, "y", TOP_MARGIN + 0.5*wallLengthPx - 0.5*massHeightPx);
+		mass2.setAttributeNS(null, "width", mass2WidthPx);
+		mass2.setAttributeNS(null, "height", massHeightPx);
+		mass2.setAttributeNS(null, "fill", "green");
+		svgDocument.documentElement.appendChild(mass2);
+
+	// The first spring
+		spring1 = svgDocument.createElementNS(svgns, "line");
+		spring1.setAttributeNS(null, "x1", LEFT_MARGIN);
+		spring1.setAttributeNS(null, "y1", TOP_MARGIN + 0.5 * wallLengthPx );
+		spring1.setAttributeNS(null, "x2", LEFT_MARGIN + spring1LengthPx );
+		spring1.setAttributeNS(null, "y2", TOP_MARGIN + 0.5 * wallLengthPx );
+		spring1.setAttributeNS(null, "stroke", "red");
+		svgDocument.documentElement.appendChild(spring1);
+
+	// The second spring
+		spring2 = svgDocument.createElementNS(svgns, "line");
+		spring2.setAttributeNS(null, "x1", LEFT_MARGIN + spring1LengthPx + mass1WidthPx);
+		spring2.setAttributeNS(null, "y1", TOP_MARGIN + 0.5 * wallLengthPx);
+		spring2.setAttributeNS(null, "x2", LEFT_MARGIN + spring1LengthPx + spring2LengthPx + mass1WidthPx );
+		spring2.setAttributeNS(null, "y2", TOP_MARGIN + 0.5 * wallLengthPx);
+		spring2.setAttributeNS(null, "stroke", "red");
+		svgDocument.documentElement.appendChild(spring2);
+
+	// Text to show the spring 1 extension
+		extension1Text = svgDocument.createElementNS(svgns, "text");
+		extension1Text.setAttributeNS(null, "x", LEFT_MARGIN + 5);
+		extension1Text.setAttributeNS(null, "y", TOP_MARGIN + wallLengthPx - 12);
+		extension1Text.setAttributeNS(null, "fill", "black");
+		extension1Text.setAttributeNS(null, "font-size", "18");
+		var wt = svgDocument.createTextNode("Extension1: 0 m");
+		extension1Text.appendChild(wt);
+		svgDocument.documentElement.appendChild(extension1Text);
+
+	// Text to show the spring 2 extension
+		extension2Text = svgDocument.createElementNS(svgns, "text");
+		extension2Text.setAttributeNS(null, "x", LEFT_MARGIN + 5);
+		extension2Text.setAttributeNS(null, "y", TOP_MARGIN + wallLengthPx + 12);
+		extension2Text.setAttributeNS(null, "fill", "black");
+		extension2Text.setAttributeNS(null, "font-size", "18");
+		wt = svgDocument.createTextNode("Extension2: 0 m");
+		extension2Text.appendChild(wt);
+		svgDocument.documentElement.appendChild(extension2Text);
+
+	// Text to show the force applied by the piston
+		forceText = svgDocument.createElementNS(svgns, "text");
+		forceText.setAttributeNS(null, "x", LEFT_MARGIN + 5);
+		forceText.setAttributeNS(null, "y", TOP_MARGIN + wallLengthPx + 36);
+		forceText.setAttributeNS(null, "fill", "black");
+		forceText.setAttributeNS(null, "font-size", "18");
+		wt = svgDocument.createTextNode("Force: 0 N");
+		forceText.appendChild(wt);
+		svgDocument.documentElement.appendChild(forceText);
+
+	// Embolden the spring with a higher stiffness
+		if (spring1Stiffness > spring2Stiffness){
+		spring1.setAttributeNS(null, "stroke-width", 3);
+		}
+		else if (spring2Stiffness > spring1Stiffness){
+		spring2.setAttributeNS(null, "stroke-width", 3);
+		}
+
+		timedUpdate();	
+	}
+     
+	
+	function timedUpdate(){
+		// get extensions of the springs
+		var url = "?Extensions";
+		request.open('GET', url, true);
+		
+		// Update image
+		request.onreadystatechange = updateImage;
+		request.send(null);
+
+		window.setTimeout(timedUpdate, 100);
+	}
+
+        function updateImage() {
+
+		if(request.readyState == 4){
+
+			// The two extensions and the force are provided as a string seperated by spaces
+			var extensionString = request.responseText;
+			var extensions = extensionString.split(" ");
+			var extension1 = parseFloat(extensions[0]);
+			var extension2 = parseFloat(extensions[1]);
+			var force = parseFloat(extensions[2]);
+
+	                var extension1Px = extension1 * METRE_TO_PIXEL;
+			var extension2Px = extension2 * METRE_TO_PIXEL;
+
+			
+	                mass1.setAttributeNS(null, "x", LEFT_MARGIN + spring1LengthPx + extension1Px );
+			spring1.setAttributeNS(null, "x2", LEFT_MARGIN + spring1LengthPx + extension1Px );
+			mass2.setAttributeNS(null, "x",    LEFT_MARGIN + spring1LengthPx + spring2LengthPx + mass1WidthPx + extension1Px +  extension2Px );
+			spring2.setAttributeNS(null, "x1", LEFT_MARGIN + spring1LengthPx + extension1Px + mass1WidthPx);
+			spring2.setAttributeNS(null, "x2", LEFT_MARGIN + spring1LengthPx + spring2LengthPx + mass1WidthPx + extension1Px +  extension2Px );
+			extension1Text.childNodes.item(0).nodeValue = "Extension1: " + extension1.toFixed(2) + " m";
+			extension2Text.childNodes.item(0).nodeValue = "Extension2: " + extension2.toFixed(2) + " m";
+			forceText.childNodes.item(0).nodeValue = "Force: " + force.toFixed(2) + " N";
+		}
+	}
+	
+    </script>
+</svg>
+
+
+
+
