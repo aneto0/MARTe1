@@ -814,7 +814,7 @@ bool SrTrATCADrv::StartAcquisition(){
 
 bool SrTrATCADrv::StopAcquisition(){
     dmaPathMux.Lock();
-    if(!rtAcquisitionInProgress){
+    if(!acquisitionInProgress){
         dmaPathMux.UnLock();
         return True;
     }
