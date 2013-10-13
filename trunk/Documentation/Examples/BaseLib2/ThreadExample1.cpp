@@ -41,7 +41,7 @@ void ComplexAnalysis(float sec){
 
 //Thread function call back
 void IncrementDecrementFunction(void *threadID){
-    int32 thisThreadID = (int32)threadID;
+    intptr thisThreadID = (intptr)threadID;
     CStaticAssertErrorCondition(Information, "Thread with id = %d started", thisThreadID);
     while(exitAfterCalls > 0){
         sharedVariable++;

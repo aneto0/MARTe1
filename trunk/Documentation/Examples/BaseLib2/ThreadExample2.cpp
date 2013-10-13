@@ -32,7 +32,7 @@
 #include "Atomic.h"
 
 //An exit condition for all the threads
-static int32 exitAfterCalls = 500;
+static int32 exitAfterCalls = 50;
 
 //Shared variable to be incremented by the threads
 static int32 sharedVariable = 0;
@@ -56,7 +56,7 @@ void ComplexAnalysis(float sec){
 
 //Thread function call back
 void IncrementDecrementFunction(void *threadID){
-    int32 thisThreadID = (int32)threadID;
+    intptr thisThreadID = (intptr)threadID;
     CStaticAssertErrorCondition(Information, "Thread with id = %d waiting for event sem", thisThreadID);
     numberOfThreadsLeftToStart--;
     if(!eventSem.Wait()){
