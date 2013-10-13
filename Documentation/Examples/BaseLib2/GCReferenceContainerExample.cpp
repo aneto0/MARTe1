@@ -92,12 +92,12 @@ int main(int argc, char *argv[]){
 
     //Create another object of type SimpleClass
     GCRTemplate<SimpleClass> simpleClassObj(GCFT_Create);
-    if(!simpleNamedObj.IsValid()){
+    if(!simpleClassObj.IsValid()){
         CStaticAssertErrorCondition(FatalError, "The simpleClassObj should be valid!!!");
         return -1;
     }
 
-    //A SimpleClass if not of type GCNamedObject
+    //A SimpleNamedObject (inheriting from GCNamedObject) if not of type SimpleClass
     GCRTemplate<SimpleClass> simpleClassObj2 = simpleNamedObj;
     //So it should not be valid...
     if(!simpleClassObj2.IsValid()){
