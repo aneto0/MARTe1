@@ -25,7 +25,8 @@
 
 CLASSPATH = .
 
-JFLAGS = -classpath $(CLASSPATH) -target 1.5
+#JFLAGS = -classpath $(CLASSPATH) -target 1.7
+JFLAGS = -classpath $(CLASSPATH)
 JCFLAGS =
 JRFLAGS =
 BUILD_DIR = build
