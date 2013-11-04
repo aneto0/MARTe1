@@ -162,7 +162,7 @@ function extractFiles(){
 
 	moduleList=$(find *.zip -maxdepth 1 -type f  | sort -n);	
 	for module in $moduleList; do   
-	    unzip $module 3>&1 1>&2 2>&3 | tee $basedir/extract-$module.$target.err
+	    unzip -o $module 3>&1 1>&2 2>&3 | tee $basedir/extract-$module.$target.err
 	done
 	
 	moduleList=$(find *.tar.gz -maxdepth 1 -type f  | sort -n);		
