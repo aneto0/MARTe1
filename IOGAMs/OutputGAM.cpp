@@ -77,6 +77,14 @@ bool OutputGAM::Initialise(ConfigurationDataBase& cdbData){
         AssertErrorCondition(Warning, "OutputGAM::Initialise: %s does not specify a TimeSignalType> Assuming int32", Name());
     }
 
+    writeInPrepulse = False;
+    FString writeInPrepulseTxt;
+    if(!cdb.ReadFString(writeInPrepulseTxt,"WriteToBoardInPrepulse","")){
+        AssertErrorCondition(Warning, "OutputGAM::Initialise: %s does not specify a WriteToBoardInPrepulse > Assuming False", Name());
+    }
+    if(writeInPrepulseTxt == "true" || writeInPrepulseTxt == "True"){
+        writeInPrepulse = True;
+    }
 
     if(!AddInputInterface(usecTime,"UsecTimeInterface")){
         AssertErrorCondition(InitialisationError,"OutputGAM::Initialise: %s failed to add input interface UsecTimeInterface",Name());
@@ -182,8 +190,8 @@ bool OutputGAM::Initialise(ConfigurationDataBase& cdbData){
             cal0Pointer[j]                 = 0.0;
             cal1Pointer[j]                 = 1.0;
             needsCalibrationPointer[j]     = False;
-	    minPointer[j]                  = -10.0;
-	    maxPointer[j]                  =  10.0;
+            minPointer[j]                  = -10.0;
+            maxPointer[j]                  =  10.0;
         }
 
         if(cdb->Exists("Cal0")){
@@ -227,7 +235,7 @@ bool OutputGAM::Initialise(ConfigurationDataBase& cdbData){
         cal1Pointer             += signalSize;
         needsCalibrationPointer += signalSize;
         maxPointer              += signalSize;
-	minPointer              += signalSize;
+        minPointer              += signalSize;
 
         signalDescriptor = signalDescriptor->Next();
         cdb->MoveToFather();
@@ -248,16 +256,22 @@ bool OutputGAM::Initialise(ConfigurationDataBase& cdbData){
 
 bool OutputGAM::Execute(GAM_FunctionNumbers functionNumber){
 
-     usecTime->Read();
-     int32 time   = *((int32 *)usecTime->Buffer());
+    usecTime->Read();
+    int32 time   = *((int32 *)usecTime->Buffer());
 
+    if(functionNumber == GAMPrepulse){
+        outputModule->PulseStart();
+        if(!writeInPrepulse){
+            return True;
+        }
+    }
 
     ///////////////////////////
     // Implement Acquisition //
     ///////////////////////////
 
     input->Read();
-
+    
     ////////////////////////
     // Apply Calibrations //
     ////////////////////////
