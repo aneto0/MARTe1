@@ -69,6 +69,8 @@ private:
     /** Flag used to specify it the signal needs calibration. */
     bool                                        *needsCalibration;
 
+    /** If true it will write to the GACQM in the GAMPrepulse. The default is not to write*/
+    bool                                         writeInPrepulse;
 public:
 
     /** Constructor */
@@ -81,10 +83,11 @@ public:
         // Calibration factors
         cal0                               = NULL;
         cal1                               = NULL;
-	// Max and Min
-	maxOutputValue                     = NULL;
-	minOutputValue                     = NULL;
+        // Max and Min
+        maxOutputValue                     = NULL;
+        minOutputValue                     = NULL;
         needsCalibration                   = NULL;
+        writeInPrepulse                    = False;
     };
 
     /** Destructor */
