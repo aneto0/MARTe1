@@ -1,0 +1,1235 @@
+%% ============================================================================
+%% Abstract:
+%%      Library of functions for generating codeInfo object and its components.
+%%    
+%% Copyright 1994-2012 The MathWorks, Inc.
+%%   
+%%
+
+%if EXISTS("_CIINFODATALIB_") == 0
+%assign _CIINFODATALIB_ = 1
+
+%include "codeinfolib.tlc"
+%include "autosarsup.tlc"
+
+%selectfile NULL_FILE
+
+%% Function SLibCreateInportInterfaces ========================================
+%% Abstract :
+%%   This function loops through Inports and creates a RTW.DataInterface
+%%   object for each of them.
+%%   The process of creation here means emitting out the MATLAB syntax which can 
+%%   create a MATLAB object. 
+%%   The MATLAB syntax is
+%%       inportObj = RTW.DataInterface(sid, 
+%%                                     signalName, 
+%%                                     implementation,
+%%                                     timing)
+%%
+%%       sid            - SID of the inport block
+%%       signalName     - Label of the signal from inport (or blockName)
+%%       implementation - code implementation, either a RTW.Variable object
+%%                        or a RTW.StructExpression object.
+%%       timing         - A RTW.TimingInterface object, giving the sample rate
+%%                        of the inport
+%%
+%%   This function will be called in codeinfo.tlc which writes out MATLAB code.
+%%   The MATLAB syntax emitted by this function will be part of that file
+%%
+%function SLibCreateInportInterfaces() Output
+  %% Flag to determine if memory for Inport will be defined by
+  %% generated code
+  %assign IsInportDefined = ...
+    !(SLibFcnProtoCtrlActive() || IsMultiInsatnceERTOrModelReference() || ...
+    SLibAutosarActive())
+  %%
+  %% Flag to determine if memory forInport is typed as ExternalInputs structure
+  %assign IsInportStructure = ...
+    ( IsInportDefined || (MultiInstanceERTCode && RootIOStructures) )
+  %%
+  %% Start looping over Inports
+  %with ::CompiledModel.ExternalInputs
+  %assign unsetEIIdx = FcnGetUnsetEIIdxFromIRInfo()
+  %foreach idx = SIZE(unsetEIIdx, 1)
+    %assign ei     = ExternalInput[unsetEIIdx[idx]]
+    %assign regObj = "[]"
+    %if ( (ei.StorageClass != "Auto") && (ei.StorageClass != "SimulinkGlobal") )
+      %% Process storage class data
+      %assign cgTypeIdx = ei.CGTypeIdx
+      %assign sigID     = LibGetRecordIdentifier(ei)
+      %if (ei.StorageClass != "Custom")
+        %% Process inputs configured with either of the following storage classes
+        %% 1) ExportedGlobal 2) ImportedExtern, 3) ImportedExternPointer
+        %%
+        %% Determine type qualifers
+        %assign ei_const  = 0
+        %assign ei_vol    = 0
+        %if !ISEMPTY(ei.StorageTypeQualifier)
+          %if (ei.StorageTypeQualifier == "const volatile")
+            %assign ei_const  = 1
+            %assign ei_vol    = 1
+          %elseif (ei.StorageTypeQualifier == "const")
+            %assign ei_const  = 1
+          %elseif (ei.StorageTypeQualifier == "volatile")
+            %assign ei_vol  = 1
+          %endif
+        %endif
+        %%
+        %% Determine type - Returns a embedded.xxxtype object
+        %assign typeObj = SLibGetEmbeddedTypeObject(cgTypeIdx, ei_const, ei_vol)
+        %if !ISEQUAL(ei.FrameData, "no")
+          %assign typeObj = FcnGetMatrixFrameTypeObj(typeObj)
+        %endif
+        %%
+        %% If ExportedGlobal, the input's definition & declaration file are known
+        %if (!IsModelReferenceRTWTarget() && ...
+          (ei.StorageClass == "ExportedGlobal"))
+          %assign ownerName = ::CompiledModel.Name
+          %assign defnFile  = "%<::CompiledModel.Name>." + ::LangFileExt
+          %assign declFile  = "%<::CompiledModel.Name>.h"
+        %else
+          %assign ownerName = ""
+          %assign defnFile  = ""
+          %assign declFile  = ""
+        %endif
+        %%
+        %% For input which is scalar and configured as ImportedExternPointer, 
+        %% add level of indirection to type
+        %if (ei.StorageClass == "ImportedExternPointer")
+          %assign tgtVar   = SLibGetRTWVariableObject(sigID, typeObj, ...
+              "%<LibGetRecordIdentifier(ei)>_val", "","","")
+          %assign pTypeObj = FcnCreatePointerTypeObj(cgTypeIdx, 0, 0)
+          %assign regObj   = ...
+            SLibGetRTWPointerVariableObject(sigID, pTypeObj, ...
+            LibGetRecordIdentifier(ei), tgtVar)          
+        %else
+          %%
+          %% Create a RTW.Variable object using type, identifer and decl/defn file
+          %assign regObj  = SLibGetRTWVariableObject(sigID, typeObj, ...
+            LibGetRecordIdentifier(ei), ownerName, defnFile, declFile)
+        %endif
+        %<regObj>.StorageSpecifier = 'extern';
+        %%
+      %else
+        %% Process CSC - custom storage class inputs
+        %assign msDefn  = SLibGetMemorySectionDefForData(ei)
+        %assign cscDefn = SLibGetCSCDefForData(ei)
+        %assign isR13CSC = ((SLibGetDataAccess(cscDefn, ei) == "unknown") ? 1 : 0)
+        %assign isPtr = ((SLibGetDataAccess(cscDefn, ei)=="Pointer") ? 1 : 0)
+        %assign isMPTVar = ISEQUAL(cscDefn.TLCFileName,"MPTUnstructured.tlc")
+         %% Determine type qualifers
+        %assign ei_const  = (msDefn.IsConst ? 1 : 0)
+        %assign ei_vol    = (msDefn.IsVolatile ? 1 : 0)
+        %if (!isR13CSC && !isPtr)
+          %% Only the following CSC are supported
+          %%   - Not a pre-R14 CSC
+          %%   - Non-Pointer Access
+          %if (cscDefn.CSCType == "Unstructured") || isMPTVar
+            %% Ungrouped CSC
+            %%  
+            %%
+            %% Determine type - Returns a embedded.xxxtype object
+            %assign typeObj = SLibGetEmbeddedTypeObject(cgTypeIdx, ei_const, ei_vol)
+            %if !ISEQUAL(ei.FrameData, "no")
+              %assign typeObj = FcnGetMatrixFrameTypeObj(typeObj)
+            %endif
+            %%
+            %% If Component exports, add known properties to Variable Object
+            %assign ownerName = ""
+            %assign defnFile  = ""
+            %assign declFile  = ""
+            %if (!IsModelReferenceRTWTarget()) 
+              %if ISFIELD(ei, "FilePackaging") && (!ISEMPTY(ei.FilePackaging))
+                %assign defineFileIdx = ei.FilePackaging.DefineFile
+                %assign hdrFileName   = ei.FilePackaging.HeaderFile
+                %if (defineFileIdx != -1)
+                  %with ::CompiledModel.DataObjectUsage
+                    %assign defFileName = File[defineFileIdx].Name
+                  %endwith
+                  %assign defnFile  = defFileName + "." + ::LangFileExt
+                  %assign ownerName = ::CompiledModel.Name
+                  %if (hdrFileName != "")
+                    %assign declFile = hdrFileName
+                  %endif
+                %endif
+              %endif
+            %endif
+            %%
+            %% Create a RTW.Variable object using type, identifer and decl/defn file
+            %assign regObj  = SLibGetRTWVariableObject(sigID, typeObj, ...
+              LibGetRecordIdentifier(ei), ownerName, defnFile, declFile)
+            %<regObj>.StorageSpecifier = 'extern';
+            %%
+          %elseif (cscDefn.CSCType == "FlatStructure")
+            %% Grouped CSC
+            %if ( (ISFIELD(cscDefn.CSCTypeAttributes, "BitPackBoolean")) && ...
+                (cscDefn.CSCTypeAttributes.BitPackBoolean) && ...
+                (::CompiledModel.CGTypes.CGType[cgTypeIdx].SLTypeIdx == 8))
+              %assign typeObj = "numerictype(0,1,0)"
+            %else
+              %assign typeObj = SLibGetEmbeddedTypeObject(cgTypeIdx,ei_const,ei_vol)
+            %endif
+            %if !ISEQUAL(ei.FrameData, "no")
+              %assign typeObj = FcnGetMatrixFrameTypeObj(typeObj)
+            %endif
+            %assign bIdx  = LibGetRecordWidth(ei) == 1 ?  "" : "[0]"
+            %assign aExpr = LibCustomData(ei, "contents", "", "")
+            %assign owner = ISEQUAL(cscDefn.DataScope, "Exported") ? ...
+              ::CompiledModel.Name : ""
+            %assign regObj = "ExternInput%<idx>_CSC"
+            
+              %<regObj> = RTW.CustomExpression(%<typeObj>,'%<aExpr>','%<aExpr>','%<owner>');
+          %elseif (ISFIELD(LibGetCustomStorageAttributes(ei), "GetFunction") && ...
+            ISFIELD(LibGetCustomStorageAttributes(ei), "SetFunction"))
+            %assign typeObj = SLibGetEmbeddedTypeObject(cgTypeIdx, 0, 0)
+            %if !ISEQUAL(ei.FrameData, "no")
+              %assign typeObj = FcnGetMatrixFrameTypeObj(typeObj)
+            %endif
+            %assign bIdx   = LibGetRecordWidth(ei) == 1 ?  "" : "[0]"
+            %assign csAttr = LibGetCustomStorageAttributes(ei)
+            %assign aReadExpr  = LibGetInstanceSpecificProp(cscDefn, csAttr, "GetFunction")
+            %assign aWriteExpr  = LibGetInstanceSpecificProp(cscDefn, csAttr, "SetFunction")
+            %assign regObj = "ExternInput%<idx>_CSC"
+            %<regObj> = RTW.CustomExpression(%<typeObj>,'%<aReadExpr>','%<aWriteExpr>','');
+            %if ISFIELD(LibGetCustomStorageAttributes(ei), "HeaderFile")
+               %assign aHeaderFile = LibGetInstanceSpecificProp(cscDefn, csAttr, "HeaderFile")
+               %<regObj>.HeaderFile = '%<aHeaderFile>';
+            %endif
+          %else
+          %% Unsupported CSC
+          %% No implementation provided. The default regObj = "[]" will be use                     
+          %endif
+        %else
+          %% Unsupported CSC
+          %% No implementation provided. The default regObj = "[]" will be used
+        %endif
+      %endif
+    %else
+      %% Process Auto storage class data
+      %if (IsInportStructure)
+        %<LibReportFatalError("CodeInfo: Structured Inports not created")>
+      %else
+        %% Root Inputs not defined - passed as args or accessed as autosar rte
+        %%
+        %if (SLibAutosarActive())
+          %<LibReportFatalError("CodeInfo: Autosar Inports not created")>
+        %else
+          %<LibReportFatalError("CodeInfo: IOArg Inports not created")>
+        %endif
+      %endif
+    %endif
+    %%
+    %% Set the implementation of the Inport appropriately
+    %assign comment = "% Setting Inport#%<idx+1>'s implementation"
+        
+    %<comment>    
+    codeInfo.Inports(%<unsetEIIdx[idx]+1>).Implementation = %<regObj>;
+  %endforeach
+  %endwith %%ExternalInputs
+%endfunction
+
+%% Local Function FcnIsDataTypeConverted(sigTypeIdx, cgTypeIdx)
+%% Abstract:
+%%   Returns TLC_FALSE if a virtual outport is driven by a signal whose data type
+%%   is compatible with the outport's data type. Otherwise TLC_TRUE.
+%%   The types are compatible if 
+%%     - They have the same complexity AND
+%%     - They have the same underlying storage type
+%%
+%function FcnIsDataTypeConverted(sigTypeIdx, cgTypeIdx) void
+  %%
+  %if (sigTypeIdx == cgTypeIdx) 
+    %% No Conversion - straightforward case
+    %return TLC_FALSE
+  %endif
+  %%
+  %% Both fixed point or integers with same underlying stored integer
+  %if ISEQUAL(CGTypes.CGType[sigTypeIdx].Constructor,"fixed")
+    %assign sigStoredIdx = CGTypes.CGType[sigTypeIdx].BaseIdx
+  %else
+    %assign sigStoredIdx = sigTypeIdx
+  %endif
+  %if ISEQUAL(CGTypes.CGType[cgTypeIdx].Constructor,"fixed")
+    %assign cgStoredIdx = CGTypes.CGType[cgTypeIdx].BaseIdx
+  %else
+    %assign cgStoredIdx = cgTypeIdx
+  %endif
+  %if (sigStoredIdx == cgStoredIdx) 
+    %return TLC_FALSE
+  %endif
+  %%
+  %% Both complex, but with compatible base type
+  %if ( ISEQUAL(CGTypes.CGType[sigTypeIdx].Constructor,"complex") && ...
+    ISEQUAL(CGTypes.CGType[cgTypeIdx].Constructor,"complex") )
+    %assign sigBaseIdx = CGTypes.CGType[sigTypeIdx].BaseIdx
+    %assign cgBaseIdx = CGTypes.CGType[cgTypeIdx].BaseIdx
+    %return FcnIsDataTypeConverted(sigBaseIdx, cgBaseIdx)
+  %endif
+  %%
+  %% Both Matrix, but with compatible base type
+  %if (ISEQUAL(CGTypes.CGType[sigTypeIdx].Constructor, "matrix") && ...
+    ISEQUAL(CGTypes.CGType[cgTypeIdx].Constructor, "matrix") )
+    %assign sigBaseIdx = CGTypes.CGType[sigTypeIdx].BaseIdx
+    %assign cgBaseIdx = CGTypes.CGType[cgTypeIdx].BaseIdx
+    %return FcnIsDataTypeConverted(sigBaseIdx, cgBaseIdx)
+  %endif
+  %%
+  %return TLC_TRUE
+%endfunction
+
+%% Function SLibCreateOutportInterfaces =======================================
+%% Abstract :
+%%   This function loops through Outports and creates a RTW.DataInterface
+%%   object for each of them.
+%%   The process of creation here means emitting out the MATLAB syntax which can 
+%%   create a MATLAB object.
+%%   The MATLAB syntax is
+%%       outportObj =RTW.DataInterface(sid, 
+%%                                     signalName, 
+%%                                     implementation,
+%%                                     timing)
+%%
+%%       sid            - sid of the outport block
+%%       signalName     - Label of the signal feeding outport (or blockName)
+%%       implementation - code implementation, either a RTW.Variable object
+%%                        or a RTW.StructExpression object.
+%%       timing         - A RTW.TimingInterface object, giving the sample rate
+%%                        of the outport
+%%
+%%   This function will be called in codeinfo.tlc which writes out MATLAB code.
+%%   The MATLAB syntax emitted by this function will be part of that file
+%%
+%function SLibCreateOutportInterfaces() Output
+  %%
+  %% Determine if memory for ExternalIO will be defined by generated code
+  %assign IsOutportDefined = ...
+    !(SLibFcnProtoCtrlActive() || IsMultiInsatnceERTOrModelReference() || ...
+    SLibAutosarActive())
+  %%
+  %% Determine if memory for Outport is typed as ExternalOutputs structure
+    %assign IsOutportStruct = ...
+    ( IsOutportDefined || (MultiInstanceERTCode && RootIOStructures) )
+  %with ::CompiledModel.ExternalOutputs
+  %assign unsetEOIdx = FcnGetUnsetEOIdxFromIRInfo()
+  %foreach idx = SIZE(unsetEOIdx, 1) 
+    %assign eo = ExternalOutput[unsetEOIdx[idx]]
+    %assign regObj = "[]"
+    %%
+    %% Get Block and get associated signal record/memory
+    %assign eoBlk = ::CompiledModel.System[eo.Block[0]].Block[eo.Block[1]]
+    %with eoBlk
+      %assign ip             = FcnGetInputPortRecord(0)
+      %assign numSrcs = 0
+      %roll idx = eoBlk.RollRegions, lcv = 1, eoBlk, "FlatRoller", [""]
+        %assign numSrcs = numSrcs+1
+      %endroll
+      %assign sigRec         = SLibGetSourceRecord(ip, 0)
+      %assign eoStorageClass = LibBlockInputSignalStorageClass(0, 0)
+      %assign sigOffset      = ip.SignalOffset[0]
+    %endwith
+    %%
+    %%
+    %if ISFIELD(eo, "VarGroupIdx")
+      %% The Port is non-virtual
+      %if (IsOutportStruct)
+        %<LibReportFatalError("CodeInfo: Structured Outports not created")>
+      %else
+        %% Root Outputs not defined - function args or RTE API's
+        %%
+        %if (SLibAutosarActive())
+          %<LibReportFatalError("CodeInfo: Autosar Outports not created")>          
+        %else
+          %<LibReportFatalError("CodeInfo: IOArg Outports not created")>
+        %endif
+      %endif
+    %elseif (numSrcs > 1)
+      %% do nothing - skip
+      %% empty implementation
+      %%
+    %elseif ( (eoStorageClass != "Auto") && (eoStorageClass != "SimulinkGlobal") )
+      %% Process storage class data
+      %assign cgTypeIdx  = eo.CGTypeIdx
+      %assign sigTypeIdx = sigRec.CGTypeIdx
+      %assign sigID      = LibGetRecordIdentifier(sigRec)
+      %% Do type validation
+      %assign dataTypeConverted = ...
+        ( (LibCGTypeWidth(sigTypeIdx) == LibCGTypeWidth(cgTypeIdx) ) && ...
+        FcnIsDataTypeConverted(sigTypeIdx, cgTypeIdx) )
+      %if ( (sigTypeIdx != cgTypeIdx) && ...
+        (eoStorageClass == "ImportedExternPointer") )
+        %assign unsupportedArrayExpr = TLC_TRUE
+      %else
+        %assign unsupportedArrayExpr = TLC_FALSE
+      %endif
+      %%
+      %% Create appropriate objects
+      %if dataTypeConverted
+        %% Unsupported signal
+        %% No implementation provided. The default regObj = "[]" will be used
+      %elseif unsupportedArrayExpr
+        %% Unsupported signal
+        %% No implementation provided. The default regObj = "[]" will be used
+      %elseif (eoStorageClass != "Custom")
+        %% Process outputs configured with one of the following storage classes
+        %% 1) ExportedGlobal 2) ImportedExtern, 3) ImportedExternPointer
+        %%
+        %% Determine type qualifers
+        %assign eo_const  = 0
+        %assign eo_vol    = 0
+        %if !ISEMPTY(sigRec.StorageTypeQualifier)
+          %if (sigRec.StorageTypeQualifier == "const volatile")
+            %assign eo_const  = 1
+            %assign eo_vol    = 1
+          %elseif (sigRec.StorageTypeQualifier == "const")
+            %assign eo_const  = 1
+          %elseif (sigRec.StorageTypeQualifier == "volatile")
+            %assign eo_vol  = 1
+          %endif
+        %endif
+        %%
+        %if ( LibCGTypeWidth(sigTypeIdx) == LibCGTypeWidth(cgTypeIdx) )
+          %assign sigTypeIdx  = cgTypeIdx
+        %endif
+        %%
+        %% Determine type - Returns a embedded.xxxtype object
+        %assign typeObj = SLibGetEmbeddedTypeObject(sigTypeIdx, eo_const, eo_vol)
+        %if !ISEQUAL(eo.FrameData, "no")
+          %assign typeObj = FcnGetMatrixFrameTypeObj(typeObj)
+        %endif
+        %%
+        %% If ExportedGlobal, the output's definition/declaration files are known
+        %if (!IsModelReferenceRTWTarget() && ...
+          (eoStorageClass == "ExportedGlobal"))
+          %assign ownerName = ::CompiledModel.Name
+          %assign defnFile  = "%<::CompiledModel.Name>." + ::LangFileExt
+          %assign declFile  = "%<::CompiledModel.Name>.h"
+        %else
+          %assign ownerName = ""
+          %assign defnFile  = ""
+          %assign declFile  = ""
+        %endif
+        
+        %if (eoStorageClass == "ImportedExternPointer")
+          %% For output which is configured as ImportedExternPointer, 
+          %% add level of indirection
+          %assign tgtVar   = SLibGetRTWVariableObject(sigID, typeObj, ...
+            "%<LibGetRecordIdentifier(sigRec)>_val", "","","")
+          %assign pTypeObj = FcnCreatePointerTypeObj(sigTypeIdx, 0, 0)
+          %assign regObj   = ...
+            SLibGetRTWPointerVariableObject(sigID, pTypeObj, ...
+            LibGetRecordIdentifier(sigRec), tgtVar)
+        %else
+          %% Create a RTW.Variable object using type, identifer and decl/defn file
+          %assign tgtVar  = SLibGetRTWVariableObject(sigID, typeObj, ...
+            LibGetRecordIdentifier(sigRec), ownerName, defnFile, declFile)
+          %assign regObj = tgtVar
+        %endif
+        %<regObj>.StorageSpecifier = 'extern';
+        %%
+        %if (LibCGTypeWidth(sigTypeIdx) > LibCGTypeWidth(cgTypeIdx))
+          %% array expression
+          %assign arTypeObj = SLibGetEmbeddedTypeObject(cgTypeIdx, 0, 0)
+          %assign regObj = SLibGetRTWArrayExprObject(arTypeObj, tgtVar, sigOffset)
+        %endif
+      %else
+        %% Process CSC - custom storage class data
+        %assign msDefn  = SLibGetMemorySectionDefForData(sigRec)
+        %assign cscDefn = SLibGetCSCDefForData(sigRec)
+        %assign isR13CSC = ...
+          ((SLibGetDataAccess(cscDefn, sigRec) == "unknown") ? 1 : 0)
+        %assign isPtr = ((SLibGetDataAccess(cscDefn, sigRec)=="Pointer") ? 1 : 0)
+        %assign isMPTVar = ISEQUAL(cscDefn.TLCFileName,"MPTUnstructured.tlc")
+        %% Determine type qualifers
+        %assign eo_const  = (msDefn.IsConst ? 1 : 0)
+        %assign eo_vol    = (msDefn.IsVolatile ? 1 : 0)
+        %if (!isR13CSC && !isPtr) 
+          %% Only the following CSC are supported
+          %%   - Not a pre-R14 CSC
+          %%
+          %if (cscDefn.CSCType == "Unstructured") || isMPTVar
+            %% Ungrouped CSC     
+            %%
+            %% Determine type - Returns a embedded.xxxtype object
+            %assign typeObj=SLibGetEmbeddedTypeObject(sigTypeIdx, eo_const, eo_vol)
+            %if !ISEQUAL(eo.FrameData, "no")
+              %assign typeObj = FcnGetMatrixFrameTypeObj(typeObj)
+            %endif
+            %%
+            %% If Component exports, add known properties to Variable Object
+            %assign ownerName = ""
+            %assign defnFile  = ""
+            %assign declFile  = ""
+            %if (!IsModelReferenceRTWTarget())
+              %if ISFIELD(sigRec, "FilePackaging") && !ISEMPTY(sigRec.FilePackaging)
+                %assign defineFileIdx = sigRec.FilePackaging.DefineFile
+                %assign hdrFileName   = sigRec.FilePackaging.HeaderFile
+                %if (defineFileIdx != -1)
+                  %with ::CompiledModel.DataObjectUsage
+                    %assign defFileName = File[defineFileIdx].Name
+                  %endwith
+                  %assign defnFile  = defFileName + "." + ::LangFileExt
+                  %assign ownerName = ::CompiledModel.Name
+                  %if (hdrFileName != "")
+                    %assign declFile = hdrFileName
+                  %endif
+                %endif
+              %endif
+            %endif
+            %assign sigID          = LibGetRecordIdentifier(sigRec)
+            %%
+            %% Create a RTW.Variable object using type, identifer & decl/defn file
+            %assign regObj  = SLibGetRTWVariableObject(sigID, typeObj, ...
+              LibGetRecordIdentifier(sigRec), ownerName, defnFile, declFile)
+            %assign tgtVar  = regObj
+            %<regObj>.StorageSpecifier = 'extern';
+            %%
+          %elseif (cscDefn.CSCType == "FlatStructure")
+            %% Grouped CSC
+            %if ( (ISFIELD(cscDefn.CSCTypeAttributes, "BitPackBoolean")) && ...
+              (cscDefn.CSCTypeAttributes.BitPackBoolean) && ...
+              (::CompiledModel.CGTypes.CGType[cgTypeIdx].SLTypeIdx == 8))
+              %assign typeObj = "numerictype(0,1,0)"
+            %else
+              %assign typeObj = SLibGetEmbeddedTypeObject(cgTypeIdx, eo_const,eo_vol)
+            %endif
+            %if !ISEQUAL(eo.FrameData, "no")
+              %assign typeObj = FcnGetMatrixFrameTypeObj(typeObj)
+            %endif
+            %assign bIdx  = LibGetRecordWidth(sigRec) == 1 ?  "" : "[0]"
+            %assign aExpr = LibCustomData(sigRec, "contents", "", "")
+            %assign owner = ISEQUAL(cscDefn.DataScope, "Exported") ? ...
+              ::CompiledModel.Name : ""
+            %assign regObj = "ExternOutput%<idx>_CSC"
+            
+%<regObj> = RTW.CustomExpression(%<typeObj>,'%<aExpr>','%<aExpr>','%<owner>');
+
+          %elseif (ISFIELD(LibGetCustomStorageAttributes(sigRec), "GetFunction") && ...
+            ISFIELD(LibGetCustomStorageAttributes(sigRec), "SetFunction"))
+            %assign typeObj = SLibGetEmbeddedTypeObject(cgTypeIdx, 0, 0)
+            %if !ISEQUAL(eo.FrameData, "no")
+              %assign typeObj = FcnGetMatrixFrameTypeObj(typeObj)
+            %endif
+            %assign bIdx   = LibGetRecordWidth(sigRec) == 1 ?  "" : "[0]"
+            %assign csAttr = LibGetCustomStorageAttributes(sigRec)
+            %assign aReadExpr  = LibGetInstanceSpecificProp(cscDefn, csAttr, "GetFunction")
+            %assign aWriteExpr  = LibGetInstanceSpecificProp(cscDefn, csAttr, "SetFunction")
+            %assign regObj = "ExternInput%<idx>_CSC"
+            %<regObj> = RTW.CustomExpression(%<typeObj>,'%<aReadExpr>','%<aWriteExpr>','');
+            %if ISFIELD(LibGetCustomStorageAttributes(sigRec), "HeaderFile")
+               %assign aHeaderFile = LibGetInstanceSpecificProp(cscDefn, csAttr, "HeaderFile")
+               %<regObj>.HeaderFile = '%<aHeaderFile>';
+            %endif
+          %else
+          %% Unsupported CSC  
+          %% No implementation provided.The default regObj = "[]" will be used
+          %endif
+          %if ( LibCGTypeWidth(sigTypeIdx) > LibCGTypeWidth(cgTypeIdx) )
+            %if (cscDefn.CSCType == "Unstructured")
+              %% possible array expression
+              %assign arTypeObj = SLibGetEmbeddedTypeObject(cgTypeIdx, 0, 0)
+              %assign regObj = SLibGetRTWArrayExprObject(arTypeObj, tgtVar, sigOffset)
+            %else
+              %assign regObj = "[]"
+            %endif
+          %endif
+        %else
+          %% Unsupported CSC
+          %% No implementation provided. The default regObj = "[]" will be used
+        %endif
+      %endif
+    %else
+      %% The Port is passed as argument
+      %%
+      %% Create a type - Returns a embedded.xxxtype object
+      %assign typeObj  = SLibGetEmbeddedTypeObject(eo.CGTypeIdx, 0, 0)
+      %if !ISEQUAL(eo.FrameData, "no")
+        %assign typeObj = FcnGetMatrixFrameTypeObj(typeObj)
+      %endif
+      %%
+      %% Create a RTW.Variable object with no owner
+      %assign regObj = ...
+        SLibGetRTWVariableObject("EO%<idx>", typeObj, LibGetRecordIdentifier(eoBlk),"","","")
+    %endif
+    %assign comment = "% Setting Outport#%<idx+1>'s Implementation"
+        
+    %<comment>    
+    codeInfo.Outports(%<unsetEOIdx[idx]+1>).Implementation = %<regObj>;
+  %endforeach
+  %endwith %%ExternalOutputs
+%endfunction
+
+%% Function: FcnAddRunnableToParamAccessInfo =================================
+%% Abstract: 
+%%   Recursively records parent runnable(s) name of system 
+%%
+%function FcnAddRunnableToParamAccessInfo(sysIdx, pAccessInfo, calPrmIdx) void
+  %assign system = ::CompiledModel.System[sysIdx]
+  %assign runnableIdx = system.RunnableIdx 
+  %if runnableIdx >= 0
+    %assign runName = ...
+      ::CompiledModel.RTWAutosar.PeriodicRunnables.Runnable[runnableIdx].Name
+    %if !ISFIELD(pAccessInfo, runName)
+      %addtorecord pAccessInfo %<runName> [%<calPrmIdx>]
+    %else
+      %assign pAccessInfo.%<runName> = pAccessInfo.%<runName> + calPrmIdx
+    %endif
+  %else
+    %assign numCallers = SIZE(system.CallSites, 0)
+    %foreach idx = numCallers
+      %<FcnAddRunnableToParamAccessInfo(system.CallSites[idx][0], pAccessInfo, calPrmIdx)>
+    %endforeach
+  %endif
+%endfunction
+
+%% Function SLibCreateParameterInterfaces =====================================
+%% Abstract :
+%%   This function loops through Parameter and creates a RTW.DataInterface
+%%   object for each of them.
+%%   The process of creation here means emitting out the MATLAB syntax which can 
+%%   create a MATLAB object. 
+%%   The MATLAB syntax is
+%%       param Obj = RTW.DataInterface(sid, 
+%%                                     paramName, 
+%%                                     implementation,
+%%                                     timing)
+%%
+%%       sid            - Either '' (for Workspace Variables) or SID of model. 
+%%                        In case InlinedParameters is off, SID of the block 
+%%                        using the Parameter.
+%%       paramName      - Name of Parameter
+%%       implementation - code implementation, either a RTW.Variable object
+%%                        or a RTW.StructExpression object.
+%%       timing         - A RTW.TimingInterface object indicating that params
+%%                        are updated at onetime.
+%%
+%%   This function will be called in codeinfo.tlc which writes out MATLAB code.
+%%   The MATLAB syntax emitted by this function will be part of that file
+%%
+%function SLibCreateParameterInterfaces() Output
+  %%
+  %% Flag to determine if memory for Parameters are typed as structure
+  %assign isParamsStructured = !SLibAreSimulinkGlobalParamsUnstructured()
+  %if (SLibAutosarActive())
+    %if !ISFIELD(::CompiledModel.RTWAutosar, "ParamAccessInfo")
+      %addtorecord ::CompiledModel.RTWAutosar ParamAccessInfo {}
+      %addtorecord ::CompiledModel.RTWAutosar ParamNameToIdxMap {}
+    %endif
+  %endif
+  %%
+  %with ::CompiledModel.ModelParameters
+  %assign unsetParamPairs = FcnGetUnsetParamIdxFromIRInfo()
+  %foreach idx = SIZE(unsetParamPairs, 0)
+    %assign unsetParamIdx = unsetParamPairs[idx]
+    %assign param = Parameter[unsetParamIdx[0]]
+    %assign regObj = "[]"
+    %if ((param.StorageClass !="Auto") && (param.StorageClass !="SimulinkGlobal"))
+      %if ISFIELD(param, "OrigIdentifier") && !ISEMPTY(param.OrigIdentifier)
+        %assign paramRTWId = param.OrigIdentifier
+      %else
+        %assign paramRTWId = LibGetRecordIdentifier(param)
+      %endif
+      checkDataGraphicalNames(codeInfo.Parameters(%<unsetParamIdx[1]+1>).GraphicalName, '%<paramRTWId>');
+      %% Process storage class data
+      %assign cgTypeIdx = SLibGetRecordOriginalCGTypeIdx(param)
+      %if (param.StorageClass != "Custom")
+        %% Process parameters configured with one of the following storage class
+        %% 1) ExportedGlobal, 2) ImportedExtern, 3) ImportedExternPointer
+        %%
+        %% Determine type qualifers
+        %assign p_const  = 0
+        %assign p_vol    = 0
+        %if !ISEMPTY(param.TypeQualifier)
+          %if (param.TypeQualifier == "const volatile")
+            %assign p_const  = 1
+            %assign p_vol    = 1
+          %elseif (param.TypeQualifier == "const")
+            %assign p_const  = 1
+          %elseif (param.TypeQualifier == "volatile")
+            %assign p_vol  = 1
+          %endif
+        %endif
+        %%
+        %% Determine type - Returns a embedded.xxxtype object
+        %assign typeObj = SLibGetEmbeddedTypeObject(cgTypeIdx, p_const, p_vol)
+        %%
+        %% If ExportedGlobal, the param's definition & declaration file are known
+        %if (!IsModelReferenceRTWTarget() && ...
+          (param.StorageClass != "ImportedExtern") && ...
+          (param.StorageClass != "ImportedExternPointer") && ...
+          ( (param.StorageClass == "ExportedGlobal") || ...
+          SLibIsParamUnstructured(param) ) )
+          %assign ownerName = ::CompiledModel.Name
+          %assign defnFile  = "%<::CompiledModel.Name>." + ::LangFileExt
+          %assign declFile  = "%<::CompiledModel.Name>.h"
+        %else
+          %assign ownerName = ""
+          %assign defnFile  = ""
+          %assign declFile  = ""
+        %endif
+        %%
+        %% For parameter which is configured as ImportedExternPointer, 
+        %% add level of indirection to type
+        %if (param.StorageClass == "ImportedExternPointer")
+          %% For output which is configured as ImportedExternPointer, 
+          %% add level of indirection
+          %assign tgtVar   = SLibGetRTWVariableObject("Par%<idx>", typeObj, ...
+              "%<LibGetRecordIdentifier(param)>_val", "","","")
+          %assign pTypeObj = FcnCreatePointerTypeObj(cgTypeIdx, 0, 0)
+          %assign regObj   = ...
+            SLibGetRTWPointerVariableObject("Par%<idx>", pTypeObj, ...
+            LibGetRecordIdentifier(param), tgtVar)
+        %else
+          %% Create a RTW.Variable object using type, identifer and decl/defn file
+          %assign regObj  = SLibGetRTWVariableObject("Par%<idx>", typeObj, ...
+            LibGetRecordIdentifier(param), ownerName, defnFile, declFile)
+        %endif
+        %<regObj>.StorageSpecifier = 'extern';
+        %assign variant = SLibDataPreprocessorStuff(param)
+        %if !ISEMPTY(variant[0])
+          %<regObj>.Variant = '%<variant[0]>';
+        %endif
+        %%
+      %elseif (SLibAutosarActive())
+        %%
+        %% Get Custom attributes from the parameter
+        %assign rtwInfo = LibGetRTWInfoObjectProperties(param)
+        %assign csAttribs = rtwInfo.CustomAttributes.Object
+        %assert (!ISEMPTY(csAttribs))
+        %if !(ISEQUAL(csAttribs.Package, "SimulinkCSC") && ...
+          (ISEQUAL(csAttribs.Class, "AttribClass_AUTOSAR_CalPrm") || ...
+          ISEQUAL(csAttribs.Class, "AttribClass_AUTOSAR_InternalCalPrm") ) )
+          skippedParameters(end+1) = %<unsetParamIdx[1]+1>;
+          %continue
+        %endif
+        %%
+        %% Autosar CSC parameters
+        %assign cgTypeIdx = SLibGetRecordOriginalCGTypeIdx(param)
+        %%
+        %% Determine type - Returns a embedded.xxxtype object
+        %assign typeObj = SLibGetEmbeddedTypeObject(cgTypeIdx, 0, 0)
+        %%
+        %if ISFIELD(param, "OrigIdentifier") && !ISEMPTY(param.OrigIdentifier)
+          %assign paramId = param.OrigIdentifier
+        %else
+          %assign paramId = LibGetRecordIdentifier(param)
+        %endif
+        checkDataGraphicalNames(codeInfo.Parameters(%<unsetParamIdx[1]+1>).GraphicalName, '%<paramId>');
+        %assign regObj = SLibGetRTWCalibrationObject(paramId, typeObj, LibGetRecordIdentifier(param), csAttribs)
+        %%
+        %% Update CalPrm Access info for autosar target
+        %assign calPrmIdx = idx + 1
+        %if ( SLibAutosarActive() )
+          %addtorecord ::CompiledModel.RTWAutosar.ParamNameToIdxMap %<paramId> %<calPrmIdx>
+          %assign runnables = FIELDNAMES(param.RunnableAccessInfo)
+          %assign numRunnables = SIZE(runnables, 1)
+          %foreach runIdx = numRunnables
+            %assign runName = runnables[runIdx]
+            %assign pAccessInfo = ::CompiledModel.RTWAutosar.ParamAccessInfo
+            %if !ISFIELD(pAccessInfo, runName)
+              %addtorecord pAccessInfo %<runName> [%<calPrmIdx>]
+            %else
+              %assign pAccessInfo.%<runName> = pAccessInfo.%<runName> + calPrmIdx
+            %endif
+          %endforeach
+        %endif
+        %% Done CalPrmAccess info
+      %else
+        %%
+        %% Process CSC - custom storage class data
+        %assign msDefn  = SLibGetMemorySectionDefForData(param)
+        %assign cscDefn = SLibGetCSCDefForData(param)
+        %assign isR13CSC = ...
+          ((SLibGetDataAccess(cscDefn, param) == "unknown") ? 1 : 0)
+        %assign isMacro = ...
+          ((SLibGetDataInitForData(cscDefn, param) == "Macro") ? 1: 0)
+        %if isMacro
+          skippedParameters(end+1) = %<unsetParamIdx[1]+1>;
+          %continue
+        %endif
+        %assign isPtr = ...
+          ((SLibGetDataAccess(cscDefn, param)=="Pointer") ? 1 : 0)
+        %assign isMPTVar = ISEQUAL(cscDefn.TLCFileName,"MPTUnstructured.tlc")
+        %% Determine type qualifers
+        %assign p_const  = (msDefn.IsConst ? 1 : 0)
+        %assign p_vol    = (msDefn.IsVolatile ? 1 : 0)
+        %if ( !isR13CSC && !isMacro && !isPtr)
+          %% Only the following CSC are supported
+          %%   - Not a pre-R14 CSC
+          %%
+          %if (cscDefn.CSCType == "Unstructured") || isMPTVar
+            %% Ungrouped CSC
+            %%  
+            %% Determine type - Returns a embedded.xxxtype object
+            %assign typeObj = SLibGetEmbeddedTypeObject(cgTypeIdx, p_const, p_vol)
+            %%
+            %% If Component exports, add known properties to Variable Object
+            %assign ownerName   = ""
+            %assign defnFile    = ""
+            %assign declFile    = ""
+            %assign isFileScope = TLC_FALSE
+            %if (!IsModelReferenceRTWTarget())
+              %if ISFIELD(param, "FilePackaging") && !ISEMPTY(param.FilePackaging)
+                %assign defineFileIdx = param.FilePackaging.DefineFile
+                %assign hdrFileName   = param.FilePackaging.HeaderFile
+                %if (defineFileIdx != -1)
+                  %with ::CompiledModel.DataObjectUsage
+                    %assign defFileName = File[defineFileIdx].Name
+                  %endwith
+                  %assign defnFile  = defFileName + "." + ::LangFileExt
+                  %assign ownerName = ::CompiledModel.Name
+                  %if (hdrFileName != "")
+                    %assign declFile = hdrFileName
+                  %endif
+                %endif
+                %assign isFileScope = ...
+                  ISEMPTY(param.FilePackaging.FilesWithDeclare) && ...
+                  ISEMPTY(param.FilePackaging.FilesWithInclude)
+              %endif
+            %endif
+            %%
+            %% For Indirect access, add level of indirection to type
+            %if (SLibGetDataAccess(cscDefn, param) == "Pointer")
+              %assign tgtVar   = SLibGetRTWVariableObject("Par%<idx>",typeObj, ...
+                "%<LibGetRecordIdentifier(param)>_val", "","","")
+              %assign pTypeObj = FcnCreatePointerTypeObj(cgTypeIdx,0, 0)
+              %assign regObj   = ...
+                SLibGetRTWPointerVariableObject("Par%<idx>", pTypeObj, ...
+                LibGetRecordIdentifier(param), tgtVar)
+            %else
+              %% Create a RTW.Variable object using type, identifer, decl/defn file
+              %assign regObj  = SLibGetRTWVariableObject("Par%<idx>",typeObj, ...
+                LibGetRecordIdentifier(param), ownerName, defnFile, declFile)
+            %endif
+            %if isFileScope
+              %<regObj>.StorageSpecifier = 'static';
+            %else
+              %<regObj>.StorageSpecifier = 'extern';
+            %endif
+            %assign variant = SLibDataPreprocessorStuff(param)
+            %if (cscDefn.CSCType == "Unstructured") && !ISEMPTY(variant[0])
+              %<regObj>.Variant = '%<variant[0]>';
+            %endif
+            %%
+          %elseif (cscDefn.CSCType == "FlatStructure")
+            %% Grouped CSC
+            %assert(ISEQUAL(CompiledModel.CGTypes.CGType[cgTypeIdx].Constructor, "matrix"))
+            %assign typeObj = SLibGetEmbeddedTypeObject(cgTypeIdx, p_const, p_vol)
+            
+            %assign baseCGTypeIdx = CompiledModel.CGTypes.CGType[cgTypeIdx].BaseIdx
+            
+            %if ((ISFIELD(cscDefn.CSCTypeAttributes, "BitPackBoolean")) && ...
+              (cscDefn.CSCTypeAttributes.BitPackBoolean) && ...
+              (::CompiledModel.CGTypes.CGType[baseCGTypeIdx].SLTypeIdx == 8))
+              %<typeObj>.BaseType = numerictype(0,1,0);
+            %endif
+          
+            %assign bIdx  = LibGetRecordWidth(param) == 1 ?  "" : "[0]"
+            %assign aExpr = LibCustomData(param, "contents", "", "")
+            %assign owner = ISEQUAL(cscDefn.DataScope, "Exported") ? ...
+              ::CompiledModel.Name : ""
+            %assign regObj = "ModelParameter%<idx>_CSC"
+            
+ %<regObj> = RTW.CustomExpression(%<typeObj>,'%<aExpr>','%<aExpr>','%<owner>');
+          
+          %elseif ((ISFIELD( LibGetCustomStorageAttributes(param), "GetFunction")) && ...
+                   (ISFIELD( LibGetCustomStorageAttributes(param), "SetFunction")))
+            %assign typeObj = SLibGetEmbeddedTypeObject(cgTypeIdx, 0, 0)
+            %assign bIdx   = LibGetRecordWidth(param) == 1 ?  "" : "[0]"
+            %assign csAttr = LibGetCustomStorageAttributes(param)
+            %assign aReadExpr  = LibGetInstanceSpecificProp(cscDefn, csAttr, "GetFunction")
+            %assign aWriteExpr  = LibGetInstanceSpecificProp(cscDefn, csAttr, "SetFunction")
+            %assign regObj = "ExternInput%<idx>_CSC"
+
+            %<regObj> = RTW.CustomExpression(%<typeObj>,'%<aReadExpr>','%<aWriteExpr>','');
+            %if ISFIELD(LibGetCustomStorageAttributes(param), "HeaderFile")
+               %assign aHeaderFile = LibGetInstanceSpecificProp(cscDefn, csAttr, "HeaderFile")
+               %<regObj>.HeaderFile = '%<aHeaderFile>';
+            %endif
+          %else
+          %% Unsupported CSC
+          %% No implementation provided. The default regObj = "[]" will be used
+          %endif
+        %else
+          %% Unsupported CSC
+          %% No implementation provided. The default regObj = "[]" will be used
+        %endif
+      %endif
+    %else  %% 
+      %if ( !(ISEQUAL(param.Tunable, "yes") && ...
+        ISEQUAL(param.IsSfcnSizePrm, 0) && ...
+        !ISEMPTY(param.Value)) )
+        %<LibReportFatalError("CodeInfo: Unsupported parameter")>
+      %endif
+      %%
+      %assign cgTypeIdx = SLibGetRecordOriginalCGTypeIdx(param)
+      %%
+      %% Determine type - Returns a embedded.xxxtype object
+      %assign typeObj = SLibGetEmbeddedTypeObject(cgTypeIdx, 0, 0)
+      %%
+      %if SLibIsParamUnstructured(param)
+        %%
+        %% Create a RTW.Variable object
+        %assign paramName = "%<tUnstructParameters>_%<LibGetRecordIdentifier(param)>"
+        %if (!IsModelReferenceRTWTarget())
+          %assign ownerName = ::CompiledModel.Name
+          %assign defnFile  = "%<::CompiledModel.Name>_data." + ::LangFileExt
+          %assign declFile  = "%<::CompiledModel.Name>.h"
+        %else
+          %assign ownerName = ""
+          %assign defnFile  = ""
+          %assign declFile  = ""
+        %endif
+        %assign regObj = ...
+          SLibGetRTWVariableObject("Par%<idx>", typeObj, paramName, ...
+          ownerName, defnFile, declFile)
+        %<regObj>.StorageSpecifier = 'extern';
+        %%
+      %else
+        %%
+         %if (param.WasAccessedAsVariable != 1)
+          skippedParameters(end+1) = %<unsetParamIdx[1]+1>;
+        %endif
+        %continue
+        %%
+        %%  
+      %endif
+      %%  
+    %endif
+    %%
+    %% Create a RTW.DataInterface object which describes the parameter
+    %assign comment = "% Setting Parameter#%<idx+1>'s implementation"
+    
+    %<comment>  
+    codeInfo.Parameters(%<unsetParamIdx[1]+1>).Implementation = %<regObj>;
+  %endforeach 
+  %endwith
+  %if (SLibAutosarActive())
+    %assign mdlRefBlks = ISFIELD(::CompiledModel,"ModelReferenceBlocks") ? ...
+      ::CompiledModel.ModelReferenceBlocks : []
+    %if !ISEMPTY(mdlRefBlks)
+      %foreach rowIdx = SIZE(mdlRefBlks,0)
+        %assign mdlRefInfo   = mdlRefBlks[rowIdx]
+        %assign mSysIdx      = mdlRefInfo[0]
+        %assign bIdx         = mdlRefInfo[1]
+        %assign blkInterface = GetModelrefInterface(System[mSysIdx].Block[bIdx])
+        %%
+        %% Add Init Runnable Access
+        %assign initAccess = ...
+          FIELDNAMES(blkInterface.AutosarParamAccessInfo.InitializeAccess)
+        %assign numInitAccess = SIZE(initAccess, 1)
+        %foreach pIdx = numInitAccess
+          %assign paramName = initAccess[pIdx]
+          %assign calPrmIdx = ...
+            GETFIELD(::CompiledModel.RTWAutosar.ParamNameToIdxMap, paramName)
+          %assign pAccessInfo = ::CompiledModel.RTWAutosar.ParamAccessInfo
+          %assign runName = ::CompiledModel.RTWAutosar.InitRunnables.Runnable[0].Name
+          %if !ISFIELD(pAccessInfo, runName)
+            %addtorecord pAccessInfo %<runName> [%<calPrmIdx>]
+          %else
+            %assign pAccessInfo.%<runName> = pAccessInfo.%<runName> + calPrmIdx
+          %endif
+        %endforeach
+        %%
+        %% Add Out Runnable Access
+        %assign outAccess = ...
+          FIELDNAMES(blkInterface.AutosarParamAccessInfo.OutputAccess)
+        %assign numOutAccess = SIZE(outAccess, 1)
+        %foreach pIdx = numOutAccess
+          %assign paramName = outAccess[pIdx]
+          %assign calPrmIdx = ...
+            GETFIELD(::CompiledModel.RTWAutosar.ParamNameToIdxMap, paramName)
+          %assign pAccessInfo = ::CompiledModel.RTWAutosar.ParamAccessInfo
+          %<FcnAddRunnableToParamAccessInfo(mSysIdx, pAccessInfo, calPrmIdx)>
+        %endforeach
+      %endforeach
+    %endif
+  %endif
+%endfunction
+
+%% Function SLibCreateParameterArguments =====================================
+%% Abstract :
+%%   This function loops through ModelArguments and creates a RTW.DataInterface
+%%   object for each of them.
+%%   The process of creation here means emitting out the MATLAB syntax which can 
+%%   create a MATLAB object. 
+%%   The MATLAB syntax is
+%%       param Obj = RTW.DataInterface(modelSID, 
+%%                                     paramName, 
+%%                                     implementation,
+%%                                     [])
+%%
+%%       modelSID       - SID of model (referenced model)
+%%       paramName      - Name of model argument
+%%       implementation - code implementation, a RTW.Variable object
+%%
+%%   This function will be called in codeinfo.tlc which writes out MATLAB code.
+%%   The MATLAB syntax emitted by this function will be part of that file
+%%
+%function SLibCreateParameterArguments() Output
+tmpParams = [];
+  %if IsModelReferenceTarget()
+    %assign baseIdx = GetBaseSystemIdx()
+    %with System[baseIdx].Interface
+      %foreach argIdx=NumCanonicalPrmArgDefs
+        %assign canPrmDef = CanonicalPrmArgDef[argIdx]
+        %if (canPrmDef.IsUsed == "no")
+          %continue
+        %endif
+        %assign argCGTypeIdx = canPrmDef.CGTypeIdx
+        %%
+        %% Determine type - Returns a embedded.xxxtype object
+        %assign typeObj = SLibGetEmbeddedTypeObject(argCGTypeIdx, 0, 0)
+        %%
+        %% Create a RTW.Variable object
+        %% use LibGetRecordIdentifier instead of Globalidentifier
+        %% For SIMTarget, we use a pointer variable to get the 
+        %% parameter out of Simulink.
+        %if IsModelReferenceSimTarget()
+          %assign prmCgType   = ::CompiledModel.CGTypes.CGType[argCGTypeIdx]
+          %if prmCgType.Constructor == "matrix" && LibGetRecordWidth(canPrmDef) > 1
+            %assign baseTypeObj = SLibGetEmbeddedTypeObject(prmCgType.BaseIdx, 0, 0)
+          %else
+            %assign baseTypeObj = typeObj
+          %endif
+          %assign pTypeObj = FcnGetPointerTypeObj(baseTypeObj, 0, 0)
+          %assign regObj = SLibGetRTWVariableObject("CanPar%<argIdx>",pTypeObj, ...
+            LibGetRecordIdentifier(canPrmDef), "", "", "")
+        %else
+          %assert IsModelReferenceRTWTarget()
+          %assign regObj  = ...
+            SLibGetRTWVariableObject("CanPar%<argIdx>",typeObj, ...
+            LibGetRecordIdentifier(canPrmDef), "", "", "")
+        %endif
+        %%
+        %%
+        %% Create a RTW.DataInterface object which describes the parameter
+        %assign paramTimeObj = SLibGetRTWTimingObject("constant")
+        %assign comment = "% Parameter Arg %<argIdx>: Data Interface"
+        %assign paramId = SLibGetModelArgumentIdentifier(canPrmDef, argIdx)                
+%<comment>    
+temp_P = RTW.DataInterface(codeInfo.GraphicalPath, '%<paramId>', %<regObj>, %<paramTimeObj>);
+tmpParams = [tmpParams; temp_P];
+      %endforeach
+    %endwith
+  %endif
+  %return "tmpParams"
+%endfunction
+
+%% Function SLibCreateDataStoreInterfaces ========================================
+%% Abstract :
+%%   This function loops through DataStores and creates a RTW.DataInterface
+%%   object for each of them.
+%%   The process of creation here means emitting out the MATLAB syntax which can 
+%%   create a MATLAB object. 
+%%   The MATLAB syntax is
+%%       dStoreObj = RTW.DataInterface(sid, 
+%%                                     dataStoreName, 
+%%                                     implementation,
+%%                                     timing)
+%%
+%%       sid            - SID of the DataStoreMemory block. 
+%%                        If GlobalDSM, sid == ''
+%%       dataStoreName  - Name of the data store
+%%       implementation - code implementation, either a RTW.Variable object
+%%                        or a RTW.StructExpression object.
+%%       timing         - A RTW.TimingInterface object, giving the sample rate
+%%                        of the data store
+%%
+%%   This function will be called in codeinfo.tlc which writes out MATLAB code.
+%%   The MATLAB syntax emitted by this function will be part of that file
+%%
+%function SLibCreateDataStoreInterfaces() Output
+  %% Start looping over DWorks
+  %with ::CompiledModel.DWorks
+  %assign unsetDSMIdx = FcnGetUnsetDSMIdxFromIRInfo()
+  %assign dwIdx = 0
+  %if SLibAutosarActive() && !ISFIELD(::CompiledModel.RTWAutosar, "DSMAccessInfo")
+    %addtorecord ::CompiledModel.RTWAutosar DSMAccessInfo {}
+  %endif
+  %foreach idx = SIZE(unsetDSMIdx, 1)
+    %assign dw     = DWork[unsetDSMIdx[idx]]
+    %if ISFIELD(dw, "OrigIdentifier") && !ISEMPTY(dw.OrigIdentifier)
+      %assign dwRTWId = dw.OrigIdentifier
+      checkDataGraphicalNames(codeInfo.DataStores(%<idx+1>).GraphicalName, '%<dwRTWId>');
+    %else
+      %% do nothing, because RTWID could be mangled in rtwgen.
+    %endif
+    %assign regObj = "[]"
+    %% Check that interface DSM is never be put into DWork structure.
+    %if ISFIELD(dw, "VarGroupIdx") || ISEQUAL(dw.StorageClass, "Auto")
+      %if IsModelReferenceSimTarget()
+        %continue
+      %else
+        %% currently fatal error. Change to assert. 
+        %<LibReportFatalError("CodeInfo: Interface DSM with VarGroupIdx")>
+      %endif
+    %endif
+    %% Process storage class data
+    %assign cgTypeIdx = dw.CGTypeIdx
+    %if (dw.StorageClass != "Custom")
+      %% Process datastores configured with eitther of the following storage classes
+      %% 1) ExportedGlobal 2) ImportedExtern, 3) ImportedExternPointer
+      %%
+      %% Determine type qualifers
+      %assign dw_const  = 0
+      %assign dw_vol    = 0
+      %if !ISEMPTY(dw.StorageTypeQualifier)
+        %if (dw.StorageTypeQualifier == "const volatile")
+          %assign dw_const  = 1
+          %assign dw_vol    = 1
+        %elseif (dw.StorageTypeQualifier == "const")
+          %assign dw_const  = 1
+        %elseif (dw.StorageTypeQualifier == "volatile")
+          %assign dw_vol  = 1
+        %endif
+      %endif
+      %%
+      %% Determine type - Returns a embedded.xxxtype object
+      %assign typeObj = SLibGetEmbeddedTypeObject(cgTypeIdx, dw_const, dw_vol)
+      %%
+      %% If ExportedGlobal, the datastore's definition & declaration file are known
+      %if (!IsModelReferenceRTWTarget() && ...
+        (dw.StorageClass == "ExportedGlobal"))
+        %assign ownerName = ::CompiledModel.Name
+        %assign defnFile  = "%<::CompiledModel.Name>." + ::LangFileExt
+        %assign declFile  = "%<::CompiledModel.Name>.h"
+      %else
+        %assign ownerName = ""
+        %assign defnFile  = ""
+        %assign declFile  = ""
+      %endif
+      %%
+      %% For datastore which is scalar and configured as ImportedExternPointer, 
+      %% add level of indirection to type
+      %if (dw.StorageClass == "ImportedExternPointer")
+        %assign tgtVar   = SLibGetRTWVariableObject("DW%<idx>", typeObj, ...
+          "%<LibGetRecordIdentifier(dw)>_val", "","","")
+        %assign pTypeObj = FcnCreatePointerTypeObj(cgTypeIdx, 0, 0)
+        %assign regObj   = ...
+          SLibGetRTWPointerVariableObject("DW%<idx>", pTypeObj, ...
+          LibGetRecordIdentifier(dw), tgtVar)          
+      %else
+        %%
+        %% Create a RTW.Variable object using type, identifer and decl/defn file
+        %assign regObj  = SLibGetRTWVariableObject("DW%<idx>", typeObj, ...
+          LibGetRecordIdentifier(dw), ownerName, defnFile, declFile)
+      %endif
+      %<regObj>.StorageSpecifier = 'extern';
+      %%
+    %else
+      %% Process CSC - custom storage class datastores
+      %assign msDefn  = SLibGetMemorySectionDefForData(dw)
+      %assign cscDefn = SLibGetCSCDefForData(dw)
+      %assign isR13CSC = ((SLibGetDataAccess(cscDefn, dw) == "unknown") ? 1 : 0)
+      %assign isPtr = ((SLibGetDataAccess(cscDefn, dw)=="Pointer") ? 1 : 0)
+      %assign isPIM =  ISFIELD(cscDefn, "IsAutosarPerInstanceMemory") && ...
+        cscDefn.IsAutosarPerInstanceMemory
+      %assign isMPTVar = ISEQUAL(cscDefn.TLCFileName,"MPTUnstructured.tlc")
+      %% Determine type qualifers
+      %assign dw_const  = (msDefn.IsConst ? 1 : 0)
+      %assign dw_vol    = (msDefn.IsVolatile ? 1 : 0)
+      %if (!isR13CSC && !isPtr)
+        %% Only the following CSC are supported
+        %%   - Not a pre-R14 CSC
+        %%   - Non-Pointer Access
+        %%
+        %if ( (cscDefn.CSCType == "Unstructured") || isPIM || isMPTVar)
+          %% Either Ungrouped CSC or Autosar PIM
+          %%
+          %% Determine type - Returns a embedded.xxxtype object
+          %assign typeObj = SLibGetEmbeddedTypeObject(cgTypeIdx, dw_const, dw_vol)
+          %%
+          %% If Component exports, add known properties to Variable Object
+          %assign ownerName = ""
+          %assign defnFile  = ""
+          %assign declFile  = ""
+          %if (!IsModelReferenceRTWTarget()) 
+            %if ISFIELD(dw, "FilePackaging") && (!ISEMPTY(dw.FilePackaging))
+              %assign defineFildwdx = dw.FilePackaging.DefineFile
+              %assign hdrFileName   = dw.FilePackaging.HeaderFile
+              %if (defineFildwdx != -1)
+                %with ::CompiledModel.DataObjectUsage
+                  %assign defFileName = File[defineFildwdx].Name
+                %endwith
+                %assign defnFile  = defFileName + "." + ::LangFileExt
+                %assign ownerName = ::CompiledModel.Name
+                %if (hdrFileName != "")
+                  %assign declFile = hdrFileName
+                %endif
+              %endif
+            %endif
+          %endif
+          %%
+          %% Create a RTW.Variable object using type, identifer and decl/defn file
+          %assign regObj  = SLibGetRTWVariableObject("DW%<idx>", typeObj, ...
+            LibGetRecordIdentifier(dw), ownerName, defnFile, declFile)
+          %<regObj>.StorageSpecifier = 'extern';
+          %%
+        %elseif (cscDefn.CSCType == "FlatStructure")
+          %% Grouped CSC
+          %if ( (ISFIELD(cscDefn.CSCTypeAttributes, "BitPackBoolean")) && ...
+            (cscDefn.CSCTypeAttributes.BitPackBoolean) && ...
+            (::CompiledModel.CGTypes.CGType[cgTypeIdx].SLTypeIdx == 8))
+            %assign typeObj = "numerictype(0,1,0)"
+          %else
+            %assign typeObj = SLibGetEmbeddedTypeObject(cgTypeIdx,dw_const,dw_vol)
+          %endif
+          %assign bIdx  = LibGetRecordWidth(dw) == 1 ?  "" : "[0]"
+          %assign aExpr = LibCustomData(dw, "contents", "", "")
+          %assign owner = ISEQUAL(cscDefn.DataScope, "Exported") ? ...
+            ::CompiledModel.Name : ""
+          %assign regObj = "DataStore%<idx>_CSC"
+          
+%<regObj> = RTW.CustomExpression(%<typeObj>,'%<aExpr>','%<aExpr>','%<owner>');
+        %elseif (ISFIELD(LibGetCustomStorageAttributes(dw), "GetFunction") && ...
+                   ISFIELD(LibGetCustomStorageAttributes(dw), "SetFunction"))
+          %assign typeObj = SLibGetEmbeddedTypeObject(cgTypeIdx, 0, 0)
+          %assign bIdx   = LibGetRecordWidth(dw) == 1 ?  "" : "[0]"
+          %assign csAttr = LibGetCustomStorageAttributes(dw)
+          %assign aReadExpr  = LibGetInstanceSpecificProp(cscDefn, csAttr, "GetFunction")
+          %assign aWriteExpr  = LibGetInstanceSpecificProp(cscDefn, csAttr, "SetFunction")
+          %assign regObj = "ExternInput%<idx>_CSC"
+          %<regObj> = RTW.CustomExpression(%<typeObj>,'%<aReadExpr>','%<aWriteExpr>','');
+          %if ISFIELD(LibGetCustomStorageAttributes(dw), "HeaderFile")
+               %assign aHeaderFile = LibGetInstanceSpecificProp(cscDefn, csAttr, "HeaderFile")
+               %<regObj>.HeaderFile = '%<aHeaderFile>';
+          %endif
+        %else
+          %% Unsupported CSC
+          %% No implementation provided. The default regObj = "[]" will be used
+        %endif
+      %else
+        %% Unsupported CSC
+        %% No implementation provided. The default regObj = "[]" will be used
+      %endif
+    %endif    
+    %assign comment = "% Setting DataStore#%<idx+1>'s  implementation"    
+        
+    %<comment>    
+    codeInfo.DataStores(%<idx+1>).Implementation = %<regObj>;
+    %if SLibAutosarActive()
+     %assign dwIdx = dwIdx + 1
+      %if ISFIELD(dw, "RunnableAccessInfo")
+        %with ::CompiledModel.RTWAutosar
+          %assign runnables = FIELDNAMES(dw.RunnableAccessInfo)
+          %assign numRunnables = SIZE(runnables, 1)
+          %foreach runIdx = numRunnables
+            %assign runName = runnables[runIdx]
+            %if !ISFIELD(DSMAccessInfo, runName)
+              %addtorecord DSMAccessInfo %<runName> [%<dwIdx>]
+            %else
+              %assign DSMAccessInfo.%<runName> = ...
+                DSMAccessInfo.%<runName> + dwIdx
+            %endif
+          %endforeach
+        %endwith
+      %endif
+     %endif %%SLibAutosarActive()
+   %endforeach
+  %endwith %%DWorks
+%endfunction
+
+%endif  %% EXISTS("_CIINFODATALIB_") == 0
+
+%% [EOF] codeinfo_datalib.tlc
+

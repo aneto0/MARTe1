@@ -1,0 +1,3402 @@
+%% ============================================================================
+%% File : deploymentdiagram.tlc
+%%
+%% Abstract:
+%%   This is the system library file for code generation for parallel 
+%%   deployment diagram.
+%%
+%% 
+%% Copyright 2010-2012 The MathWorks, Inc.
+%%
+%% ============================================================================
+%selectfile NULL_FILE
+
+%if EXISTS("_PARALLELDEPLOYMENT_") == 0
+%assign _PARALLELDEPLOYMENT_ = 1
+%endif %% __PARALLELDEPLOYMENT_
+
+%%============================================================================%%
+%%                             HELPER FUNCTIONS                               %%
+%%============================================================================%%
+
+%% Function: SLibDeploymentSchedulerName =======================================
+%% Description: Returns the name of rate scheduler function for deployment diagram
+%%
+%function SLibDeploymentSchedulerName()
+  %assert (LibIsDeploymentDiagram())
+  %assign fcnName = "AdvanceTaskCounters"
+  %return fcnName
+%endfunction
+
+%% Local function used in this file
+%% Description: Returns the name of the variable for sample time indexes.
+%%           
+%function FcnGetSampleTimeIndexVarName() 
+  %assign varName = "taskTID"
+  %return varName
+%endfunction
+
+%% Local function used in this file
+%% Description: Returns the SampleTimeIndex of a task
+%%      In MDS V1 all entry points have the same SampleTimeIndex, so the 
+%%      SampleTimeIndex of a task is equal with the SampleTimeIndex of any entry
+%%      point.
+%%
+%function FcnGetTaskSampleTimeIndex(task)
+  %assign idx = task.EntryPointInfo[0].SampleTimeIndices[0]
+  %if idx == 1 && LibGetTID01EQ()
+    %assign idx = 0
+  %endif
+  %return idx
+%endfunction
+
+%% Description: Returns the number of tasks generated for deployment diagram
+%%
+%function SLibDeploymentGetNumPeriodicTasks() void
+  %assert (LibIsDeploymentDiagram())
+  %assign retVal = 0
+  %foreach tgIdx = CompiledModel.NumEventHandlers
+    %if ISEQUAL(CompiledModel.EventHandler[tgIdx].Periodicity.Type, "Periodic")
+      %assign retVal = retVal + CompiledModel.EventHandler[tgIdx].NumTasks
+    %endif
+  %endforeach
+  %return retVal
+%endfunction
+
+%% Local function used in this file
+%% Description: Returns the number of tasks generated for deployment diagram
+%%
+%function SLibDeploymentGetNumAperiodicTasks() void
+  %assert (LibIsDeploymentDiagram())
+  %assign retVal = 0
+  %foreach tgIdx = CompiledModel.NumEventHandlers
+    %if ISEQUAL(CompiledModel.EventHandler[tgIdx].Periodicity.Type, "Aperiodic")
+      %assign retVal = retVal + CompiledModel.EventHandler[tgIdx].NumTasks
+    %endif
+  %endforeach
+  %return retVal
+  
+%endfunction
+
+%% Function: LibDeploymentGetTasksRTMVarName ===================================
+%% Description: Returns the variable name of rtModel vector of tasks
+%%
+%function SLibDeploymentGetTasksRTMVarName()
+  %assert (LibIsDeploymentDiagram())
+  %assign varName = "task_M"
+  %return varName
+%endfunction
+
+%% Function: FcnGetTasksContStatesVarName ===================================
+%% Description: Returns the variable name of contStates vector of tasks
+%%
+%function FcnGetTasksContStatesVarName()
+  %assert (LibIsDeploymentDiagram())
+  %assign varName = "task_X"
+  %return varName
+%endfunction
+
+%% Function: SLibDeploymentGetTasksMassMatricesVarName =========================
+%% Description: Returns the variable name of mass matrices vector of a task
+%%
+%function SLibDeploymentGetTasksMassMatricesVarName(tIdx)
+  %assert (LibIsDeploymentDiagram())
+  %assign varName = "task_MassMatrix_%<tIdx>"
+  %return varName
+%endfunction
+
+%% Local function used in this file
+%% Description: Returns the name of sfcnInfo variable
+%%
+%function SLibDeploymentGetTasksSfcnInfoVarName()
+  %assert (LibIsDeploymentDiagram())
+  %assign varName = "sfcnInfo"
+  %return varName
+%endfunction
+
+%% Function: SLibDeploymentRTMGet ==============================================
+%% Description:  Generate Get record of rtm
+%%
+%function SLibDeploymentRTMGet(recordName, rtmName)
+  %assert (LibIsDeploymentDiagram())
+  %assign rtRecs = RTMGetRTModelRecShell()
+  %assign theRec = rtRecs.%<recordName>    
+  
+  %switch (theRec.RecType)
+    %case "Variable"
+      %assign buf    = FcnGenFieldAccessString(theRec, "get", "", "", rtmName)
+      %break
+    %case "IndexedAccess" 
+      %assign refRec = rtRecs.%<theRec.AccessedRec>
+      %assign buf    = FcnGenFieldAccessString(refRec, "get", "", "", rtmName)
+      %break
+    %case "SpecialAccess"
+      %assign optIdx = ""
+      %assign nArgs  = (optIdx == "") ? 0 : 1
+      %assign buf    = FcnGenSpecialAccess(NumSystems-1, recordName, "get", ...
+        nArgs, ["%<optIdx>"], "", rtmName)
+      %break
+    %default
+      %% Do nothing
+      %assign buf = ""
+      %break
+  %endswitch
+  
+  %return buf
+%endfunction
+
+%% Local function used in this file
+%% Description: Generates Set record of rtm
+%%
+%function FcnRTMSet(recordName, fldIdx, initVal, rtmName)  
+  %if TYPE(initVal) != "String"
+    %assign initVal = "%<initVal>"
+  %endif
+  %assign rtRecs = RTMGetRTModelRecShell()
+  %assign theRec = rtRecs.%<recordName>    
+  
+  %switch (theRec.RecType)
+    %case "Variable"
+      %assign buf    = FcnGenFieldAccessString(theRec, "set", fldIdx, initVal, ...
+        rtmName)
+      %break
+    %case "IndexedAccess" 
+      %assign refRec = rtRecs.%<theRec.AccessedRec>
+      %assign buf    = FcnGenFieldAccessString(refRec, "set", fldIdx, initVal, ...
+        rtmName)
+      %break
+    %case "SpecialAccess"
+      %assign optIdx = ""
+      %assign nArgs  = (optIdx == "") ? 0 : 1
+      %assign buf    = FcnGenSpecialAccess(NumSystems-1, recordName, "set", ...
+        nArgs, ["%<optIdx>"], initVal, rtmName)
+      %break
+    %default
+      %% Do nothing
+      %assign buf = ""
+      %break
+  %endswitch
+  
+  %return buf
+%endfunction
+
+%% Local function used in this file
+%% Description: Return the solver info
+%%
+%function FcnRTMGetSolverInfo(rtmName) void
+  %% simstructbasedtarget not supported
+  %assert (!IsModelReferenceNonSimstructBasedRTWTarget() && ...
+    SLibIsERTCodeFormat() && !UsingMalloc)
+  %assign retVal = "&%<SLibDeploymentRTMGet("RTWSolverInfo", rtmName)>"
+  %return retVal
+%endfunction %% RTMGetSolverInfo
+
+%% Local function used in this file
+%% Description: Generates Set solver info record of rtm
+%%
+%function FcnRTMSolverSet(fldName, sVal, rtmName) void
+  %assign rts    = FcnRTMGetSolverInfo(rtmName) 
+  %assign setStr = "rtsiSet%<fldName>(%<rts>, %<sVal>)"
+  %return setStr
+%endfunction 
+
+%% Local function used in this file
+%% Description: Set the solver stop time for a rtm
+%%
+%function FcnERTSetSolverStopTime(rtmName)
+  %openfile retBuf
+  %assign needGuard = TLC_FALSE
+  %%
+  /* set solver stop time */
+  %assign ct  = SLibDeploymentRTMGet("ClockTick0", rtmName)
+  %assign ss =  SLibDeploymentRTMGet("StepSize0", rtmName)
+  %if SLibClockTickIsUnit32Pair(0)
+    %assign cth  = SLibDeploymentRTMGet("ClockTickH0", rtmName)
+    if (!(%<ct>+1)) {
+      rtsiSetSolverStopTime(%<FcnRTMGetSolverInfo(rtmName)>, ...
+        ((%<cth> + 1) * %<ss> * 4294967296.0));
+    } else {
+      rtsiSetSolverStopTime(%<FcnRTMGetSolverInfo(rtmName)>, ...
+        ((%<ct>  + 1) * %<ss> + %<cth> * %<ss> * 4294967296.0));
+    }
+  %else
+    rtsiSetSolverStopTime(%<FcnRTMGetSolverInfo(rtmName)>,((%<ct>+1)*%<ss>));
+  %endif
+  %closefile retBuf
+  %return retBuf
+%endfunction 
+
+%% Local function used in this file
+%% Description: Generates Get task time for a rtm
+%%
+%function FcnGetTaskTime(ss, tid, rtmName) void
+  %assert (SLibIsERTCodeFormat())
+  %return RTMsGetTaskTimeForTIDGivenRTM(ss, rtmName, tid) 
+%endfunction %% LibGetTaskTime
+
+%% Local function used in this file
+%% Description: Updates rate interaction flags
+%%
+%function FcnDumpUpdateRateTransitionFlags(tid, rtmName) 
+  %assert (!IsModelReferenceTarget() && SLibIsERTCodeFormat()) 
+  %openfile retBuf
+  %foreach idx = NumSynchronousSampleTimes - tid - 1
+    %assign j = idx + tid + 1
+    %if SLibGetNeedRateInteraction(tid, j)
+      %% xxx KP: check rate interaction only for model blocks and not the top
+      %% xxx KP: same idea can be used for the clockTicks
+      %assign cTick = SLibDeploymentRTMGet("TaskCounters", rtmName)
+      %assign shMat = SLibDeploymentRTMGet("PerTaskSampleHits", rtmName)
+      %assign limit = FcnComputeTaskTickLimit(j)/FcnComputeTaskTickLimit(tid)
+      %<SLibAddTIDtoAccessTIDList(...
+        System[NumSystems-1].Interface.RTMArgDef,::BlockFcn,"",tid)>
+      %assign period = CompiledModel.SampleTime[tid].PeriodAndOffset[0]
+      %assign offset = CompiledModel.SampleTime[tid].PeriodAndOffset[1]
+      %assign s_period = CompiledModel.SampleTime[j].PeriodAndOffset[0]
+      %assign s_offset = CompiledModel.SampleTime[j].PeriodAndOffset[1]
+      /* Update the flag to indicate when data transfers from 
+      *  Sample time: [%<period>s, %<offset>s] to Sample time: [%<s_period>s, %<s_offset>s]  */
+      %if SLibModelHierarchyContainsNoninlinedSfcn() || GenerateGRTWrapper
+        %<SLibDeploymentRTMGet("PerTaskSampleHitsPtr", rtmName)>[%<j + tid*NumSynchronousSampleTimes>] = ...
+          (%<shMat>.%<SLibERTMultiRateTimingField(j,tid)> == 0);
+      %endif 
+      %if HasModelReferenceBlocks() && SuppressMultiTaskScheduler
+        %<shMat>.b_%<SLibERTMultiRateTimingField(j,tid)> = ...
+          (%<shMat>.%<SLibERTMultiRateTimingField(j,tid)> == 0);
+      %endif
+      (%<shMat>.%<SLibERTMultiRateTimingField(j,tid)>)++;
+      if ((%<shMat>.%<SLibERTMultiRateTimingField(j,tid)>) > %<limit-1>) {
+        %<shMat>.%<SLibERTMultiRateTimingField(j,tid)> = 0;
+      }
+      
+    %endif
+  %endforeach
+  %closefile retBuf
+  %return retBuf
+%endfunction
+
+%% Local function used in this file
+%% Description: Updates rate interaction flags if needed
+%%
+%function FcnUpdateRateTransitionFlags(tid, skipMajorTimeCheck, rtmName) 
+  %assert (SLibIsERTCodeFormat())
+  %openfile tmpBuf
+  %if !RootSystemIsSingleRate
+    %if FixedStepOpts.TID01EQ 
+      %if ISEQUAL(tid, 0) 
+        %<FcnDumpUpdateRateTransitionFlags(0, rtmName)>
+        %<FcnDumpUpdateRateTransitionFlags(1, rtmName)>
+      %elseif ISEQUAL(tid, 1) 
+        %% do nothing
+      %else
+        %<FcnDumpUpdateRateTransitionFlags(tid, rtmName)>
+      %endif
+    %else
+      %<FcnDumpUpdateRateTransitionFlags(tid, rtmName)>
+    %endif
+  %endif
+  %closefile tmpBuf
+  
+  %openfile retBuf
+  %if !WHITE_SPACE(tmpBuf)
+    %if !skipMajorTimeCheck && (tid == 0) && (NumContStates > 0)
+      if (%<RTMIs("MajorTimeStep")>) {
+        %<tmpBuf>
+      }    
+    %else
+      %<tmpBuf>
+    %endif
+  %endif
+  %closefile retBuf
+  
+  %return retBuf
+%endfunction
+
+%% Local function used in this file
+%% Description: Returns the timing buffer for an output function
+%%
+%function FcnGetTimingForTopOfOutputFcn(tid, rtmName, continuousOutput)
+  %assert (!UsingMalloc)
+  %assign retBuf = ""
+  %openfile buf
+  %if continuousOutput
+    %<FcnERTSetSolverStopTime(rtmName)>
+  %endif
+  %<FcnUpdateRateTransitionFlags(tid, TLC_FALSE, rtmName)>
+  %closefile buf
+    
+  %openfile retBuf
+  %assign needMajorTimeGuard = continuousOutput
+  %if !WHITE_SPACE(buf)
+    %if needMajorTimeGuard    
+      %assign rtmIsMajorTimeStep = FcnGenSpecialAccess(NumSystems-1, ...
+      "MajorTimeStep", "is", 0, [], "", rtmName)
+      if (%<rtmIsMajorTimeStep>) {
+    %endif
+      %<buf>
+    %if needMajorTimeGuard
+      } /* end MajorTimeStep */
+    %endif
+  %endif
+  %if needMajorTimeGuard
+    %% update base rate absolute time from SolverInfo
+    /* Update absolute time of base rate at minor time step */    
+    %assign rtmIsMinorTimeStep = FcnGenSpecialAccess(NumSystems-1, ...
+    "MinorTimeStep", "is", 0, [], "", rtmName)
+    %assign tid = 0
+    if (%<rtmIsMinorTimeStep>) {
+      %<FcnGetTaskTime(System[NumSystems-1], tid, rtmName)> = rtsiGetT(%<FcnRTMGetSolverInfo(rtmName)>);
+    } 
+  %endif
+  %closefile retBuf
+  %return retBuf
+%endfunction
+
+%% Local function used in this file
+%% Description:
+%%   Used currently by ERT to update time for TID. It is not a real SimStruc macro.
+%% 
+%function FcnRTMUpdateRealAbsoluteTimeForTID(tid, rtmName, continuousUpdate) void
+  %assert (!IsModelReferenceRTWTarget() && GenRTModel && !UsingMalloc)
+  
+  %assign updateRealTimeFromSolverInfo = continuousUpdate 
+  %assign offsetStr = FcnSampleTimeOffsetString(tid)
+  %if SLibClockTickIsUnit32Pair(tid)
+    %assign ct  = SLibDeploymentRTMGet("ClockTick%<tid>", rtmName)
+    %assign cth = SLibDeploymentRTMGet("ClockTickH%<tid>", rtmName)
+    %assign ss =  SLibDeploymentRTMGet("StepSize%<tid>", rtmName)
+    %assign tt = "%<FcnGetTaskTime(System[NumSystems-1], tid, rtmName)>"
+    %assign updStr = "if(!(++%<ct>)) {\n ++%<cth>; \n}"
+    
+    %if PurelyIntegerCode
+      /* Integer time limited to single word timer. */
+      %assign updStr = "%<updStr> %<tt> = %<ct>;"
+    %elseif updateRealTimeFromSolverInfo
+      %assign updStr = "%<updStr>  %<tt> = rtsiGetSolverStopTime(%<FcnRTMGetSolverInfo(rtmName)>);"
+    %else
+      %assign updStr = "%<updStr> %<tt> = %<ct> * %<ss> + %<cth> * %<ss> * 4294967296.0"
+      %assign updStr = updStr + offsetStr+";"
+    %endif
+  %else
+    %assign ct = SLibDeploymentRTMGet("ClockTick%<tid>", rtmName)
+    %assign ss = SLibDeploymentRTMGet("StepSize%<tid>", rtmName) 
+    %assign tt = "%<FcnGetTaskTime(System[NumSystems-1], tid, rtmName)>"
+    
+    %if PurelyIntegerCode
+      %assign updStr = "%<tt> = \n (++%<ct>);"
+    %elseif updateRealTimeFromSolverInfo
+      %assign updStr = "++%<ct>; \n  %<tt> = rtsiGetSolverStopTime(%<FcnRTMGetSolverInfo(rtmName)>);"
+    %else
+      %assign updStr = "%<tt> = \n (++%<ct>) * %<ss>"
+      %assign updStr = updStr + offsetStr + ";"
+    %endif
+  %endif
+  %return updStr
+%endfunction 
+
+%% Local function used in this file
+%% Description:
+%%   Used currently by ERT to update time for TID. It is not a real SimStruc macro.
+%% 
+%function FcnRTMUpdateIntegerAbsoluteTimeForTID(tid, rtmName) void
+  %assert (GenRTModel)
+  %assign updStr = ""
+  %if SLibClockTickIsUnit32Pair(tid)
+    %assign ct  = SLibDeploymentRTMGet("ClockTick%<tid>", rtmName)
+    %assign cth = SLibDeploymentRTMGet("ClockTickH%<tid>", rtmName)
+    %if !ISEMPTY(ct)
+      %assign updStr = "%<ct>++;"
+      %assign updStr = "%<updStr>\n if (!%<ct>) {\n %<cth>++; \n}"
+    %endif
+  %else
+    %assign ct = SLibDeploymentRTMGet("ClockTick%<tid>", rtmName)
+    %if !ISEMPTY(ct)
+      %assign updStr = "%<ct>++;"
+    %endif
+  %endif
+  %return updStr
+%endfunction 
+
+%% Local function used in this file
+%% Description: Updates absolute time 
+%%
+%function FcnRTMUpdateAbsoluteTimeForTID(tid, rtmName, continuousUpdate) void
+  %openfile tmpBuf
+  %<SLibGenAbsTimeComment(tid)>
+  %if SampleTime[tid].NeedFloatTime == "yes"
+    %<FcnRTMUpdateRealAbsoluteTimeForTID(tid, rtmName, continuousUpdate)>
+  %else
+    %<FcnRTMUpdateIntegerAbsoluteTimeForTID(tid, rtmName)>
+  %endif 
+  %closefile tmpBuf
+  %return tmpBuf
+%endfunction 
+
+%% Local function used in this file
+%% Description: Updates absolute time if needed
+%%
+%function LocFcnUpdateAbsoluteTimeNonRateGrouping(ssIdx, rtmName, continuousUpdate)
+  %%  simstructbasedtarget not supported
+  %assert (!IsModelReferenceForASimstructBasedTarget())  
+  
+  %assign absTimeDumped = TLC_FALSE
+  %openfile tmpBuf
+  %% enhanced absolute time
+  %if SLibNeedAbsoluteTimeForTID(0)
+    /* Update absolute time for base rate */
+    %<FcnRTMUpdateAbsoluteTimeForTID(0, rtmName, continuousUpdate)>
+    %assign absTimeDumped = TLC_TRUE
+  %endif
+  %closefile tmpBuf
+  
+  %if absTimeDumped
+    %assign arg = CompiledModel.System[ssIdx].Interface.RTMArgDef
+    %<SLibAccessArgHelper(arg,"","")>
+  %endif
+
+  %return tmpBuf
+%endfunction %%FcnUpdateAbsoluteTimeNonRateGrouping
+
+%% Local function used in this file
+%% Abstract:
+%%   Generate float point absolute time if the tid  NeedFloatTime. 
+%%   See SLibSetupAbsoluteTime to find out how the NeedFloatTime logic is calculated.
+%%
+%function LocFcnUpdateAbsoluteTimeRateGrouping(ssIdx, subRateIdx, rtmName, ...
+  continuousUpdate) void
+  %%  simstructbasedtarget not supported
+  %assert (!IsModelReferenceForASimstructBasedTarget())  
+
+  %assign tmpBuf = ""
+  %if SLibNeedAbsoluteTimeForTID(subRateIdx)
+    %openfile tmpBuf
+    %assert(SampleTime[subRateIdx].NeedAbsoluteTime == "yes")
+    /* Update absolute time */
+    %<FcnRTMUpdateAbsoluteTimeForTID(subRateIdx, rtmName, continuousUpdate)> 
+    %closefile tmpBuf
+    %assign arg = CompiledModel.System[ssIdx].Interface.RTMArgDef
+    %<SLibAddTIDtoAccessTIDList(arg, ::BlockFcn, "",subRateIdx)>
+  %endif
+  
+  %return tmpBuf
+%endfunction
+
+%% Local function used in this file
+%% Description: NumSystems-1, buffsRec, 
+%% isRateGrouping = SLibIsMultiRateAndRateGrouping(rootSystem)
+%%
+%function FcnGenUpdateAbsoluteTimeCode(rtmName, isRateGrouping, tid, ...
+  continuousUpdate) void
+  %assign ::initBlockFcn = ::BlockFcn
+  %assign ::BlockFcn = "Update"
+  
+  %openfile tmpBuf
+  %if isRateGrouping
+    %assign System[NumSystems-1].CurrentTID = tid
+    %<LocFcnUpdateAbsoluteTimeRateGrouping(NumSystems-1, tid, rtmName, ...
+      continuousUpdate)>
+    
+    %if FixedStepOpts.TID01EQ && (tid == 0)
+      %% Update absolute time code for tid 1 as well
+      %assign System[NumSystems-1].CurrentTID = 1
+      %<LocFcnUpdateAbsoluteTimeRateGrouping(NumSystems-1, 1, rtmName, ...
+        continuousUpdate)>
+    %endif
+    
+    %assign System[NumSystems-1].CurrentTID = -1
+      
+  %else %% single-rate
+    %<LocFcnUpdateAbsoluteTimeNonRateGrouping(NumSystems-1, rtmName, ...
+      continuousUpdate)>
+  %endif
+  
+  %closefile tmpBuf
+  %assign  ::BlockFcn = initBlockFcn
+  %return tmpBuf
+%endfunction
+
+%% Local function used in this file
+%% Description: Generates stop simulation buffer
+%%
+%function FcnErtGenStopSimCode(rtmName) 
+  %assign ::BlockFcn = "RootUpdate"
+  %assign rootSystem = System[NumSystems-1]
+  %assign isRateGrouping = SLibIsMultiRateAndRateGrouping(rootSystem)
+  %assign rootSystem.CurrentTID = 0
+  %openfile stopSimBuffer
+  %if !GenerateGRTWrapper
+    %if MatFileLogging 
+
+      /* signal main to stop simulation */
+      %<FcnGenerateTidGuardOpenCode(0)>
+      %% Since you can't have PurelyIntegerCode while MatFileLogging,
+      %% only need to handle real_T time.
+      %% If continuous time, use taskTime(TID01EQ), otherwise taskTime(0)
+      %assign taskTime = (NumContStates > 0) ? ...
+        FcnGetTaskTime(System[NumSystems-1], FixedStepOpts.TID01EQ, rtmName) : ...
+        FcnGetTaskTime(System[NumSystems-1], 0, rtmName)
+      if ( (%<SLibDeploymentRTMGet("TFinal", rtmName)>!=-1) &&
+      !((%<SLibDeploymentRTMGet("TFinal", rtmName)>-%<taskTime>) > %<taskTime> * ...
+        %<LibGetMathConstant("EPSILON",tSS_DOUBLE)>)) {
+        %<RTMSetErrStat("\"Simulation finished\"")>;
+      }
+      %if NumChildSFunctions
+	if (%<RTMGetStopRequested()>) {
+	  %<RTMSetErrStat("\"Simulation finished\"")>;
+	}
+      %endif
+      %<FcnGenerateTidGuardCloseCode(0)>
+    %endif
+    %% Issue warning if TFinal is longer than LifeSpan. Timer may overflow
+    %% before reach TFinal. Model may runs forever.
+    %assign stopTime = SLibERTGetStopTime()
+    %assign lifeSpanInSeconds = CompiledModel.ConfigSet.EvaledLifeSpan * 86400
+    %if stopTime > lifeSpanInSeconds
+      %assign warnTxt = "Stop time %<stopTime> (seconds) is out the range of "...
+        "Application life span %<CompiledModel.ConfigSet.EvaledLifeSpan> (days). "...
+        "Generated code may fail to stop because timer can overflow before the stop time is reached. "...
+        "Consider choosing smaller 'Stop time' on Solver pane, or longer "...
+        "'Application life span' on Optimization pane."
+      %<LibReportWarning(warnTxt)>
+    %endif
+  %endif
+  %closefile stopSimBuffer
+  %assign rootSystem.CurrentTID = -1
+  %return stopSimBuffer
+%endfunction %% SLibErtGenStopSimCode(buffsRec)
+
+%% Local function used in this file
+%% Description: Returns the timing buffer for update function
+%%
+%function FcnGetTimingForBottomOfUpdateFcn(tid, skipMajorTimeCheck, taskName, ...
+  rtmName, continuousUpdate)
+  %assert (!IsModelReferenceTarget()) 
+  
+  %assign rtmIsMajorTimeStep = FcnGenSpecialAccess(NumSystems-1, ...
+    "MajorTimeStep", "is", 0, [], "", rtmName)
+  %assign needMajorTimeGuard = !skipMajorTimeCheck && continuousUpdate
+ 
+  %openfile buff               
+  %if needMajorTimeGuard   
+    if (%<rtmIsMajorTimeStep>) {
+    %endif
+    
+  %if ISEQUAL(tid, 0) || ISEQUAL(tid, "")
+    %% Stop sim buffer is empty for model reference
+    %<FcnErtGenStopSimCode(rtmName)>
+  %endif
+  
+  %if continuousUpdate
+    %assign reuseArgs = SLibModelFcnArgs("ODEUpdateContinuousStates",2,0)
+    %if !ISEQUAL(reuseArgs,"")
+      %assign reuseArgs = ", " + reuseArgs
+    %endif
+    %if !needMajorTimeGuard %% No major time guard yet
+      if (%<rtmIsMajorTimeStep>) {
+        %<taskName>_rt_ertODEUpdateContinuousStates(%<FcnRTMGetSolverInfo(rtmName)>%<reuseArgs>);
+      }
+    %else
+      %<taskName>_rt_ertODEUpdateContinuousStates(%<FcnRTMGetSolverInfo(rtmName)>%<reuseArgs>);
+    %endif
+  %endif  
+
+  %assert !LibAsynchronousTriggeredTID(tid)  
+  
+  %assign isRateGrouping = SLibIsMultiRateAndRateGrouping(System[NumSystems-1])
+  %assign tmpBuf         = FcnGenUpdateAbsoluteTimeCode(rtmName, isRateGrouping, ...
+    tid, continuousUpdate)
+  
+  %if !WHITE_SPACE(tmpBuf)
+    %<tmpBuf>
+  %endif
+  
+  %if needMajorTimeGuard
+     } /* end MajorTimeStep */
+  %endif
+  
+  %closefile buff
+  %return buff
+%endfunction
+
+%% Local function used in this file
+%% Description: Generates continuous output function for deployment diagram
+%%
+%function FcnGenerateContinuousOutput(tid, task, entryPointIdx)
+  %assign rootSystem  = System[NumSystems-1]
+  %assign buffsRec    = CompiledModel.CachedCodeBuffsForRootSys
+  %assign fcnName     = "%<task.FunctionName>_output"
+  %assign fcnReturns  = "void"
+  %assign fcnParams   = "void"
+   
+  %foreach epIdx = task.NumEntryPointInfos
+    %assign blkIdx                   = task.EntryPointInfo[epIdx].BlockIdx
+    %assign currentSystem            = System[blkIdx[1]]
+    %assign currentSystem.CurrentTID = tid
+  %endforeach
+  %assign rootSystem.CurrentTID = tid
+  %assign rtmName = "%<SLibDeploymentGetTasksRTMVarName()>[%<entryPointIdx>]"
+
+  %openfile tmpBuffer
+  %assign fcnAbstract = "Output for Task: %<task.FunctionName>" 
+  %assign ::BlockFcn  = "Output"
+  %assign timingCodeBuf      = FcnGetTimingForTopOfOutputFcn(tid, rtmName, TLC_TRUE)
+  %assign rtmIsMajorTimeStep = FcnGenSpecialAccess(NumSystems-1, ...
+    "MajorTimeStep", "is", 0, [], "", rtmName)
+  
+  %openfile fcnProtoType
+  %<fcnReturns> %<fcnName>(%<fcnParams>)\
+  %closefile fcnProtoType
+  %if SLibNeedDumpRootSysPrototypeInPrivateHeader("Output", tid)
+    %<LibAddToSystemField(rootSystem, "SystemFcnPrototype","%<fcnProtoType>;")>
+  %endif
+  
+  %assign empty = TLC_TRUE
+  %foreach epIdx = task.NumEntryPointInfos
+    %assign blkIdx        = task.EntryPointInfo[epIdx].BlockIdx
+    %assign currentSystem = System[blkIdx[1]]
+    %if !LibSystemFcnIsEmptyForTID(currentSystem,"Output")
+      %assign empty = TLC_FALSE
+      %break
+    %endif
+  %endforeach
+  
+  %openfile outputCode
+  %if  empty && WHITE_SPACE(timingCodeBuf)
+    /* (no output code required) */
+  %else 
+    %<SLibDumpLocalTidInSystem(rootSystem, "Output")>
+    %foreach epIdx = task.NumEntryPointInfos
+      %assign blkIdx          = task.EntryPointInfo[epIdx].BlockIdx
+      %assign currentSystem   = System[blkIdx[1]]
+      %if SLibSystemFcnRateGrouping(currentSystem, "Output")
+        %<LibGetSystemLocalVars(currentSystem,"Output", tid)> 
+        %<LibGetSystemLocalVars(currentSystem, "OutputUpdate", tid)>  
+      %else
+        %<LibGetSystemLocalVars(currentSystem,"Output","")>
+        %<LibGetSystemLocalVars(currentSystem, "OutputUpdate", "")>
+      %endif
+    %endforeach
+    %if !WHITE_SPACE(timingCodeBuf)
+      %<timingCodeBuf>      
+    %endif
+        
+    %% Generate Output function call
+    %foreach epIdx = task.NumEntryPointInfos
+      %assign blkIdx        = task.EntryPointInfo[epIdx].BlockIdx
+      %assign currentSystem = System[blkIdx[1]]
+      %if !LibSystemFcnIsEmpty(currentSystem, "Output")  
+        %openfile localVars
+        %if SLibSystemFcnRateGrouping(currentSystem, "Output")
+          %<SLibGetFcnLocalVars(currentSystem, "Output", tid)>  
+        %else
+          %<SLibGetFcnLocalVars(currentSystem, "Output", "")>     
+        %endif    
+        %closefile localVars
+        %if !WHITE_SPACE(localVars) 
+          {
+            %<localVars>
+        %endif
+        
+        %if !ISEQUAL(task.EntryPointInfo[epIdx].SampleTimeIndices[0], 0)
+          if (%<rtmIsMajorTimeStep>) {
+            %<LibGenSystemFcnCall(currentSystem, "Output", 0)> 
+          }
+        %else 
+          %<LibGenSystemFcnCall(currentSystem, "Output", 0)> 
+        %endif
+        
+        %if !WHITE_SPACE(localVars) 
+          }
+        %endif
+      %endif
+    %endforeach
+  %endif
+    
+  %% Dump MAT-file logging code here. Note that as of 12a, MAT-file logging
+  %% is not supported with Concurrent Tasking.
+  
+  %closefile outputCode
+  %if WHITE_SPACE(outputCode)
+    %assign outputCode = "/* (no output code required) */"
+  %endif
+  %openfile fcnContent
+  %<outputCode>
+  %closefile fcnContent
+
+  %addtorecord task OutputWrapperFcn fcnName
+  %createrecord fcnRec {Name fcnName; Returns fcnReturns; Params fcnParams; ...
+    Abstract fcnAbstract; Category "model"; GeneratedBy "ertlib.tlc"; Type "Output"; ...
+    GeneratedFor FcnGeneratedFor(rootSystem)}
+  %<SLibDumpFunctionBanner(fcnRec)>
+  %undef fcnRec
+  %<fcnProtoType> %<LibTaskComment(tid)>
+  {
+    %<fcnContent>
+  }
+  %assign prototypeBuf =  "%<LibExternInFcnDecls()>%<fcnProtoType>;"
+  %<SLibCacheCodeToFile("mdl_extern_fcn_decl", prototypeBuf)> 
+  %closefile tmpBuffer
+  
+  %foreach epIdx = task.NumEntryPointInfos
+    %assign blkIdx                   = task.EntryPointInfo[epIdx].BlockIdx
+    %assign currentSystem            = System[blkIdx[1]]
+    %assign currentSystem.CurrentTID = -1
+  %endforeach
+  %assign rootSystem.CurrentTID = -1
+
+  %return(tmpBuffer)
+%endfunction
+
+%% Local function used in this file
+%% Description: Generates continuous update function for deployment diagram
+%%
+%function FcnGenerateContinuousUpdate(tid, task, entryPointIdx)
+  %assign rootSystem  = System[NumSystems-1]
+  %assign buffsRec    = CompiledModel.CachedCodeBuffsForRootSys
+  %assign fcnName     = "%<task.FunctionName>_update"
+  %assign fcnReturns  = "void"
+  %assign fcnParams   = "void"
+  
+  %foreach epIdx = task.NumEntryPointInfos
+    %assign blkIdx                   = task.EntryPointInfo[epIdx].BlockIdx
+    %assign currentSystem            = System[blkIdx[1]]
+    %assign currentSystem.CurrentTID = tid
+  %endforeach
+  %assign rootSystem.CurrentTID = tid
+  %assign rtmName = "%<SLibDeploymentGetTasksRTMVarName()>[%<entryPointIdx>]"
+  %assign recursivefcnName = SLibGenErtFunctionName(tid, "output")
+  
+  %openfile tmpBuffer
+  %assign fcnAbstract = " Update for Task: %<task.FunctionName>" 
+  
+  %openfile fcnProtoType
+  %<fcnReturns> %<fcnName>(%<fcnParams>)\
+  %closefile fcnProtoType
+  %assign empty = TLC_TRUE
+  %foreach epIdx = task.NumEntryPointInfos
+    %assign blkIdx        = task.EntryPointInfo[epIdx].BlockIdx
+    %assign currentSystem = System[blkIdx[1]]
+    %if !LibSystemFcnIsEmptyForTID(currentSystem,"Output")
+      %assign empty = TLC_FALSE
+      %break
+    %endif
+  %endforeach
+  %if SLibNeedDumpRootSysPrototypeInPrivateHeader("Update", tid)
+    %<LibAddToSystemField(rootSystem, "SystemFcnPrototype","%<fcnProtoType>;")>
+  %endif
+  
+  %openfile updateCode  
+  %<SLibDumpLocalTidInSystem(rootSystem, "Update")>  
+  %foreach epIdx = task.NumEntryPointInfos
+    %assign blkIdx          = task.EntryPointInfo[epIdx].BlockIdx
+    %assign currentSystem   = System[blkIdx[1]]
+    %if SLibSystemFcnRateGrouping(currentSystem, "Update")
+      %<LibGetSystemLocalVars(currentSystem,"Update", tid)>
+    %else
+      %<LibGetSystemLocalVars(currentSystem,"Update","")>
+    %endif
+  %endforeach
+
+  %% Generate Update function call 
+  %foreach epIdx = task.NumEntryPointInfos
+    %assign blkIdx        = task.EntryPointInfo[epIdx].BlockIdx
+    %assign currentSystem = System[blkIdx[1]]
+    %if !LibSystemFcnIsEmpty(currentSystem, "Update")   
+      %openfile localVars
+      %if SLibSystemFcnRateGrouping(currentSystem, "Update")
+        %<SLibGetFcnLocalVars(currentSystem, "Update", tid)>  
+      %else
+        %<SLibGetFcnLocalVars(currentSystem, "Update", "")>   
+      %endif
+      %closefile localVars
+      %if !WHITE_SPACE(localVars) 
+        {
+          %<localVars>
+      %endif
+      
+      %<LibGenSystemFcnCall(currentSystem, "Update", 0)>
+      
+      %if !WHITE_SPACE(localVars) 
+        }
+      %endif
+    %endif
+  %endforeach
+
+  %% blkStateChangeFlag may be set, need to run one more minor step
+  %<SLibDumpOneMoreMinorOutput(recursivefcnName, "Output", tid)>\
+  %<FcnGetTimingForBottomOfUpdateFcn(tid, TLC_TRUE, task.FunctionName, ...
+    rtmName, TLC_TRUE)>
+  %closefile updateCode
+  %%
+  %if WHITE_SPACE(updateCode)
+    %assign updateCode = "/* (no update code required) */"
+  %endif
+  %openfile fcnContent
+  %<updateCode>
+  %closefile fcnContent
+  
+  %if !WHITE_SPACE(fcnContent)
+    %addtorecord task UpdateWrapperFcn fcnName
+  %else 
+    %addtorecord task UpdateWrapperFcn ""
+  %endif
+  
+  %createrecord fcnRec {Name fcnName; Returns fcnReturns; Params fcnParams; ...
+    Abstract fcnAbstract; Category "model"; GeneratedBy "ertlib.tlc"; ...
+    Type "Update"; GeneratedFor FcnGeneratedFor(rootSystem)}
+  %<SLibDumpFunctionBanner(fcnRec)>
+  %undef fcnRec
+  %<fcnProtoType> %<LibTaskComment(tid)>
+  {
+    %<fcnContent>
+  }
+ 
+  %assign prototypeBuf =  "%<LibExternInFcnDecls()>%<fcnProtoType>;"
+  %<SLibCacheCodeToFile("mdl_extern_fcn_decl", prototypeBuf)> 
+  %closefile tmpBuffer
+  
+  %foreach epIdx = task.NumEntryPointInfos
+    %assign blkIdx                   = task.EntryPointInfo[epIdx].BlockIdx
+    %assign currentSystem            = System[blkIdx[1]]
+    %assign currentSystem.CurrentTID = -1
+  %endforeach
+  %assign rootSystem.CurrentTID = -1
+  
+  %return tmpBuffer
+%endfunction
+
+%% Local function used in this file
+%% Description: Generates continuous step function for deployment diagram
+%%
+%function FcnGenerateContinuousOutputUpdate(tid, task, entryPointIdx)
+  %assign tmpBlockFcn    = ::BlockFcn
+  %assign rootSystem     = System[NumSystems-1]
+  %assign ::BlockFcn     = "OutputUpdate"  
+  %assign fcnName        = "%<task.FunctionName>_step"
+  %assign fcnReturns     = "void"
+  %assign fcnParams      = "void"
+  %assign buffsRec = CompiledModel.CachedCodeBuffsForRootSys
+  
+  %foreach epIdx = task.NumEntryPointInfos
+    %assign blkIdx                   = task.EntryPointInfo[epIdx].BlockIdx
+    %assign currentSystem            = System[blkIdx[1]]
+    %assign currentSystem.CurrentTID = tid
+  %endforeach
+  %assign rootSystem.CurrentTID = tid
+  %assign rtmName = "%<SLibDeploymentGetTasksRTMVarName()>[%<entryPointIdx>]"
+  
+  %openfile tmpBuffer
+  %assign fcnAbstract = "Step for Task: %<task.FunctionName>" 
+  %assign timingCodeBuf      = FcnGetTimingForTopOfOutputFcn(tid, rtmName, TLC_TRUE)
+  %assign rtmIsMajorTimeStep = FcnGenSpecialAccess(NumSystems-1, ...
+    "MajorTimeStep", "is", 0, [], "", rtmName)
+  
+  %openfile fcnProtoType
+  %<fcnReturns> %<fcnName>(%<fcnParams>)\
+  %closefile fcnProtoType
+  %if SLibNeedDumpRootSysPrototypeInPrivateHeader("OutputUpdate",tid)
+    %<LibAddToSystemField(rootSystem, "SystemFcnPrototype","%<fcnProtoType>;")>
+  %endif
+
+  %openfile fcnContent    
+  %foreach epIdx = task.NumEntryPointInfos
+    %assign blkIdx          = task.EntryPointInfo[epIdx].BlockIdx
+    %assign currentSystem   = System[blkIdx[1]]
+    %if SLibSystemFcnRateGrouping(currentSystem, "OutputUpdate")
+      %<LibGetSystemLocalVars(currentSystem,"OutputUpdate", tid)> 
+      %<LibGetSystemLocalVars(currentSystem,"Output", tid)> 
+      %<LibGetSystemLocalVars(currentSystem,"Update", tid)>
+    %else
+      %<LibGetSystemLocalVars(currentSystem,"OutputUpdate","")> 
+      %<LibGetSystemLocalVars(currentSystem,"Output","")>
+      %<LibGetSystemLocalVars(currentSystem,"Update","")>
+    %endif
+  %endforeach
+  
+  %openfile outputUpdateCode
+  %if SLibFcnProtoCtrlActive()
+    %assign fcnData = FcnGetFunctionPrototypeRecord()
+    %if LibSystemFcnNeedsTID(rootSystem, "OutputUpdate")
+      int_T %<CompiledModel.GlobalScope.tTID> = 0;
+    %endif
+    %<FcnModelStepFcnReturnCode(fcnData, "ReturnDeclaration")>
+    %<FcnModelStepBufferInputsCode(fcnData)>
+  %endif
+  %% If absolute time is accessed by this TID,
+  %% maintain absolute timer for this TID, otherwise
+  %% don't need absolute timer
+  %if !WHITE_SPACE(timingCodeBuf)
+    %<timingCodeBuf>      
+  %endif
+    
+  %% Generate Output function call
+  %foreach epIdx = task.NumEntryPointInfos
+    %assign blkIdx        = task.EntryPointInfo[epIdx].BlockIdx
+    %assign currentSystem = System[blkIdx[1]]
+    %if !LibSystemFcnIsEmpty(currentSystem, "Output")
+      %openfile localVars
+      %if SLibSystemFcnRateGrouping(currentSystem, "OutputUpdate")
+        %<SLibGetFcnLocalVars(currentSystem, "OutputUpdate", tid)>
+        %<SLibGetFcnLocalVars(currentSystem, "Output", tid)>
+      %else
+        %<SLibGetFcnLocalVars(currentSystem, "OutputUpdate", "")>
+        %<SLibGetFcnLocalVars(currentSystem, "Output", "")>
+      %endif    
+      %closefile localVars
+      %if !WHITE_SPACE(localVars) 
+        {
+          %<localVars>
+      %endif
+      %if !ISEQUAL(task.EntryPointInfo[epIdx].SampleTimeIndices[0], 0)
+        if (%<rtmIsMajorTimeStep>) {
+          %<LibGenSystemFcnCall(currentSystem, "Output", 0)> 
+        }
+      %else
+        %<LibGenSystemFcnCall(currentSystem, "Output", 0)> 
+      %endif
+      
+      %if !WHITE_SPACE(localVars) 
+        }
+      %endif
+    %endif
+  %endforeach
+  
+  %% Dump MAT-file logging code here. Note that as of 12a, MAT-file logging
+  %% is not supported with Concurrent Tasking.
+    
+  %% Generate Update code for step
+  %openfile updateCode 
+  
+  %% Generate Update function call 
+  %foreach epIdx = task.NumEntryPointInfos
+    %assign blkIdx        = task.EntryPointInfo[epIdx].BlockIdx
+    %assign currentSystem = System[blkIdx[1]]
+    %if !LibSystemFcnIsEmpty(currentSystem, "Update")
+      %openfile localVars
+      %if SLibSystemFcnRateGrouping(currentSystem, "OutputUpdate")
+        %<SLibGetFcnLocalVars(currentSystem, "Update", tid)>    
+      %else
+        %<SLibGetFcnLocalVars(currentSystem, "Update", "")> 
+      %endif
+      %closefile localVars
+      %if !WHITE_SPACE(localVars) 
+        {
+          %<localVars>
+      %endif
+      
+      %assign fcnInfo = LibGetFcnInfo(currentSystem, "Update", currentSystem.CurrentTID)
+      %<LibGenSystemFcnCall(currentSystem, "Update", 0)>   
+      
+      %if !WHITE_SPACE(localVars)
+        }
+      %endif  
+    %endif
+  %endforeach
+  
+  %% blkStateChangeFlag may be set, need to run one more minor step    
+  %<SLibDumpOneMoreMinorOutput(fcnName, "UpdateContStates", tid)>\                
+ 
+  %closefile updateCode 
+  
+  %if !WHITE_SPACE(updateCode) 
+    if (%<rtmIsMajorTimeStep>) {
+      %<updateCode>
+    } /* end MajorTimeStep */
+  %endif
+  
+  %<FcnGetTimingForBottomOfUpdateFcn(tid, TLC_FALSE,task.FunctionName, rtmName, ...
+    TLC_TRUE)>
+  %closefile outputUpdateCode
+  
+  %openfile returnStatement
+  %if SLibFcnProtoCtrlActive()
+    %assign fcnData = FcnGetFunctionPrototypeRecord()
+    %<FcnModelStepBufferOutputsCode(fcnData)>
+    %<FcnModelStepFcnReturnCode(fcnData,"ReturnStatement")>
+  %endif
+  %closefile returnStatement
+  
+  %if WHITE_SPACE(outputUpdateCode)
+    %assign outputUpdateCode = "/* (no output/update code required) */"
+  %endif
+  %<outputUpdateCode>
+  %<returnStatement>
+  %closefile fcnContent
+    
+  %addtorecord task OutputWrapperFcn fcnName
+  %addtorecord task UpdateWrapperFcn ""
+  
+  %createrecord fcnRec {Name fcnName; Returns fcnReturns; Params fcnParams; ...
+    Abstract fcnAbstract; Category "model"; GeneratedBy "ertlib.tlc"; ...
+    Type "Step"; GeneratedFor FcnGeneratedFor(rootSystem)}
+  %<SLibDumpFunctionBanner(fcnRec)>
+  %undef fcnRec
+  %<fcnProtoType> %<LibTaskComment(tid)>  
+  {
+    %<fcnContent>
+  } %% end of combined output/update fcn
+ 
+  %assign prototypeBuf =  "%<LibExternInFcnDecls()>%<fcnProtoType>;"
+  %<SLibCacheCodeToFile("mdl_extern_fcn_decl", prototypeBuf)> 
+  %closefile tmpBuffer
+  %foreach epIdx = task.NumEntryPointInfos
+    %assign blkIdx                   = task.EntryPointInfo[epIdx].BlockIdx
+    %assign currentSystem            = System[blkIdx[1]]
+    %assign currentSystem.CurrentTID = -1
+  %endforeach
+  %assign rootSystem.CurrentTID = -1
+  %assign ::BlockFcn = tmpBlockFcn
+  %return(tmpBuffer)
+%endfunction
+
+%% Local function used in this file
+%% Description: Generates void modelName_%<fcnType>(void) 
+%%    fcnType     : OutputUpdate, Update or Output
+%%
+%function FcnGenerateModelEntryPoint(fcnType) 
+  %assert ((fcnType == "OutputUpdate") || (fcnType == "Output") || ...
+    (fcnType == "Update"))
+  
+  %assign rootSystem    = System[NumSystems-1]
+  %assign tmpBlockFcn   = ::BlockFcn
+  
+  %if ISEQUAL(fcnType, "OutputUpdate")  %% modelName_step
+    %assign topFcnName = SLibGenErtFunctionName("", "step") 
+    %assign ::BlockFcn = "OutputUpdate"  
+  %elseif ISEQUAL(fcnType, "Output")    %% modelName_output  
+    %assign topFcnName = SLibGenErtFunctionName("", "output") 
+    %assign ::BlockFcn = "Output"  
+  %else                                 %% modelName_update
+    %assign topFcnName = SLibGenErtFunctionName("", "update")
+    %assign ::BlockFcn = "Update"  
+  %endif
+  
+  %assign topFcnReturns = "void"
+  %assign isSingleRate  = LibIsSingleRateSystem(rootSystem)
+
+  %assign rootSystem.CurrentTID = ""
+  %openfile tmpBuffer
+  %assign topFcnParams = GetErtModelFcnArgs(fcnType, TLC_FALSE, "")
+  %createrecord fcnRec {Name topFcnName; Returns topFcnReturns; Params topFcnParams; ...
+    Abstract "";  Category "model"; ...
+    GeneratedBy "ertlib.tlc:SLibGenErt%<fcnType>Function"; ...
+    Type "%<fcnType>"; GeneratedFor FcnGeneratedFor(rootSystem)}
+  %<SLibDumpFunctionBanner(fcnRec)>
+  %undef fcnRec
+  %if ISEQUAL(topFcnParams, "void")
+    %assert (isSingleRate)  %% Only single-rate has modelName_step() void function
+    %assign topFcnParams = "int " + CompiledModel.GlobalScope.tTID
+  %endif 
+  
+  %assign taskIdx = 0
+  
+  %<topFcnReturns> %<topFcnName>(%<topFcnParams>) {
+    %% Generate TID switch-case type of code. 
+    switch(%<CompiledModel.GlobalScope.tTID>) {
+    %foreach tgIdx = CompiledModel.NumEventHandlers
+      %assign tg = CompiledModel.EventHandler[tgIdx]   
+      %% Only periodic tasks are supported for now
+      %if !ISEQUAL(tg.Periodicity.Type, "Periodic")
+        %continue
+      %endif
+      %if ISEQUAL(tg.NumTasks, 0)
+        %continue
+      %endif     
+      
+      %foreach tIdx = tg.NumTasks
+        %assign task = tg.Task[tIdx]    
+        
+        %openfile caseContent 
+        %if !WHITE_SPACE(task.OutputWrapperFcn)  %% has void (void) wrapper functions
+          %if ISEQUAL(fcnType, "OutputUpdate") || ISEQUAL(fcnType, "Output") 
+            %<task.OutputWrapperFcn>();
+          %endif
+          %if (ISEQUAL(fcnType, "OutputUpdate") || ISEQUAL(fcnType, "Update")) && ...
+            !WHITE_SPACE(task.UpdateWrapperFcn)
+            %<task.UpdateWrapperFcn>();
+          %endif
+        %endif
+        %closefile caseContent
+               
+        %if !WHITE_SPACE(caseContent)
+          case %<taskIdx> :
+          %<caseContent> 
+          break;
+        %endif 
+        %assign taskIdx = taskIdx + 1
+      %endforeach %% Tasks
+    %endforeach   %% TaskGroups
+      
+    default :
+    break;
+  }
+  }
+  
+  %assign prototypeBuf =  "%<LibExternInFcnDecls()> %<topFcnReturns> %<topFcnName>(%<topFcnParams>);"
+  %<SLibCacheCodeToFile("mdl_extern_fcn_decl", prototypeBuf)> 
+   
+  %closefile tmpBuffer
+  %assign rootSystem.CurrentTID = -1
+  %return(tmpBuffer)
+%endfunction
+
+%% Local function used in this file
+%% Description: Generates void (void) entry point for deployment diagram
+%%    fcnType: OutputUpdate, Update or Output
+%%    if (TYPE(tid) ==  number) then:
+%%               generate code for tid, modelName_%<fcnType>%<entryPointIdx>
+%%    if (tid == ""), then generate non rate grouping code, modelName_%<fcnType>
+%%
+%function FcnGenerateDiscreteEntryPoint(tid, task, entryPointIdx, fcnType) 
+  %assert ((fcnType == "OutputUpdate") || (fcnType == "Output") || ...
+    (fcnType == "Update"))
+  
+  %assign rootSystem    = System[NumSystems-1]
+  %assign buffsRec      = CompiledModel.CachedCodeBuffsForRootSys
+  %assign tmpBlockFcn   = ::BlockFcn
+  
+  %if ISEQUAL(fcnType, "OutputUpdate")          %% taskFunctionName_step
+    %assign fcnName   = "%<task.FunctionName>_step"  
+    %assign ::BlockFcn    = "OutputUpdate"  
+  %elseif ISEQUAL(fcnType, "Output")            %% taskFunctionName_output  
+    %assign fcnName   = "%<task.FunctionName>_output"
+    %assign ::BlockFcn    = "Output"  
+  %else                                         %% taskFunctionName_update
+    %assign fcnName   = "%<task.FunctionName>_update" 
+    %assign ::BlockFcn    = "Update"  
+  %endif
+  %assign fcnReturns    = "void"
+  %assign fcnParams     = "void"
+  
+  %foreach epIdx = task.NumEntryPointInfos
+    %assign blkIdx                   = task.EntryPointInfo[epIdx].BlockIdx
+    %assign currentSystem            = System[blkIdx[1]]
+    %assign currentSystem.CurrentTID = tid
+  %endforeach
+  %assign rootSystem.CurrentTID = tid
+  %assign rtmName = "%<SLibDeploymentGetTasksRTMVarName()>[%<entryPointIdx>]"
+
+  %openfile tmpBuffer
+  %assign fcnAbstract = "%<fcnType> for Task: %<task.FunctionName>"
+  %assign timingCodeBuf = FcnGetTimingForTopOfOutputFcn(tid, rtmName, TLC_FALSE)
+ 
+  %openfile fcnProtoType
+  %<fcnReturns> %<fcnName>(%<fcnParams>)\
+  %closefile fcnProtoType
+  
+  %openfile fcnContent
+  %foreach epIdx = task.NumEntryPointInfos
+    %assign blkIdx          = task.EntryPointInfo[epIdx].BlockIdx
+    %assign currentSystem   = System[blkIdx[1]]
+    %if SLibSystemFcnRateGrouping(currentSystem, fcnType)  
+      %<LibGetSystemLocalVars(currentSystem, fcnType, tid)>
+      %if ISEQUAL(fcnType, "OutputUpdate")
+        %<LibGetSystemLocalVars(currentSystem,"Output",tid)>
+        %<LibGetSystemLocalVars(currentSystem,"Update",tid)>
+      %elseif ISEQUAL(fcnType, "Output")
+        %<LibGetSystemLocalVars(currentSystem, "OutputUpdate", tid)>
+      %endif
+    %else  
+      %<LibGetSystemLocalVars(currentSystem, fcnType, "")>    
+      %if ISEQUAL(fcnType, "OutputUpdate")
+        %<LibGetSystemLocalVars(currentSystem,"Output","")>
+        %<LibGetSystemLocalVars(currentSystem,"Update","")>
+      %elseif ISEQUAL(fcnType, "Output")
+        %<LibGetSystemLocalVars(currentSystem, "OutputUpdate", "")>
+      %endif
+    %endif
+  %endforeach
+  
+  %if ISEQUAL(fcnType, "Output") || ISEQUAL(fcnType, "OutputUpdate")
+    %if !WHITE_SPACE(timingCodeBuf)
+      %<timingCodeBuf>      
+    %endif
+               
+    %% Generate Output function call
+    %foreach epIdx = task.NumEntryPointInfos
+      %assign blkIdx        = task.EntryPointInfo[epIdx].BlockIdx
+      %assign currentSystem = System[blkIdx[1]]
+      %if !LibSystemFcnIsEmpty(currentSystem, "Output")
+        %openfile localVars
+        %if SLibSystemFcnRateGrouping(currentSystem, fcnType)  
+          %<SLibGetFcnLocalVars(currentSystem, fcnType, tid)>  
+          %if ISEQUAL(fcnType, "OutputUpdate")
+            %<SLibGetFcnLocalVars(currentSystem, "Output", tid)>
+          %endif
+        %else
+          %<SLibGetFcnLocalVars(currentSystem, fcnType, "")>  
+          %if ISEQUAL(fcnType, "OutputUpdate")
+            %<SLibGetFcnLocalVars(currentSystem, "Output", "")>
+          %endif
+        %endif
+        %closefile localVars
+        %if !WHITE_SPACE(localVars) 
+          {
+            %<localVars>
+        %endif
+        
+        %<LibGenSystemFcnCall(currentSystem, "Output", 0)>   
+        
+        %if !WHITE_SPACE(localVars) 
+          }
+        %endif
+      %endif
+    %endforeach
+    
+    %% Dump MAT-file logging code here. Note that as of 12a, MAT-file logging
+    %% is not supported with Concurrent Tasking.
+  %endif
+  
+  %if ISEQUAL(fcnType, "Update") || ISEQUAL(fcnType, "OutputUpdate")
+    %% Generate Update function call 
+    %foreach epIdx = task.NumEntryPointInfos
+      %assign blkIdx        = task.EntryPointInfo[epIdx].BlockIdx
+      %assign currentSystem = System[blkIdx[1]]
+      %if !LibSystemFcnIsEmpty(currentSystem, "Update")
+        %openfile localVars
+        %if SLibSystemFcnRateGrouping(currentSystem, fcnType)  
+          %<SLibGetFcnLocalVars(currentSystem, fcnType, tid)>  
+          %if ISEQUAL(fcnType, "OutputUpdate")
+            %<SLibGetFcnLocalVars(currentSystem, "Update", tid)>    
+          %endif
+        %else
+          %<SLibGetFcnLocalVars(currentSystem, fcnType, "")>    
+          %if ISEQUAL(fcnType, "OutputUpdate")
+            %<SLibGetFcnLocalVars(currentSystem, "Update", "")> 
+          %endif
+        %endif
+        %closefile localVars
+        %if !WHITE_SPACE(localVars) 
+          {
+            %<localVars>
+        %endif
+     
+        %<LibGenSystemFcnCall(currentSystem, "Update", 0)>   
+        
+        %if !WHITE_SPACE(localVars) 
+          }
+        %endif
+      %endif
+    %endforeach
+    
+    %% Generate stop code
+    %<FcnGetTimingForBottomOfUpdateFcn(tid, TLC_FALSE, task.FunctionName, ...
+      rtmName, TLC_FALSE)>
+  %endif
+  %closefile fcnContent
+  
+  %if ISEQUAL(fcnType, "Output") || ISEQUAL(fcnType, "OutputUpdate")
+    %addtorecord task OutputWrapperFcn fcnName
+    %if ISEQUAL(fcnType, "OutputUpdate")
+      %addtorecord task UpdateWrapperFcn ""
+    %endif
+  %elseif !WHITE_SPACE(fcnContent)
+    %addtorecord task UpdateWrapperFcn fcnName
+  %else 
+    %addtorecord task UpdateWrapperFcn ""
+  %endif
+  
+  %createrecord fcnRec {Name fcnName; Returns fcnReturns; Params fcnParams; ...
+    Abstract fcnAbstract; Category "model"; GeneratedBy "ertlib.tlc"; ...
+    Type "Step"; GeneratedFor FcnGeneratedFor(currentSystem)}
+  %<SLibDumpFunctionBanner(fcnRec)>
+  %undef fcnRec
+  %if ISEQUAL(tid, 0) && ISEQUAL(SolverType, "FixedStep") && FixedStepOpts.TID01EQ
+    %<fcnProtoType> %<LibTaskComment(1)>
+  %else
+    %<fcnProtoType> %<LibTaskComment(tid)>  
+  %endif
+  {
+    %<fcnContent>
+  }
+  
+  %assign prototypeBuf =  "%<LibExternInFcnDecls()>%<fcnProtoType>;"
+  %<SLibCacheCodeToFile("mdl_extern_fcn_decl", prototypeBuf)> 
+  %closefile tmpBuffer
+  
+  %foreach epIdx = task.NumEntryPointInfos
+    %assign blkIdx                   = task.EntryPointInfo[epIdx].BlockIdx
+    %assign currentSystem            = System[blkIdx[1]]
+    %assign currentSystem.CurrentTID = -1
+  %endforeach
+  %assign rootSystem.CurrentTID = -1
+
+  %assign ::BlockFcn = tmpBlockFcn
+  %return(tmpBuffer)
+%endfunction
+
+%% Local function used in this file
+%% Description: Generates void (void) entry point for deployment diagram
+%%    fcnType: OutputUpdate, Update or Output
+%%    if (TYPE(tid) ==  number) then:
+%%               generate code for tid, modelName_%<fcnType>%<entryPointIdx>
+%%    if (tid == ""), then generate non rate grouping code, modelName_%<fcnType>
+%%
+%function FcnGenerateAsyncEntryPoint(tid, task) 
+  %assign fcnType    = "OutputUpdate"
+  %assign rootSystem = System[NumSystems-1]
+  %if ISFIELD(task, "FunctionName") %% task
+    %assign fcnName = "%<task.FunctionName>"  
+  %else  %% aperiodic event handler
+    %assign fcnName = "%<task.Name>"
+  %endif
+  %assign fcnReturns    = "void"
+  %assign fcnParams     = "void"
+  
+  %% Each async buffer has a separate tid and they are cached in the rootSystem
+  %assign rootSystem.CurrentTID = tid
+  
+  %openfile fcnProtoType
+  %<fcnReturns> %<fcnName>(%<fcnParams>)\
+  %closefile fcnProtoType
+  
+  %openfile fcnContent
+  %<SLibDumpOutputUpdateCodeForAsyncTid(tid)>
+  %closefile fcnContent
+  
+  %openfile tmpBuffer
+  %assign fcnAbstract = "%<fcnType> for Task:%<fcnName>"
+ 
+  %addtorecord task OutputWrapperFcn fcnName
+  %addtorecord task UpdateWrapperFcn ""
+  
+  %createrecord fcnRec {Name fcnName; Returns fcnReturns; Params fcnParams; ...
+    Abstract fcnAbstract; Category "model"; GeneratedBy "ertlib.tlc"; ...
+    Type "Step"; GeneratedFor FcnGeneratedFor(rootSystem)}
+  %<SLibDumpFunctionBanner(fcnRec)>
+  %undef fcnRec
+  %<fcnProtoType> %<LibTaskComment(tid)>  
+  {
+    %<fcnContent>
+  }
+  
+  %assign prototypeBuf =  "%<LibExternInFcnDecls()>%<fcnProtoType>;"
+  %<SLibCacheCodeToFile("mdl_extern_fcn_decl", prototypeBuf)> 
+  %closefile tmpBuffer
+  
+  %assign rootSystem.CurrentTID = -1
+  %return(tmpBuffer)
+%endfunction
+
+%% Local function used in this file
+%% Description: Add entry point to codeInfo for a deployment diagram  
+%%    fcnType   : "OutputUpdate" or  "Update"
+%%    fcnName   : name of entry point function
+%%    tid       : tid corresponding to the entry point
+%%    fcnParams : arguments of entry point
+%%    fcnReturns: return value of the entry point
+%% 
+%function FcnAddEntryPointToCodeInfo(componentObj, fcnType, fcnName, tid, ...
+  fcnParams, fcnReturns) void
+ 
+  %assert ((fcnType == "OutputUpdate") || (fcnType == "Update"))
+  %% For now, only void(void) supported
+  %assert ((fcnParams == "void") && (fcnReturns == "void"))
+ 
+  %openfile tmpBuff
+  %% Initialize vars
+  tmpArgs         = [];
+  tmpActualArgs   = [];
+  tmpRet          = [];
+  tmpActualReturn = [];
+  
+  %assert (SLibIsRateGrouping() == TLC_TRUE)
+  
+  %if MultiInstanceERTCode
+    %<FcnAddReusableCodeArgs(componentObj,fcnType,tid,"tmpArgs","tmpActualArgs")>
+  %elseif (SLibFcnProtoCtrlActive()) && ...
+    ((fcnType == "OutputUpdate") || (fcnType == "UpdateContStates"))
+    %<FcnAddFPCArgs(componentObj, fcnType,"tmpArgs","tmpActualArgs","tmpRet","tmpActualReturn" )>
+  %endif
+  
+  %% Create a function Prototype with the above arguments
+  %<fcnName>_Prototype            = RTW.CImplementation;
+  %<fcnName>_Prototype.Arguments  = tmpArgs;
+  %<fcnName>_Prototype.Return     = tmpRet;
+  %<fcnName>_Prototype.HeaderFile = ['%<CompiledModel.Name>', '.h'];
+  %<fcnName>_Prototype.SourceFile = ['%<CompiledModel.Name>', '.%<::LangFileExt>'];
+  
+  %% Create a function interface with the above actual arguments
+  %<fcnName>_Interface              = RTW.FunctionInterface;
+  %<fcnName>_Interface.Prototype    = %<fcnName>_Prototype;
+  %<fcnName>_Interface.ActualArgs   = tmpActualArgs;
+  %<fcnName>_Interface.ActualReturn = tmpActualReturn;
+  
+  %% Add Name and Timing information
+  %assign taskID    = (TYPE(tid) == "Number") ? tid : 0
+  %<fcnName>_Prototype.Name = '%<fcnName>'; 
+  %assign timeObj = SLibGetRTWTimingObject(taskID)
+  %<fcnName>_Interface.Timing = %<timeObj>;
+  
+  %switch fcnType
+    %case "OutputUpdate"
+      %<componentObj>.OutputFunctions =  [%<componentObj>.OutputFunctions; %<fcnName>_Interface'];
+      %break
+    %case "Update"
+      %<componentObj>.UpdateFunctions =  [%<componentObj>.UpdateFunctions; %<fcnName>_Interface'];
+      %break
+    %default
+      %assign errTxt = "Parallel Deployment CodeInfo Error: Unknown fcnType: %<fcnType>"
+      %<LibReportFatalError(errTxt)>
+  %endswitch
+  
+  %closefile tmpBuff
+  %return tmpBuff
+%endfunction
+
+%%============================================================================%%
+%%                         TIMING &  SOLVER HELPER UTILS                      %%
+%%============================================================================%%
+
+%% Function: SLibDeploymentEmitSolverFunctions ================================
+%% Description: Generates calls for solver functions
+%%
+%function SLibDeploymentEmitSolverFunctions(taskName, fcnType)
+  %assert (LibIsDeploymentDiagram())
+  %openfile tmpBuf
+  %foreach tgIdx = CompiledModel.NumEventHandlers
+    %if !ISEQUAL(CompiledModel.EventHandler[tgIdx].Periodicity.Type, "Periodic")
+      %continue
+    %endif
+    %if ISEQUAL(CompiledModel.EventHandler[tgIdx].NumTasks, 0)
+      %continue
+    %endif
+    %foreach taskIdx = CompiledModel.EventHandler[tgIdx].NumTasks
+      %if !ISEQUAL(CompiledModel.EventHandler[tgIdx].Task[taskIdx].FunctionName, ...
+        taskName)
+        %continue
+      %endif
+      %assign task = CompiledModel.EventHandler[tgIdx].Task[taskIdx]
+      %foreach epIdx = task.NumEntryPointInfos
+        %assign blkIdx = task.EntryPointInfo[epIdx].BlockIdx
+        %if !ISEQUAL(task.EntryPointInfo[epIdx].SampleTimeIndices[0], 0)
+          %continue
+        %endif
+        %assign currentSystem  = System[blkIdx[1]]
+        %assign saveCurrentTID = currentSystem.CurrentTID
+        %if !(currentSystem.HasCStatesArg) 
+          %continue
+        %endif
+        
+        %assert (SLibIsRateGrouping() == TLC_TRUE)
+        %assign currentSystem.CurrentTID = 0
+                
+        %assign functionName = "SLibGetBody%<fcnType>FcnCache"
+        %if !LibSystemFcnIsEmpty(currentSystem, fcnType)
+          %assign code = %<functionName>(currentSystem)
+          %<code>
+        %endif
+        %assign currentSystem.CurrentTID = saveCurrentTID
+      %endforeach
+      %break
+    %endforeach
+  %endforeach
+  %closefile tmpBuf    
+  %return tmpBuf
+%endfunction
+
+%% Local function used in this file
+%% Description: Returns the name of timing bridge variable
+%%
+%function SLibDeploymentGetTimingBridgeName()
+  %assert (LibIsDeploymentDiagram())
+  %assign varName = "timingBridge"
+  %return varName
+%endfunction
+
+%% Local function used in this file
+%% Description:  Declares a vector of rtm for tasks
+%%
+%function FcnDeclareTasksRTMVec() void
+  %assert (!IsModelReferenceTarget()) 
+  %assign numTasks = SLibDeploymentGetNumPeriodicTasks()
+    
+  %% Declare in the model.c
+  %if !CompiledModel.EmptyRealTimeObject
+    %openfile tmpBuf
+    /* Tasks */
+    %assign definition = "%<tSimStructType> %<SLibDeploymentGetTasksRTMVarName()>_[%<numTasks>];"
+    %<SLibApplyMemSecToDataDefn(definition, "MemSecDataInternal", "%<SLibDeploymentGetTasksRTMVarName()>_")>
+    %assign definition = "%<tSimStructType> *%<SLibDeploymentGetTasksRTMVarName()>[%<numTasks>];"
+    %<SLibApplyMemSecToDataDefn(definition, "MemSecDataInternal", "%<SLibDeploymentGetTasksRTMVarName()>")>\
+     %closefile tmpBuf
+    %<SLibCacheCodeToFile("mdl_data_defn", tmpBuf)> 
+  %endif
+%endfunction
+
+%% Local function used in this file
+%% Description:  Declares a vector of timingBridge of model blocks
+%%
+%function FcnDeclareTimingBridgeVec() void
+  %% Declare in the model.c
+  %openfile tmpBuf
+  /* Timing bridge */
+  rtTimingBridge %<SLibDeploymentGetTimingBridgeName()>[%<SIZE(CompiledModel.ModelReferenceBlocks, 0)>];
+  %closefile tmpBuf
+  %<SLibCacheCodeToFile("mdl_data_defn", tmpBuf)> 
+%endfunction
+
+%% Local function used in this file
+%% Description:  Declares a vector of contStates for tasks
+%%
+%function FcnDeclareTasksContStatesVec() void
+  %assign numTasks = SLibDeploymentGetNumPeriodicTasks()
+  %% Declare in the model.c
+  %openfile tmpBuf
+  /* Continuous states of tasks */
+  %assign definition = "%<tContStateType> %<FcnGetTasksContStatesVarName()>;"
+  %<SLibApplyMemSecToDataDefn(definition, "MemSecDataInternal", "%<FcnGetTasksContStatesVarName()>")>
+  %closefile tmpBuf
+  %<SLibCacheCodeToFile("mdl_data_defn", tmpBuf)> 
+%endfunction
+
+%% Local function used in this file
+%% Description:  Declares a vector of mass matrices for tasks
+%%
+%function FcnDeclareTasksMassMatricesVec() void
+  %assign numTasks = SLibDeploymentGetNumPeriodicTasks()
+  %% Declare in the model.c
+  %openfile tmpBuf
+  /* Mass matrices of tasks */
+  %foreach tgIdx = CompiledModel.NumEventHandlers
+    %assign tg = CompiledModel.EventHandler[tgIdx]
+    %% Only periodic tasks have continuous states
+    %if !ISEQUAL(tg.Periodicity.Type, "Periodic") || ISEQUAL(tg.NumTasks, 0)
+      %continue
+    %endif
+    %foreach tIdx = tg.NumTasks
+      %assign task    = tg.Task[tIdx]
+      %if task.NumContStates <= 0 || task.IsLinearlyImplicit == "no"
+        %continue
+      %endif
+      %assign definition = "%<tMassMatrixGlobalType>_%<task.FunctionName> %<SLibDeploymentGetTasksMassMatricesVarName(tIdx)>;"
+      %<SLibApplyMemSecToDataDefn(definition, "MemSecDataInternal", "%<SLibDeploymentGetTasksMassMatricesVarName(tIdx)>")>
+    %endforeach
+  %endforeach
+
+  %closefile tmpBuf
+  %<SLibCacheCodeToFile("mdl_data_defn", tmpBuf)> 
+%endfunction
+
+%% Local function used in this file
+%% Description:  Declares a vector of sfcnInfo for model blocks
+%%
+%function FcnDeclareSfcnInfoVec() void
+  %% Declare in the model.c
+  %openfile tmpBuf
+  /* Child s-functions */
+  RTWSfcnInfo %<SLibDeploymentGetTasksSfcnInfoVarName()>_[%<SIZE(CompiledModel.ModelReferenceBlocks, 0)>];
+  RTWSfcnInfo *%<SLibDeploymentGetTasksSfcnInfoVarName()>[%<SIZE(CompiledModel.ModelReferenceBlocks, 0)>];
+  %closefile tmpBuf
+  %<SLibCacheCodeToFile("mdl_data_defn", tmpBuf)> 
+%endfunction
+
+%% Local function used in this file
+%% Description:  Initializes the vector of tasks RTM and ContStates
+%%
+%function FcnInitializeTasksStruct() void
+  %assert (!UsingMalloc)
+  %assign numTasks = SLibDeploymentGetNumPeriodicTasks()
+  %assign addr     = IsMultiInsatnceERTOrModelReference() ? "" : "&"
+  %% Initialize the vector of pointers in model_initialization()
+  %openfile tmpBuf
+  int_T tIdx;
+
+  %if  (NumContStates > 0)  && SLibZeroMemory("CState")
+    /* initialize continuous states */
+    (void) %<LibGenMemFcnCall("memset", "(void *)%<addr>%<FcnGetTasksContStatesVarName()>", ...
+      "0", "sizeof(%<tContStateType>)")>;
+  %endif
+
+  for(tIdx = 0; tIdx < %<numTasks>; tIdx++) {
+    %<SLibDeploymentGetTasksRTMVarName()>[tIdx] = &%<SLibDeploymentGetTasksRTMVarName()>_[tIdx];
+    /* initialize real-time model */
+    (void) %<LibGenMemFcnCall("memset", "(void *) %<SLibDeploymentGetTasksRTMVarName()>[tIdx]", ...
+      "0", "sizeof(%<tSimStructType>)")>;
+    
+    %if SuppressMultiTaskScheduler && !GenerateSampleERTMain
+      %foreach i = NumSynchronousSampleTimes
+        %<SLibDeploymentGetTasksRTMVarName()>[tIdx]->Timing.TaskCounters.cLimit[%<i>] = %<FcnComputeTaskTickLimit(i)>;
+      %endforeach
+    %endif
+  }
+  %if ModelIsLinearlyImplicit == "yes"
+    %foreach tgIdx = CompiledModel.NumEventHandlers
+      %assign tg = CompiledModel.EventHandler[tgIdx]
+      %% Only periodic tasks have continuous states
+      %if !ISEQUAL(tg.Periodicity.Type, "Periodic") || ISEQUAL(tg.NumTasks, 0)
+        %continue
+      %endif
+      %foreach tIdx = tg.NumTasks
+        %assign task    = tg.Task[tIdx]
+        %if task.NumContStates <= 0 || task.IsLinearlyImplicit == "no"
+          %continue
+        %endif
+        %openfile massMatrixBuf
+        %if GenerateGRTWrapper
+          %assign rtmName = "%<SLibDeploymentGetTasksRTMVarName()>[%<tIdx>]"
+          %<FcnRTMSet("MassMatrixIr", "", "ir", rtmName)>;
+          %<FcnRTMSet("MassMatrixJc", "", "jc", rtmName)>;
+          %<FcnRTMSet("MassMatrixPr", "", "pr", rtmName)>;
+        %endif
+        %if SLibZeroMemory("MassMatrix")
+          (void) %<LibGenMemFcnCall("memset", "(void *)ir", "0", ...
+            "%<task.MassMatrixNzMax>*sizeof(int_T)")>;
+          (void) %<LibGenMemFcnCall("memset", "(void *)jc", "0", ...
+            "(%<task.NumContStates+1>)*sizeof(int_T)")>;
+          (void) %<LibGenMemFcnCall("memset", "(void *)pr", "0", ...
+            "%<task.MassMatrixNzMax>*sizeof(real_T)")>;
+        %endif
+        %closefile massMatrixBuf
+        %if !WHITE_SPACE(massMatrixBuf)
+          /* Mass matrix for %<task.FunctionName> */
+          {
+            int_T *ir = %<SLibDeploymentGetTasksMassMatricesVarName(tIdx)>.ir;
+            int_T *jc = %<SLibDeploymentGetTasksMassMatricesVarName(tIdx)>.jc;
+            real_T *pr = %<SLibDeploymentGetTasksMassMatricesVarName(tIdx)>.pr;
+          
+            %<massMatrixBuf>\
+          }
+        %endif
+      %endforeach
+    %endforeach
+  %endif
+  %closefile tmpBuf
+  %<LibMdlRegCustomCode(tmpBuf, "declaration")>
+%endfunction
+
+%% Function: SLibDeploymentGetTaskInfoForComponent ============================
+%% Abstract:
+%%      Returns the task-related information for a component and sample time index
+%function SLibDeploymentGetTaskInfoForComponent(compIdx, stIdx)
+  %assert (LibIsDeploymentDiagram())
+  %assign rtmIdx = -1
+  %assign task = ""
+  %assign found  = TLC_FALSE
+  %foreach tgIdx = CompiledModel.NumEventHandlers
+    %assign tg = CompiledModel.EventHandler[tgIdx]   
+    %% Only periodic tasks are supported for now
+    %if !ISEQUAL(tg.Periodicity.Type, "Periodic") || ISEQUAL(tg.NumTasks, 0)
+      %continue
+    %endif
+    %foreach tIdx = tg.NumTasks
+      %assign rtmIdx  = rtmIdx + 1
+      %assign task    = tg.Task[tIdx]
+      %assign taskTID = FcnGetTaskSampleTimeIndex(task)
+      
+      %foreach epIdx = task.NumEntryPointInfos
+        %assign blkIdx = task.EntryPointInfo[epIdx].BlockIdx
+        %% Continuous 
+        %if ISEQUAL(taskTID, 0) && ISEQUAL(SolverType, "FixedStep") && ...
+          FixedStepOpts.TID01EQ && ISEQUAL(stIdx, 1) && ...
+          ISEQUAL(blkIdx[1], compIdx)  
+          %assign found = TLC_TRUE 
+          %createrecord taskInfo {RTMIdx rtmIdx; Task task}
+          %return taskInfo
+        %endif
+        %if ISEQUAL(blkIdx[1], compIdx) && ISEQUAL(stIdx, taskTID)
+          %assign found = TLC_TRUE 
+          %createrecord taskInfo {RTMIdx rtmIdx; Task task}
+          %return taskInfo
+        %endif
+      %endforeach  
+    %endforeach
+  %endforeach
+  %if !found 
+    %assign rtmIdx = -1
+    %assign task = ""
+  %endif
+  %createrecord taskInfo {RTMIdx rtmIdx; Task task}
+  %return taskInfo
+%endfunction
+
+%% Function: SLibDeploymentGetTaskIndexForComponent ============================
+%% Abstract:
+%%      Returns the task-rtm index for a component and sampletimeindex
+%function SLibDeploymentGetTaskIndexForComponent(compIdx, stIdx)
+  %assign taskInfo = SLibDeploymentGetTaskInfoForComponent(compIdx, stIdx)
+  %return taskInfo.RTMIdx
+%endfunction
+
+%% Function: SLibDeploymentGetTaskNameForComponent ============================
+%% Abstract:
+%%      Returns the task's function name for a component and sampletimeindex
+%function SLibDeploymentGetTaskNameForComponent(compIdx, stIdx)
+  %assign taskInfo = SLibDeploymentGetTaskInfoForComponent(compIdx, stIdx)
+  %assert(!ISEMPTY(taskInfo.Task))
+  %return taskInfo.Task.FunctionName
+%endfunction
+
+%% Function: SLibDeploymentIsValidAsyncSampleTimeIndexForComponent ============================
+%% Abstract:
+%%      Returns true if a component has the given sampletime index
+%function SLibDeploymentIsValidAsyncSampleTimeIndexForComponent(compIdx, stIdx)
+  %assert (LibIsDeploymentDiagram())
+  %assign found  = TLC_FALSE
+  %foreach tgIdx = CompiledModel.NumEventHandlers
+    %assign tg = CompiledModel.EventHandler[tgIdx]
+    %if ISEQUAL(tg.Periodicity.Type, "Periodic")
+      %continue
+    %endif
+    %% Only aperiodic event handlers allow number of tasks to be zero
+    %if ISEQUAL(tg.NumTasks, 0)
+      %assign taskTID = FcnGetTaskSampleTimeIndex(tg)
+      %foreach epIdx = tg.NumEntryPointInfos
+        %assign blkIdx = tg.EntryPointInfo[epIdx].BlockIdx
+        %if ISEQUAL(blkIdx[1], compIdx) && ISEQUAL(stIdx, taskTID)
+          %assign found = TLC_TRUE 
+          %return found
+        %endif
+      %endforeach  
+    %else
+      %foreach tIdx = tg.NumTasks
+        %assign task    = tg.Task[tIdx]
+        %assign taskTID = FcnGetTaskSampleTimeIndex(task)
+        %foreach epIdx = task.NumEntryPointInfos
+          %assign blkIdx = task.EntryPointInfo[epIdx].BlockIdx
+          %if ISEQUAL(blkIdx[1], compIdx) && ISEQUAL(stIdx, taskTID)
+            %assign found = TLC_TRUE 
+            %return found
+          %endif
+        %endforeach  
+    %endforeach
+    %endif
+  %endforeach
+  %return found
+%endfunction
+
+%% Local function used in this file
+%% Description: Dumps sample times initialization in model_initialize for RTM 
+%%
+%function FcnDumpModelInitializeSampleTimes(rtmName) Output
+  /* task periods */
+  %foreach tidIdx = NumSynchronousSampleTimes
+    %assign period = SampleTime[tidIdx].PeriodAndOffset[0]
+    %assign fldIdx = "%<tidIdx>"
+    %assign initVal = "%<period>"
+    %<FcnRTMSet("SampleTime", fldIdx, initVal, rtmName)>;    
+  %endforeach
+  
+  /* task offsets */
+  %foreach tidIdx = NumSynchronousSampleTimes
+    %assign offset = SampleTime[tidIdx].PeriodAndOffset[1]
+    %assign fldIdx = "%<tidIdx>"
+    %assign initVal = "%<offset>"
+    %<FcnRTMSet("OffsetTime", fldIdx, initVal, rtmName)>;
+  %endforeach
+%endfunction
+
+%% Local function used in this file
+%% Description:  Dump the creation of the solver info object that lives in 
+%%               the rtModel.
+%%
+%function LocFcnDumpSolverInfoObjectCreation(bEmitReg, bEmitInit, rtmName) Output
+  %assert (GenRTModel && !UsingMalloc && SLibIsERTCodeFormat())
+  {
+    /* Setup solver object */ 
+    %assign stptr = "&%<SLibDeploymentRTMGet("SimTimeStep", rtmName)>"
+    %<FcnRTMSolverSet("SimTimeStepPtr", stptr, rtmName)>;
+    %assign tptr = "&%<SLibDeploymentRTMGet("TPtr", rtmName)>"
+    %<FcnRTMSolverSet("TPtr", tptr, rtmName)>;
+    %if RTMStepSizeForTIDIsReqFcn(0)
+      %assign sptr = "&%<SLibDeploymentRTMGet("StepSize0", rtmName)>"
+      %<FcnRTMSolverSet("StepSizePtr", sptr, rtmName)>;
+    %elseif RTMStepSizeIsReqFcn()
+      %assign sptr = "&%<SLibDeploymentRTMGet("StepSize", rtmName)>"
+      %<FcnRTMSolverSet("StepSizePtr", sptr, rtmName)>;
+    %endif
+    %if NumContStates > 0
+      %assign dxptr = "&%<SLibDeploymentRTMGet("dX", rtmName)>"
+      %<FcnRTMSolverSet("dXPtr", dxptr, rtmName)>;
+      %assign csptr = "&%<SLibDeploymentRTMGet("ContStates", rtmName)>"
+      %<FcnRTMSolverSet("ContStatesPtr", csptr, rtmName)>;
+      %assign ncsptr = "&%<SLibDeploymentRTMGet("NumContStates", rtmName)>"
+      %<FcnRTMSolverSet("NumContStatesPtr", ncsptr, rtmName)>;
+    %endif 
+    %<FcnRTMSolverSet("ErrorStatusPtr", GetRTMErrorStatusPtr(), rtmName)>;
+       
+    %<FcnRTMSolverSet("RTModelPtr", rtmName, rtmName)>;
+  }
+%endfunction
+
+%% Local function used in this file
+%% Description:
+%%     Assign the mass matrices fields of the solver info object that lives in
+%%     the rtModel.
+%%
+%function LocFcnDumpMassMatrixSolverInfoObjectCreation() Output
+  %if ModelIsLinearlyImplicit == "yes"
+    %foreach tgIdx = CompiledModel.NumEventHandlers
+      %assign tg = CompiledModel.EventHandler[tgIdx]
+      %% Only periodic tasks have continuous states
+      %if !ISEQUAL(tg.Periodicity.Type, "Periodic") || ISEQUAL(tg.NumTasks, 0)
+        %continue
+      %endif
+      %foreach tIdx = tg.NumTasks
+        %assign task    = tg.Task[tIdx]
+        %if task.NumContStates <= 0 || task.IsLinearlyImplicit == "no"
+          %continue
+        %endif
+        %% Cannot get these from RTM -- not set, yet.
+        %assign ir = "%<SLibDeploymentGetTasksMassMatricesVarName(tIdx)>.ir"
+        %assign jc = "%<SLibDeploymentGetTasksMassMatricesVarName(tIdx)>.jc"
+        %assign pr = "%<SLibDeploymentGetTasksMassMatricesVarName(tIdx)>.pr"
+        %assign rtmName = "%<SLibDeploymentGetTasksRTMVarName()>[%<tIdx>]"
+        %<FcnRTMSolverSet("SolverMassMatrixIr", ir, rtmName)>;
+        %<FcnRTMSolverSet("SolverMassMatrixJc", jc, rtmName)>;
+        %<FcnRTMSolverSet("SolverMassMatrixPr", pr, rtmName)>;
+      %endforeach
+    %endforeach
+  %endif
+%endfunction
+
+%% Local function used in this file
+%% Description: Dump solvers initialization in rtm
+%%
+%function LocFcnCreateAndInitializeSolverData(rtmName, bEmitReg, bEmitInit)
+  %assert (!UsingMalloc && !IsModelReferenceTarget() && !GenerateClassInterface)
+  
+  %assign addr       = IsMultiInsatnceERTOrModelReference() ? "" : "&"
+  %assign solverInfo = "%<FcnRTMGetSolverInfo(rtmName)>" 
+
+  %openfile buff
+  %if bEmitReg
+    %% Legacy GRT Malloc always dumped solver info object creation,
+    %% other ert-derived targets did so only for LibIsContinuous(0)
+    %if LibIsContinuous(0) 
+      %<LocFcnDumpSolverInfoObjectCreation(bEmitReg, bEmitInit, rtmName)>\
+    %endif %% LibIsContinuous(0) 
+  %endif %% bEmitReg
+  %if LibIsContinuous(0) 
+    %if bEmitInit
+      %<FcnRTMSolverSet("SimTimeStep", "MAJOR_TIME_STEP", rtmName)>;
+      %<FcnRTMSolverSet("SolverOutputComputed", "FALSE", rtmName)>;
+      %if NumContStates > 0
+        %if ISEQUAL(Solver, "ode1")
+          %<SLibDeploymentRTMGet("IntgData", rtmName)>.f[0] = %<SLibDeploymentRTMGet("OdeF", rtmName)>[0];
+        %elseif ISEQUAL(Solver, "ode2")
+          %<SLibDeploymentRTMGet("IntgData", rtmName)>.y = %<SLibDeploymentRTMGet("OdeY", rtmName)>;
+          %<SLibDeploymentRTMGet("IntgData", rtmName)>.f[0] = %<SLibDeploymentRTMGet("OdeF", rtmName)>[0];
+          %<SLibDeploymentRTMGet("IntgData", rtmName)>.f[1] = %<SLibDeploymentRTMGet("OdeF", rtmName)>[1];
+        %elseif ISEQUAL(Solver, "ode3")
+          %<SLibDeploymentRTMGet("IntgData", rtmName)>.y = %<SLibDeploymentRTMGet("OdeY", rtmName)>;
+          %<SLibDeploymentRTMGet("IntgData", rtmName)>.f[0] = %<SLibDeploymentRTMGet("OdeF", rtmName)>[0];
+          %<SLibDeploymentRTMGet("IntgData", rtmName)>.f[1] = %<SLibDeploymentRTMGet("OdeF", rtmName)>[1];
+          %<SLibDeploymentRTMGet("IntgData", rtmName)>.f[2] = %<SLibDeploymentRTMGet("OdeF", rtmName)>[2];
+        %elseif ISEQUAL(Solver, "ode4")
+          %<SLibDeploymentRTMGet("IntgData", rtmName)>.y = %<SLibDeploymentRTMGet("OdeY", rtmName)>;
+          %<SLibDeploymentRTMGet("IntgData", rtmName)>.f[0] = %<SLibDeploymentRTMGet("OdeF", rtmName)>[0];
+          %<SLibDeploymentRTMGet("IntgData", rtmName)>.f[1] = %<SLibDeploymentRTMGet("OdeF", rtmName)>[1];
+          %<SLibDeploymentRTMGet("IntgData", rtmName)>.f[2] = %<SLibDeploymentRTMGet("OdeF", rtmName)>[2];
+          %<SLibDeploymentRTMGet("IntgData", rtmName)>.f[3] = %<SLibDeploymentRTMGet("OdeF", rtmName)>[3];
+        %elseif ISEQUAL(Solver, "ode5")
+          %<SLibDeploymentRTMGet("IntgData", rtmName)>.y = %<SLibDeploymentRTMGet("OdeY", rtmName)>;
+          %<SLibDeploymentRTMGet("IntgData", rtmName)>.f[0] = %<SLibDeploymentRTMGet("OdeF", rtmName)>[0];
+          %<SLibDeploymentRTMGet("IntgData", rtmName)>.f[1] = %<SLibDeploymentRTMGet("OdeF", rtmName)>[1];
+          %<SLibDeploymentRTMGet("IntgData", rtmName)>.f[2] = %<SLibDeploymentRTMGet("OdeF", rtmName)>[2];
+          %<SLibDeploymentRTMGet("IntgData", rtmName)>.f[3] = %<SLibDeploymentRTMGet("OdeF", rtmName)>[3];
+          %<SLibDeploymentRTMGet("IntgData", rtmName)>.f[4] = %<SLibDeploymentRTMGet("OdeF", rtmName)>[4];
+          %<SLibDeploymentRTMGet("IntgData", rtmName)>.f[5] = %<SLibDeploymentRTMGet("OdeF", rtmName)>[5];
+        %elseif ISEQUAL(Solver, "ode8")
+          %<SLibDeploymentRTMGet("IntgData", rtmName)>.deltaY= %<SLibDeploymentRTMGet("OdeDeltaY", rtmName)>;
+          %<SLibDeploymentRTMGet("IntgData", rtmName)>.f[0]  = %<SLibDeploymentRTMGet("OdeF", rtmName)>[0];
+          %<SLibDeploymentRTMGet("IntgData", rtmName)>.f[1]  = %<SLibDeploymentRTMGet("OdeF", rtmName)>[1];
+          %<SLibDeploymentRTMGet("IntgData", rtmName)>.f[2]  = %<SLibDeploymentRTMGet("OdeF", rtmName)>[2];
+          %<SLibDeploymentRTMGet("IntgData", rtmName)>.f[3]  = %<SLibDeploymentRTMGet("OdeF", rtmName)>[3];
+          %<SLibDeploymentRTMGet("IntgData", rtmName)>.f[4]  = %<SLibDeploymentRTMGet("OdeF", rtmName)>[4];
+          %<SLibDeploymentRTMGet("IntgData", rtmName)>.f[5]  = %<SLibDeploymentRTMGet("OdeF", rtmName)>[5];  
+          %<SLibDeploymentRTMGet("IntgData", rtmName)>.f[6]  = %<SLibDeploymentRTMGet("OdeF", rtmName)>[6];
+          %<SLibDeploymentRTMGet("IntgData", rtmName)>.f[7]  = %<SLibDeploymentRTMGet("OdeF", rtmName)>[7];
+          %<SLibDeploymentRTMGet("IntgData", rtmName)>.f[8]  = %<SLibDeploymentRTMGet("OdeF", rtmName)>[8];
+          %<SLibDeploymentRTMGet("IntgData", rtmName)>.f[9]  = %<SLibDeploymentRTMGet("OdeF", rtmName)>[9];
+          %<SLibDeploymentRTMGet("IntgData", rtmName)>.f[10] = %<SLibDeploymentRTMGet("OdeF", rtmName)>[10];
+          %<SLibDeploymentRTMGet("IntgData", rtmName)>.f[11] = %<SLibDeploymentRTMGet("OdeF", rtmName)>[11];
+          %<SLibDeploymentRTMGet("IntgData", rtmName)>.f[12] = %<SLibDeploymentRTMGet("OdeF", rtmName)>[12];
+          %<SLibDeploymentRTMGet("IntgData", rtmName)>.x0    = %<SLibDeploymentRTMGet("OdeX0", rtmName)>;
+        %elseif ISEQUAL(Solver, "ode14x")
+          %<SLibDeploymentRTMGet("IntgData", rtmName)>.x0      = %<SLibDeploymentRTMGet("OdeX0", rtmName)>;
+          %<SLibDeploymentRTMGet("IntgData", rtmName)>.f0      = %<SLibDeploymentRTMGet("OdeF0", rtmName)>;
+          %<SLibDeploymentRTMGet("IntgData", rtmName)>.x1start = %<SLibDeploymentRTMGet("OdeX1START", rtmName)>;
+          %<SLibDeploymentRTMGet("IntgData", rtmName)>.f1      = %<SLibDeploymentRTMGet("OdeF1", rtmName)>;
+          %<SLibDeploymentRTMGet("IntgData", rtmName)>.Delta   = %<SLibDeploymentRTMGet("OdeDELTA", rtmName)>;
+          %<SLibDeploymentRTMGet("IntgData", rtmName)>.E       = %<SLibDeploymentRTMGet("OdeE", rtmName)>;
+          %<SLibDeploymentRTMGet("IntgData", rtmName)>.fac     = %<SLibDeploymentRTMGet("OdeFAC", rtmName)>;
+          
+          /* initialize */
+          {
+            int_T i;     
+            real_T *f =  %<SLibDeploymentRTMGet("IntgData", rtmName)>.fac;
+            for(i = 0; i < (int_T)(sizeof(%<SLibDeploymentRTMGet("OdeFAC", rtmName)>)/sizeof(real_T)); i++) {
+              f[i] = 1.5e-8;
+            }
+          }
+          %<SLibDeploymentRTMGet("IntgData", rtmName)>.DFDX    = %<SLibDeploymentRTMGet("OdeDFDX", rtmName)>;
+          %<SLibDeploymentRTMGet("IntgData", rtmName)>.W       = %<SLibDeploymentRTMGet("OdeW", rtmName)>;
+          %<SLibDeploymentRTMGet("IntgData", rtmName)>.pivots  = %<SLibDeploymentRTMGet("OdePIVOTS", rtmName)>;
+          %<SLibDeploymentRTMGet("IntgData", rtmName)>.xtmp  = %<SLibDeploymentRTMGet("OdeXTMP", rtmName)>;
+          %<SLibDeploymentRTMGet("IntgData", rtmName)>.ztmp  = %<SLibDeploymentRTMGet("OdeZTMP", rtmName)>;
+            
+          %if (ModelIsLinearlyImplicit == "yes")
+            %<SLibDeploymentRTMGet("IntgData", rtmName)>.M = %<SLibDeploymentRTMGet("OdeMASSMATRIX_M", rtmName)>;
+            %if (SLibModelMassMatrixType() != "constant")
+              %<SLibDeploymentRTMGet("IntgData", rtmName)>.M1 = %<SLibDeploymentRTMGet("OdeMASSMATRIX_M1", rtmName)>;
+              %if (SLibModelMassMatrixType() == "statedep")
+                %<SLibDeploymentRTMGet("IntgData", rtmName)>.xdot   = %<SLibDeploymentRTMGet("OdeXDOT", rtmName)>;
+                %<SLibDeploymentRTMGet("IntgData", rtmName)>.Edot   = %<SLibDeploymentRTMGet("OdeEDOT", rtmName)>;
+                %<SLibDeploymentRTMGet("IntgData", rtmName)>.fminusMxdot  = %<SLibDeploymentRTMGet("OdeFMXDOT", rtmName)>;
+              %endif
+            %endif        
+          %endif
+            
+          %<SLibDeploymentRTMGet("IntgData", rtmName)>.isFirstStep  = TRUE;
+
+          %<FcnRTMSolverSet("SolverExtrapolationOrder", "%<FixedStepOpts.ExtrapolationOrder>", rtmName)>;
+          %<FcnRTMSolverSet("SolverNumberNewtonIterations", "%<FixedStepOpts.NumberNewtonIterations>", rtmName)>;
+            
+        %endif  %% elseif ode14x
+          
+        rtsiSetSolverData(%<solverInfo>, (void *)&%<SLibDeploymentRTMGet("IntgData", rtmName)>);
+      %endif %% end of if NumContStates > 0
+    %endif %% bEmitInit
+  %endif %% end of If LibIsContinuous(0)
+  %if bEmitReg
+    rtsiSetSolverName(%<solverInfo>,"%<Solver>");
+    %if NumChildSFunctions
+      %<FcnRTMSet("RTWSolverInfoPtr", "", solverInfo, rtmName)>;
+    %endif
+  %endif
+  %closefile buff
+  %return buff
+%endfunction
+
+%% LocFcnInitializeMassMatrixVars
+%% Description:
+%%     Assign the mass matrices fields of the ModelData object that lives in
+%%     the rtModel.
+%%
+%function LocFcnInitializeMassMatrixVars() Output
+  %if (ModelIsLinearlyImplicit == "yes")
+    %assign type  = "(ssMatrixType)%<ModelMassMatrixType>"
+    %foreach tgIdx = CompiledModel.NumEventHandlers
+      %assign tg = CompiledModel.EventHandler[tgIdx]
+      %% Only periodic tasks have continuous states
+      %if !ISEQUAL(tg.Periodicity.Type, "Periodic") || ISEQUAL(tg.NumTasks, 0)
+        %continue
+      %endif
+      %foreach tIdx = tg.NumTasks
+        %assign task = tg.Task[tIdx]
+        %if task.NumContStates <= 0 || task.IsLinearlyImplicit == "no"
+          %continue
+        %endif
+        %assign nzmax = "%<task.MassMatrixNzMax>"
+        %assign ir = "%<SLibDeploymentGetTasksMassMatricesVarName(tIdx)>.ir"
+        %assign jc = "%<SLibDeploymentGetTasksMassMatricesVarName(tIdx)>.jc"
+        %assign pr = "%<SLibDeploymentGetTasksMassMatricesVarName(tIdx)>.pr"
+            
+        %assign rtmName = "%<SLibDeploymentGetTasksRTMVarName()>[%<tIdx>]"
+        %<FcnRTMSet("MassMatrixType", "",type, rtmName)>;
+        %<FcnRTMSet("MassMatrixNzMax", "", nzmax, rtmName)>;
+        %<FcnRTMSet("MassMatrixIr", "", ir, rtmName)>;
+        %<FcnRTMSet("MassMatrixJc",  "", jc, rtmName)>;
+        %<FcnRTMSet("MassMatrixPr", "", pr, rtmName)>;
+            
+        %<FcnRTMSolverSet("SolverMassMatrixType",type, rtmName)>;
+        %<FcnRTMSolverSet("SolverMassMatrixNzMax",nzmax, rtmName)>;
+      %endforeach
+    %endforeach
+  %endif
+%endfunction
+
+%% Local function used in this file
+%% Description: Dump timing initialization in rtm
+%%
+%function LocFcnCreateAndInitializeTimingData(rtmName, bEmitReg, bEmitInit)
+  %assert (!IsModelReferenceTarget()) 
+  %% Initialize timing engine of model data
+  %openfile buff
+  %if ExportFunctionsMode == 0 
+    %if GenerateGRTWrapper || RTMNonInlinedSFcnsIsReqFcn()
+      %% Initialize timing info.
+      %% Initialize timing fields if the IsReqFcn of this field returns true.
+      %%
+      %% To support GRT interface, non-inline sfunction, or model-ref,
+      %% some timing fields that are not used in ert are required and need to be 
+      %% initialized. These fields are initialized here.
+      %%
+      /* Initialize timing info */
+      %if RTMModelPtrsForNonERTIsReqFcn() || SLibModelHierarchyContainsNoninlinedSfcn()
+        {
+          int_T  *mdlTsMap      = %<SLibDeploymentRTMGet("SampleTimeTaskIDArray", rtmName)>;
+          %%
+          %if NumSynchronousSampleTimes >= 1 && ...
+            NumSynchronousSampleTimes < RollThreshold
+            %% do not use a loop
+            %foreach sampIdx = NumSynchronousSampleTimes
+              mdlTsMap[%<sampIdx>] = %<sampIdx>;
+            %endforeach
+          %elseif NumSynchronousSampleTimes >= RollThreshold
+            %% use a loop
+            int_T i;
+            
+            for(i = 0; i < %<NumSynchronousSampleTimes>; i++) {
+              mdlTsMap[i] = i;
+            }
+          %endif
+          %<FcnRTMSet("SampleTimeTaskIDPtr", "", "&mdlTsMap[0]", rtmName)>;
+          %<FcnRTMSet("SampleTimePtr", "", "&%<SLibDeploymentRTMGet("SampleTimeArray", rtmName)>[0]", rtmName)>;
+          %<FcnRTMSet("OffsetTimePtr", "", "&%<SLibDeploymentRTMGet("OffsetTimeArray", rtmName)>[0]", rtmName)>;
+          %<FcnDumpModelInitializeSampleTimes(rtmName)>\
+        }
+      %endif
+      
+      %if RTMTimePtrIsReqFcn()
+        %<FcnRTMSet("TPtr", "", "&%<SLibDeploymentRTMGet("TaskTimeArray", rtmName)>[0]", rtmName)>;
+      %endif
+      
+      %if SLibModelHierarchyContainsNoninlinedSfcn() || GenerateGRTWrapper
+        {
+          int_T  *mdlSampleHits = %<SLibDeploymentRTMGet("SampleHitArray", rtmName)>;
+          %assert (SLibSingleTasking() == TLC_FALSE)
+          %if RTMChildSfunctionIsReqFcn()
+            int_T *mdlPerTaskSampleHits = %<SLibDeploymentRTMGet("PerTaskSampleHitsArray", rtmName)>;
+            
+            %<FcnRTMSet("PerTaskSampleHitsPtr", "", "&mdlPerTaskSampleHits[0]", rtmName)>;
+            mdlSampleHits[0] = 1;
+          %endif
+          %<FcnRTMSet("SampleHitPtr", "", "&mdlSampleHits[0]", rtmName)>;
+        }
+      %endif
+    %elseif LibIsContinuous(0)
+      %assert RTMTimePtrIsReqFcn()
+      %assign val = "&%<SLibDeploymentRTMGet("TaskTimeArray", rtmName)>[0]"
+      %<FcnRTMSet("TPtr", "", val, rtmName)>;
+    %endif
+  %elseif LibIsContinuous(0)
+    %assert RTMTimePtrIsReqFcn()
+    %<FcnRTMSet("TPtr", "&%<LibDeploymentRTMGet("TaskTimeArray")>[0]")>;
+  %endif
+  
+  %if bEmitReg || bEmitInit  
+    %%
+    %% Setup absolute time
+    %%
+    %if StartTime != 0.0
+      %assign errTxt = "Start time must be 0.0 for the chosen target: %<StartTime>."
+      %<LibReportFatalError(errTxt)>
+    %endif
+
+    %if (SLibNeedAbsoluteTime() || MatFileLogging) 
+      %if PurelyIntegerCode && MatFileLogging
+        %<LibReportError("Do not yet support integer-only MAT-file logging.")>
+      %elseif PurelyIntegerCode && !MatFileLogging
+        %% nop
+      %else
+        %if RTMTFinalIsReqFcn()
+          %% Initialize stop time
+          %<FcnRTMSet("TFinal", "", "%<SLibERTGetStopTime()>", rtmName)>;
+        %endif
+        %foreach tid = NumSampleTimes
+          %if SampleTime[tid].NeedFloatTime == "yes" && !PurelyIntegerCode
+            %<SLibDeploymentRTMGet("StepSize%<tid>", rtmName)>  = %<SampleTime[tid].ClockTickStepSize>;
+          %endif
+        %endforeach 
+      %endif
+    %endif
+    
+    %if RTMFirstInitCondFlagIsReqFcn()
+      %<FcnRTMSet("FirstInitCond", "", 1, rtmName)>;
+    %endif
+  %endif
+  
+  %if bEmitInit
+    %if RTMNonInlinedSFcnsIsReqFcn() || GenerateGRTWrapper
+      %% SolverInfo
+      %assign solverInfo = "%<FcnRTMGetSolverInfo(rtmName)>"
+      %<FcnRTMSet("RTWSolverInfoPtr", "", solverInfo, rtmName)>;
+      %% StepSize
+      %<FcnRTMSet("StepSize", "", FixedStepOpts.FixedStep, rtmName)>;
+      %<FcnRTMSolverSet("FixedStepSize", FixedStepOpts.FixedStep, rtmName)>;
+      %% SolverMode
+      %assert(CompiledModel.FixedStepOpts.SolverMode == "MultiTasking")
+      %<FcnRTMSolverSet("SolverMode", "SOLVER_MODE_MULTITASKING", rtmName)>;
+    %endif
+  %endif %% bEmitInit
+  
+  %closefile buff
+  %return buff
+%endfunction
+
+%% Local function used in this file
+%% Description: Create Task specific mass matrices
+%% 
+%function FcnInitTaskMassMatrices() Output
+  %foreach tgIdx = CompiledModel.NumEventHandlers
+    %assign tg = CompiledModel.EventHandler[tgIdx]
+    %% Only periodic tasks have continuous states
+    %if !ISEQUAL(tg.Periodicity.Type, "Periodic") || ISEQUAL(tg.NumTasks, 0)
+      %continue
+    %endif
+    %foreach tIdx = tg.NumTasks
+      %assign task    = tg.Task[tIdx]
+      %if task.NumContStates <= 0 || task.IsLinearlyImplicit == "no"
+        %continue
+      %endif
+      %<FcnCreateInitSystemMatrices(tIdx, task.NumContStates, task.MassMatrixJc, task.MassMatrixIr)>
+    %endforeach
+  %endforeach
+%endfunction
+
+%% Local function used in this file
+%% Description: Returns the initialization code of the mass matrices for a task
+%% 
+%function FcnCreateInitSystemMatrices(tIdx, nx, jc, ir)
+  %assert (LibIsDeploymentDiagram() && ModelIsLinearlyImplicit == "yes") 
+  %openfile buff
+  /* Root-level InitSystemMatrices */    
+  {      
+    %assign nnz = jc[nx]
+    static int_T taskMassMatrixIr[%<nnz>] = {\
+      %assign comma = ""
+      %foreach idx = nnz
+        %<comma>%<ir[idx]>\
+        %assign comma = ", "
+      %endforeach
+    };      
+    %assign njc = nx+1    
+    static int_T taskMassMatrixJc[%<njc>] = {\
+      %assign comma = ""
+      %foreach idx = njc
+        %<comma>%<jc[idx]>\
+        %assign comma = ", "
+      %endforeach
+    };
+    static real_T taskMassMatrixPr[%<nnz>] = {\
+      %assign comma = ""
+      %foreach idx = nnz
+        %<comma>1.0\
+        %assign comma = ", "
+      %endforeach
+    };
+    %% Task Ir
+    %assign copyAddr = "%<SLibDeploymentGetTasksMassMatricesVarName(tIdx)>.ir"
+    %assign copySize = "%<nnz>*sizeof(int_T)"    
+    (void) %<LibGenMemFcnCall("memcpy", copyAddr, "taskMassMatrixIr", copySize)>;
+        
+    %% Task Jc
+    %assign copyAddr = "%<SLibDeploymentGetTasksMassMatricesVarName(tIdx)>.jc"
+    %assign copySize = "%<njc>*sizeof(int_T)"    
+    (void) %<LibGenMemFcnCall("memcpy", copyAddr, "taskMassMatrixJc", copySize)>;
+        
+    %% Task Pr
+    %assign copyAddr = "%<SLibDeploymentGetTasksMassMatricesVarName(tIdx)>.pr"
+    %assign copySize = "%<nnz>*sizeof(real_T)"    
+    (void) %<LibGenMemFcnCall("memcpy", copyAddr, "taskMassMatrixPr", copySize)>;              }
+  %closefile buff
+  %return buff
+%endfunction
+
+%% Local function used in this file
+%% Description: Returns the task-rtm index for a component and sampletimeindex
+%%
+%function FcnInitializeSolverAndTimingData() void
+  %assert(!UsingMalloc)
+  %assign bEmitReg  = TLC_TRUE
+  %assign bEmitInit = TLC_TRUE  
+  
+  %assign rtmName = "%<SLibDeploymentGetTasksRTMVarName()>[tIdx]"
+  
+  %openfile solverDataBuf
+  %if (LibIsContinuous(0) || NumChildSFunctions)
+    %<LocFcnCreateAndInitializeSolverData(rtmName, bEmitReg, bEmitInit)>
+  %endif 
+  %<LocFcnCreateAndInitializeTimingData(rtmName, bEmitReg, bEmitInit)>
+  %closefile solverDataBuf 
+  
+  %if !WHITE_SPACE(solverDataBuf)
+    %openfile tmpBuf    
+    for (tIdx = 0; tIdx < %<SLibDeploymentGetNumPeriodicTasks()>; tIdx++) {
+    %<solverDataBuf>
+    }
+    %if LibIsContinuous(0) && ModelIsLinearlyImplicit == "yes"
+        %% Legacy GRT Malloc always dumped solver info object creation,
+        %% other ert-derived targets did so only for LibIsContinuous(0)
+        %<LocFcnDumpMassMatrixSolverInfoObjectCreation()>
+
+        %<LocFcnInitializeMassMatrixVars()>
+
+        %<FcnInitTaskMassMatrices()>
+    %endif
+    %<FcnInitializeContinuousStates()>
+    %closefile tmpBuf
+    %<LibMdlRegCustomCode(tmpBuf, "declaration")>
+  %endif
+%endfunction
+
+%% FcnInitializeContinuousStates
+%% Description:
+%%      Initializes the continuous states pointer for each task within the
+%%      global contiguous continuous state structure using appropriate
+%%      offsets. Tasks with no continuous states are assigned to NULL.
+%function FcnInitializeContinuousStates()
+  %assert (LibIsDeploymentDiagram())
+  %openfile buf
+  %assign addr = IsMultiInsatnceERTOrModelReference() ? "" : "&"
+  %foreach tgIdx = CompiledModel.NumEventHandlers
+    %assign tg = CompiledModel.EventHandler[tgIdx]
+    %% Only periodic tasks can have continuous states
+    %if !ISEQUAL(tg.Periodicity.Type, "Periodic")|| ISEQUAL(tg.NumTasks, 0)
+      %continue
+    %endif
+    %foreach tIdx = tg.NumTasks
+      %assign rtmName = "%<SLibDeploymentGetTasksRTMVarName()>[%<tIdx>]"
+      %assign task    = tg.Task[tIdx]
+      %if task.NumContStates > 0
+        %assign x = "(real_T *) %<addr>%<FcnGetTasksContStatesVarName()> + %<task.ContStateStartIndex>"
+      %else
+        %assign x = "(NULL)"
+      %endif
+      %<FcnRTMSet("ContStates", "", x, rtmName)>;
+    %endforeach
+  %endforeach
+  %closefile buf
+  %return buf
+%endfunction
+
+
+%function FcnInitializeSfcnInfo() void
+  %assert(!IsModelReferenceTarget())
+
+  %assign mdlRefBlks  = CompiledModel.ModelReferenceBlocks
+  %assign sfcnInfoVar = SLibDeploymentGetTasksSfcnInfoVarName()
+  %openfile tmpBuf
+  
+  %foreach rowIdx = SIZE(mdlRefBlks,0)
+    %assign mdlRefInfo = mdlRefBlks[rowIdx]
+    %assign mSysIdx    = mdlRefInfo[0]
+    %assign bIdx       = mdlRefInfo[1]
+    %assign instIdx    = mdlRefInfo[2]
+    %assign blk            = System[mSysIdx].Block[bIdx]
+    %assign blockInterface = GetModelrefInterface(blk)
+    
+    %if blockInterface.HasNonInlinedSfcn
+      %% %<FcnSetupSFcnRTWInfo()>
+      %assign sfcnInfo = "%<sfcnInfoVar>[%<rowIdx>]"
+      %assign perTaskSampleHitsSize = ...
+        "(%<NumSynchronousSampleTimes> * %<NumSynchronousSampleTimes>)"
+     { /* child S-Function registration */
+       static time_T *taskTimePtrs[%<NumSampleTimes>];
+       static int_T *perTaskSampleHitsPtrs[%<perTaskSampleHitsSize>];
+       %<sfcnInfo>= &%<sfcnInfoVar>_[%<rowIdx>];
+       rtssSetErrorStatusPtr(%<sfcnInfo>, %<GetRTMErrorStatusPtr()>);
+       rtssSetNumRootSampTimesPtr(%<sfcnInfo>, &%<RTMGet("NumSampleTimes")>);
+       rtssSetTStartPtr(%<sfcnInfo>,           &%<RTMGet("TStart")>);
+       %if RTMTFinalIsReqFcn()
+         rtssSetTFinalPtr(%<sfcnInfo>,         &%<RTMGet("TFinal")>);
+       %endif
+       rtssSetTimeOfLastOutputPtr(%<sfcnInfo>, &%<RTMGet("TimeOfLastOutput")>);
+       rtssSetStepSizePtr(%<sfcnInfo>,         &%<RTMGet("StepSize")>);
+       rtssSetStopRequestedPtr(%<sfcnInfo>,    &%<RTMGetStopRequested()>);
+       rtssSetSimModePtr(%<sfcnInfo>,          &%<RTMGet("SimMode")>);
+       
+       %% Derivatives, ZC, and BlkStatesChanges are used by continuous s-functions.
+       %% Thus, they must point to the fields of the rtm which corresponds to the 
+       %% continuous task to whom the model block is mapped to. Continuous has TID0.
+       %% Find task to whom is mapped TID0
+       %assign rtmIdx = SLibDeploymentGetTaskIndexForComponent(mSysIdx, 0)         
+       %if !ISEQUAL(rtmIdx, -1) %% Referenced model has blocks at rate i 
+         %assign rtmName = "%<SLibDeploymentGetTasksRTMVarName()>[%<rtmIdx>]"     
+         rtssSetDerivCacheNeedsResetPtr(%<sfcnInfo>, ...
+           &%<SLibDeploymentRTMGet("DerivCacheNeedsReset", rtmName)>);
+         rtssSetZCCacheNeedsResetPtr(%<sfcnInfo>, ...
+           &%<SLibDeploymentRTMGet("ZCCacheNeedsReset", rtmName)>);
+         rtssSetBlkStateChangePtr(%<sfcnInfo>, ...
+           &%<SLibDeploymentRTMGet("BlkStateChangeFlag", rtmName)>);
+         rtssSetSolverInfoPtr(%<sfcnInfo>, ...
+           &%<SLibDeploymentRTMGet("RTWSolverInfoPtr", rtmName)>);
+       %else %% Make them NULL
+         rtssSetDerivCacheNeedsResetPtr(%<sfcnInfo>, ...
+           %<SLibGetNullDefinitionFromTfl()>);
+         rtssSetZCCacheNeedsResetPtr(%<sfcnInfo>, ...
+           %<SLibGetNullDefinitionFromTfl()>);
+         rtssSetBlkStateChangePtr(%<sfcnInfo>, ...
+           %<SLibGetNullDefinitionFromTfl()>);  
+         rtssSetSolverInfoPtr(%<sfcnInfo>,  %<SLibGetNullDefinitionFromTfl()>); 
+       %endif
+       %% TPtr needs to point to different RTM's TPtr 
+       %foreach idx = NumSampleTimes
+         %if SLibDeploymentIsValidAsyncSampleTimeIndexForComponent(mSysIdx, idx)
+           taskTimePtrs[%<idx>] = &(%<RTMGet("TPtr")>[%<idx>]);
+         %else
+           %% find task who has sampleTime idx of component mSysIdx
+           %assign rtmIdx = SLibDeploymentGetTaskIndexForComponent(mSysIdx, idx)    
+           %if !ISEQUAL(rtmIdx, -1) %% Referenced model has blocks at rate idx  
+             %assign rtmName = "%<SLibDeploymentGetTasksRTMVarName()>[%<rtmIdx>]"     
+             %if SampleTime[idx].NeedFloatTime == "yes"
+               taskTimePtrs[%<idx>] = &(%<FcnGetTaskTime(System[NumSystems-1], idx, rtmName)>);
+             %else
+               taskTimePtrs[%<idx>] = %<SLibGetNullDefinitionFromTfl()>;
+             %endif
+           %else
+             taskTimePtrs[%<idx>] = %<SLibGetNullDefinitionFromTfl()>;
+           %endif
+         %endif
+       %endforeach
+       rtssSetTPtrPtr(%<sfcnInfo>, taskTimePtrs);
+       %% perTaskSampleHitsPtr needs to point to different RTM's perTaskSampleHitsPtr
+       %foreach i = NumSynchronousSampleTimes 
+         %foreach j = NumSynchronousSampleTimes
+           %if SLibGetNeedRateInteraction(i,j)
+             %% find task idx who has sampleTime i of component mSysIdx
+             %assign rtmIdx = SLibDeploymentGetTaskIndexForComponent(mSysIdx, i)  
+             %if !ISEQUAL(rtmIdx, -1) %% Referenced model has blocks at rate i  
+               %assign rtmName = "%<SLibDeploymentGetTasksRTMVarName()>[%<rtmIdx>]" 
+               %assign val = "%<SLibDeploymentRTMGet("PerTaskSampleHitsPtr", rtmName)>[%<j + i*NumSynchronousSampleTimes>]"
+                              
+               perTaskSampleHitsPtrs[%<i>*%<NumSynchronousSampleTimes> + %<j>] \ 
+               = &(%<val>);
+             %else %% Initialize with NULL
+               perTaskSampleHitsPtrs[%<i>*%<NumSynchronousSampleTimes> + %<j>] \ 
+               = %<SLibGetNullDefinitionFromTfl()>;
+             %endif
+           %endif
+         %endforeach
+       %endforeach  
+       rtssSetPerTaskSampleHitsPtr(%<sfcnInfo>, perTaskSampleHitsPtrs);
+       
+       rtssSetSampleHitsPtr(%<sfcnInfo>,       &%<RTMGet("SampleHitPtr")>);
+     }
+    %endif
+  %endforeach
+  
+  %closefile tmpBuf
+  %<LibMdlRegCustomCode(tmpBuf, "declaration")>
+%endfunction
+
+%% Function: SLibDeploymentCallModelrefBlockRegFcns ============================
+%% Abstract:
+%%    Call all child model reference block registration functions.  Note
+%%    that the input mdlRefBlks can be empty.
+%%
+%function  SLibDeploymentCallModelrefBlockRegFcns(mdlRefBlks)
+  %assert (LibIsDeploymentDiagram() && !IsModelReferenceTarget() && GenRTModel ...
+    && SLibIsERTCodeFormat()) 
+
+  %% Determine if any clockticks are needed.  Note that if a long clock
+  %% tick is needed, then the normal clock tick is also needed since they
+  %% come in pairs.
+  %assign needClockTicks = TLC_FALSE
+  %assign needLongClockTicks = TLC_FALSE
+  %foreach idx = NumSynchronousSampleTimes
+    %if ClockTickForTIDIsReqFcn(idx)
+      %assign needClockTicks = TLC_TRUE
+      %if LongClockTickForTIDIsReqFcn(idx)
+        %assign needLongClockTicks = TLC_TRUE
+        %break
+      %endif
+    %endif
+  %endforeach
+  
+  %openfile modelrefBuffer  
+  %assign baseSysIdx = GetBaseSystemIdx()
+  %if !ISEMPTY(mdlRefBlks)
+    %% First determine if the model blocks need the global timing engine.
+    %foreach rowIdx = SIZE(mdlRefBlks,0)
+      %assign mdlRefInfo = mdlRefBlks[rowIdx]
+      %assign mSysIdx = mdlRefInfo[0]
+      %assign bIdx    = mdlRefInfo[1]
+      %assign instIdx = mdlRefInfo[2]
+     
+      %assign blk = System[mSysIdx].Block[bIdx]
+      %assign blockInterface = GetModelrefInterface(blk)
+      %if blockInterface.NeedsGlobalTimingEngine 
+        {
+            
+          %if needClockTicks
+            static uint32_T *clockTickPtrs[%<NumSampleTimes>];
+            %if needLongClockTicks
+              static uint32_T *clockTickHPtrs[%<NumSampleTimes>];
+            %endif
+          %endif  
+          %if RTMTimePtrIsReqFcn() || RTMTaskTimeIsReqFcnForTID(0)
+            static real_T *taskTimePtrs[%<NumSampleTimes>];
+          %endif
+          %if CompiledModel.SingleRate != "yes" 
+            %if ERTPerTaskSampleHitsIsReqFcn()
+              %assign rateTransitionSize = ...
+                "(%<NumSynchronousSampleTimes> * %<NumSynchronousSampleTimes>)"
+              static boolean_T *rateTransitionPtrs[%<rateTransitionSize>];
+            %endif
+          %endif
+          
+          %<SLibDeploymentGetTimingBridgeName()>[%<rowIdx>].nTasks = %<NumSampleTimes>;
+          
+          %if needClockTicks   
+            %foreach idx = NumSampleTimes
+              %assign recordName = "ClockTick%<idx>"
+              %if ClockTickForTIDIsReqFcn(idx)  
+                %if SLibDeploymentIsValidAsyncSampleTimeIndexForComponent(mSysIdx, idx)
+                  clockTickPtrs[%<idx>] = &(%<SLibDeploymentRTMGet(recordName, tSimStruct)>);
+                %else
+                  %% find task idx who contains sampleTime idx of component mSysIdx
+                  %assign rtmIdx = SLibDeploymentGetTaskIndexForComponent(mSysIdx, idx)
+                  %if !ISEQUAL(rtmIdx, -1) %% Component has blocks at rate idx
+                    %assign rtmName    = "%<SLibDeploymentGetTasksRTMVarName()>[%<rtmIdx>]" 
+                    clockTickPtrs[%<idx>] = &(%<SLibDeploymentRTMGet(recordName, rtmName)>);
+                  %else
+                    clockTickPtrs[%<idx>] = %<SLibGetNullDefinitionFromTfl()>;
+                  %endif
+                %endif
+              %else
+                clockTickPtrs[%<idx>] = %<SLibGetNullDefinitionFromTfl()>;
+              %endif
+              
+              %if needLongClockTicks
+                %assign recordName = "ClockTickH%<idx>"
+                %if LongClockTickForTIDIsReqFcn(idx)
+                  %if SLibDeploymentIsValidAsyncSampleTimeIndexForComponent(mSysIdx, idx)
+                    clockTickHPtrs[%<idx>] = &(%<SLibDeploymentRTMGet(recordName, tSimStruct)>);
+                  %else
+                    %assign rtmIdx = SLibDeploymentGetTaskIndexForComponent(mSysIdx, idx)
+                    %if !ISEQUAL(rtmIdx, -1) %% Component has blocks at rate idx  
+                      %assign rtmName    = "%<SLibDeploymentGetTasksRTMVarName()>[%<rtmIdx>]" 
+                      clockTickHPtrs[%<idx>] = &(%<SLibDeploymentRTMGet(recordName, rtmName)>);
+                    %else 
+                      clockTickHPtrs[%<idx>] = %<SLibGetNullDefinitionFromTfl()>;
+                    %endif
+                  %endif
+                %else
+                  clockTickHPtrs[%<idx>] = %<SLibGetNullDefinitionFromTfl()>;
+                %endif
+              %endif
+            %endforeach
+            %<SLibDeploymentGetTimingBridgeName()>[%<rowIdx>].clockTick = clockTickPtrs;
+            %if needLongClockTicks
+              %<SLibDeploymentGetTimingBridgeName()>[%<rowIdx>].clockTickH = clockTickHPtrs;
+            %else
+              %<SLibDeploymentGetTimingBridgeName()>[%<rowIdx>].clockTickH = %<SLibGetNullDefinitionFromTfl()>;
+            %endif
+          %else
+            %<SLibDeploymentGetTimingBridgeName()>[%<rowIdx>].clockTick = %<SLibGetNullDefinitionFromTfl()>;
+            %<SLibDeploymentGetTimingBridgeName()>[%<rowIdx>].clockTickH = %<SLibGetNullDefinitionFromTfl()>;
+          %endif
+          
+          %if CompiledModel.SingleRate != "yes" 
+            %if ERTPerTaskSampleHitsIsReqFcn()
+              %assign shMat = RTMGet("PerTaskSampleHits")
+              %foreach i = NumSynchronousSampleTimes 
+                %foreach j = NumSynchronousSampleTimes
+                  %if SLibGetNeedRateInteraction(i,j)  
+                    %% find task idx who has sampleTime i of component mSysIdx
+                    %assign rtmIdx = SLibDeploymentGetTaskIndexForComponent(mSysIdx, i)    
+                    %if !ISEQUAL(rtmIdx, -1) %% Component has blocks at rate i  
+                      %assign rtmName = "%<SLibDeploymentGetTasksRTMVarName()>[%<rtmIdx>]" 
+                      
+                      %if SuppressMultiTaskScheduler
+                        %assign val = "%<SLibDeploymentRTMGet("PerTaskSampleHits", rtmName)>."...
+                          "b_%<SLibERTMultiRateTimingField(j,i)>"
+                      %else
+                        %assign val = "%<SLibDeploymentRTMGet("PerTaskSampleHits", rtmName)>."...
+                          "%<SLibERTMultiRateTimingField(j,i)>"
+                      %endif
+                      rateTransitionPtrs[%<i>*%<NumSynchronousSampleTimes> + %<j>] \ 
+                      = &(%<val>);
+                    %else %% Initialize with NULL
+                      rateTransitionPtrs[%<i>*%<NumSynchronousSampleTimes> + %<j>] \ 
+                      = %<SLibGetNullDefinitionFromTfl()>;
+                    %endif
+                  %endif
+                %endforeach
+              %endforeach
+              %<SLibDeploymentGetTimingBridgeName()>[%<rowIdx>].rateTransition = rateTransitionPtrs;
+            %endif
+          %endif
+          
+          %if RTMTimePtrIsReqFcn() || RTMTaskTimeIsReqFcnForTID(0) 
+            %foreach idx = NumSampleTimes 
+              %if SLibDeploymentIsValidAsyncSampleTimeIndexForComponent(mSysIdx, idx)
+                %if SampleTime[idx].NeedFloatTime == "yes"
+                  taskTimePtrs[%<idx>] = &(%<FcnGetTaskTime(System[NumSystems-1], idx, tSimStruct)>);
+                %else
+                  taskTimePtrs[%<idx>] = %<SLibGetNullDefinitionFromTfl()>;
+                %endif
+              %else
+                %% find task who has sampleTime idx of component mSysIdx
+                %assign rtmIdx = SLibDeploymentGetTaskIndexForComponent(mSysIdx, idx)    
+                %if !ISEQUAL(rtmIdx, -1) %% Referenced model has blocks at rate idx  
+                  %assign rtmName = "%<SLibDeploymentGetTasksRTMVarName()>[%<rtmIdx>]"     
+                  %if ISEQUAL(idx, 0) 
+                    taskTimePtrs[%<idx>] = &(%<SLibDeploymentRTMGet("T", rtmName)>);
+                  %elseif SampleTime[idx].NeedFloatTime == "yes"
+                    taskTimePtrs[%<idx>] = &(%<FcnGetTaskTime(System[NumSystems-1], idx, rtmName)>);
+                  %else
+                    taskTimePtrs[%<idx>] = %<SLibGetNullDefinitionFromTfl()>;
+                  %endif
+                %else
+                  taskTimePtrs[%<idx>] = %<SLibGetNullDefinitionFromTfl()>;
+                %endif
+              %endif
+            %endforeach
+            %<SLibDeploymentGetTimingBridgeName()>[%<rowIdx>].taskTime = taskTimePtrs;
+          %endif  
+          
+          %if RTMFirstInitCondFlagIsReqFcn()
+             %<SLibDeploymentGetTimingBridgeName()>[%<rowIdx>].firstInitCond = &%<RTMIs("FirstInitCond")>;
+          %endif   
+        }
+      %endif
+    %endforeach
+  %endif
+  
+  %% Model initialize functions
+  %with System[baseSysIdx]
+    %foreach rowIdx = SIZE(mdlRefBlks,0)
+      %assign mdlRefInfo = mdlRefBlks[rowIdx]
+      %assign mSysIdx = mdlRefInfo[0]
+      %assign bIdx    = mdlRefInfo[1]
+      %assign instIdx = mdlRefInfo[2]
+      %with System[mSysIdx].Block[bIdx]
+        %assign blk = System[mSysIdx].Block[bIdx]
+        %assign blockInterface = GetModelrefInterface(blk)
+        %assign doSSInitCacheClose = TLC_FALSE
+        %if instIdx != -1
+          %assign standaloneSysIdx = System[mSysIdx].StandaloneParentSysIdx[instIdx]
+          %if standaloneSysIdx != -1 
+            %% cache registration fcn to parent standalone initialize fcn
+            %openfile stdSSBuffer
+            %assign doSSInitCacheClose = TLC_TRUE
+          %endif
+        %endif
+        
+        %assign tmpVec = [%<mdlRefInfo[3]>, %<mdlRefInfo[4]>]
+        %assign bpath  = STRING(SLibMangledGrBlockPath(tmpVec))
+        %if ISFIELD(blockInterface, "RegistrationFcn")
+          /* Model Initialize fcn for %<Type> Block: '%<Name>' */
+          %<SLibMdlRefIfNetPreprocessorCondition(System[mSysIdx].Block[bIdx])>
+          %<GetFunctionStr(System[mSysIdx].Block[bIdx], ...
+            "Registration", instIdx, "", rowIdx, bpath)>
+          %<SLibMdlRefEndIfNetPreprocessorCondition(System[mSysIdx].Block[bIdx])>
+        %endif
+        %if (CompiledModel.RTWStatesLogging || MatFileSignalLogging) && ...
+          !System[mSysIdx].Block[bIdx].ParamSettings.InsideForEachSS
+          %assign rtm_mmi = "&(%<RTMGet("DataMapInfo")>.mmi)"
+          %assign childMMI = "rtwCAPI_GetChildMMI(%<rtm_mmi>,%<rowIdx>)"
+          { 
+          /* MAT-file logging: Update full-paths stored in the MMI */
+          %assign bpath_unmangled  = STRING(SLibGrBlockPath(tmpVec))
+          char_T *tempStr = rtwCAPI_EncodePath("%<bpath_unmangled>");
+          rtwCAPI_UpdateFullPaths((%<childMMI>), tempStr, 1);
+          utFree(tempStr);
+        } 
+      %endif
+      
+      %if doSSInitCacheClose
+        %closefile stdSSBuffer
+        %<LibAddToSystemField(System[standaloneSysIdx],"CachedInitializeDataBody",...
+          "\n" + stdSSBuffer+ "\n")>
+      %endif
+      
+    %endwith
+  %endforeach
+  %<SLibCacheCodeToFile("mdl_data_defn", LibDumpGroundDeclarations(0))>
+ %endwith
+ %closefile modelrefBuffer
+ %return modelrefBuffer
+%endfunction %% SLibDeploymentCallModelrefBlockRegFcns
+
+%%============================================================================%%
+%%                        FUNCTIONS FOR ERT/GRT CODE GEN                      %%
+%%============================================================================%%
+
+%% Function: SLibDeploymentGenerateOutputAndUpdate() ===========================
+%% Description: 
+%%    Generates for a parallel deployment diagram:
+%%        - a separate void(void) entry  point for each task
+%%        - a separate solver instance for each task which has continuous states
+%%
+%function SLibDeploymentGenerateOutputAndUpdate() void
+  %assert (LibIsDeploymentDiagram())
+  %if UsingMalloc
+    %assign errTxt = "Parallel Deployment Error: malloc is not supported."
+    %<LibReportFatalError(errTxt)>
+  %endif
+  %if IsModelReferenceForASimstructBasedTarget()
+    %assign errTxt = "Parallel Deployment Error: SimStruct based targets are not supported."
+    %<LibReportFatalError(errTxt)>
+  %endif
+    
+  %assign entryPointIdx = -1
+  %assign rootSystem    = System[NumSystems-1]
+
+  %openfile tmpBuf
+  
+  %foreach tgIdx = CompiledModel.NumEventHandlers
+    %assign tg = CompiledModel.EventHandler[tgIdx]
+    %% Only periodic tasks are supported for now
+    %if ISEQUAL(tg.NumTasks, 0) && ISEQUAL(tg.NumEntryPointInfos, 0)
+      %continue
+    %endif
+    
+    %% Generate task functions
+    %foreach tIdx           = tg.NumTasks
+      %assign task          = tg.Task[tIdx]   
+      %if ISEQUAL(tg.Periodicity.Type, "Periodic") 
+        %assign entryPointIdx = entryPointIdx + 1 
+      %endif
+      %if ISEQUAL(task.NumEntryPointInfos, 0)
+        %addtorecord task OutputWrapperFcn ""
+        %addtorecord task UpdateWrapperFcn ""
+        %continue
+      %endif
+      %assign taskTID = FcnGetTaskSampleTimeIndex(task)
+      %assign requiresSolver = TLC_FALSE
+      
+      %% check if has continuous entry points
+      %foreach epIdx = task.NumEntryPointInfos
+        %assign blkIdx        = task.EntryPointInfo[epIdx].BlockIdx
+        %assign currentSystem = System[blkIdx[1]]
+        %if (currentSystem.HasCStatesArg == 1) && ISEQUAL(taskTID, 0)
+          %assign requiresSolver = TLC_TRUE
+          %break
+        %endif
+      %endforeach
+       
+      %if requiresSolver
+        %% Generate TID0 entry points for continuous solver as for normal models
+        %assign currentTid = SLibSystemFcnRateGrouping(rootSystem, "Output") ? 0 : ""
+        %assign rootSystem.CurrentTID = currentTid
+        %if (CombineOutputUpdateFcns == 1)
+          %<FcnGenerateContinuousOutputUpdate(currentTid, task, entryPointIdx)>
+        %else
+          %<FcnGenerateContinuousOutput(currentTid, task, entryPointIdx)>
+          %<FcnGenerateContinuousUpdate(currentTid, task, entryPointIdx)>
+        %endif
+        %assign rootSystem.CurrentTID = 0
+        %<SLibDumpSolverCode(CompiledModel.EventHandler[tgIdx].Task[tIdx])>
+      %else 
+        %% Generate entry point 
+        
+        %if ISEQUAL(tg.Periodicity.Type, "Aperiodic")
+          %% Async entry point
+          %<FcnGenerateAsyncEntryPoint(taskTID, task)>   
+         
+          %% Discrete entry point
+        %elseif (CombineOutputUpdateFcns == 1)
+          %% Generate combined output/update function 
+          %<FcnGenerateDiscreteEntryPoint(taskTID, task, entryPointIdx, "OutputUpdate")>
+        %else
+          %% Generate separate output and update functions
+          %<FcnGenerateDiscreteEntryPoint(taskTID, task, entryPointIdx, "Output")> 
+          %assign buf = FcnGenerateDiscreteEntryPoint(taskTID, task, entryPointIdx, ...
+            "Update")
+          %if !WHITE_SPACE(buf)
+            %<buf>
+          %endif
+        %endif
+      %endif     %% if requiresSolver
+    %endforeach  %% Tasks
+    
+    %% Generate event handler functions
+    %if ISEQUAL(tg.Periodicity.Type, "Aperiodic")
+      %foreach epIdx = tg.NumEntryPointInfos
+        %assign tid = FcnGetTaskSampleTimeIndex(tg)
+        %% Async entry point
+        %<FcnGenerateAsyncEntryPoint(tid, tg)>   
+      %endforeach
+    %endif
+    
+  %endforeach    %% TaskGroups
+  
+  %if GenerateGRTWrapper 
+    %assign genLocalMain = 1
+  %elseif (GenerateSampleERTMain || RateBasedStepFcn ) && ...
+    (!SLibGenerateNativeThreads())
+    %% if generateSampleERTMain, not step main fcn generated in model.c,
+    %% it is generated in SampleERTMain function.
+    %assign genLocalMain = 0
+  %else
+    %assign genLocalMain = 1
+  %endif
+  
+  %if ISEQUAL(genLocalMain, 1) 
+    %% Generate modelName_step() function of root system for ERT, respectively 
+    %% modelName_output() and modelName_update() for GRT
+    %if !GenerateGRTWrapper && (CombineOutputUpdateFcns == 1)
+      %<FcnGenerateModelEntryPoint("OutputUpdate")>
+    %else
+      %<FcnGenerateModelEntryPoint("Output")>
+      %<FcnGenerateModelEntryPoint("Update")>
+    %endif
+  %endif
+  %closefile tmpBuf
+  
+  %<FcnDeclareTasksRTMVec()>      
+  %<FcnDeclareTimingBridgeVec()>    
+  %if NumContStates > 0
+    %<FcnDeclareTasksContStatesVec()>
+  %endif
+  %if SLibModelHierarchyContainsNoninlinedSfcn()
+    %<FcnDeclareSfcnInfoVec()>
+  %endif
+  %if ModelIsLinearlyImplicit == "yes" 
+    %<FcnDeclareTasksMassMatricesVec()>
+  %endif
+  %% Initialize tasks RTM, timing bridge, ContStates and sfcnInfo
+  %<FcnInitializeTasksStruct()>
+  %<FcnInitializeSolverAndTimingData()>
+  %if SLibModelHierarchyContainsNoninlinedSfcn()
+    %<FcnInitializeSfcnInfo()>
+  %endif
+  
+  %% Generate AdvanceTaskCounters()
+  %<FcnGenerateAdvanceTaskCountersFcn()>
+  
+  %return (tmpBuf)
+%endfunction
+
+%% Function:  SLibDeploymentGenerateCodeInfo ===================================
+%% Description: Generate CodeInfo for a parallel deployment diagram  
+%% 
+%function SLibDeploymentGenerateCodeInfo(componentObj) void
+  %assert (LibIsDeploymentDiagram())
+  %openfile tmpBuff
+  
+  %foreach tgIdx = CompiledModel.NumEventHandlers
+    %assign tg = CompiledModel.EventHandler[tgIdx]   
+    %% Only periodic tasks are supported for now
+    %if !ISEQUAL(tg.Periodicity.Type, "Periodic")
+      %continue
+    %endif
+    %if ISEQUAL(tg.NumTasks, 0)
+      %continue
+    %endif
+    %foreach tIdx = tg.NumTasks
+      %assign task = tg.Task[tIdx]  
+      %assign tid  = FcnGetTaskSampleTimeIndex(task)
+      %if !WHITE_SPACE(task.OutputWrapperFcn)  %% has void (void) wrapper functions
+        %assign fcnName    = task.OutputWrapperFcn
+        %assign fcnParams  = "void"
+        %assign fcnReturns = "void"
+        %<FcnAddEntryPointToCodeInfo(componentObj, "OutputUpdate", fcnName, tid, ...
+          fcnParams, fcnReturns)>;
+   
+        %if !WHITE_SPACE(task.UpdateWrapperFcn) 
+          %assign fcnName  = task.UpdateWrapperFcn
+          %<FcnAddEntryPointToCodeInfo(componentObj, "Update", fcnName, tid, ...
+            fcnParams, fcnReturns)>;
+        %endif
+      %endif
+    %endforeach %% Tasks
+  %endforeach   %% TaskGroups
+  
+  %closefile tmpBuff
+  %return tmpBuff
+%endfunction
+
+%% Function: FcnGenerateAdvanceTaskCountersFcn =================================
+%% Description: Generate void AdvanceTaskCounters(void) function as rates
+%%              scheduler
+%%
+%function FcnGenerateAdvanceTaskCountersFcn() void
+  %assert (LibIsDeploymentDiagram())
+  %openfile tmpBuf
+  %assign fcnName    = SLibDeploymentSchedulerName()
+  %assign fcnParams  = "void"
+  %assign fcnReturns = "void"
+
+  %openfile schedulerCode
+  %if !RootSystemIsSingleRate && (!SuppressMultiTaskScheduler || ...
+    SLibGenerateNativeThreads())
+    %assign ::NeedScheduler = %<FcnScheduleSubRates()>
+  %endif
+  %closefile schedulerCode
+  
+  %openfile fcnAbstract
+  This function updates active task counters and model execution time.
+  %closefile fcnAbstract
+  
+  %openfile fcnProtoType
+  %createrecord fcnRec {Name fcnName; Returns fcnReturns; Params fcnParams; ...
+    Abstract fcnAbstract; Category "model"; GeneratedBy "ertmdlreftiming.tlc";...
+    Type "Schedule"}
+  %<SLibDumpFunctionBanner(fcnRec)>
+  %undef fcnRec
+  %<fcnReturns> %<fcnName>(%<fcnParams>)\
+  %closefile fcnProtoType
+   
+  %<fcnProtoType>
+  {
+    %if !WHITE_SPACE(schedulerCode) 
+      %<schedulerCode>
+    %endif
+    /* Update absolute time for base rate */
+    %<FcnRTMUpdateAbsoluteTimeForTID(0, tSimStruct, TLC_FALSE)>
+    %if !IsModelReferenceTarget()
+      %<FcnUpdateAsyncTaskTimers()>
+    %endif
+  }
+  %closefile tmpBuf
+
+  %% Declare function in header file
+  %assign prototypeBuf =  "%<LibExternInFcnDecls()> %<fcnReturns> %<fcnName>(%<fcnParams>);"
+  %<SLibCacheCodeToFile("mdl_extern_fcn_decl", prototypeBuf)> 
+  
+  %% Dump code in model.c
+  %<SLibCacheCodeToFile("baseMdl_fcn_defn", tmpBuf)>
+ 
+%endfunction
+
+%% Function: SLibDeploymentGenerateGRTMain() ===================================
+%% Description: Generates rt_main.c or classic_main.c for parallel deployment 
+%% diagram and GRT target.
+%%
+%function SLibDeploymentGenerateGRTMain() void
+  %assert (LibIsDeploymentDiagram())
+  %openfile banner
+  /*
+   * %<Name>.%<LangFileExt>
+   * 
+   %<SLibCommonHeaderInfo()>\
+   */
+   %closefile banner
+   %<SLibCacheCodeToFile("mainSrc_ban", banner)>
+   %openfile tmpBuf
+   %<SLibCreateMainForGRTWrapper()>
+   %closefile tmpBuf
+   %return (tmpBuf)
+%endfunction
+
+%% Function:  SLibDeploymentCallGRTEntryPoints =================================
+%% Description: Call GRT Entry points generated for parallel deployment diagram
+%%
+%function SLibDeploymentCallGRTEntryPoints(tid, fcnType) void
+  %assert (LibIsDeploymentDiagram())
+  %assert ((fcnType == "Update") || (fcnType == "Output") || ...
+    (fcnType == "OutputUpdate"))
+  
+  %assign taskIdx = 0
+  %openfile tmpBuf
+  %foreach tgIdx = CompiledModel.NumEventHandlers
+    %assign tg = CompiledModel.EventHandler[tgIdx]   
+    %% Only periodic tasks are supported for now
+    %if !ISEQUAL(tg.Periodicity.Type, "Periodic")
+      %continue
+    %endif
+    %if ISEQUAL(tg.NumTasks, 0)
+      %continue
+    %endif
+   
+    %foreach tIdx = tg.NumTasks
+      %assign task = tg.Task[tIdx]
+      %assign taskTID = FcnGetTaskSampleTimeIndex(task)
+      %% Call GRT entry points for tid
+      %if ISEQUAL(tid, taskTID) || ...
+        (ISEQUAL(tid, "") && LibIsSingleRateSystem(rootSystem)) %% single-rate
+        %if ISEQUAL(fcnType, "OutputUpdate") || ISEQUAL(fcnType, "Output")   
+          MdlOutputs(%<taskIdx>);
+        %endif
+        %if ISEQUAL(fcnType, "OutputUpdate") || ISEQUAL(fcnType, "Update")   
+          MdlUpdate(%<taskIdx>); 
+        %endif
+      %endif
+      %assign taskIdx = taskIdx + 1
+    %endforeach  %% Tasks 
+  %endforeach    %% TaskGroups
+  
+  %%  Call AdvanceTaskCounters() 
+  %if !SuppressMultiTaskScheduler && ...
+    (tid == 0) && ...
+    (ISEQUAL(fcnType, "OutputUpdate") || ISEQUAL(fcnType, "Update"))   
+    %<SLibDeploymentSchedulerName()>();
+  %endif
+  
+  %closefile tmpBuf
+  %return (tmpBuf)
+%endfunction
+
+%% Function: SLibDeploymentCallERTEntryPoints ==================================
+%% Description: Generates calls to the ERT entry points of a parallel deployment
+%%              diagram associated with %<tid>. 
+%% If tid == 0  calls to a continuous entry point and all discrete entry points
+%%              associated with tid0
+%%    tid > 0   calls to all discrete entry points associated with tid0
+%%    tid == "" calls to all entry points of a single-rate block diagram
+%%
+%function SLibDeploymentCallERTEntryPoints(tid) void
+  %assert (LibIsDeploymentDiagram())
+  %openfile tmpBuff
+ 
+  %foreach tgIdx = CompiledModel.NumEventHandlers
+    %assign tg = CompiledModel.EventHandler[tgIdx]   
+    %% Only periodic tasks are supported for now
+    %if !ISEQUAL(tg.Periodicity.Type, "Periodic")
+      %continue
+    %endif
+    %if ISEQUAL(tg.NumTasks, 0)
+      %continue
+    %endif
+
+    %foreach tIdx = tg.NumTasks
+      %assign task    = tg.Task[tIdx]
+      %assign taskTID = FcnGetTaskSampleTimeIndex(task)
+      
+      %if ISEQUAL(tid, taskTID) || ...
+        (ISEQUAL(tid, "") && LibIsSingleRateSystem(rootSystem))  %% single-rate
+        %if !WHITE_SPACE(task.OutputWrapperFcn)
+          %% Wrapper functions are always void (void)
+          %<task.OutputWrapperFcn>();
+          %if !WHITE_SPACE(task.UpdateWrapperFcn)
+            %<task.UpdateWrapperFcn>();
+          %endif
+        %endif
+      %endif
+    %endforeach %% Tasks
+  %endforeach   %% TaskGroups
+    
+  %% Call AdvanceTaskCounters()
+  %if !SuppressMultiTaskScheduler
+    %<SLibDeploymentSchedulerName()>();
+  %endif
+   
+  %closefile tmpBuff
+  %return tmpBuff
+%endfunction 
+
+%% Function: SLibDeploymentGRTCustomizeRtOneStep ===============================
+%% Description: Customize the body of rtOneStep function for GRT target
+%%
+%function SLibDeploymentGRTCustomizeRtOneStep(indexVar, fcnType) void
+  %assert (LibIsDeploymentDiagram())
+  %assert ((fcnType == "Update") || (fcnType == "Output") || ...
+    (fcnType == "OutputUpdate"))
+  %assign nTids   = SLibDeploymentGetNumPeriodicTasks() 
+  %assign varName = FcnGetSampleTimeIndexVarName() 
+  %openfile tmpBuf 
+  { 
+  int_T k;
+  for (k = 0; k < %<nTids>; k++) {
+    if (%<varName>[k] == %<indexVar>)  {
+      %if ISEQUAL(fcnType, "OutputUpdate") || ISEQUAL(fcnType, "Output")   
+        MdlOutputs(k); 
+      %endif
+      %if ISEQUAL(fcnType, "OutputUpdate") || ISEQUAL(fcnType, "Update")   
+        MdlUpdate(k); 
+      %endif
+    }  
+  }
+  }
+  %closefile tmpBuf
+  %return (tmpBuf)
+%endfunction
+
+%% Function: SLibDeploymentDeclareTasksSampleTimeIndex() ========================
+%% Description: Declare a local variable with the task IDs .
+%%
+%function SLibDeploymentDeclareTasksSampleTimeIndex() void
+  %assert (LibIsDeploymentDiagram())
+  %assign initStr = ""
+  %assign comma   = ""
+   
+  %foreach tgIdx = CompiledModel.NumEventHandlers
+    %assign tg = CompiledModel.EventHandler[tgIdx]
+    %% Only periodic tasks are supported for now
+    %if !ISEQUAL(tg.Periodicity.Type, "Periodic")
+      %continue
+    %endif
+    %if ISEQUAL(tg.NumTasks, 0)
+      %continue
+    %endif
+  
+    %foreach tIdx = tg.NumTasks
+      %assign task = tg.Task[tIdx]
+      %if !ISEQUAL(task.NumEntryPointInfos, 0)
+        %assign taskTID = FcnGetTaskSampleTimeIndex(task)
+        %if !ISEQUAL(taskTID, "")
+          %assign initStr = initStr +"%<comma>%<taskTID>"
+          %assign comma = ","
+        %endif
+      %endif
+    %endforeach  %% Tasks 
+  %endforeach    %% TaskGroups
+  %assign varName = FcnGetSampleTimeIndexVarName() 
+  %openfile tmpBuf
+  int_T %<varName>[%<SLibDeploymentGetNumPeriodicTasks()>] = {%<initStr>};
+  %closefile tmpBuf
+  %return tmpBuf
+%endfunction
+
+%% Function: SLibDeploymentBeautifyGRTMain() ===================================
+%% Description: Call c_beautifier on rt_main.c/classic_main.c file
+%%
+%function SLibDeploymentBeautifyGRTMain() void
+  %assert (LibIsDeploymentDiagram())
+  %openfile tmpBuf
+  %assign dirName  = "%<CompiledModel.Name>_grt_rtw"
+  %if ::GRTInterface==TLC_FALSE
+    %assign fileName = "rt_main.c"
+  %else
+    %assign fileName = "classic_main.c"
+  %endif
+  %assign name     =  FEVAL("fullfile", dirName, fileName)
+  %matlab c_beautifier(name)
+  %closefile tmpBuf
+  %return (tmpBuf)
+%endfunction
+
+%%==============================================================================
+%% Replicated *Struct() functions from fcniolib.tlc because of 
+%%     opaquelib.tlc:SLibCGIRVarGroupPath()
+%% These are required to pass the correct Task RTM/states as argument in solver
+%% functions.
+%%==============================================================================
+
+%% Function:  SLibDeploymentLibGetContStatesStruct =============================
+%% Abstract:
+%%    Returns the variable for the ContStates variable.
+%%
+%function SLibDeploymentGetContStatesStruct(sysIdx, forceDerivFromRTM) void
+  %% continuous has always TID0, but hasCStatesArg is still empty at this point
+  %assign tid     = System[sysIdx].HasCStatesArg ? 0 : 1
+  %assign taskIdx = SLibDeploymentGetTaskIndexForComponent(sysIdx, tid)
+  %assert (taskIdx >= 0)
+  
+  %assign varName = ""
+  %if forceDerivFromRTM 
+    %assign varName = "%<SLibDeploymentGetTasksRTMVarName()>[%<taskIdx>]" 
+  %else
+    %assign varName = "%<FcnGetTasksContStatesVarName()>"
+  %endif
+  
+  %if CompiledModel.HasSimStructVars == 1
+    %assign retStr = SLibDeploymentRTMGet("ContStates", varName)
+    %assign retStr =  "((%<tContStateType> *) %<retStr>)"
+  %else
+    %assign retStr = varName
+  %endif
+  %return retStr
+%endfunction 
+
+%% Function: SLibDeploymentGetContStatesDisabledStruct =========================
+%% Abstract:
+%%    Returns the variable for the ContStatesDisabled variable.
+%%
+%function SLibDeploymentGetContStatesDisabledStruct(sysIdx, forceDerivFromRTM) void
+  %assign errTxt = "Parallel Deployment Error: variable-step solver is not supported."
+  %<LibReportFatalError(errTxt)>
+%endfunction 
+
+%% Function: SLibDeploymentGetContStatesDerivativeStruct =======================
+%% Abstract:
+%%    Returns the variable for the ContStatesDerivative variable.
+%%
+%function SLibDeploymentGetContStatesDerivativeStruct(sysIdx, forceDerivFromRTM) void
+  %if CompiledModel.HasSimStructVars == 1 || forceDerivFromRTM 
+    %% continuous has always TID0, but hasCStatesArg is still empty at this point
+    %assign tid     = System[sysIdx].HasCStatesArg ? 0 : 1
+    %assign taskIdx = SLibDeploymentGetTaskIndexForComponent(sysIdx, tid)
+    %assert (taskIdx >= 0)
+   
+    %assign varName = "%<SLibDeploymentGetTasksRTMVarName()>[%<taskIdx>]" 
+    %assign xdotName = SLibDeploymentGetTaskNameForComponent(sysIdx, tid)
+    %return "((%<tXdotType>_%<xdotName> *) %<SLibDeploymentRTMGet("dX", varName)>)"
+  %else 
+    %return tXdot
+  %endif
+%endfunction
+
+%% Function: SLibDeploymentGetSystemCStatesDeriv =======================
+%% Abstract:
+%%    Returns the task specific continuous states derivatives structure.  This
+%%    function needs to return the derivatives in the same order that they
+%%    appear in the global continuous states structure.  So it uses the
+%%    BlockContStateOrder field of the task to ensure that the continuous states
+%%    of the blocks mapped to the task appear in the correct order.
+%%
+%function SLibDeploymentGetSystemCStatesDeriv(sysIdx)
+  %assert (LibIsDeploymentDiagram())
+  %assert (sysIdx == NumSystems-1)
+  %assign retval = ["", 0]
+  %assign cstates = ""
+  %assign numContStates = 0
+  %foreach tgIdx = CompiledModel.NumEventHandlers
+    %assign tg = CompiledModel.EventHandler[tgIdx]
+    %% Only periodic tasks have continuous states
+    %if !ISEQUAL(tg.Periodicity.Type, "Periodic") || ISEQUAL(tg.NumTasks, 0)
+      %continue
+    %endif
+    %foreach tIdx = tg.NumTasks
+      %assign task    = tg.Task[tIdx]
+      %if task.NumContStates <= 0
+        %continue
+      %endif
+      %assign identifier = "%<tXdotType>_%<task.FunctionName>"
+      %openfile comment
+      /* State derivatives for %<task.FunctionName> */
+      %closefile comment
+      %openfile taskCStates
+
+      %<comment>\
+      %<GetHideChildDefineSymbol("ifndef")>\
+      typedef struct {
+      %foreach epIdx = task.NumEntryPointInfos
+        %assign blkIdx = task.EntryPointInfo[task.BlockContStateOrder[epIdx]].BlockIdx
+        %assign taskSysIdx = blkIdx[1]
+        %assign taskCStatesDerivBuff = SLibGetSystemCStatesDeriv(taskSysIdx)
+        %if taskCStatesDerivBuff[1] > 0
+          %<taskCStatesDerivBuff[0]>
+        %endif
+      %endforeach
+      } %<identifier>;
+      %<GetHideChildDefineSymbol("endif")>\
+      %closefile taskCStates
+      %assign cstates = "%<cstates> %<taskCStates>"
+      %assign numContStates = numContStates + task.NumContStates
+    %endforeach
+  %endforeach
+  %assert (LibGetFieldSet(System[sysIdx], "HasCStatesDerivArg") == 0)
+  %if numContStates > 0
+    %assign System[sysIdx].HasCStatesDerivArg = 1
+  %endif
+  %<LibSetFieldSet(System[sysIdx], "HasCStatesDerivArg")>
+  %if numContStates > 0
+    %assign retval[0] = "%<cstates>"
+    %assign retval[1] = %<numContStates>
+  %endif
+  %return retval
+%endfunction
+
+%% Function: SLibDeploymentGetSystemMassMatrix =======================
+%% Abstract:
+%%    Returns the task specific mass matrix structure.  This function utilizes
+%%    the task-specific version of the Ir and Jc matrices dumped in the RTW
+%%    file.
+%%
+%function SLibDeploymentGetSystemMassMatrix(sysIdx)
+  %assert (LibIsDeploymentDiagram())
+  %assign retval = ["", 0]
+  %assign taskMassMatrixBuff = ""
+  %assign numTasksWithMassMatrices = 0
+  %if (::CompiledModel.ModelIsLinearlyImplicit == "yes")
+    %foreach tgIdx = CompiledModel.NumEventHandlers
+      %assign tg = CompiledModel.EventHandler[tgIdx]
+      %% Only periodic tasks have continuous states
+      %if !ISEQUAL(tg.Periodicity.Type, "Periodic") || ISEQUAL(tg.NumTasks, 0)
+        %continue
+      %endif
+      %openfile taskMassMatrixDef
+      %foreach tIdx = tg.NumTasks
+        %assign task    = tg.Task[tIdx]
+        %if task.NumContStates <= 0 || task.IsLinearlyImplicit == "no"
+          %continue
+        %endif
+        %assign identifier = "%<tMassMatrixGlobalType>_%<task.FunctionName>"
+        %openfile comment
+        /* Mass Matrix for %<task.FunctionName> */
+        %closefile comment
+        %<comment>\
+        %<GetHideChildDefineSymbol("ifndef")>\
+        typedef struct {
+          int_T  ir[%<task.MassMatrixNzMax>];
+          int_T  jc[%<task.NumContStates+1>];
+          real_T pr[%<task.MassMatrixNzMax>];
+        } %<identifier>;
+        %<GetHideChildDefineSymbol("endif")>\
+      %endforeach
+      %closefile taskMassMatrixDef
+      %assign taskMassMatrixBuff = "%<taskMassMatrixBuff> %<taskMassMatrixDef>"
+      %assign numTasksWithMassMatrices = numTasksWithMassMatrices + 1
+    %endforeach
+  %endif
+  %assert (LibGetFieldSet(System[sysIdx], "HasMassMatrixGlobalArg") == 0)
+  %if numTasksWithMassMatrices > 0
+    %assign System[sysIdx].HasMassMatrixGlobalArg = 1
+  %endif
+  %<LibSetFieldSet(System[sysIdx], "HasMassMatrixGlobalArg")>
+  %if numTasksWithMassMatrices > 0
+    %assign retval[0] = "%<taskMassMatrixBuff>"
+    %assign retval[1] = %<numTasksWithMassMatrices>
+  %endif
+  %return retval
+%endfunction
+
+%% Function: SLibDeploymentGetSystemMassMatrixPr =======================
+%% Abstract:
+%%    Returns the Pr offset of a Model block within the task-specific Pr
+%%    structure.  This function calculates the relative offset within a task's
+%%    Pr matrix by subtracting the beginning of the task's continuous state
+%%    index from the block's continous state index within the flattened global
+%%    continuous state structure.
+%%
+%function SLibDeploymentGetSystemMassMatrixPr(sysIdx, blockIdx)
+  %assign blkPrIdx = -1
+  %foreach tgIdx = CompiledModel.NumEventHandlers
+    %assign tg = CompiledModel.EventHandler[tgIdx]
+    %% Only periodic tasks can have continuous states
+    %if !ISEQUAL(tg.Periodicity.Type, "Periodic") || ISEQUAL(tg.NumTasks, 0)
+      %continue
+    %endif
+    %foreach tIdx = tg.NumTasks
+      %assign task = tg.Task[tIdx]
+      %if task.NumContStates <= 0
+        %continue
+      %endif
+      %foreach epIdx = task.NumEntryPointInfos
+        %assign compIdx = task.EntryPointInfo[epIdx].BlockIdx
+        %assign system = System[compIdx[1]]
+        %foreach bIdx = system.NumTotalBlocks
+          %assign block = system.Block[bIdx]
+          %assign grSrc = block.GrSrc
+          %if ISEQUAL(grSrc[0], sysIdx) && ISEQUAL(grSrc[1], blockIdx)
+            %assign contStartIdx = block.ContStates[2]
+            %assign blkcstateIdx = contStartIdx - task.ContStateStartIndex
+            %assign blkPrIdx = task.MassMatrixJc[blkcstateIdx]
+            %return blkPrIdx
+          %endif
+        %endforeach
+      %endforeach
+    %endforeach
+  %endforeach
+  %assert (blkPrIdx != -1)
+  %return blkPrIdx
+%endfunction
+
+
+%% Function: SLibDeploymentIsSampleHit =========================================
+%% Abstract:
+%%   Generates IsSampleHit special access using task rtm.
+%%
+%function SLibDeploymentIsSampleHit(tid, compIdx) void
+  %assert (LibIsDeploymentDiagram())
+  
+  %assign rtmIdx = SLibDeploymentGetTaskIndexForComponent(compIdx, tid)
+  %assert ((rtmIdx >= 0) || ((rtmIdx == -1) && (compIdx == NumSystems-1)))
+
+  %if (rtmIdx >= 0)
+    %assign rtmName = "%<SLibDeploymentGetTasksRTMVarName()>[%<rtmIdx>]"  
+    %assign rtmIsMajorTimeStep = FcnGenSpecialAccess(NumSystems-1, ...
+      "MajorTimeStep", "is", 0, [], "", rtmName)
+  %else
+    %assign rtmIsMajorTimeStep = LibIsSampleHit(tid)
+  %endif
+  %return rtmIsMajorTimeStep
+%endfunction 
+
+%% Function: SLibDeploymentGenerateRTMGetMacro =================================
+%% Abstract:
+%%   Helper function to generate sspecial access macros using task rtm.
+%%
+%function SLibDeploymentGenerateRTMGetMacro(tid, compIdx, field) void
+  %assert (LibIsDeploymentDiagram())
+  
+  %assign rtmIdx = SLibDeploymentGetTaskIndexForComponent(compIdx, tid)
+  %assert (rtmIdx >= 0)
+  
+  %assign rtmName = "%<SLibDeploymentGetTasksRTMVarName()>[%<rtmIdx>]"  
+  %assign rtmAccess = SLibDeploymentRTMGet(field, rtmName) 
+  
+  %return rtmAccess
+%endfunction 
+
+%% Function: SLibDeploymentGenerateRTMGetMacro =================================
+%% Abstract:
+%%   Helper function to generate special access macros using task rtm.
+%%
+%function SLibDeploymentRTMSolverIs(tid, compIdx, field) void
+  %assert (LibIsDeploymentDiagram())
+  
+  %assign rtmIdx = SLibDeploymentGetTaskIndexForComponent(compIdx, tid)
+  %assert (rtmIdx >= 0)
+  
+  %assign rtmName = "%<SLibDeploymentGetTasksRTMVarName()>[%<rtmIdx>]"  
+  %assign rts = FcnRTMGetSolverInfo(rtmName)
+  %assign rtmAccess = "rtsiIsSolver%<field>(%<rts>)"
+  %return rtmAccess
+%endfunction 
+
+%% Function: SLibDeploymentGenerateRTMGetTMacro ================================
+%% Abstract:
+%%   Helper function to generate special access macros using task rtm.
+%%
+%function SLibDeploymentGenerateRTMGetTMacro(tid, compIdx) void
+  %assert (LibIsDeploymentDiagram())
+  
+  %assign rtmIdx = SLibDeploymentGetTaskIndexForComponent(compIdx, tid)
+  %assert (rtmIdx >= 0)
+  
+  %assign rtmName   = "%<SLibDeploymentGetTasksRTMVarName()>[%<rtmIdx>]"  
+  %assign rtmAccess = FcnGetTaskTime(System[NumSystems-1], tid, rtmName)
+  
+  %return rtmAccess
+%endfunction 
+
+
+%%============================================================================%%
+%%                        FUNCTIONS FOR TARGETS CUSTOMIZATION                 %%
+%%============================================================================%%
+
+%% Function: SLibDeploymentEmitCallTaskFunction ================================
+%% Description: 
+%%     Generates a call to task %<taskNum> of task group %<tgNum>
+%%
+%function SLibDeploymentEmitCallTaskFunction(taskNum, tgNum) void
+  %assert (LibIsDeploymentDiagram() && SLibIsERTCodeFormat())
+  %% if ERT target without model_step() function, error
+  %if (GenerateSampleERTMain || RateBasedStepFcn) && (!SLibGenerateNativeThreads())
+    %assign errTxt = "Parallel Deployment Error: No model wrapper function"
+    %<LibReportFatalError(errTxt)>
+  %endif
+  
+  %% Get task index 
+  %assign tIdx = 0
+  %foreach tgIdx = tgNum - 1
+    %assign tIdx = tIdx + CompiledModel.EventHandler[tgIdx].NumTasks
+  %endforeach
+  %assign tIdx = tIdx + taskNum
+  
+  %% Emit calls to model_step() of task %<taskNum> of EventHandler %<tgNum>
+  %openfile tmpBuf
+  %if SLibIsERTTarget()
+    %assign stepFcnName = SLibGenErtFunctionName("", "step")   %% %<mdlName>_step
+    %<stepFcnName>(%<tIdx>);
+  %else
+    MdlOutputs(%<tIdx>);
+    MdlUpdate(%<tIdx>);
+  %endif
+  %closefile tmpBuf
+  
+  %return tmpBuf
+%endfunction
+
+%function SLibDeploymentGetAperiodicEventHandler(aehIdx)
+  %assign nAEH = -1 %% aehIdx is 0-indexed
+  %assign nTaskGroups = LibDeploymentGetNumTaskGroups()
+  %assign retVal = ""
+  %foreach tgIdx = nTaskGroups
+    %assign tg = LibDeploymentGetTaskGroup(tgIdx)
+    %if ISEQUAL(tg.Periodicity.Type, "Aperiodic")
+      %assign nAEH = nAEH + 1
+      %if ISEQUAL(nAEH, aehIdx)
+       %assign retVal = tg
+       %break
+     %endif
+   %endif
+ %endforeach
+ %return retVal
+%endfunction
+
+%% Declare local variables required in model entry points which are not
+%% rate-grouped.
+%function SLibDeploymentGetLocalVars(fcnType) void
+  %openfile localVars
+  %foreach sysIdx = NumSystems-1
+    %assign currentSystem = System[sysIdx]
+    %% Add local variabels required for the Start function
+    %if ISEQUAL(fcnType, "Start")
+      %<FcnDeclareAccessedLocalVariables(currentSystem)>
+    %endif
+  %endforeach
+  %closefile localVars
+  %return localVars
+%endfunction
+%include "paralleldeploymentlib.tlc"
+
+%% [EOF]  deploymentdiagram.tlc

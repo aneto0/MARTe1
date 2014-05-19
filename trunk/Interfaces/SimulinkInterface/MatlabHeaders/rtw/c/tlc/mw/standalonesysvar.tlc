@@ -1,0 +1,252 @@
+%% $Revision: 1.1.6.14 $
+%%
+%% Copyright 2005-2010 The MathWorks, Inc.
+%%
+%% Abstract: 
+%%   This TLC file contains all the code for generating global variables 
+%%   which are used by nonreusable functions that live in reusable functions.
+%%
+
+%if EXISTS("_STANDALONESYSVAR_") == 0
+%assign _STANDALONESYSVAR_ = 1
+
+%% Function: SLibInitializeStandaloneData ======================================
+%% Abstract:
+%%   We need to initialize rtC and rtP, we should do this in subsystem_data
+%% if the standalone subsystem is not being generated into model.c
+%function SLibInitializeStandaloneData(system) void
+  %openfile tmpbuf
+  %with system.Interface
+    %if system.HasParametersArg
+      %assign rtp = LibGetSystemField(system, "StandaloneParametersInit")
+      %assign identifier = FcnSysVarGroupNonreusedName(system,"Parameter")
+      %if SLibAutosarCompilerAbstractionRequired()
+        %openfile definition
+        %<SLibAutosarCompilerAbstractionForDataDecl(TLC_FALSE, FcnSysVarGroupType(system,"Parameter"), TLC_FALSE, TLC_FALSE, identifier, "DataGlobal")> = { ...
+          %<rtp>
+        };\
+        %closefile definition
+      %else
+        %openfile definition
+        %<FcnSysVarGroupType(system,"Parameter")> ...
+          %<identifier> = {
+          %<rtp>
+        };\
+      %closefile definition
+      %endif
+      %<SLibApplyMemSecToDataDefnForSystem(definition, "MemSecDataParameters", identifier, system, TLC_FALSE)>\
+    %endif
+    %if system.HasConstBlockIOArg
+      %assign constbo = LibGetSystemField(system, "StandaloneConstBlockIOInit")
+      %assign identifier = FcnSysVarGroupNonreusedName(system,"ConstBlockIO")
+      %if SLibAutosarCompilerAbstractionRequired()
+        %openfile definition
+        %<SLibAutosarCompilerAbstractionForDataDecl(TLC_FALSE, FcnSysVarGroupType(system,"ConstBlockIO"), TLC_FALSE, TLC_FALSE, identifier, "DataGlobal")> = { ...
+          %<constbo>
+        };\
+        %closefile definition
+      %else
+        %assign qualifiers = SLibGetConstBlockIOForSystemQualifiers(system)
+        %openfile definition
+        %<qualifiers> %<FcnSysVarGroupType(system,"ConstBlockIO")>
+        %<identifier> = {
+          %<constbo>
+        };\
+        %closefile definition
+      %endif
+      %<SLibApplyMemSecToDataDefnForSystem(definition, "MemSecDataConstants", identifier, system, TLC_FALSE)>\
+    %endif
+  %endwith
+  %closefile tmpbuf
+ 
+  %% Write this data out to subsystem_data.c if it is nonempty.
+  %if NotRootFileName(system) && !ISEMPTY(tmpbuf)
+    %% Check if someone already created this file
+    %assign fileName = SLibGetSystemOutputFileBaseName(system)
+    %assign dataFile = SLibDoesModelFileExist("SystemBody", "%<fileName>_data")
+    %if ISEMPTY(dataFile)
+      %openfile dataBanBuf
+      /*
+      * %<fileName>_data.%<LangFileExt>
+      *
+      %<SLibCommonHeaderInfo()>\
+      */
+      %closefile dataBanBuf
+      
+      %assign rootFileName = GetRootSystemFileName()
+      %openfile inclBuf
+      #include "%<rootFileName>.h"
+      %<SLibIncludePrivateHeader()>
+      %closefile inclBuf
+      %<SLibCacheSystemCodeToFile("sysdata_src_ban", system, dataBanBuf)>
+      %undef dataBanBuf
+      %<SLibCacheSystemCodeToFile("sysdata_src_incl", system, inclBuf)>
+      %undef inclBuf
+    %endif
+    %<SLibCacheSystemCodeToFile("sysdata_data_defn", system, tmpbuf)>
+  %else
+    %% If the subsystem is generating into model.c, then we need
+    %% to cache the initialization so we can dump into model_data.c
+    %if !ISEMPTY(tmpbuf)
+      %<LibSetSystemField(system, "StandaloneDataInit", tmpbuf)>
+    %endif
+  %endif
+  
+%endfunction %% SLibInitializeStandaloneData
+
+
+%% Function: SLibDeclareStandaloneVars =========================================
+%% Abstract:
+%%   For the given system, declare the global variables that are used by any
+%% nonreusable functions that live below this system.  The function may be
+%% passed a string to prepend the declaration (such as "extern")
+%function SLibDeclareStandaloneVars(system, extern) void
+  %assert system.StandaloneSubsystem
+  %openfile tmpbuf
+  %with system.Interface
+    %if system.HasBlockIOArg
+      %assign varGroupType = FcnSysVarGroupType(system,"BlockIO")
+      %assign identifier = FcnSysVarGroupNonreusedName(system,"BlockIO")
+      %if SLibAutosarCompilerAbstractionRequired()
+        %openfile definition
+        %<extern> %<SLibAutosarCompilerAbstractionForDataDecl(TLC_FALSE, FcnSysVarGroupType(system,"BlockIO"), TLC_FALSE, TLC_FALSE, identifier, "DataGlobal")>;\
+        %closefile definition
+      %else
+        %openfile definition
+        %<extern> %<FcnSysVarGroupType(system,"BlockIO")> ...
+          %<identifier>;\
+        %closefile definition
+      %endif
+      %if !ISEMPTY(extern)
+        %<SLibApplyMemSecToDataDeclForSystem(definition, ...
+          "MemSecDataInternal", identifier, system, TLC_FALSE)>
+      %else
+        %<SLibApplyMemSecToDataDefnForSystem(definition, "MemSecDataInternal", identifier, system, TLC_FALSE)>\
+      %endif
+    %endif
+    %if system.HasDWorkArg
+      %assign varGroupType = FcnSysVarGroupType(system, "DWork")
+      %assign identifier = FcnSysVarGroupNonreusedName(system,"DWork")
+      %openfile definition
+      %if SLibAutosarCompilerAbstractionRequired()
+        %<extern> %<SLibAutosarCompilerAbstractionForDataDecl(TLC_FALSE, varGroupType, TLC_FALSE, TLC_FALSE, identifier, "DataGlobal")>;\
+      %else
+        %<extern> %<varGroupType> ...
+        %<identifier>;\
+      %endif
+      %closefile definition
+      %if !ISEMPTY(extern)
+        %<SLibApplyMemSecToDataDeclForSystem(definition, ...
+          "MemSecDataInternal", identifier, system, TLC_FALSE)>
+      %else
+        %<SLibApplyMemSecToDataDefnForSystem(definition, "MemSecDataInternal", identifier, system, TLC_FALSE)>\
+      %endif
+    %endif
+    %%
+    %% For rtP and constBlockIO, we may need to write out the
+    %% initialization into a subsystem_data.c file.
+    %if ISEMPTY(extern)
+      %<SLibInitializeStandaloneData(system)>
+    %else 
+      %if system.HasParametersArg
+        %<SLibIfNetPreprocessorCondition(system)>
+        %openfile decls
+        %<extern> %<FcnSysVarGroupType(system, "Parameter")> ...
+          %<FcnSysVarGroupNonreusedName(system,"Parameter")>;
+        %closefile decls
+        %<SLibApplyMemSecToDataDeclForSystem(decls, ...
+        "MemSecDataParameters", FcnSysVarGroupNonreusedName(system,"Parameter"), system, TLC_FALSE)>
+        %<SLibEndIfNetPreprocessorCondition(system)>
+      %endif
+      %if system.HasConstBlockIOArg
+        %assign qualifiers = SLibGetConstBlockIOForSystemQualifiers(system)
+        %<SLibIfNetPreprocessorCondition(system)>
+        %openfile decls
+        %<extern> %<qualifiers> %<FcnSysVarGroupType(system,"ConstBlockIO")> ...
+          %<FcnSysVarGroupNonreusedName(system,"ConstBlockIO")>;
+        %closefile decls
+        %<SLibApplyMemSecToDataDeclForSystem(decls, ...
+        "MemSecDataConstants", FcnSysVarGroupNonreusedName(system,"ConstBlockIO"), system, TLC_FALSE)>
+        %<SLibEndIfNetPreprocessorCondition(system)>
+      %endif
+    %endif
+    %if system.HasZCEventArg
+      %assign varGroupType = FcnSysVarGroupType(system, "ZCEvent")
+      %assign identifier = FcnSysVarGroupNonreusedName(system,"ZCEvent")
+      %if SLibAutosarCompilerAbstractionRequired()
+        %openfile definition
+        %<extern> %<SLibAutosarCompilerAbstractionForDataDecl(TLC_FALSE, FcnSysVarGroupType(system,"ZCEvent"), TLC_FALSE, TLC_FALSE, identifier, "DataGlobal")>;\
+        %closefile definition
+      %else
+        %openfile definition
+        %<extern> %<FcnSysVarGroupType(system,"ZCEvent")> ...
+          %<identifier>;\
+        %closefile definition
+      %endif
+      %if !ISEMPTY(extern)
+        %<SLibApplyMemSecToDataDeclForSystem(definition, ...
+          "MemSecDataInternal", identifier, system, TLC_FALSE)>
+      %else
+        %<SLibApplyMemSecToDataDefnForSystem(definition, "MemSecDataInternal", identifier, system, TLC_FALSE)>\
+      %endif
+    %endif
+    %% All canonical inputs and outputs have been turned into external globals
+    %assert (NumCanonicalInputArgDefs == 0)
+    %assert (NumCanonicalOutputArgDefs == 0)
+    %% There should be no canonical parameters since these are created
+    %% only for reused systems
+    %assert (NumCanonicalPrmArgDefs == 0)
+  %endwith
+  %closefile tmpbuf
+  %return tmpbuf
+%endfunction  %% SLibDeclareStandaloneVars
+
+
+%% Function: SLibExternStandaloneData ==========================================
+%% Abstract:
+%%  Extern any internal variables used by standalone subsystems
+%function SLibExternStandaloneData() void
+  %foreach idx = NumSystems
+    %assign system = System[idx]
+    %if system.StandaloneSubsystem
+      %assign externBuf = SLibDeclareStandaloneVars(system, "extern")
+      %if !WHITE_SPACE(externBuf)
+        %openfile tmpBuf
+        %assign sysInfo = GetSystemNameForComments(system)
+        %<SLibIfNetPreprocessorCondition(system)>
+        %<GetHideChildDefineSymbol("ifndef")>\
+        /* Extern declarations of internal data for %<sysInfo> */
+        %<externBuf>
+        %<GetHideChildDefineSymbol("endif")>\
+        %<SLibEndIfNetPreprocessorCondition(system)>
+        %closefile tmpBuf
+        %<SLibCacheSystemCodeToFile("sys_standalone_extern_data_decl", system, tmpBuf)>
+      %endif
+    %endif
+  %endforeach
+%endfunction
+
+%% Function: SLibDumpStandaloneVarDeclarationForSystem =========================
+%% Abstract:
+%%     Dump standalone variable declaration into a buffer in the system.
+%%
+%function SLibDumpStandaloneVarDeclarationsForSystem(system) void
+  %assign globalBuf = ""
+  %if system.StandaloneSubsystem
+    %assert (StandaloneSSSupported)
+    %assign buf = SLibDeclareStandaloneVars(system,"")
+    %if !WHITE_SPACE(buf)
+      %assign sysInfo = GetSystemNameForComments(system)
+      %openfile globalBuf
+      
+      /* Declare variables for internal data of %<sysInfo> */
+      %<buf>\
+      %closefile globalBuf
+    %endif
+  %endif
+  %return globalBuf
+%endfunction
+
+%endif %% _STANDALONESYSVAR_
+
+%% [EOF] standalonesysvar.tlc

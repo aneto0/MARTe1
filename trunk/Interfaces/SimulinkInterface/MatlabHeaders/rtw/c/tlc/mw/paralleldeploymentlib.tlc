@@ -1,0 +1,172 @@
+%% ============================================================================
+%% File : paralleldeploymentlib.tlc
+%%
+%% Abstract:
+%%   This is the system library file for target customization of code 
+%%   generation for a parallel deployment diagram.
+%%
+%% $Revision: 1.1.8.4 $
+%% Copyright 2010 The MathWorks, Inc.
+%%
+%% ============================================================================
+%selectfile NULL_FILE
+
+%if EXISTS("_PARALLELDEPLOYMENTLIB_") == 0
+%assign _PARALLELDEPLOYMENTLIB_ = 1
+%endif %% __PARALLELDEPLOYMENTLIB_
+
+%% =============================================================================
+%% Public functions
+%% =============================================================================
+
+%% LibDeploymentGetNumTaskGroups ===============================================
+%% Abstract:
+%%   Get the number of task groups that have been created.
+%%
+%% Call syntax:
+%%   %assign numTaskGroups = LibDeploymentGetNumTaskGroups()
+%%
+%% Returns:
+%%   Returns the number of task groups (Number).
+%%
+%function LibDeploymentGetNumTaskGroups() void
+  %return ::CompiledModel.NumEventHandlers
+%endfunction
+
+
+%% LibDeploymentGetTaskGroup ===================================================
+%% Abstract:
+%%   Returns the record of task group %<tgIdx>.
+%%
+%% Call syntax:
+%%   %assign tg = LibDeploymentGetTaskGroup(tgIdx)
+%%
+%function LibDeploymentGetTaskGroup(tgIdx) void
+  %return ::CompiledModel.EventHandler[tgIdx]
+%endfunction
+
+
+%% LibDeploymentGetTask ========================================================
+%% Abstract:
+%%   Returns the record of task %<tIdx> of task group %<tgIdx>.
+%%
+%% Call syntax:
+%%   %assign tg = LibDeploymentGetTask(tIdx, tgIdx)
+%%
+%function LibDeploymentGetTask(tIdx, tgIdx) void
+  %return ::CompiledModel.EventHandler[tgIdx].Task[tIdx]
+%endfunction
+
+
+%% LibDeploymentCallTaskFunction ===============================================
+%% Abstract:
+%%   Emits a call to task %<tIdx> of task group %<tgIdx>
+%%
+%% Call syntax:
+%%   %assign buffer = LibDeploymentCallTaskFunction(tIdx, tgIdx)
+%%
+%function LibDeploymentCallTaskFunction(tIdx, tgIdx) void
+  %return SLibDeploymentEmitCallTaskFunction(tIdx, tgIdx)
+%endfunction
+
+
+%% LibDeploymentCallAdvanceTaskCounters ========================================
+%% Abstract:
+%%   Emits a call to AdvanceTaskCounters function
+%%
+%% Call syntax:
+%%   %assign buffer = LibDeploymentCallAdvanceTaskCounters()
+%%
+%function LibDeploymentCallAdvanceTaskCounters() void
+  %assign rootSystem = System[NumSystems-1]
+  %openfile tmpBuf
+  %if !LibIsSingleRateSystem(rootSystem)
+    %<SLibDeploymentSchedulerName()>();
+  %endif
+  %closefile tmpBuf
+  %return tmpBuf
+%endfunction
+
+%% SLibDeploymentGetEventHandlerType ============================================
+%% Abstract:
+%%   Returns the periodicity type for an event handler
+%function SLibDeploymentGetEventType(ehId) void
+  %return CompiledModel.EventHandler[ehId].Periodicity.Type
+%endfunction
+
+%% SLibDeploymentGetEventHandlerName ============================================
+%% Abstract:
+%function SLibDeploymentGetEventHandlerName(ehId)
+  %return CompiledModel.EventHandler[ehId].Name
+%endfunction
+
+%% LibDeploymentGetEventHandlerTargetObject() =====================================
+%% Abstract:
+%function SLibDeploymentGetEventHandlerTargetObject(ehId) 
+  %if ISFIELD(CompiledModel.EventHandler[ehId], "TargetObject")
+    %return CompiledModel.EventHandler[ehId].TargetObject
+  %else
+    %return ""
+  %endif
+%endfunction  
+
+%% SLibDeploymentGetEventHandlerType() =====================================
+%% Abstract:
+%function SLibDeploymentGetEventHandlerType(ehId) 
+  %if ISEQUAL(CompiledModel.EventHandler[ehId].NumTasks, 0) && ...
+    !ISEQUAL(CompiledModel.EventHandler[ehId].NumEntryPointInfos, 0)
+    %assign ehType = "isr"
+  %elseif !ISEQUAL(CompiledModel.EventHandler[ehId].NumTasks, 0) && ...
+    ISEQUAL(CompiledModel.EventHandler[ehId].NumEntryPointInfos, 0)
+    %assign ehType = "task"
+  %else  
+    %assign errTxt = "Mapping to both event handler and task is not supported"
+    %<LibReportError(errTxt)>
+  %endif
+  %return ehType
+%endfunction  
+
+%% SLibDeploymentEmitCallToEventHandlerTask =====================================
+%% Abstract:
+%function SLibDeploymentEmitCallToEventHandlerTask(ehIdx, taskIdx)
+  %assign tg     = CompiledModel.EventHandler[ehIdx]
+  %assign retVal = "%<tg.Task[taskIdx].FunctionName>();"       
+  %return retVal
+%endfunction
+
+%% SLibDeploymentbEmitCallToEventHandler =========================================
+%% Abstract:
+%function SLibDeploymentEmitCallToEventHandler(ehIdx)
+  %assign tg     = CompiledModel.EventHandler[ehIdx]
+  %assign retVal = ""
+  %if !ISEQUAL(tg.NumEntryPointInfos, 0)  
+    %assign retVal ="%<tg.Name>();"
+  %endif
+  %return retVal
+%endfunction  
+  
+%% SLibDeploymentbEmitCallToEventHandler =========================================
+%% Abstract:
+%function SLibDeploymentGetNumEventHandlerTasks(ehIdx)
+  %assign retVal = CompiledModel.EventHandler[ehIdx].NumTasks
+  %return retVal
+%endfunction  
+  
+%% SLibDeploymentGetTaskSampleTimeIndex =========================================
+%% Abstract:
+%function SLibDeploymentGetTaskSampleTimeIndex(ehIdx, taskId)
+  %assign stId = -1
+  %assign eventHandler = CompiledModel.EventHandler[ehIdx]
+  %if ISEQUAL(eventHandler.Periodicity.Type, "Periodic")
+    %assign period = eventHandler.Task[taskId].Period
+    %foreach st = NumSampleTimes
+      %if ISEQUAL(CompiledModel.SampleTime[st].PeriodAndOffset[0], period)
+        %assign stId = st
+        %break %% break foreach
+      %endif
+    %endforeach
+  %endif
+  %return stId
+%endfunction
+
+%% [EOF] paralleldeploymentlib.tlc

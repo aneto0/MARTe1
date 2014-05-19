@@ -1,0 +1,733 @@
+%% ==============================================================================
+%% $Revision: 1.1.6.5 $
+%% $Date: 2011/09/03 19:50:56 $
+%%
+%% Abstract:
+%%    Generation of threaded ERT main.c file with Posix threads
+%%
+%% Copyright 1994-2011 The MathWorks, Inc.
+%%
+%selectfile NULL_FILE
+
+%include "commonthreadlib.tlc"
+
+%%==============================================================================
+%function FcnGenerateUtilFunctionsAndGlobalVariables(isMac, numPeriodicTasks) void
+  %assign overrunDetection = !isMac
+  %openfile tmpFcnBuf
+  typedef struct {
+    int signo;
+    sigset_t sigMask;
+    double period;
+  } schedulerInfo;
+  %closefile tmpFcnBuf
+  %<SLibCacheCodeToFile("mainSrc_userTop", tmpFcnBuf)>
+    
+  %openfile tmpFcnBuf
+  #define CHECK_STATUS(status, fcn) if (status != 0) {fprintf(stderr, "Call to %s returned error status (%d).\n", fcn, status); perror(fcn); fflush(stderr); exit(EXIT_FAILURE);}
+ 
+  /* Semaphores used for threads synchronization */
+  %assign semDT = "sem_t"
+  %if isMac
+    %assign semDT = "sem_t*"
+  %endif
+  %<semDT> quitSem;	 
+  %<semDT> periodicTaskStartSem[%<numPeriodicTasks>];
+  %<semDT> periodicTaskStopSem[%<numPeriodicTasks>];
+  int threadID[%<numPeriodicTasks>];
+ 
+  %closefile tmpFcnBuf
+  %<SLibCacheCodeToFile("mainSrc_data_defn", tmpFcnBuf)>
+    
+  %openfile tmpFcnBuf
+  void MW_sem_wait(sem_t *sem)
+  {
+    int status;
+    while (((status = sem_wait(sem)) == -1) && (errno == EINTR))
+    {
+      /* Restart if interrupted by a signal */
+      continue;
+    }
+    CHECK_STATUS(status, "sem_wait");
+  }
+  
+  void MW_blockSignal(int sigNo, sigset_t *sigMask)
+  {
+    int ret;
+    sigaddset(sigMask, sigNo);
+    ret = pthread_sigmask(SIG_BLOCK, sigMask, NULL);
+    CHECK_STATUS(ret, "pthread_sigmask");
+  }
+   
+  void MW_sigWait(sigset_t *sigMask)
+  {
+    int ret;
+    %if isMac 
+    ret = sigwait(sigMask, NULL);
+    %else
+    ret = sigwaitinfo(sigMask, NULL);
+    %endif 
+    if (ret == -1)
+    {
+      fprintf(stderr, "Call to sigwait returned error.\n");
+      perror("sigwait");
+      fflush(stderr);
+      exit(EXIT_FAILURE);
+    }
+  }
+  
+  %if !isMac
+  void MW_setTaskPeriod(double periodInSeconds, int sigNo)
+  {
+    timer_t timerId;
+    struct sigevent sev;
+    struct itimerspec its;
+    long stNanoSec;
+    int ret;
+    
+    /* Create a timer */
+    sev.sigev_notify          = SIGEV_SIGNAL;
+    sev.sigev_signo           = sigNo;
+    sev.sigev_value.sival_ptr = &timerId;
+    ret = timer_create(CLOCK_REALTIME, &sev, &timerId);
+    CHECK_STATUS(ret, "timer_create");
+    
+    /* Real-time scheduling timer */
+    stNanoSec               = (long)(periodInSeconds * 1e9);
+    its.it_value.tv_sec     = stNanoSec / 1000000000;
+    its.it_value.tv_nsec    = stNanoSec % 1000000000;
+    its.it_interval.tv_sec  = its.it_value.tv_sec;
+    its.it_interval.tv_nsec = its.it_value.tv_nsec;
+    ret = timer_settime(timerId, 0, &its, NULL);
+    CHECK_STATUS(ret, "timer_settime");
+  }
+  %else 
+    %% For MAC platforms register Ctrl+C signal handler to clean the semaphore 
+    %% before terminate=ing the process 
+    void CtrlCHandler(int signo)
+    {
+      sem_post(quitSem);
+    }
+  %endif
+  
+  %if overrunDetection
+  void MW_sigWaitWithOverrunDetection(sigset_t *sigMask)
+  {
+    int ret;
+    struct timespec timeout;
+    timeout.tv_sec  = 0;
+    timeout.tv_nsec = 0;
+    
+    ret = sigtimedwait(sigMask, NULL, &timeout);
+    if (ret == -1) 
+    {
+      if (errno == EAGAIN)
+      {
+        MW_sigWait(sigMask);
+      }
+      else 
+      {
+        fprintf(stderr, "Call to sigwaitinfo returned error.\n");
+        perror("sigtimedwait");
+        fflush(stderr);
+        exit(EXIT_FAILURE);
+      }
+    }
+    else
+    {
+      %assign msg = "Overrun - base rate too fast."
+      printf("%<msg>\n");
+    }
+  }
+  
+  void MW_sem_waitWithOverrunDetection(sem_t *stopSem, int taskIdx)
+  {
+    int ret; 
+    ret = sem_trywait(stopSem);
+    if (ret == -1) 
+    { 
+      if (errno == EAGAIN)  
+      {   
+        %assign msg = "Overrun - rate for periodic task %d too fast."
+        printf("%<msg>\n", taskIdx);
+        MW_sem_wait(stopSem);
+      }
+      else 
+      {  
+        fprintf(stderr, "Call to sem_trywait returned error.\n");
+        perror(" sem_trywait");
+        fflush(stderr);
+        exit(EXIT_FAILURE);
+      }
+    }
+  }
+  %endif
+  %closefile tmpFcnBuf
+  %<SLibCacheCodeToFile("mainSrc_fcn_defn", tmpFcnBuf)>
+%endfunction
+
+%%==============================================================================
+%function FcnMaskAperiodicSignals(maskAllSignals, idx, isMac)
+  %openfile maskSigBuf
+  %foreach aehIdx = LibGetNumEventHandlers()
+    %assign evType = LibGetEventType(aehIdx)
+    %if ISEQUAL(evType, "Periodic") || (!maskAllSignals && ISEQUAL(idx, aehIdx))
+      %continue
+    %endif
+    %assign targetObj = LibGetEventHandlerTargetObject(aehIdx)
+    %if !ISFIELD(targetObj, "SignalNumber")
+      %assign errTxt = "Unsupported aperiodic event for native threads."
+      %<LibReportFatalError(errTxt)>
+    %endif
+    %assign sigNumber = targetObj.SignalNumber
+    %if isMac
+      MW_blockSignal(%<sigNumber[0]>, &ss);
+    %else
+      MW_blockSignal(SIGRTMIN+%<sigNumber[0]>, &ss);
+    %endif
+  %endforeach
+  %closefile maskSigBuf
+
+  %openfile retBuf
+  %if !WHITE_SPACE(maskSigBuf)
+    sigset_t ss;
+    sigemptyset(&ss);
+    %<maskSigBuf> 
+  %endif
+  %closefile retBuf
+  
+  %return retBuf
+%endfunction
+
+%%==============================================================================
+%function FcnGeneratePeriodicTaskWrapperFunctions(isMac, numPeriodicTasks) void
+  %assign overrunDetection = !isMac
+  %assign stopCheck = "(%<RTMGetErrStat()> == %<SLibGetNullDefinitionFromTfl()>)" 
+  %if RTMStopReqAccessed()
+    %assign stopCheck = stopCheck + " && !%<RTMGetStopRequested()>"
+  %endif
+  %if isMac
+    %assign semaphorePtr = ""
+  %else 
+    %assign semaphorePtr = "&"
+  %endif 
+  %openfile tmpFcnBuf
+  void* periodicTask(void *arg)
+  {
+    int taskId = *((int *) arg);
+    int_T taskIdT = *((int_T *) arg);
+    %<FcnMaskAperiodicSignals(TLC_TRUE, 0, isMac)>
+    while(1) 
+    {          
+      MW_sem_wait(%<semaphorePtr>periodicTaskStartSem[taskId]);
+      %<LibCallModelStep("taskIdT")> 
+      sem_post(%<semaphorePtr>periodicTaskStopSem[taskId]);
+    }
+    return NULL;
+  }
+  
+  void* periodicTaskScheduler(void *arg)
+  {
+    %if !isMac
+    schedulerInfo info = *((schedulerInfo *)arg);
+    %endif
+    volatile boolean_T noErr;
+    %if (numPeriodicTasks > 1)
+      %assign indexVar = "i" 
+      int %<indexVar>;
+    %endif
+  
+    %% Declare list of sample time indexes for tasks
+    %assign initStr = ""
+    %assign comma   = ""
+    %foreach ehIdx = LibGetNumEventHandlers()
+      %assign evType = LibGetEventType(ehIdx)
+      %if ISEQUAL(evType, "Aperiodic")
+        %continue
+      %endif
+      %foreach taskIdx = LibGetNumEventHandlerTasks(ehIdx)
+        %assign stId = LibGetEventHandlerTaskSampleTimeIndex(ehIdx, taskIdx)
+        %assign initStr = initStr +"%<comma>%<stId>" + "/* %<LibGetSampleTimePeriodAndOffset(stId, 0)> */"
+        %assign comma = ","
+      %endforeach
+    %endforeach
+    int stId[%<numPeriodicTasks>] = {%<initStr>}; 
+    %<FcnMaskAperiodicSignals(TLC_TRUE, 0, isMac)>
+    %if !isMac
+    MW_setTaskPeriod(info.period, info.signo);
+    %endif
+    noErr = %<stopCheck>;
+    while (noErr)  
+    {
+      %if overrunDetection 
+      /* Wait for the next timer interrupt */
+      MW_sigWaitWithOverrunDetection(&info.sigMask);
+      %elseif !isMac
+      /* Wait for the next timer interrupt */
+      MW_sigWait(&info.sigMask);
+      %endif 
+      
+      %if (numPeriodicTasks > 1)  
+      for (i = 0; i < %<numPeriodicTasks>; i++)     
+      {   
+      %if !RootSystemIsSingleRate
+        if (%<RTMTaskRunsThisBaseStep("stId[i]")>)
+      %endif
+        {  
+        %if overrunDetection   
+          MW_sem_waitWithOverrunDetection(%<semaphorePtr>periodicTaskStopSem[i], i);
+        %else
+          MW_sem_wait(%<semaphorePtr>periodicTaskStopSem[i]);
+        %endif
+        }
+      }  
+      %else
+        %if overrunDetection   
+      MW_sem_waitWithOverrunDetection(%<semaphorePtr>periodicTaskStopSem[0], 0);
+        %else
+      MW_sem_wait(%<semaphorePtr>periodicTaskStopSem[0]);
+        %endif
+      %endif
+      
+      noErr = %<stopCheck>;
+      if (noErr) 
+      {
+      %if (numPeriodicTasks > 1)  
+        for (i = 0; i <%<numPeriodicTasks>; i++)     
+        {   
+        %if !RootSystemIsSingleRate
+          if (%<RTMTaskRunsThisBaseStep("stId[i]")>)
+        %endif
+          {
+            sem_post(%<semaphorePtr>periodicTaskStartSem[i]); 
+          }
+        }  
+      %else
+        sem_post(%<semaphorePtr>periodicTaskStartSem[0]);
+      %endif
+      %<LibCallRateScheduler()>
+      }
+      %if (numPeriodicTasks > 1) && (!RootSystemIsSingleRate)
+      else  
+      {
+        for (i = 0; i < %<numPeriodicTasks>; i++)     
+        {
+           if (!%<RTMTaskRunsThisBaseStep("stId[i]")>) 
+           {
+             MW_sem_wait(%<semaphorePtr>periodicTaskStopSem[i]);
+           }
+        }
+      }  
+      %endif
+    } /* while */
+    
+    sem_post(%<semaphorePtr>quitSem); 
+    return NULL;
+  }
+  
+  %closefile tmpFcnBuf
+  %<SLibCacheCodeToFile("mainSrc_fcn_defn",tmpFcnBuf)>
+%endfunction
+
+%function FcnGenerateAperiodicWrapperFunctions(isMac) void
+  %openfile tmpFcnBuf 
+  %foreach aehIdx = LibGetNumEventHandlers()
+    %assign evType = LibGetEventType(aehIdx)
+    %if ISEQUAL(evType, "Periodic")
+      %continue
+    %endif
+    %assign targetObj = LibGetEventHandlerTargetObject(aehIdx)
+    %assign sigNumber = targetObj.SignalNumber
+    %assign aehName   = LibGetEventHandlerName(aehIdx)
+    %assign type      = LibGetEventHandlerType(aehIdx)
+    %assert ISEQUAL(type, "task") || ISEQUAL(type, "isr")
+    %if ISEQUAL(type, "task")
+      %foreach taskIdx = LibGetNumEventHandlerTasks(aehIdx)
+      void* %<aehName>_%<taskIdx>() 
+      {
+        sigset_t sigMask;  
+        int sigNo = %<sigNumber[0]>;
+        %<FcnMaskAperiodicSignals(TLC_FALSE, aehIdx, isMac)>     
+        sigemptyset(&sigMask);
+        %if isMac
+          MW_blockSignal(sigNo, &sigMask);
+        %else
+          MW_blockSignal(SIGRTMIN+sigNo, &sigMask);
+        %endif
+        while(1) 
+        {
+          MW_sigWait(&sigMask);
+          %<LibCallEventHandlerTask(aehIdx, taskIdx)>
+        }
+        return NULL;
+      } 
+      %endforeach
+    %else
+      %% Generate ISR 
+      %<LibAddToCommonIncludes("<signal.h>")>
+      %<LibAddToCommonIncludes("<errno.h>")> 
+      %assign isrFuncName = "sigHandler_%<aehName>"
+      /* Software Interrupt */
+      void %<isrFuncName>(int signo)
+      {
+         %<LibCallEventHandlerISR(aehIdx)>
+      } 
+    %endif
+  %endforeach  
+  %closefile tmpFcnBuf
+  %<SLibCacheCodeToFile("mainSrc_fcn_defn",tmpFcnBuf)>
+%endfunction
+
+%function FcnEnableSignalHandler(isMac) 
+  %openfile tmpBuf
+  %foreach aehIdx = LibGetNumEventHandlers()
+    %assign evType = LibGetEventType(aehIdx)
+    %if ISEQUAL(evType, "Periodic")
+      %continue
+    %endif
+    %assign type = LibGetEventHandlerType(aehIdx)
+    %if ISEQUAL(type, "isr") 
+      %assign targetObj   = LibGetEventHandlerTargetObject(aehIdx)
+      %assign sigNumber   = targetObj.SignalNumber
+      %assign aehName     = LibGetEventHandlerName(aehIdx)
+      %assign isrFuncName = "sigHandler_%<aehName>"
+      {
+        /* Connect and enable the signal handler: %<isrFuncName> */
+        struct sigaction sa;
+        sa.sa_handler = &%<isrFuncName>;
+        sigemptyset(&sa.sa_mask);
+        %foreach idx = LibGetNumEventHandlers()
+          %assign evType = LibGetEventType(idx)
+          %if ISEQUAL(evType, "Periodic") || ISEQUAL(idx, aehIdx)
+            %continue
+          %endif
+          %assign type = LibGetEventHandlerType(idx)
+          %if ISEQUAL(type, "isr")
+            %assign targetObjForMask = LibGetEventHandlerTargetObject(idx)
+            %assign sigNumberForMask = targetObjForMask.SignalNumber
+            %if isMac
+              sigaddset(&sa.sa_mask, %<sigNumberForMask[0]>);
+            %else
+              sigaddset(&sa.sa_mask, SIGRTMIN+%<sigNumberForMask[0]>);
+            %endif
+          %endif
+        %endforeach     
+        sa.sa_flags = SA_RESTART; /* Restart functions if interrupted by handler */
+        %if isMac
+        if (sigaction(%<sigNumber[0]>, &sa, NULL) == -1) 
+        %else
+        if (sigaction(SIGRTMIN+%<sigNumber[0]>, &sa, NULL) == -1) 
+        %endif
+        {
+         fprintf(stderr, "Failed to register signal handler for signal %<sigNumber[0]> : %s\n", strerror(errno));
+        }
+      }     
+    %endif
+  %endforeach
+  
+  %% Enable Ctrl+C signal handler 
+  %if isMac
+    {
+      struct sigaction sa;
+      sa.sa_handler = &CtrlCHandler;  
+      sigemptyset(&sa.sa_mask);
+      sa.sa_flags = SA_RESTART; /* Restart functions if interrupted by handler */
+      if (sigaction(SIGINT, &sa, NULL) == -1) 
+      {
+        fprintf(stderr, "Failed to register signal handler for signal SIGINT : %s\n", strerror(errno));
+      }
+    }
+  %endif
+  
+  %closefile tmpBuf
+  %return tmpBuf
+%endfunction
+
+%function FcnDisableSignalHandler(isMac) 
+  %openfile tmpBuf
+  %foreach aehIdx = LibGetNumEventHandlers()
+    %assign evType = LibGetEventType(aehIdx)
+    %if ISEQUAL(evType, "Periodic")
+      %continue
+    %endif
+    %assign type = LibGetEventHandlerType(aehIdx)
+    %if ISEQUAL(type, "isr")
+      %assign targetObj = LibGetEventHandlerTargetObject(aehIdx)
+      %assign sigNumber = targetObj.SignalNumber
+      {
+        /* Restore the interrupt handler for signal: %<sigNumber[0]> */
+        struct sigaction sa;
+        sa.sa_handler = SIG_DFL;
+        sigemptyset(&sa.sa_mask);
+        sa.sa_flags = SA_RESTART; /* Restart functions if interrupted by handler */
+        %if isMac
+        if (sigaction(%<sigNumber[0]>, &sa, NULL) == -1) {
+        %else
+        if (sigaction(SIGRTMIN+%<sigNumber[0]>, &sa, NULL) == -1) {
+        %endif
+          fprintf(stderr, "Failed to restore default signal handler for signal %<sigNumber[0]> : %s\n", strerror(errno));
+        }
+      }   
+    %endif
+  %endforeach
+  
+  %% Disable Ctrl+C signal handler 
+   %if isMac
+    {
+      struct sigaction sa;
+      sa.sa_handler =  SIG_DFL;  
+      sigemptyset(&sa.sa_mask);
+      sa.sa_flags = SA_RESTART; /* Restart functions if interrupted by handler */
+      if (sigaction(SIGINT, &sa, NULL) == -1) 
+      {
+        fprintf(stderr, "Failed to register signal handler for signal SIGINT : %s\n", strerror(errno));
+      }
+    }
+  %endif
+  
+  %closefile tmpBuf
+  %return tmpBuf
+%endfunction
+
+%%==============================================================================
+%function FcnGenerateMainFunction(isMac, numPeriodicTasks) void
+  %assign numAperiodicTasks = SLibGetNumAperiodicTasks()
+  %assign schedPriority     = "40"
+  
+  %openfile tmpFcnBuf
+  int main(int argc, char *argv[])
+  {
+    int i;
+    pthread_t periodicThread[%<numPeriodicTasks>];  
+    %if (numAperiodicTasks > 0)
+      pthread_t aperiodicThread[%<numAperiodicTasks>];
+    %endif
+    uid_t euid;
+    struct sched_param sp;
+    int ret, policy;   
+    schedulerInfo info;
+    %if (numAperiodicTasks > 0)
+      sigset_t aperiodicSigMask;
+    %endif
+    pthread_attr_t attr;
+    pthread_t periodicTaskSchedulerThread;
+     
+    %% Declare threads priority based on rate monotonic assignment
+    int priority[%<numPeriodicTasks>]; 
+    %assign asyncPr = 1
+    %if numAperiodicTasks > 0  %% Reserve highest priority to async
+      %assign asyncPr = 2
+    %endif      
+    %assign idx = 0
+    %foreach ehIdx = LibGetNumEventHandlers()
+      %assign evType = LibGetEventType(ehIdx)
+      %if ISEQUAL(evType, "Aperiodic")
+        %continue
+      %endif
+      %foreach taskIdx = LibGetNumEventHandlerTasks(ehIdx)
+        %assign stId = LibGetEventHandlerTaskSampleTimeIndex(ehIdx, taskIdx)
+        %assign pt   = %<CAST("Number", schedPriority)> - %<asyncPr> - %<stId>
+        priority[%<idx>] = %<pt>;  
+        %assign idx = idx + 1
+      %endforeach        
+    %endforeach  
+    printf("**starting the model**\n");	  
+    %<RTMSetErrStat(0)>;
+      
+    #if !defined (_POSIX_THREAD_PRIORITY_SCHEDULING)
+    fprintf(stderr, "Priority scheduling is NOT supported by your system.\n");
+    fprintf(stderr, "The generated code will not run correctly because your\n");
+    fprintf(stderr, "model contains multiple rates and uses multi-tasking\n");
+    fprintf(stderr, "code generation mode.\n");
+    exit(EXIT_FAILURE);
+    #endif
+    
+    /* Initialize semaphore used for thread synchronization */	 
+    %if isMac
+      quitSem = sem_open("quitSem", O_CREAT, 0777, 0);
+    %else
+      ret = sem_init(&quitSem, 0, 0);
+      CHECK_STATUS(ret, "sem_init:quitSem");
+    %endif
+    
+    /* Create threads executing the Simulink model */
+    pthread_attr_init(&attr);
+    ret = pthread_attr_setinheritsched(&attr, PTHREAD_INHERIT_SCHED);
+    CHECK_STATUS(ret, "pthread_attr_setinheritsched");
+    ret = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+    CHECK_STATUS(ret, "pthread_attr_setdetachstate");
+    ret = pthread_attr_getschedpolicy(&attr, &policy);
+    CHECK_STATUS(ret, "pthread_attr_getschedpolicy"); 
+    sigemptyset(&info.sigMask);
+    
+    %if !isMac
+    /* Block signal used for timer notification */
+    %assign baseRateTid = LibGetTID01EQ()
+    info.period = %<LibGetSampleTimePeriodAndOffset(baseRateTid, 0)>; 
+    info.signo  = SIGRTMIN;
+    MW_blockSignal(info.signo, &info.sigMask);
+    %endif
+   
+    /* Block all aperiodic task signals */
+    %foreach aehIdx = LibGetNumEventHandlers()
+      %assign evType = LibGetEventType(aehIdx)
+      %if ISEQUAL(evType, "Periodic")
+        %continue
+      %endif 
+      %assign type = LibGetEventHandlerType(aehIdx)
+      %if ISEQUAL(type, "task")
+        %assign targetObj = LibGetEventHandlerTargetObject(aehIdx)
+        %assign sigNumber = targetObj.SignalNumber  
+        %if isMac 
+          MW_blockSignal(%<sigNumber[0]>, &aperiodicSigMask);
+        %else
+          MW_blockSignal(SIGRTMIN+%<sigNumber[0]>, &aperiodicSigMask);
+        %endif
+      %endif
+    %endforeach
+    
+    %<LibCallModelInitialize()> 
+    %<FcnEnableSignalHandler(isMac)>
+  
+    /* Create periodic threads */
+    for (i = 0; i < %<numPeriodicTasks>; i++)
+    {
+      %if isMac
+      char semName[50];
+      sprintf(semName, "periodicTaskStartSem%d", i);
+      periodicTaskStartSem[i] = sem_open(semName, O_CREAT, 0777, 0);  
+      sprintf(semName, "periodicTaskStopSem%d", i);
+      periodicTaskStopSem[i] = sem_open(semName, O_CREAT, 0777, 1);
+      %else
+      ret = sem_init(&periodicTaskStartSem[i], 0, 0);
+      CHECK_STATUS(ret, "sem_init");
+      ret = sem_init(&periodicTaskStopSem[i], 0, 1);
+      CHECK_STATUS(ret, "sem_init");
+      %endif
+      threadID[i] = i; 
+      if (policy == SCHED_FIFO || policy == SCHED_RR) { 
+         sp.sched_priority = priority[i];
+         ret = pthread_attr_setschedparam(&attr, &sp);
+         CHECK_STATUS(ret, "pthread_attr_setschedparam"); 
+      }
+      ret = pthread_create(&periodicThread[i], &attr, periodicTask, (void *) &threadID[i]);
+      CHECK_STATUS(ret,"pthread_create");
+    }
+    
+    %if (numAperiodicTasks > 0) 
+      %assign pt = %<CAST("Number", schedPriority)> -1
+      if (policy == SCHED_FIFO || policy == SCHED_RR) {  
+       sp.sched_priority = %<pt>;   
+       ret = pthread_attr_setschedparam(&attr, &sp); 
+       CHECK_STATUS(ret, "pthread_attr_setschedparam"); 
+      }
+      /* Create asynchronously triggered tasks */
+      %assign idx = 0
+      %foreach aehIdx = LibGetNumEventHandlers()
+        %assign evType = LibGetEventType(aehIdx)
+        %if ISEQUAL(evType, "Periodic")
+          %continue
+        %endif
+        %assign type = LibGetEventHandlerType(aehIdx)
+        %if ISEQUAL(type, "task")
+          %assign aehName = LibGetEventHandlerName(aehIdx) 
+          %foreach taskIdx = LibGetNumEventHandlerTasks(aehIdx)
+            ret = pthread_create(&aperiodicThread[%<idx>], &attr, (void *(*)(void*)) &%<aehName>_%<taskIdx>, NULL);
+            CHECK_STATUS(ret,"pthread_create");
+            %assign idx = idx + 1
+          %endforeach
+        %endif
+      %endforeach
+    %endif
+        
+    /* Create base rate task */
+    if (policy == SCHED_FIFO || policy == SCHED_RR) {  
+      sp.sched_priority = %<CAST("Number", schedPriority)>;
+      ret = pthread_attr_setschedparam(&attr, &sp);
+      CHECK_STATUS(ret, "pthread_attr_setschedparam"); 
+    }
+    %if isMac 
+      ret = pthread_create(&periodicTaskSchedulerThread, &attr, periodicTaskScheduler, NULL);
+    %else
+    ret = pthread_create(&periodicTaskSchedulerThread, &attr, periodicTaskScheduler, (void *) &info);
+    %endif
+    CHECK_STATUS(ret, "pthread_create");
+    pthread_attr_destroy(&attr);
+    
+    /* Wait for a stopping condition. */
+    %if isMac
+      MW_sem_wait(quitSem);
+    %else
+      MW_sem_wait(&quitSem);
+    %endif
+    printf("**stopping the model**\n");
+    if (%<RTMGetErrStat()> != NULL)
+    {
+      fprintf(stderr, "\n**%s**\n", %<RTMGetErrStat()>);
+    }
+ 
+    %<LibCallModelTerminate()> 
+    %<FcnDisableSignalHandler(isMac)>
+    
+    %if isMac
+    for (i = 0; i < %<numPeriodicTasks>; i++)
+    { 
+      char semName[50];  
+      sprintf(semName, "periodicTaskStartSem%d", i);  
+      sem_unlink(semName);
+      sprintf(semName, "periodicTaskStopSem%d", i);
+      sem_unlink(semName);
+    } 
+    sem_unlink("quitSem"); 
+    %else
+    for (i = 0; i < %<numPeriodicTasks>; i++)
+    {
+      sem_destroy(&periodicTaskStartSem[i]);
+      sem_destroy(&periodicTaskStopSem[i]);
+    } 
+    sem_destroy(&quitSem);     
+    %endif
+    
+    return 0;
+  }
+  
+  %closefile tmpFcnBuf
+  %<SLibCacheCodeToFile("mainSrc_fcn_defn", tmpFcnBuf)>
+%endfunction
+
+%%
+%%**********************************************************************
+%%   This is the entry point for generating main.c 
+%%**********************************************************************
+%function SLibGenerateThreadedMain() void
+  %assign isMac = FEVAL("ismac")
+  %assign numPeriodicTasks = SLibGetNumPeriodicTasks()
+  %openfile tmpFcnBuf
+  #define _GNU_SOURCE
+  #include <stdlib.h>
+  #include <unistd.h>    %%_POSIX_THREAD_PRIORITY_SCHEDULING is defined here
+  #include <pthread.h>
+  #include <sched.h>
+  #include <semaphore.h>
+  #include <errno.h>
+  #include <signal.h>
+  %if !isMac
+  #include <time.h>
+  %endif
+  %if SLibRealNonFinitesRequired()
+    #include "rt_nonfinite.h"
+  %endif
+  %closefile tmpFcnBuf
+  %<SLibCacheCodeToFile("mainSrc_incl", tmpFcnBuf)>
+  
+  %openfile tmpFcnBuf
+  %<SLibDeclareModelFcnArgs(TLC_TRUE)>\
+  %<SLibDeclareFcnProtoCtlGlobalVariables()>
+  %closefile tmpFcnBuf
+  %<SLibCacheCodeToFile("mainSrc_data_defn", tmpFcnBuf)>
+  
+  %<FcnGenerateUtilFunctionsAndGlobalVariables(isMac, numPeriodicTasks)>
+  %<FcnGeneratePeriodicTaskWrapperFunctions(isMac, numPeriodicTasks)>
+  %<FcnGenerateAperiodicWrapperFunctions(isMac)>
+  %<FcnGenerateMainFunction(isMac, numPeriodicTasks)> 
+%endfunction

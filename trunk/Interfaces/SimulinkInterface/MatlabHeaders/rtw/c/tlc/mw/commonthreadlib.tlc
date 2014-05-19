@@ -1,0 +1,233 @@
+%% ==============================================================================
+%% $Revision: 1.1.6.4 $
+%% $Date: 2011/04/22 17:43:35 $
+%%
+%% Abstract:
+%%   Output file template library
+%%
+%% Copyright 1994-2011 The MathWorks, Inc.
+%%
+%selectfile NULL_FILE
+
+%% =============================================================================
+%% Public functions
+%% =============================================================================
+
+%% SLibGetNumPeriodicTasks ======================================================
+%% Abstract:
+%%   Return the number of periodic tasks in generated code.
+%%
+%function SLibGetNumPeriodicTasks() 
+  %assign numTasks = 0 
+  %if LibIsDeploymentDiagram() 
+    %assign numTasks = SLibDeploymentGetNumPeriodicTasks()
+  %else   
+    %assign numTasks = LibGetNumSyncPeriodicTasks()
+  %endif
+  %return numTasks
+%endfunction
+
+
+%% SLibGetNumAperiodicTasks =====================================================
+%% Abstract:
+%%   Return the number of aperiodic tasks in generated code.
+%%
+%function SLibGetNumAperiodicTasks()
+  %assign retVal = 0
+  %if LibIsDeploymentDiagram()
+    %assign retVal = SLibDeploymentGetNumAperiodicTasks() 
+  %endif
+  %return retVal
+%endfunction
+
+
+%% LibCallRateScheduler() ======================================================
+%% Abstract:
+%%   Returns necessary code for calling the model's rate scheduler function 
+%%
+%function LibCallRateScheduler()
+  %assert (SLibConcurrentTasks() || LibIsDeploymentDiagram())
+  %assign buf = ""
+  %if LibIsDeploymentDiagram()  
+    %assign buf = LibDeploymentCallAdvanceTaskCounters()
+  %elseif !SLibSingleTasking() 
+    %if IsMultiInsatnceERTOrModelReference()
+      %assign buf = "%<FcnGetMulirateSchedulerName()>(%<tSimStruct>);"
+    %else
+      %assign buf = "%<FcnGetMulirateSchedulerName()>();"
+    %endif
+  %endif
+  %return buf
+%endfunction
+
+
+%% LibGetNumEventHandlers() ====================================================
+%% Abstract:
+%%   Returns the number of event handlers 
+%%
+%function LibGetNumEventHandlers() 
+  %assert (SLibConcurrentTasks() || LibIsDeploymentDiagram())
+  %assign numEH = 1 %% At least one periodic event handler
+  %if LibIsDeploymentDiagram()
+    %assign numEH = LibDeploymentGetNumTaskGroups()
+  %endif
+  %return numEH
+%endfunction
+
+
+%% LibGetEventType() ===========================================================
+%% Abstract:
+%%   Returns the type of the event which triggers the event handler: "periodic" 
+%%   or "aperiodic"
+%%
+%function LibGetEventType(ehId)
+  %assert (SLibConcurrentTasks() || LibIsDeploymentDiagram())
+  %assign evType = ""
+  %if LibIsDeploymentDiagram()
+    %assign evType = SLibDeploymentGetEventType(ehId)
+  %else
+    %assert ISEQUAL(ehId, 0)
+    %assign evType = "Periodic"
+  %endif
+  %return evType
+%endfunction
+
+
+%% LibGetEventHandlerName() ====================================================
+%% Abstract:
+%%   Returns the name of the event handler
+%%
+%function LibGetEventHandlerName(ehId)
+  %assert (SLibConcurrentTasks() || LibIsDeploymentDiagram())
+  %assign retVal = ""
+  %if LibIsDeploymentDiagram()
+    %assign retVal = SLibDeploymentGetEventHandlerName(ehId) 
+  %else
+    %assert ISEQUAL(ehId, 0)
+    %assign retVal = "baseRate"
+  %endif
+  %return retVal
+%endfunction
+
+
+%% LibGetEventHandlerTargetObject() ============================================
+%% Abstract:
+%%   Returns the target customization object associated with an event handler
+%%
+%function LibGetEventHandlerTargetObject(ehId)
+  %assert (SLibConcurrentTasks() || LibIsDeploymentDiagram())
+  %assign retVal = ""
+  %assign evType = LibGetEventType(ehId)   
+  %if ISEQUAL(evType, "Periodic")
+    %assign errTxt = "Target object for periodic event handler is not supported"
+    %<LibReportError(errTxt)>
+  %else
+    %assert LibIsDeploymentDiagram()
+    %assign retVal = SLibDeploymentGetEventHandlerTargetObject(ehId) 
+  %endif
+  %return retVal
+%endfunction
+
+
+%% LibGetEventHandlerType ======================================================
+%% Abstract:
+%%   Returns the type of the event handler: "isr" or "task"
+%%
+%function LibGetEventHandlerType(ehId)
+  %assert (SLibConcurrentTasks() || LibIsDeploymentDiagram())
+  %assign retVal = ""
+  %if LibIsDeploymentDiagram()
+    %assign retVal = SLibDeploymentGetEventHandlerType(ehId) 
+  %else
+    %assert ISEQUAL(ehId, 0)
+    %assign retVal = "task"
+  %endif
+  %return retVal
+%endfunction
+
+
+%% LibCallEventHandlerTask =====================================================
+%% Abstract:
+%%   Returns necessary code for calling a task associated with an event handler
+%%
+%function LibCallEventHandlerTask(ehId, taskId)
+  %assert (SLibConcurrentTasks() || LibIsDeploymentDiagram())
+  %assign retVal = ""
+  %assign evType = LibGetEventType(ehId)   
+  %if ISEQUAL(evType, "Periodic")
+    %assign errTxt = "LibCallEventHandlerTask for periodic event handler is not supported"
+    %<LibReportError(errTxt)>
+  %else
+    %assert LibIsDeploymentDiagram() 
+    %assign retVal = SLibDeploymentEmitCallToEventHandlerTask(ehId, taskId) 
+  %endif
+  %return retVal
+%endfunction
+
+
+%% LibCallEventHandlerISR ======================================================
+%% Abstract:
+%%   Returns necessary code for calling an event handler function.
+%%
+%function LibCallEventHandlerISR(ehId)
+  %assert (SLibConcurrentTasks() || LibIsDeploymentDiagram())
+  %assign retVal = ""
+  %assign evType = LibGetEventType(ehId)   
+  %if ISEQUAL(evType, "Periodic")
+    %assign errTxt = "LibCallEventHandlerISR for periodic event handler is not supported"
+    %<LibReportError(errTxt)>
+  %else
+    %assert LibIsDeploymentDiagram()  
+    %assign retVal = SLibDeploymentEmitCallToEventHandler(ehId) 
+  %endif
+  %return retVal
+%endfunction
+
+
+%% LibGetNumEventHandlerTasks ==================================================
+%% Abstract:
+%%   Returns the number of tasks triggered by the event associated with an event 
+%%   handler
+%%
+%function LibGetNumEventHandlerTasks(ehId) void
+  %assert (SLibConcurrentTasks() || LibIsDeploymentDiagram())
+  %assign numTasks = 0 %% assume
+  %if LibIsDeploymentDiagram() 
+    %assign numTasks = SLibDeploymentGetNumEventHandlerTasks(ehId)
+  %else   
+    %assert ISEQUAL(ehId, 0)
+    %assign numTasks = LibGetNumSyncPeriodicTasks()
+  %endif
+  %return numTasks
+%endfunction
+
+
+%% LibGetEventHandlerTaskSampleTimeIndex =======================================
+%% Abstract:
+%%    Return the sample time index for the specified task identifier (taskId) 
+%%    triggered by the event associated with the event handler (ehId)
+%%
+%function LibGetEventHandlerTaskSampleTimeIndex(ehId, taskId)
+  %assert (SLibConcurrentTasks() || LibIsDeploymentDiagram())
+  %assign stId   = -1
+  %assign retVal = ""
+  %assign evType = LibGetEventType(ehId)   
+  %if ISEQUAL(evType, "Aperiodic")
+   %assign errTxt = "Target object for aperiodic event handler is not supported"
+    %<LibReportError(errTxt)>
+  %else 
+    %if LibIsDeploymentDiagram() 
+      %assign stId = SLibDeploymentGetTaskSampleTimeIndex(ehId, taskId)
+    %else
+      %assert ISEQUAL(ehId, 0)
+      %assign tid01Eq = ISEQUAL(SolverType, "FixedStep") && FixedStepOpts.TID01EQ
+      %assert (taskId < NumSynchronousSampleTimes+tid01Eq)
+      %assign stId   = taskId + tid01Eq 
+    %endif
+  %endif
+  %return stId
+%endfunction
+
+
+
+

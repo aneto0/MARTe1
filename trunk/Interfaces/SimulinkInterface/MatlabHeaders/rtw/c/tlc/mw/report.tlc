@@ -1,0 +1,830 @@
+%% ============================================================================
+%% 
+%% 
+%% 
+%%
+%% Copyright 1994-2012 The MathWorks, Inc.
+%%
+%% Abstract:
+%%   This file create a HTML report of the generated code. 
+%%
+
+%if EXISTS("_RTW_REPORT_") == 0
+%assign _RTW_REPORT_ = 1
+
+%include "javascript.tlc"
+
+%% Function: DumpModelOptimizationTable =======================================
+%% Abstract:
+%%
+%function DumpModelOptimizationTable() Output
+  
+  %assign green = "<FONT COLOR=\"green\">green</FONT>"
+  %assign red   = "<FONT COLOR=\"red\">red</FONT>"
+
+  The following table lists selected code generation options.
+  Options prefixed with an ellipsis (...)
+  depend on a main configuration option. Settings which
+  result in less efficient code are marked in %<red>.
+  
+  /%
+  The following table lists the available and chosen code 
+  generation optimization types. If an optimization type has
+  an ellipsis ("...") as an prefix, then it depends
+  on the value (on/off) of the optimization at the top of the row.
+  If a value is marked in %<red>, the chosen setting results in 
+  non-optimal code.
+  %/
+  <BR><BR>
+  
+  %assign rec = FEVAL("rtwprivate", "rtwreport", "getModelInfo")
+  %if !ISEMPTY(rec) 
+    <TABLE BORDER="1" CELLPADDING="5" CELLSPACING="1">
+    <TR><TD><B> Optimization Types <TD> Value [On/Off] </B></TR>
+    %with rec
+      %foreach idx = NumberOfOptimizations
+        %with Optimizations[idx]
+          %assign depNames  = " "
+          %assign depValues = " "
+          %if NumberOfDependencies > 0
+            %foreach subIdx = NumberOfDependencies
+              %with Dependent[subIdx]
+                %assign depNames = depNames + "<BR> . . . %<Name>"
+                %assign color = (Value == "off") ? ...
+                  (Negation ? "green":"red"):(Negation ? "red":"green")
+                %assign depValues = depValues + ...
+                  "<BR> <FONT COLOR=\"%<color>\"> %<Value> </FONT> "
+              %endwith
+            %endforeach
+          %endif
+          %assign color = (Value == "off") ? ...
+            (Negation ? "green":"red"):(Negation ? "red":"green") 
+          <TR><TD> %<Name> %<depNames> <TD>\
+          <FONT COLOR="%<color>"> %<Value> </FONT> %<depValues> </TR>
+        %endwith
+      %endforeach
+    %endwith
+    </TABLE>
+  %endif
+ 
+%endfunction
+
+%% Function: DumpReducedBlockTable =======================================
+%% Abstract: Create html file which contains eliminated block list.
+%%
+%function DumpReducedBlockTable(REDTBL_FILE) Output
+  %if (ShowEliminatedStatements && !GenerateTraceInfo)
+    %with ReducedBlocks
+    %if NumReducedBlocks > 0
+    %selectfile NULL_FILE
+    %openfile  tmp_buf = "%<REDTBL_FILE>"
+    <HTML>
+    <HEAD>
+    <TITLE>%<Name> Code Generation Report</TITLE>
+    </HEAD>
+    %assign OnloadJS = FEVAL("rtwprivate","rtwreport", "getOnloadJS", "rtwIdReducedBlock")
+    <BODY BGCOLOR="#ffffff" LINK="0033CC" VLINK="#666666" ONLOAD="%<OnloadJS>">
+    <BR>
+    List of blocks eliminated as a result of block reduction optimization.
+    <BR><BR>
+    <TABLE BORDER="1" CELLPADDING="5" CELLSPACING="1">
+    <TR><TD><B> Block <TD> Description </B></TR>
+      %foreach bIdx = NumReducedBlocks
+        %assign b = Block[bIdx]
+        %assign linkname = FEVAL("rtwprivate","rtwctags_expand", b.Name, "blue")
+       <TR><TD> %<linkname> <TD> %<b.OptimizationInfo> </TR>
+      %endforeach
+    </TABLE>
+    </BODY>
+    </HTML>
+    %closefile tmp_buf
+    %endif
+    %endwith
+  %endif
+%endfunction
+
+%% Function: DumpTargetSpecificOptimizationTable ==============================
+%%
+%%
+%function DumpTargetSpecificOptimizationTable() Output
+  
+  <TABLE BORDER="1" CELLPADDING="5" CELLSPACING="1">
+  <TR><TD><B> Optimization Types <TD> Value [On/Off] </B></TR>
+  %%
+  <TR><TD> MAT-file logging <TD>\
+  %if MatFileLogging == 1
+    <FONT COLOR="red"> on </FONT></TR>
+  %else
+    <FONT COLOR="green"> off </FONT></TR>
+  %endif
+  %%
+  <TR><TD> Single output/update function <TD>\
+  %if CombineOutputUpdateFcns == 1
+    <FONT COLOR="green"> on </FONT></TR>
+  %else
+    <FONT COLOR="red"> off </FONT></TR>
+  %endif
+  %%
+  <TR><TD> Inline invariant signals <TD>\
+  %if InlineInvariantSignals == 1
+    <FONT COLOR="green"> on </FONT></TR>
+  %else
+    <FONT COLOR="red"> off </FONT></TR>
+  %endif
+  %%
+  <TR><TD> Local block outputs <TD>\
+  %if LocalBlockOutputs == 1
+    <FONT COLOR="green"> on </FONT></TR>
+  %else
+    <FONT COLOR="red"> off </FONT></TR>
+  %endif
+  %%
+  <TR><TD> Initialize internal data <TD>\
+  %if ZeroInternalMemoryAtStartup == 1
+    <FONT COLOR="red"> on </FONT></TR>
+  %else
+    <FONT COLOR="green"> off </FONT></TR>
+  %endif
+  %%
+  <TR><TD> Initialize external I/O data <TD>\
+  %if ZeroExternalMemoryAtStartup == 1
+    <FONT COLOR="red"> on </FONT></TR>
+  %else
+    <FONT COLOR="green"> off </FONT></TR>
+  %endif
+  %%
+  </TABLE>
+%endfunction
+
+%% Function: SaturationCodeOptionsIsEmpty =====================================
+%% Abstract:
+%%   
+%%
+%function SaturationCodeOptionsIsEmpty() void
+  %<LibTrapCacheAssert(RTWReportSaturationCodeOptions)>
+  %return WHITE_SPACE(RTWReportSaturationCodeOptions)
+%endfunction
+
+%% Function: CacheSaturationCodeOptions =======================================
+%% Abstract:
+%%
+%function CacheSaturationCodeOptions() Output
+  %<LibAddToCompiledModel("RTWReportSaturationCodeOptions", 0)>
+
+  %openfile tmpBuffer
+  
+  %with CompiledModel
+    %foreach sysIdx = NumSystems
+      %assign system = System[sysIdx]
+      %with system
+	%foreach blkIdx = NumBlocks+NumVirtualOutportBlocks
+	  %assign block = Block[blkIdx]
+	  %with block
+	    %if ISFIELD(block, "ParamSettings")
+	      %with ParamSettings
+		%if ISFIELD(ParamSettings, "SaturateOnOverflow")
+		  %if SaturateOnOverflow == "Needed"
+		    %assign doSaturate = 1
+		  %elseif SaturateOnOverflow == "NeededButOff"
+		    %assign doSaturate = 0
+		  %else
+		    %assign doSaturate = -1
+		  %endif
+		  %if doSaturate > -1
+		    <TR><TD> %<FEVAL("rtwctags_expand", block.Name, ...
+		      "#117755")> <TD>\
+		    %if doSaturate
+		      <FONT COLOR="red"> on </FONT></TR>
+		    %else
+		      <FONT COLOR="green"> off </FONT></TR>
+		    %endif
+		  %endif
+		%endif
+	      %endwith
+	    %endif
+	  %endwith %% block
+	%endforeach %% blkIdx
+      %endwith %% system
+    %endforeach %% sysIdx
+  %endwith %% CompiledModel
+  
+  %closefile tmpBuffer
+  %assign ::CompiledModel.RTWReportSaturationCodeOptions = tmpBuffer
+  
+%endfunction
+
+%% Function: DumpSaturationCodeOptions ========================================
+%% Abstract:
+%%
+%function DumpSaturationCodeOptions() Output
+  %assign docroot = FEVAL("docroot")
+  %assign filesep = FEVAL("filesep")
+  %assign tagfile = "%<docroot>%<filesep>mapfiles%<filesep>rtw_ug.map"
+  %assign link = FEVAL("rtwprivate", "rtwreport", "expandLink", ...
+    tagfile, "rtw_saturate_ovflow_opt")
+  
+  The following table lists all blocks with optional saturate
+  output on integer overflow. 
+  <A HREF="%<link>"
+  TARGET="rtwreport_document_frame">Saturation on integer overflow</A> 
+  increases code size and should be selected only when necessary.
+  <BR><BR>
+  
+  <TABLE BORDER="1" CELLPADDING="5" CELLSPACING="1">
+  <TR><TD><B> Block saturates on integer overflow <TD> Value [On/Off] </B></TR>
+  %<LibTrapCacheAssert(RTWReportSaturationCodeOptions)>
+  %<RTWReportSaturationCodeOptions>
+  </TABLE>
+%endfunction
+
+%% Function: DumpStaticCodeDependencies =======================================
+%% Abstract:
+%%
+%function DumpStaticCodeDependencies() Output
+  
+  The generated code depends on these header files.
+  <BR><BR>
+  
+  <TABLE BORDER="1" CELLPADDING="5" CELLSPACING="1">
+  <TR><TD><B> Relative path from the MATLAB root directory  </B></TR>
+  <TR><TD> extern/include/tmwtypes.h </TR>
+  <TR><TD> simulink/include/simstruc_types.h </TR>
+  %if ExtMode == 1
+    <TR><TD> rtw/c/src/ext_work.h </TR>
+  %endif
+  </TABLE>
+  
+%endfunction
+
+%% Function: DumpStateflowSpecificOptions =====================================
+%% Abstract:
+%%
+%function DumpStateflowSpecificOptions(rec) Output
+  %assign docroot = FEVAL("docroot")
+  %assign filesep = FEVAL("filesep")
+  %assign tagfile = "%<docroot>%<filesep>mapfiles%<filesep>stateflow.map"
+  %assign link = FEVAL("rtwprivate", "rtwreport", "expandLink", ...
+    tagfile, "CHART_DIALOG")
+  
+  The following table lists chart 
+  options that influence code efficiency. To
+  achieve the most efficient code, 
+  <A HREF= "%<link>" 
+  TARGET="rtwreport_document_frame"> Strong Data Typing with Simulink I/O</A>
+  should always be selected (on). It is also recommended that 
+  <A HREF= "%<link>" 
+  TARGET="rtwreport_document_frame"> Enable C-like Bit Operations</A>
+  is consistent for all charts.
+  
+  <BR><BR>
+  
+  <TABLE BORDER="1" CELLPADDING="5" CELLSPACING="1">
+  <TR><TD><B> Chart name </B>
+  %with rec.Chart[0]
+    %foreach optIdx = NumberOfOptions
+      <TD><B> %<Option[optIdx].Name> <BR> [On/Off] </B>
+    %endforeach
+    </TR>
+  %endwith
+  %foreach chartIdx = rec.NumberOfCharts
+    %with rec.Chart[chartIdx]
+      <TR><TD> %<Name>
+      %foreach optIdx = NumberOfOptions
+	%with Option[optIdx]
+	  %if Negation < 0 %% neutral
+	    %assign color = "blue"
+	  %else
+	    %assign color = Value  ? ...
+	      (Negation ? "red":"green"):(Negation ? "green":"red")
+	  %endif
+	  %assign v = Value ? "on" : "off"
+	  <TD> <FONT COLOR="%<color>"> %<v> </FONT>
+	%endwith
+      %endforeach
+      </TR>
+    %endwith
+  %endforeach
+  </TABLE>
+%endfunction
+
+%% Function: DumpSignalInitializationInfo =====================================
+%% Abstract:
+%%
+%function DumpSignalInitializationInfo() Output
+  %assign docroot = FEVAL("docroot")
+  %assign filesep = FEVAL("filesep")
+  %assign tagfile = "%<docroot>%<filesep>mapfiles%<filesep>ecoder.map"
+  %assign link = FEVAL("rtwprivate", "rtwreport", "expandLink", ...
+    tagfile, "rtw_ecoder_basic_codegen_opt")
+  
+  Non-zero, non-static data is always initialized. Initializing data to zero
+  may be redundant for your application. Initialization code is optionally
+  generated with the
+  <A HREF="%<link>" 
+   TARGET="rtwreport_document_frame"> Initialize internal data </A> and
+  <A HREF="%<link>" 
+   TARGET="rtwreport_document_frame"> Initialize external I/O data </A>
+  options.
+  
+%endfunction
+
+%% Function: DumpAdditionalInformation ========================================
+%% Abstract:
+%%
+%function DumpAdditionalInformation() Output
+  %assign docroot = FEVAL("docroot")
+  %assign filesep = FEVAL("filesep")
+  %assign tagfile  = "%<docroot>%<filesep>mapfiles%<filesep>rtw_ug.map"
+  
+  <UL>
+%%  <LI><A HREF="%<docroot>/toolbox/rtw/rtw_ug/opt_mod9.html"
+  <LI><A HREF="%<FEVAL("rtwprivate", "rtwreport", "expandLink", ...
+    tagfile, "rtw_saturate_ovflow_opt")>"
+         TARGET="rtwreport_document_frame">Use of Data Types</A></LI>
+  <LI><A HREF="%<FEVAL("rtwprivate", "rtwreport", "expandLink", ...
+    tagfile, "rtw_interface_sigs_ext_code")>" 
+         TARGET="rtwreport_document_frame">Interfacing Signals to External
+	 Code</A></LI>
+  <LI><A HREF="%<FEVAL("rtwprivate", "rtwreport", "expandLink", ...
+    tagfile, "rtw_nonvirtual_subsys_codegen")>"
+         TARGET="rtwreport_document_frame">Preserving function names and
+	 boundaries</A></LI>
+  </UL>
+%endfunction
+
+%% Function: DumpSummary ======================================================
+%% Abstract:
+%%
+%function DumpSummary() Output
+  
+  Code generation for model "%<Name>". 
+  <BR><BR>
+  
+  <TABLE CELLPADDING="1" CELLSPACING="1">
+  
+  <TR><TD>Model version              </TD><TD>: %<ModelVersion></TD></TR>
+  <TR><TD>Simulink Coder version </TD><TD>: %<Version></TD></TR>
+%if GenerateFullHeader
+  <TR><TD>%<CorCPPForBuildLogsandComments()> source code generated on </TD><TD>: %<TLC_TIME></TD></TR>
+%endif
+  </TABLE>
+  <BR>
+  <TABLE CELLPADDING="1" CELLSPACING="1">
+  %% matFileFullName will be used when the model is closed or not existed.
+  %assign matFileFullName= FEVAL("rtwprivate","rtwinfomatman", ...
+    "getMatFileName", "binfo", LibGetModelName(), ::CompiledModel.ModelReferenceTargetType)
+  </TABLE>
+  %<FEVAL("rtwprivate", "genConfigCheckReportTable", LibGetModelName(), matFileFullName)>
+%endfunction
+
+%% Function: FcnTlcTraceInfo =================================================
+%% Abstract:
+%%     Create a record storing traceability information obtained during the
+%%     TLC phase
+%%
+%function FcnTlcTraceInfo() void
+  %assign TimeStamp = TLC_TIME
+  %createrecord TlcTraceInfo {   \
+    TimeStamp           "%<TimeStamp>"; \
+    Version             "%<Version>" \
+  }
+  %if EXISTS(ReducedBlocks)
+    %with ReducedBlocks
+      %if NumReducedBlocks > 0
+        %foreach bIdx = NumReducedBlocks
+          %assign b = Block[bIdx]
+          %addtorecord TlcTraceInfo ReducedBlock { \
+            Name              "%<b.Name>"; \
+            SID               "%<b.SID>"; \
+            Type              "%<b.Type>"; \
+            Comment           "%<b.OptimizationInfo>" \
+          }
+        %endforeach
+      %endif
+    %endwith
+  %endif
+  %if EXISTS(InsertedHiddenBlocks)
+    %with InsertedHiddenBlocks
+      %if NumInsertedHiddenBlocks > 0 
+        %foreach bIdx = NumInsertedHiddenBlocks
+          %assign b = Block[bIdx]
+          %if b.Type == "SignalSpecification"
+            %continue
+          %endif %% we don't want to show inserted SigSpec blocks, which are virtual          
+          %createrecord InsertedBlock { \
+            Name              "%<b.Name>"; \
+            Type              "%<b.Type>"; \
+            Comment           "%<b.InsertInfo>" \
+          }
+          %if ::CompiledModel.CoderReportInfo
+            %if b.NumSrcBlks > 0
+              %assign InsertedBlock = InsertedBlock + b.SrcBlock
+            %endif
+            %if b.NumDstBlks > 0
+              %assign InsertedBlock = InsertedBlock + b.DstBlock
+            %endif
+          %endif
+          %assign TlcTraceInfo = TlcTraceInfo + InsertedBlock
+        %endforeach
+      %endif
+    %endwith
+  %endif
+  %return TlcTraceInfo
+%endfunction
+
+%% Function: DumpCSS ==========================================================
+%% Abstract:
+%%   Generate Casecaded Style Sheet to be used by HTML documents
+%%
+%function DumpCSS(filename) Output
+%assign ISPC = FEVAL("ispc")
+%openfile cssFileName = "%<filename>"
+%if ISPC
+body,p,table {font-family: verdana, sans-serif; font-size: 12px}
+button,input {font-family: verdana, sans-serif; font-size: 10px}
+%else
+body,p,table {font-family: verdana, sans-serif;}
+button,input {font-family: verdana, sans-serif;}  
+%endif
+h1 { font-weight: normal; color: #000066; }
+td { vertical-align: top }
+th { background-color: #eeeeee; text-align: left; }
+a:link { color: #0033cc; }
+a:visited { color: #666666; }
+%closefile cssFileName
+%endfunction
+
+%% Function: DumpCSSInclude ====================================================
+%% Abstract:
+%%   Dump a line to reference CSS
+%%
+%function DumpCSSInclude(filename) Output
+<link rel="stylesheet" type="text/css" href="%<filename>" />\
+%endfunction
+
+%% Function: DumpRtwHiliteJS ============================================
+%% Abstract:
+%%   Dump JavaScript function for hyperlinks
+%%
+%function DumpRtwHiliteJS(Name,buildDir) Output
+%assign rtwHilite = FEVAL("rtwprivate","rtwreport","getRtwHiliteJSForModel",...
+                          Name, buildDir, TLC_TRUE)
+%if !ISEMPTY(rtwHilite)
+%<rtwHilite>
+%endif
+%endfunction
+
+%% Function: CreateHTMLReportMainFcn ====================================
+%% Abstract:
+%%
+%function CreateHTMLReportMainFcn() Output
+%%
+%% Start of the HTML code generation
+%%
+%assign webExplorer           =  "explorer.html"
+%assign webModel              =  "model.html"
+%assign rptFileName           = "%<Name>_codegen_rpt.html"
+%assign rptContentFileName    = "%<Name>_contents.html" 
+%assign rptSurveyFileName     = "%<Name>_survey.html"
+%assign rptSubsystemsFileName = "%<Name>_subsystems.html"
+%assign buildDir        = FEVAL("rtwprivate", "rtwattic", "getBuildDir")
+%assign htmlDir         = "%<buildDir>/html"
+%assign ::reducedBlockFileName   = "%<htmlDir>/%<Name>_redblock.html"
+%assign ::insertedBlockFileName  = "%<htmlDir>/%<Name>_intblock.html"
+%assign ::javaScriptFileName     = "rtwhilite.js"
+%assign traceRptFileName         = "%<Name>_trace.html"
+%assign codeInfoRptFileName      = "%<Name>_interface.html"
+%assign codeMetricsRptFileName   = "%<Name>_metrics.html"
+%assign rptMsgFileName           = "rtwmsg.html"
+%assign cssFileName              = "rtwreport.css"
+%assign generateWebView          = FEVAL("rtwprivate","rtwreport","generateWebViewOn",Name)
+%assign isERTTarget              = SLibIsERTTarget()
+%if FEVAL("exist",htmlDir,"dir") || FEVAL("mkdir", buildDir, "html")
+
+%if ::RTWVerbose && !::CompiledModel.CoderReportInfo
+  %selectfile STDOUT
+### Creating HTML report file %<rptFileName>
+  %selectfile NULL_FILE
+%endif
+
+%<CacheSaturationCodeOptions()>
+
+%with CompiledModel
+%assign rptFileName = "%<htmlDir>/%<rptFileName>"
+
+%%
+%% Generate the report frame file
+%%
+%openfile rptFrameFile = "%<rptFileName>"
+<HTML>
+<HEAD>
+<TITLE>%<Name> Code Generation Report</TITLE>
+%if (EXISTS(ConfigSet.GenerateWebview) && ConfigSet.GenerateWebview)
+<SCRIPT LANGUAGE="JavaScript"><!--
+myVar="";
+myCanvas1 ="";
+//--></SCRIPT>
+%endif
+%<IncludeJavaScript(javaScriptFileName)>
+%<IncludeJavaScript("rtwshrink.js")>
+%if GenerateTraceInfo
+  %assign traceJsFile = "%<LibGetModelName()>_traceInfo.js"
+  %<IncludeJavaScript(traceJsFile)>
+%endif
+</HEAD>
+
+
+<FRAMESET Cols="25%,75%" CELLSPACING="0">
+%if generateWebView
+<FRAMESET Rows="50%,50%" CELLSPACING="0">
+%assign webfilename = FEVAL("rtwprivate","rtwreport","generateWebView",Name,htmlDir)
+%endif
+<FRAME scrolling="auto" SRC="%<rptContentFileName>" NAME="rtwreport_contents_frame" />
+%if generateWebView
+<FRAME src="explorer.html"  name="%<Name>_slwebview_explorer" id="%<Name>_slwebview_explorer" scrolling="auto" marginheight="3" marginwidth="3" />
+</FRAMESET>
+<FRAMESET Rows="50%,*" CELLSPACING="0">
+%endif
+%if isERTTarget
+  <FRAME scrolling="auto" NAME="rtwreport_document_frame" />
+%else
+  <FRAME scrolling="auto" SRC="%<rptSurveyFileName>"  NAME="rtwreport_document_frame" />
+%endif
+
+%if generateWebView
+    
+    <FRAMESET id="%<Name>_slwebview_frame" name="%<Name>_slwebview_frame" frameborder="0" border="0" framespacing="0" rows="100%, 0%">
+        <FRAME src="model.html" name="%<Name>_slwebview_model" id="%<Name>_slwebview_model" scrolling="no" marginheight="3" marginwidth="3" />
+        <FRAME src="" name="%<Name>_slwebview_web" id="%<Name>_slwebview_web" scrolling="auto" frameborder="0" border="0" framespacing="0" marginheight="3" marginwidth="3" />
+    </FRAMESET>
+  </FRAMESET>
+
+      </FRAMESET>
+
+%endif
+
+</FRAMESET>
+
+
+%% <body> is need for Linux or otherwise onload function is not executed
+<BODY></BODY>
+</HTML>
+%closefile rptFrameFile
+%% global Variables
+%%
+%assign sfChartRec = FEVAL("rtwprivate","rtwreport","getStateflowChartOptions")
+%if ISEMPTY(sfChartRec) || sfChartRec.NumberOfCharts == 0
+  %assign bSfChartRec = 0
+%else
+  %assign bSfChartRec = 1
+%endif
+%%
+%% Generate the report contents file
+%%
+%openfile rptContentFile = "%<htmlDir>/%<rptContentFileName>"
+<HTML>
+<HEAD>
+%<DumpCSSInclude(cssFileName)>
+<script language="JavaScript" type="text/javascript" defer="defer"> 
+    function rtwFileListShrink(o, category, numFiles) 
+    {
+        var indent = document.getElementById(category + "_indent");
+        var fileTable = document.getElementById(category + "_table");
+        var catName = document.getElementById(category + "_name");
+        if (fileTable.style.display == "none") {
+            fileTable.style.display = "";
+            indent.style.display = "";
+            o.innerHTML = '<span style="font-family:monospace" id = "' + category + '_button">[-]</span>';
+            catName.innerHTML = '<b>' + category + '</b>';
+        } else {
+            fileTable.style.display = "none";
+            indent.style.display = "none";
+            o.innerHTML = '<span style="font-family:monospace" id = "' + category + '_button">[+]</span>';
+            catName.innerHTML = '<b>' + category + " (" + numFiles + ")" + '</b>';
+        } 
+    }
+</script>
+</HEAD>
+%assign ISPC = FEVAL("ispc")
+%if ISPC
+<BODY BGCOLOR="#eeeeee"  LINK="0033CC" VLINK="#666666" RIGHTMARGIN="0">
+%else
+<BODY BGCOLOR="#eeeeee"  LINK="0033CC" VLINK="#666666">
+%endif
+%if ISPC || FEVAL("rtwprivate","useReportInfo")
+  <TABLE BORDER="0" CELLSPACING="0" CELLPADDING="1" WIDTH="100%">
+  <TR>
+  <TD><BUTTON TYPE="button" NAME="bwbutton" ONCLICK="history.go(-1)" style="width: 75">Back</BUTTON></TD>
+  <TD>&nbsp;&nbsp;</TD>
+  <TD><BUTTON type="button" NAME="fwbutton" ONCLICK="history.go(1)" style="width: 75">Forward</BUTTON></TD>
+  </TR></TABLE><P />
+%endif
+
+%if IncludeHyperlinkInReport == 0 || CodeFormat == "S-Function"
+  %assign hyperlink = TLC_FALSE
+%else
+  %assign hyperlink = TLC_TRUE
+%endif
+
+%assign hilite_onClick = "ONCLICK=\"if (top) if (top.tocHiliteMe) top.tocHiliteMe(window, this, true);\" NAME=\"TOC_List\""
+
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="4" WIDTH="100%" BGCOLOR="#ffffff">
+ <TR><TD><B><FONT COLOR="#000000">Contents</FONT></B></TD></TR>
+%if isERTTarget
+ <TR ><TD><A HREF="%<rptMsgFileName>" style="display: none" TARGET="rtwreport_document_frame" ID="rtwIdMsgFileLink" %<hilite_onClick> >Block-to-code Message</A></TD></TR>
+%endif
+ <TR><TD><A HREF="%<rptSurveyFileName>"\
+  TARGET="rtwreport_document_frame" ID="rtwIdSummaryPage" %<hilite_onClick>>Summary</A></TD></TR>
+
+%assign cdFeatOn = FEVAL("feature", "CodeReuseDiagnostics")
+%if cdFeatOn
+  <TR><TD><A HREF="%<rptSubsystemsFileName>"\
+  TARGET="rtwreport_document_frame" ID="rtwIdSubsystem"  %<hilite_onClick>>Subsystem Report</A></TD></TR>
+%endif  
+%if CompiledModel.GenerateCodeInterfaceReport
+<TR><TD><A HREF="%<codeInfoRptFileName>" TARGET="rtwreport_document_frame" ID="rtwIdCodeInterface" %<hilite_onClick>>Code Interface Report</A></TD></TR>
+%endif
+
+%if isERTTarget
+  <TR><TD><A HREF="%<traceRptFileName>" TARGET="rtwreport_document_frame" ID="rtwIdTraceability" %<hilite_onClick> >Traceability Report</A></TD></TR>
+  <TR><TD><A HREF="%<codeMetricsRptFileName>" TARGET="rtwreport_document_frame" ID="rtwIdCodeMetrics" %<hilite_onClick>>Static Code Metrics Report</A></TD></TR>
+%endif %% SLibIsERTTarget()
+
+%if (ShowEliminatedStatements && !GenerateTraceInfo)
+  %with ReducedBlocks
+    %if NumReducedBlocks > 0
+<TR><TD> <A HREF="%<reducedBlockFileName>" TARGET="rtwreport_document_frame" ID="rtwIdReducedBlock" %<hilite_onClick> > List of eliminated blocks </A></TD></TR>
+    %endif
+ %endwith
+%endif
+%with InsertedHiddenBlocks
+  %if NumInsertedHiddenBlocks > 0
+    %assign tmp_buf = FEVAL("rtwprivate","rtwreport",...
+      "getInsertedBlockTable", Block, LibGetModelName(), buildDir)
+    %openfile rptInsertedBlock = insertedBlockFileName
+%<tmp_buf>\
+    %closefile rptInsertedBlock
+    %selectfile rptContentFile
+<TR><TD> <A HREF="%<insertedBlockFileName>" TARGET="rtwreport_document_frame" ID="rtwIdInsertedBlock" %<hilite_onClick> > List of inserted blocks </A></TD></TR>
+  %endif
+%endwith
+
+%% Used by Target products to insert code profiling report into the code generation report
+<!--ADD_CODE_PROFILE_REPORT_LINK_HERE-->
+</TABLE>
+%if isERTTarget
+<TABLE BORDER="0" CELLSPACING="0" CELLPADDING="1" WIDTH="100%" BGCOLOR="#ffffff" style="display: none; margin-top: 10px; margin-bottom: 10px" ID="rtwIdTracePanel">
+<TR><TD><B><FONT COLOR="#000000">Highlight Navigation</FONT></B></TD></TR>
+<TR><TD><INPUT TYPE="button" VALUE="Previous" style="width: 85" ID="rtwIdButtonPrev" ONCLICK="if (top.rtwGoPrev) top.rtwGoPrev();" disabled="disabled" />
+<INPUT TYPE="button" VALUE="Next" style="width: 85" ID="rtwIdButtonNext" ONCLICK="if (top.rtwGoNext) top.rtwGoNext();" disabled="disabled" /></TD></TR>
+</TABLE>
+%endif
+<!--REPLACE_WITH_GENERATED_FILES-->
+<!--REPLACE_WITH_AUTOSAR_XML_FILES-->
+
+</BODY>
+</HTML>
+%closefile rptContentFile
+%%
+%% Generate the report document / survey
+%%
+%openfile rptSurveyFile = "%<htmlDir>/%<rptSurveyFileName>"
+<HTML>
+<HEAD>
+<TITLE>Report - Code generation report summary for %<Name></TITLE>
+%<DumpCSSInclude(cssFileName)>
+</HEAD>
+%assign OnloadJS = FEVAL("rtwprivate","rtwreport", "getOnloadJS", "rtwIdSummaryPage")
+<BODY BGCOLOR="#ffffff" LINK="0033CC" VLINK="#666666" ONLOAD="%<OnloadJS>">
+<FONT SIZE="+3" COLOR="#000066"> Code Generation Report for %<Name></FONT>
+<P CLASS="margin">
+<A NAME="summary"><FONT SIZE="+1" COLOR="#000066"> <B CLASS="midprod"> 
+ Summary </B></FONT></A>
+</P>
+ <P CLASS="margin">  
+ %<DumpSummary()> 
+ </P>
+</BODY>
+</HTML>
+%closefile rptSurveyFile
+
+%openfile rptSubsystemsFile = "%<htmlDir>/%<rptSubsystemsFileName>"
+<HTML>
+<HEAD>
+<TITLE>Report - Nonvirtual subsystems in %<Name></TITLE>
+%<DumpCSSInclude(cssFileName)>
+%if hyperlink == TLC_TRUE
+  %<DumpRtwHiliteJS(LibGetModelName(), buildDir)>\
+%endif
+</HEAD>
+%assign OnloadJS = FEVAL("rtwprivate","rtwreport", "getOnloadJS", "rtwIdSubsystem")
+<BODY BGCOLOR="#ffffff" LINK="0033CC" VLINK="#666666" ONLOAD="%<OnloadJS>">
+<FONT SIZE="+3" COLOR="#000066"> Non-virtual subsystems in %<Name></FONT>
+<P CLASS="margin" />
+<A NAME="codemap"><FONT SIZE="+1" COLOR="#000066"> <B CLASS="midprod"> 
+ Code Mapping </B></FONT></A>
+<P CLASS="margin" />  
+The following table:
+<ul>
+
+<li> provides a mapping from the non-virtual subsystems in the model to
+functions or reusable functions in the generated code and </li>
+
+<li> notes exceptions that caused some non-virtual subsystems to not reuse code
+even though they were assigned a Reuse Setting ('Function packaging' entry 
+on the Subsystem Block Dialog) of 'Auto' or 'Reused Function'.</li>
+
+</ul>
+<BR />
+ %% Get the diagnostics from MATLAB in table form
+ %assign tableEntries = FEVAL("rtwprivate", "rtwreport", ...
+   "getSubsysDiag", LibGetModelName(), rptSubsystemsFileName, hyperlink)
+ %assign tabSize = SIZE(tableEntries)[1]
+ %if tabSize > 0
+   <TABLE BORDER="1" CELLPADDING="5" CELLSPACING="1">
+   %foreach tIdx = SIZE(tableEntries)[1]
+     %<tableEntries[tIdx]>
+   %endforeach
+   </TABLE>
+ %else
+   <B>No non-virtual subsystems in model</B>
+ %endif
+<BR />
+<BR />
+%% Get the reuse blockers for various subsystems
+<A NAME="codeexcepts"><FONT SIZE="+1" COLOR="#000066"> <B CLASS="midprod"> 
+ Code Reuse Exceptions</B></FONT></A>
+ <P CLASS="margin" />  
+
+The following section provides details on each exception that caused
+a non-virtual subsystem with a function packaging setting of 
+<ul>
+
+<li> 'Auto' to become an inlined code segment, </li>
+
+<li> 'Auto' to become a non-reusable function without arguments, or</li>
+
+<li> 'Reusable function' to become a non-reusable function without arguments.</li>
+
+</ul>
+
+<B>Note</B>: This section does not report graphically identical non-virtual
+subsystems marked as 'Auto' that were not reused due to differences in their
+functional properties (such as dimensions, datatypes, work vectors, parameters,
+etc.).  You may identify reasons for non-reuse in such cases by
+inspecting the differences in the functional attributes of the
+subsystems in the model or in the inlined generated code.
+
+<BR />
+<BR />
+ %assign blockers = FEVAL("rtwprivate","rtwreport",...
+   "getReuseBlockers", LibGetModelName(), hyperlink)
+ %assign tSize = SIZE(blockers)[1]
+ %if tSize > 0
+   %foreach tIdx = SIZE(blockers)[1]
+     %<blockers[tIdx]>
+   %endforeach
+ %else
+   <B>No reuse exceptions in model</B>
+ %endif
+
+ </BODY>
+</HTML>
+
+%closefile rptSubsystemsFile
+
+%<DumpReducedBlockTable(reducedBlockFileName)>
+
+%openfile tmpBuffer = "%<htmlDir>/%<javaScriptFileName>"
+%<DumpJavaScript()>
+%<DumpJavaScriptOnLoadHook()>
+%closefile tmpBuffer
+
+%<DumpCSS("%<htmlDir>/%<cssFileName>")>
+
+%endwith %% CompiledModel 
+
+%endif %% FEVAL("mkdir", buildDir, "html")
+%endfunction
+
+%assign modelName = LibGetModelName()
+%if GenerateTraceInfo == 1 || ::CompiledModel.CoderReportInfo
+  %assign tlcTraceInfo = FcnTlcTraceInfo()
+  %matlab rtwprivate("rtwreport", "setTlcTraceInfo", modelName, tlcTraceInfo)
+%endif
+
+%if ::CompiledModel.CoderReportInfo
+  %if HasCodeVariants
+    %matlab rtwprivate("rtwreport", "setReportInfo", modelName, "CodeVariants", ...
+      SLibGetCodeVariantDataForReport())
+  %endif
+  %matlab rtwprivate("rtwreport","setGenUtilsPath", modelName, GenUtilsPath)
+%else
+  %% Create HTML report
+  %<CreateHTMLReportMainFcn()>
+%endif
+
+%endif %% _RTW_REPORT_
+
+%% [EOF] report.tlc
+

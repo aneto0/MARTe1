@@ -1,0 +1,54 @@
+%% SYSTLC: Embedded Coder (host-based shared library target) TMF: ert_default_tmf MAKE: make_rtw \
+%%    EXTMODE: ext_comm
+%%
+%% $RCSfile: ert_shrlib.tlc,v $
+%% $Revision: 1.1.6.4 $
+%%
+%% Copyright 2006-2010 The MathWorks, Inc.
+%% Abstract: Embedded real-time system target file for shared library generation.
+%%
+%selectfile NULL_FILE
+
+%assign CodeFormat = "Embedded-C"
+%assign TargetType = "RT"
+%assign Language   = "C"
+%assign AutoBuildProcedure = !GenerateSampleERTMain
+
+%include "codegenentry.tlc"
+
+%% Error out on incompatible options
+%if (ExtMode != 0)
+  %assign errTxt = "External mode is not supported by the Embedded Coder shared library target."
+  %<LibReportError(errTxt)>
+%endif
+
+%if (CompiledModel.NumAsynchronousSampleTimes > 0)
+  %assign warnTxt = "Asynchronous functions are not supported by the Embedded Coder shared library target."
+  %<LibReportWarning(warnTxt)>
+%endif
+
+%% generate export symbol description files.
+%include "export_shrlib_def.tlc"
+
+%% The contents between 'BEGIN_RTW_OPTIONS' and 'END_RTW_OPTIONS' in this file
+%% are used to maintain backward compatibility to R13 and preR13 custom target 
+%% file only.  If you want to use this file as a template to develop your
+%% own system target file, you need to remove the 'CONFIGSET_TARGET_COMPONENT'
+%% section at the end of this file.
+%%
+/%
+  BEGIN_RTW_OPTIONS
+  
+  %
+
+  %----------------------------------------%
+  % Configure code generation settings %
+  %----------------------------------------%
+ 
+  rtwgensettings.DerivedFrom    = 'ert.tlc';
+  rtwgensettings.BuildDirSuffix = '_ert_shrlib_rtw';
+  rtwgensettings.Version        = '1'; % Specify callbacks' compliance with DAStudio dialog
+  rtwgensettings.SelectCallback = ['ert_shrlib_callback_handler(hDlg, hSrc)']; 
+
+  END_RTW_OPTIONS 
+ %/

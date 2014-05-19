@@ -1,0 +1,1031 @@
+%% ===========================================================================
+%% 
+%%  
+%% 
+%% 
+%%
+%% Abstract:
+%%      Library of functions for generating codeInfo object and its components.
+%%    
+%% Copyright 1994-2012 The MathWorks, Inc.
+%%
+
+%if EXISTS("_CIINFOMDLREFLIB_") == 0
+%assign _CIINFOMDLREFLIB_ = 1
+
+%include "codeinfolib.tlc"
+%include "modelrefutil.tlc"
+
+%selectfile NULL_FILE
+
+%% Function SLibCreateModelReferenceFunctionInterfaces =======================
+%% Abstract
+%%   This function creates FunctionInterface objects and adds it to CodeInfo.
+%%   A object is created for each of the following functions (if generated)
+%%     - Registration (mr_model_initialize)
+%%     - Output       (mr_model_output)
+%%     - OutputUpdate (mr_model)
+%%     - Update       (mr_model_update)
+%%     - Derivative   (mr_model_deriv)
+%%     - Terminate    (mr_model_term)
+%%     - Initialize   (mr_model_Init)
+%%     - Start        (mr_model_Start)
+%%     - Enable       (mr_model_enable)
+%%     - Disable      (mr_model_disable)
+%%   
+%%   The argument "codeInfoObj" is the CodeInfo object to which these 
+%%   function interfaces are added
+%%
+%function SLibCreateModelReferenceFunctionInterfaces(codeInfoObj) Output
+  %assign buildStartDir = FEVAL("rtwprivate","rtwattic","getStartDir")
+  %assign mdlInterface  = ...
+    LoadModelrefInterfaceInMatInfoFile(::CompiledModel.Name, buildStartDir)
+  %%
+  %% Create and add Registration function interface
+  %<FcnAddMdlRefFcnInterface(codeInfoObj, mdlInterface, "Registration", "")>
+  %%
+  %% Create and add Output, OutputUpdate and Update function interfaces 
+  %assign mr = SLibIsMultiRateAndRateGrouping(System[GetBaseSystemIdx()])
+  %if mr
+    %foreach tid = NumSynchronousSampleTimes
+      %<FcnAddMdlRefFcnInterface(codeInfoObj, mdlInterface, "Output", tid)>
+      %<FcnAddMdlRefFcnInterface(codeInfoObj, mdlInterface, "OutputUpdate", tid)>
+      %<FcnAddMdlRefFcnInterface(codeInfoObj, mdlInterface, "Update", tid)>
+    %endforeach
+  %else
+    %<FcnAddMdlRefFcnInterface(codeInfoObj, mdlInterface, "Output", "")>
+    %<FcnAddMdlRefFcnInterface(codeInfoObj, mdlInterface, "OutputUpdate", "")>
+    %<FcnAddMdlRefFcnInterface(codeInfoObj, mdlInterface, "Update", "")>
+  %endif
+  %assign hasEnable = (CompiledModel.HasRootEnablePort == "yes") ? 1 : 0
+  %%
+  %% Create and add Derivative function interface
+  %<FcnAddMdlRefFcnInterface(codeInfoObj, mdlInterface, "Derivative", "")>
+  %%
+  %% Create and add Terminate function interface
+  %<FcnAddMdlRefFcnInterface(codeInfoObj, mdlInterface, "Terminate", "")>
+  %%
+  %% Create and add Initialize Function (Enabled models do not expose this function)
+  %if !hasEnable
+    %<FcnAddMdlRefFcnInterface(codeInfoObj, mdlInterface, "Initialize", "")>
+  %endif
+  %%
+  %% Create and add Start Function
+  %<FcnAddMdlRefFcnInterface(codeInfoObj, mdlInterface, "Start", "")>
+  %%
+  %% Create and add Enable (Enabled models do not expose this function)
+  %if !hasEnable
+    %<FcnAddMdlRefFcnInterface(codeInfoObj, mdlInterface, "Enable", "")>
+  %endif
+  %%
+  %% Create and add Disable
+  %<FcnAddMdlRefFcnInterface(codeInfoObj, mdlInterface, "Disable", "")>
+  %%
+  %% Add additional initialize functions for CppEncap CodeGen
+  %if ::GenerateClassInterface
+     %<FcnAddAuxiliaryMdlRefInitializeFcnInterface(codeInfoObj, "setupGlobalTimingEngine")>    
+     %<FcnAddAuxiliaryMdlRefInitializeFcnInterface(codeInfoObj, "setErrorStatusPointer")>     
+
+     %if (RTWCAPI == 1)
+       %<FcnAddAuxiliaryMdlRefInitializeFcnInterface(codeInfoObj, "setupCAPIInfo")>
+     %endif
+     
+     %if RealTimeModelAccessed
+       %<FcnAddAuxiliaryMdlRefInitializeFcnInterface(codeInfoObj, "initializeRTM")>
+     %endif
+
+  %endif
+%endfunction
+
+%% =====================================================
+%% LOCAL HELPER FUNCTIONS BELOW THIS LINE
+%% =====================================================
+%% 
+
+%% Function: FcnGetRootInputPortIdx ============================================
+%% Abstract:
+%%   Returns the root input port idx for a given canonical inpout index.
+%%
+%function FcnGetRootInputPortIdx(aSystemInterace, aArgIdx) void
+  %assign ci               = aSystemInterace.CanonicalInputArgDef[aArgIdx]
+  %assign U_idx            = IDNUM(ci.SignalSrc[0])
+  %assign portIdx          = U_idx[1]
+  %return CAST("Number", portIdx)
+%endfunction %% FcnGetRootInputPortIdx
+
+%% Function: FcnGetRootOutputPortIdx ===========================================
+%% Abstract:
+%%   Returns the root input port idx for a given canonical inpout index.
+%%
+%function FcnGetRootOutputPortIdx(aSystemInterace, aArgIdx) void
+  %return CAST("Number", ...
+    aSystemInterace.CanonicalOutputArgDef[aArgIdx].RootOutputIdx)
+%endfunction %% FcnGetRootOutputPortIdx
+
+%% Function: FcnGetPointerBaseTypeIdx ==========================================
+%% Abstract:
+%%   Returns the CG base type index of a pointer type.
+%%
+%function FcnGetPointerBaseTypeIdx(aCGTypeIdx) void
+  %assign cgType = ::CompiledModel.CGTypes.CGType[aCGTypeIdx]
+  %if cgType.Constructor == "pointer"
+    %return cgType.BaseIdx
+  %endif
+  %return aCGTypeIdx  
+%endfunction %% FcnGetPointerBaseTypeIdx
+
+
+%% Function: FcnGetStructArg ====================================================
+%% Abstract:
+%%   Adds the a structured argument to the argument and actual argument vector.
+%%   
+%%   aBaseSystem   - model reference base system
+%%   aVarGroupType - vargroup type (e.g. "BlockIO")
+%%   aArgName      - argument name (e.g. "localB")
+%%   aSfcnArg      - model reference s-function argument (e.g. "dw->rtb")
+%%
+%function FcnGetStructArg(aBaseSystem, aVarGroupType, aArgName, aSfcnArg) Output
+  %assign varGroupType = FcnSysVarGroupType(aBaseSystem, aVarGroupType)
+  %assign rtStructType = FcnGetInternalTypeObj(aArgName, varGroupType, "")
+  %assign rtStructPtrType = FcnGetPointerTypeObj(rtStructType, 0, 0)
+  %<FcnAddRTWArg("tmpArgs", aArgName, aArgName, rtStructPtrType)>
+  %<FcnAddRTWActualArg("tmpActualArgs", aArgName, rtStructType, [], aSfcnArg)>
+%endfunction %% FcnGetStructArg
+
+%% Function: FcnGetStructArg ====================================================
+%% Abstract:
+%%   Adds the a structured argument to the argument and actual argument vector.
+%%   
+%%   aBaseSystem   - model reference base system
+%%   aVarGroupType - vargroup type (e.g. "ContStates")
+%%   aArgName      - argument name (e.g. "localX")
+%%
+%function FcnGetContStructArg(aBaseSystem, aIsScalableBuild, aVarGroupType, ...
+  aArgName) Output
+  %if aIsScalableBuild
+    %assign rtType    = SLibGetEmbeddedTypeObject(0, 0, 0)   %% real_T
+    %assign rtPtrType = FcnGetPointerTypeObj(rtType, 0, 0)  %% real_T*
+    %assign argName   = aArgName + "_"
+  %else
+    %assign baseIdx      = GetBaseSystemIdx()
+    %assign varGroupType = FcnSysVarGroupType(aBaseSystem, aVarGroupType)
+    %assign argName      = aArgName
+    %assign rtType       = FcnGetInternalTypeObj(argName, varGroupType, "")
+    %assign rtPtrType    = FcnGetPointerTypeObj(rtType, 0, 0)      
+  %endif
+  %%
+  %% SIM Target uses the raw pointer from the simstruct
+  %%
+  %assign actualArgType = IsModelReferenceSimTarget() ? rtPtrType : rtType
+  %<FcnAddRTWArg("tmpArgs", argName, argName, rtPtrType)>
+  %<FcnAddRTWActualArg("tmpActualArgs", argName, actualArgType, [], "")>
+%endfunction %% FcnGetContStructArg
+  
+%% Function FcnAddMdlFcnInterface ==============================================
+%% Abstract
+%%   Creates a RTW.FunctionInterface object for a given "tid" and "sysFcn"
+%%   The process of creation here means emitting out the M-syntax which can 
+%%   create a M-object in MATLAB. 
+%%   The M-syntax is
+%%      fcnObj = RTW.FunctionInterface
+%%
+%%   After creation, the object is added to codeInfoObj, depending on sysFcn.
+%%   For e.g., if sysFcn is "Output", then
+%%      codeInfoObj.OutputFunctions = fcnObj
+%%
+%%   The M-syntax for setting the properties of the fcnObj is
+%%        fcnObj.Prototype    = prototypeObj
+%%        fcnObj.Timing       = timingObj
+%%        fcnObj.ActualArgs   = [actArgsVector]
+%%        fcnObj.ActualReturn = actReturnObj
+%%
+%%   Note, all of the properties themselves point to objects.
+%%   Some of these objects need to be created (if required) by this function. 
+%%   For e.g.
+%%     - timingObj is created by using the "tid"  argument
+%%     - prototypeObj is created using "fcntype" and "tid" arguments
+%%     - actualArgsVector/actReturnObj could points to I/O Data. In that case, 
+%%       the objects would have been created by fcns in codeinfodatalib.tlc
+%%     - actualArgsVector/actReturnObj could point to internal data 
+%%       (BlockI/O, DWork, RTM). These objects will be created by this fcn
+%%
+%function FcnAddMdlRefFcnInterface(codeInfoObj, interface, sysFcn, tid) Output
+  %% 
+  %% Get the FcnInfo from interface
+  %assign sysFcnName = ISEQUAL(tid,"") ? "%<sysFcn>Fcn":"%<sysFcn>TID%<tid>Fcn"
+  %if !ISFIELD (interface, sysFcnName)
+    %return
+  %endif
+  %assign fcnInfo = interface.%<sysFcnName>
+  %%
+  %% Get relevant info from FcnInfo
+  %assign fcnName    = fcnInfo.FcnName
+  %assign inputInfo  = fcnInfo.Inputs
+  %assign outputInfo = fcnInfo.Outputs
+  %assign prmArgInfo = fcnInfo.PrmArgs
+  %assign canInpInfo = fcnInfo.InDimSizeDW
+  %assign canOutInfo = fcnInfo.OutDimSizeDW
+  %assign canDWArgInfo  = fcnInfo.DWArgs
+  
+  %%
+  %%
+  %assign TIDIdx                  = 0
+  %assign RTModelIdx              = 1
+  %assign BlockIOIdx              = 2
+  %assign DWorkIdx                = 3
+  %assign ContStatesIdx           = 4
+  %assign ContStatesDerivativeIdx = 5
+  %assign ContStatesDisabledIdx   = 6
+  %assign ContStatesAbsoluteToleranceIdx   = 7
+  %assign NonsampledZCIdx         = 8
+  %assign ZCEventIdx              = 9
+  %%
+  %assign baseSystem       = ::CompiledModel.System[GetBaseSystemIdx()]
+  %assign baseSysInterface = baseSystem.Interface
+  %%
+  %% Initialize vars
+  tmpArgs         = [];           %% Vector of function arguments
+  tmpActualArgs   = [];           %% Vector of function actual arguments
+  tmpRet          = [];           %% function return
+  tmpActualReturn = [];           %% function actual return
+  %%
+  %% Start adding to the arguments
+  %%
+  %% Special case: Registration Fcn Args
+  %if (sysFcnName == "RegistrationFcn" && !IsSimstructBasedTarget())
+    %%
+    %if interface.NeedsFirstTime
+      %% If first time is needed, add it to Arguments
+      %assign typeObj = SLibGetEmbeddedTypeObject(8, 0, 0)  %% boolean_T      
+      %<FcnAddRTWArg("tmpArgs", "firstTime", "firstTime", typeObj)>
+      %<FcnAddRTWActualConstant("tmpActualArgs", 1, "firstTime")>
+    %endif
+    %%
+    %if interface.NeedsErrorStatus
+      %% If error status is needed, add it to Arguments
+      %assign typeObj = FcnGetCharTypeObj(1, 0)          %% const char_T
+      %assign typeObj = FcnGetPointerTypeObj(typeObj, 0, 0) %% const char_T*
+      %assign typeObj = FcnGetPointerTypeObj(typeObj, 0, 0) %% const char_T**
+      %<FcnAddRTWArg("tmpArgs", "rt_errorStatus", "rt_errorStatus", typeObj)>
+      %<FcnAddRTWActualArg("tmpActualArgs", "rt_errorStatus", typeObj, [], "")>
+    %endif
+    %%
+    %if interface.StopReqAccessed
+      %% If stop request is needed, add it to Arguments
+      %assign typeObj = SLibGetEmbeddedTypeObject(8, 0, 0)  %% boolean_T
+      %assign typeObj = FcnGetPointerTypeObj(typeObj, 0, 0) %% boolean_T*     
+      %<FcnAddRTWArg("tmpArgs", "rt_stopRequested","rt_stopRequested", typeObj)>
+      %<FcnAddRTWActualArg("tmpActualArgs", "rt_stopRequested", typeObj, [], "")>
+    %endif
+    %%rt_solverInfo
+    %if  LibIsContinuous(0) || SLibModelHierarchyContainsNoninlinedSfcn()
+      %% For continuous time referenced models or if a non-inlined s-function
+      %% is in the hierarchy, pass the solverInfo to the submodel.
+      %assign typeObj = "Type_solver"
+      %<typeObj> = embedded.opaquetype('RTWSolverInfo');    %% RTW_SolverInfo
+      %assign typeObj = FcnGetPointerTypeObj(typeObj, 0, 0) %% RTW_SolverInfo*
+      %<FcnAddRTWArg("tmpArgs", "rt_solverInfo", "rt_solverInfo", typeObj)>
+      %<FcnAddRTWActualArg("tmpActualArgs", "rt_solverInfo", typeObj, [], "")>
+    %endif
+    %%rt_sfcnInfo
+    %if SLibModelHierarchyContainsNoninlinedSfcn()
+      %% For hierarchies that contain non-inlined s-functions, 
+      %% pass down the sfcnInfo
+      %assign typeObj = "Type_sfcnInfo"
+      %<typeObj> = embedded.opaquetype('RTWSfcnInfo');    %% RTWSfcnInfo
+      %assign typeObj = FcnGetPointerTypeObj(typeObj, 0, 0) %% RTWSfcnInfo*
+      %<FcnAddRTWArg("tmpArgs", "rt_sfcnInfo", "rt_sfcnInfo", typeObj)>
+      %<FcnAddRTWActualArg("tmpActualArgs", "rt_sfcnInfo", typeObj, [], "")>
+    %endif    
+  %endif  %% Special case: Registration Fcn Args
+  %%
+  %%
+  %% CompiledModel.GlobalScope.tTID Argument
+  %if fcnInfo.ArgInfo[TIDIdx] == 1
+    %assert sysFcnName != "RegistrationFcn"
+    %% If TID is needed, add it to Arguments
+    %assign typeObj = FcnGetIntegerTypeObj(0, 0)          %% int_T
+    %assign timeObj = SLibGetRTWTimingObject(0)
+    %assign tidName = ::CompiledModel.GlobalScope.tTID
+    %<FcnAddRTWArg("tmpArgs", "GlobalTID", tidName, typeObj)>
+    %if ( ISEQUAL(tid, "") || (TYPE(tid) != "Number") )
+      %<FcnAddRTWActualArg("tmpActualArgs", tidName, typeObj, timeObj, "")>
+    %else
+      %<FcnAddRTWActualConstant("tmpActualArgs", tid, "GlobalTID%<tid>")>
+    %endif
+  %endif
+  
+  %if (sysFcnName == "OutputUpdateFcn")
+    %assign fpcRecord = interface.FPC
+  %else
+    %assign fpcRecord = []  
+  %endif
+  
+  %assign modIdx = baseSystem.CGIRModuleIdx
+  %assign thisModule = ::CompiledModel.RTWCGModules.RTWCGModule[modIdx]
+  
+  %assign numPrmArgs = SIZE(prmArgInfo,1)
+  canParamStartIdx = length(%<codeInfoObj>.Parameters) - %<numPrmArgs> + 1;
+ 
+  %assign useModelRefSFcnArg = ...
+    (IsModelReferenceSimTarget() && !IsModelRefScalableBuild())
+  %assign isScalableBuild = interface.IsScalableBuild
+  
+  %with baseSystem.Interface
+    %%
+    %% The following TLC code is used to prune the CGIR function call
+    %% arguments and transfer the CGIR argument tracking 
+    %% information to the legacy TLC tracking infrastructure.
+    %%
+    %assign skipCanInput = ...
+      Vector(%<NumCanonicalInputArgDefs>) [0@%<NumCanonicalInputArgDefs>]
+    %assign skipInputDims = ...
+      Vector(%<NumCanonicalInputArgDefs>) [0@%<NumCanonicalInputArgDefs>]
+    %assign skipCanOutput = ...
+      Vector(%<NumCanonicalOutputArgDefs>) [0@%<NumCanonicalOutputArgDefs>]
+    %assign skipOutputDims = ...
+      Vector(%<NumCanonicalOutputArgDefs>) [0@%<NumCanonicalOutputArgDefs>]
+    %assign skipCanDWork = ...
+      Vector(%<NumCanonicalDWorkArgDefs>) [0@%<NumCanonicalDWorkArgDefs>]
+    %assign skipCanParam = ...
+      Vector(%<NumCanonicalPrmArgDefs>) [0@%<NumCanonicalPrmArgDefs>]
+
+    %assign skipRTM = 0
+    %assign skipLocalB = 0
+    %assign skipLocalC = 0
+    %assign skipLocalDW = 0
+    %assign skipLocalP = 0
+    %assign skipLocalX = 0
+    %assign skipLocalXdot = 0
+    %assign skipLocalXdis = 0
+    %assign skipLocalXabstol = 0    
+    %assign skipLocalZCSV = 0
+    %assign skipLocalZCE = 0
+        
+    %if ISEMPTY(fpcRecord) && ...
+      ISFIELD(thisModule, "SystemFunctions") && ...
+      ISFIELD(thisModule.SystemFunctions, fcnName)
+      %assign fcnIndex = GETFIELD(thisModule.SystemFunctions, fcnName)
+      %assign thisFcn  = thisModule.Function[fcnIndex]
+      %foreach argIdx=thisFcn.NumArgs
+        %if thisFcn.ArgAccessed[argIdx]
+          %assign argType = thisFcn.ArgTypes[argIdx]
+          %assign idNum = SLibSafeIDNUM(thisFcn.ArgSource, argIdx)
+          %assign argSrc = idNum[0]
+          %assign argSrcIdx = idNum[1]
+          %switch argSrc
+            %case "I" %% canonical input
+              %assign typeObj = SLibGetConstTypeObject(argType)
+              %assign portIdx = FcnGetRootInputPortIdx(baseSysInterface, argSrcIdx)
+              %<FcnAddRTWArg("tmpArgs", "ci%<portIdx>", ...
+                thisFcn.ArgNames[argIdx], typeObj)>
+              tmpActualArgs = [tmpActualArgs; %<codeInfoObj>.Inports(%<portIdx>+1)];
+              %assign skipCanInput[argSrcIdx] = 1
+              %break
+            %case "O" %% canonical output
+              %assign typeObj = SLibGetEmbeddedTypeObject(argType, 0, 0)
+              %assign portIdx = FcnGetRootOutputPortIdx(baseSysInterface, argSrcIdx)
+              %<FcnAddRTWArg("tmpArgs", "co%<portIdx>", ...
+                thisFcn.ArgNames[argIdx], typeObj)>
+              tmpActualArgs = [tmpActualArgs; %<codeInfoObj>.Outports(%<portIdx>+1)];
+              %assign skipCanOutput[argSrcIdx] = 1
+              %break
+            %case "D" %% canonical dwork
+              %assert ISFIELD(thisFcn, "Association")
+              %assert SIZE(thisFcn.Association, 1) == thisFcn.NumArgs
+              %assign dimsIdNum = SLibSafeIDNUM(thisFcn.Association, argIdx)
+              %assign dimsSrc = dimsIdNum[0]
+              %assign dimsSrcIdx = dimsIdNum[1]
+              %assert "I" == dimsSrc || "O" == dimsSrc
+              %if "I" == dimsSrc
+                %assign argTypeObj = SLibGetConstTypeObject(argType)
+                %assign portIdx = FcnGetRootInputPortIdx(baseSysInterface, dimsSrcIdx)
+                %<FcnAddRTWArg("tmpArgs", "InVarDims%<portIdx>", ...
+                  thisFcn.ArgNames[argIdx], argTypeObj)>
+                %assign actArgType = FcnGetPointerBaseTypeIdx(argType)
+                %assign actArgTypeObj = ...
+                  SLibGetEmbeddedTypeObject(actArgType, 1, 0)
+                %<FcnAddRTWActualArg("tmpActualArgs", ...
+                  "InVarDims%<portIdx>", actArgTypeObj, [], "")>
+                %assign skipInputDims[dimsSrcIdx] = 1
+              %else
+                %assign typeObj = SLibGetEmbeddedTypeObject(argType, 0, 0)
+                %assign portIdx = FcnGetRootOutputPortIdx(baseSysInterface, dimsSrcIdx)
+                %<FcnAddRTWArg("tmpArgs", "OutVarDims%<portIdx>", ...
+                  thisFcn.ArgNames[argIdx], typeObj)>
+                %assign actArgType = FcnGetPointerBaseTypeIdx(argType)
+                %assign actArgTypeObj = ...
+                  SLibGetEmbeddedTypeObject(actArgType, 0, 0)
+                %<FcnAddRTWActualArg("tmpActualArgs", ...
+                  "OutVarDims%<portIdx>", actArgTypeObj, [], "")>
+                %assign skipOutputDims[dimsSrcIdx] = 1
+              %endif
+              %assign skipCanDWork[argSrcIdx] = 1
+              %break
+            %case "P" %% canonical parameter
+              %assert ISFIELD(thisFcn, "Association")
+              %assert SIZE(thisFcn.Association, 1) == thisFcn.NumArgs
+              %assign prmSrcIdNum = SLibSafeIDNUM(thisFcn.Association, argIdx)
+              %assign prmSrc = prmSrcIdNum[0]
+              %assign prmSrcIdx = prmSrcIdNum[1]
+              %assert "P" == prmSrc
+              %assert prmSrcIdx <= argSrcIdx
+              %assign typeObj = SLibGetConstTypeObject(argType)
+              %assign skipCanParam[argSrcIdx] = 1
+              %<FcnAddRTWArg("tmpArgs", "cp%<prmSrcIdx>", ...
+                thisFcn.ArgNames[argIdx], typeObj)>
+              paramIdx = canParamStartIdx + %<prmSrcIdx>;
+              tmpActualArgs = [tmpActualArgs; %<codeInfoObj>.Parameters(paramIdx)];
+              %break
+            %case "RTM" %% rtModel
+              %assign rtMType = ...
+                FcnGetInternalTypeObj("RTModel", tSimStructType, "") %% RT_MODEL
+              %assign rtMPtrType = FcnGetPointerTypeObj(rtMType, 1, 0)       %% RT_MODEL*
+              %<rtMPtrType>.ReadOnly = 1;
+              %if sysFcnName != "RegistrationFcn" && GenRTModel
+                %assign rtmArgName = "rtm"
+              %else
+                %assign rtmArgName = tSimStruct
+              %endif
+              %<FcnAddRTWArg("tmpArgs", "rtm", rtmArgName, rtMPtrType)>
+              %assign identifier = useModelRefSFcnArg ? "dw->rtm" : ""
+              %<FcnAddRTWActualArg("tmpActualArgs", "RTModel", rtMType, [], identifier)>
+              %assign skipRTM = 1
+              %break
+            %case "LB" %% block IO
+              %assign identifier = useModelRefSFcnArg ? "dw->rtb" : ""
+              %<FcnGetStructArg(baseSystem, "BlockIO", "localB", identifier)>
+              %assign skipLocalB = 1
+              %break
+            %case "LW" %% dwork
+              %assign identifier = useModelRefSFcnArg ? "dw->rtdw" : ""
+              %<FcnGetStructArg(baseSystem, "DWork", "localDW", identifier)>
+              %assign skipLocalDW = 1
+              %break
+            %case "LX" %% continues states
+              %<FcnGetContStructArg(baseSystem, isScalableBuild, ...
+                "ContStates", "localX")>
+              %assign skipLocalX = 1
+              %break
+            %case "LDX" %% derivatives
+              %assert (sysFcnName != "RegistrationFcn")
+              %<FcnGetContStructArg(baseSystem, isScalableBuild, ...
+                "ContStatesDerivative", "localXdot")>
+              %assign skipLocalXdot = 1
+              %break
+            %case "LXDI" %% continues state disabled
+              %assert (sysFcnName != "RegistrationFcn")
+              %<FcnGetContStructArg(baseSystem, isScalableBuild, ...
+                "ContStatesDisabled", "localXdis")>
+              %assign skipLocalXdis = 1
+              %break
+            %case "LXAT" %% continues state absolute tolerance
+              %assert (sysFcnName != "RegistrationFcn")
+              %<FcnGetContStructArg(baseSystem, isScalableBuild, ...
+                "ContStatesAbsoluteTolerance", "localXAbsTollocalXAbsTol")>
+              %assign skipLocalXabstol = 1
+              %break
+            %case "LZ" %% non-sampled zero crossings
+              %assign skipLocalZCSV = 1
+              %<LibReportError("CodeInfo: Cannot generate for variable step solver")>
+              %break
+            %case "LZE" %% zero crossing events
+              %assign identifier = useModelRefSFcnArg ? "dw->zce" : ""
+              %<FcnGetStructArg(baseSystem, "ZCEvent", "localZCE", identifier)>
+              %assign skipLocalZCE = 1
+              %break
+            %case "U"
+              %break
+            %case "LC" %% constat block IO
+            %case "LP"  %% parameter
+            %case "LCP" %% constant parameter
+            %case "LPI" %% const parameter with init
+            %default
+              %%START_ASSERT
+              %assign errTxt = "Unhandled argument type '%<argSrc>'."
+              %<LibBlockReportError([],errTxt)>
+              %break
+              %%END_ASSERT              
+          %endswitch
+        %endif
+      %endforeach
+    %endif
+  %endwith
+  %%
+  %% For I/O Args, need to consider function prototype control
+  %%
+  %assign numInputs  = baseSysInterface.NumCanonicalInputArgDefs
+  %assign numOutputs = baseSysInterface.NumCanonicalOutputArgDefs
+  %%  
+  %if !ISEMPTY(fpcRecord)
+    %assign fcnName = fpcRecord.FunctionName
+    %% number of args =>  number of arg specs
+    %assign numArgs = SIZE(fpcRecord.ArgSpecData,1)
+  %else
+    %% number of args =>  sum of canonical inputs and outputs
+    %% Without FPC, this is the 'reduced' set of args
+    %assign numArgs    = numInputs + numOutputs
+  %endif
+  %%
+  %% Loop over I/O Args
+  %foreach argIdx = numArgs
+    %if ISEMPTY(fpcRecord)
+      %if argIdx < numInputs
+        %assign portIdx      = FcnGetRootInputPortIdx(baseSysInterface, argIdx)
+        %assign SLObjectType = "Inport"
+        %assign inArgIdx     = argIdx
+      %else
+        %assign outArgIdx    = argIdx-baseSysInterface.NumCanonicalInputArgDefs
+        %assign portIdx      = FcnGetRootOutputPortIdx(baseSysInterface, ...
+          outArgIdx)
+        %assign SLObjectType = "Outport"
+      %endif
+    %else
+      %assign portIdx = CAST("Number", fpcRecord.ArgSpecData[argIdx].PortNum)
+      %assign outArgIdx    = portIdx
+      %assign inArgIdx     = portIdx
+      %assign SLObjectType = fpcRecord.ArgSpecData[argIdx].SLObjectType
+    %endif
+    %%
+    %if SLObjectType == "Inport"
+      %if ISEMPTY(fpcRecord) && !skipCanInput[inArgIdx]
+        %assign ci = baseSysInterface.CanonicalInputArgDef[inArgIdx]
+        %assign ciIdx = CAST("Number", portIdx)
+        %if (inputInfo[portIdx] > 0)           
+          %assign ci_Identifier = LibGetRecordIdentifier(ci)
+          %%
+          %%
+          %if (sysFcnName=="RegistrationFcn")
+            %assign typeObj = SLibGetEmbeddedTypeObject(ci.CGTypeIdx, 1, 0)
+            %% type_T
+            %if (LibGetRecordWidth(ci) == 1 )
+              %assign typeObj = FcnGetPointerTypeObj(typeObj, 0, 0)         
+              %% type_T*
+            %endif
+          %else
+            %if (inputInfo[portIdx] == 2) %% scalarpassbyRef
+              %assign typeObj = SLibGetEmbeddedTypeObject(ci.CGTypeIdx, 1, 0) 
+              %% const type_T
+              %assign typeObj = FcnGetPointerTypeObj(typeObj, 0, 0)           
+              %% const type_T*
+            %elseif (LibGetRecordWidth(ci) > 1)
+              %assign typeObj = SLibGetEmbeddedTypeObject(ci.CGTypeIdx, 1, 0) 
+              %% const type_T[]
+            %else
+              %assign typeObj = SLibGetEmbeddedTypeObject(ci.CGTypeIdx, 0, 0) 
+              %% type_T
+            %endif
+          %endif
+          %%
+          %%
+          %<FcnAddRTWArg("tmpArgs", "ci%<ciIdx>", ci_Identifier, typeObj)>
+          tmpActualArgs = [tmpActualArgs; %<codeInfoObj>.Inports(%<portIdx>+1)];
+        %endif
+        %if (!skipInputDims[inArgIdx] && ...
+          SLibGetCanIOIsVarDims(ci) && (canInpInfo[portIdx] == 1))
+          %assign cdwIdx  = SLibGetCanDimSizeDWIdxForArg(ci)
+          %assign cdw     = baseSysInterface.CanonicalDWorkArgDef[cdwIdx]
+          %assign dwRec   = ::CompiledModel.DWorks.DWork[cdw.FirstSignalSrc]
+          %assign typeObj = SLibGetEmbeddedTypeObject(dwRec.CGTypeIdx, 1, 0)
+          %if (LibGetRecordWidth(dwRec)==1) 
+            %assign argTypeObj = FcnGetPointerTypeObj(typeObj, 0, 0) 
+          %else 
+            %assign argTypeObj = typeObj 
+          %endif 
+          %<FcnAddRTWArg("tmpArgs", "InVarDims%<ciIdx>", LibGetRecordIdentifier(cdw), argTypeObj)>
+          %<FcnAddRTWActualArg("tmpActualArgs", "InVarDims%<ciIdx>", typeObj, [], "")>
+          %%<LibReportError("CodeInfo: Variable Dims inputs not handled yet")>
+        %endif
+      %elseif !ISEMPTY(fpcRecord)
+        %assign ci_Identifier = fpcRecord.ArgSpecData[argIdx].ArgName
+        %assign qual =  fpcRecord.ArgSpecData[argIdx].Qualifier
+        %assign ei = ::CompiledModel.ExternalInputs.ExternalInput[portIdx]
+        %if ( (qual == "const") || (qual == "const *") || ...
+          (qual == "const * const") )
+          %assign typeObj = SLibGetEmbeddedTypeObject(ei.CGTypeIdx, 1, 0) 
+          %% const type_T
+        %else
+          %assign typeObj = SLibGetEmbeddedTypeObject(ei.CGTypeIdx, 0, 0) 
+          %% type_T
+        %endif
+        %if (fpcRecord.ArgSpecData[argIdx].Category == "Pointer")
+          %assign typeObj = FcnGetPointerTypeObj(typeObj, 0, 0)
+        %endif
+        %%
+        %assign ciIdx = CAST("Number", portIdx)
+        %<FcnAddRTWArg("tmpArgs", "ci%<ciIdx>", ci_Identifier, typeObj)>
+        tmpActualArgs = [tmpActualArgs; %<codeInfoObj>.Inports(%<portIdx>+1)];
+      %else
+        %% do nothing - this input is not an arg
+      %endif
+    %elseif SLObjectType == "Outport"
+      %if ISEMPTY(fpcRecord) && !skipCanOutput[outArgIdx]
+        %assign co      = baseSysInterface.CanonicalOutputArgDef[outArgIdx]
+        %assign coIdx = CAST("Number", portIdx)
+        %if (outputInfo[portIdx] == 1)
+          %assign typeObj = SLibGetEmbeddedTypeObject(co.CGTypeIdx, 0, 0)
+          %if (LibGetRecordWidth(co)==1)
+            %assign typeObj = FcnGetPointerTypeObj(typeObj, 0, 0)
+          %endif
+          %<FcnAddRTWArg("tmpArgs", "co%<coIdx>", LibGetRecordIdentifier(co), typeObj)>
+          tmpActualArgs = [tmpActualArgs; %<codeInfoObj>.Outports(%<portIdx>+1)];
+        %endif
+        %if (!skipOutputDims[outArgIdx] && ...
+          SLibGetCanIOIsVarDims(co) && (canOutInfo[portIdx] == 1))
+          %assign cdwIdx  = SLibGetCanDimSizeDWIdxForArg(co)
+          %assign cdw     = baseSysInterface.CanonicalDWorkArgDef[cdwIdx]
+          %assign dwRec   = ::CompiledModel.DWorks.DWork[cdw.FirstSignalSrc]
+          %assign typeObj = SLibGetEmbeddedTypeObject(dwRec.CGTypeIdx, 0, 0)
+          %if (LibGetRecordWidth(dwRec)==1) 
+            %assign argTypeObj = FcnGetPointerTypeObj(typeObj, 0, 0) 
+          %else 
+            %assign argTypeObj = typeObj 
+          %endif 
+          %<FcnAddRTWArg("tmpArgs", "OutVarDims%<coIdx>", LibGetRecordIdentifier(cdw), argTypeObj)> 
+          %<FcnAddRTWActualArg("tmpActualArgs", "OutVarDims%<coIdx>", typeObj, [], "")>
+          %%<LibReportError("CodeInfo: Variable Dims outputs not handled yet")>
+        %endif
+      %elseif !ISEMPTY(fpcRecord)
+        %assign eo = ExternalOutputs.ExternalOutput[portIdx]
+        %assign typeObj = SLibGetEmbeddedTypeObject(eo.CGTypeIdx, 0, 0)
+        %assign coIdx = CAST("Number", portIdx)
+        %if fpcRecord.ArgSpecData[argIdx].Category == "Value"
+          %<FcnAddRTWArg("tmpRet", "co%<coIdx>", "", typeObj)>
+          tmpActualReturn = %<codeInfoObj>.Outports(%<portIdx>+1);
+        %else
+          %if (LibGetRecordWidth(eo)==1)
+            %assign typeObj = FcnGetPointerTypeObj(typeObj, 0, 0)
+          %endif
+          %assign co_Identifier = fpcRecord.ArgSpecData[argIdx].ArgName
+          %<FcnAddRTWArg("tmpArgs", "co%<coIdx>", co_Identifier, typeObj)>
+          tmpActualArgs = [tmpActualArgs; %<codeInfoObj>.Outports(%<portIdx>+1)];
+        %endif
+      %else
+        %% do nothing - this output is not an argument/return
+      %endif
+    %else
+      %<LibReportError("CodeInfo: FunctionPrototype SLObjectType error")>
+    %endif
+  %endforeach
+  %%
+  %%
+  %if IsModelReferenceForASimstructBasedTarget() && ...
+    !(IsModelReferenceSimTarget() && ::CompiledModel.PILSimTargetUnification)
+    %<LibReportError("CodeInfo: Cannot generate for a SimStruct target")>
+  %endif %% !IsModelReferenceForASimstructBasedTarget()
+  %%
+  %% %% Special case: Registration Fcn Args
+  %if sysFcnName == "RegistrationFcn"
+    %if interface.NeedsGlobalTimingEngine
+      %assign typeObj = "Type_TimingBridge"
+      %<typeObj> = embedded.opaquetype('rtTimingBridge'); %% rtTimingBridge
+      %<typeObj>.ReadOnly = 1;
+      %assign typeObj = FcnGetPointerTypeObj(typeObj, 0, 0) 
+      %<FcnAddRTWArg("tmpArgs", "timingBridge", "timingBridge", typeObj)>
+      %<FcnAddRTWActualArg("tmpActualArgs", "timingBridge", typeObj, [], "")>
+    %endif
+    %%
+    %% mdlref_TID Args
+    %if ::tMdlRefNeedTIDArgs
+      %assign typeObj = FcnGetIntegerTypeObj(0, 0)          %% int_T
+      %assign timeObj = SLibGetRTWTimingObject(0)
+      %if !MdlRefIsConstSampleBlock()
+        %foreach idx = NumSynchronousSampleTimes
+          %assign tidName = "mdlref_TID%<idx>"
+          %<FcnAddRTWArg("tmpArgs", tidName, tidName, typeObj)>
+          %<FcnAddRTWActualArg("tmpActualArgs", tidName, typeObj, timeObj, "")>
+        %endforeach
+      %else
+        %assign tidName = "mdlref_TID0"
+        %<FcnAddRTWArg("tmpArgs", tidName, tidName, typeObj)>
+        %<FcnAddRTWActualArg("tmpActualArgs", tidName, typeObj, timeObj, "")>
+      %endif
+    %endif
+  %endif
+  %%
+  %% RTModel
+  %if !skipRTM && fcnInfo.ArgInfo[RTModelIdx] == 1
+    %assign rtMType = ...
+      FcnGetInternalTypeObj("RTModel", tSimStructType, "") %% RT_MODEL
+    %assign rtMPtrType = FcnGetPointerTypeObj(rtMType, 1, 0)       %% RT_MODEL*
+    %<rtMPtrType>.ReadOnly = 1;
+    %if sysFcnName != "RegistrationFcn" && GenRTModel
+      %assign rtmArgName = "rtm"
+    %else
+      %assign rtmArgName = tSimStruct
+    %endif
+    %<FcnAddRTWArg("tmpArgs", "rtm", rtmArgName, rtMPtrType)>
+    %assign identifier = useModelRefSFcnArg ? "dw->rtm" : ""
+    %<FcnAddRTWActualArg("tmpActualArgs", "RTModel", rtMType, [], identifier)>
+  %endif
+  %%
+  %% BlockIO
+  %if !skipLocalB && fcnInfo.ArgInfo[BlockIOIdx] == 1
+    %assign identifier = useModelRefSFcnArg ? "dw->rtb" : ""
+    %<FcnGetStructArg(baseSystem, "BlockIO", "localB", identifier)>
+  %endif
+  %%
+  %% DWork
+  %if !skipLocalDW && fcnInfo.ArgInfo[DWorkIdx] == 1
+    %assign identifier = useModelRefSFcnArg ? "dw->rtdw" : ""
+    %<FcnGetStructArg(baseSystem, "DWork", "localDW", identifier)>
+  %endif
+  %%
+  %% ContStates
+  %if !skipLocalX && fcnInfo.ArgInfo[ContStatesIdx] == 1
+    %<FcnGetContStructArg(baseSystem, isScalableBuild, "ContStates", "localX")>
+  %endif
+  %%
+  %% ContStatesDerivative
+  %if !skipLocalXdot && fcnInfo.ArgInfo[ContStatesDerivativeIdx] == 1
+    %assert (sysFcnName != "RegistrationFcn")
+    %<FcnGetContStructArg(baseSystem, isScalableBuild, ...
+      "ContStatesDerivative", "localXdot")>
+  %endif
+  %%
+  %% ContStatesDisabled
+  %if !skipLocalXdis && fcnInfo.ArgInfo[ContStatesDisabledIdx] == 1
+    %assert (sysFcnName != "RegistrationFcn")
+    %<FcnGetContStructArg(baseSystem, isScalableBuild, ...
+      "ContStatesDisabled", "localXdis")>
+  %endif
+  %%
+  %% ContStatesAbsoluteTolerance
+  %if !skipLocalXabstol && fcnInfo.ArgInfo[ContStatesAbsoluteToleranceIdx] == 1
+    %assert (sysFcnName != "RegistrationFcn")
+    %<FcnGetContStructArg(baseSystem, isScalableBuild, ...
+      "ContStatesAbsoluteTolerance", "localXAbsTollocalXAbsTol")>
+  %endif
+  %%
+  %% NonsampledZC
+  %if fcnInfo.ArgInfo[NonsampledZCIdx] == 1
+    %<LibReportError("CodeInfo: Cannot generate for variable step solver")>
+  %endif
+  %%
+  %% ZCEvent
+  %if !skipLocalZCE && fcnInfo.ArgInfo[ZCEventIdx] == 1
+    %assign identifier = useModelRefSFcnArg ? "dw->zce" : ""
+    %<FcnGetStructArg(baseSystem, "ZCEvent", "localZCE", identifier)>
+  %endif
+  %%
+  %% Parameter Arguments
+  %assign prmArgIdx  = 0
+  %foreach argIdx=baseSysInterface.NumCanonicalPrmArgDefs
+    %assign cp = baseSysInterface.CanonicalPrmArgDef[argIdx]
+    %if (cp.IsUsed == "no")
+      %continue
+    %endif
+    %if !skipCanParam[argIdx] && prmArgInfo[prmArgIdx] >= 1
+      %%
+      %%
+      %if (LibGetRecordWidth(cp) > 1 || (ISEQUAL(cp.DeclareAsPointer, "yes")) )
+        %assign typeObj = SLibGetEmbeddedTypeObject(cp.CGTypeIdx, 1, 0)
+      %else
+        %assign typeObj = SLibGetEmbeddedTypeObject(cp.CGTypeIdx, 0, 0)
+      %endif
+      %%
+      %if ISEQUAL(cp.DeclareAsPointer, "yes")
+        %assign typeObj = FcnGetPointerTypeObj(typeObj, 0, 0)
+      %endif
+      %<FcnAddRTWArg("tmpArgs", "cp%<prmArgIdx>", LibGetRecordIdentifier(cp), typeObj)>
+paramIdx = canParamStartIdx + %<prmArgIdx>;
+tmpActualArgs = [tmpActualArgs; %<codeInfoObj>.Parameters(paramIdx)];
+    %endif
+    %assign prmArgIdx = prmArgIdx + 1
+  %endforeach
+  %%
+  %% RTWCAPI args for registration fcn
+  %if ((sysFcnName == "RegistrationFcn") && (RTWCAPI == 1) )
+    %%
+    %% rtwCAPI_ModelMappingInfo *rt_ParentMMI
+    %assign typeObj = "Type_MMI"
+    %<typeObj> = embedded.opaquetype('rtwCAPI_ModelMappingInfo'); %% MMI
+    %assign typeObj = FcnGetPointerTypeObj(typeObj, 0, 0)         %% MMI*
+    %<FcnAddRTWArg("tmpArgs", "rt_ParentMMI", "rt_ParentMMI", typeObj)>
+    %<FcnAddRTWActualArg("tmpActualArgs", "rt_ParentMMI", typeObj, [], "")>
+    %%
+    %% const char_T *rt_ChildPath
+    %assign typeObj = FcnGetCharTypeObj(1, 0)          %% const char_T
+    %assign typeObj = FcnGetPointerTypeObj(typeObj, 0, 0) %% const char_T*
+    %<FcnAddRTWArg("tmpArgs", "rt_ChildPath", "rt_ChildPath", typeObj)>
+    %<FcnAddRTWActualArg("tmpActualArgs", "rt_ChildPath", typeObj, [], "")>
+    %%
+    %% int_T rt_ChildMMIIdx
+    %assign typeObj = FcnGetIntegerTypeObj(0, 0)          %% int_T
+    %<FcnAddRTWArg("tmpArgs", "rt_ChildMMIIdx", "rt_ChildMMIIdx", typeObj)>
+    %<FcnAddRTWActualArg("tmpActualArgs", "rt_ChildMMIIdx", typeObj, [], "")>
+    %%
+    %% int_T rt_CSTATEIdx
+    %<FcnAddRTWArg("tmpArgs", "rt_CSTATEIdx", "rt_CSTATEIdx", typeObj)>
+    %<FcnAddRTWActualArg("tmpActualArgs", "rt_CSTATEIdx", typeObj, [], "")>
+  %endif
+
+  %<sysFcnName>_Prototype = RTW.CImplementation;
+  %<sysFcnName>_Interface = RTW.FunctionInterface;
+  %<sysFcnName>_Prototype.HeaderFile = ['%<::CompiledModel.Name>', '.h'];
+  
+  %if ::GenerateClassInterface    
+    %<sysFcnName>_Prototype.SourceFile = ['%<::CompiledModel.Name>', '.cpp'];
+    %<sysFcnName>_Interface.Owner = %<codeInfoObj>.InternalData(1).Implementation;    
+    %if (sysFcnName == "RegistrationFcn")
+      tmpArgs = [];
+      tmpActualArgs = [];
+    %endif    
+  %else
+    %<sysFcnName>_Prototype.SourceFile = ['%<::CompiledModel.Name>', '.c'];
+  %endif  
+  %%
+  %% Create a function Prototype with the above arguments
+  %<sysFcnName>_Prototype.Name = '%<fcnName>';
+  %<sysFcnName>_Prototype.Arguments  = tmpArgs;
+  %<sysFcnName>_Prototype.Return     = tmpRet;
+  %%
+  %% Create a function interface with the above actual arguments
+  %<sysFcnName>_Interface.Prototype    = %<sysFcnName>_Prototype;
+  %<sysFcnName>_Interface.ActualArgs   = tmpActualArgs;
+  %<sysFcnName>_Interface.ActualReturn = tmpActualReturn;
+  
+  %% Depending on sysFcn, assign it to appropriate CodeInfo field
+  %switch sysFcn
+    %case "Registration"
+    %case "Start"
+      %assign timeObj = SLibGetRTWTimingObject("constant")
+      %<sysFcnName>_Interface.Timing = %<timeObj>;
+      %<codeInfoObj>.InitializeFunctions =  [%<codeInfoObj>.InitializeFunctions; %<sysFcnName>_Interface'];
+      %break
+    %case "Initialize"
+      %assign timeObj = SLibGetRTWTimingObject("constant")
+      %<sysFcnName>_Interface.Timing = %<timeObj>;
+      %<codeInfoObj>.InitConditionsFunction =  %<sysFcnName>_Interface';
+      %break
+    %case "Output"
+    %case "OutputUpdate"
+      %assign taskID  = (TYPE(tid) == "Number") ? tid : 0
+      %assign timeObj = SLibGetRTWTimingObject(taskID)
+      %<sysFcnName>_Interface.Timing = %<timeObj>;
+      %<codeInfoObj>.OutputFunctions =  [%<codeInfoObj>.OutputFunctions; %<sysFcnName>_Interface'];
+      %break
+    %case "Update"
+      %assign taskID  = (TYPE(tid) == "Number") ? tid : 0
+      %assign timeObj = SLibGetRTWTimingObject(taskID)
+      %<sysFcnName>_Interface.Timing = %<timeObj>;
+      %<codeInfoObj>.UpdateFunctions =  [%<codeInfoObj>.UpdateFunctions; %<sysFcnName>_Interface'];
+      %break
+    %case "Derivative"
+      %assign taskID  = (TYPE(tid) == "Number") ? tid : 0
+      %assign timeObj = SLibGetRTWTimingObject(taskID)
+      %<sysFcnName>_Interface.Timing = %<timeObj>;
+      %<codeInfoObj>.DerivativeFunction = %<sysFcnName>_Interface;
+      %break
+    %case "Terminate"
+      %assign timeObj = SLibGetRTWTimingObject("constant")
+      %<sysFcnName>_Interface.Timing = %<timeObj>;
+      %<codeInfoObj>.TerminateFunctions =  [%<codeInfoObj>.TerminateFunctions; %<sysFcnName>_Interface'];
+      %break
+    %case "Enable"
+      %assign timeObj = SLibGetRTWTimingObject("constant")
+      %<sysFcnName>_Interface.Timing = %<timeObj>;
+      %<codeInfoObj>.EnableFunction = %<sysFcnName>_Interface;
+      %break
+    %case "Disable"
+      %assign timeObj = SLibGetRTWTimingObject("constant")
+      %<sysFcnName>_Interface.Timing = %<timeObj>;
+      %<codeInfoObj>.DisableFunction = %<sysFcnName>_Interface;
+      %break
+    %default
+      %assign errTxt = "CodeInfo Error: Unknown sysFcnName: %<sysFcnName>"
+      %<LibReportFatalError(errTxt)>
+  %endswitch  
+%endfunction
+
+%function FcnAddRTWArg(argList, argKey, argName, argType) Output
+  %assign arg = "Arg_" + argKey
+
+  %<arg> = RTW.Argument;
+  %<arg>.Type = %<argType>;
+  %<arg>.Name = '%<argName>';
+  %<argList> = [%<argList>; %<arg>];
+%endfunction
+
+%function FcnAddRTWActualArg(argList, argName, argType, timeObj, ident) Output
+  %if ISEMPTY(ident)
+    %assign identifier = argName
+  %else
+    %assign identifier = ident
+  %endif
+  
+  %assign actualVar  = SLibGetRTWVariableObject(argName, argType, identifier, "","","")
+  %assign actualData = ...
+    FcnGetInternalDataObject(argName, "", argName, actualVar, timeObj)
+  %<argList> = [%<argList>; %<actualData>];
+%endfunction
+
+%function FcnAddRTWActualConstant(argList, value, key) Output
+  %assign typeObj    = FcnGetIntegerTypeObj(0, 0)
+  %assign actualVar  = SLibGetRTWLiteralObject(typeObj, value)
+  %assign actualData = FcnGetInternalConstant(key, actualVar)
+  %<argList> = [%<argList>; %<actualData>];
+%endfunction
+
+%function FcnAddAuxiliaryMdlRefInitializeFcnInterface(codeInfoObj, initFcn) Output
+
+  tmpArgs = [];
+  tmpActualArgs = [];
+  aImpl = RTW.CImplementation;
+  aFcn = RTW.FunctionInterface; 
+  
+  %% initializeRTM function
+  %switch initFcn 
+    %case "setErrorStatusPointer"
+      %assign typeObj = FcnGetCharTypeObj(1, 0)          %% const char_T
+      %assign typeObj = FcnGetPointerTypeObj(typeObj, 0, 0) %% const char_T*
+      %assign typeObj = FcnGetPointerTypeObj(typeObj, 0, 0) %% const char_T**
+      %<FcnAddRTWArg("tmpArgs", "rt_errorStatus", "rt_errorStatus", typeObj)>
+      %<FcnAddRTWActualArg("tmpActualArgs", "rt_errorStatus", typeObj, [], "")>
+      %break
+    %case "setupGlobalTimingEngine"
+      %assign needed = TLC_FALSE
+      %if !IsModelReferenceForASimstructBasedTarget() && ...
+          ::tMdlRefTimingBridgeAccessed
+        %assign needed = TLC_TRUE
+        %assign typeObj = "Type_TimingBridge"
+        %<typeObj> = embedded.opaquetype('rtTimingBridge'); %% rtTimingBridge
+        %<typeObj>.ReadOnly = 1;
+        %assign typeObj = FcnGetPointerTypeObj(typeObj, 0, 0) 
+        %<FcnAddRTWArg("tmpArgs", "timingBridge", "timingBridge", typeObj)>
+        %<FcnAddRTWActualArg("tmpActualArgs", "timingBridge", typeObj, [], "")>
+      %endif
+      
+      %assign typeObj = FcnGetIntegerTypeObj(0, 0)          %% int_T
+      %assign tObj = SLibGetRTWTimingObject(0)      
+      %if ::tMdlRefNeedTIDArgs
+        %assign needed = TLC_TRUE
+        %if !MdlRefIsConstSampleBlock()
+          %foreach idx = NumSynchronousSampleTimes
+            %assign tidName = "mdlref_TID%<idx>"
+            %<FcnAddRTWArg("tmpArgs", tidName, tidName, typeObj)>
+            %<FcnAddRTWActualArg("tmpActualArgs", tidName, typeObj, tObj, "")>
+          %endforeach
+        %else
+          %assign tidName = "mdlref_TID0"
+          %<FcnAddRTWArg("tmpArgs", tidName, tidName, typeObj)>
+          %<FcnAddRTWActualArg("tmpActualArgs", tidName, typeObj, tObj, "")>
+        %endif
+      %endif
+
+      %if SLibModelNeedsTriggerTIDArg()
+        %assign needed = TLC_TRUE
+        %<FcnAddRTWArg("tmpArgs", "mdlref_TriggerTID", "mdlref_TriggerTID", typeObj)>
+        %<FcnAddRTWActualArg("tmpActualArgs", "mdlref_TriggerTID", typeObj, tObj, "")>
+      %endif
+
+      %if !needed
+        %return
+      %endif
+      
+      %break
+    %case "setupCAPIInfo"
+        %%
+        %% rtwCAPI_ModelMappingInfo *rt_ParentMMI
+        %assign typeObj = "Type_MMI"
+        %<typeObj> = embedded.opaquetype('rtwCAPI_ModelMappingInfo'); %% MMI
+        %assign typeObj = FcnGetPointerTypeObj(typeObj, 0, 0)         %% MMI*
+        %<FcnAddRTWArg("tmpArgs", "rt_ParentMMI", "rt_ParentMMI", typeObj)>
+        %<FcnAddRTWActualArg("tmpActualArgs", "rt_ParentMMI", typeObj, [], "")>
+        %%
+        %% const char_T *rt_ChildPath
+        %assign typeObj = FcnGetCharTypeObj(1, 0)          %% const char_T
+        %assign typeObj = FcnGetPointerTypeObj(typeObj, 0, 0) %% const char_T*
+        %<FcnAddRTWArg("tmpArgs", "rt_ChildPath", "rt_ChildPath", typeObj)>
+        %<FcnAddRTWActualArg("tmpActualArgs", "rt_ChildPath", typeObj, [], "")>
+        %%
+        %% int_T rt_ChildMMIIdx
+        %assign typeObj = FcnGetIntegerTypeObj(0, 0)          %% int_T
+        %<FcnAddRTWArg("tmpArgs", "rt_ChildMMIIdx", "rt_ChildMMIIdx", typeObj)>
+        %<FcnAddRTWActualArg("tmpActualArgs", "rt_ChildMMIIdx", typeObj, [], "")>
+        %%
+        %% int_T rt_CSTATEIdx
+        %<FcnAddRTWArg("tmpArgs", "rt_CSTATEIdx", "rt_CSTATEIdx", typeObj)>
+        %<FcnAddRTWActualArg("tmpActualArgs", "rt_CSTATEIdx", typeObj, [], "")>        
+        %break
+    %case "initializeRTM"
+        %break
+  %endswitch
+  
+  %assign timeObj = SLibGetRTWTimingObject("constant")
+  
+  aImpl.Name = '%<::CPPClassName>::%<initFcn>';
+  aImpl.HeaderFile = ['%<::CompiledModel.Name>', '.h'];
+  aImpl.SourceFile = ['%<::CompiledModel.Name>', '.cpp'];
+  aImpl.Arguments = tmpArgs;
+  aFcn.Prototype = aImpl;
+  aFcn.ActualArgs = tmpActualArgs;
+  aFcn.Timing = %<timeObj>;
+  aFcn.Owner = %<codeInfoObj>.InternalData(1).Implementation;
+  %<codeInfoObj>.InitializeFunctions = [aFcn; %<codeInfoObj>.InitializeFunctions];
+  
+%endfunction
+
+%endif  %% EXISTS("_CIINFOMDLREFLIB_") == 0
+
+%% [EOF] codeinfomdlreflib.tlc

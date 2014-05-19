@@ -1,0 +1,68 @@
+%% ============================================================================
+%% File: prm_assignbuffers.tlc
+%%
+%% Abstract:
+%%   Assign parameter buffers into appropriate files.
+%%   
+%%  
+%% 
+%%
+%% Copyright 1994-2012 The MathWorks, Inc.
+%% 
+%% ============================================================================
+%selectfile NULL_FILE
+
+%if EXISTS("_PRM_ASSIGNBUFFERS_") == 0
+%assign _PRM_ASSIGNBUFFERS_ = 1
+
+%include "prm_cacheutils.tlc"
+
+%% Function: SLibAssignPrmBuffers =============================================
+%% Abstract:
+%%   Assign parameter buffers into appropriate files.
+%%
+%function SLibAssignPrmBuffers() void
+  
+  %if !SLibPrmBufferIsEmpty("UnstructuredSimulinkGlobal", "Decl")
+    %% FOR MODEL REFERENCE: SimulinkGlobal parameters treated like ExportedGlobal
+    %assign declComment = "/* Model block global parameters (auto storage) */"
+    %assign declBuffer = SLibGetPrmBuffer("UnstructuredSimulinkGlobal", "Decl")
+    %<SLibCacheCodeToFile("data_simulinkGlobal_decl", declComment)>
+    %<SLibCacheCodeToFile("data_simulinkGlobal_decl", declBuffer)>
+  %endif
+  %if ModelParameters.NumInrtP > 0
+    %% Assign rtP structures to appropriate files for each system.
+    %foreach sysIdx = NumSystems
+      %assign sys = System[sysIdx]
+      %if !SLibSystemPrmBufferIsEmpty(sys, "SimulinkGlobal", "Decl")
+        %assert(!IsModelReferenceTarget() || IsModelReferenceInlineOffTarget() )
+        %% Assign parameter structure declaration for each system
+        %assign declBuffer = ...
+          SLibGetSystemPrmBuffer(sys, "SimulinkGlobal", "Decl")
+        %if IsModelReferenceInlineOffTarget()
+          %assign declBuffer = GetHideChildDefineSymbol("ifndef") + "\n" + ...
+            declBuffer + "\n" + GetHideChildDefineSymbol("endif") 
+        %endif
+        %<SLibCacheSystemCodeToFile("sys_data_simulinkGlobal_decl", sys, declBuffer)>
+        
+        %% ASSERT: Typedef can never be empty if the Decl is not empty
+        %assert !SLibSystemPrmBufferIsEmpty(sys, "SimulinkGlobal", "Typedef")
+        
+        %% Assign parameter structure typedef for each system if the system
+        %% is not an RLS. If it's an RLS, then this is emitted directly for the
+        %% system in commonhdrlib.tlc.
+        %if !LibSystemIsReusedLibraryFcn(sys)
+          %assign typedefBuffer = ...
+            SLibGetSystemPrmBuffer(sys, "SimulinkGlobal", "Typedef")
+          %assign opFile = SLibGetFileRecForCode("data_simulinkGlobal_typedef")
+          %<SLibSetModelFileAttributeWithRequiredInclude(opFile, "Typedefs", typedefBuffer, "rtwtypes.h")>
+        %endif
+      %endif
+    %endforeach
+  %endif
+  
+%endfunction %% SLibAssignPrmBuffers
+  
+%endif %% EXISTS("_PRM_ASSIGNBUFFERS_")
+
+%% [EOF] prm_assignbuffers.tlc

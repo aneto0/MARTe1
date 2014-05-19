@@ -1,0 +1,172 @@
+%% $Revision: 1.1.6.6 $
+%% $Date: 2010/11/17 08:11:40 $
+%%
+%% Copyright 1994-2007 The MathWorks, Inc.
+%%
+%% insert C preprocessor code to check for agreement of
+%% integer sizes
+%%
+%if !ISFIELD(CTargetSpecific,"PreprocMaxBitsSint")
+  %%
+  %addtorecord CTargetSpecific PreprocMaxBitsSint 128
+  %%
+%endif
+
+%if !ISFIELD(CTargetSpecific,"PreprocMaxBitsUint")
+  %%
+  %addtorecord CTargetSpecific PreprocMaxBitsUint 128
+  %%
+%endif
+%%
+
+%% loop through the model data types and search for fixed point types
+%assign UsesFixedPointMath = TLC_FALSE
+%with ::CompiledModel.DataTypes
+  %foreach i=NumDataTypes
+    %if DataType[i].IsFixedPoint == 1
+      %assign UsesFixedPointMath = TLC_TRUE
+      %break
+    %endif
+  %endforeach
+%endwith
+%% only put the word size checks in if fixed point data types are used
+%if UsesFixedPointMath == TLC_TRUE
+%openfile buffer
+%%
+%assign signedYes = 1
+%assign signedNo  = 0
+
+%%
+%% If PORTABLE_WORDSIZES is on, include tmwtypes.h in rtwtypes.h instead of 
+%% checking word length here
+%%
+%assign ENABLE_PORTABLE_WORDSIZES = ::CompiledModel.ConfigSet.PortableWordSizes
+%if ENABLE_PORTABLE_WORDSIZES == 1
+#ifndef PORTABLE_WORDSIZES
+%endif
+
+%%
+%% make sure limits.h has been included
+%%
+#ifndef UCHAR_MAX
+#include <limits.h>
+#endif
+
+%%
+%%
+%% check CHARS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%assign umask = SetLSNBitsStr((IntegerSizes.CharNumBits),IntegerSizes.CharNumBits,signedNo)
+%assign smask = SetLSNBitsStr((IntegerSizes.CharNumBits-1),IntegerSizes.CharNumBits,signedYes)
+%if IntegerSizes.CharNumBits > CTargetSpecific.PreprocMaxBitsUint || ...
+  IntegerSizes.CharNumBits > CTargetSpecific.PreprocMaxBitsSint
+#if 0
+/* Skip this size verification because of preprocessor limitation */
+%endif
+#if ( UCHAR_MAX != %<umask> ) || ( SCHAR_MAX != %<smask> )
+#error "Code was generated for compiler with different sized uchar/char. \
+Consider adjusting Emulation Hardware word size settings on the \
+Hardware Implementation pane to match your compiler word sizes as \
+defined in the compiler's limits.h header file. Alternatively, you can \
+select 'None' for Emulation Hardware and select the 'Enable portable \
+word sizes' option for ERT based targets, which will disable \
+the preprocessor word size checks."
+#endif
+%if IntegerSizes.CharNumBits > CTargetSpecific.PreprocMaxBitsUint || ...
+  IntegerSizes.CharNumBits > CTargetSpecific.PreprocMaxBitsSint
+#endif
+%endif
+
+%%
+%%
+%% check SHORTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%assign umask = SetLSNBitsStr((IntegerSizes.ShortNumBits),IntegerSizes.ShortNumBits,signedNo)
+%assign smask = SetLSNBitsStr((IntegerSizes.ShortNumBits-1),IntegerSizes.ShortNumBits,signedYes)
+%if IntegerSizes.ShortNumBits > CTargetSpecific.PreprocMaxBitsUint || ...
+  IntegerSizes.ShortNumBits > CTargetSpecific.PreprocMaxBitsSint
+#if 0
+/* Skip this size verification because of preprocessor limitation */
+%endif
+#if ( USHRT_MAX != %<umask> ) || ( SHRT_MAX != %<smask> )
+#error "Code was generated for compiler with different sized ushort/short. \
+Consider adjusting Emulation Hardware word size settings on the \
+Hardware Implementation pane to match your compiler word sizes as \
+defined in the compilers limits.h header file. Alternatively, you can \
+select 'None' for Emulation Hardware and select the 'Enable portable \
+word sizes' option for ERT based targets, this will disable \
+the preprocessor word size checks."
+#endif
+%if IntegerSizes.ShortNumBits > CTargetSpecific.PreprocMaxBitsUint || ...
+  IntegerSizes.ShortNumBits > CTargetSpecific.PreprocMaxBitsSint
+#endif
+%endif
+
+%%
+%%
+%% check INTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%assign umask = SetLSNBitsStr((IntegerSizes.IntNumBits),IntegerSizes.IntNumBits,signedNo)
+%assign smask = SetLSNBitsStr((IntegerSizes.IntNumBits-1),IntegerSizes.IntNumBits,signedYes)
+%if IntegerSizes.IntNumBits > CTargetSpecific.PreprocMaxBitsUint || ...
+  IntegerSizes.IntNumBits > CTargetSpecific.PreprocMaxBitsSint
+#if 0
+/* Skip this size verification because of preprocessor limitation */
+%endif
+#if ( UINT_MAX != %<umask> ) || ( INT_MAX != %<smask> )
+#error "Code was generated for compiler with different sized uint/int. \
+Consider adjusting Emulation Hardware word size settings on the \
+Hardware Implementation pane to match your compiler word sizes as \
+defined in the compilers limits.h header file. Alternatively, you can \
+select 'None' for Emulation Hardware and select the 'Enable portable \
+word sizes' option for ERT based targets, this will disable \
+the preprocessor word size checks."
+#endif
+%if IntegerSizes.IntNumBits > CTargetSpecific.PreprocMaxBitsUint || ...
+  IntegerSizes.IntNumBits > CTargetSpecific.PreprocMaxBitsSint
+#endif
+%endif
+
+%%
+%%
+%% check LONGS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%assign umask = SetLSNBitsStr((IntegerSizes.LongNumBits),IntegerSizes.LongNumBits,signedNo)
+%assign smask = SetLSNBitsStr((IntegerSizes.LongNumBits-1),IntegerSizes.LongNumBits,signedYes)
+%if IntegerSizes.LongNumBits > CTargetSpecific.PreprocMaxBitsUint || ...
+  IntegerSizes.LongNumBits > CTargetSpecific.PreprocMaxBitsSint
+#if 0
+/* Skip this size verification because of preprocessor limitation */
+%endif
+#if ( ULONG_MAX != %<umask> ) || ( LONG_MAX != %<smask> )
+#error "Code was generated for compiler with different sized ulong/long. \
+Consider adjusting Emulation Hardware word size settings on the \
+Hardware Implementation pane to match your compiler word sizes as \
+defined in the compilers limits.h header file. Alternatively, you can \
+select 'None' for Emulation Hardware and select the 'Enable portable \
+word sizes' option for ERT based targets, this will disable \
+the preprocessor word size checks."
+#endif
+%if IntegerSizes.LongNumBits > CTargetSpecific.PreprocMaxBitsUint || ...
+  IntegerSizes.LongNumBits > CTargetSpecific.PreprocMaxBitsSint
+#endif
+%endif
+
+%% If SIL_TESTING is on, include tmwtypes.h in rtwtypes.h instead of 
+%% defining word length here
+%if ENABLE_PORTABLE_WORDSIZES == 1                         
+#endif  /* PORTABLE_WORDSIZES */
+%endif
+
+%%
+%closefile buffer
+%%
+%% cause defines to be included in generated code
+%%
+%<LibCacheDefine(buffer)>\
+%%
+%% end define integer size check
+%%
+%% end of %if UsesFixedPointMath == TLC_TRUE
+%%
+%endif

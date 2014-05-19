@@ -1,0 +1,450 @@
+%% 
+%% 
+%%
+%% Copyright 1994-2012 The MathWorks, Inc.
+%%
+%% Abstract:
+%%   Library file to create a sample main for ERT code format
+%%   for a given model.
+%%
+%selectfile NULL_FILE
+
+%% Function: FcnCallExportWrapperFunction
+%% Abstract:
+%%   Provide sample usage for exported functions
+%function FcnCallExportWrapperFunction(sysId, callEl, fcnType) Output
+  %switch fcnType
+    %case "OutputUpdate"
+      %assign fcnId = System[sysId].OutputUpdateFcn
+      %break
+    %case "Enable"
+      %assign fcnId = System[sysId].EnableFcn
+      %break
+    %case "Disable"
+      %assign fcnId = System[sysId].DisableFcn
+      %break
+    %default
+      %assign errTxt = "Invalid function type %<fcnType>."
+      %<LibBlockReportFatalError([], errTxt)>
+      %break
+  %endswitch
+  
+  %assign fcnAbstract = "Example use case for call to exported function:"
+  %if callEl == -1
+    %assign fcnAbstract = fcnAbstract + "\n" + "  %<fcnId>"
+    %assign fcnName = "sample_usage_%<fcnId>"
+  %else
+    %assign fcnAbstract = fcnAbstract + "\n" + "  \"<fcnId>\" at call element %<callEl>"
+    %assign fcnName = "sample_usage_%<fcnId>_%<callEl>"
+  %endif 
+  %assign fcnReturns = "void"
+  %assign fcnParams = "void"
+  %createrecord fcnRec {Name fcnName; Returns fcnReturns; Params fcnParams; Abstract fcnAbstract; ...
+    Category "main"; GeneratedBy "ertmain_expfcn.tlc"; Type "Utility"}
+  %<SLibDumpFunctionBanner(fcnRec)>
+  %undef fcnRec
+  %<fcnReturns> %<fcnName>(%<fcnParams>)
+  {
+     %openfile readBuf
+     %if NumModelInputs > 0 && ...
+       ISFIELD(System[sysId], "ExternalInputs")
+       %foreach idx = SIZE(System[sysId].ExternalInputs, 1)
+         %assign extInp  = ExternalInputs.ExternalInput[System[sysId].ExternalInputs[idx]]
+         %assign dataTypeEnum = LibGetDataTypeEnumFromId(SLibGetRecordDataTypeId(extInp))
+         %if dataTypeEnum == "SS_FCN_CALL"
+           %continue
+         %endif
+         %if extInp.StorageClass == "ExportedGlobal"
+           %assign varName = LibGetRecordIdentifier(extInp)
+         %else
+           %assign varName = "%<LibGetExternalInputStruct()>%<UQualifier>%<LibGetRecordIdentifier(extInp)>"             
+         %endif
+         _user_write(%<varName>);
+       %endforeach
+     %endif
+     %closefile readBuf
+     %if !WHITE_SPACE(readBuf) && ...
+       (fcnType == "OutputUpdate" || fcnType == "Disable")
+       /*
+       * Set function inputs here:
+       */     
+       %<readBuf>
+     %else
+       /* (No external inputs.) */
+     %endif
+     /*
+      * Call to function
+      */
+      %if callEl == -1
+        %<fcnId>();
+      %else
+        %<fcnId>(%<callEl>);
+      %endif
+     %openfile writeBuf
+     %assign ::BlockFcn = "RegistrationAndStart"
+     %<LibSetGlobalSysFcnsForArgAccess([])>\
+     %with System[NumSystems-1]
+       %if NumModelOutputs > 0 && ...
+         ISFIELD(System[sysId], "ExternalOutputs")
+         %% we learn this code from SLibInitExternalOutputs
+         %foreach idx = SIZE(System[sysId].ExternalOutputs, 1)
+           %assign extOut       = ExternalOutputs.ExternalOutput[System[sysId].ExternalOutputs[idx]]
+           %assign sysIdx       = extOut.Block[0]
+           %assign blkIdx       = extOut.Block[1]
+           %assign outportBlock = System[sysIdx].Block[blkIdx]
+           %assign id           = LibGetRecordIdentifier(outportBlock)
+           %with outportBlock
+             %if !SLibExternalOutputIsVirtual(outportBlock)
+               _user_read(%<LibGetExternalOutputStruct()>%<YQualifier>%<id>);
+             %else
+               %assign rollVars = ["outportblk", "U"]
+               %roll sigIdx = RollRegions, lcv = RollThreshold, outportBlock, "Roller", rollVars
+                 _user_read(%<LibBlockInputSignal(0, "", lcv, sigIdx)>);
+               %endroll
+               %%_user_read(%<LibBlockInputSignal(0, "", "", "")>);
+             %endif
+             %<SLibAccessArgHelper(extOut,"","")>\
+           %endwith
+         %endforeach
+       %endif
+     %endwith
+     %closefile writeBuf
+     %if !WHITE_SPACE(writeBuf) && ...
+       (fcnType == "OutputUpdate" || fcnType == "Disable")
+       /*
+       * Read function outputs here
+       */     
+       %<writeBuf>
+     %else
+       /* (No external outputs.) */
+     %endif     
+   }
+   
+%endfunction %% FcnCallExportWrapperFunction
+
+%% Function: FcnCallExportTaskFunction
+%% Abstract:
+%%   Provide sample usage for exported task step functions
+%function FcnCallExportTaskFunction(tid) Output  
+  %assign sysNameForAsync = ""
+
+  %assign fcnReturns = "void"
+  %assign fcnParams = "void"
+  
+  %assign fcnAbstract = "Example use case for call to exported tasks:"
+  %if !SLibIsRateGrouping()
+    %assign fcnAbstract = fcnAbstract + "\n" + SLibModelStepFcnName("")
+    %assign fcnName = "sample_usage_%<SLibModelStepFcnName("")>"
+  %elseif tid < NumSynchronousSampleTimes
+    %assign fcnAbstract = fcnAbstract + SLibModelStepFcnName(tid)
+    %assign fcnName = "sample_usage_%<SLibModelStepFcnName(tid)>"
+  %else
+    %assign rootSystem = System[NumSystems-1]
+    %foreach id = rootSystem.NumChildSystems
+      %assign systemId = rootSystem.ChildSystems[id][0]
+      %assign system = System[systemId]
+      %if system.Type == "function-call" && ...
+        system.DescSysNonTrigTID[0] == tid
+        %assign sysNameForAsync = LibGetRecordIdentifier(System[systemId])
+        %break
+      %endif
+    %endforeach
+    %assert sysNameForAsync != ""
+    %assign fcnAbstract = fcnAbstract + "\n" + sysNameForAsync
+    %assign fcnName = "sample_usage_%<sysNameForAsync>"
+  %endif
+  %createrecord fcnRec {Name fcnName; Returns fcnReturns; Params fcnParams; Abstract fcnAbstract; ...
+    Category "main"; GeneratedBy "ertmain_expfcn.tlc"; Type "Utility"}
+  %<SLibDumpFunctionBanner(fcnRec)>
+  %undef fcnRec
+  %<fcnReturns> %<fcnName>(%<fcnParams>)
+  {
+    /*
+     * Set task inputs here:
+     */     
+     %% example from SLibInitExternalInputs
+     %if (NumModelInputs > 0)
+       %foreach idx = ExternalInputs.NumExternalInputs
+         %assign extInp  = ExternalInputs.ExternalInput[idx]
+         %if extInp.TID == tid
+           %if extInp.StorageClass == "ExportedGlobal"
+             %assign varName = LibGetRecordIdentifier(extInp)
+           %else
+             %assign varName = "%<LibGetExternalInputStruct()>%<UQualifier>%<LibGetRecordIdentifier(extInp)>"             
+           %endif
+           _user_write(%<varName>);
+         %endif
+       %endforeach
+     %endif
+
+     %if !SLibIsRateGrouping()
+       %<SLibModelStepFcnName("")>(%<SLibModelFcnArgs("OutputUpdate",TLC_TRUE,tid)>);
+     %elseif tid < NumSynchronousSampleTimes %% synchronous task
+       /*
+       * Call to task step function
+       */
+       %<SLibModelStepFcnName(tid)>(%<SLibModelFcnArgs("OutputUpdate",TLC_TRUE,tid)>);
+     %else
+       %<sysNameForAsync>();
+     %endif
+     
+     /*
+     * Read function outputs here
+     */     
+     %assign ::BlockFcn = "RegistrationAndStart"
+     %<LibSetGlobalSysFcnsForArgAccess([])>\
+     %with System[NumSystems-1]
+       %if NumModelOutputs > 0         
+         %% we learn this code from SLibInitExternalOutputs
+         %foreach idx = ExternalOutputs.NumExternalOutputs
+           %assign extOut       = ExternalOutputs.ExternalOutput[idx]
+           %assign sysIdx       = extOut.Block[0]
+           %assign blkIdx       = extOut.Block[1]
+           %assign outportBlock = System[sysIdx].Block[blkIdx]
+           %assign id           = LibGetRecordIdentifier(outportBlock)
+           %if outportBlock.TID == tid
+             %with outportBlock
+               %if !SLibExternalOutputIsVirtual(outportBlock)
+                 _user_read(%<LibGetExternalOutputStruct()>%<YQualifier>%<id>);
+               %else
+                 %assign rollVars = ["outportblk", "U"]
+                 %roll sigIdx = RollRegions, lcv = RollThreshold, outportBlock, "Roller", rollVars
+                   _user_read(%<LibBlockInputSignal(0, "", lcv, sigIdx)>);
+                 %endroll
+                 %%_user_read(%<LibBlockInputSignal(0, "", "", "")>);
+               %endif
+               %<SLibAccessArgHelper(extOut,"","")>\
+             %endwith
+           %endif
+         %endforeach
+       %endif
+     %endwith
+   }
+   
+%endfunction %%FcnCallExportSyncTaskFunction
+ 
+%function FcnExportFcnMain() Output
+  %assign fcnName = "main"
+  %assign fcnReturns = "int_T"
+  %assign fcnParams = "int_T argc, const char_T *argv[]"
+  %openfile fcnAbstract
+The example "main" function illustrates what is required by your
+application code to initialize, execute, and terminate the generated code.
+Attaching exported functions to a real-time clock is target specific.  
+This example illustates how you do this relative to initializing the model. 
+  %closefile fcnAbstract
+  
+  %createrecord fcnRec {Name fcnName; Returns fcnReturns; Params fcnParams; Abstract fcnAbstract; ...
+    Category "model"; GeneratedBy "ertmain_expfcn.tlc"; Type "Main"}
+  %<SLibDumpFunctionBanner(fcnRec)>
+  %undef fcnRec
+  %<fcnReturns> %<fcnName>(%<fcnParams>)
+  {
+    %assign rootSystem = System[NumSystems-1]
+    %assign reqInsts = LibGetSystemField(rootSystem, "ReqRootPrmHdrDataInsts")
+ 
+    %if ExtMode == 1
+
+      /* External mode */
+      rtParseArgsForExtMode(argc, argv);
+    %endif
+
+    /* Initialize model */
+    %<SLibModelInitFcnName()>(%<SLibModelFcnArgs("Initialize",TLC_TRUE,"")>);
+
+    %openfile writeBuf
+    %assign ::BlockFcn = "RegistrationAndStart"
+    %<LibSetGlobalSysFcnsForArgAccess([])>\
+    %with System[NumSystems-1]
+      %if NumModelOutputs > 0 
+        %% we learn this code from SLibInitExternalOutputs
+        %foreach idx = ExternalOutputs.NumExternalOutputs
+           %assign extOut       = ExternalOutputs.ExternalOutput[idx]
+           %assign sysIdx       = extOut.Block[0]
+           %assign blkIdx       = extOut.Block[1]
+           %assign outportBlock = System[sysIdx].Block[blkIdx]
+           %assign id           = LibGetRecordIdentifier(outportBlock)
+           %with outportBlock
+             %if !SLibExternalOutputIsVirtual(outportBlock)
+               _user_read(%<LibGetExternalOutputStruct()>%<YQualifier>%<id>);
+             %else
+               %assign rollVars = ["outportblk", "U"]
+               %roll sigIdx = RollRegions, lcv = RollThreshold, outportBlock, "Roller", rollVars
+                 _user_read(%<LibBlockInputSignal(0, "", lcv, sigIdx)>);
+               %endroll
+               %%_user_read(%<LibBlockInputSignal(0, "", "", "")>);
+             %endif
+             %<SLibAccessArgHelper(extOut,"","")>\
+           %endwith
+         %endforeach
+       %endif
+     %endwith
+     %closefile writeBuf
+     %if !WHITE_SPACE(writeBuf)
+       /* First time initialization of system output variables. 
+       * Constant and invariant outputs will not be updated 
+       * after this step.
+       */
+       %<writeBuf>
+     %endif
+    
+    %assign forceOneStep = EXISTS("ForceSimulatedRTOneStep")
+    %assign rootSystem = System[NumSystems-1]
+    %assign reqInsts = LibGetSystemField(rootSystem,"ReqRootPrmHdrDataInsts")
+    %if !reqInsts.SimStructInst && !EmptyRealTimeObject
+      %assign simstructArg = tSimStruct
+    %else
+      %assign simstructArg = ""
+    %endif
+    
+    while (%<RTMGetErrStat()> == %<SLibGetNullDefinitionFromTfl()>) {
+      /*  Perform application tasks here. */
+    }
+      
+    %% If SuppressErrorStatus is true, RTMGetErrStat() 
+    %% is always (void 0). The following code is 
+    %% dead code. Should not generate
+    %if SuppressErrorStatus
+      /* The option 'Suppress error status in real-time model data structure' 
+       * is selected, therefore the following code does not need to execute.
+       */
+       #if 0
+       %<FcnGenerateModelTerminate()>\
+       return 0;
+       #endif
+    %else
+      %if IncludeMdlTerminateFcn
+        /* Terminate model */
+        %<FcnMdlName()>_terminate(%<SLibModelFcnArgs("Terminate",TLC_TRUE,"")>);
+      %endif
+      return 0;
+    %endif
+  }
+%endfunction
+
+%function FcnExpFcnSampleMain() void
+  %openfile tmpFcnBuf
+  
+  #define _user_read(var)  (void)var
+  #define _user_write(var) (void)var
+  
+  %if ExportFunctionsMode == 1
+    %assign rootSystem = System[NumSystems-1]
+    %foreach id = rootSystem.NumChildSystems
+      %assign systemId = rootSystem.ChildSystems[id][0]
+      %assign system = System[systemId]
+      %if system.Type == "function-call" && system.Exported == "yes"
+        %if FcnDeclareCPIIfNeeded(system, "OutputUpdate")
+          %assign triggerPort = system.Block[system.TriggerBlkIdx]
+          %with triggerPort
+            %foreach callEl = LibBlockOutputSignalWidth(0)
+              %<FcnCallExportWrapperFunction(systemId, callEl, "OutputUpdate")>
+            %endforeach
+          %endwith
+        %else
+          %if !LibSystemFcnIsEmpty(system,"OutputUpdate")
+            %<FcnCallExportWrapperFunction(systemId, -1, "OutputUpdate")>
+          %endif
+          %if !LibSystemFcnIsEmpty(system,"Enable")
+            %<FcnCallExportWrapperFunction(systemId, -1, "Enable")>
+          %endif
+          %if !LibSystemFcnIsEmpty(system,"Disable")
+            %<FcnCallExportWrapperFunction(systemId, -1, "Disable")>
+          %endif
+        %endif
+      %endif
+    %endforeach
+  %else
+    %foreach tid = NumSampleTimes
+      %<FcnCallExportTaskFunction(tid)>
+    %endforeach
+  %endif
+  
+  %<FcnExportFcnMain()>\
+  %closefile tmpFcnBuf
+  %return tmpFcnBuf
+%endfunction
+
+%function FcnGenerateExpFcnMainFunctions(retDesc) void
+  %assign delim = "*   "
+    
+  %return retDesc ? ...
+    "%<delim>Embedded Coder example main assuming\n" ...
+    "%<delim>no operating system.\n" : ...
+    FcnExpFcnSampleMain()
+%endfunction
+
+%function SLibCreateSampleMainForExportFcns() void  
+  %openfile tmpFcnBuf
+  %<SLibDeclareModelFcnArgs(TLC_TRUE)>\
+  %closefile tmpFcnBuf
+  %<SLibCacheCodeToFile("mainSrc_data_defn", tmpFcnBuf)>
+
+  %openfile tmpFcnBuf
+  /*
+   * Auto generated example main program for model: %<FcnMdlName()>
+   *
+   * Simulink Coder version : %<Version>
+   %if GenerateFullHeader
+   * %<CorCPPForBuildLogsandComments()> source code generated on : %<TLC_TIME>
+    %endif
+   *
+   * Description:
+   %<FcnGenerateExpFcnMainFunctions(1)>\
+   *
+   * For more information:
+   *   o Simulink Coder User's Guide
+   *   o Embedded Coder User's Guide
+   *   o matlabroot/rtw/c/ert/ert_main.c
+   %if TargetOS == "VxWorksExample"
+   *   o matlabroot/rtw/c/tornado/rt_main.c
+   %endif
+   *   o Type 'ecodertutorial' in MATLAB
+   *
+   %if TargetOS == "BareBoardExample"
+     * For a real-time operating system deployment example, reconfigure the
+     * "Target operating system" option to "VxWorksExample".
+   %elseif TargetOS == "VxWorksExample"
+     * For a bare board (i.e., no real-time operating system) deployment
+     * example, reconfigure the "Target operating system" option to
+     * "BareBoardExample".
+   %else
+     %if TargetOS == "NativeThreadsExample"
+       %assign errTxt = "Unsupported TargetOS: %<TargetOS>"
+     %else
+       %assign errTxt = "Unknown TargetOS: %<TargetOS>"
+     %endif
+     %<LibReportFatalError(errTxt)>
+   %endif
+   */
+  %closefile tmpFcnBuf
+  
+  %<SLibCacheCodeToFile("mainSrc_ban", tmpFcnBuf)>
+  
+  %<SLibCacheCodeToFile("mainSrc_fcn_defn", ...
+    FcnGenerateExpFcnMainFunctions(0))>
+  
+  %openfile tmpFcnBuf
+
+  %if TargetOS == "BareBoardExample"
+    %if PurelyIntegerCode
+      %<LibExternInFcnDecls()>int printf(const char *, ...); 
+      %<LibExternInFcnDecls()>int fflush(void *);
+    %elseif !MatFileLogging && !ExtMode
+      #include <stdio.h> /* This ert_main.c example uses printf/fflush */
+    %else
+      #include <stdio.h>
+    %endif
+  %endif
+  #include "%<FcnGetPublicModelHeaderFile()>" /* Model's header file */
+  #include "rtwtypes.h" /* MathWorks types */
+  #include "stddef.h"
+  %if ExtMode
+    #include "ext_work.h" /* External mode header file */
+  %endif
+  %closefile tmpFcnBuf
+  
+  %<SLibCacheCodeToFile("mainSrc_incl", tmpFcnBuf)>
+
+%endfunction
+

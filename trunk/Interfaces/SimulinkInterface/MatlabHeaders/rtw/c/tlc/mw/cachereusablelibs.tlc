@@ -1,0 +1,59 @@
+%% ============================================================================
+%% Abstract:
+%%   This file contains helper functions to cache reusable library checksums
+%%   into the binfo.mat file
+%%
+%% Copyright 2010-2011 The MathWorks, Inc.
+%%
+
+%if EXISTS("_CACHEREUSABLELIBS_") == 0
+%assign _CACHEREUSABLELIBS_ = 1
+
+%% Function: CacheReusableLibChecksumsInMatFile ===============================
+%% Abstract:
+%%     Cache reusable library checksums in the mat file
+%function CacheReusableLibChecksumsInMatFile() void
+  
+  %with CompiledModel
+
+    %createrecord csInterface { Model  "%<Name>" NumberOfChecksums 0}
+    
+    %foreach idx = NumSystems
+      %assign sys = System[idx]
+      %if EXISTS(sys.ReusableLibraryChecksum)
+        %assign cs = sys.ReusableLibraryChecksum
+        %createrecord checksumInfo { \
+            Checksum %<cs>; \
+            Name "%<sys.SystemFileName>" \
+	     }
+         %addtorecord csInterface ChecksumInfo %<checksumInfo>
+         %assign csInterface.NumberOfChecksums = csInterface.NumberOfChecksums + 1
+      %endif
+    %endforeach
+    
+  %endwith %% CompiledModel
+  %if csInterface.NumberOfChecksums > 0
+    %<CacheCSInMatInfoFile(Name, "addReuseLibChecksumInfo", csInterface)>
+  %endif
+%endfunction
+
+%% Function: CacheCSInMatInfoFile  =============================
+%% Abstract:
+%%      Store data in .mat file.
+
+%function CacheCSInMatInfoFile(mdl, type, interface) void
+  
+  %if IsModelReferenceTarget()
+    %assign targetType = IsModelReferenceSimTarget() ? "SIM" : "RTW"
+  %else
+    %assign targetType = "NONE"
+  %endif
+  %assign buildStartDir = GetBuildStartDir()
+  %assign rtwinfomat = FEVAL("rtwprivate", "rtwinfomatman", ...
+    type, "binfo", "%<mdl>", ...
+    "%<targetType>", interface)
+
+
+%endfunction
+
+%endif %% _CACHEREUSABLELIBS_

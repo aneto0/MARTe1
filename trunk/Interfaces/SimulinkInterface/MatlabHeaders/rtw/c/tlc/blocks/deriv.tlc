@@ -1,0 +1,111 @@
+%% $RCSfile: deriv.tlc,v $
+%% $Revision: 1.13.4.3 $ 
+%% $Date: 2009/05/14 14:44:11 $
+%%
+%% Copyright 1994-2009 The MathWorks, Inc.
+%%
+%% Abstract: Derivative block target file.
+
+%implements Derivative "C"
+
+%% Function: InitializeConditions =============================================
+%% Abstract:
+%%      RWork(TimeStamp) = rtInf
+%%
+%function InitializeConditions(block, system) Output
+  %%
+  %assign infVariable = LibRealNonFinite(inf)
+  %<LibBlockRWork(TimeStampA, "", "", 0)> = %<infVariable>;
+  %<LibBlockRWork(TimeStampB, "", "", 0)> = %<infVariable>;
+
+%endfunction
+
+
+%% Function: Outputs ==========================================================
+%% Abstract:
+%%      Y = (U(T) - U(T-1)) / delta_T
+%%
+%function Outputs(block, system) Output
+  %%
+  %assign timeStampA      = LibBlockRWork(TimeStampA, "", "", 0)
+  %assign lastUAtTimeA    = LibBlockRWork(LastUAtTimeA, "", "", "")
+  %assign timeStampB      = LibBlockRWork(TimeStampB, "", "", 0)
+  %assign lastUAtTimeB    = LibBlockRWork(LastUAtTimeB, "", "", "")
+  %%
+  {
+    real_T t = %<LibGetTaskTimeFromTID(block)>;
+    real_T timeStampA    = %<timeStampA>;
+    real_T timeStampB    = %<timeStampB>;
+    real_T *lastU        = &%<lastUAtTimeA>;
+    if (timeStampA >= t && timeStampB >= t) {
+      %assign rollVars = ["Y"]
+      %assign rollRegions = [0:%<LibBlockOutputSignalWidth(0) - 1>]
+      %roll sigIdx = rollRegions, lcv = RollThreshold, block, "Roller", rollVars
+        %<LibBlockOutputSignal(0, "", lcv, sigIdx)> = 0.0;
+      %endroll
+    } else {
+      real_T       deltaT;
+      real_T       lastTime = timeStampA;
+      if (timeStampA < timeStampB) {
+        if (timeStampB < t) {
+          lastTime    = timeStampB;
+          lastU = &%<lastUAtTimeB>;
+        }
+      } else if (timeStampA >= t) {
+        lastTime = timeStampB;
+        lastU = &%<lastUAtTimeB>;
+      }
+      deltaT = t - lastTime;
+      %%
+      %assign rollVars = ["U", "Y"]
+      %roll sigIdx = RollRegions, lcv = RollThreshold, block, "Roller", rollVars
+        %assign u = LibBlockInputSignal(0, "", lcv, sigIdx)
+        %assign y = LibBlockOutputSignal(0, "", lcv, sigIdx)
+        %<y> = (%<u> - *lastU++) / deltaT;
+      %endroll
+    }
+  }
+
+%endfunction
+
+
+%% Function: Update ===========================================================
+%% Abstract:
+%%      Update the oldest bank of last inputs
+%%
+%function Update(block, system) Output
+  %%
+  %assign timeStampA      = LibBlockRWork(TimeStampA, "", "", 0)
+  %assign lastUAtTimeA    = LibBlockRWork(LastUAtTimeA, "", "", "")
+  %assign timeStampB      = LibBlockRWork(TimeStampB, "", "", 0)
+  %assign lastUAtTimeB    = LibBlockRWork(LastUAtTimeB, "", "", "")
+  %%
+  {
+    real_T  timeStampA     = %<timeStampA>;
+    real_T  timeStampB     = %<timeStampB>;
+    real_T* lastTime       = &%<timeStampA>;
+    real_T* lastU          = &%<lastUAtTimeA>; 
+    %%
+    %assign infVariable = LibRealNonFinite(inf)
+    if (timeStampA != %<infVariable>) {
+      if (timeStampB == %<infVariable>) {
+          lastTime    = &%<timeStampB>;
+          lastU = &%<lastUAtTimeB>;
+      } else if (timeStampA >= timeStampB) {
+          lastTime    = &%<timeStampB>;
+          lastU = &%<lastUAtTimeB>;
+      }
+    }
+    %%
+    *lastTime = %<LibGetTaskTimeFromTID(block)>;
+    %%
+    %%
+    %assign rollVars = ["U"]
+    %roll sigIdx = RollRegions, lcv = RollThreshold, block, "Roller", rollVars
+      *lastU++ = %<LibBlockInputSignal(0, "", lcv, sigIdx)>;
+    %endroll
+  }
+
+%endfunction
+
+%% [EOF] deriv.tlc

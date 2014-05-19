@@ -1,0 +1,960 @@
+%% ============================================================================
+%% File : ertmodelarg.tlc
+%%
+%% Abstract:
+%%   This is the system library file for code generation's Embedded-C code format.
+%%
+%% 
+%% Copyright 1994-2011 The MathWorks, Inc.
+
+%selectfile NULL_FILE
+
+%if EXISTS("_ERT_MODEL_ARG_") == 0
+%assign _ERT_MODEL_ARG_ = 1
+
+
+%% Function: SLibModelStepFcnName
+%% Abstrack: 
+%%   Generate model step fcn name
+%%
+%function SLibModelStepFcnName(tid) void
+  %assert CombineOutputUpdateFcns
+  %if SLibFcnProtoCtrlActive()
+    %assign fcnData = FcnGetFunctionPrototypeRecord()
+    %return fcnData.FunctionName
+  %elseif SLibAutosarActive() && !SLibAutosarIsServerOperation()
+    %assign fcnData = FcnGetAutosarRecord()
+    %return fcnData.PeriodicRunnableName
+  %elseif LibSamActive()
+    %% Periodic runnable name hardwired for now.
+    %assign runnableName = LibSamPeriodicRunnableName(tid)
+    %if runnableName == ""
+      %% Non-periodic model.
+      %return ""
+    %endif
+    %if LibSamIsCpp()
+      %% Sam C++ output is based on C++(Encapsulated) target.
+      %if ::CPPObjectName == "this"
+        %return "this->%<runnableName>"
+      %else
+        %return "%<::CPPObjectName>.%<runnableName>"
+      %endif
+    %else
+      %return runnableName
+    %endif
+  %elseif GenerateClassInterface
+    %assign classConfObj = FcnGetRTWCPPStepPrototypeRecord()
+    %assign tidPostfix = ""
+    
+    %if !SLibSingleTasking()
+      %%MR/MT, must be void-void case
+      %assign tidPostfix = "%<tid>"
+    %endif
+    
+    %if ::CPPObjectName == "this"
+      %return "this->%<classConfObj.FunctionName>%<tidPostfix>"
+    %else
+      %return "%<::CPPObjectName>.%<classConfObj.FunctionName>%<tidPostfix>"
+    %endif
+  %else
+    %return "%<Name>_step%<tid>"
+  %endif
+%endfunction
+    
+%% Function: SLibModelInitFcnName
+%% Abstrack: 
+%%   Generate model init fcn name
+%%
+%function SLibModelInitFcnName() void
+  %if SLibFcnProtoCtrlActive()
+    %assign fcnData = FcnGetFunctionPrototypeRecord()
+    %return fcnData.InitFunctionName
+  %elseif SLibAutosarActive() && !SLibAutosarIsServerOperation()
+    %assign fcnData = FcnGetAutosarRecord()
+    %return fcnData.InitRunnableName
+  %elseif LibSamActive() && LibSamHasInitRunnable()
+    %return LibSamInitRunnableName()
+  %elseif ExportFunctionsMode && EXISTS("ExpFcnInitFcnName")
+    %return ExpFcnInitFcnName
+  %else
+    %return ::CompiledModel.Name + "_initialize"
+  %endif
+%endfunction
+    
+
+%% Function: SLibModelStepFcnReturn
+%% Abstrack: 
+%%   Generate model step fcn return
+%%
+%function SLibModelStepFcnReturn(mode) void
+  %assert CombineOutputUpdateFcns
+  %if SLibFcnProtoCtrlActive()
+    %assign fcnData = FcnGetFunctionPrototypeRecord()
+    %return FcnModelStepFcnReturnCode(fcnData, mode)
+  %elseif GenerateClassInterface
+    %assign classConfObj = FcnGetRTWCPPStepPrototypeRecord()
+    %return FcnModelStepFcnReturnCode(classConfObj, mode)
+  %else
+    %if mode == "ReturnType"
+      %return "void"
+    %else
+      %return ""
+    %endif
+  %endif
+%endfunction
+
+%% Function: SLibExtIOStructArgNeeded
+%% Abstrack: 
+%%   Return true if any element in extOut/extIn is accessed. 
+%%
+%% type  = 'Input', check external inports
+%%         'Output', check external outports
+%%     
+%function SLibExtIOStructArgNeeded(type, tid, isRateGrouping)
+  %assert type == "Input" || type == "Output"
+  %assign retVal = TLC_FALSE
+
+  %if RootIOStructures
+    %assign numIOs = External%<type>s.NumExternal%<type>s
+    %foreach idx = numIOs 
+      %assign extIO = External%<type>s.External%<type>[idx]
+      
+      %if !FcnArgNeeded(extIO,tid,isRateGrouping)
+        %continue
+      %endif
+      
+      %if type == "Input"
+        %if (extIO.StorageClass != "Auto")
+          %continue
+        %endif
+      %else
+        %% Output
+        %assign extOut       = ExternalOutputs.ExternalOutput[idx]
+        %assign sysIdx       = extOut.Block[0]
+        %assign blkIdx       = extOut.Block[1]
+        %assign outportBlock = System[sysIdx].Block[blkIdx]
+        %if SLibExternalOutputIsVirtual(outportBlock)
+          %continue
+        %endif
+      %endif
+      
+%assign retVal = TLC_TRUE
+      %break
+    %endforeach
+  %endif
+  
+  %return retVal
+%endfunction
+
+%% Function: SLibModelFcnArgs
+%% Abstrack: 
+%%   Generate model fcn arg list.
+%%
+%% isCallSite = 1, is call site and called from ertmain
+%%            = 2, is call site, not called from ertmain
+%%
+%function SLibModelFcnArgs(type,isCallSite,tid) void
+  %assign tmpBlockFcn = ::BlockFcn
+  %assign recArgs = []
+  %assign rootSystem        = System[NumSystems-1]
+  %assign isRateGrouping    = ...
+    SLibSystemFcnRateGrouping(rootSystem, type)
+  %assign calledFromERTMain =  (isCallSite == 2) ? 0 : 1
+  
+  %assign tmpHasSimStructVars = ::CompiledModel.HasSimStructVars
+  %if UsingMalloc 
+    %% If UsingMalloc is true, all data is passed in with SimStruct at callsite
+    %assign ::CompiledModel.HasSimStructVars = isCallSite
+  %endif
+  %if type == "ODEUpdateContinuousStates"
+    %assign type = "UpdateContStates"
+    %assign needsTID = TLC_FALSE
+  %else
+    %% NeedsTID is true if rootsystem is multirate 
+    %% and need tid 
+ 
+    %if LibIsDeploymentDiagram()
+      %assign needsTID = TLC_TRUE
+    %else
+      %assign needsTID = LibSystemFcnNeedsTID(rootSystem,type)
+    %endif
+
+  %endif
+  
+  %if GenerateClassInterface && GenerateSampleERTMain
+    %assert (needsTID == TLC_FALSE)
+  %endif
+    
+  %assign reqInsts = LibGetSystemField(rootSystem, "ReqRootPrmHdrDataInsts")
+
+  %switch type
+    %case "Initialize"
+      %assign ::BlockFcn = "Registration"
+      %% usage of firstTime is computed in ertreg.tlc
+      %if SLibGetNeedFirstTime()
+	%if isCallSite
+	  %assign recArgs = recArgs + "1"
+	%else
+	  %assign recArgs = recArgs + "boolean_T %<SLibFirstTime()>"
+	%endif
+      %endif
+      %break
+    %case "Start"
+      %assign ::BlockFcn = "Start"
+      %if needsTID
+	%if isCallSite
+	  %assign recArgs = recArgs + "%<tid>"
+	%else
+	  %assign recArgs = recArgs + "%<tTIDType> %<tTID>"
+	%endif
+      %endif
+      %break
+    %case "Output"
+      %assign ::BlockFcn = "Output"
+      %if needsTID
+	%if isCallSite
+	  %assign recArgs = recArgs + "%<tid>"
+	%else
+	  %assign recArgs = recArgs + "%<tTIDType> %<tTID>"
+	%endif
+      %endif
+      %break
+    %case "OutputUpdate"
+      %assign ::BlockFcn = "OutputUpdate"
+      %if SLibFcnProtoCtrlActive()
+        %assign fcnData = FcnGetFunctionPrototypeRecord()
+        %if isCallSite 
+          %assign recArgs = recArgs + FcnModelStepFcnArgs(fcnData,"WrapperCall")
+        %else
+          %assign recArgs = recArgs + FcnModelStepFcnArgs(fcnData,"WrapperDec")
+        %endif
+      %elseif GenerateClassInterface
+        %assign classConfObj = FcnGetRTWCPPStepPrototypeRecord()
+        %if isCallSite 
+          %assign recArgs = recArgs + FcnModelStepFcnArgs(classConfObj,"WrapperCall")
+        %else
+          %assign recArgs = recArgs + FcnModelStepFcnArgs(classConfObj,"WrapperDec")
+        %endif
+      %else
+        %if needsTID
+          %if isCallSite
+            %assign recArgs = recArgs + "%<tid>"
+          %else
+            %assign recArgs = recArgs + "%<tTIDType> %<tTID>"
+          %endif
+        %endif
+      %endif
+      %break  
+    %case "RootUpdate"
+      %assign ::BlockFcn = "RootUpdate"
+      %if needsTID
+        %if isCallSite
+          %assign recArgs = recArgs + "%<tid>"
+        %else
+          %assign recArgs = recArgs + "%<tTIDType> %<tTID>"
+        %endif
+      %endif
+      %if ISEQUAL(rootSystem.CurrentTID, 1) && (NumContStates > 0)
+	%<SLibAddTIDtoAccessTIDList(rootSystem.Interface.RTMArgDef, ...
+	  "RootUpdate", "",[0,1])>
+      %endif
+      %break
+    %case "Update"
+      %assign ::BlockFcn = "Update"
+      %if needsTID
+	%if isCallSite
+	  %assign recArgs = recArgs + "%<tid>"
+	%else
+	  %assign recArgs = recArgs + "%<tTIDType> %<tTID>"
+	%endif
+      %endif
+      %if ISEQUAL(rootSystem.CurrentTID, 1) && (NumContStates > 0)
+	%<SLibAddTIDtoAccessTIDList(rootSystem.Interface.RTMArgDef, ...
+	  "Update", "",[0,1])>
+      %endif
+      %break
+    %case "UpdateContStates"
+      %assign ::BlockFcn = "UpdateContStates"
+      %if SLibFcnProtoCtrlActive()
+        %assign fcnData = FcnGetFunctionPrototypeRecord()
+        %if isCallSite 
+          %assign recArgs = recArgs + FcnModelStepFcnArgs(fcnData,"CalledInStep")
+        %else
+          %assign recArgs = recArgs + FcnModelStepFcnArgs(fcnData,"WrapperDec")
+        %endif
+      %elseif GenerateClassInterface
+        %assign classConfObj = FcnGetRTWCPPStepPrototypeRecord()
+        %if isCallSite 
+          %assign recArgs = recArgs + FcnModelStepFcnArgs(classConfObj,"CalledInStep")
+        %else
+          %assign recArgs = recArgs + FcnModelStepFcnArgs(classConfObj,"WrapperDec")
+        %endif
+      %else
+        %if needsTID
+          %if isCallSite
+            %assign recArgs = recArgs + "%<tid>"
+          %else
+            %assign recArgs = recArgs + "%<tTIDType> %<tTID>"
+          %endif
+        %endif
+      %endif
+      %break
+    %case "Derivative"
+    %case "ForcingFunction"
+    %case "MassMatrix"      
+    %case "Projection"
+      %assign ::BlockFcn = "Derivative"
+      %if GenerateClassInterface
+        %assign classConfObj = FcnGetRTWCPPStepPrototypeRecord()
+        %if isCallSite 
+          %assign recArgs = recArgs + FcnModelStepFcnArgs(classConfObj,"CalledInStep")
+        %else
+          %assign recArgs = recArgs + FcnModelStepFcnArgs(classConfObj,"WrapperDec")
+        %endif
+      %elseif SLibFcnProtoCtrlActive()
+        %assign fcnData = FcnGetFunctionPrototypeRecord()
+        %if isCallSite 
+          %assign recArgs = recArgs + FcnModelStepFcnArgs(fcnData,"CalledInStep")
+        %else
+          %assign recArgs = recArgs + FcnModelStepFcnArgs(fcnData,"WrapperDec")
+        %endif
+      %endif
+      %if UsingMalloc && (type == "Derivative" ||  type == "Projection")
+        %assign ::BlockFcn = type
+        %<SLibAccessArgHelper(rootSystem.Interface.RTMArgDef,"","")>
+      %endif
+      %break
+    %case "Terminate"
+      %assign ::BlockFcn = "Terminate"
+      %break
+    %case "Enable"
+    %case "Disable"
+      %assign ::BlockFcn = type
+      %break
+    %default
+      %assign errTxt = "Unknown type: %<type>"
+      %<LibReportFatalError(errTxt)>
+  %endswitch
+  
+  %with rootSystem.Interface
+    %if !reqInsts.SimStructInst && FcnArgNeeded(RTMArgDef,...
+      rootSystem.CurrentTID,isRateGrouping) && !GenerateClassInterface
+      %if isCallSite
+        %assign recArgs = recArgs + "%<tSimStruct>"
+      %else
+	%assign recArgs = recArgs + "%<tSimStructType> *const %<tSimStruct>"
+      %endif
+    %endif
+    %assign deref = calledFromERTMain && !UsingMalloc ? "&" : ""
+    %assign addTypeCast = WHITE_SPACE(deref)
+    %if !reqInsts.ParamsInst && FcnArgNeeded(ParameterArgDef,...
+      rootSystem.CurrentTID,isRateGrouping) && !GenerateClassInterface
+      %if isCallSite
+	%assign recArgs = recArgs + "%<deref>%<SLibGetParametersStruct(addTypeCast)>"
+      %else
+	%assign recArgs = recArgs + "%<tParametersType> *%<SLibGetParametersStruct(0)>"
+      %endif
+    %endif
+    %if !reqInsts.BlockIOInst && FcnArgNeeded(BlockIOArgDef,...
+      rootSystem.CurrentTID,isRateGrouping) && !GenerateClassInterface
+      %if isCallSite
+	%assign recArgs = recArgs + "%<deref>%<SLibGetBlockIOStruct(addTypeCast)>"
+      %else
+	%assign recArgs = recArgs + "%<tBlockIOType> *%<SLibGetBlockIOStruct(0)>"
+      %endif
+    %endif
+    %if !reqInsts.DworkInst && FcnArgNeeded(DWorkArgDef,...
+      rootSystem.CurrentTID,isRateGrouping) && !GenerateClassInterface
+      %if isCallSite
+	%assign recArgs = recArgs + "%<deref>%<SLibGetDWorkStruct(addTypeCast)>"
+      %else
+	%assign recArgs = recArgs + "%<tDWorkType> *%<SLibGetDWorkStruct(0)>"
+      %endif
+    %endif
+    %if !reqInsts.ContStatesInst && FcnArgNeeded(ContStatesArgDef,...
+      rootSystem.CurrentTID,isRateGrouping) && !GenerateClassInterface
+      %if isCallSite
+	%assign recArgs = recArgs + "%<deref>%<SLibGetContinuousStateStruct(addTypeCast)>"
+      %else
+	%assign recArgs = recArgs + "%<tContStateType> *%<SLibGetContinuousStateStruct(0)>"
+      %endif
+    %endif
+    %if !reqInsts.PrevZCStatesInst && FcnArgNeeded(ZCEventArgDef,...
+      rootSystem.CurrentTID,isRateGrouping) && !GenerateClassInterface
+      %if isCallSite
+	%assign recArgs = recArgs + "%<deref>%<SLibGetPreviousZCStruct(addTypeCast)>"
+      %else
+	%assign recArgs = recArgs + "%<tPrevZCStateType> *%<SLibGetPreviousZCStruct(0)>"
+      %endif
+    %endif
+    %if !reqInsts.ExtInpsInst && !LibExternalInputsStructIsEmpty() && !GenerateClassInterface
+      %if RootIOStructures 
+        %if SLibExtIOStructArgNeeded("Input",rootSystem.CurrentTID,isRateGrouping)
+          %if isCallSite
+            %assign recArgs = recArgs + "%<deref>%<SLibGetExternalInputStruct(addTypeCast,isCallSite,TLC_FALSE)>"
+          %else
+            %assign recArgs = recArgs + "%<tInputType> *%<SLibGetExternalInputStruct(0,isCallSite,TLC_FALSE)>"
+          %endif
+        %endif
+      %else
+	%foreach idx = ExternalInputs.NumExternalInputs 
+	  %assign extInp = ExternalInputs.ExternalInput[idx]
+          %assign id = LibGetRecordIdentifier(extInp)
+	  %with extInp
+	    %if extInp.StorageClass != "Auto" || ...
+	      !FcnArgNeeded(extInp,rootSystem.CurrentTID,isRateGrouping)
+	      %continue
+	    %endif
+	    %assign passByRef = PassExtInpByRef(extInp)
+	    %if isCallSite
+	      %assign addressOf = passByRef ? deref : ""
+	      %assign recArgs = recArgs + "%<addressOf>%<SLibGetExternalInputStruct(WHITE_SPACE(addressOf),isCallSite,TLC_FALSE)>%<UQualifier>%<id>"
+	    %else
+	      %assign optStar = passByRef ? "*" : ""
+	      %assign dataType  = SLibGetRecordDataTypeName(extInp, "")
+	      %if LibGetRecordWidth(extInp) > 1
+		%assign recArgs = recArgs + "%<dataType> %<SLibGetExternalInputStruct(0,isCallSite,TLC_FALSE)>%<UQualifier>%<id>[%<LibGetRecordWidth(extInp)>]"
+	      %else
+		%assign recArgs = recArgs + "%<dataType> %<optStar>%<SLibGetExternalInputStruct(0,isCallSite,TLC_FALSE)>%<UQualifier>%<id>"
+	      %endif
+	    %endif
+	  %endwith
+	%endforeach
+      %endif
+    %endif
+    %if !reqInsts.ExtOutputsInst && !LibExternalOutputsStructIsEmpty() && !GenerateClassInterface
+      %if RootIOStructures
+        %if SLibExtIOStructArgNeeded("Output",rootSystem.CurrentTID,isRateGrouping)
+          %if isCallSite
+            %assign recArgs = recArgs + "%<deref>%<SLibGetExternalOutputStruct(addTypeCast,isCallSite,TLC_FALSE)>"
+          %else
+            %assign recArgs = recArgs + "%<tOutputType> *%<SLibGetExternalOutputStruct(0,isCallSite,TLC_FALSE)>"
+          %endif
+        %endif
+      %else
+	%foreach idx = ExternalOutputs.NumExternalOutputs
+	  %assign extOut       = ExternalOutputs.ExternalOutput[idx]
+	  %assign sysIdx       = extOut.Block[0]
+	  %assign blkIdx       = extOut.Block[1]
+	  %assign outportBlock = System[sysIdx].Block[blkIdx]
+	  %if SLibExternalOutputIsVirtual(outportBlock) || ...
+	    !FcnArgNeeded(extOut,rootSystem.CurrentTID,isRateGrouping)
+	    %continue
+	  %endif
+	  %with outportBlock
+	    %assign portWidth = LibBlockInputSignalWidth(0)
+	    %assign dataType  = LibBlockInputSignalDataTypeName(0, "")
+	  %endwith
+          %assign id = LibGetRecordIdentifier(outportBlock)
+	  %if isCallSite
+	    %if portWidth > 1
+	      %assign recArgs = recArgs + "%<SLibGetExternalOutputStruct(0,isCallSite,TLC_FALSE)>%<YQualifier>%<id>"
+	    %else
+	      %assign recArgs = recArgs + "%<deref>%<SLibGetExternalOutputStruct(addTypeCast,isCallSite,TLC_FALSE)>%<YQualifier>%<id>"
+	    %endif
+	  %else
+	    %if portWidth > 1
+	      %assign recArgs = recArgs + "%<dataType> %<SLibGetExternalOutputStruct(0,isCallSite,TLC_FALSE)>%<YQualifier>%<id>[%<portWidth>]"
+	    %else
+	      %assign recArgs = recArgs + "%<dataType> *%<SLibGetExternalOutputStruct(0,isCallSite,TLC_FALSE)>%<YQualifier>%<id>"
+	    %endif
+	  %endif
+	%endforeach
+      %endif
+    %endif
+  
+  %endwith
+  
+  %assign ::BlockFcn = tmpBlockFcn
+  %assign  ::CompiledModel.HasSimStructVars = tmpHasSimStructVars
+
+  %if ISEMPTY(recArgs)
+    %if isCallSite
+      %return ""
+    %else
+      %if !GenerateClassInterface
+        %return "void"
+      %else
+        %return ""
+      %endif
+    %endif
+  %endif
+
+  %foreach idx = SIZE(recArgs,1)
+    %if idx == 0
+      %assign fcnArgs = recArgs[idx]
+    %else
+      %assign fcnArgs = fcnArgs + ", %<recArgs[idx]>"
+    %endif
+  %endforeach
+  %return fcnArgs
+%endfunction
+
+
+%function SLibDeclareFcnProtoCtlVariables() void
+  %openfile tmpFcnBuf  
+    %if SLibFcnProtoCtrlActive()
+      %%customized function prototype generated. Need global variables.
+      %assign fcnData = FcnGetFunctionPrototypeRecord()
+      %with fcnData
+        %foreach idx = NumArgSpecData
+          %assign spec = ArgSpecData[idx]
+          
+          %if spec.Category == "None" || spec.SLObjectType == "Outport"
+            %continue
+          %endif
+          
+          %assign staticFlag = "static "
+          %assign extInp    = ExternalInputs.ExternalInput[spec.PortNum]
+          %assign dTypeId   = LibGetRecordDataTypeId(extInp)
+          %assign dataType  = LibGetRecordDataTypeName(extInp, "")
+          %assign ground = "%<LibGetGroundInitFromId(dTypeId)>"
+          %if LibGetRecordIsComplex(extInp)
+            %assign ground = "{" + ground + ", " + ground + "}"
+          %endif
+          %assign portWidth = LibGetRecordWidth(extInp)
+          %assign argName = spec.ArgName
+          
+          %if portWidth > 1
+            %assign initializer = "{"
+            %foreach idx = (portWidth-1)
+              %assign initializer = initializer + ground + ", "
+            %endforeach
+            %assign initializer = initializer + ground + "}"
+            %if SLibAutosarCompilerAbstractionRequired()
+              %assign definition = ...
+              "%<staticFlag>%<SLibAutosarCompilerAbstractionForDataDecl(TLC_FALSE, dataType, TLC_FALSE, TLC_FALSE, "%<argName>[%<portWidth>]", "DataGlobal")> = %<initializer>;"
+            %else
+              %assign definition = ...
+                "%<staticFlag>%<dataType> %<argName>[%<portWidth>] = %<initializer>;"
+            %endif
+            /* '%<extInp.BlockName>' */
+            %<SLibApplyMemSecToDataDefn(definition, ...
+              "MemSecDataIO", "%<LibGetExternalInputStruct()>")> \ 
+          %else
+            %if NumContStates > 0 && spec.Category == "Pointer"
+              %if SLibAutosarCompilerAbstractionRequired()
+              %assign definition = ...
+                "%<staticFlag>%<SLibAutosarCompilerAbstractionForDataDecl(TLC_FALSE, dataType, TLC_FALSE, TLC_FALSE, "local_%<argName>", "DataGlobal")> = %<ground>;"
+              %else
+                %assign definition = ...
+                  "%<staticFlag>%<dataType> local_%<argName> = %<ground>;"
+              %endif
+               /* '%<extInp.BlockName>' */
+              %<SLibApplyMemSecToDataDefn(definition, ...
+                "MemSecDataIO", "%<LibGetExternalInputStruct()>")> \ 
+              
+              %if SLibAutosarCompilerAbstractionRequired()
+                %assign definition = ...
+                  "%<staticFlag>%<SLibAutosarCompilerAbstractionForDataDecl(TLC_FALSE, dataType, TLC_TRUE, TLC_FALSE, argName, "DataGlobal")> = &local_%<argName>;"
+                %else
+                  %assign definition = ...
+                    "%<staticFlag>%<dataType> * %<argName> = &local_%<argName>;"
+              %endif
+              %<SLibApplyMemSecToDataDefn(definition, ...
+                "MemSecDataIO", "%<LibGetExternalInputStruct()>")> \ 
+           %else
+             %if SLibAutosarCompilerAbstractionRequired()
+             %assign definition = ...
+               "%<staticFlag>%<SLibAutosarCompilerAbstractionForDataDecl(TLC_FALSE, dataType, TLC_FALSE, TLC_FALSE, argName, "DataGlobal")> = %<ground>;"
+             %else
+               %assign definition = ...
+                 "%<staticFlag>%<dataType> %<argName> = %<ground>;"
+               %endif
+             /* '%<extInp.BlockName>' */
+             %<SLibApplyMemSecToDataDefn(definition, ...
+               "MemSecDataIO", "%<LibGetExternalInputStruct()>")> \ 
+           %endif
+          %endif          
+        %endforeach %% NumArgSpecData
+      %endwith %%fcnData
+      
+      %with fcnData
+        %foreach idx = NumArgSpecData
+          %assign spec = ArgSpecData[idx]
+          
+          %if spec.Category == "None" || spec.SLObjectType == "Inport"
+            %continue
+          %endif
+          
+          %assign staticFlag = "static "
+          %assign extOut       = ExternalOutputs.ExternalOutput[spec.PortNum]
+          %assign portWidth    = LibGetRecordWidth(extOut)
+          %assign dataType     = LibGetRecordDataTypeName(extOut, "")
+          %assign sysIdx       = extOut.Block[0]
+          %assign blkIdx       = extOut.Block[1]
+          %assign outportBlock = System[sysIdx].Block[blkIdx]
+          %assign argName = spec.ArgName
+          
+          %if portWidth > 1
+            %if SLibAutosarCompilerAbstractionRequired()
+              %assign definition = "%<staticFlag>%<SLibAutosarCompilerAbstractionForDataDecl(TLC_FALSE, dataType, TLC_FALSE, TLC_FALSE, "%<argName>[%<portWidth>]", "DataGlobal")>;"
+            /* '%<outportBlock.Name>' */
+            %else
+              %assign definition = "%<staticFlag>%<dataType> " ...
+                "%<argName>[%<portWidth>];"
+              /* '%<outportBlock.Name>' */
+            %endif
+            %<SLibApplyMemSecToDataDefn(definition, "MemSecDataIO", ...
+              "%<LibGetExternalOutputStruct()>")> \ 
+          %else
+            %if NumContStates > 0 && spec.Category == "Pointer"
+              %if SLibAutosarCompilerAbstractionRequired()
+                %assign definition = "%<staticFlag>%<SLibAutosarCompilerAbstractionForDataDecl(TLC_FALSE, dataType, TLC_FALSE, TLC_FALSE, "local_%<argName>", "DataGlobal")>;"
+                /* '%<outportBlock.Name>' */
+              %else
+                %assign definition = "%<staticFlag>%<dataType> local_%<argName>;"
+                /* '%<outportBlock.Name>' */
+              %endif
+              %<SLibApplyMemSecToDataDefn(definition, "MemSecDataIO", ...
+                "%<LibGetExternalOutputStruct()>")> \ 
+              %if SLibAutosarCompilerAbstractionRequired()
+                %assign definition = "%<staticFlag>%<SLibAutosarCompilerAbstractionForDataDecl(TLC_FALSE, dataType, TLC_TRUE, TLC_FALSE, argName, "DataGlobal")> = &local_%<argName>;"
+              %else
+                %assign definition = "%<staticFlag>%<dataType> * %<argName> = &local_%<argName>;"
+              %endif
+              %<SLibApplyMemSecToDataDefn(definition, "MemSecDataIO", ...
+                "%<LibGetExternalOutputStruct()>")> \
+            %else
+              %if SLibAutosarCompilerAbstractionRequired()
+                %assign definition = "%<staticFlag>%<SLibAutosarCompilerAbstractionForDataDecl(TLC_FALSE, dataType, TLC_FALSE, TLC_FALSE, argName, "DataGlobal")>;"
+                /* '%<outportBlock.Name>' */
+              %else
+                %assign definition = "%<staticFlag>%<dataType> %<argName>;"
+                /* '%<outportBlock.Name>' */
+              %endif
+              %<SLibApplyMemSecToDataDefn(definition, "MemSecDataIO", ...
+                "%<LibGetExternalOutputStruct()>")> \ 
+            %endif
+          %endif          
+        %endforeach %%NumArgSpecData
+      %endwith %%fcnData
+     %endif     
+  %closefile tmpFcnBuf
+  
+  %return tmpFcnBuf
+%endfunction
+
+%% Keep this function for backward compatibility. Since the variable declared is not always global, 
+%% The function is renamed to SLibDeclareFcnProtoCtlVariables(). However, since the function is 
+%% used by down stream target teams, the old function continues to work to maintain backward compatibility. 
+%function SLibDeclareFcnProtoCtlGlobalVariables() void
+  %return SLibDeclareFcnProtoCtlVariables()
+%endfunction
+
+
+%function SLibDeclareGlobalVariablesForCPPClass() void
+    %if GenerateClassInterface
+      %assign classConfObj = FcnGetRTWCPPStepPrototypeRecord()
+      %if classConfObj.noArgOnList
+        %% GlobalAccess' case requires no 
+        %% Global variable other than the object, since they
+        %% will be class scope fields.
+        
+        %openfile tmpFcnBuf
+             static %<CPPClassName> %<CPPObjectName>;  /* Instance of model class */
+        %closefile tmpFcnBuf
+        
+        %return tmpFcnBuf
+      %endif
+
+      %openfile tmpFcnBuf
+         static %<CPPClassName> %<CPPObjectName>;  /* Instance of model class */
+       
+         %with classConfObj
+           %foreach idx = NumArgSpecData
+             %assign spec = ArgSpecData[idx]
+          
+             %if spec.Category == "None" || spec.SLObjectType == "Outport"
+               %continue
+             %endif
+          
+             %assign staticFlag = "static "
+             %assign extInp    = ExternalInputs.ExternalInput[spec.PortNum]
+             %assign dataType  = LibGetRecordDataTypeName(extInp, "")
+             %assign portWidth = LibGetRecordWidth(extInp)
+             %assign dTypeId   = LibGetRecordDataTypeId(extInp)
+             %assign ground = "%<LibGetGroundInitFromId(dTypeId)>"
+             %if LibGetRecordIsComplex(extInp)
+               %assign ground = "{" + ground + ", " + ground + "}"
+             %endif
+             %assign argName = spec.ArgName
+          
+             %if portWidth > 1
+               %assign initializer = "{"
+               %foreach idx = (portWidth-1)
+                 %assign initializer = initializer + ground + ", "
+               %endforeach
+               %assign initializer = initializer + ground + "}"
+               %assign definition = ...
+                     "%<staticFlag>%<dataType> %<argName>[%<portWidth>] = %<initializer>;"
+               /* '%<extInp.BlockName>' */
+                 %<SLibApplyMemSecToDataDefn(definition, ...
+                   "MemSecDataIO", "%<LibGetExternalInputStruct()>")> \
+             %else
+               %if NumContStates > 0 && spec.Category == "Pointer"
+                 %assign definition = ...
+                   "%<staticFlag>%<dataType> local_%<argName> = %<ground>;"
+                 
+                 /* '%<extInp.BlockName>' */
+                 %<SLibApplyMemSecToDataDefn(definition, ...
+                   "MemSecDataIO", "%<LibGetExternalInputStruct()>")> \ 
+
+                 %assign definition = ...
+                   "%<staticFlag>%<dataType> * %<argName> = &local_%<argName>;"
+
+                 %<SLibApplyMemSecToDataDefn(definition, ...
+                   "MemSecDataIO", "%<LibGetExternalInputStruct()>")> \ 
+               %else
+                 %assign definition = ...
+                   "%<staticFlag>%<dataType> %<argName> = %<ground>;"
+                 /* '%<extInp.BlockName>' */
+                 %<SLibApplyMemSecToDataDefn(definition, ...
+                   "MemSecDataIO", "%<LibGetExternalInputStruct()>")> \
+               %endif
+             %endif
+             
+           %endforeach %% NumArgSpecData
+         %endwith %%classConfObj
+         
+         %with classConfObj
+           %foreach idx = NumArgSpecData
+             %assign spec = ArgSpecData[idx]
+             
+             %if spec.Category == "None" || spec.SLObjectType == "Inport"
+               %continue
+             %endif
+             
+             %assign staticFlag = "static "
+             %assign extOut       = ExternalOutputs.ExternalOutput[spec.PortNum]
+             %assign portWidth    = LibGetRecordWidth(extOut)
+             %assign dataType     = LibGetRecordDataTypeName(extOut, "")
+             %assign sysIdx       = extOut.Block[0]
+             %assign blkIdx       = extOut.Block[1]
+             %assign outportBlock = System[sysIdx].Block[blkIdx]
+             %assign argName = spec.ArgName
+             
+             %if portWidth > 1
+               %assign definition = "%<staticFlag>%<dataType> " ...
+                     "%<argName>[%<portWidth>];"
+  
+                 /* '%<outportBlock.Name>' */
+               %<SLibApplyMemSecToDataDefn(definition, "MemSecDataIO", ...
+               "%<LibGetExternalOutputStruct()>")> \ 
+             %else
+               %if NumContStates > 0 && spec.Category == "Pointer"
+                 %assign definition = "%<staticFlag>%<dataType> local_%<argName>;"
+
+                 /* '%<outportBlock.Name>' */
+                 %<SLibApplyMemSecToDataDefn(definition, "MemSecDataIO", ...
+                   "%<LibGetExternalOutputStruct()>")> \ 
+                 %assign definition = "%<staticFlag>%<dataType> * %<argName> = &local_%<argName>;"
+
+                 %<SLibApplyMemSecToDataDefn(definition, "MemSecDataIO", ...
+                   "%<LibGetExternalOutputStruct()>")> \
+               %else
+                 %assign definition = "%<staticFlag>%<dataType> %<argName>;"
+
+                 /* '%<outportBlock.Name>' */
+                 %<SLibApplyMemSecToDataDefn(definition, "MemSecDataIO", ...
+                   "%<LibGetExternalOutputStruct()>")> \ 
+               %endif
+             %endif
+             
+           %endforeach %%NumArgSpecData
+         %endwith %%classConfObj
+         
+      %closefile tmpFcnBuf
+      
+      %return tmpFcnBuf       
+     
+    %else      
+      %return ""
+    %endif %%%%%% GenerateClassInterface
+
+%endfunction
+
+%function SLibDeclareModelFcnArgs(useStatic) void
+
+  %if !MultiInstanceERTCode
+    %return ""
+  %endif
+  
+  %assign recArgs = []
+  %assign rootSystem = System[NumSystems-1]
+
+  %assign reqInsts = LibGetSystemField(rootSystem, "ReqRootPrmHdrDataInsts")
+
+  %assign static = useStatic ? "static" : ""
+  
+  %openfile tmpFcnBuf
+  %if !reqInsts.SimStructInst && !EmptyRealTimeObject && ...
+    !GenerateClassInterface
+    %if FcnIsERTMalloc()
+      %<tSimStructType> %<tSimStruct>;
+    %else
+      %assign definition = ...
+        "%<static> %<tSimStructType> %<tSimStruct>_;"
+      %% SLibAutosarCompilerAbstraction not needed as MultiInstance not supported
+      %<SLibApplyMemSecToDataDefn(definition, ...
+        "MemSecDataInternal", "%<tSimStruct>_")>\
+      %assign definition = ...
+        "%<static> %<tSimStructType> *const %<tSimStruct> = " ...
+        "&%<tSimStruct>_; /* Real-time model */"
+      %% SLibAutosarCompilerAbstraction not needed as MultiInstance not supported
+      %<SLibApplyMemSecToDataDefn(definition, ...
+        "MemSecDataInternal", "%<tSimStruct>")>\
+    %endif
+  %endif
+  %if !reqInsts.ParamsInst && ...
+    !SLibPrmBufferIsEmpty("SimulinkGlobal", "Instance") && ...
+    !GenerateClassInterface
+    %if  FcnIsERTMalloc()
+      %<tParametersType> %<LibGetParametersStruct()>;
+    %else
+      %openfile definition
+      %<static> %<tParametersType> %<LibGetParametersStruct()> = {
+        %<SLibGetPrmBuffer("SimulinkGlobal", "Instance")>
+      }; /* Modifiable parameters */\
+      %closefile definition
+      %% SLibAutosarCompilerAbstraction not needed as MultiInstance not supported
+      %<SLibApplyMemSecToDataDefn(definition, ...
+        "MemSecDataParameters", "%<LibGetParametersStruct()>")>\
+    %endif
+  %endif
+  %if !reqInsts.BlockIOInst && !LibBlockIOInstanceIsEmpty() && ...
+    !GenerateClassInterface
+    %assign definition = ...
+      "%<static> %<tBlockIOType> %<LibGetBlockIOStruct()>; /* Observable signals */"
+    %% SLibAutosarCompilerAbstraction not needed as MultiInstance not supported
+    %<SLibApplyMemSecToDataDefn(definition, ...
+      "MemSecDataInternal", "%<LibGetBlockIOStruct()>")>\
+  %endif
+  %if !reqInsts.DworkInst && !LibDWorkInstanceIsEmpty() && !GenerateClassInterface
+    %assign definition = ...
+      "%<static> %<tDWorkType> %<LibGetDWorkStruct()>; /* Observable states */"
+    %% SLibAutosarCompilerAbstraction not needed as MultiInstance not supported
+    %<SLibApplyMemSecToDataDefn(definition, ...
+      "MemSecDataInternal", "%<LibGetDWorkStruct()>")>\
+  %endif
+  %if !reqInsts.ContStatesInst && !LibContStatesInstanceIsEmpty() && ...
+    !GenerateClassInterface
+    %assign definition = ...
+      "%<static> %<tContStateType> %<LibGetContinuousStateStruct()>; " ...
+      "/* Observable continuous states */"
+    %% SLibAutosarCompilerAbstraction not needed as MultiInstance not supported
+    %<SLibApplyMemSecToDataDefn(definition, ...
+      "MemSecDataInternal", "%<LibGetContinuousStateStruct()>")>\
+  %endif
+  %if !reqInsts.PrevZCStatesInst && !LibPrevZCStatesInstanceIsEmpty() && ...
+    !GenerateClassInterface
+    %assign definition = ...
+      "%<static> %<tPrevZCStateType> %<LibGetPreviousZCStruct()>; " ...
+      "/* Triggered events */"
+    %% SLibAutosarCompilerAbstraction not needed as MultiInstance not supported
+    %<SLibApplyMemSecToDataDefn(definition, ...
+      "MemSecDataInternal", "%<LibGetPreviousZCStruct()>")>\
+  %endif
+  %if !reqInsts.ExtInpsInst && !LibExternalInputsInstanceIsEmpty() &&...
+    !GenerateClassInterface
+    %if RootIOStructures
+      %assign definition = ...
+        "%<static> %<tInputType> %<LibGetExternalInputStruct()>; /* External inputs */"
+      %% SLibAutosarCompilerAbstraction not needed as MultiInstance not supported
+      %<SLibApplyMemSecToDataDefn(definition, ...
+        "MemSecDataIO", "%<LibGetExternalInputStruct()>")>\
+    %else
+      %foreach idx = ExternalInputs.NumExternalInputs 
+	%assign extInp = ExternalInputs.ExternalInput[idx]
+	%with extInp
+	  %if extInp.StorageClass != "Auto" 
+	    %continue
+	  %endif
+          %assign id = LibGetRecordIdentifier(extInp)
+          %assign qfd_id = "%<LibGetExternalInputStruct()>%<UQualifier>%<id>"
+	  %assign dataType  = SLibGetRecordDataTypeName(extInp, "")
+          %assign cgType = ::CompiledModel.CGTypes.CGType[extInp.CGTypeIdx]
+          %assign align=""
+          %if cgType.Constructor != "struct" && extInp.Alignment > 0
+            %assign align = SLibGetAlignmentSyntax(::CompiledModel.Name, qfd_id, dataType, ...
+                                                   extInp.Alignment, "DATA_ALIGNMENT_GLOBAL_VAR")
+          %endif          
+          /* '%<extInp.BlockName>' */
+	  %if LibGetRecordWidth(extInp) > 1
+            %assign plainDef = "%<static> %<dataType> %<qfd_id>[%<LibGetRecordWidth(extInp)>];"
+	  %else
+            %assign plainDef = "%<static> %<align> %<dataType> %<qfd_id>;"
+          %endif
+          %if !ISEMPTY(align)
+            %assign definition = LibGlobalDefinitionWithAlignment(plainDef, "", align)
+          %else
+            %assign definition = plainDef
+          %endif          
+          %<SLibApplyMemSecToDataDefn(definition, ...
+            "MemSecDataIO", "%<LibGetExternalInputStruct()>")> \	  
+	%endwith
+      %endforeach
+    %endif
+  %endif
+  %if !reqInsts.ExtOutputsInst && !LibExternalOutputsInstanceIsEmpty() && ...
+    !GenerateClassInterface
+    %if RootIOStructures
+      %assign definition = ...
+        "%<static> %<tOutputType> %<LibGetExternalOutputStruct()>; /* External outputs */"
+      %% SLibAutosarCompilerAbstraction not needed as MultiInstance not supported
+      %<SLibApplyMemSecToDataDefn(definition, ...
+        "MemSecDataIO", "%<LibGetExternalOutputStruct()>")>\
+    %else
+      %foreach idx = ExternalOutputs.NumExternalOutputs
+	%assign extOut       = ExternalOutputs.ExternalOutput[idx]
+	%assign sysIdx       = extOut.Block[0]
+	%assign blkIdx       = extOut.Block[1]
+	%assign outportBlock = System[sysIdx].Block[blkIdx]
+	%if SLibExternalOutputIsVirtual(outportBlock)
+	  %continue
+	%endif
+	%with outportBlock
+	  %assign portWidth = LibBlockInputSignalWidth(0)
+	  %assign dataType  = LibBlockInputSignalDataTypeName(0, "")
+	%endwith
+        %assign id = LibGetRecordIdentifier(outportBlock)
+        %assign qfd_id = "%<LibGetExternalOutputStruct()>%<YQualifier>%<id>"
+        %assign cgType = ::CompiledModel.CGTypes.CGType[extOut.CGTypeIdx]
+        %assign align=""
+        %if cgType.Constructor != "struct" && extOut.Alignment > 0
+          %assign align = SLibGetAlignmentSyntax(::CompiledModel.Name, qfd_id, dataType, ...
+                                                 extOut.Alignment, "DATA_ALIGNMENT_GLOBAL_VAR")
+        %endif          
+        /* '%<outportBlock.Name>' */
+	%if portWidth > 1
+          %assign plainDef = "%<static> %<dataType> %<qfd_id>[%<portWidth>];"
+        %else
+          %assign plainDef = "%<static> %<align> %<dataType> %<qfd_id>;"
+        %endif
+        %if !ISEMPTY(align)
+          %assign definition = LibGlobalDefinitionWithAlignment(plainDef, "", align)
+        %else
+          %assign definition = plainDef
+        %endif
+        %<SLibApplyMemSecToDataDefn(definition, ...
+          "MemSecDataIO", "%<LibGetExternalOutputStruct()>")> \
+      %endforeach
+    %endif
+  %endif
+  %closefile tmpFcnBuf
+   
+  %if FcnIsERTMalloc()
+    %assert WHITE_SPACE(static)
+    %openfile typeDefBuf
+    typedef struct model_data_struct {
+      %<tmpFcnBuf>
+    } model_data_struct;
+    %closefile typeDefBuf
+    %return typeDefBuf
+  %else
+    %return tmpFcnBuf
+  %endif
+  
+%endfunction %% SLibDeclareModelFcnArgs(useStatic) void
+
+%endif %% _ERT_MODEL_ARG_

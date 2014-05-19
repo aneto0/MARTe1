@@ -1,0 +1,54 @@
+%if EXISTS("_SAMLIB_AUTOSAR_") == 0
+%assign _SAMLIB_AUTOSAR_ = 1
+
+%%
+%% SAM support library for Autosar
+%%
+
+%function LibSamGetFileName(swcName) void
+  %assign fileName = "Rte_" + swcName
+  %return fileName
+%endfunction
+
+%function LibSamCreateHeaderFile(swcName) void
+  %% Header name according to RTE spec.
+  %assign fileName = LibSamGetFileName(swcName)
+  %assign fileH    = LibCreateSourceFile("Header", "SCP", fileName)
+  %<SLibSetModelFileAttribute(fileH, "Group", "")>
+  %assign incStat  = LibSamHashInclude("Rte")
+  %<LibSetSourceFileSection(fileH, "Includes", incStat)>
+  %<SLibSamCreateRteH()>
+  %return fileH
+%endfunction
+
+%function LibSamCreateSourceFile(swcName) void
+  %% Source name according to RTE spec.
+  %assign fileName = LibSamGetFileName(swcName)
+  %assign fileC    = LibCreateSourceFile("Source", "SCP", fileName)
+  %<SLibSetModelFileAttribute(fileC, "Group", "")>
+  %assign incStat  = LibSamHashInclude(::CompiledModel.Name + "_types")
+  %<LibSetSourceFileSection(fileC, "Includes", incStat)>
+  %assign incStat  = LibSamHashInclude(fileName)
+  %<LibSetSourceFileSection(fileC, "Includes", incStat)>
+  %openfile defs
+  #define UNUSED_PARAMETER(x) (void)x;
+  %closefile defs
+  %<LibSetSourceFileSection(fileC, "Defines", defs)>
+  %return fileC
+%endfunction
+
+%function SLibSamCreateRteH() void
+  %assign fileName = "Rte"
+  %assign fileH = LibCreateSourceFile("Header", "SCP", fileName)
+  %<SLibSetModelFileAttribute(fileH, "Group", "")>
+
+  %% Place default definitions in Rte.h
+  %openfile buf
+  /* Autosar standard types. */
+  %% For instance: typedef uint8_T Std_ReturnType;
+  %closefile buf
+  %<LibSetSourceFileSection(fileH, "Typedefs", buf)>
+%endfunction
+
+%endif %% _SAMLIB_AUTOSAR_
+

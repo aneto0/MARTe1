@@ -1,0 +1,260 @@
+%% ==============================================================================
+%% 
+%% 
+%% 
+%%
+%% Abstract:
+%%   This system file creates code for the model.h file.
+%%
+%% Copyright 1994-2011 The MathWorks, Inc.
+%% 
+%selectfile NULL_FILE
+
+%include "formatrtm.tlc"
+
+%if EXISTS("_FORMATEXPORT_") == 0
+%assign _FORMATEXPORT_ = 1
+
+%realformat "CONCISE"
+
+%%*****************************************************************************
+%% NOTE: This file is not used for model reference. If you are updating
+%% this file, please update ModelrefHandleExportFileInfo in
+%% formatmodelref.tlc file.
+%%
+%assert (!IsModelReferenceTarget())
+
+
+%% Function: SLibFormatExport ==================================================
+%% Abstract:
+%%   Function to create and cache exported symbols in the model.h file sections.
+%%
+%function SLibFormatExport() void
+  
+  %assign isSfcnForm = (CodeFormat == "S-Function")
+  
+  %if SLibIsERTCodeFormat() &&  ...
+    (!GenerateGRTWrapper || ExtMode || NumContStates)
+    %% Export model functions
+    %%
+    %%   Initialize function
+    %%
+    %assign rootSystem = System[NumSystems-1]
+    %openfile entryPointFcns
+
+    %if ::GenCPP
+    #ifdef __cplusplus
+    %<::ExternCPrefix> {
+    #endif
+    %endif
+    %if !SLibAutosarActive()
+      /* Model entry point functions */
+    %endif
+    %if SLibHasSetEventsForThisBaseRateFcn()
+      %<SLibGetFcnMemSecPragmaOnDecl("%<Name>_SetEventsForThisBaseStep", "MemSecFuncInitTerm", "Pre")>\
+      %if MultiInstanceERTCode
+        %<LibExternInFcnDecls()>void %<Name>_SetEventsForThisBaseStep(boolean_T *eventFlags, %<tSimStructType> *const rtm);
+      %else
+        %<LibExternInFcnDecls()>void %<Name>_SetEventsForThisBaseStep(boolean_T *eventFlags);
+      %endif       
+      %<SLibGetFcnMemSecPragmaOnDecl("%<Name>_SetEventsForThisBaseStep", "MemSecFuncInitTerm", "Post")>\
+    %endif
+    %% Use the exact same condition as in ertreg.tlc:
+    %if !IsModelReferenceTarget() && LibSamActive() && LibSamHasInitRunnable()
+      %% pragma is added by LibSamDeclareInitTerm()
+      %<LibSamDeclareInit()>
+    %elseif !SLibAutosarActive()
+      %<SLibGetFcnMemSecPragmaOnDecl(SLibModelInitFcnName(), "MemSecFuncInitTerm", "Pre")>\
+      %<LibExternInFcnDecls()>void %<SLibModelInitFcnName()>(%<SLibModelFcnArgs("Initialize",TLC_FALSE,"")>);
+      %<SLibGetFcnMemSecPragmaOnDecl(SLibModelInitFcnName(), "MemSecFuncInitTerm", "Post")>\
+    %endif
+    %%
+    %%   step function(s)
+    %%
+    %if ExportFunctionsMode > 0
+      %assign rootSystem = System[NumSystems-1]
+      %foreach id = rootSystem.NumChildSystems
+        %assign systemId = rootSystem.ChildSystems[id][0]
+        %assign system = System[systemId]
+        %if SLibSystemIsModelEntryPoint(system,"") && ...
+          !LibSystemFcnIsEmpty(system,"OutputUpdate")
+          %if SLibAutosarActive()
+            %assign sysTid = FcnGetSubsystemTID(system,TLC_TRUE)
+            %assign fcnRecord = LibGetSystemField(system, "OutputUpdateTID%<sysTid>FcnInfo")
+          %else 
+            %assign fcnRecord = LibGetSystemField(system, "OutputUpdateFcnInfo")
+          %endif
+          %<SLibGetFcnMemSecPragmaForSystemOnDecl(fcnRecord.Name, "MemSecFuncExecute", "Pre", system)>\
+          %<LibExternInFcnDecls()>%<fcnRecord.FcnPrototype>;
+          %<SLibGetFcnMemSecPragmaForSystemOnDecl(fcnRecord.Name, "MemSecFuncExecute", "Post", system)>\
+          %if !LibSystemFcnIsEmpty(system, "Enable")
+            %assign fcnRecord = LibGetSystemField(system, "EnableFcnInfo")
+            %<SLibGetFcnMemSecPragmaForSystemOnDecl(fcnRecord.Name, "MemSecFuncExecute", "Pre", system)>\
+            %<LibExternInFcnDecls()>%<fcnRecord.FcnPrototype>;
+            %<SLibGetFcnMemSecPragmaForSystemOnDecl(fcnRecord.Name, "MemSecFuncExecute", "Post", system)>\
+          %endif
+          %if !LibSystemFcnIsEmpty(system, "Disable")
+            %assign fcnRecord = LibGetSystemField(system, "DisableFcnInfo")
+            %<SLibGetFcnMemSecPragmaForSystemOnDecl(fcnRecord.Name, "MemSecFuncExecute", "Pre", system)>\
+            %<LibExternInFcnDecls()>%<fcnRecord.FcnPrototype>;
+            %<SLibGetFcnMemSecPragmaForSystemOnDecl(fcnRecord.Name, "MemSecFuncExecute", "Post", system)>\
+          %endif
+        %endif
+      %endforeach
+    %endif
+    %% -SAM-
+    %if LibSamActive()
+      %% Don't output step functions for SCP, only functions we export in module scope.
+      %<LibSamGenPrototypes(TLC_TRUE)>
+    %else
+      %foreach tid = NumSynchronousSampleTimes
+        %if  SLibSystemIsModelEntryPoint(rootSystem, tid)
+          %assign rootSystem.CurrentTID = tid
+          %if CombineOutputUpdateFcns
+            %<SLibGetFcnMemSecPragmaOnDecl(SLibModelStepFcnName(tid), "MemSecFuncExecute", "Pre")>\
+            %if (tid == 0) && (NumContStates > 0)
+              %<LibExternInFcnDecls()>%<SLibModelStepFcnReturn("ReturnType")> %<SLibModelStepFcnName(tid)>(%<SLibModelFcnArgs("UpdateContStates" ,TLC_FALSE,tid)>);
+            %else
+              %<LibExternInFcnDecls()>%<SLibModelStepFcnReturn("ReturnType")> %<SLibModelStepFcnName(tid)>(%<SLibModelFcnArgs("OutputUpdate",TLC_FALSE,tid)>);
+            %endif
+            %<SLibGetFcnMemSecPragmaOnDecl(SLibModelStepFcnName(tid), "MemSecFuncExecute", "Post")>\
+          %else
+            %assign outputFcnName = "%<Name>_output%<tid>"
+            %<SLibGetFcnMemSecPragmaOnDecl(outputFcnName, "MemSecFuncExecute", "Pre")>\
+            %<LibExternInFcnDecls()>void %<outputFcnName>(%<SLibModelFcnArgs("Output",TLC_FALSE,tid)>);
+            %<SLibGetFcnMemSecPragmaOnDecl(outputFcnName, "MemSecFuncExecute", "Post")>\
+            %assign outputFcnName = "%<Name>_update%<tid>"
+            %<SLibGetFcnMemSecPragmaOnDecl(outputFcnName, "MemSecFuncExecute", "Pre")>\
+            %if (tid == 0) && (NumContStates > 0) 
+              %<LibExternInFcnDecls()>void %<outputFcnName>(%<SLibModelFcnArgs("UpdateContStates",TLC_FALSE,tid)>);
+            %else
+              %<LibExternInFcnDecls()>void %<outputFcnName>(%<SLibModelFcnArgs("RootUpdate",TLC_FALSE,tid)>);
+            %endif
+            %<SLibGetFcnMemSecPragmaOnDecl(outputFcnName, "MemSecFuncExecute", "Post")>\
+          %endif
+        %endif
+      %endforeach
+      %if SLibSystemIsModelEntryPoint(rootSystem, "")
+        %assign rootSystem.CurrentTID = ""
+        %if CombineOutputUpdateFcns
+          %<SLibGetFcnMemSecPragmaOnDecl(SLibModelStepFcnName(""), "MemSecFuncExecute", "Pre")>\
+          %if (NumContStates > 0)
+            %<LibExternInFcnDecls()>%<SLibModelStepFcnReturn("ReturnType")> %<SLibModelStepFcnName("")>(%<SLibModelFcnArgs("UpdateContStates",TLC_FALSE,"")>);
+          %else
+            %<LibExternInFcnDecls()>%<SLibModelStepFcnReturn("ReturnType")> %<SLibModelStepFcnName("")>(%<SLibModelFcnArgs("OutputUpdate",TLC_FALSE,"")>);
+          %endif
+          %<SLibGetFcnMemSecPragmaOnDecl(SLibModelStepFcnName(""), "MemSecFuncExecute", "Post")>\
+        %else
+          %assign outputFcnName = "%<Name>_output"
+          %<SLibGetFcnMemSecPragmaOnDecl(outputFcnName, "MemSecFuncExecute", "Pre")>\
+          %<LibExternInFcnDecls()>void %<outputFcnName>(%<SLibModelFcnArgs("Output",TLC_FALSE,"")>);
+          %<SLibGetFcnMemSecPragmaOnDecl(outputFcnName, "MemSecFuncExecute", "Post")>\
+          %assign outputFcnName = "%<Name>_update"
+          %<SLibGetFcnMemSecPragmaOnDecl(outputFcnName, "MemSecFuncExecute", "Pre")>\
+          %if (NumContStates > 0)
+            %<LibExternInFcnDecls()>void %<outputFcnName>(%<SLibModelFcnArgs("UpdateContStates",TLC_FALSE,"")>);
+          %else
+            %<LibExternInFcnDecls()>void %<outputFcnName>(%<SLibModelFcnArgs("RootUpdate",TLC_FALSE,"")>);
+          %endif
+          %<SLibGetFcnMemSecPragmaOnDecl(outputFcnName, "MemSecFuncExecute", "Post")>\
+        %endif
+      %endif
+    %endif
+    %%
+    %%   terminate function
+    %%
+    %% Use the exact same condition as in ertreg.tlc:
+    %if !IsModelReferenceTarget() && LibSamActive() && LibSamHasTermRunnable()
+      %<LibSamDeclareTerm()>
+    %elseif IncludeMdlTerminateFcn == 1
+      %assign termFcnName = "%<Name>_terminate"
+      %<SLibGetFcnMemSecPragmaOnDecl(termFcnName, "MemSecFuncInitTerm", "Pre")>\
+      %<LibExternInFcnDecls()>void %<termFcnName>(%<SLibModelFcnArgs("Terminate",TLC_FALSE,"")>);
+      %<SLibGetFcnMemSecPragmaOnDecl(termFcnName, "MemSecFuncInitTerm", "Post")>\
+    %endif
+    %if ::GenCPP
+    #ifdef __cplusplus
+    }
+    #endif
+    %endif
+    %%
+    %% Enable and Disable functions
+    %%
+    %if EnableGenerated == 1
+      %assign modelEnable = "%<Name>_enable"
+      %<SLibGetFcnMemSecPragmaOnDecl(modelEnable, "MemSecFuncExecute", "Pre")>\
+      %<LibExternInFcnDecls()>void %<modelEnable>(%<SLibModelFcnArgs("Enable",TLC_FALSE,"")>);
+      %<SLibGetFcnMemSecPragmaOnDecl(modelEnable, "MemSecFuncExecute", "Post")>\
+    %endif
+    %if DisableGenerated == 1
+      %assign modelDisable = "%<Name>_disable"
+      %<SLibGetFcnMemSecPragmaOnDecl(modelDisable, "MemSecFuncExecute", "Pre")>\
+      %<LibExternInFcnDecls()>void %<modelDisable>(%<SLibModelFcnArgs("Disable",TLC_FALSE,"")>);
+      %<SLibGetFcnMemSecPragmaOnDecl(modelDisable, "MemSecFuncExecute", "Post")>\
+    %endif
+    %closefile entryPointFcns
+    
+    %%
+    %% Suppress extern declarations of functions for wrapper C++ class generation
+    %%
+    %if !GenerateClassInterface
+      %<SLibCacheCodeToFile("mdl_entryPointFcn_decl", entryPointFcns)>
+    %endif
+    %undef entryPointFcns
+  %endif
+  
+  
+  %openfile externDataBuf
+  %% ===========================================================================
+  %% Add typedefs that support the profiler
+  %%
+  %<SLibGenProfTypeDef()>\
+  %%
+  %closefile externDataBuf
+  %<SLibCacheCodeToFile("mdl_profiler_typedef", externDataBuf)>
+  %undef externDataBuf
+  
+  
+  %% =========================================================================
+  %% Information related to the rtModel
+  %%
+  %assign rtmRet = SLibGenRTMTypedefAndMacros()
+  %if !WHITE_SPACE(rtmRet[0])
+    %% This is type decl, instead of "typedef".  Put into Typedefs symbol instead
+    %% of Declarations symbol.  Consistant with formatmodelref.tlc
+    %<SLibCacheCodeToFile("data_rtmodel_typedef", rtmRet[0])>
+  %endif
+  %if !WHITE_SPACE(rtmRet[1])
+    %<SLibCacheCodeToFile("baseMdl_hdr_define", rtmRet[1])>
+  %endif
+  %if !WHITE_SPACE(rtmRet[2])
+    %<SLibCacheCodeToFile("baseMdl_data_decl", rtmRet[2])>
+  %endif
+  %undef rtmRet
+  
+  %% -SAM-
+  %if LibSamActive() && !LibSamIsCpp()
+    %openfile taskCounterDecls
+      %<LibSamDeclareTaskCounters(TLC_TRUE)>
+    %closefile taskCounterDecls
+    %<SLibCacheCodeToFile("baseMdl_data_decl", taskCounterDecls)>
+  %endif
+
+  %if GenRTModel && !EmptyRealTimeObject
+    %openfile opaqTypedefBuf
+    %<RTMsGenOpaqueTypedef(::CompiledModel.System[NumSystems-1])>\
+    %closefile opaqTypedefBuf
+    %<SLibCacheCodeToFile("mdl_data_typedef", opaqTypedefBuf)>
+    %undef opaqTypedefBuf
+  %endif
+  
+  %<SLibGenRTModelHFile()>
+  
+  %undef baseFile
+  %undef isSfcnForm
+
+%endfunction
+
+%endif %% _FORMATEXPORT_
+
+%% [EOF] formatexport.tlc

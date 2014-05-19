@@ -1,0 +1,2892 @@
+%% 
+%%  
+%% 
+%%
+%% Copyright 1994-2012 The MathWorks, Inc.
+%%
+%% Abstract: Library of functions for generating ASAP2 data definition file.
+%%
+%selectfile NULL_FILE
+
+
+%% Function: SLibASAP2WriteDynamicContents =====================================
+%% Abstract:
+%%      Main function for output of model-dependent portion of ASAP2 file.
+%%      Sections:
+%%      - RECORD_LAYOUTS
+%%      - CHARACTERISTICS (Loop through ParameterGroups & ModelParameters)
+%%      - MEASUREMENTS    (Loop through ExternalInputs & BlockOutputs)
+%%      - COMPU_METHODS
+%%
+%function SLibASAP2WriteDynamicContents() Output
+%with ::CompiledModel
+  %<FcnOutputRecordLayouts()> \
+  %if InvariantConstants == "yes"
+    %<FcnLoopThruParamGroups()> \
+    %<FcnLoopThruModelParameters()> \
+  %else
+    %assign warnTxt="Inline Parameters must be ON to output CHARACTERISTICS"
+    %<LibReportWarning(warnTxt)>\
+    /* WARNING: %<warnTxt>  */
+  %endif
+  %if !IsModelReferenceTarget()
+    %<FcnLoopThruExternalInputs()> \
+    %<FcnLoopThruExternalOutputs()> \
+  %endif
+  %<FcnLoopThruBlockOutputs()> \
+  %<FcnLoopThruDWorks()> \
+  %<FcnOutputCompuMethods()> \
+  %<FcnOutputRecordLayoutsForSTDAxis()> \
+%endwith
+%endfunction
+
+%% Function:  FcnAxisIsEvenlySpaced(value) =================================
+%% Abstract:
+%%      Returns TLC_TRUE if the elements in value are evenly-spaced.
+%%      Returns TLC_FALSE otherwise.
+%%
+%function FcnAxisIsEvenlySpaced(value)
+ %assign numAxisPoints = %<SIZE(value,1)>
+ %if numAxisPoints > 3   
+   %foreach idx = %<numAxisPoints-3>
+     %if ((value[idx+2] - value[idx+1]) != (value[idx+1] - value[idx]))
+       %% not evenly-spaced
+       %return TLC_FALSE
+     %else
+       %return TLC_TRUE
+     %endif
+   %endforeach
+  %elseif numAxisPoints == 3
+    %assign idx = 0
+    %if ((value[idx+2] - value[idx+1]) != (value[idx+1] - value[idx]))
+      %% not evenly-spaced
+      %return TLC_FALSE
+    %else
+      %return TLC_TRUE
+    %endif
+  %elseif numAxisPoints == 2
+     %% only 2 axis points so they are evenly spaced
+     %return TLC_TRUE
+  %else
+     %return TLC_FALSE
+  %endif
+%endfunction
+
+
+%% Function: FcnOutputRecordLayouts ============================================
+%% Abstract:
+%%      Outputs record layouts for all registered "Templates"
+%%      Templates are registered by users using LibASAP2RegisterTemplate()
+%%
+%%      Expects user-defined function with name:
+%%        "ASAP2UserFcnWriteRecordLayout_%<Template.Name>"
+%%
+%function FcnOutputRecordLayouts() Output
+  %with ::CompiledModel.Templates
+    %foreach idx = NumTemplates
+      %assign tmpVar = ASAP2UserFcnWriteRecordLayout_%<Template[idx].Name>()
+    %endforeach
+  %endwith
+%endfunction
+
+%% Function: FcnOutputRecordLayoutsForSTDAxis ==================================
+%% Abstract:
+%%      Outputs record layouts for all lookup tables supporting Standard 
+%%      Axis Format
+%%      
+%function FcnOutputRecordLayoutsForSTDAxis() Output
+  %assign recordLayouts = CompiledModel.ASAP2RecordLayouts.RecordLayouts
+  %assign numRecordLayouts = CompiledModel.ASAP2RecordLayouts.NumRecordLayouts
+  %assign recordLayoutNames = FIELDNAMES(recordLayouts)
+  %if numRecordLayouts > 0
+      /* Record Layouts for Lookup Tables in Standard Axis format */
+      
+  %endif
+  %foreach idx = numRecordLayouts
+    %assign recordLayout = recordLayouts.%<recordLayoutNames[idx]>
+    %assign LUTType = SIZE(recordLayout.STDAxisInfo,1)==3 ? "Lookup2D" : "Lookup1D"
+    %assign tmpVar = ...
+      ASAP2UserFcnWriteSTDAxisRecordLayout_%<LUTType>(recordLayout)
+  %endforeach
+ %endfunction
+
+%% Function: FcnLoopThroughNewLookupBlocks ===================================
+%% Abstract:
+%%   Generate ASAP2 characterisitcs for new lookup blocks
+%%     - Interpolation using Prelookup (Interpolation_n-D) 
+%%     - Lookup Table (n-D)
+%%     - Direct Lookup Table
+%%
+%%
+%function FcnLoopThroughNewLookupBlocks() void
+%with ::CompiledModel.BlockHierarchyMap
+  %createrecord portObj { SignalSrc [-1] SignalOffset [-1] Width 1 }
+  %createrecord directXPrm {Value []; OriginalDataTypeIdx 7; tableType "DirectLookup"}
+  %createrecord directYPrm {Value []; OriginalDataTypeIdx 7; tableType "DirectLookup"}
+  %foreach lookupIdx = LookupBlocksMap.NumLookupBlocks
+    %assign lkBlk    = LookupBlocksMap.LookupBlock[lookupIdx]
+    %assign thisBlock = Subsystem[lkBlk.GrSrc[0]].Block[lkBlk.GrSrc[1]]
+    %with thisBlock
+      %if ISEQUAL(Type, "LookupNDDirect")
+        %if (NumParameters != 1 || !Parameter[0].IsReference)
+          %continue
+        %endif
+        %assign tblBlkPrm   = Parameter[0]
+        %assign data = FcnGetGlobalMemoryMapData(tblBlkPrm)
+        %if !(FcnDataSupportsASAP2(data))
+          %% Early return
+          %continue
+        %endif
+        %assign tblPrm= ::CompiledModel.ModelParameters.Parameter[tblBlkPrm._idx]   
+        %assign tblPrmLayout = LibGetDataLayout(tblPrm)
+        %if (tblPrmLayout[1] > 2) 
+          %% Direct Lookup Tables with more than 2 dimensions or with column
+          %% outputs are not supported. Only 1D and 2D tables with single
+          %% element outputs are supported.
+          %continue
+        %elseif (tblPrmLayout[2][0] > 1) && (NumDataInputPorts == 2)
+          %% This is a Direct Lookup ND table with 2 dimensions and single 
+          %% element output
+          %% Create param group
+          %assign group = SLibCreateParameterGroup(thisBlock,"Lookup2D")
+          %assign directXPrm.Value = [0:%<tblPrmLayout[2][0]-1>]
+          %assign directYPrm.Value = [0:%<tblPrmLayout[2][1]-1>]
+          %assign tmpVar  = SLibAddMember(thisBlock, group, directXPrm)
+          %assign tmpVar  = SLibAddMember(thisBlock, group, directYPrm)
+          %assign tmpVar  = SLibAddMember(thisBlock, group, tblPrm)
+          %% Check input signals
+          %assign portObj.SignalSrc = DataInputPort[0].Region[0]._Source
+          %assign rowSig =  SLibGetSourceRecord(portObj, 0)
+          %assign rowName = ""
+          %if !ISEMPTY(rowSig) && FcnIsRecordDataTypeValidForASAP2(rowSig)
+            %assign rdata = FcnGetGlobalMemoryMapData(rowSig)
+            %if FcnRecordIsASAP2TestPointSignal(rowSig) || ...
+              FcnRecordIsASAP2ExternalInput(rowSig) || ...
+              FcnDataSupportsASAP2(rdata)
+              %assign rowName = LibASAP2GetSymbol(rowSig)
+            %endif
+          %endif        
+          %assign portObj.SignalSrc = DataInputPort[1].Region[0]._Source
+          %assign colSig =  SLibGetSourceRecord(portObj, 0)
+          %assign colName = ""
+          %if !ISEMPTY(colSig) && FcnIsRecordDataTypeValidForASAP2(colSig)
+            %assign cdata = FcnGetGlobalMemoryMapData(colSig)
+            %if FcnRecordIsASAP2TestPointSignal(colSig) || ...
+              FcnRecordIsASAP2ExternalInput(colSig) || ...
+              FcnDataSupportsASAP2(cdata)
+              %assign colName = LibASAP2GetSymbol(colSig)
+            %endif
+          %endif
+          %addtorecord group RowIdxSigName rowName
+          %addtorecord group ColIdxSigName colName
+          %%
+          %if FcnCheckValidityOf2DParamGroup(group)
+              %assign tmpVar = ...
+                  ASAP2UserFcnWriteCharacteristic_Lookup2D(group)            
+          %endif
+          %%  
+        %elseif (tblPrmLayout[2][0] == 1) && (NumDataInputPorts == 1)
+          %% This is a Direct Lookup ND table with 1 dimension and a single
+          %% element output (column dimensions are not supported)
+          %% Create param group
+          %assign group = SLibCreateParameterGroup(thisBlock,"Lookup1D")
+          %assign directXPrm.Value = [0:%<tblPrmLayout[2][1]-1>]
+          %assign tmpVar  = SLibAddMember(thisBlock, group, directXPrm)          
+          %assign tmpVar  = SLibAddMember(thisBlock, group, tblPrm)
+          %% Check input signals
+          %assign portObj.SignalSrc = DataInputPort[0].Region[0]._Source
+          %assign rowSig =  SLibGetSourceRecord(portObj, 0)
+          %assign rowName = ""
+          %if !ISEMPTY(rowSig) && FcnIsRecordDataTypeValidForASAP2(rowSig)
+            %assign rdata = FcnGetGlobalMemoryMapData(rowSig)
+            %if FcnRecordIsASAP2TestPointSignal(rowSig) || ...
+              FcnRecordIsASAP2ExternalInput(rowSig) || ...
+              FcnDataSupportsASAP2(rdata)
+              %assign rowName = LibASAP2GetSymbol(rowSig)
+            %endif
+          %endif                  
+          %addtorecord group InputValSigName rowName          
+          %%
+          %if FcnCheckValidityOf1DParamGroup(group)
+            %assign tmpVar = ASAP2UserFcnWriteCharacteristic_Lookup1D(group)
+          %endif
+        %endif      
+      %%
+      %elseif ISEQUAL(Type, "Interpolation_n-D")
+        %if (NumParameters == 0 || !Parameter[0].IsReference)
+          %% Early return. Atleast 1 parameter is expected for table data.
+          %% Also the table parameter must resolve to a workspace variable.
+          %continue
+        %endif
+        %assign tblBlkPrm   = Parameter[0]
+        %%
+        %assign data = FcnGetGlobalMemoryMapData(tblBlkPrm)
+        %if !(FcnDataSupportsASAP2(data)) && ...
+          !(FcnDataIsStructuredAndSupportsASAP2(data))
+          %% Early return
+          %continue
+        %endif
+        %%
+        %if (NumDataInputPorts != lkBlk.NumPreLookups)
+        %% Early return
+          %continue
+        %endif
+        %%
+        %assign tblPrm= ::CompiledModel.ModelParameters.Parameter[tblBlkPrm._idx]
+        %assign blkPath = SLibMangledGrBlockPath(lkBlk.GrSrc)
+        %assign numDims = lkBlk.NumberOfTableDimensions
+        %if numDims > 2
+          %% Interpolation_n-D Lookup Tables with more than 2 dimensions are
+          %% not supported
+          %continue
+        %elseif numDims == 2
+          %% This is an Interpolation_n-D Lookup table with 2 dimensions
+          %assign numPrelookupBlocks = (NumDataInputPorts==4) ? 2 : 1
+          %if lkBlk.NumPreLookups >= numPrelookupBlocks
+            %assign xPreIdx = lkBlk.PreLookupBlock[0].GrSrc
+            %assign xPreBlk = Subsystem[xPreIdx[0]].Block[xPreIdx[1]]
+            %if xPreBlk.NumParameters < 1 || xPreBlk.Parameter[0]._idx < 0
+              %continue
+            %endif
+            %assign yPreIdx = lkBlk.PreLookupBlock[(NumDataInputPorts==4) ? 2 : 1].GrSrc
+            %assign yPreBlk = Subsystem[yPreIdx[0]].Block[yPreIdx[1]]
+            %if yPreBlk.NumParameters < 1 || yPreBlk.Parameter[0]._idx < 0
+              %continue
+            %endif
+          %else
+            %% When Interpolation using prelookup block has unconnected input 
+            %% and output ports
+            %continue
+          %endif
+          %if FcnDataIsStructuredAndSupportsASAP2(data)
+            %% Candidate for STD Axis
+            %if (tblBlkPrm._idx != xPreBlk.Parameter[0]._idx) || ...
+              (xPreBlk.Parameter[0]._idx != yPreBlk.Parameter[0]._idx)
+              %% Return if table and axis points do not use the same 
+              %% ModelParameter
+              %continue
+            %endif
+            %assign xPreBlkPath = SLibMangledGrBlockPath(xPreIdx)
+            %assign yPreBlkPath = SLibMangledGrBlockPath(yPreIdx)
+            %assign retVal = FEVAL("rtwprivate","getTableAndAxisPtsForLUT",blkPath, xPreBlkPath,yPreBlkPath)
+            %if retVal[0]==-1
+              %% Early return (Not a valid candidate for STD Axis)
+              %continue
+            %endif
+            %% Get positions of table/axis data in bus structure
+            %assign tableBusElemPos = retVal[1]
+            %assign bp1BusElemPos   = retVal[2]
+            %assign bp2BusElemPos   = retVal[3]
+            %if FcnCheckSTDAxisValidityOf2DParam(tblPrm,"Prelookup")
+              %% Create a Lookup2D param group, which generates a MAP A2L entry
+              %assign group   = SLibCreateParameterGroup(thisBlock,"Lookup2D")
+              %%
+              %addtorecord group xAxisType "STD_AXIS" 
+              %addtorecord group yAxisType "STD_AXIS"
+              %%
+              %% Store bus elements corresponding to table and axis points 
+              %% to members of the parameter group
+              %assign busObject = data.StructInfo
+              %%              
+              %if !ISFIELD(busObject,"STDAxisInfo")
+                %% Add STDAxisInfo to busObject if not already added. It would 
+                %% be already added if the busObject is being shared by more 
+                %% than one LUT block.
+                %addtorecord busObject ...
+                  STDAxisInfo [%<tableBusElemPos>, %<bp1BusElemPos>, %<bp2BusElemPos>]
+              %endif
+              %assign xPrm = AxisRecord { \
+                BusElement busObject.BusElement[bp1BusElemPos] \
+              }
+              %assign yPrm = AxisRecord { \
+                BusElement busObject.BusElement[bp2BusElemPos] \
+              }
+              %addtorecord tblPrm AxisRecord { \
+                BusElement busObject.BusElement[tableBusElemPos] \
+              }
+              %assign tmpVar  = SLibAddMember(thisBlock, group, xPrm)
+              %assign tmpVar  = SLibAddMember(thisBlock, group, yPrm)
+              %assign tmpVar  = SLibAddMember(thisBlock, group, tblPrm)
+              %%
+              %addtorecord group RecordLayoutName busObject.Name
+              %%
+              %% Write to ASAP2RecordLayouts Record
+              %assign tmpvar = SLibWriteToRecordLayoutsRecord(busObject)
+            %else
+              %% Return if STD axis validity failed
+              %continue
+            %endif %% FcnCheckSTDAxisValidityOf2DParam
+          %else
+            %% Candidate for COM or FIX Axis
+            %%
+            %assign xPrm    = ...
+              ::CompiledModel.ModelParameters.Parameter[xPreBlk.Parameter[0]._idx] 
+            %assign yPrm    = ...
+              ::CompiledModel.ModelParameters.Parameter[yPreBlk.Parameter[0]._idx]
+            %%
+            %%
+            %% Create a Lookup2D param group, which generates a MAP A2L entry
+            %assign group   = SLibCreateParameterGroup(thisBlock,"Lookup2D")
+            %%
+            %assign tmpVar  = SLibAddMember(thisBlock, group, xPrm)
+            %assign tmpVar  = SLibAddMember(thisBlock, group, yPrm)
+            %assign tmpVar  = SLibAddMember(thisBlock, group, tblPrm)          
+            %%
+            %if !FcnCheckValidityOf2DParamGroup(group)
+              %% Return if parameter group failed validity check
+              %continue
+            %endif
+          %endif %% FcnDataIsStructuredAndSupportsASAP2
+          %%
+          %% Figure out input signals
+          %assign rowName = ""
+          %assign colName = ""
+          %if (xPreBlk.NumDataInputPorts>0) && ...
+            (xPreBlk.DataInputPort[0].NumRegions>0) && ...
+            (yPreBlk.NumDataInputPorts>0) && ...
+            (yPreBlk.DataInputPort[0].NumRegions>0)
+            %assign portObj.SignalSrc = xPreBlk.DataInputPort[0].Region[0]._Source
+            %assign rowSig =  SLibGetSourceRecord(portObj, 0)
+            %if !ISEMPTY(rowSig) && FcnIsRecordDataTypeValidForASAP2(rowSig)
+              %assign rdata = FcnGetGlobalMemoryMapData(rowSig)
+              %if FcnRecordIsASAP2TestPointSignal(rowSig) || ...
+                FcnRecordIsASAP2ExternalInput(rowSig) || ...
+                FcnDataSupportsASAP2(rdata)
+                %assign rowName = LibASAP2GetSymbol(rowSig)
+              %endif                              
+            %endif
+            %assign portObj.SignalSrc = yPreBlk.DataInputPort[0].Region[0]._Source
+            %assign colSig =  SLibGetSourceRecord(portObj, 0)
+            %if !ISEMPTY(colSig) && FcnIsRecordDataTypeValidForASAP2(colSig)
+              %assign cdata = FcnGetGlobalMemoryMapData(colSig)
+              %if FcnRecordIsASAP2TestPointSignal(colSig) || ...
+                FcnRecordIsASAP2ExternalInput(colSig) || ...
+                FcnDataSupportsASAP2(cdata)
+                %assign colName = LibASAP2GetSymbol(colSig)
+              %endif
+            %endif
+          %endif   
+          %% Add input quantities to parameter group
+          %addtorecord group RowIdxSigName rowName
+          %addtorecord group ColIdxSigName colName
+          %%
+          %% Write out Characteristic
+          %assign tmpVar = ...
+            ASAP2UserFcnWriteCharacteristic_Lookup2D(group) 
+          %%
+        %elseif numDims == 1 
+          %% This is an Interpolation_n-D Lookup table with 1 dimension
+          %if lkBlk.NumPreLookups > 0
+            %assign xPreIdx = lkBlk.PreLookupBlock[0].GrSrc
+            %assign xPreBlk = Subsystem[xPreIdx[0]].Block[xPreIdx[1]]
+            %if xPreBlk.NumParameters< 1 || xPreBlk.Parameter[0]._idx < 0
+              %continue
+            %endif
+          %else
+            %% When Interpolation using prelookup block has unconnected input
+            %% and output ports
+            %continue
+          %endif
+          %if FcnDataIsStructuredAndSupportsASAP2(data)
+            %% Candidate for STD Axis
+            %if (tblBlkPrm._idx != xPreBlk.Parameter[0]._idx) 
+              %% Return if table and axis points do not use the same 
+              %% ModelParameter
+              %continue
+            %endif
+            %assign xPreBlkPath = SLibMangledGrBlockPath(xPreIdx)
+            %assign retVal = FEVAL("rtwprivate","getTableAndAxisPtsForLUT",blkPath, xPreBlkPath) 
+            %if retVal[0]==-1
+              %% Early return (Not a valid candidate for STD Axis)
+              %continue
+            %endif
+            %% Get positions of table/axis data in bus structure
+            %assign tableBusElemPos = retVal[1]
+            %assign bp1BusElemPos   = retVal[2]
+            %if FcnCheckSTDAxisValidityOf1DParam(tblPrm,"Prelookup")
+              %% Create a Lookup1D param group, which generates a CURVE A2L entry
+              %assign group   = SLibCreateParameterGroup(thisBlock,"Lookup1D")
+              %% 
+              %addtorecord group xAxisType "STD_AXIS"
+              %%
+              %% Store bus elements corresponding to table and axis points 
+              %% to members of the parameter group
+              %assign busObject = data.StructInfo
+              %%              
+              %if !ISFIELD(busObject,"STDAxisInfo")
+                %% Add STDAxisInfo to busObject if not already added. It would 
+                %% be already added if the busObject is being shared by more 
+                %% than one LUT block.
+                %addtorecord busObject ...
+                  STDAxisInfo [%<tableBusElemPos>, %<bp1BusElemPos>]
+              %endif
+              %assign xPrm = AxisRecord { \
+                BusElement busObject.BusElement[bp1BusElemPos] \
+              }
+              %addtorecord tblPrm AxisRecord { \
+                BusElement busObject.BusElement[tableBusElemPos] \
+              }
+              %assign tmpVar  = SLibAddMember(thisBlock, group, xPrm)          
+              %assign tmpVar  = SLibAddMember(thisBlock, group, tblPrm)  
+              %%
+              %addtorecord group RecordLayoutName busObject.Name
+              %%
+              %% Write to ASAP2RecordLayouts Record
+              %assign tmpvar = SLibWriteToRecordLayoutsRecord(busObject)
+            %else
+              %% Return if STD axis validity failed
+              %continue
+            %endif %% FcnCheckSTDAxisValidityOf1DParam            
+            %%
+          %else
+            %% Candidate for COM or FIX Axis
+            %%
+            %assign xPrm    = ...
+              ::CompiledModel.ModelParameters.Parameter[xPreBlk.Parameter[0]._idx] 
+            %%
+            %% Create a Lookup1D param group, which generates a CURVE A2L entry
+            %assign group   = SLibCreateParameterGroup(thisBlock,"Lookup1D")
+            %%
+            %assign tmpVar  = SLibAddMember(thisBlock, group, xPrm)          
+            %assign tmpVar  = SLibAddMember(thisBlock, group, tblPrm)          
+            %%
+            %if !FcnCheckValidityOf1DParamGroup(group)
+               %% Return if parameter group failed validity check
+              %continue
+            %endif
+          %endif %% FcnDataIsStructuredAndSupportsASAP2
+          %%
+          %% Figure out input signal
+          %assign rowName = ""
+          %if (xPreBlk.NumDataInputPorts>0) && (xPreBlk.DataInputPort[0].NumRegions>0)
+            %assign portObj.SignalSrc = xPreBlk.DataInputPort[0].Region[0]._Source
+            %assign rowSig =  SLibGetSourceRecord(portObj, 0)
+            %if !ISEMPTY(rowSig) && FcnIsRecordDataTypeValidForASAP2(rowSig)
+              %assign rdata = FcnGetGlobalMemoryMapData(rowSig)
+              %if FcnRecordIsASAP2TestPointSignal(rowSig) || ...
+                FcnRecordIsASAP2ExternalInput(rowSig) || ...
+                FcnDataSupportsASAP2(rdata)
+                %assign rowName = LibASAP2GetSymbol(rowSig)
+              %endif
+            %endif
+          %endif
+          %% Add input quantity to parameter group
+          %addtorecord group InputValSigName rowName 
+          %%
+          %% Write out Characteristic
+          %assign tmpVar = ...
+            ASAP2UserFcnWriteCharacteristic_Lookup1D(group)
+          %%
+        %else
+          %continue
+        %endif        
+        %%
+      %elseif ISEQUAL(Type, "Lookup_n-D")
+        %if (NumParameters == 0 || !Parameter[0].IsReference)
+          %% Early return. Atleast 1 parameter is expected for table data.  
+          %% Also the table parameter must resolve to a workspace variable.
+          %continue
+        %endif
+        %assign tblBlkPrm   = Parameter[0]
+        %%
+        %assign numDims = lkBlk.NumberOfTableDimensions
+        %if numDims > 2
+          %% Lookup Tables with more than 2 dimensions are
+          %% not supported
+          %continue
+        %endif
+        %%
+        %assign data = FcnGetGlobalMemoryMapData(tblBlkPrm)
+        %if !(FcnDataSupportsASAP2(data)) && ...
+          !(FcnDataIsStructuredAndSupportsASAP2(data))         
+          %% Early return
+          %continue
+        %endif
+        %assign tblPrm= ::CompiledModel.ModelParameters.Parameter[tblBlkPrm._idx]
+        %if FcnDataIsStructuredAndSupportsASAP2(data)
+          %% Candidate for STD Axis
+          %%
+          %% Find out the dimensions of the Lookup Table
+          %assign blkPath = SLibMangledGrBlockPath(lkBlk.GrSrc)
+          %assign retVal = FEVAL("rtwprivate","getTableAndAxisPtsForLUT",blkPath)
+          %if (retVal[0] == -1)
+            %% Early return (Not a valid candidate for STD Axis)
+            %continue
+          %endif     
+          %if numDims == 2
+            %if (Parameter[0]._idx != Parameter[1]._idx) || ...
+              (Parameter[1]._idx != Parameter[2]._idx)
+              %% Return if table and axis points do not use the same 
+              %% ModelParameter
+              %continue
+            %endif
+            %if FcnCheckSTDAxisValidityOf2DParam(tblPrm,"LookupND")
+              %% Create a Lookup2D param group, which generates a MAP A2L entry
+              %assign group   = SLibCreateParameterGroup(thisBlock,"Lookup2D")
+              %%
+              %addtorecord group xAxisType "STD_AXIS" 
+              %addtorecord group yAxisType "STD_AXIS"
+              %%
+              %% Get positions of table/axis data in bus structure and add them 
+              %% to bus object
+              %assign tableBusElemPos = retVal[1]
+              %assign bp1BusElemPos   = retVal[2]
+              %assign bp2BusElemPos   = retVal[3]
+              %assign busObject = data.StructInfo
+              %%              
+              %if !ISFIELD(busObject,"STDAxisInfo")
+                %% Add STDAxisInfo to busObject if not already added. It would 
+                %% be already added if the busObject is being shared by more 
+                %% than one LUT block.
+                %addtorecord busObject ...
+                  STDAxisInfo [%<tableBusElemPos>, %<bp1BusElemPos>, %<bp2BusElemPos>]
+              %endif              
+              %%
+              %% Store bus elements corresponding to table and axis points 
+              %% to members of the parameter group
+              %assign xPrm = AxisRecord { \
+                BusElement busObject.BusElement[bp1BusElemPos] \
+              }
+              %assign yPrm = AxisRecord { \
+                BusElement busObject.BusElement[bp2BusElemPos] \
+              }
+              %addtorecord tblPrm AxisRecord { \
+                BusElement busObject.BusElement[tableBusElemPos] \
+              }
+              %assign tmpVar  = SLibAddMember(thisBlock, group, xPrm)
+              %assign tmpVar  = SLibAddMember(thisBlock, group, yPrm)
+              %assign tmpVar  = SLibAddMember(thisBlock, group, tblPrm)
+              %%
+              %addtorecord group RecordLayoutName busObject.Name
+              %%
+              %% Write to ASAP2RecordLayouts Record
+              %assign tmpvar = SLibWriteToRecordLayoutsRecord(busObject)
+            %else
+              %% Return if STD axis validity failed
+              %continue
+            %endif %% FcnCheckSTDAxisValidityOf2DParam
+            %%
+          %elseif numDims == 1
+            %if (Parameter[0]._idx != Parameter[1]._idx)
+              %% Return if table and axis points do not use the same 
+              %% ModelParameter
+              %continue
+            %endif
+            %if FcnCheckSTDAxisValidityOf1DParam(tblPrm,"LookupND")
+              %% Create a Lookup1D param group, which generates a CURVE A2L entry
+              %assign group   = SLibCreateParameterGroup(thisBlock,"Lookup1D")
+              %% 
+              %addtorecord group xAxisType "STD_AXIS"
+              %%
+              %% Get positions of table/axis data in bus structure and add them 
+              %% to bus object
+              %assign tableBusElemPos = retVal[1]
+              %assign bp1BusElemPos   = retVal[2]
+              %assign busObject = data.StructInfo
+              %%              
+              %if !ISFIELD(busObject,"STDAxisInfo")
+                %% Add STDAxisInfo to busObject if not already added. It would 
+                %% be already added if the busObject is being shared by more 
+                %% than one LUT block.
+                %addtorecord busObject ...
+                  STDAxisInfo [%<tableBusElemPos>, %<bp1BusElemPos>]
+              %endif 
+              %%
+              %% Store bus elements corresponding to table and axis points 
+              %% to members of the parameter group
+              %assign xPrm = AxisRecord { \
+                BusElement busObject.BusElement[bp1BusElemPos] \
+              }
+              %addtorecord tblPrm AxisRecord { \
+                BusElement busObject.BusElement[tableBusElemPos] \
+              }
+              %assign tmpVar  = SLibAddMember(thisBlock, group, xPrm)          
+              %assign tmpVar  = SLibAddMember(thisBlock, group, tblPrm)       
+              %%
+              %addtorecord group RecordLayoutName busObject.Name
+              %%              
+              %% Write to ASAP2RecordLayouts Record
+              %assign tmpvar = SLibWriteToRecordLayoutsRecord(busObject)
+            %else
+              %% Return if STD axis validity failed
+              %continue
+            %endif %% FcnCheckSTDAxisValidityOf1DParam
+          %endif %% numDims
+          %%
+        %else
+          %% Candidate for COM or Fix Axis
+          %%
+          %% Continue if any parameter is not available. For example, a 
+          %% parameter is not available if it is a mask parameter of a reusable
+          %% subsystem. 
+          %% For 1D, there must be 2 parameters (one corresponding to axis data
+          %% and the other to table data)
+          %% For 2D, there must be 4 parameters (one corresponding to each axis, 
+          %% one for table data and one for an internal parameter).
+          %assign tblPrmLayout = LibGetDataLayout(tblPrm)
+          %if (tblPrmLayout[2][0] > 1)
+            %% This is a n-D Lookup table with 2 dimensions
+            %%
+            %if thisBlock.NumParameters != 4
+              %continue
+            %endif
+            %%
+            %% Create a Lookup2D param group, which generates a MAP A2L entry
+            %assign group   = SLibCreateParameterGroup(thisBlock,"Lookup2D")
+            %assign tmpVar  = SLibAddMember(thisBlock, group,\
+            ::CompiledModel.ModelParameters.Parameter[Parameter[1]._idx])
+            %assign tmpVar  = SLibAddMember(thisBlock, group,\
+            ::CompiledModel.ModelParameters.Parameter[Parameter[2]._idx])
+            %assign tmpVar  = SLibAddMember(thisBlock, group,\
+            ::CompiledModel.ModelParameters.Parameter[Parameter[0]._idx])
+            %%          
+            %if !FcnCheckValidityOf2DParamGroup(group)
+              %% Return if parameter group failed validity check
+              %continue
+            %endif
+            %%
+          %elseif (tblPrmLayout[2][0] == 1) %% Column-vector dimensions are 
+            %% not supported
+            %% 
+            %if thisBlock.NumParameters != 2
+              %continue
+            %endif            
+            %%
+            %% Create a Lookup1D param group, which generates a CURVE A2L entry
+            %assign group   = SLibCreateParameterGroup(thisBlock,"Lookup1D")
+            %assign tmpVar  = SLibAddMember(thisBlock, group,\
+            ::CompiledModel.ModelParameters.Parameter[Parameter[1]._idx])          
+            %assign tmpVar  = SLibAddMember(thisBlock, group,\
+            ::CompiledModel.ModelParameters.Parameter[Parameter[0]._idx])
+            %%          
+            %if !FcnCheckValidityOf1DParamGroup(group)
+              %% Return if parameter group failed validity check
+              %continue
+            %endif
+          %endif %% tblPrmLayout
+        %endif %% FcnDataIsStructuredAndSupportsASAP2
+        %%
+        %if numDims == 2
+          %% Figure out input signals
+          %assign rowName = ""
+          %assign colName = ""
+          %if (NumDataInputPorts==2) && (DataInputPort[0].NumRegions>0) && ...
+            (DataInputPort[1].NumRegions>0)
+            %assign portObj.SignalSrc = DataInputPort[0].Region[0]._Source
+            %assign rowSig =  SLibGetSourceRecord(portObj, 0)
+            %if !ISEMPTY(rowSig) && FcnIsRecordDataTypeValidForASAP2(rowSig)
+              %assign rdata = FcnGetGlobalMemoryMapData(rowSig)
+              %if FcnRecordIsASAP2TestPointSignal(rowSig) || ...
+                FcnRecordIsASAP2ExternalInput(rowSig) || ...
+                FcnDataSupportsASAP2(rdata)
+                %assign rowName = LibASAP2GetSymbol(rowSig)
+              %endif
+            %endif
+            %assign portObj.SignalSrc = DataInputPort[1].Region[0]._Source
+            %assign colSig =  SLibGetSourceRecord(portObj, 0)
+            %if !ISEMPTY(colSig) && FcnIsRecordDataTypeValidForASAP2(colSig)
+              %assign cdata = FcnGetGlobalMemoryMapData(colSig)
+              %if FcnRecordIsASAP2TestPointSignal(colSig) || ...
+                FcnRecordIsASAP2ExternalInput(colSig) || ...
+                FcnDataSupportsASAP2(cdata)
+                %assign colName = LibASAP2GetSymbol(colSig)
+              %endif
+            %endif
+          %endif
+          %%
+          %% Add input quantities to parameter group
+          %addtorecord group RowIdxSigName rowName
+          %addtorecord group ColIdxSigName colName
+          %%
+          %% Write out Characteristic
+          %assign tmpVar = ...
+            ASAP2UserFcnWriteCharacteristic_Lookup2D(group) 
+        %elseif numDims == 1
+          %% Figure out input signal
+          %assign rowName = ""
+          %if (NumDataInputPorts==1) && (DataInputPort[0].NumRegions>0)
+            %assign portObj.SignalSrc = DataInputPort[0].Region[0]._Source
+            %assign rowSig =  SLibGetSourceRecord(portObj, 0)
+            %if !ISEMPTY(rowSig) && FcnIsRecordDataTypeValidForASAP2(rowSig)
+              %assign rdata = FcnGetGlobalMemoryMapData(rowSig)
+              %if FcnRecordIsASAP2TestPointSignal(rowSig) || ...
+                FcnRecordIsASAP2ExternalInput(rowSig) || ...
+                FcnDataSupportsASAP2(rdata)
+                %assign rowName = LibASAP2GetSymbol(rowSig)
+              %endif
+            %endif
+          %endif          
+          %%
+          %% Add input quantity to parameter group
+          %addtorecord group InputValSigName rowName
+          %%
+          %% Write out Characteristic
+          %assign tmpVar = ...
+            ASAP2UserFcnWriteCharacteristic_Lookup1D(group)
+        %endif %% numDims       
+        %%
+      %else
+        %% Unhandled Lookup Table Type: Do nothing
+      %endif
+    %endwith
+  %endforeach %% 
+  %undef portObj
+%endwith
+%endfunction
+
+%% Function: FcnLoopThruParamGroups ============================================
+%% Abstract:
+%%      Outputs CHARACTERISTICS for blocks with ParameterGroups defined
+%%      Loops through Systems->Blocks->ParameterGroups
+%%
+%%      Expects user-defined function:
+%%        "ASAP2UserFcnWriteCharacteristic_%<ParameterGroup.Name>(paramGroup)"
+%%
+%function FcnLoopThruParamGroups() Output
+%with ::CompiledModel
+  %if !ISFIELD(::CompiledModel, "ASAP2DataEntityRec")
+     %addtorecord ::CompiledModel %<"ASAP2DataEntityRec"> {}
+  %endif
+  %foreach systemIdx = NumSystems
+    %with System[systemIdx]
+      %foreach blockIdx = NumBlocks
+        %assign thisBlock = Block[blockIdx]
+        %with thisBlock
+          %if NumParameterGroups != 0
+            %foreach paramGroupIdx = NumParameterGroups
+              %assign paramGroup = ParameterGroup[paramGroupIdx]
+              %if paramGroup.Name == "Lookup1D"
+                %assign inpName= SLibGetLookUpInputSignalName(...
+                  paramGroup.Member[0].Reference)
+                %addtorecord ParameterGroup[paramGroupIdx] InputValSigName inpName
+                %if FcnCheckValidityOf1DParamGroup(paramGroup)
+                  %assign tmpVar = ...
+                    ASAP2UserFcnWriteCharacteristic_Lookup1D(paramGroup)            
+                %endif
+                %%
+              %elseif paramGroup.Name == "Lookup2D"
+                %assign inpNames = SLibGetLookUp2DInputSignalNames(...
+                  paramGroup.Member[0].Reference)
+                %addtorecord ParameterGroup[paramGroupIdx] RowIdxSigName inpNames[0]
+                %addtorecord ParameterGroup[paramGroupIdx] ColIdxSigName inpNames[1]
+                %if FcnCheckValidityOf2DParamGroup(paramGroup)
+                  %assign tmpVar = ...
+                    ASAP2UserFcnWriteCharacteristic_Lookup2D(paramGroup)            
+                %endif
+              %endif
+            %endforeach
+          %endif
+        %endwith
+      %endforeach
+    %endwith
+  %endforeach
+%endwith
+%<FcnLoopThroughNewLookupBlocks()>
+%endfunction
+
+
+%% Function: FcnDataSupportsASAP2 ==============================================
+%% Abstract:
+%%   Can we represent this data as a stand-alone member of the ASAP2 file?
+%%
+%function FcnDataSupportsASAP2(data) void
+  %% NOTE: If data.IsStruct, it is a non-virtual bus or parameter structure.
+  %if ((TYPE(data) == "Scope") && ...
+    (data.HasObject) && ...
+    (data.IsStruct == 0) && ...
+    (data.IsComplex == 0))
+    %assign rtwRecord     = LibRTWRecord(data) 
+    %if !ISEMPTY(rtwRecord) && rtwRecord.StorageClass == "Custom"
+      %assign cscDefn = SLibGetCSCDefForData(rtwRecord)
+      %if (cscDefn.IsGrouped !=0 )
+        %return TLC_FALSE
+      %endif
+    %endif
+    %return !SLibIsGlobalMapDataWithNoExternalLinkage(data)
+  %else
+    %return TLC_FALSE
+  %endif
+%endfunction
+
+%% Function: FcnDataIsStructuredAndSupportsASAP2 ====================================
+%% Abstract:
+%%   Can we represent this data as a stand-alone member of the ASAP2 file?
+%%
+%function FcnDataIsStructuredAndSupportsASAP2(data) void
+  %% NOTE: If data.IsStruct, it is a non-virtual bus or parameter structure.
+  %if ((TYPE(data) == "Scope") && ...
+    (data.HasObject) && ...
+    (data.IsStruct == 1))
+    %assign rtwRecord     = LibRTWRecord(data) 
+    %if !ISEMPTY(rtwRecord) && rtwRecord.StorageClass == "Custom"
+      %assign cscDefn = SLibGetCSCDefForData(rtwRecord)
+      %if (cscDefn.IsGrouped !=0 )
+        %return TLC_FALSE
+      %endif
+    %endif
+    %return !SLibIsGlobalMapDataWithNoExternalLinkage(data)
+  %else
+    %return TLC_FALSE
+  %endif
+%endfunction
+ 
+%% Function: FcnIsASAP2TestPointSignalEnabled ========================================
+%% Abstract:
+%%   Is test point signal description enabled for ASAP2?
+%%
+%function FcnIsASAP2TestPointSignalEnabled() void
+  %if ASAP2EnableTestPointSignals==TLC_TRUE && ...
+    !MultiInstanceERTCode
+    %return TLC_TRUE  
+  %else
+    %return TLC_FALSE
+  %endif 
+%endfunction  
+
+%% Function: FcnRecordIsASAP2TestPointSignal =========================================
+%% Abstract:
+%%   Is record valid for test point signal description?
+%%
+%function FcnRecordIsASAP2TestPointSignal(record) void
+  %if ISFIELD(record,"TestPoint") && record.TestPoint == "yes" && ...
+    FcnIsASAP2TestPointSignalEnabled() && !(record.RecordType=="ExternalInput" ... 
+    && LibIsModelReferenceTarget())
+    %return TLC_TRUE  
+  %else
+    %return TLC_FALSE
+  %endif  
+%endfunction
+
+%% Function: FcnIsASAP2TestPointStateflowEnabled ========================================
+%% Abstract:
+%%   Is test pointed Stateflow states and Stateflow local data description 
+%%   enabled for ASAP2?
+%%
+%function FcnIsASAP2TestPointStateflowEnabled() void
+  %if ASAP2EnableTestPointStateflow==TLC_TRUE && ...
+    !MultiInstanceERTCode
+    %return TLC_TRUE  
+  %else
+    %return TLC_FALSE
+  %endif 
+%endfunction  
+
+%% Function: FcnIsASAP2ExternalInputEnabled ====================================
+%% Abstract:
+%%   Is root-level inport description enabled for ASAP2?
+%%
+%function FcnIsASAP2ExternalInputEnabled() void
+  %if ASAP2EnableRootLevelIO==TLC_TRUE && ...
+    !LibIsModelReferenceTarget() && !SLibFcnProtoCtrlActive() && ...
+    !MultiInstanceERTCode
+    %return TLC_TRUE  
+  %else
+    %return TLC_FALSE
+  %endif 
+%endfunction  
+
+%% Function: FcnRecordIsASAP2ExternalInput =====================================
+%% Abstract:
+%%   Is record valid for root-level inport description?
+%%
+%function FcnRecordIsASAP2ExternalInput(record) void
+  %if ISFIELD(record,"RecordType") && record.RecordType=="ExternalInput" && ...
+    FcnIsASAP2ExternalInputEnabled()
+    %return TLC_TRUE  
+  %else
+    %return TLC_FALSE
+  %endif
+%endfunction
+
+%% Function: FcnIsASAP2ExternalOutputEnabled ===================================
+%% Abstract:
+%%   Is root-level outport description enabled for ASAP2?
+%%
+%function FcnIsASAP2ExternalOutputEnabled() void
+  %if ASAP2EnableRootLevelIO==TLC_TRUE && ...
+    !LibIsModelReferenceTarget() && !SLibFcnProtoCtrlActive() && ...
+    !MultiInstanceERTCode
+    %return TLC_TRUE  
+  %else
+    %return TLC_FALSE
+  %endif 
+%endfunction 
+
+%% Function: FcnRecordIsASAP2ExternalOutput =====================================
+%% Abstract:
+%%   Is record valid for root-level outport description?
+%%
+%function FcnRecordIsASAP2ExternalOutput(record) void
+  %if ISFIELD(record,"RecordType") && record.RecordType=="ExternalOutput" && ...
+    FcnIsASAP2ExternalOutputEnabled()
+    %return TLC_TRUE  
+  %else
+    %return TLC_FALSE
+  %endif
+%endfunction
+
+%% Function: FcnIsRecordDataTypeValidForASAP2 ==================================
+%% Abstract:
+%%   Check validity of a record's data type for ASAP2
+%%
+%function FcnIsRecordDataTypeValidForASAP2(record) void
+  %assign dtID = LibGetRecordDataTypeId(record)
+  %if LibIsNonBuiltInTypeNeededForFixpt(dtID) || ...
+    !(FcnIsNumericDataType(dtID) || LibIsEnumDataType(dtID)) || ...
+    LibGetRecordIsComplex(record)
+    %% 64-bit fixed point integers, non-numeric types (besides enum) and  
+    %% complex types are not supported
+    %return TLC_FALSE
+  %endif 
+  %assign data   = FcnGetGlobalMemoryMapData(record)
+  %if (TYPE(data) != "Scope") 
+    %return TLC_FALSE
+  %elseif data.IsStruct 
+    %% Bus data type is not supported  
+    %return TLC_FALSE
+  %else
+    %return TLC_TRUE
+  %endif
+%endfunction  
+
+%% Function: FcnIsNumericDataType ================================================
+%% Abstract:
+%%   Does the input data type ID correspond to an numeric type?
+%%
+%function FcnIsNumericDataType(id) void
+  %assign dtId = LibGetDataTypeIdAliasedThruToFromId(id)
+  %return DataTypes.DataType[dtId].IsNumericType
+%endfunction
+
+%% Function: FcnLoopThruModelParameters ========================================
+%% Abstract:
+%%      Outputs CHARACTERISTICS for ModelParameters
+%%      Loops through ModelParameters->Instances
+%%      Excludes ModelParameters which are part of ParameterGroups
+%%
+%%      Assumes existence of function:
+%%        "ASAP2UserFcnWriteCharacteristic_Scalar(record)"
+%%
+%function FcnLoopThruModelParameters() Output
+%with ::CompiledModel.GlobalMemoryMap.ModelParameters
+  %foreach modelParamIdx = NumModelParameters
+    %with ModelParameter[modelParamIdx]
+      %if NumInstances > 1
+        %assign paramName = Name
+        %assign warnTxt="%<paramName> is defined in both Simulink & Stateflow."
+        %<LibReportWarning(warnTxt)>\
+        /*  WARNING: %<warnTxt> */
+      %endif
+      %foreach instanceIdx = NumInstances
+        %assign record = Instance[instanceIdx]
+        %% Do not describe parameter in current A2L file if it is only used in
+        %% the referenced model
+        %foreach blkGrIdx = SIZE(record.BlkGrRef,0)
+          %assign subsysIdx = record.BlkGrRef[blkGrIdx][0]
+          %assign blkIdx = record.BlkGrRef[blkGrIdx][1]
+          %if ( (blkIdx == -1) && (subsysIdx == -1) ) || ...
+            ::CompiledModel.BlockHierarchyMap.Subsystem[subsysIdx].Block[blkIdx].Type ...
+            != "ModelReference"
+            %% Describe parameter only if it belongs to a:
+            %% (1) Synthesized block:
+            %% This happens when a Simulink.Parameter object is specified as 
+            %% InitialValue of a Simulink.Signal object, and used with global
+            %% data stores.
+            %% (2) Parent model (that is, not in its referenced model)
+            %% 
+            %% Check validity of record before calling UserFcn
+            %assign data = FcnGetGlobalMemoryMapData(record)
+            %if FcnDataSupportsASAP2(data) && !ISFIELD(data,"UsedInParameterGroup")
+              %<ASAP2UserFcnWriteCharacteristic_Scalar(record)>                           
+            %elseif FcnDataIsStructuredAndSupportsASAP2(data) && ... 
+              !ISFIELD(data,"UsedInParameterGroup") 
+              %<ASAP2UserFcnWriteStructCharacteristic_Scalar(record)>    
+            %endif
+            %% Don't describe a parameter more than once (for e.g. when used 
+            %% by multiple blocks)
+            %break
+          %endif
+        %endforeach 
+      %endforeach
+    %endwith
+  %endforeach
+%endwith
+%endfunction
+
+
+%% Function: FcnLoopThruExternalInputs =========================================
+%% Abstract:
+%%      Outputs MEASUREMENTS for ExternalInputs
+%%
+%%      Assumes existence of function:
+%%        "ASAP2UserFcnWriteMeasurement(record)"
+%%
+%function FcnLoopThruExternalInputs() Output
+%with ::CompiledModel.ExternalInputs
+  %foreach idx = NumExternalInputs
+    %assign record = ExternalInput[idx]
+    %if !FcnIsRecordDataTypeValidForASAP2(record)
+      %continue
+    %endif
+    %% Check validity of record before calling UserFcn
+    %assign data   = FcnGetGlobalMemoryMapData(record)
+    %if FcnDataSupportsASAP2(data) || ...
+      FcnIsASAP2ExternalInputEnabled() || ...
+      FcnRecordIsASAP2TestPointSignal(record)
+      %<ASAP2UserFcnWriteMeasurement(record)>
+    %endif
+  %endforeach
+%endwith
+%endfunction
+
+%% Function: FcnLoopThruExternalOutputs ========================================
+%% Abstract:
+%%      Outputs MEASUREMENTS for ExternalOutputs
+%%
+%%      Assumes existence of function:
+%%        "ASAP2UserFcnWriteMeasurement(record)"
+%%
+%function FcnLoopThruExternalOutputs() Output
+%with ::CompiledModel.ExternalOutputs
+  %foreach idx = NumExternalOutputs
+    %assign record = ExternalOutput[idx]
+    %if !FcnIsRecordDataTypeValidForASAP2(record)
+      %continue
+    %endif
+    %% Check validity of record before calling UserFcn
+    %assign data   = FcnGetGlobalMemoryMapData(record)
+    %if FcnDataSupportsASAP2(data) || ...
+      FcnIsASAP2ExternalOutputEnabled()
+      %<ASAP2UserFcnWriteMeasurement(record)>
+    %endif
+  %endforeach
+%endwith
+%endfunction
+
+
+%% Function: FcnLoopThruBlockOutputs ===========================================
+%% Abstract:
+%%      Outputs MEASUREMENTS for BlockOutputs
+%%
+%%      Assumes existence of function:
+%%        "ASAP2UserFcnWriteMeasurement(record)"
+%%
+%function FcnLoopThruBlockOutputs() Output
+%with ::CompiledModel.BlockOutputs
+  %foreach idx = NumGlobalBlockOutputs
+    %assign record = GlobalBlockOutput[idx]
+    %if ISEQUAL(record.DrivesModelRefRootOutport, "yes")
+      %continue
+    %endif
+    %if !FcnIsRecordDataTypeValidForASAP2(record)
+      %continue
+    %endif
+    %% Check validity of record before calling UserFcn
+    %assign data   = FcnGetGlobalMemoryMapData(record)
+    %if FcnDataSupportsASAP2(data) || FcnRecordIsASAP2TestPointSignal(record)
+      %<ASAP2UserFcnWriteMeasurement(record)>
+    %endif
+  %endforeach
+  %foreach idx = NumExternalBlockOutputs
+    %assign record = ExternalBlockOutput[idx]
+    %if ISEQUAL(record.DrivesModelRefRootOutport, "yes")
+      %continue
+    %endif
+    %if !FcnIsRecordDataTypeValidForASAP2(record)
+      %continue
+    %endif
+    %% Check validity of record before calling UserFcn
+    %assign data   = FcnGetGlobalMemoryMapData(record)
+    %if FcnDataSupportsASAP2(data) || FcnRecordIsASAP2TestPointSignal(record)
+      %<ASAP2UserFcnWriteMeasurement(record)>
+    %endif
+  %endforeach
+  %foreach idx = NumConstBlockOutputs
+    %assign record = ConstBlockOutput[idx]
+    %if ISEQUAL(record.DrivesModelRefRootOutport, "yes")
+      %continue
+    %endif
+    %if !FcnIsRecordDataTypeValidForASAP2(record)
+      %continue
+    %endif
+    %% Check validity of record before calling UserFcn
+    %assign data   = FcnGetGlobalMemoryMapData(record)
+    %if FcnDataSupportsASAP2(data) || FcnRecordIsASAP2TestPointSignal(record)
+      %<ASAP2UserFcnWriteMeasurement(record)>
+    %endif
+  %endforeach
+%endwith
+%endfunction
+
+%% Function: FcnLoopThruDWorks ================================================
+%% Abstract:
+%%      Outputs MEASUREMENTS for Discrete States stored in DWork
+%%
+%%      Assumes existence of function:
+%%        "ASAP2UserFcnWriteMeasurement(record)"
+%%
+%function FcnLoopThruDWorks() Output
+%with ::CompiledModel.DWorks
+  %foreach idx = NumDWorks
+    %assign record = DWork[idx]
+    %if !FcnIsRecordDataTypeValidForASAP2(record)
+      %continue
+    %endif
+    %if record.GlobalDSM && LibIsModelReferenceTarget()
+      %% Global data stores get bubbled up to top model. So skip them for 
+      %% referenced models.
+      %continue
+    %endif
+    %% Check validity of record before calling UserFcn
+    %assign data   = FcnGetGlobalMemoryMapData(record)
+    %if FcnDataSupportsASAP2(data)
+      %<ASAP2UserFcnWriteMeasurement(record)>
+    %endif
+  %endforeach
+%endwith
+%%
+%if FcnIsASAP2TestPointStateflowEnabled()
+  %with ::CompiledModel.BlockHierarchyMap
+    %foreach subIdx = NumSubsystems
+      %with Subsystem[subIdx]
+        %foreach blkIdx = NumBlocks
+          %if Block[blkIdx].Type=="Stateflow" && ISFIELD(Block[blkIdx],"ChartData")
+            %% MATLAB Function blocks do not have ChartData
+            %foreach chartIdx = Block[blkIdx].ChartData.NumChartData
+              %if Block[blkIdx].ChartData.ChartData[chartIdx].IsTestPoint
+                %assign dWorkIdx = Block[blkIdx].DWork[chartIdx]._idx
+                %assign dWorkRecord = ::CompiledModel.DWorks.DWork[dWorkIdx]
+                %if !FcnIsRecordDataTypeValidForASAP2(dWorkRecord)
+                  %continue
+                %endif
+                %assign data = FcnGetGlobalMemoryMapData(dWorkRecord)
+                %if !data.HasObject
+                  %% Check for data that is not resolved with a data object
+                  %<ASAP2UserFcnWriteMeasurement(dWorkRecord)>  
+                %endif
+              %endif
+            %endforeach
+          %endif
+        %endforeach
+      %endwith
+    %endforeach
+  %endwith
+%endif %% FcnIsASAP2TestPointStateflowEnabled()
+%endfunction
+
+
+%% Function: FcnOutputCompuMethods =============================================
+%% Abstract:
+%%      Outputs COMPU_METHODS based on cache generated from 
+%%      CHARACTERISTICS and MEASUREMENTS produced from parameters & signals
+%%      CompuMethods are registered by LibASAP2GetCompuMethod(record)
+%%
+%%      Assumes existence of function:
+%%        "ASAP2UserFcnWriteCompuMethods(idx)"
+%%
+%function FcnOutputCompuMethods() Output
+%with ::CompiledModel.CompuMethods
+  %foreach idx = NumCompuMethods
+    %<ASAP2UserFcnWriteCompuMethods(idx)>
+  %endforeach
+%endwith
+%endfunction
+
+%% Function: FcnCheckSTDAxisValidityOf1DParam ====================================
+%% Abstract:
+%%      Checks validity of parameter for STD Axis support
+%%      Add "UsedInParameterGroup" to data record
+%%
+%function FcnCheckSTDAxisValidityOf1DParam(tblPrm, LookupType)
+  %if LookupType == "Prelookup"
+    %% Parameter should be used only by Interpolation block (for table)
+    %% and Prelookup block (for breakpoints)
+    %assign numUses = 0
+    %foreach blkGrIdx = SIZE(tblPrm.GraphicalRef,0)
+      %assign subsysIdx = tblPrm.GraphicalRef[blkGrIdx][0]
+      %assign blkIdx = tblPrm.GraphicalRef[blkGrIdx][1]
+      %if ::CompiledModel.BlockHierarchyMap.Subsystem[subsysIdx].Block[blkIdx].Type ...
+        != "ModelReference"
+        %assign numUses = numUses + 1
+      %endif
+    %endforeach
+    
+    %if numUses != 2
+      %return TLC_FALSE
+    %endif
+  %elseif LookupType == "LookupND"
+    %% Parameter should be used only by LookupND block (for table and 
+    %% breakpoints)
+    %assign numUses = 0
+    %foreach blkGrIdx = SIZE(tblPrm.GraphicalRef,0)
+      %assign subsysIdx = tblPrm.GraphicalRef[blkGrIdx][0]
+      %assign blkIdx = tblPrm.GraphicalRef[blkGrIdx][1]
+      %if ::CompiledModel.BlockHierarchyMap.Subsystem[subsysIdx].Block[blkIdx].Type ...
+        != "ModelReference"
+        %assign numUses = numUses + 1
+      %endif
+    %endforeach 
+    
+    %if numUses != 1
+      %return TLC_FALSE
+    %endif
+  %else
+    %<SLibReportErrorWithIdAndArgs("RTW:tlc:WrongLookupType", LookupType)>
+  %endif
+  %%
+  %assign zData       = FcnGetGlobalMemoryMapData(tblPrm)
+  %if EXISTS("zData.UsedInParameterGroup")
+    %if (zData.UsedInParameterGroup    != "STDAxisLookup1D")
+      %return TLC_FALSE
+    %endif
+  %else
+    %<LibAddIdentifier(zData, "UsedInParameterGroup", "STDAxisLookup1D")>
+  %endif
+  %% Check if data is used in any other ParameterGroup
+  %if ISFIELD(::CompiledModel.ASAP2DataEntityRec,zData.Name)
+    %return TLC_FALSE
+  %else
+    %addtorecord CompiledModel.ASAP2DataEntityRec %<zData.Name> 1         
+  %endif
+  %%
+  %return TLC_TRUE
+%endfunction
+
+%% Function: FcnCheckValidityOf1DParamGroup ====================================
+%% Abstract:
+%%      Checks that all members of paramGroup refer to valid data records
+%%        - table data record must have Object
+%%        - table data record must not be used in any other ParameterGroup
+%%      - assign group to use COM_AXIS or FIX_AXIS
+%%      Add "UsedInParameterGroup" to data record
+%%
+%function FcnCheckValidityOf1DParamGroup(paramGroup)
+  %with paramGroup
+    %assign yData = FcnGetGlobalMemoryMapData(Member[1].Reference)
+    %% If Y-axis data is global and has a Simulink Object
+    %% associated with it, add UsedInParameterGroup else return 0
+    %if !(FcnDataSupportsASAP2(yData))
+      %% Early return  
+      %return TLC_FALSE
+    %endif
+    %if EXISTS("yData.UsedInParameterGroup")
+      %if (yData.UsedInParameterGroup    != "Lookup1D.Member[1]") 
+        %% Lookup 1d and 2d table data cannot be shared
+        %<SLibReportErrorWithIdAndArgs("RTW:tlc:ParameterGroup", ...
+            ["%<yData.Name>", "%<yData.UsedInParameterGroup>", "Lookup1D.Member[1]"])>
+        %endif
+    %else
+      %<LibAddIdentifier(yData, "UsedInParameterGroup", "Lookup1D.Member[1]")>
+    %endif
+    %if ISFIELD(::CompiledModel.ASAP2DataEntityRec,yData.Name)
+      %return TLC_FALSE
+    %else
+      %addtorecord ::CompiledModel.ASAP2DataEntityRec %<yData.Name> 1         
+    %endif
+    %%
+    %assign xParam = Member[0].Reference
+    %assign xData  = FcnGetGlobalMemoryMapData(xParam)
+    %% If X-axis data is global and has a Simulink Object
+    %% associated with it, add UsedInParameterGroup
+    %if (FcnDataSupportsASAP2(xData))
+      %assign xDataIsInGlobalMemory = TLC_TRUE
+      %%
+      %if ISFIELD(xData,"UsedInParameterGroup")
+        %if (xData.UsedInParameterGroup     != "Lookup1D.Member[0]") 
+           %% Lookup 1d and 2d tables can share same axis parameter 
+           %if ((xData.UsedInParameterGroup != "Lookup2D.Member[0]") &&...
+             (xData.UsedInParameterGroup != "Lookup2D.Member[1]"))
+             %<SLibReportErrorWithIdAndArgs("RTW:tlc:ParameterGroup", ...
+               ["%<xData.Name>",  "%<xData.UsedInParameterGroup>", "Lookup1D.Member[0]"])>
+           %endif          
+        %endif
+      %else
+        %<LibAddIdentifier(xData, "UsedInParameterGroup", "Lookup1D.Member[0]")>
+      %endif
+      %%
+      %assign xParamName = LibASAP2GetSymbol(xParam)  
+      %if ISFIELD(::CompiledModel.ASAP2DataEntityRec,xParamName)
+        %addtorecord paramGroup isDuplicateBreakPoint TLC_TRUE         
+      %else
+        %addtorecord ::CompiledModel.ASAP2DataEntityRec %<xParamName> 1 
+        %addtorecord paramGroup isDuplicateBreakPoint TLC_FALSE 
+      %endif  
+      %%
+      %% Decide which axis, COM_AXIS or STD_AXIS
+      %% Check if this parameter is shared between tables      
+      %% If Axis parameters are shared between tables then create COM_AXIS
+      %addtorecord paramGroup xAxisType "COM_AXIS"
+    %else
+      %%  
+      %if FcnIsParamCandidateForFixAxis(xParam)
+        %if (FcnAxisIsEvenlySpaced(xParam.Value))
+          %addtorecord paramGroup xAxisType "FIX_AXIS"
+        %else
+          %addtorecord paramGroup xAxisType "FIX_AXIS_PAR_LIST"
+        %endif
+      %else
+        %return TLC_FALSE  
+      %endif
+    %endif
+    %%
+    %return TLC_TRUE
+  %endwith
+%endfunction
+
+%% Function: FcnIsParamCandidateForFixAxis(param)===============================
+%% Abstract:
+%%      If axis values are evenly spaced integers return TLC_TRUE.
+%%
+%function FcnIsParamCandidateForFixAxis(param)  
+  %% Check if Parmaeter DataType is an integer first. If DataType is not 
+  %% an integer, or is not evenly spaced return TLC_FLASE
+  %assign paramDTId = param.OriginalDataTypeIdx
+  %if (  LibIsDataTypeFixpt(paramDTId) )
+    %return TLC_TRUE
+  %endif
+  %assign eDTId = LibGetDataTypeIdAliasedThruToFromId(paramDTId)
+  %if ( LibIsBuiltInDataType(eDTId) && SLibIsIntegerFromId(eDTId) )
+    %return TLC_TRUE 
+  %else
+    %return TLC_FALSE
+  %endif
+%endfunction
+  
+%% Function: FcnCheckSTDAxisValidityOf2DParam ====================================
+%% Abstract:
+%%      Checks validity of parameter for STD Axis support
+%%      Add "UsedInParameterGroup" to data record
+%%
+%function FcnCheckSTDAxisValidityOf2DParam(tblPrm, LookupType)
+  %if LookupType == "Prelookup"
+    %% Parameter should be used only by Interpolation block (for table)
+    %% and Prelookup blocks (for breakpoints)
+    %assign numUses = 0
+    %foreach blkGrIdx = SIZE(tblPrm.GraphicalRef,0)
+      %assign subsysIdx = tblPrm.GraphicalRef[blkGrIdx][0]
+      %assign blkIdx = tblPrm.GraphicalRef[blkGrIdx][1]
+      %if ::CompiledModel.BlockHierarchyMap.Subsystem[subsysIdx].Block[blkIdx].Type ...
+        != "ModelReference"
+        %assign numUses = numUses + 1
+      %endif
+    %endforeach
+    
+    %if numUses != 3
+      %return TLC_FALSE
+    %endif
+  %elseif LookupType == "LookupND"
+    %% Parameter should be used only by LookupND block (for table and 
+    %% breakpoints)
+    %assign numUses = 0
+    %foreach blkGrIdx = SIZE(tblPrm.GraphicalRef,0)
+      %assign subsysIdx = tblPrm.GraphicalRef[blkGrIdx][0]
+      %assign blkIdx = tblPrm.GraphicalRef[blkGrIdx][1]
+      %if ::CompiledModel.BlockHierarchyMap.Subsystem[subsysIdx].Block[blkIdx].Type ...
+        != "ModelReference"
+        %assign numUses = numUses + 1
+      %endif
+    %endforeach
+    
+    %if numUses != 1
+      %return TLC_FALSE
+    %endif
+  %else
+    %<SLibReportErrorWithIdAndArgs("RTW:tlc:WrongLookupType", LookupType)>
+  %endif
+  %%
+  %assign zData       = FcnGetGlobalMemoryMapData(tblPrm)
+  %if EXISTS("zData.UsedInParameterGroup")
+    %if (zData.UsedInParameterGroup    != "STDAxisLookup2D")
+      %return TLC_FALSE
+    %endif
+  %else
+    %<LibAddIdentifier(zData, "UsedInParameterGroup", "STDAxisLookup2D")>
+  %endif
+  %% Check if data is used in any other ParameterGroup
+  %if ISFIELD(::CompiledModel.ASAP2DataEntityRec,zData.Name)
+    %return TLC_FALSE
+  %else
+    %addtorecord CompiledModel.ASAP2DataEntityRec %<zData.Name> 1         
+  %endif
+  %%
+  %return TLC_TRUE
+%endfunction
+
+%% Function: FcnCheckValidityOf2DParamGroup ====================================
+%% Abstract:
+%%     Checks that all members of paramGroup refer to valid data records
+%%        - tabledata record must have Object
+%%        - data record must not be used in any other ParameterGroup
+%%      - assign group to use STD_AXIS, COM_AXIS, or FIX_AXIS
+%%      Add "UsedInParameterGroup" to data record
+%%
+%function FcnCheckValidityOf2DParamGroup(paramGroup)
+  %with paramGroup
+    %assign zData       = FcnGetGlobalMemoryMapData(Member[2].Reference)
+    %% If Z-axis data is global and has a Simulink Object
+    %% associated with it, add UsedInParameterGroup else return 0
+    %if !(FcnDataSupportsASAP2(zData))
+      %% Early return  
+      %return TLC_FALSE
+    %endif
+    %if EXISTS("zData.UsedInParameterGroup")
+      %if (zData.UsedInParameterGroup    != "Lookup2D.Member[2]") 
+        %% Lookup 1d and 2d table data cannot be shared
+        %<SLibReportErrorWithIdAndArgs("RTW:tlc:ParameterGroup", ...
+          ["%<zData.Name>", "%<zData.UsedInParameterGroup>", "Lookup2D.Member[2]"])>
+      %endif
+    %else
+      %<LibAddIdentifier(zData, "UsedInParameterGroup", "Lookup2D.Member[2]")>
+    %endif
+    %if ISFIELD(::CompiledModel.ASAP2DataEntityRec,zData.Name)
+      %return TLC_FALSE
+    %else
+      %addtorecord ::CompiledModel.ASAP2DataEntityRec %<zData.Name> 1         
+    %endif
+    %%
+    %assign xParam = Member[0].Reference
+    %assign xData  = FcnGetGlobalMemoryMapData(xParam)
+    %% If X-axis data is global and has a Simulink Object
+    %% associated with it, add UsedInParameterGroup
+    %if (FcnDataSupportsASAP2(xData))      
+      %%
+      %if ISFIELD(xData,"UsedInParameterGroup")
+        %if (xData.UsedInParameterGroup    != "Lookup2D.Member[0]") 
+          %% Lookup 1d and 2d tables can share same axis parameter 
+          %if ((xData.UsedInParameterGroup != "Lookup1D.Member[0]") &&...
+            (xData.UsedInParameterGroup   != "Lookup2D.Member[1]"))
+            %<SLibReportErrorWithIdAndArgs("RTW:tlc:ParameterGroup", ...
+              ["%<xData.Name>", "%<xData.UsedInParameterGroup>", "Lookup2D.Member[0]"])>
+          %endif          
+        %endif
+      %else
+        %<LibAddIdentifier(xData, "UsedInParameterGroup", "Lookup2D.Member[0]")>
+      %endif
+      %%
+      %assign xParamName = LibASAP2GetSymbol(xParam)  
+      %if ISFIELD(::CompiledModel.ASAP2DataEntityRec,xParamName)
+        %addtorecord paramGroup xIsDuplicateBreakPoint TLC_TRUE         
+      %else
+        %addtorecord ::CompiledModel.ASAP2DataEntityRec %<xParamName> 1 
+        %addtorecord paramGroup xIsDuplicateBreakPoint TLC_FALSE 
+      %endif   
+      %%
+      %% Decide which axis, COM_AXIS or STD_AXIS
+      %% Check if this parameter is shared between tables        
+      %% If Axis parameters are shared between tables then create COM_AXIS
+      %addtorecord paramGroup xAxisType "COM_AXIS"
+    %else
+      %if FcnIsParamCandidateForFixAxis(xParam)
+        %if (FcnAxisIsEvenlySpaced(xParam.Value))
+          %addtorecord paramGroup xAxisType "FIX_AXIS"
+        %else
+          %addtorecord paramGroup xAxisType "FIX_AXIS_PAR_LIST"
+        %endif
+      %else
+        %return TLC_FALSE  
+      %endif
+    %endif
+    %%    
+    %assign yParam = Member[1].Reference
+    %assign yData  = FcnGetGlobalMemoryMapData(yParam)
+    %% If y-axis data is global and has a Simulink Object
+    %% associated with it, add UsedInParameterGroup
+    %if (FcnDataSupportsASAP2(yData))    
+      %%
+      %if ISFIELD(yData,"UsedInParameterGroup")
+        %if (yData.UsedInParameterGroup != "Lookup2D.Member[1]") 
+          %% Lookup 1d and 2d tables can share same axis parameter 
+          %if ((yData.UsedInParameterGroup != "Lookup1D.Member[0]") &&...
+            (yData.UsedInParameterGroup != "Lookup2D.Member[0]")) 
+            %<SLibReportErrorWithIdAndArgs("RTW:tlc:ParameterGroup", ...
+              ["%<yData.Name>", "%<yData.UsedInParameterGroup>", "Lookup2D.Member[1]"])>
+          %endif          
+        %endif
+      %else
+        %<LibAddIdentifier(yData, "UsedInParameterGroup", "Lookup2D.Member[1]")>
+      %endif
+      %%
+      %assign yParamName = LibASAP2GetSymbol(yParam)  
+      %if ISFIELD(::CompiledModel.ASAP2DataEntityRec,yParamName)
+        %addtorecord paramGroup yIsDuplicateBreakPoint TLC_TRUE         
+      %else
+        %addtorecord ::CompiledModel.ASAP2DataEntityRec %<yParamName> 1 
+        %addtorecord paramGroup yIsDuplicateBreakPoint TLC_FALSE 
+      %endif 
+      %addtorecord paramGroup yAxisType "COM_AXIS"
+     %else
+      %% Check if parameter is a candidate for FIX_AXIS
+      %if FcnIsParamCandidateForFixAxis(yParam) 
+         %if (FcnAxisIsEvenlySpaced(yParam.Value))
+           %addtorecord paramGroup yAxisType "FIX_AXIS"
+         %else
+           %addtorecord paramGroup yAxisType "FIX_AXIS_PAR_LIST"
+         %endif
+       %else
+        %return TLC_FALSE  
+      %endif
+    %endif
+    %%
+    %return TLC_TRUE
+  %endwith
+%endfunction
+
+%% Function: SLibWriteToRecordLayoutsRecord ========
+%% Abstract:
+%%   Store details of Record Layout to ASAP2RecordLayouts record
+%function SLibWriteToRecordLayoutsRecord(busObject) void
+    
+  %if !ISFIELD(busObject,"STDAxisInfo")
+    %assign errStr = "Bus object does not have any information regarding STD Axis"
+    %<LibReportFatalError(errStr)>
+  %endif
+  
+  %assign recordLayoutName = busObject.Name
+  %if ISFIELD(CompiledModel.ASAP2RecordLayouts.RecordLayouts,recordLayoutName)
+    %% Record Layout already exists
+    %return
+  %endif
+
+  %assign %<recordLayoutName> = busObject
+  
+  %assign recordLayouts = CompiledModel.ASAP2RecordLayouts.RecordLayouts
+  %assign recordLayouts = recordLayouts + %<recordLayoutName>
+  %assign CompiledModel.ASAP2RecordLayouts.NumRecordLayouts = ...
+    CompiledModel.ASAP2RecordLayouts.NumRecordLayouts + 1
+  
+%endfunction
+
+%% Function: FcnGetObjectProperties ============================================
+%% Abstract:
+%%      Returns pointer to ObjectProperties record referred to by record
+%%      (record = Record containing MemoryMapIdx)
+%%
+%function FcnGetObjectProperties(record)
+  %assign data = FcnGetGlobalMemoryMapData(record)
+  %assert ((TYPE(data)=="Scope") && (data.HasObject))
+  %return data.Object.ObjectProperties
+%endfunction
+
+
+%% Function: LibASAP2RegisterTemplate ==========================================
+%% Abstract:
+%%      Registers user-defined template (related to parameter groups)
+%%
+%%      Expects user-defined functions:
+%%        "ASAP2UserFcnWriteRecordLayout_%<Template.Name>"
+%%        "ASAP2UserFcnWriteCharacteristic_%<Template.Name>"
+%%
+%function LibASAP2RegisterTemplate(templateName) void
+  %assign tmpVar = Template { Name templateName }
+  %assign templates = ::CompiledModel.Templates
+  %assign templates = templates + Template
+  %assign templates.NumTemplates = templates.NumTemplates + 1
+%endfunction
+
+
+%% Function: ASAP2_WarnForObsoleteProperties
+%% Abstract:
+%%   Produce a one-time warning to inform users that the old _ASAP2 properties
+%%   are now obsolete and have been replaced by built-in properties.
+%function ASAP2_WarnForObsoleteProperties(record) void
+  %assign data = FcnGetGlobalMemoryMapData(record)
+  %assert ((TYPE(data)=="Scope") && (data.HasObject))
+  %assign packageName = data.Object.Package
+  %assign className   = data.Object.Class
+  %assign warningID   = "::AlreadyWarnedForObsoletePropertiesIn%<package>_%<class>"
+  %if (!EXISTS(%<warningID>))
+    %assign %<warningID> = 1
+    %assign warnTxt = ...
+      "\n" + ...
+      "This class '%<packageName>.%<className>' contains ASAP2-related properties\n" + ...
+      "that have been obsoleted and replaced by properties in the built-in\n" + ...
+      "Simulink data object classes, as follows:\n" + ...
+      "\n" + ...
+      "  LongID_ASAP2      --> Description\n" + ...
+      "  PhysicalMin_ASAP2 --> Min\n" + ...
+      "  PhysicalMax_ASAP2 --> Max\n" + ...
+      "  Units_ASAP2       --> DocUnits\n" + ...
+      "\n" + ...
+      "Support for the obsoleted properties may be removed in future releases\n" + ...
+      "so please remove these properties from your data object classes and\n" + ...
+      "update your M/TLC code to use the built-in properties.\n"
+  %endif
+%endfunction
+
+
+%% Function: LibASAP2GetSymbol =================================================
+%% Abstract:
+%%      Returns the data symbol (variable name) for specified record.
+%%
+%function LibASAP2GetSymbol(record) void
+  %assign data = FcnGetGlobalMemoryMapData(record)
+  %return data.Name
+%endfunction
+
+%% Function: LibASAP2GetSymbolForBusElement ====================================
+%% Abstract:
+%%      Returns the data symbol (structureName.fieldName) for specified field of
+%%      structured data
+%%
+%function LibASAP2GetSymbolForBusElement(data,busIdx) void
+  %assign symbol = data.Name + "." + data.StructInfo.BusElement[busIdx].Name
+  %return symbol
+%endfunction
+
+
+%% Function: LibASAP2GetParamWidth =============================================
+%% Abstract:
+%%      Returns the data width (total number of elements) for specified record.
+%%
+%function LibASAP2GetParamWidth(paramRecord) void
+  %assign data  = FcnGetGlobalMemoryMapData(paramRecord)
+  %assign nDims = data.NumDimensions
+  %assign retWidth = 1
+  %if nDims > 2
+    %foreach dimsIdx = nDims
+      %assign retWidth = retWidth*data.Dimensions[dimsIdx]
+    %endforeach
+  %else
+    %assign retWidth = data.NumCols * data.NumRows
+  %endif
+  %return retWidth
+%endfunction
+
+
+%% Function: LibASAP2GetParamWidthForBusElement ================================
+%% Abstract:
+%%      Returns the data width (total number of elements) for specified field of 
+%%      structured data 
+%%
+%function LibASAP2GetParamWidthForBusElement(data,busIdx) void
+  %assign nDims = data.StructInfo.BusElement[busIdx].NumDimensions
+  %assign retWidth = 1
+  %if nDims > 2
+    %foreach dimsIdx = nDims
+      %assign retWidth = retWidth*data.Dimensions[dimsIdx]
+    %endforeach
+  %else
+    %assign retWidth = data.StructInfo.BusElement[busIdx].NumCols * ...
+      data.StructInfo.BusElement[busIdx].NumRows
+  %endif
+  %return retWidth
+%endfunction
+
+%% Function: LibASAP2GetLongID =================================================
+%% Abstract:
+%%      Returns the Long Identifier (description) for specified record.
+%%
+%function LibASAP2GetLongID(record) void
+  %assign data = FcnGetGlobalMemoryMapData(record)
+  %if !data.HasObject
+    %return ""
+  %endif
+  %assign objectProperties = FcnGetObjectProperties(record)
+  %if (ISFIELD(objectProperties,"LongID_ASAP2"))
+    %<ASAP2_WarnForObsoleteProperties(record)>
+    %assign description = objectProperties.LongID_ASAP2
+  %else
+    %assign description = objectProperties.Description
+  %endif
+  %% Escape double-quotes
+  %if !ISEMPTY(description)
+    %assign description = FEVAL("regexprep",description, "\"","\\\\\"")
+  %endif
+  %return description
+%endfunction
+
+%% Function: LibASAP2GetLongIDForBusElement ====================================
+%% Abstract:
+%%      Returns the Long Identifier (description) for specified field of 
+%%      structured data
+%%
+%function LibASAP2GetLongIDForBusElement(data,busIdx) void
+  %% Simulink.BusElement currently does not support Description
+  %assign description = "" 
+  %return description
+%endfunction
+
+
+%% Function: LibASAP2GetAddress ================================================
+%% Abstract:
+%%      Returns the Memory Address for specified record.
+%%
+%function LibASAP2GetAddress(record) void
+  %assign data = FcnGetGlobalMemoryMapData(record)
+  %if !data.HasObject
+    %return "0x0000 /* @ECU_Address@%<LibASAP2GetSymbol(record)>@ */"
+  %endif
+  %assign objectProperties = FcnGetObjectProperties(record)
+  %with objectProperties
+    %if ((ISFIELD(objectProperties,"MemoryAddress_ASAP2")) && ...
+         (SIZE(MemoryAddress_ASAP2, 1) != 0))
+      %return MemoryAddress_ASAP2
+    %else
+      %return "0x0000 /* @ECU_Address@%<LibASAP2GetSymbol(record)>@ */"
+    %endif
+  %endwith
+%endfunction
+
+%% Function: LibASAP2GetAddressForBusElement ==================================
+%% Abstract:
+%%      Returns the Memory Address for specified field of structured data
+%%
+%function LibASAP2GetAddressForBusElement(data,busIdx) void
+  %return "0x0000 /* @ECU_Address@%<LibASAP2GetSymbolForBusElement(data,busIdx)>@ */"
+%endfunction
+
+
+%% Function: LibASAP2GetCompuMethod ============================================
+%% Abstract:
+%%      Returns the CompuMethod for specified record.
+%%      - Compiles CompuMethod information
+%%      - If identical CompuMethod exists - use it
+%%      - Otherwise, register a new CompuMethod
+%%
+%function LibASAP2GetCompuMethod(record) void
+
+  %assign data        = FcnGetGlobalMemoryMapData(record)
+  
+  %% Determine the units
+  %assign CM_Units = FcnASAP2GetUnits(record)
+    
+  %if FcnDataIsStructuredAndSupportsASAP2(data)
+    %% STD Axis
+    %assign busObject = data.StructInfo
+    %if !ISFIELD(busObject,"STDAxisInfo")
+      %assign errStr = "Bus object does not have any information regarding STD Axis"
+      %<LibReportFatalError(errStr)>
+    %endif
+    %assign tablePosInBus = busObject.STDAxisInfo[0] 
+    %assign dataTypeId = busObject.BusElement[tablePosInBus].DataTypeIdx
+  %else
+    %if !data.HasObject
+      %assign dataTypeId  = LibGetRecordDataTypeId(record)
+    %else
+      %assign dataTypeId  = LibGetRecordDataTypeId(data)
+    %endif
+  %endif
+  
+  %% Construct COMPU_METHOD based on dataTypeId and CM_Units
+  %assign CM_Name = FcnASAP2ConstructCompuMethod(dataTypeId, CM_Units)
+  %return CM_Name
+  
+%endfunction
+
+%function LibASAP2GetCompuMethodForBusElement(data,busIdx) void 
+  %% Determine the units
+  %assign CM_Units = FcnASAP2GetUnitsForBusElement(data,busIdx)
+  %% Determine the ID of the data type
+  %assign dataTypeId = data.StructInfo.BusElement[busIdx].DataTypeIdx
+  
+  %% Construct COMPU_METHOD based on dataTypeId and CM_Units
+  %assign CM_Name = FcnASAP2ConstructCompuMethod(dataTypeId, CM_Units)
+  %return CM_Name
+  
+%endfunction
+
+
+%function FcnASAP2ConstructCompuMethod(dataTypeId, CM_Units) void
+  %assign CM_VTabCoeffs  = []
+  %assign CM_ConvType = "RAT_FUNC"
+  %assign CM_Format   = ASAP2NumberFormat
+  %assign Default_Format = "%<CM_Format>"
+  
+  %% Determine the data type
+  %if LibIsEnumDataType(dataTypeId) || LibIsAliasDataType(dataTypeId)
+    %assign dataTypeName = LibGetDataTypeNameFromId(dataTypeId)
+  %else
+    %assign dataTypeName = DataTypes.DataType[dataTypeId].DataTypeName
+  %endif  
+    
+  %% Create a unique ID (CM_Name) for each computation method
+  %assign CM_Name = FEVAL("rtwprivate", "getAndCheckASAP2CompuMethodName", dataTypeName, CM_Units)
+  %if ISEMPTY(CM_Name)
+    %assign errStr = "The Computation Method name returned by " + ...
+      "$MATLABROOT/toolbox/rtw/targets/asap2/asap2/user/getCompuMethodName.m" + ...
+      " is invalid"
+    %<LibReportFatalError(errStr)>
+  %endif
+  %assign CM_Name = "%<ASAP2CompuMethodName_Prefix>%<CM_Name>"
+  
+  %% If CompuMethod already exists, then return its Name
+  %if ISFIELD(::CompiledModel.CompuMethods.CompuMethodsHash,CM_Name)
+    %assign CompuMethodIdx = ::CompiledModel.CompuMethods.CompuMethodsHash.%<CM_Name>
+    %assign hashedUnits = ::CompiledModel.CompuMethods.CompuMethod[CompuMethodIdx].Units
+    %if !ISEQUAL(hashedUnits,CM_Units)
+      %assign errArgs = ["%<CM_Name>", "%<hashedUnits>", "%<CM_Units>"]
+      %<SLibReportErrorWithIdAndArgs("RTW:asap2:SameCompuMethodName", errArgs)>
+    %endif
+    
+    %return CM_Name
+  %endif   
+    
+  %if LibIsDataTypeFixpt(dataTypeId)
+    %assign fixExp    = DataTypes.DataType[dataTypeId].FixedExp
+    %assign numBits   = DataTypes.DataType[dataTypeId].ActualBits
+    %assign fracSlope = CAST("Real",DataTypes.DataType[dataTypeId].FracSlope)
+    %assign bias      = CAST("Real",DataTypes.DataType[dataTypeId].Bias)
+      
+    %% Summary of conversion:
+    %% ======================
+    %%     c1(V^2)+c2(V)+c3   (V-bias)
+    %% Q = ---------------- = --------
+    %%     c4(V^2)+c5(V)+c6    slope
+    %%
+    %% where: slope = fracSlope*(2^fixExp)
+    
+    %% Calculate slope:
+    %if (fracSlope == 0)
+      %assign slope = 0
+    %elseif (fixExp == 0)
+      %assign slope = fracSlope
+    %else
+      %assign slope = FEVAL("eval","%<fracSlope>*(2^%<fixExp>)")
+      %if (slope == 0)
+        %assign errMsg = "Error computing CompuMethod for fixed-point data"
+        %<LibReportFatalError(errMsg)>
+      %endif
+    %endif
+    
+    %% for fixed point calculate the CM_format
+    %assign CM_Format = FEVAL("getCompuMethodFormat", %<fracSlope>, %<fixExp>, %<bias>, %<numBits>, CM_Units)
+    %if CM_Format == "customformat"
+      %assign CM_Format = Default_Format
+    %endif
+    
+    %% Derive coefficients:
+    %if bias == 0.0
+      %assign c3 = 0
+      %assign CM_LongId = "Q = V"
+    %else
+      %assign c3 = -bias
+      %if bias > 0.0
+        %assign CM_LongId = FEVAL("sprintf", "Q = (V-%<Default_Format>f)", bias)
+      %else
+        %assign CM_LongId = FEVAL("sprintf", "Q = (V+%<Default_Format>f)", -bias)
+      %endif
+    %endif
+    
+    %if slope < 1
+      %% coeffs = [0 1/slope (-bias)/slope 0 0 1]
+      %assign c2 = 1/slope
+      %assign c3 = c3/slope
+      %assign c6 = 1
+      %assign CM_LongId = FEVAL("sprintf", "%<CM_LongId>*%<Default_Format>f", 1/slope)
+    %else
+      %% coeffs = [0 1 (-bias) 0 0 slope]
+      %assign c2 = 1
+      %assign c6 = slope
+      %assign CM_LongId = FEVAL("sprintf", "%<CM_LongId>/%<Default_Format>f", slope)
+    %endif
+    %assign CM_Coeffs = FEVAL("sprintf", "0 %<Default_Format>f %<Default_Format>f 0 0 %<Default_Format>f", c2, c3, c6)
+    
+    
+  %elseif LibIsEnumDataType(dataTypeId)
+    %assign dtName      = LibGetDataTypeNameFromId(dataTypeId)
+    %assign CM_ConvType = "TAB_VERB"
+    %assign CM_LongId   = "Enumerated data type: %<dtName>"
+    
+    %% Coeffs contains enumeration list with unique values
+    %openfile tmpBuf
+    %assign numUniqueEnums = 0
+    %foreach enumIdx = FcnGetEnumTypeNumEnums(dataTypeId)
+      %assign enumValue = FcnGetEnumTypeValue(dataTypeId, enumIdx)
+      %assign numUniqueEnums = numUniqueEnums+1
+      %assign enumString     = FcnGetEnumTypeString(dataTypeId, enumIdx)
+      %assign emitString     = "%<enumValue> " + "\"%<enumString>\""
+      %assign CM_VTabCoeffs  =  CM_VTabCoeffs + emitString
+      %<emitString>
+    %endforeach
+    %closefile tmpBuf
+    
+    %% Put together the contents of the V-Table:
+    %openfile CM_Coeffs
+    %<tmpBuf>
+    %closefile CM_Coeffs
+  %else
+    
+    %assign dTypeThruId =  LibGetDataTypeIdAliasedThruToFromId(dataTypeId)
+    %if (dTypeThruId == tSS_DOUBLE)
+      %assign CM_Format = FEVAL("getFloatingPointCompuMethodFormat", "DOUBLE", CM_Units)     
+    %elseif (dTypeThruId == tSS_SINGLE)
+      %assign CM_Format = FEVAL("getFloatingPointCompuMethodFormat", "SINGLE", CM_Units)  
+    %elseif (dTypeThruId == tSS_BOOLEAN)
+      %assign CM_Format = "%1.0"
+    %else
+      %assign dTypeRec  = ::CompiledModel.DataTypes.DataType[dTypeThruId]
+      %assign numBits   = %<dTypeRec.RequiredBits>
+      %assign CM_Format = FEVAL("getCompuMethodFormat", 1, 0, 0, %<numBits>, CM_Units)  
+    %endif
+    %assign CM_LongId = "Q = V"
+    %assign CM_Coeffs = "0 1 0 0 0 1"
+  %endif
+  
+  %% Add CompuMethod to CompiledModel (could not be found above)
+  %assign numCompuMethods = ::CompiledModel.CompuMethods.NumCompuMethods
+        
+  %assign tmpVar = CompuMethod\
+  {\
+    Name     CM_Name;\
+    LongId   CM_LongId;\
+    ConvType CM_ConvType;\
+    Format   CM_Format;\
+    Units    CM_Units;\
+    Coeffs   CM_Coeffs;\
+    VTabs    CM_VTabCoeffs\
+  }
+  %assign compuMethods = ::CompiledModel.CompuMethods
+  %assign compuMethods = compuMethods + CompuMethod
+  %% Add the unique ID to hash table
+  %addtorecord ::CompiledModel.CompuMethods.CompuMethodsHash %<CM_Name> numCompuMethods
+  %assign compuMethods.NumCompuMethods = numCompuMethods + 1
+  %return CM_Name
+%endfunction
+
+
+%% Function: LibASAP2GetFixAxisInfo(axisParam) void ==================
+%% Abstract:
+%%   Returns a axisInfo record which has the following fields
+%%     - CompuMethod: Name of the CompuMethod for the axis.
+%%     - Format     : Format string of the fix axis
+%%     - PhysicalMin: The lower limit of the axis
+%%     - PhysicalMax: The ipper limit of the axis
+%%
+%function LibASAP2GetFixAxisInfo(axisParam) void
+  %assign dataTypeId     = axisParam.OriginalDataTypeIdx
+  %assign CM_ConvType    = "RAT_FUNC"
+  %assign CM_Units       = ""
+  %assign CM_Format      = ASAP2NumberFormat
+  %assign Default_Format = "%<CM_Format>"
+  %assign dataType       = ::CompiledModel.DataTypes.DataType[dataTypeId]
+  %assign dTypeThruId    =  LibGetDataTypeIdAliasedThruToFromId(dataTypeId)
+  %%
+  %if (dTypeThruId == tSS_DOUBLE) || (dTypeThruId == tSS_SINGLE)
+    %<SLibReportErrorWithId("RTW:tlc:FloatDataAsAxis")>
+  %endif
+  
+  %assign dTypeRec  = ::CompiledModel.DataTypes.DataType[dTypeThruId]
+  %assign numBits   = %<dTypeRec.RequiredBits>
+  
+  %assign numAxisPoints = %<SIZE(axisParam.Value,1)>
+  %assign upperLimit    = CAST("Number", %<axisParam.Value[numAxisPoints-1]>)
+  %assign lowerLimit    = CAST("Number", %<axisParam.Value[0]>)
+  %assign axisInfo  = AxisInfo {  \
+    CompuMethod     "";           \
+    Format          CM_Format;    \
+    PhysicalMin     %<lowerLimit>;\
+    PhysicalMax     %<upperLimit> \      
+  }
+  
+  %% Create a unique ID (CM_Name) for each computation method
+  %assign CM_Name = FEVAL("rtwprivate","getAndCheckASAP2CompuMethodName", dataType.DataTypeName, CM_Units)
+  %if ISEMPTY(CM_Name)
+    %<SLibReportErrorWithId("RTW:tlc:CompMethod")>
+  %endif
+  %assign CM_Name = "%<ASAP2CompuMethodName_Prefix>%<CM_Name>" 
+   
+  %if LibIsDataTypeFixpt(dTypeThruId)
+    %assign fixExp    = %<dTypeRec.FixedExp>
+    %assign fracSlope = %<dTypeRec.FracSlope>
+    %assign bias      = %<dTypeRec.Bias>
+    
+    %% Summary of conversion:
+    %% ======================
+    %%     c1(V^2)+c2(V)+c3   (V-bias)
+    %% Q = ---------------- = --------
+    %%     c4(V^2)+c5(V)+c6    slope
+    %%
+    %% where: slope = fracSlope*(2^fixExp)
+    
+    %% Calculate slope:
+    %if (fracSlope == 0)
+      %assign slope = 0
+    %elseif (fixExp == 0)
+      %assign slope = fracSlope
+    %else
+      %assign slope = FEVAL("eval","%<fracSlope>*(2^%<fixExp>)")
+      %if (slope == 0)
+        %assign errMsg = "Error computing CompuMethod for fixed-point data"
+        %<LibReportFatalError(errMsg)>
+      %endif
+    %endif
+    
+    %assign axisInfo.PhysicalMin  = slope*lowerLimit + bias
+    %assign axisInfo.PhysicalMax  = slope*upperLimit + bias
+    
+    %% If CompuMethod exists, then return axisInfo
+    %if ISFIELD(::CompiledModel.CompuMethods.CompuMethodsHash,CM_Name)
+      %assign CompuMethodIdx = ::CompiledModel.CompuMethods.CompuMethodsHash.%<CM_Name>
+      %assign axisInfo.CompuMethod = ::CompiledModel.CompuMethods.CompuMethod[CompuMethodIdx].Name
+      %assign axisInfo.Format = ::CompiledModel.CompuMethods.CompuMethod[CompuMethodIdx].Format
+      %return axisInfo
+    %endif
+     
+    %% for fixed point calculate the CM_format
+    %assign CM_Format = ...
+      FEVAL("getCompuMethodFormat", %<fracSlope>, %<fixExp>, %<bias>, %<numBits>, CM_Units)
+    %if CM_Format == "customformat"
+      %assign CM_Format = Default_Format
+    %endif
+    
+    %% Derive coefficients:
+    %if bias == 0.0
+      %assign c3 = 0
+      %assign CM_LongId = "Q = V"
+    %else
+      %assign c3 = -bias
+      %if bias > 0.0
+        %assign CM_LongId = FEVAL("sprintf", "Q = (V-%<Default_Format>f)", bias)
+      %else
+        %assign CM_LongId = FEVAL("sprintf", "Q = (V+%<Default_Format>f)", -bias)
+      %endif
+    %endif\
+    
+    %if slope < 1
+      %% coeffs = [0 1/slope (-bias)/slope 0 0 1]
+      %assign c2 = 1/slope
+      %assign c3 = c3/slope
+      %assign c6 = 1
+      %assign CM_LongId = FEVAL("sprintf", "%<CM_LongId>*%<Default_Format>f", 1/slope)
+    %else
+      %% coeffs = [0 1 (-bias) 0 0 slope]
+      %assign c2 = 1
+      %assign c6 = slope
+      %assign CM_LongId = FEVAL("sprintf", "%<CM_LongId>/%<Default_Format>f", slope)
+    %endif
+    %assign CM_Coeffs = FEVAL("sprintf", "0 %<Default_Format>f %<Default_Format>f 0 0 %<Default_Format>f", c2, c3, c6)
+  %else
+    
+    %% If CompuMethod exists, then return axisInfo
+    %if ISFIELD(::CompiledModel.CompuMethods.CompuMethodsHash,CM_Name)
+      %assign CompuMethodIdx = ::CompiledModel.CompuMethods.CompuMethodsHash.%<CM_Name>
+      %assign axisInfo.CompuMethod = ::CompiledModel.CompuMethods.CompuMethod[CompuMethodIdx].Name
+      %assign axisInfo.Format = ::CompiledModel.CompuMethods.CompuMethod[CompuMethodIdx].Format
+      %return axisInfo
+    %endif
+   
+    %assign CM_Format = FEVAL("getCompuMethodFormat", 1, 0, 0, %<numBits>, CM_Units)
+    %if CM_Format == "customformat"
+      %assign CM_Format = Default_Format
+    %endif
+    
+    %% If ASAP2GenNoCompuMethod is true (default is false), then do not 
+    %% generate a CompuMethod for FIX_AXIS with integer data type and no units.
+    %% The Conversion method in this case would be NO_COMPU_METHOD.
+    %if ASAP2GenNoCompuMethod
+      %if !(::CompiledModel.DataTypes.DataType[axisParam.OriginalDataTypeIdx].IsFixedPoint)
+        %assign axisInfo.CompuMethod = "NO_COMPU_METHOD"
+        %assign axisInfo.Format = CM_Format
+        %return axisInfo
+      %endif
+    %endif
+
+    %assign CM_LongId = "Q = V"
+    %assign CM_Coeffs = "0 1 0 0 0 1"
+        
+  %endif
+  %assign axisInfo.Format = CM_Format
+   
+  %% Add CompuMethod to CompiledModel (could not be found above)
+  %assign numCompuMethods = ::CompiledModel.CompuMethods.NumCompuMethods 
+  %assign tmpVar  = CompuMethod\
+  {\
+    Name     CM_Name;\
+    LongId   CM_LongId;\
+    ConvType CM_ConvType;\
+    Format   CM_Format;\
+    Units    "";\
+    Coeffs   CM_Coeffs\      
+  }
+  %assign compuMethods = ::CompiledModel.CompuMethods
+  %assign compuMethods = compuMethods + CompuMethod
+  %% Add the unique ID to hash table
+  %addtorecord ::CompiledModel.CompuMethods.CompuMethodsHash %<CM_Name> numCompuMethods
+  %assign compuMethods.NumCompuMethods = numCompuMethods + 1
+  %assign axisInfo.CompuMethod = tmpVar.Name
+  %return axisInfo
+%endfunction
+
+%% Function: LibASAP2GetSTDAxisInfo(axisParam) void ==================
+%% Abstract:
+%%   Returns a axisInfo record which has the following fields
+%%     - CompuMethod: Name of the CompuMethod for the axis.
+%%     - PhysicalMin: The lower limit of the axis
+%%     - PhysicalMax: The ipper limit of the axis
+%%
+%function LibASAP2GetSTDAxisInfo(axisParam) void
+
+  %if !ISFIELD(axisParam,"BusElement")
+    %<SLibReportErrorWithId("RTW:tlc:NoBusEl")>
+  %endif
+  %assign dataTypeId =  axisParam.BusElement.DataTypeIdx
+  %assign numAxisPoints = axisParam.BusElement.NumRows * ...
+    axisParam.BusElement.NumCols
+      
+  %assign CM_ConvType = "RAT_FUNC"
+  %assign CM_Units = "" 
+  %assign CM_Format   = ASAP2NumberFormat
+  %assign Default_Format = "%<CM_Format>"
+  %assign CM_VTabCoeffs  = []
+    
+  %assign dTypeRec  = ::CompiledModel.DataTypes.DataType[dataTypeId]
+  %assign numBits   = %<dTypeRec.RequiredBits>
+  
+  %assign upperLimit    = LibASAP2GetPhysicalMinFromDTId(dataTypeId)
+  %assign lowerLimit    = LibASAP2GetPhysicalMaxFromDTId(dataTypeId)
+  %assign axisInfo  = AxisInfo {  \
+    CompuMethod     "";           \
+    NumAxisPoints  numAxisPoints;\
+    PhysicalMin    upperLimit;\
+    PhysicalMax    lowerLimit\      
+  }
+  
+  %% Determine the data type
+  %if LibIsEnumDataType(dataTypeId) || LibIsAliasDataType(dataTypeId)
+    %assign dataTypeName = LibGetDataTypeNameFromId(dataTypeId)
+  %else
+    %assign dataTypeName = DataTypes.DataType[dataTypeId].DataTypeName
+  %endif
+  
+  %% Create a unique ID (CM_Name) for each computation method
+  %assign CM_Name = FEVAL("rtwprivate", "getAndCheckASAP2CompuMethodName", dataTypeName, CM_Units)
+  %if ISEMPTY(CM_Name)
+    %assign errStr = "The Computation Method name returned by " + ...
+      "$MATLABROOT/toolbox/rtw/targets/asap2/asap2/user/getCompuMethodName.m" + ...
+      " is invalid"
+    %<LibReportFatalError(errStr)>
+  %endif
+  %assign CM_Name = "%<ASAP2CompuMethodName_Prefix>%<CM_Name>"
+  
+  %if LibIsDataTypeFixpt(dataTypeId)
+    %assign fixExp    = %<dTypeRec.FixedExp>
+    %assign fracSlope = %<dTypeRec.FracSlope>
+    %assign bias      = %<dTypeRec.Bias>
+    
+    %% Summary of conversion:
+    %% ======================
+    %%     c1(V^2)+c2(V)+c3   (V-bias)
+    %% Q = ---------------- = --------
+    %%     c4(V^2)+c5(V)+c6    slope
+    %%
+    %% where: slope = fracSlope*(2^fixExp)
+    
+    %% Calculate slope:
+    %if (fracSlope == 0)
+      %assign slope = 0
+    %elseif (fixExp == 0)
+      %assign slope = fracSlope
+    %else
+      %assign slope = FEVAL("eval","%<fracSlope>*(2^%<fixExp>)")
+      %if (slope == 0)
+        %assign errMsg = "Error computing CompuMethod for fixed-point data"
+        %<LibReportFatalError(errMsg)>
+      %endif
+    %endif
+    
+    %% If CompuMethod exists, then return axisInfo
+    %if ISFIELD(::CompiledModel.CompuMethods.CompuMethodsHash,CM_Name)
+      %assign CompuMethodIdx = ::CompiledModel.CompuMethods.CompuMethodsHash.%<CM_Name>
+      %assign axisInfo.CompuMethod = ::CompiledModel.CompuMethods.CompuMethod[CompuMethodIdx].Name
+      %return axisInfo
+    %endif
+     
+    %% for fixed point calculate the CM_format
+    %assign CM_Format = FEVAL("getCompuMethodFormat", %<fracSlope>, %<fixExp>, %<bias>, %<numBits>, CM_Units)
+    %if CM_Format == "customformat"
+      %assign CM_Format = Default_Format
+    %endif
+    
+    %% Derive coefficients:
+    %if bias == 0.0
+      %assign c3 = 0
+      %assign CM_LongId = "Q = V"
+    %else
+      %assign c3 = -bias
+      %if bias > 0.0
+        %assign CM_LongId = FEVAL("sprintf", "Q = (V-%<Default_Format>f)", bias)
+      %else
+        %assign CM_LongId = FEVAL("sprintf", "Q = (V+%<Default_Format>f)", -bias)
+      %endif
+    %endif\
+    
+    %if slope < 1
+      %% coeffs = [0 1/slope (-bias)/slope 0 0 1]
+      %assign c2 = 1/slope
+      %assign c3 = c3/slope
+      %assign c6 = 1
+      %assign CM_LongId = FEVAL("sprintf", "%<CM_LongId>*%<Default_Format>f", 1/slope)
+    %else
+      %% coeffs = [0 1 (-bias) 0 0 slope]
+      %assign c2 = 1
+      %assign c6 = slope
+      %assign CM_LongId = FEVAL("sprintf", "%<CM_LongId>/%<Default_Format>f", slope)
+    %endif
+    %assign CM_Coeffs = FEVAL("sprintf", "0 %<Default_Format>f %<Default_Format>f 0 0 %<Default_Format>f", c2, c3, c6)
+      
+  %elseif LibIsEnumDataType(dataTypeId)
+    
+    %if ISFIELD(::CompiledModel.CompuMethods.CompuMethodsHash,CM_Name)
+      %assign CompuMethodIdx = ::CompiledModel.CompuMethods.CompuMethodsHash.%<CM_Name>
+      %assign axisInfo.CompuMethod = ::CompiledModel.CompuMethods.CompuMethod[CompuMethodIdx].Name
+      %return axisInfo
+    %endif
+    
+    %assign dtName      = LibGetDataTypeNameFromId(dataTypeId)
+    %assign CM_ConvType = "TAB_VERB"
+    %assign CM_LongId   = "Enumerated data type: %<dtName>"
+    %assign CM_Units    = ""
+    
+    %% Coeffs contains enumeration list with unique values
+    %openfile tmpBuf
+    %assign numUniqueEnums = 0
+    %foreach enumIdx = FcnGetEnumTypeNumEnums(dataTypeId)
+      %assign enumValue = FcnGetEnumTypeValue(dataTypeId, enumIdx)
+      %assign numUniqueEnums = numUniqueEnums+1
+      %assign enumString     = FcnGetEnumTypeString(dataTypeId, enumIdx)
+      %assign emitString     = "%<enumValue> " + "\"%<enumString>\""
+      %assign CM_VTabCoeffs  =  CM_VTabCoeffs + emitString
+      %<emitString>
+    %endforeach
+    %closefile tmpBuf
+    
+    %% Put together the contents of the V-Table:
+    %openfile CM_Coeffs
+    %<tmpBuf>
+    %closefile CM_Coeffs
+    
+  %else
+    
+    %% If CompuMethod exists, then return axisInfo
+    %if ISFIELD(::CompiledModel.CompuMethods.CompuMethodsHash,CM_Name)
+      %assign CompuMethodIdx = ::CompiledModel.CompuMethods.CompuMethodsHash.%<CM_Name>
+      %assign axisInfo.CompuMethod = ::CompiledModel.CompuMethods.CompuMethod[CompuMethodIdx].Name
+      %return axisInfo
+    %endif
+    
+    %assign dTypeThruId =  LibGetDataTypeIdAliasedThruToFromId(dataTypeId)
+    %if (dTypeThruId == tSS_DOUBLE)
+      %assign CM_Format = FEVAL("getFloatingPointCompuMethodFormat", "DOUBLE", CM_Units)     
+    %elseif (dTypeThruId == tSS_SINGLE)
+      %assign CM_Format = FEVAL("getFloatingPointCompuMethodFormat", "SINGLE", CM_Units)  
+    %elseif (dTypeThruId == tSS_BOOLEAN)
+      %assign CM_Format = "%1.0"
+    %else
+      %assign dTypeRec  = ::CompiledModel.DataTypes.DataType[dTypeThruId]
+      %assign numBits   = %<dTypeRec.RequiredBits>
+      %assign CM_Format = FEVAL("getCompuMethodFormat", 1, 0, 0, %<numBits>, CM_Units)  
+    %endif
+    %assign CM_LongId = "Q = V"
+    %assign CM_Coeffs = "0 1 0 0 0 1"
+  %endif
+  
+  %% Add CompuMethod to CompiledModel (could not be found above)
+  %assign numCompuMethods = ::CompiledModel.CompuMethods.NumCompuMethods 
+  %assign tmpVar  = CompuMethod\
+  {\
+    Name     CM_Name;\
+    LongId   CM_LongId;\
+    ConvType CM_ConvType;\
+    Format   CM_Format;\
+    Units    CM_Units;\
+    Coeffs   CM_Coeffs;\
+    VTabs    CM_VTabCoeffs\
+  }
+  %assign compuMethods = ::CompiledModel.CompuMethods
+  %assign compuMethods = compuMethods + CompuMethod
+  %% Add the unique ID to hash table
+  %addtorecord ::CompiledModel.CompuMethods.CompuMethodsHash %<CM_Name> numCompuMethods
+  %assign compuMethods.NumCompuMethods = numCompuMethods + 1
+  %assign axisInfo.CompuMethod = tmpVar.Name
+  %return axisInfo
+%endfunction
+
+
+%% Function: LibASAP2GetPhysicalMin ============================================
+%% Abstract:
+%%      Returns the Physical Minimum for specified record.
+%%
+%function LibASAP2GetPhysicalMin(record) void
+  %assign minValue = "" %% Default
+  %% Extract Min from data object (if record has data object)
+  %assign data = FcnGetGlobalMemoryMapData(record)
+  %if data.HasObject
+    %assign objectProperties = FcnGetObjectProperties(record)
+    %if (ISFIELD(objectProperties,"PhysicalMin_ASAP2"))
+      %<ASAP2_WarnForObsoleteProperties(record)>
+      %if (SIZE(objectProperties.PhysicalMin_ASAP2, 1) != 0)
+        %assign minValue = objectProperties.PhysicalMin_ASAP2
+      %endif
+    %else
+      %assign minValue = objectProperties.Min
+    %endif
+  %endif
+  %% If Min is unspecified, use DesignMin (if available)
+  %if ISEMPTY(minValue)
+    %if ISFIELD(record,"DesignMin") && (record.DesignMin[0]!=rtMinusInf && ...
+      record.DesignMin[0]!=rtInf)
+      %assign minValue = record.DesignMin[0]
+    %elseif ISFIELD(record,"AxisRecord") && ... 
+      (record.AxisRecord.BusElement.Min != rtMinusInf && ...
+        record.AxisRecord.BusElement.Min != rtInf)
+      %assign minValue = record.AxisRecord.BusElement.Min
+    %elseif ISFIELD(record,"BusElement") && ... 
+      (record.BusElement.Min != rtMinusInf && ...
+        record.BusElement.Min != rtInf)
+      %assign minValue = record.BusElement.Min
+    %else
+      %assign dtId = LibASAP2GetOrigDataTypeId(record)
+      %if LibIsEnumDataType(dtId)
+        %% For enumerated data types we don't allow users to specify min/max
+        %% ==> use the limits of the underlying numeric values instead
+        %assign minValue = SLibGetEnumTypeMinValue(dtId)
+      %else
+        %assign minValue = LibASAP2GetPhysicalMinFromDTId(dtId)
+      %endif 
+    %endif
+  %endif
+  
+  %return minValue
+%endfunction
+
+%% Function: LibASAP2GetPhysicalMinForBusElement ===============================
+%% Abstract:
+%%      Returns the Physical Minimum for specified field of structured data.
+%%
+%function LibASAP2GetPhysicalMinForBusElement(data,busIdx) void
+  %assign dataTypeId = data.StructInfo.BusElement[busIdx].DataTypeIdx
+  %if (data.StructInfo.BusElement[busIdx].Min != rtMinusInf) && ...
+    (data.StructInfo.BusElement[busIdx].Min != rtInf)
+    %assign minValue = data.StructInfo.BusElement[busIdx].Min    
+  %else
+    %assign minValue = LibASAP2GetPhysicalMinFromDTId(dataTypeId)
+  %endif
+  %return minValue
+%endfunction
+
+%% Function: LibASAP2GetPhysicalMinFromDTId ====================================
+%% Abstract:
+%%      Returns the Physical Minimum for specified datatype index.
+%%
+%function LibASAP2GetPhysicalMinFromDTId(dtId) void
+
+  %if LibIsEnumDataType(dtId)
+    %% For enumerated data types we don't allow users to specify min/max
+    %% ==> use the limits of the underlying numeric values instead
+    %assign minValue = SLibGetEnumTypeMinValue(dtId)
+  %else
+    %assign dTypeThruId =  LibGetDataTypeIdAliasedThruToFromId(dtId)
+    %if (dTypeThruId == tSS_DOUBLE)
+      %assign minValue = "-1.7E+308"
+    %elseif (dTypeThruId == tSS_SINGLE)
+      %assign minValue = "-3.4E+38"
+    %elseif (dTypeThruId == tSS_BOOLEAN)
+      %assign minValue = "0"
+    %elseif (dTypeThruId == tSS_INT8)
+      %assign minValue = "-128"
+    %elseif (dTypeThruId == tSS_UINT8)
+      %assign minValue = "0"
+    %elseif (dTypeThruId == tSS_INT16)
+      %assign minValue = "-32768" 
+    %elseif (dTypeThruId == tSS_UINT16)
+      %assign minValue = "0"  
+    %elseif (dTypeThruId == tSS_INT32)
+      %assign minValue = "-2147483648" 
+    %elseif (dTypeThruId == tSS_UINT32)
+      %assign minValue = "0"
+    %elseif LibIsDataTypeFixpt(dTypeThruId)
+      %assign dt = ::CompiledModel.DataTypes.DataType[dTypeThruId]
+      %assign wordLength = dt.RequiredBits
+      %assign fracSlope = dt.FracSlope
+      %assign fracExp = dt.FixedExp
+      %assign bias = dt.Bias
+      %if dt.IsSigned        
+        %% slope = fracSlope * 2^(fixedExp)
+        %% minValue = -slope * 2^(wordLength-1) + bias
+        %assign minValue = FEVAL("eval","-(%<fracSlope>*2^(%<fracExp>))*(2^(%<wordLength>-1)) + %<bias>")
+      %else
+        %% minValue = 0
+        %assign minValue = "0"
+      %endif
+    %else
+      %assign dtypeName = LibGetDataTypeNameFromId(dTypeThruId)
+      %assign errTxt = "Invalid data type %<dtypeName>."
+      %<LibBlockReportFatalError([], errTxt)>
+    %endif	
+  %endif
+  
+  %return minValue
+ 
+%endfunction
+
+%% Function: LibASAP2GetPhysicalMax ============================================
+%% Abstract:
+%%      Returns the Physical Maximum for specified record.
+%%
+%function LibASAP2GetPhysicalMax(record) void
+  %assign maxValue = "" %% Default
+  %% Extract Max from data object (if record has data object)
+  %assign data = FcnGetGlobalMemoryMapData(record)
+  %if data.HasObject
+    %assign objectProperties = FcnGetObjectProperties(record)
+    %if (ISFIELD(objectProperties,"PhysicalMax_ASAP2"))
+      %<ASAP2_WarnForObsoleteProperties(record)>
+      %if (SIZE(objectProperties.PhysicalMax_ASAP2, 1) != 0)
+        %assign maxValue = objectProperties.PhysicalMax_ASAP2
+      %endif
+    %else
+      %assign maxValue = objectProperties.Max
+    %endif
+  %endif
+  %% If Max is unspecified, use DesignMax (if available)
+  %if ISEMPTY(maxValue)
+    %if ISFIELD(record,"DesignMax") && (record.DesignMax[0]!=rtMinusInf && ...
+      record.DesignMax[0]!=rtInf)
+      %assign maxValue = record.DesignMax[0]
+    %elseif ISFIELD(record,"AxisRecord") && ... 
+      (record.AxisRecord.BusElement.Max != rtMinusInf && ...
+        record.AxisRecord.BusElement.Max != rtInf)
+      %assign maxValue = record.AxisRecord.BusElement.Max
+    %elseif ISFIELD(record,"BusElement") && ... 
+      (record.BusElement.Max != rtMinusInf && ...
+        record.BusElement.Max != rtInf)
+      %assign maxValue = record.BusElement.Max
+    %else
+      %assign dtId = LibASAP2GetOrigDataTypeId(record)
+      %if LibIsEnumDataType(dtId)
+        %% For enumerated data types we don't allow users to specify min/max
+        %% ==> use the limits of the underlying numeric values instead
+        %assign maxValue = SLibGetEnumTypeMaxValue(dtId)
+      %else
+        %assign maxValue = LibASAP2GetPhysicalMaxFromDTId(dtId)
+      %endif 
+    %endif
+  %endif
+  
+  %return maxValue
+%endfunction
+
+%% Function: LibASAP2GetPhysicalMaxForBusElement ===============================
+%% Abstract:
+%%      Returns the Physical Maximum for specified field of structured data.
+%%
+%function LibASAP2GetPhysicalMaxForBusElement(data,busIdx) void
+  %assign dataTypeId = data.StructInfo.BusElement[busIdx].DataTypeIdx
+  %if (data.StructInfo.BusElement[busIdx].Max != rtInf) && ...
+    (data.StructInfo.BusElement[busIdx].Max != rtMinusInf)
+    %assign maxValue = data.StructInfo.BusElement[busIdx].Max    
+  %else
+    %assign maxValue = LibASAP2GetPhysicalMaxFromDTId(dataTypeId)
+  %endif
+  %return maxValue
+%endfunction
+
+%% Function: LibASAP2GetPhysicalMaxFromDTId ====================================
+%% Abstract:
+%%      Returns the Physical Maximum for specified datatype index.
+%%
+%function LibASAP2GetPhysicalMaxFromDTId(dtId) void
+  
+  %if LibIsEnumDataType(dtId)
+    %% For enumerated data types we don't allow users to specify min/max
+    %% ==> use the limits of the underlying numeric values instead
+    %assign maxValue = SLibGetEnumTypeMaxValue(dtId)
+  %else
+    %assign dTypeThruId =  LibGetDataTypeIdAliasedThruToFromId(dtId)
+    %if (dTypeThruId == tSS_DOUBLE) 
+      %assign maxValue = "1.7E+308"
+    %elseif(dTypeThruId == tSS_SINGLE)
+      %assign maxValue = "3.4E+38"
+    %elseif (dTypeThruId == tSS_BOOLEAN)
+      %assign maxValue = 1
+    %elseif (dTypeThruId == tSS_INT8)
+      %assign maxValue = "127"
+    %elseif (dTypeThruId == tSS_UINT8)
+      %assign maxValue = "255"
+    %elseif (dTypeThruId == tSS_INT16)
+      %assign maxValue = "32767" 
+    %elseif (dTypeThruId == tSS_UINT16)
+      %assign maxValue = "65535"  
+    %elseif (dTypeThruId == tSS_INT32)
+      %assign maxValue = "2147483647" 
+    %elseif (dTypeThruId == tSS_UINT32)
+      %assign maxValue = "0xFFFFFFFF"
+    %elseif LibIsDataTypeFixpt(dTypeThruId)
+      %assign dt = ::CompiledModel.DataTypes.DataType[dTypeThruId]
+      %assign wordLength = dt.RequiredBits
+      %assign fracSlope = dt.FracSlope
+      %assign fracExp = dt.FixedExp
+      %assign bias = dt.Bias
+      %if dt.IsSigned        
+        %% slope = fracSlope * 2^(fixedExp)
+        %% maxValue = slope * 2^((wordLength-1)-1) + bias
+        %assign maxValue = FEVAL("eval","(%<fracSlope>*2^(%<fracExp>))*(2^(%<wordLength>-1)-1) + %<bias>")
+      %else
+        %% slope = fracSlope * 2^(fixedExp)
+        %% maxValue = slope * 2^((wordLength-1)) + bias
+        %assign maxValue = FEVAL("eval","(%<fracSlope>*2^(%<fracExp>))*(2^(%<wordLength>)-1) + %<bias>")
+      %endif
+    %else
+      %assign dtypeName = LibGetDataTypeNameFromId(dTypeThruId)
+      %assign errTxt = "Invalid data type %<dtypeName>."
+      %<LibBlockReportFatalError([], errTxt)>
+    %endif	
+  %endif
+    
+  %return maxValue
+
+%endfunction
+
+%% Function: FcnASAP2GetUnits ============================================
+%% Abstract:
+%%      Returns the Units for specified record
+%%
+%function FcnASAP2GetUnits(record) void
+  %assign data = FcnGetGlobalMemoryMapData(record)
+  %if !data.HasObject
+    %return ""
+  %endif
+  %assign objectProperties = FcnGetObjectProperties(record)
+  
+  %% Determine the units
+  %if (ISFIELD(objectProperties,"Units_ASAP2"))
+    %<ASAP2_WarnForObsoleteProperties(record)>
+    %assign CM_Units = objectProperties.Units_ASAP2
+  %else
+    %assign CM_Units = objectProperties.DocUnits
+  %endif
+    
+  %return CM_Units
+
+%endfunction
+
+%% Function: FcnASAP2GetUnitsForBusElement =====================================
+%% Abstract:
+%%      Returns the Units for specified field of structured data.
+%%
+%function FcnASAP2GetUnitsForBusElement(data,busIdx) void
+  %% Simulink.BusElement currently does not support Units
+  %assign CM_Units = ""
+  %return CM_Units
+
+%endfunction
+
+%% Function: LibASAP2GetNumAxisPts =============================================
+%% Abstract:
+%%      Returns the Number of Axis Points for specified record.
+%%
+%function LibASAP2GetNumAxisPts(record) void
+  %assign objectProperties = FcnGetObjectProperties(record)
+  %return SIZE(objectProperties.Value, 1)
+%endfunction
+
+%% Function: LibASAP2GetDataTypeId =============================================
+%% Abstract:
+%%      Returns Stored DataTypeIdx for record
+%%
+%function LibASAP2GetDataTypeId(record) void
+
+  %assign dtId = LibASAP2GetOrigDataTypeId(record)
+  
+  %assign aliasDtId = LibGetDataTypeStorageIdFromId(dtId)
+  %if aliasDtId == tSS_INVALID_DATA_TYPE_ID
+    %return dtId
+  %else
+    %return aliasDtId
+  %endif
+%endfunction
+  
+%% Function: LibASAP2GetOrigDataTypeId =============================================
+%% Abstract:
+%%      Returns DataTypeIdx for record
+%%
+%function LibASAP2GetOrigDataTypeId(record) void
+  %assign foundCustom = 0
+  %if ISFIELD(record,"StorageClass")
+    %if record.StorageClass == "Custom"
+      %% found a custom storage class
+      %assign foundCustom = 1
+      %assign data = FcnGetGlobalMemoryMapData(record)
+      %assign dtId = SLibGetRecordDataTypeId(data)
+    %endif
+  %endif
+  
+  %assign dataIsDefined = TLC_TRUE
+  %if foundCustom == 0
+    %assign section = FcnGetGlobalMemoryMapSection(record)
+    %if TYPE(section) == "Scope"
+      %assign dtId = SLibGetRecordDataTypeId(section)
+      %assign dataIsDefined = TLC_FALSE
+    %else
+      %assign data = FcnGetGlobalMemoryMapData(record)
+      %assign dtId = SLibGetRecordDataTypeId(data)
+    %endif
+  %endif
+  
+  %if dataIsDefined && data.IsStruct
+    %if !ISFIELD(record,"AxisRecord")
+      %<SLibReportErrrorWithId("RTW:tlc:NoAxisRecord")>
+    %endif
+    %assign dtId =  record.AxisRecord.BusElement.DataTypeIdx
+  %endif
+  
+  %return dtId
+  
+%endfunction
+  
+
+%% Function: LibASAP2GetCompuMethodName ========================================
+%% Abstract:
+%%      Returns the CompuMethod Name referenced by the index
+%%
+%function LibASAP2GetCompuMethodName(idx)
+%with ::CompiledModel.CompuMethods
+  %return CompuMethod[idx].Name
+%endwith
+%endfunction
+
+
+%% Function: LibASAP2GetCompuMethodLongID ======================================
+%% Abstract:
+%%      Returns the CompuMethod LongID referenced by the index
+%%
+%function LibASAP2GetCompuMethodLongID(idx)
+%with ::CompiledModel.CompuMethods
+  %return CompuMethod[idx].LongId
+%endwith
+%endfunction
+
+
+%% Function: LibASAP2GetCompuMethodConvType ====================================
+%% Abstract:
+%%      Returns the CompuMethod ConversionType referenced by the index
+%%
+%function LibASAP2GetCompuMethodConvType(idx)
+%with ::CompiledModel.CompuMethods
+  %return CompuMethod[idx].ConvType
+%endwith
+%endfunction
+
+
+%% Function: LibASAP2GetCompuMethodFormat ======================================
+%% Abstract:
+%%      Returns the CompuMethod Format referenced by the index
+%%
+%function LibASAP2GetCompuMethodFormat(idx)
+%with ::CompiledModel.CompuMethods
+  %return FEVAL("strrep", CompuMethod[idx].Format, "f", "")
+%endwith
+%endfunction
+
+
+%% Function: LibASAP2GetCompuMethodUnits =======================================
+%% Abstract:
+%%      Returns the CompuMethod Units referenced by the index
+%%
+%function LibASAP2GetCompuMethodUnits(idx)
+%with ::CompiledModel.CompuMethods
+  %return CompuMethod[idx].Units
+%endwith
+%endfunction
+
+
+%% Function: LibASAP2GetCompuMethodCoeffs ======================================
+%% Abstract:
+%%      Returns the coefficients for RAT_FUNC CompuMethod
+%%      referenced by the index
+%%
+%function LibASAP2GetCompuMethodCoeffs(idx)
+%with ::CompiledModel.CompuMethods
+  %assert LibASAP2GetCompuMethodConvType(idx) == "RAT_FUNC"
+  %return CompuMethod[idx].Coeffs
+%endwith
+%endfunction
+
+%% Function: LibASAP2GetCompuMethodVTabContents ================================
+%% Abstract:
+%%      Returns the contents of the conversion table for TAB_VERB CompuMethod
+%%      referenced by the index
+%%
+%function LibASAP2GetCompuMethodVTabContents(idx)
+%with ::CompiledModel.CompuMethods
+  %assert LibASAP2GetCompuMethodConvType(idx) == "TAB_VERB"
+  %return CompuMethod[idx].VTabs
+%endwith
+%endfunction
+
+%% Function SLibGetLookUpInputSignalName ==============================
+%% Abstract:
+%%   Returns a STRING corresponding to the name of the the signal object
+%%   connected to the input port of the LookUp1D block.
+%%   The input "lookupParam" is a parameter record in the Lookup block
+%%   record. For e.g: InputValues
+%%   If the signal is not specified via Simulink object, an empty string
+%%   is returned
+%%                    _____________
+%%           sig1    |             |
+%%          -------->|  LookUp 1D  |
+%%                   |             |------->
+%%                   |    Block    |
+%%                   |_____________|
+%%
+%%   sig1 = SLibGetLookUpInputSignalName(InputValues)
+%%
+%% This function can be called from the Block Record scope
+%%
+%function SLibGetLookUpInputSignalName(lookupParam) void
+  
+  %% Default return Value
+  %assign inpName = ""
+
+  %% Get the list of blocks which reference "lookupParam". 
+  %assign mdlParamIdx = FcnGetModelParamIdxFromBlockParam(lookupParam)
+  %if mdlParamIdx == -1
+    %% It is a canonical parameter
+     %return inpName
+  %endif
+  %assign mdlParam    = ::CompiledModel.ModelParameters.Parameter[mdlParamIdx]
+  %assign mdlParamRef = mdlParam.GraphicalRef
+  
+  %% Loop over the list of blocks. Each block is specified by its 
+  %% graphical index which gives its index in the BlockHierarchy map.
+  %foreach refIdx = SIZE(mdlParamRef)[0]
+    %assign refBlkIdx = mdlParamRef[refIdx]
+    %assign refBlk    = ...
+      ::CompiledModel.BlockHierarchyMap.Subsystem[refBlkIdx[0]].Block[refBlkIdx[1]]
+    %if refBlk.Type != "Lookup"
+      %% Skip the block if it is not a Lookup Block
+      %continue
+    %else
+      %if ISFIELD(mdlParam,"ASAP2Counter_Lookup")
+	%% Handle multiple LookUp1D blocks
+	%% ASAP2Counter_Lookup keeps track of multiple lookup blocks
+	%% referring to the same parameter. 
+	%if mdlParam.ASAP2Counter_Lookup < refIdx
+	  %assign mdlParam.ASAP2Counter_Lookup = refIdx
+	  %break
+	%else
+	  %% Skip block if it already referenced
+	  %continue
+	%endif
+      %else
+	%% Handle first instance of LookUp1D block
+	%addtorecord mdlParam ASAP2Counter_Lookup refIdx
+	%break
+      %endif
+    %endif
+  %endforeach
+  %if (refBlk.NumDataInputPorts == 1) && (refBlk.DataInputPort[0].NumRegions > 0)
+    %% Make sure Regions are included in BlockHierarchyMap.
+    %% Usually they are optimized away.
+    %% To include regions use 
+    %% set_param(modelName,'IncludeRegionsInRTWFileBlockHierarchyMap','on')
+    %%
+    %createrecord portObj { SignalSrc [-1] SignalOffset [-1] Width 1 }
+    %assign portObj.SignalSrc = refBlk.DataInputPort[0].Region[0]._Source
+    %assign inpSig            = SLibGetSourceRecord(portObj, 0)
+    %if !ISEMPTY(inpSig) && FcnIsRecordDataTypeValidForASAP2(inpSig)
+      %assign data = FcnGetGlobalMemoryMapData(inpSig)  
+      %if FcnRecordIsASAP2TestPointSignal(inpSig) || ...
+        FcnRecordIsASAP2ExternalInput(inpSig) || ...
+        FcnDataSupportsASAP2(data)
+        %assign inpName = LibASAP2GetSymbol(inpSig)
+      %endif
+    %endif
+  %endif
+  %return inpName
+%endfunction
+
+%% Function SLibGetLookUp2DInputSignalNames ==============================
+%% Abstract:
+%%   Returns a Vector of 2 STRINGS. The strings correspond to the names of the 
+%%   the signal objects connected to the input ports of the LookUp2D Block.
+%%   The input "lookup2DParam" is a parameter record in the Lookup2D block
+%%   record. For e.g: RowIndex
+%%   If the signals are not specified via Simulink objects, empty strings are
+%%   is returned
+%%                    _____________
+%%           sig1    |             |
+%%          -------->|  LookUp 2D  |
+%%                   |             |------->
+%%          -------->|    Block    |
+%%           sig2    |_____________|
+%%
+%%   [sig1, sig2] = SLibGetLookUp2DInputSignalNames(RowIndex)
+%%
+%% This function can be called from the Lookup2D table Block Record scope
+
+%function SLibGetLookUp2DInputSignalNames(lookup2DParam) void
+  
+  %% Default return Values
+  %assign rowName = ""
+  %assign colName = ""
+
+  %% Get the list of blocks which reference "lookup2DParam". 
+  %assign mdlParamIdx = FcnGetModelParamIdxFromBlockParam(lookup2DParam)
+  %if mdlParamIdx == -1
+    %%It is a canonical parameter
+    %return ["%<rowName>", "%<colName>"]
+  %endif
+
+  %assign mdlParam    = ::CompiledModel.ModelParameters.Parameter[mdlParamIdx]
+  %assign mdlParamRef = mdlParam.GraphicalRef
+  
+  %% Loop over the list of blocks. Each block is specified by its 
+  %% graphical index which gives its index in the BlockHierarchy map.
+  %foreach refIdx = SIZE(mdlParamRef)[0]
+    %assign refBlkIdx = mdlParamRef[refIdx]
+    %assign refBlk    = ...
+      ::CompiledModel.BlockHierarchyMap.Subsystem[refBlkIdx[0]].Block[refBlkIdx[1]]
+    %if refBlk.Type != "Lookup2D"
+      %% Skip the block if it is not a Lookup Block
+      %continue
+    %else
+      %if ISFIELD(mdlParam,"ASAP2Counter_Lookup2D")
+	%% Handle multiple LookUp2D blocks
+	%% ASAP2Counter_Lookup2d
+	%if mdlParam.ASAP2Counter_Lookup2D < refIdx
+	  %assign mdlParam.ASAP2Counter_Lookup2D = refIdx
+	  %break
+	%else
+	  %% Skip block if it already referenced
+	  %continue
+	%endif
+      %else
+	%% Handle first instance of LookUp1D block
+	%addtorecord mdlParam ASAP2Counter_Lookup2D refIdx
+	%break
+      %endif
+    %endif
+  %endforeach
+  %if (refBlk.NumDataInputPorts == 2) && (refBlk.DataInputPort[0].NumRegions > 0)
+    %% Make sure Regions are included in BlockHierarchyMap.
+    %% Usually they are optimized away.
+    %% To include regions use 
+    %% set_param(modelName,'IncludeRegionsInRTWFileBlockHierarchyMap','on')
+    %%
+    %createrecord portObj { SignalSrc [-1] SignalOffset [-1] Width 1 }
+    %assign portObj.SignalSrc = refBlk.DataInputPort[0].Region[0]._Source
+    %assign rowSig =  SLibGetSourceRecord(portObj, 0)
+    %if !ISEMPTY(rowSig) && FcnIsRecordDataTypeValidForASAP2(rowSig)
+      %assign rdata = FcnGetGlobalMemoryMapData(rowSig)  
+      %if FcnRecordIsASAP2TestPointSignal(rowSig) || ...
+        FcnRecordIsASAP2ExternalInput(rowSig) || ...
+        FcnDataSupportsASAP2(rdata)
+        %assign rowName = LibASAP2GetSymbol(rowSig)
+      %endif
+    %endif
+    %assign portObj.SignalSrc = refBlk.DataInputPort[1].Region[0]._Source
+    %assign colSig =  SLibGetSourceRecord(portObj, 0)
+    %if !ISEMPTY(colSig) && FcnIsRecordDataTypeValidForASAP2(colSig)
+      %assign cdata = FcnGetGlobalMemoryMapData(colSig)      
+      %if FcnRecordIsASAP2TestPointSignal(colSig) || ...
+        FcnRecordIsASAP2ExternalInput(colSig) || ...
+        FcnDataSupportsASAP2(cdata)
+        %assign colName = LibASAP2GetSymbol(colSig)
+      %endif
+    %endif
+  %endif
+  %return ["%<rowName>", "%<colName>"]
+%endfunction
+
+%% [EOF] asap2lib.tlc

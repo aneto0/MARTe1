@@ -1,0 +1,4477 @@
+%% ============================================================================
+%% File : commonbodlib.tlc
+%%
+%% Abstract:
+%%      This system TLC library file contains functions that are common
+%%      between the different code generators for producing the model's
+%%      source file.
+%%
+%%      The functions provide for caching code for all systems and also dumping
+%%      the cached buffers.
+%%
+%% Note: The only CodeFormat dependencies allowed in this file are for:
+%%       1) Creating function prototypes for subsystems
+%%       2) Caching body code
+%%
+%% 
+%% Copyright 1994-2012 The MathWorks, Inc.
+%%
+%% ============================================================================
+%selectfile NULL_FILE
+
+%if EXISTS("_COMMONBODLIB_") == 0
+%assign _COMMONBODLIB_ = 1
+
+%% Function FcnForcedHasTIDArg(sys) void
+%% Abstract:
+%%   Return ture is parameter tid is forced to include
+%% for uniform subsystem interface. 
+%%
+%function FcnForcedHasTIDArg(sys)
+  %return ((sys.Type == "root" && RootBodyTIDneeded)) || ...
+   (LibSystemIsForceNonInline(sys) && LibSystemCalledByNonInlineSfcn(sys))
+%endfunction
+
+%% Function: FcnSysAccessedTID ====================
+%% Abstract:
+%%      returns 1 if TID was used, then reset the flag
+%%
+%function FcnSysAccessedTID() void
+  %if NeedTID
+    %assign ::CompiledModel.NeedTID = 0
+    %return 1
+  %else
+    %return 0
+  %endif
+%endfunction
+
+%% Function: FcnSetSystemFcnNeedTIDFlag ===================
+%% Abstract:
+%%   Set NeedTIDIn%<Type> flag if tid is accessed.
+%%   Set ForcedNeedTIDIn%<type>Fcn flags if
+%%   tid is forced to be included in subsystem interface. 
+%% 
+%function FcnSetSystemFcnNeedTIDFlag(system, type) void
+  %if FcnSysAccessedTID() 
+    %<LibSetSystemField(system, "NeedTIDIn%<type>", TLC_TRUE)>
+  %elseif FcnForcedHasTIDArg(system)
+    %<LibSetSystemField(system, "NeedTIDIn%<type>", TLC_FALSE)>
+    %addtorecord system ForcedNeedTIDIn%<type> TLC_TRUE
+  %endif
+%endfunction
+
+%% Function: FcnHandlesUnusedTIDArg =========================
+%% Abstract:
+%%
+%function FcnHandlesUnusedTIDArg(ss, type)
+  %openfile retBuf
+  %if LibSystemFcnNeedsTID(ss,type)
+    %if ISFIELD(ss, "ForcedNeedTIDIn%<type>")
+      %assert !LibGetSystemField(ss, "NeedTIDIn%<type>")
+      /* %<tTID> is required for a uniform function interface. 
+       * Argument %<tTID> is not used in the function. */
+      %<SLibUnusedParameter(tTID)>
+      
+    %elseif (SLibSystemFcnRateGrouping(ss, type) && ...
+      LibGetSystemField(ss, "NeedTIDIn%<type>"))
+       /* If subsystem generates rate grouping %<type> functions,
+        * when %<tTID> is used in %<type> function for one rate,
+        * all %<type> functions include %<tTID> as argument. 
+        * As result, some %<type> functions may have unused %<tTID> 
+        */
+        %<SLibUnusedParameter(tTID)>
+        
+    %endif
+  %endif
+  %closefile retBuf
+  
+  %return retBuf
+%endfunction %%FcnHandlesUnusedTIDArg
+
+
+%% Function: FcnDeclareCPIIfNeeded =============================================
+%% Abstract:
+%%      returns 1 if CPI (Control Port Index) was used in a function-call
+%%      subsystem.
+%%
+%function FcnDeclareCPIIfNeeded(system, fcn) void
+  %assign tempName = "NeedCPIIn" + fcn
+  %return LibGetSystemField(system, tempName)
+%endfunction
+
+
+%% Function: SLibSystemNonEmpty ================================================
+%% Abstract:
+%%    Returns true if a system generates some code
+%%
+%function SLibSystemNonEmpty(system)
+  %assign nonEmpty = ...
+    !LibSystemFcnIsEmpty(system, "Start")              || ...
+    !LibSystemFcnIsEmpty(system, "Initialize")         || ...
+    !LibSystemFcnIsEmpty(system, "Output")             || ...
+    !LibSystemFcnIsEmpty(system, "Update")             || ...
+    !LibSystemFcnIsEmpty(system, "Derivative")         || ...
+    !LibSystemFcnIsEmpty(system, "Projection")         || ...
+    !LibSystemFcnIsEmpty(system, "ForcingFunction")    || ...
+    !LibSystemFcnIsEmpty(system, "MassMatrix")         || ...
+    !LibSystemFcnIsEmpty(system, "OutputUpdate")       || ...
+    !LibSystemFcnIsEmpty(system, "FinalizeDims")       || ...
+    !LibSystemFcnIsEmpty(system, "SetDims")       || ...
+    !LibSystemFcnIsEmpty(system, "Enable")             || ...
+    !LibSystemFcnIsEmpty(system, "Disable")
+  %return (nonEmpty)
+%endfunction %% SLibSystemNonEmpty
+
+
+%% Function: SLibSystemTerminateNonEmpty =======================================
+%% Abstract:
+%%   Returns true if a system terminate generates some code
+%%
+%function SLibSystemTerminateNonEmpty(system) void
+  %return !LibSystemFcnIsEmpty(system, "Terminate")
+%endfunction %% SLibSystemTerminateNonEmpty
+
+
+%% Function: SLibPassThroughArgsRequired =======================================
+%% Abstract:
+%%   Retruns true if the system in question requires arguments to by passed.
+%%
+%function SLibPassThroughArgsRequired(system) void
+  %if LibSystemIsRoot(system)
+    %if MultiInstanceERTCode || GenerateClassInterface || UsingMalloc ...
+      || SLibFcnProtoCtrlActive() || CodeFormat == "S-Function"
+      %return TLC_TRUE
+    %endif
+  %elseif LibSystemIsNonReusedFcn(system)
+    %if (CodeFormat == "S-Function") || ...
+        (system.CrossNoArgFcnBound && (UsingMalloc || IsModelRefScalableBuild())) 
+      %return TLC_TRUE
+    %endif
+  %elseif LibSystemIsReusedFcn(system)
+    %return TLC_TRUE
+  %endif
+  %return TLC_FALSE
+%endfunction %% SLibPassThroughArgsRequired
+
+
+%% Function: SLibCopyRootInputsArgAccessedFlags ================================
+%% Abstract:
+%%   This function is used to copy the access flags in the root IO records
+%%   from a callee to the caller function.
+%%
+%function SLibCopyRootInputsArgAccessedFlags(aSystemRec, calleeName) void  
+  %%
+  %if LibSystemIsRoot(aSystemRec) && SLibPassThroughArgsRequired(aSystemRec)
+    %%
+    %assign cTID    = aSystemRec.CurrentTID
+    %assign isRG    = SLibSystemFcnRateGrouping(aSystemRec, calleeName)
+    %with ::CompiledModel.ExternalInputs
+      %foreach idx = NumExternalInputs
+        %assign extInp = ExternalInput[idx]
+        %if extInp.StorageClass == "Auto" && ...
+          SysFcnArgNeeded(calleeName, extInp, cTID, isRG)
+          %<SLibAccessArgHelper(extInp,"",cTID)>
+        %endif
+      %endforeach
+    %endwith
+    %with ::CompiledModel.ExternalOutputs
+      %foreach idx = NumExternalOutputs
+        %assign extOut = ExternalOutput[idx]
+        %if SysFcnArgNeeded(calleeName, extOut, cTID, isRG)
+          %<SLibAccessArgHelper(extOut,"",cTID)>
+        %endif
+      %endforeach
+    %endwith
+  %endif
+%endfunction
+
+%% Function: SLibCGCallSubFcn ==================================================
+%% Abstract:
+%%   This function is used to call subfunctions in a module. It calls specifice
+%%   TLC function for each argument generated in RTWCG.
+%%
+%function SLibCGCallSubFcn(block, modIdx, fcnIdx, callIdx) void
+  %% 
+  %assign thisModule    = RTWCGModules.RTWCGModule[modIdx]
+  %assign thisFcn       = thisModule.Function[fcnIdx]
+  %assign thisCall      = thisFcn.FunctionCall[callIdx]
+  %assign calleeModIdx  = thisCall.CalleeIdx[0]
+  %assign calleeFcnIdx  = thisCall.CalleeIdx[1]
+  %assign calleeInstIdx = thisCall.CalleeIdx[2]
+  %assign calleeModule  = RTWCGModules.RTWCGModule[calleeModIdx]
+  %assign callee        = calleeModule.Function[calleeFcnIdx]
+  %assign fileName      = thisModule.TLCFileName + "_Functions"
+  %assign fcnName       = thisFcn.Name + "_Fcn%<fcnIdx>Call%<callIdx>"
+  %assign argStr        = ""
+  %assign argVec        = []
+  %assign sep = ""
+  %%
+  %foreach argIdx = callee.NumArgs
+    %if callee.ArgAccessed[argIdx]
+      %assign tlcFcnName = fcnName + "Arg%<argIdx>"
+      %assign arg = GENERATE_TYPE(block, tlcFcnName, fileName)
+      %assign argStr = argStr + sep + arg
+      %assign argVec = argVec + arg
+      %assign sep = ", "
+    %else
+      %assign argVec = argVec + ""
+    %endif
+  %endforeach
+  %if thisFcn.IsShared
+     %return callee.Name + "(" + argStr + ")"
+  %endif
+  %assign system       = ::CompiledModel.System[thisModule.CGSystemIdx]
+  %assign sysIdx       = system.SystemIdx
+  %assign isScalableMRSys = ...
+      IsModelReferenceBaseSys(system) && IsModelRefScalableBuild()
+  %%
+  %<SLibCopyRootInputsArgAccessedFlags(system, callee.Name)>
+  %<SLibCopyArgAccessedFlags(sysIdx, callee.Name, ::BlockFcn, ...
+    system.CurrentTID, isScalableMRSys)>
+  %%
+  %% (modIdx > calleeModIdx) the current module is calling a function
+  %% from a child module. We need to generated complete argument accesses
+  %% in this case, similar to those that are created for reusable subsystem
+  %% function calls.
+  %%
+  %if modIdx > calleeModIdx 
+    %assign argStr = FcnGetAdditionalArgs(callee.Name, argVec, callee.Name, ...
+      calleeModule.CGSystemIdx, thisModule.CGSystemIdx, calleeInstIdx)
+    %return callee.Name + "(" + argStr + ")"
+  %else
+    %%
+    %% (modIdx < calleeModIdx) the current module is calling a function
+    %% from a parent module. In this case we need to generate the argument
+    %% list from the parent system.
+    %%
+    %if modIdx < calleeModIdx 
+      %%
+      %% FcnGenerateSubFcnBody will create the PassThroughArgs for the
+      %% the current callee function call record
+      %%
+      %assign calleeSystem = ::CompiledModel.System[calleeModule.CGSystemIdx]
+      %if SLibPassThroughArgsRequired(calleeSystem) 
+        %assign currentFcn = ::BlockFcn
+        %assign saveTID = System[calleeModule.CGSystemIdx].CurrentTID
+        %% Parent module's CurrentTID has not been setup yet; Need to use
+        %% the context's, i.e., the caller's
+        %assign System[calleeModule.CGSystemIdx].CurrentTID = system.CurrentTID
+        %<FcnGenerateSubFcnBody(block, calleeModule, calleeFcnIdx, TLC_TRUE)>
+        %assign System[calleeModule.CGSystemIdx].CurrentTID = saveTID
+        %assign ::BlockFcn = currentFcn
+      %endif
+    %endif
+    %assign passThroughArgs = callee.PassThroughArgs
+    %if ISEMPTY(passThroughArgs)
+      %return callee.Name + "(" + argStr + ")"
+    %else
+      %%
+      %% Subfunction called by iterator systems get the address of a 
+      %% BlockIO or DWork array element passed not just the base pointer.
+      %%
+      %% e.g. localBlockIO --> &localBlockIO[iterBlock_idx]
+      %%
+      %% The array element is accessed by pointer dereference inside
+      %% of the sub-function.
+      %%
+      %% e.g. localBlockIO->someElement
+      %%
+      %if !system.GeneratingSubFunctions
+        %assign argRepl = system.ArgumentReplacements
+        %foreach replIdx = SIZE(argRepl, 1)/2
+          %assign argIdx = replIdx * 2
+          %assign passThroughArgs = ...
+            FEVAL("regexprep", passThroughArgs, ...
+            "(^|\W|,)" + argRepl[argIdx] + "($|\W|,)", ...
+            "$1" + argRepl[argIdx+1] + "$2")
+        %endforeach
+      %endif
+      %return callee.Name + "(" + argStr + sep + passThroughArgs + ")"
+    %endif
+  %endif
+%endfunction %% SLibCGCallSubFcn
+
+%% Function: SLibGetRootLevelArgDefs ===========================================
+%% Abstract:
+%%   This function is used to generate the passthrough arument list for the
+%%   root system. It is used to properly pass in model data such as model inputs
+%%   and outputs (root IO) to subfunctions that are directly called from the
+%%   root system.
+%%
+%function SLibGetRootLevelArgDefs(aSystemRec, aFunctionRec) void  
+  %%
+  %if !SLibPassThroughArgsRequired(aSystemRec)
+    %return
+  %endif
+  %%
+  %assign fcnName = aFunctionRec.Name
+  %assign cTID    = aSystemRec.CurrentTID
+  %assign isRG    = SLibSystemFcnRateGrouping(aSystemRec, fcnName)
+  %assign args    = ""
+  %assign argDefs = ""
+  %assign comma   = ""
+  %assert LibSystemIsRoot(aSystemRec)
+  %%
+  %% Root inputs
+  %%
+  %if CodeFormat != "S-Function"
+    %%
+    %assign useRootIOStructures = MultiInstanceERTCode && ...
+      RootIOStructures && !GenerateClassInterface && !SLibFcnProtoCtrlActive()  
+    %%
+    %with ::CompiledModel.ExternalInputs
+      %if useRootIOStructures
+        %assign rootInputsRequired = TLC_FALSE
+        %foreach idx = NumExternalInputs
+          %assign extInp = ExternalInput[idx]
+          %if extInp.StorageClass == "Auto" && ...
+            SysFcnArgNeeded(fcnName, extInp, cTID, isRG)
+            %assign rootInputsRequired = TLC_TRUE
+            %break
+          %endif
+        %endforeach
+        %if rootInputsRequired
+          %assign args    = args + comma + tInput
+          %assign argDefs = argDefs + comma + tInputType + " *" + tInput
+          %assign comma   = ", "
+        %endif
+      %else      
+        %foreach idx = NumExternalInputs
+          %assign extInp = ExternalInput[idx]
+          %if extInp.StorageClass == "Auto" && ...
+            SysFcnArgNeeded(fcnName, extInp, cTID, isRG)
+            %%
+            %assign width    = LibGetRecordWidth(extInp)
+            %assign optStar  = " "
+            %assign optWidth = width == 1 ? "" : "[%<width>]"
+            %assign dType    = LibGetRecordDataTypeName(extInp, "")
+            %assign reqLocalAccess = extInp.RequiresGlobalAccess == "no"
+            %assign argName  = ""
+            %%
+            %if SLibFcnProtoCtrlActive()
+              %if reqLocalAccess
+                %assign fcnData = FcnGetFunctionPrototypeRecord()
+                %assign spec = FcnGetFcnDataForPort(fcnData, "Inport", idx)
+                %assign argName = spec.ArgName
+                %if width == 1 && spec.Category == "Pointer"
+                  %assign optStar = " *"
+                %endif
+              %else
+                %continue
+              %endif
+            %elseif GenerateClassInterface
+              %assign classConfObj = FcnGetRTWCPPStepPrototypeRecord()
+              %if !classConfObj.hasGlobalAccessForInport && reqLocalAccess
+                %assign spec = FcnGetFcnDataForPort(classConfObj, "Inport", idx)
+                %assign argName = spec.ArgName
+                %if width == 1 && spec.Category == "Pointer"
+                  %assign optStar = " *"
+                %endif
+              %else
+                %continue
+              %endif
+            %endif
+            %if ISEMPTY(argName)
+              %assign argName = tInput + UQualifier + LibGetRecordIdentifier(extInp)
+              %assign dtID    = LibGetRecordDataTypeId(extInp)
+              %if width == 1 && LibIsStructDataType(dtID) && !LibIsDataTypeMultiWordFixpt(dtID)
+                 %assign optStar = " *"
+              %endif
+            %endif
+            %assign args     = args + comma + argName
+            %assign argDefs  = ...
+              argDefs + comma + dType + optStar + argName + optWidth
+            %assign comma   = ", "
+          %endif
+        %endforeach
+      %endif
+    %endwith      
+    %with ::CompiledModel.ExternalOutputs
+      %if useRootIOStructures
+        %assign rootOutputsRequired = TLC_FALSE
+        %foreach idx = NumExternalOutputs
+          %assign extOut = ExternalOutput[idx]
+          %if SysFcnArgNeeded(fcnName, extOut, cTID, isRG)
+            %assign rootOutputsRequired = TLC_TRUE
+            %break
+          %endif
+        %endforeach
+        %if rootOutputsRequired
+          %assign args    = args + comma + tOutput
+          %assign argDefs = argDefs + comma + tOutputType + " *" + tOutput
+          %assign comma   = ", "
+        %endif
+      %else      
+        %foreach idx = NumExternalOutputs
+          %assign extOut = ExternalOutput[idx]
+          %if SysFcnArgNeeded(fcnName, extOut, cTID, isRG)
+            %%
+            %assign width    = LibGetRecordWidth(extOut)
+            %assign optStar  = " "
+            %assign optWidth = width == 1 ? "" : "[%<width>]"
+            %assign dType    = LibGetRecordDataTypeName(extOut, "")
+            %assign reqLocalAccess = extOut.RequiresGlobalAccess == "no"
+            %assign argName  = ""
+            %%
+            %if SLibFcnProtoCtrlActive()
+              %if reqLocalAccess
+                %assign fcnData = FcnGetFunctionPrototypeRecord()
+                %assign spec = FcnGetFcnDataForPort(fcnData, "Outport", idx)
+                %assign argName = spec.ArgName
+                %if width == 1 && spec.Category == "Pointer"
+                  %assign optStar = " *"
+                %endif
+              %else
+                %continue
+              %endif
+            %elseif GenerateClassInterface
+              %assign classConfObj = FcnGetRTWCPPStepPrototypeRecord()
+              %if !classConfObj.hasGlobalAccessForOutport && reqLocalAccess
+                %assign spec = FcnGetFcnDataForPort(classConfObj, "Outport", idx)
+                %assign argName = spec.ArgName
+                %if width == 1 && spec.Category == "Pointer"
+                  %assign optStar = " *"
+                %endif
+              %else
+                %continue
+              %endif
+            %elseif width == 1
+              %assign optStar = " *"
+            %endif
+            %if ISEMPTY(argName)
+              %assign outpBlk = System[extOut.Block[0]].Block[extOut.Block[1]]	
+              %assign argName = tOutput + YQualifier + LibGetRecordIdentifier(outpBlk)
+              %assign dtID    = LibGetRecordDataTypeId(extOut)
+              %if width == 1 && LibIsStructDataType(dtID) && !LibIsDataTypeMultiWordFixpt(dtID)
+                %assign optStar = " *"
+              %endif
+            %endif
+            %assign args     = args + comma + argName
+            %assign argDefs  = ...
+              argDefs + comma + dType + optStar + argName + optWidth
+            %assign comma   = ", "
+          %endif
+        %endforeach
+      %endif
+    %endwith
+  %endif
+  %%
+  %%
+  %%
+  %with aSystemRec.Interface
+    %if !GenerateClassInterface      
+      %%
+      %% rtModel argument
+      %%
+      %if CodeFormat == "S-Function"
+        %if SysFcnArgNeeded(fcnName, RTMArgDef,               cTID, isRG) || ...
+          SysFcnArgNeeded( fcnName, BlockIOArgDef,            cTID, isRG) || ...
+          SysFcnArgNeeded( fcnName, DWorkArgDef,              cTID, isRG) || ...
+          SysFcnArgNeeded( fcnName, ParameterArgDef,          cTID, isRG) || ...
+          SysFcnArgNeeded( fcnName, ContStatesArgDef,         cTID, isRG) || ...
+          SysFcnArgNeeded( fcnName, ContStatesDisabledArgDef, cTID, isRG) || ...
+          SysFcnArgNeeded( fcnName, ContStatesAbsoluteToleranceArgDef, cTID, isRG) || ...
+          SysFcnArgNeeded( fcnName, ZCSVArgDef,               cTID, isRG)
+          %assign rtmArg  = FcnUpdateRTModelInterfaceArg(aSystemRec, tSimStruct)
+          %assign args    = args + comma + rtmArg
+          %assign argDefs = argDefs + comma + tSimStructType + " *" + tSimStruct
+          %assign comma   = ", "
+        %endif
+      %elseif  MultiInstanceERTCode
+        %%
+        %% rtModel argument
+        %%      
+        %if SysFcnArgNeeded(fcnName, RTMArgDef, cTID, isRG)
+          %assign rtmArg  = FcnUpdateRTModelInterfaceArg(aSystemRec, tSimStruct)
+          %assign args    = args + comma + rtmArg
+          %assign argDefs = argDefs + comma + tSimStructType + " *" + tSimStruct
+          %assign comma   = ", "
+        %endif        
+        %%
+        %% Block IO argument
+        %%
+        %if SysFcnArgNeeded(fcnName, BlockIOArgDef, cTID, isRG)
+          %assign args    = args + comma + tBlockIO
+          %assign argDefs = argDefs + comma + tBlockIOType + " *" + tBlockIO
+          %assign comma   = ", "
+        %endif
+        %%
+        %% Constant block IO (not passed in as an argument)
+        %%      
+        %%
+        %% DWork argument
+        %%
+        %if SysFcnArgNeeded(fcnName, DWorkArgDef, cTID, isRG)
+          %assign args    = args + comma + tDWork
+          %assign argDefs = argDefs + comma + tDWorkType + " *" + tDWork
+          %assign comma   = ", "
+        %endif
+        %%
+        %% Parameter H-Struct argument
+        %%
+        %if SysFcnArgNeeded(fcnName, ParameterArgDef, cTID, isRG)
+          %assign args    = args + comma + tParameters
+          %assign argDefs = argDefs + comma + tParametersType + " *" + tParameters
+          %assign comma   = ", "
+        %endif
+        %%
+        %% Continuous States argument
+        %%
+        %if SysFcnArgNeeded(fcnName, ContStatesArgDef, cTID, isRG)
+          %assign args    = args + comma + tContState
+          %assign argDefs = argDefs + comma + tContStateType + " *" + tContState
+          %assign comma   = ", "
+        %endif
+        %%
+        %% Continuous States Disabled argument
+        %%
+        %if SysFcnArgNeeded(fcnName, ContStatesDisabledArgDef, cTID, isRG)
+          %assign args    = args + comma + tXdis
+          %assign argDefs = argDefs + comma + tXdisType + " *" + tXdis
+          %assign comma   = ", "
+        %endif
+        %%
+        %% Continuous States Absolute Tolerance argument
+        %%
+        %if SysFcnArgNeeded(fcnName, ContStatesAbsoluteToleranceArgDef, cTID, isRG)
+          %assign args    = args + comma + tXAbsTol
+          %assign argDefs = argDefs + comma + tXAbsTolType + " *" + tXAbsTol
+          %assign comma   = ", "
+        %endif
+        %%
+        %% ZcSignalValue  argument
+        %%
+        %if SysFcnArgNeeded(fcnName, ZCSVArgDef, cTID, isRG)
+          %assign args    = args + comma + tZCSignalValue
+          %assign argDefs = argDefs + comma + tZCSignalValueType + " *" + ...
+            tZCSignalValue
+          %assign comma   = ", "
+        %endif
+        %%
+        %% ZCEvent H-Struct argument **** part of dwork
+        %%
+        %%
+        %% Canonical Parameters *** not applicable for the root system
+        %%
+        %%
+        %% CanonicalDWork *** not applicable for the root system
+        %%
+      %endif
+    %endif
+  %endwith
+  %assign aFunctionRec.PassThroughArgDefs = argDefs
+  %assign aFunctionRec.PassThroughArgs    = args
+%endfunction
+
+%% Function: FcnResetModelRefLocalVars =========================================
+%% Abstract:
+%%    Resets the cached model reference local variable declaration for 
+%%    given function (through module and function index).
+%%
+%function FcnResetModelRefLocalVars(aModule, aSubFcnIdx) void
+  %assign        fcn = aModule.Function[aSubFcnIdx]
+  %assign     system = ::CompiledModel.System[aModule.CGSystemIdx]
+  %<SLibResetModelRefLocalVars(system, fcn.Name, "")>
+%endfunction
+
+%% Function: FcnGenerateSubFcnBody =============================================
+%% Abstract:
+%%   Generates and returns the function body for a given sub-function    
+%%
+%function FcnGenerateSubFcnBody(aOpaqueBlock, aModule, aSubFcnIdx, aCalledFromChildMod) void
+  %assign   fileName = aModule.TLCFileName + "_Functions"
+  %assign        fcn = aModule.Function[aSubFcnIdx]
+  %assign    fcnName = fcn.Name
+  %assign     system = ::CompiledModel.System[::CompiledModel.System[aModule.CGSystemIdx].NonInlinedParentSystemIdx]
+  %assign     lboDef = ::CompiledModel.BlockOutputs.LocalBlockOutputDefaults  
+  %assign     ldwDef = ::CompiledModel.DWorks.DWorkDefaults
+  %assign callerFcn = ::BlockFcn
+  %assign ::BlockFcn = fcnName
+  %<LibSetGlobalSysFcnsForArgAccess([])>
+  %assign sysField = fcnName + "Fcn"
+  %if !ISFIELD(system, sysField)
+    %addtorecord system %<sysField> fcnName
+  %endif
+  %assign localRecordField = "DeclareIn" + fcnName + "FcnScope"
+  %if !ISFIELD(lboDef, localRecordField)
+    %addtorecord lboDef %<localRecordField> 0
+  %endif
+  %if !ISFIELD(ldwDef, localRecordField)
+    %addtorecord ldwDef %<localRecordField> 0
+  %endif
+  %assign ::GlobalGeneratingSubFunctions = TLC_TRUE
+  %assign system.GeneratingSubFunctions = TLC_TRUE
+  %with system
+    %assign tlcFcnName = fcnName + "_Fcn%<aSubFcnIdx>"
+    %assign    fcnBody = GENERATE_TYPE(aOpaqueBlock, tlcFcnName, fileName)
+    %if aCalledFromChildMod
+      %assign isScalableMRSys = ...
+        IsModelReferenceBaseSys(system) && IsModelRefScalableBuild()
+      %<SLibCopyRootInputsArgAccessedFlags(system, fcnName)>
+      %<SLibCopyArgAccessedFlags(aModule.CGSystemIdx, fcnName, callerFcn, ...
+        system.CurrentTID, isScalableMRSys)>
+    %endif
+  %endwith
+  %if !fcn.IsShared
+    %if LibSystemIsRoot(system)
+      %<SLibGetRootLevelArgDefs(system, fcn)>
+    %else
+      %assign            fcnInfo = SLibSystemFcnInfoRecord(system, fcnName)
+      %assign passThroughArgDefs = fcnInfo.Params
+      %%
+      %if !ISEMPTY(passThroughArgDefs) && !WHITE_SPACE(passThroughArgDefs)
+        %assign fcn.PassThroughArgDefs = passThroughArgDefs
+        %assign fcn.PassThroughArgs = ...
+          FEVAL("rtwprivate", "getargstr", passThroughArgDefs)
+      %endif
+    %endif
+  %endif
+  %assign ::GlobalGeneratingSubFunctions = TLC_FALSE
+  %assign system.GeneratingSubFunctions = TLC_FALSE
+  %%
+  %assign ::BlockFcn = callerFcn
+  %return fcnBody
+%endfunction
+
+%% Function: SLibFcnHasArgs ====================================================
+%% Abstract:
+%%   Returns true if a function has any arguments that have been accessed.
+%%
+%function SLibFcnHasArgs(aFcnRecord) void
+  %foreach argIdx = aFcnRecord.NumArgs
+    %if aFcnRecord.ArgAccessed[argIdx]
+      %return TLC_TRUE
+    %endif
+  %endforeach
+  %return TLC_FALSE
+%endfunction %% SLibFcnHasArgs
+
+
+%function FcnGetSubFcnGlobalVars(system, fcn) void
+  %if !fcn.IsEntryPointSubFcn
+    %return ""
+  %endif
+  
+  %assign saveBlockFcn = ::BlockFcn
+  %assign ::BlockFcn = fcn.Name
+  %assign backTID = system.CurrentTID
+  %assign system.CurrentTID =fcn.FcnTID
+  %assign globalVars = LibInitializeGlobalVars(system, fcn)
+  %assign system.CurrentTID = backTID
+  %assign ::BlockFcn = saveBlockFcn
+  
+  %return globalVars
+%endfunction %% FcnGetSubFcnGlobalVars
+
+%% Function: FcnGenModuleSubFunctions ==========================================
+%% Abstract:
+%%   This function generates the subfunctions called by system functions in
+%%   the module. Each function is generated separately using its own function
+%%   type for argument tracking. The functions are generated in reverse
+%%   callgraph order.
+%%
+%function FcnGenModuleSubFunctions(module) void
+  %assign    block = FcnRootOpaqueBlock()
+  %assign fileName = module.TLCFileName + "_Functions"
+  %assign   system = ::CompiledModel.System[module.CGSystemIdx]
+  %assign system.CurrentTID = ""
+  %assign genSharedUtils = (::CompiledModel.GenUtilsSrcInSharedLocation == 1)
+  %assign useEncapsCPP   = ::GenerateClassInterface && ...
+    (IsBaseSystem(system) || SLibGenNonReusableSubsysFcnAsClassMemFcn(system)) 
+  %%
+  %if module.HasRecursion && SLibPassThroughArgsRequired(system)
+    %foreach fcnIdx = module.NumSubFunctions
+      %<FcnGenerateSubFcnBody(block, module, fcnIdx,TLC_FALSE)>
+    %endforeach
+    %if IsModelReferenceBaseSys(system) && IsModelRefScalableBuild() && ...
+      !::GenerateClassInterface
+      %foreach fcnIdx = module.NumSubFunctions
+        %<FcnResetModelRefLocalVars(module, fcnIdx)>
+      %endforeach
+    %endif
+  %endif
+  %%
+  %assign   exported = ""
+  %assign subFcnProt = ""
+  %assign shaFcnProt = "" %% shared function prototypes
+  %assign subFcnCode = ""
+  %assign inlineProt = ""
+  %assign inlineCode = ""
+  %assign extApiProt = ""
+  %assign extApiCode = ""
+  %assign memberProt = ""
+  %openfile exported
+    /* Exported functions */
+  %openfile subFcnProt    
+  %openfile subFcnCode
+  %openfile shaFcnProt
+  %openfile inlineProt
+  %openfile inlineCode
+  %openfile extApiProt
+  %openfile extApiCode
+  %openfile memberProt
+  %foreach fcnIdx = module.NumSubFunctions
+    %assign          fcn = module.Function[fcnIdx]
+    %assign prevBlockFcn = ::BlockFcn
+    %assign   ::BlockFcn = fcn.Name
+    %assign      fcnBody = FcnGenerateSubFcnBody(block, module, fcnIdx,TLC_FALSE)
+    %assign hasPassThroughArgs = !ISEMPTY(fcn.PassThroughArgs)
+    %assign         globalVars = FcnGetSubFcnGlobalVars(system,fcn)
+    %if hasPassThroughArgs
+      %assign passThroughArgDefs = fcn.PassThroughArgDefs
+    %else
+      %assign passThroughArgDefs = ""
+    %endif
+    %assign  fcnClose = ")"
+    %assign seperator = ", "
+    %assign hasArgs = SLibFcnHasArgs(fcn)
+    %if !hasArgs || !hasPassThroughArgs
+      %assign seperator = ""
+      %if !hasArgs && !hasPassThroughArgs
+        %assign fcnClose = "void)"
+      %endif
+    %endif
+    %assign fcnProto = fcn.ProtoType + seperator + passThroughArgDefs + fcnClose
+    %assign localVars = ...
+      fcn.HasLocalData ? FcnDeclareAccessedLocalVariables(system) : ""
+    %%
+    %% Function prototype dispatching
+    %%
+    %selectfile NULL_FILE
+    %assign extern = ""
+    %assign repFcn = ""
+    %if fcn.IsShared
+      %if !genSharedUtils
+        %if !SLibLookupUtilityDecl(fcn.Name)
+          %<SLibInsertUtilityDecl(fcn.Name)>
+          %selectfile shaFcnProt
+        %endif
+      %endif
+    %elseif useEncapsCPP
+      %assign fcnProto = FEVAL("regexprep", fcnProto, "static\W*", "", "once")
+      %assign fcnProto = FEVAL("regexprep", fcnProto, "extern\W*", "", "once")
+      %selectfile memberProt
+    %elseif fcn.IsExported
+      %selectfile exported
+    %else
+      %selectfile subFcnProt
+    %endif
+    
+    %if fcn.IsShared && genSharedUtils
+      %<SLibGetFcnMemSecPragmaForSystemOnDecl(fcn.Name, "MemSecFuncSharedUtil", "Pre", system)>\
+      %<extern> %<fcnProto>;
+      %<SLibGetFcnMemSecPragmaForSystemOnDecl(fcn.Name, "MemSecFuncSharedUtil", "Post", system)>\
+    %else
+      %<SLibGetFcnMemSecPragmaForSystemOnDecl(fcn.Name, "MemSecFuncExecute", "Pre", system)>\
+      %<extern> %<fcnProto>;
+      %<SLibGetFcnMemSecPragmaForSystemOnDecl(fcn.Name, "MemSecFuncExecute", "Post", system)>\
+    %endif
+
+    %selectfile NULL_FILE
+    %%
+    %% Function body code generation
+    %%
+    %assign fcnComment = ""
+    %if !ISEMPTY(fcn.BlockName) && !ISEMPTY(fcn.BlockType)
+      %assign fcnType = ""
+      %if !ISEMPTY(fcn.FunctionType)
+        %assign fcnType = fcn.FunctionType + " function"
+      %else
+        %assign fcnType = "Function"
+      %endif
+      %assign fcnComment = "%<fcnType> for " + fcn.BlockType + ...
+        ": '" + fcn.BlockName + "'"
+    %endif
+    %if !ISEMPTY(fcn.Abstract)
+      %if !ISEMPTY(fcnComment)
+        %assign fcnComment = fcnComment + "\n"
+      %endif
+      %assign fcnComment = fcnComment + fcn.Abstract
+    %endif
+    %assign fcnDefinition = ""
+    %openfile fcnDefinitionHeader
+    %%
+    %% Shared function handling
+    %%
+    %if fcn.IsShared
+      %if genSharedUtils
+        %foreach headerIdx = fcn.NumFcnHeaders
+          %assign headerName = fcn.FcnHeader[headerIdx].Name
+          %if headerName[0] == "<" || headerName[0] == "\""
+            #include %<headerName>
+          %else
+            #include "%<headerName>"
+          %endif
+        %endforeach
+      %else
+        %foreach headerIdx = fcn.NumFcnHeaders
+          %<LibAddToCommonIncludes(fcn.FcnHeader[headerIdx].Name)>
+        %endforeach
+      %endif
+    %endif
+    %%
+    %if useEncapsCPP && !fcn.IsShared
+      %assign memberFcnName = CPPClassName + "::" + fcn.Name
+      %assign fcnProtoForDef = ...
+        FEVAL("regexprep", fcnProto, fcn.Name, memberFcnName, "once")      
+    %else
+      %assign fcnProtoForDef = fcnProto
+      %% If the prototype is for an exported function, and 
+      %% we're preserving extern in fcn declarations, the prototype
+      %% will have an extern in it.  This is not want we want for
+      %% the function definition prototype; strip it off.
+      %if fcn.IsExported && LibPreserveExternInFcnDecls()
+        %assign fcnProtoForDef = FEVAL("regexprep", fcnProtoForDef, "extern\W*", "", "once")
+      %endif
+    %endif
+    %%
+    %% We assume sub-functions are not MemSecFuncInitTerm
+    %%
+    %assign msFcnType    = "MemSecFuncExecute"
+    %assign generatedFor = FcnGeneratedFor(system)
+    %if fcn.IsShared
+      %assign fcn_category = "utility"
+      %if genSharedUtils
+        %assign msFcnType    = "MemSecFuncSharedUtil"
+      %endif
+    %else
+      %assign fcn_category = "model"
+    %endif
+    %createrecord fcnInfo { Name fcn.Name;  Returns  ""; ... 
+      Params passThroughArgDefs; Abstract fcnComment; Category fcn_category; ...
+      GeneratedBy "commonbodlib.tlc"; Type "Sub"; GeneratedFor generatedFor }
+    %%
+    %<SLibDumpFunctionBanner(fcnInfo)>
+    %closefile fcnDefinitionHeader
+    %openfile fcnCommonBody
+    %<fcnProtoForDef>
+    {
+      %assign mrLocalVars = FcnDumpMRLocalVars(system, fcn.Name, "")
+      %if !ISEMPTY(mrLocalVars)
+        %<mrLocalVars>
+      %endif
+      %if !ISEMPTY(localVars)
+        %if TYPE(localVars) == "Vector"
+          %<localVars[0]>
+        %else
+          %assert TYPE(localVars) == "String"
+          %<localVars>
+        %endif
+      %endif
+      %if !ISEMPTY(globalVars) && !WHITE_SPACE(globalVars)
+        %<globalVars>
+        {
+      %endif
+          %<fcnBody>
+      %if !ISEMPTY(globalVars) && !WHITE_SPACE(globalVars)    
+        }
+      %endif  
+    }
+    %closefile fcnCommonBody
+
+    %if fcn.IsShared
+      %if !SLibLookupUtility(fcn.Name)
+        %<SLibInsertUtility(fcn.Name)>
+        %if genSharedUtils
+          %% Create function definition buffer without Pragma
+          %% to avoid duplicated pragmas after calling SLibDumpUtilsSourceCode
+          %openfile fcnDefinitionNOPragma
+          %<fcnDefinitionHeader>
+          %<fcnCommonBody>
+          %closefile fcnDefinitionNOPragma
+          %<SLibDumpUtilsSourceCode(fcn.Name, fcnProto + ";", fcnDefinitionNOPragma)>
+        %else
+          %selectfile subFcnCode
+        %endif
+      %endif
+    %else
+      %selectfile subFcnCode
+    %endif
+        
+    %% create function definition buffer with Pragma wrapped
+    %openfile fcnDefinition
+    %<fcnDefinitionHeader>
+    %<SLibGetFcnMemSecPragmaForSystem(fcn.Name, msFcnType, "Pre", system)>
+    %<fcnCommonBody>
+    %<SLibGetFcnMemSecPragmaForSystem(fcn.Name, msFcnType, "Post", system)>
+    %closefile fcnDefinition
+    %<fcnDefinition>
+    %assign ::BlockFcn = prevBlockFcn
+  %endforeach %% fcnIdx = module.NumSubFunctions
+  %closefile memberProt
+  %closefile extApiCode
+  %closefile extApiProt
+  %closefile inlineCode
+  %closefile inlineProt
+  %closefile subFcnCode
+  %closefile subFcnProt
+  %closefile shaFcnProt
+  %closefile exported
+  %assign unused = UNLOAD_GENERATE_TYPE(block, fileName)
+  %%
+  %<LibSetSystemField(system, "CachedSubFunctions", subFcnCode)>
+  %%
+  %if !WHITE_SPACE(subFcnProt)
+    %assign subFcnProt = ...
+      "/* Forward declaration for local functions */\n" + subFcnProt    
+    %<SLibCacheSystemCodeToFile("sys_sub_fcn_fwd_decl", system, subFcnProt)>
+  %endif
+  %%
+  %if !WHITE_SPACE(shaFcnProt)
+    %<SLibCacheCodeToFile("mdl_priv_fcn_decl", shaFcnProt)>
+  %endif  
+  %%
+  %if module.HasExportedSym
+    %<SLibCacheSystemCodeToFile("sys_exported_fcn_decl", system, exported)>
+  %endif
+  %%
+  %if useEncapsCPP
+    %<LibAddToSystemField(system, "SystemMemberPrototype", memberProt)>
+  %endif
+%endfunction
+
+%% Function: FcnGenBodySysCache ================================================
+%% Description:
+%%   Cache all code for a module (including root).
+%%
+%function FcnGenBodySysCache(module) void
+  %% Assert (!system.SystemCached)
+  %assign  system = System[module.CGSystemIdx]
+  %assign  isRoot = (system.Type == "root")
+
+  %if (system.CrossNoArgFcnBound && (UsingMalloc || (MultiInstanceERTCode && !GenerateClassInterface)))
+    %% The first of these tracks if *any* subsystem has the "cross" flag set
+    %% (need this to know whether to put extra fields in RT_MODEL).
+    %% The second tracks if *this* subsystem has the "cross" flag set
+    %% (need this to communicate this info across GENERATE_TYPE boundary,
+    %% so generated code knows how to address certain globals).
+    %% thisSubsysCross will get reset to false at the bottom of this function.
+    %assign ::AnyCross = TLC_TRUE
+    %assign ::ThisSubsysCross = TLC_TRUE
+  %endif
+
+  %%
+  %% Generated code for sub-functions and exported functions
+  %%  
+  %%%<SLibAddTLCCompileStatsCheckPoint(TLC_TRUE,"Generate code for sub-functions and exported functions")>
+  %if module.NumSubFunctions > 0
+    %with ::CompiledModel
+      %<FcnGenModuleSubFunctions(module)>
+    %endwith
+  %endif
+  %%%<SLibAddTLCCompileStatsCheckPoint(TLC_FALSE,"Generate code for sub-functions and exported functions")>
+  
+  %if (ISFIELD(system,"NoCode"))
+    %if (system.NoCode == "yes")
+      %<SLibExtModeHostOnlyStub(system)>
+      %assign ::ThisSubsysCross = TLC_FALSE
+      %return ""
+    %endif
+  %endif
+
+  %% EnableFcn, InitializeFcn, and StartFcn fields should always exist in
+  %% System record
+  %% However, there may not be any blocks in the system that generate initialize
+  %% or enable code.  Thus, we must cache those two functions first -- Start
+  %% will call them if they are non-empty.
+
+  %% Cache Initialize before Enable so Initialize args get added to Enable
+  %if ISFIELD(system,"InitializeFcn")
+    %<SLibFcnGenBodySysFcnEntry(system,"Initialize","InitializeConditions",...
+                                TLC_TRUE,TLC_TRUE,TLC_FALSE,TLC_FALSE)>
+  %endif
+
+  %if ISFIELD(system, "FinalizeDimsFcn")
+    %<SLibFcnGenBodySysFcnEntry(system,"FinalizeDims","FinalizeDims",...
+                                TLC_FALSE,TLC_FALSE,TLC_FALSE,TLC_FALSE)>
+  %endif
+ 
+  %if ISFIELD(system, "SetDimsFcn")
+    %<SLibFcnGenBodySysFcnEntry(system,"SetDims","SetDims",...
+                                TLC_FALSE,TLC_FALSE,TLC_FALSE,TLC_FALSE)>
+  %endif
+  
+  %if ISFIELD(system,"EnableFcn")
+    %<SLibFcnGenBodySysFcnEntry(system,"Enable","Enable",...
+                                TLC_TRUE,TLC_TRUE,TLC_FALSE,TLC_FALSE)>
+  %endif
+
+  %% Don't cache start function since it will never be called, Accelerator
+  %% runs start function via Simulink.
+  %if Accelerator
+    %<LibSetSystemField(system, "CachedStartFcn", "")>
+  %else
+    %<SLibFcnGenBodySysFcnEntry(system,"Start","Start",...
+                                TLC_TRUE,TLC_TRUE,TLC_FALSE,TLC_FALSE)>
+  %endif
+  
+
+  %if ISFIELD(system,"DerivativeFcn") && (!isRoot || (NumContStates > 0))
+    %<SLibFcnGenBodySysFcnEntry(system,"Derivative","Derivatives",...
+                                TLC_TRUE,TLC_FALSE,TLC_TRUE,TLC_FALSE)>
+  %endif
+
+  
+  %if ISFIELD(system,"ProjectionFcn") && (!isRoot || (NumContStates > 0))
+    %<SLibFcnGenBodySysFcnEntry(system,"Projection","Projection",...
+                                TLC_TRUE,TLC_FALSE,TLC_FALSE,TLC_FALSE)>
+  %endif
+
+
+  %if ISFIELD(system,"ForcingFunctionFcn") && (ModelIsLinearlyImplicit == "yes") && (!isRoot || (NumContStates > 0))
+    %<SLibFcnGenBodySysFcnEntry(system,"ForcingFunction","ForcingFunction",...
+                                TLC_TRUE,TLC_FALSE,TLC_FALSE,TLC_FALSE)>
+  %endif
+
+
+  %if ISFIELD(system,"MassMatrixFcn") && (ModelIsLinearlyImplicit == "yes") && (!isRoot || (NumContStates > 0))
+    %<SLibFcnGenBodySysFcnEntry(system,"MassMatrix","MassMatrix",...
+                                TLC_TRUE,TLC_FALSE,TLC_FALSE,TLC_FALSE)>
+  %endif
+
+  
+  %if ISFIELD(system,"ZeroCrossingFcn") && (!isRoot || (NumNonsampledZCs > 0))
+    %<SLibFcnGenBodySysFcnEntry(system,"ZeroCrossing","ZeroCrossings",...
+                                TLC_TRUE,TLC_FALSE,TLC_FALSE,TLC_FALSE)>
+  %endif
+
+
+  %if ISFIELD(system,"DisableFcn")
+    %<SLibFcnGenBodySysFcnEntry(system,"Disable","Disable",...
+                                TLC_TRUE,TLC_TRUE,TLC_FALSE,TLC_FALSE)>
+  %endif
+
+  %if ISFIELD(system,"UpdateFcn")
+    %<SLibFcnGenBodySysFcnEntry(system,"Update","Update",...
+                                TLC_TRUE,TLC_TRUE,TLC_TRUE,TLC_TRUE)>
+  %endif
+
+  %% Cache Outputs function after update fcn because the
+  %% the Output method checks if output or update is empty
+  %% before generating special code for conditionally
+  %% executed systems (such as setting the mode in an enabled
+  %% subsystem).  It is possible with CGIR for the Output buffer
+  %% of an enabled subsystem to be empty, but the Update buffer
+  %% to be nonempty.
+  %if !system.DeletedInIR
+    %if ISFIELD(system,"OutputFcn")
+      %<SLibFcnGenBodySysFcnEntry(system,"Output","Outputs",...
+                                  TLC_TRUE,TLC_TRUE,TLC_TRUE,TLC_TRUE)>
+    %elseif ISFIELD(system,"OutputUpdateFcn")
+      %<SLibFcnGenBodySysFcnEntry(system,"OutputUpdate","OutputUpdate",...
+                                  TLC_TRUE,TLC_TRUE,TLC_TRUE,TLC_TRUE)>
+    %endif
+  %endif
+
+  %%
+  %% For ert model reference the registration function will be in the top level
+  %% subsystem file. If all blocks have constant sample time, only registration
+  %% function will be generated. The registration function will be dumped in
+  %% in ertreg.tlc.
+  %assign isMdlRefSys  = IsModelReferenceBaseSys(system)
+  %assign nonEmpty = isRoot || isMdlRefSys || SLibSystemNonEmpty(system)
+  %<LibSetSystemField(system, "SystemNonEmpty", nonEmpty)>
+  %<LibSetSystemField(system, "SystemCached",   TLC_TRUE)>
+
+  %% For the model reference base system, we generate the interface
+  %% and prototype in FcnGenBodySysCache.  This is because information
+  %% from Output may be needed in Update to determine if an 
+  %% rtModel argument is needed (one reason is the firstInitCond).
+  %% 
+  %% NOTE(mdt): We do not need to this here for OutputUpdate because
+  %% we call ModelrefMarkRTMIfNeeded at the end of 
+  %% FcnGenBodyOutputUpdateFcnCache after both Output and Update 
+  %% have already been generated.  This avoids the problem that
+  %% happens when Output and Update are called separately.
+  %if isMdlRefSys
+    %if ISFIELD(system,"UpdateFcn")
+      %assign ::BlockFcn = "Update"
+      %<LibSetGlobalSysFcnsForArgAccess([])>
+      %if ISFIELD(system, "UpdateOOCC")
+        %<LibSetGlobalSysFcnsForArgAccess(system.UpdateOOCC)>
+      %endif
+      %<LibDefineSystemFcn(system, "Update")>
+      %assign ::BlockFcn = "Unknown"
+    %endif
+    
+    %if ISFIELD(system,"OutputFcn") && !system.DeletedInIR
+      %assign ::BlockFcn = "Output"
+      %<LibSetGlobalSysFcnsForArgAccess([])>
+      %if ISFIELD(system, "OutputOOCC")
+        %<LibSetGlobalSysFcnsForArgAccess(system.OutputOOCC)>
+      %endif
+      %<LibDefineSystemFcn(system, "Output")>
+      %assign ::BlockFcn = "Unknown"
+    %endif
+  %endif
+  %% Reset flag for next subsystem
+  %assign ::ThisSubsysCross = TLC_FALSE
+%endfunction %% FcnGenBodySysCache
+
+
+%% Function: FcnGenSystemTerminate =============================================
+%% Description:
+%%   Cache all terminate code for a subsystem.  Ultimately, this function
+%%   should also be able to cache code for the root system.
+%%
+%function FcnGenSystemTerminate(system) void
+  %% Assert (!system.SystemTerminateCached)
+
+  %if (ISFIELD(system,"NoCode"))
+    %if (system.NoCode == "yes")
+      %<SLibExtModeHostOnlyStub(system)>
+      %return ""
+    %endif
+  %endif
+
+  %<FcnGenBodyTerminateFcnCache(system)>
+
+  %assign terminateNonEmpty = SLibSystemTerminateNonEmpty(system)
+  %<LibSetSystemField(system, "SystemTerminateNonEmpty", terminateNonEmpty)>
+  %<LibSetSystemField(system, "SystemTerminateCached", TLC_TRUE)>
+
+%endfunction %% FcnGenSystemTerminate
+
+
+%% Function: FcnCacheLocalVars =================================================
+%% Abstract:
+%%   Generates the local variable declaration for a given function type and
+%%   caches it in the systems instance record.
+%%    
+%function FcnCacheLocalVars(system, fcnType) void
+  %assign multiTID = (fcnType == "Update") || ...
+                     (fcnType == "Output") || ...
+                     (fcnType == "OutputUpdate")
+                   
+  %if SLibNonEmptyModel() 
+    %if (fcnType == "Update") && (CombineOutputUpdateFcns != 0) && ...
+        LibSystemIsRoot(system)
+        %return
+    %endif
+    
+    %assign localVar = FcnDeclareAccessedLocalVariables(system)
+    %if LibIsDeploymentDiagram() && (system == rootSystem)
+      %assign localVar = localVar + SLibDeploymentGetLocalVars(fcnType)
+    %endif
+    %assert (TYPE(localVar) == "String" && !multiTID) || ...
+             multiTID
+    %if multiTID
+      %<LibSetSystemFieldForTID(system, fcnType,"LocalBO", localVar)>
+    %else
+      %if !ISEMPTY(localVar)
+        %<LibSetSystemField(system, "Cached" + fcnType + "LocalBO", localVar)>
+      %endif
+    %endif
+  %endif  
+%endfunction
+  
+
+
+%% Function: FcnGenerateVirtualOutports() ======================================
+%% Description:
+%% Generate virtual outport code for all blocks with Virtual
+%% InitializeConditions functions
+%%
+%function FcnGenerateVirtualOutports(system) void
+  %openfile tmpBuffer
+  %with system
+    %if (system.Type != "root")
+      %foreach blkIdx = NumVirtualOutportBlocks
+	  %assign vblkIdx = VirtualOutportBlocksIdx + blkIdx
+
+	  %<GENERATE(Block[vblkIdx], "VirtualInitializeConditions", system)>
+
+      %endforeach
+    %else
+      %if (CodeFormat == "S-Function" && ::CompiledModel.HaveVirtualOutports)
+        %% Run root outports so any ICs that are connected to root outports
+        %% propagate to the output.  This is to ensure the IC is put at the
+        %% output of the generated S-Function, since mdlOutputs doesn't run at
+        %% time 0 if the s-function is in a disabled enable_subsystm.
+        %foreach blkIdx = NumBlocks
+          %if Block[blkIdx].Type == "Outport"
+
+	    %<GENERATE(Block[blkIdx], "OutputsForRTWSFunction", system)>
+
+          %endif
+        %endforeach
+      %endif
+    %endif
+  %endwith
+  %closefile tmpBuffer
+  %if !WHITE_SPACE(tmpBuffer)
+    %openfile retBuffer
+    /* virtual outports code */
+
+    %<tmpBuffer>\
+    %closefile retBuffer
+    %if (system.Type != "root")
+      %assign ::CompiledModel.HaveVirtualOutports = 1
+    %endif
+    %return retBuffer
+  %else
+    %return ""
+  %endif
+%endfunction %%FcnGenerateVirtualOutports
+
+%% Function: FncGenInitStatesInRootStart ======================================
+%% Abstract:
+%%   This function generate code initialize states
+%% if needed
+%%
+%function FncGenInitStatesInRootStart()
+  %assign ss = System[NumSystems - 1] %% root system
+  %openfile retBuf
+  %% Load intial states if needed.
+  %if ::CompiledModel.LoadInitialState == "yes"
+
+    /* initial state override */
+    %assign origBlockFcn = ::BlockFcn
+    %assign ::BlockFcn = "Start"
+    %<FcnLoadInitialState()>\
+    %assign ::BlockFcn = origBlockFcn
+  %endif
+  %closefile retBuf
+  %return retBuf
+%endfunction %% FncGenInitStatesInRootStart
+
+
+%% Function: FcnGenInitMassMatrixPr ===================
+%% Abstract:
+%%   This function generates code that initializes MassMatrixPr offsets in DWork
+%%   MassMatrixPr offsets are only generated at the model root level.
+%%
+%function FcnGenInitMassMatrixPr(system) void
+  %assert (ModelIsLinearlyImplicit == "yes") 
+  %assert (system.Type == "root")
+    
+  %openfile tempbuf  
+  
+      /* Root-level init GlobalMassMatrixPr offset */
+      {      
+        %foreach mmIdx = ::CompiledModel.MassMatrices.NumMassMatrices
+          %assign mm = ::CompiledModel.MassMatrices.MassMatrix[mmIdx]
+          %assign prOffset = mm.IndexPr
+          %assign grSrc = mm.GrSrc
+          %assign comment  = "/* '%<SLibGrBlockName(grSrc)>' */"    
+          
+          %assign grSubSys = ::CompiledModel.BlockHierarchyMap.Subsystem[grSrc[0]]
+          %assign grBlock  = grSubSys.Block[grSrc[1]]
+          
+          %assign dwIdx = -1  %% invalid
+          %assign dw = ""
+          %assign foundMassMatrixDWork = TLC_FALSE
+          %foreach blkDW = grBlock.NumDWorks
+            %assign dwIdx = grBlock.DWork[blkDW]._idx
+            %assign dw = ::CompiledModel.DWorks.DWork[dwIdx]          
+            %if dw.Name == "MASS_MATRIX_PR"
+              %assign foundMassMatrixDWork = TLC_TRUE 
+              %break
+            %endif
+          %endforeach          
+          %assert foundMassMatrixDWork                
+          %with system
+            
+            %if ISFIELD(mm, "ForEachSSLoopBnds")
+              %% The owner block is inside For Each subsystem.
+              %% Need to initialize the DWork value correctly for each iteration
+              %assign ::NeedForEachLoopInReg = TLC_TRUE
+              %assign ::NumForEachLoopHierarchyLevel = SIZE(mm.ForEachSSLoopBnds,1)
+              %assign ::ForEachLoopHierarchyLevel = ::NumForEachLoopHierarchyLevel
+              %assign mmPrOffset = "%<prOffset>"
+             {
+               %% Form loop for every parent For Each subsystem
+               %foreach ssIdx = SIZE(mm.ForEachSSLoopBnds,1)
+                 %assign iterVar = "i_%<ForEachLoopHierarchyLevel>"
+                 %assign ::ForEachLoopHierarchyLevel = ::ForEachLoopHierarchyLevel - 1
+                 int32_T %<iterVar>;
+                 for (%<iterVar> = 0; %<iterVar> < %<mm.ForEachSSLoopBnds[::ForEachLoopHierarchyLevel]>; %<iterVar>++) {
+                   %assign mmPrOffset = mmPrOffset + "+" + iterVar + "*%<mm.ForEachSSMassMatrixPrSize[::ForEachLoopHierarchyLevel]>"
+                 %endforeach
+                 %assign ::ForEachLoopHierarchyLevel = 1
+            %elseif LibIsMultiSolver()
+              %assign sysIdx = grSrc[0]
+              %assign blockIdx = grSrc[1]
+              %assign mmPrOffset = "%<SLibDeploymentGetSystemMassMatrixPr(sysIdx, blockIdx)>"
+            %else
+              %assign mmPrOffset = "%<prOffset>"
+            %endif
+          
+            %<SLibBlockMassMatrixPrOffsetInternal("", "", 0, dwIdx, dw, 1)> = %<mmPrOffset>; %<comment>        
+
+            %if ISFIELD(mm, "ForEachSSLoopBnds")
+              %% Close the loop for every parent For Each subsystem
+              %foreach ssIdx = SIZE(mm.ForEachSSLoopBnds,1)
+                 }
+              %endforeach
+             }
+              %assign ::NeedForEachLoopInReg = TLC_FALSE
+            %endif
+          
+          %endwith
+        %endforeach
+      }
+            
+  %closefile tempbuf
+  
+  %return tempbuf
+  
+%endfunction   %% FcnGenInitMassMatrixPr
+
+
+
+%function FcnGenInitMassMatrixPrInRoot() void
+
+  %openfile retBuf
+ 
+  %if (::CompiledModel.ModelIsLinearlyImplicit == "yes") && !IsModelReferenceTarget()
+
+    %assign ss = System[NumSystems - 1] %% root system
+    
+    %<FcnGenInitMassMatrixPr(ss)>
+
+  %endif  
+  
+  %closefile retBuf
+  %if !WHITE_SPACE(retBuf)
+    %return retBuf
+  %else
+    %return ""
+  %endif
+
+%endfunction %% FncGenInitMassMatrixPrInRoot
+
+
+%% Function FcnNonRootSystemHasModes(system) ===================================
+%% Description:
+%%      Return whether system is not root and has modes
+%function FcnNonRootSystemHasModes(system) void
+  %if system.Type == "root"
+    %return TLC_FALSE
+  %else
+    %assign callSites      = system.CallSites
+    %assign graphParentSys = ::CompiledModel.System[callSites[0][2]]
+    %assign ssBlock        = graphParentSys.Block[callSites[0][3]]
+    %return ssBlock.ModeVector[0] > 0
+  %endif
+%endfunction
+
+
+%% Function: FcnGenerateTerminate ==============================================
+%% Description:
+%%      Generate terminate code for the system
+%%
+%function FcnGenerateTerminate(system)
+  %openfile tmpBuffer
+  %with system
+    %if system.Type == "root"
+      %foreach idx = LibGetNumAsyncTasks()
+        %assign tid = idx + NumSynchronousSampleTimes
+        %if RTMAbsTimeNeedTransProtection(tid) && ...
+          SLibConcurrentTasks()
+          %<SLibCGIRMutexOp(3,SLibGetTimerSemID(tid))>
+        %endif
+      %endforeach
+    %endif
+    %if SLibNonEmptyModel()
+      %assign rootOpaqueBlock = FcnRootOpaqueBlock()
+      %assign termCode = FcnGenerateCodeFromModule(rootOpaqueBlock, system, "Terminate")
+      %<termCode>
+    %endif
+  %endwith
+  %% Stateflow global machine terminate
+  %if IsBaseSystem(system)
+    %<SLibWriteMachineTerminate()>\
+  %endif
+
+  %closefile tmpBuffer
+  %if !WHITE_SPACE(tmpBuffer)
+    %return tmpBuffer
+  %else
+    %return ""
+  %endif
+%endfunction  %% FcnGenerateTerminate
+
+
+%% Function: FcnGenBodyTerminateFcnCache(system) ===============================
+%% Description:
+%%      Caches system Terminate function
+%%
+%function FcnGenBodyTerminateFcnCache(system) void
+  %assign terminateFcn    = FcnGenerateTerminate(system)
+  %if IsBaseSystem(system)
+    %assign terminateProf = SLibGenProfSysTerminate(system)
+    %<LibSetSystemField(system, "CachedTerminateProfileEndCode", terminateProf)>
+  %endif
+  %<LibSetSystemField(system, "CachedTerminateFcn",    terminateFcn)>
+  %<FcnCacheLocalVars(system, "Terminate")>
+  %<LibDefineSystemFcn(system, "Terminate")>
+%endfunction %% FcnGenBodyTerminateFcnCache
+
+%% Function: FcnGenerateTidGuardOpenCodeInMain(tid) =====================
+%%  Return TID guard open potion.
+%%  If rate grouping is on, return "" because
+%%  rate grouped code does not need tid guard
+%%
+%% NOTE: This function is similar to FcnGenerateTidGuardOpenCode function 
+%% except for the MajorTimeStep check (since this code will be in main.c)
+%function FcnGenerateTidGuardOpenCodeInMain(tid)
+  %if SLibIsRateGrouping()
+    %return "{ %<LibTaskComment(tid)>"
+  %else
+    %assign tidGuard = FcnERTIsSampleHitInMain(tid)
+    %if tidGuard == "1"
+      %return "{ %<LibTaskComment(tid)>"
+    %else
+      %return  "if (%<tidGuard>) { %<LibTaskComment(tid)>"
+    %endif
+  %endif
+%endfunction %%  FcnGenerateTidGuardOpenCode
+
+%% Function: FcnGenerateTidGuardOpenCode(tid) ===========================
+%%  Return TID guard open potion.
+%%  If rate grouping is on, return "" because
+%%  rate grouped code does not need tid guard
+%%
+%function FcnGenerateTidGuardOpenCode(tid)
+  %if SLibIsRateGrouping()
+    %return "{ %<LibTaskComment(tid)>"
+  %else
+    %assign tidGuard = LibIsSampleHit(tid)
+    %if tidGuard == "1"
+      %return "{ %<LibTaskComment(tid)>"
+    %else
+      %return  "if (%<tidGuard>) { %<LibTaskComment(tid)>"
+    %endif
+  %endif
+%endfunction %%  FcnGenerateTidGuardOpenCode
+
+%% Function: FcnGenerateTidGuardCloseCode(tid) ===========================
+%%  Return TID guard close potion.
+%%  If rate grouping is on, return "" because
+%%  rate grouped code does not need tid guard
+%%
+%function FcnGenerateTidGuardCloseCode(tid)
+  %return  "}"
+%endfunction %%  FcnGenerateTidGuardCloseCode
+
+
+%% Function: SystemNeedTidGuard(system, tid) =====================
+%% Return true if tid guard is need in subsystem code for specific 
+%% tid
+%%
+%function SystemNeedTidGuard(system, tid)
+  %assign needTidGuard = TLC_TRUE
+
+  %if LibIsSingleRateSystem(system) 
+    %assign needTidGuard = TLC_FALSE
+  %elseif SLibSingleTasking() && TID == 0 && ...
+    (Accelerator || (CodeFormat!="S-Function"))
+    %assign needTidGuard = TLC_FALSE
+  %endif
+  
+  %return needTidGuard
+%endfunction
+
+%% Function: FcnGenerateTimeManagementForAsyncTs ===========
+%% Abstractu:
+%%   Generate code for asynchronous task to manage timer. 
+%% An asynchronous task can update its timer from base rate
+%% timer, its caller task, or external timer. 
+%% 
+%function FcnGenerateTimeManagementForAsyncTs(fcnType, tid,loc)
+  %assert LibAsynchronousTriggeredTID(tid)
+  
+  %if !LibAsyncTaskAccessTimeInFcn(tid, ::BlockFcn) 
+    %return ""
+  %endif
+  %assign ts  = SampleTime[tid]
+  
+  %% If async timer is Self_internal, timer increase by 1 
+  %% when timer is update. Timer should be updated in Outputs function 
+  %% once and only once. Timer can't be updated in other fcn type. 
+  %if ts.TimeSource == "Self_internal" 
+    %if fcnType != "Outputs" || loc == "top"
+      %return ""
+    %endif
+  %else
+    %if loc == "bottom"
+      %return ""
+    %endif
+  %endif
+  
+  %% If sample time is Asynchronous and need abs time,
+  %% and this subsystem is the top one associated with
+  %% the async sample time, then
+  %% fcnCall need update absolute time whenever it
+  %% runs.
+  %openfile retBuf
+  %if ExportFunctionsMode 
+    %assign updateTime = ...
+      ts.Asynchronous == "yes" && ...
+      ts.NeedAbsoluteTime == "yes" 
+    %if updateTime
+      %<FcnExportFcnCallUpdatesTimer(tid)>
+    %endif
+  %else
+    %assign updateTime = ...
+      ts.Asynchronous == "yes" && ...
+      ts.NeedAbsoluteTime == "yes" && ...
+      ts.TimeSource == "BaseRate"
+    %if updateTime
+      %<FcnAsyncTaskUpdatesTimersFromBaseRate(tid)>
+    %endif
+  %endif
+  %closefile retBuf
+  %return retBuf
+%endfunction
+
+%% Function: FcnGenerateOutput(system) =========================================
+%% Description:
+%%      Generates the Outputs code for a system with the proper scoping(s) of
+%%      blocks in their TIDs.
+%%
+%function FcnGenerateOutput(system) void
+  %assign ::CompiledModel.GeneratingOutputsCode = 1
+  %with system
+    %assign extOutput = ""
+    
+    %if SLibNonEmptyModel()
+      %assign rootOpaqueBlk = FcnRootOpaqueBlock()
+      %assign Multirate_outputBuffers = ...
+        FcnGenerateCodeFromModule(rootOpaqueBlk, system, "Outputs")
+    %else
+      %assign Multirate_outputBuffers = [] 
+      %foreach Tid = NumSampleTimes
+        %assign Multirate_outputBuffers = ...
+          Multirate_outputBuffers + ""
+      %endforeach
+    %endif  %% end of gerate code from blocks
+    
+   %endwith %% system
+  
+  %assign ::CompiledModel.GeneratingOutputsCode = 0
+  %assign Multirate_outputBuffers[0] = ...
+    extOutput + rootInportsFromFile + Multirate_outputBuffers[0] 
+  %return Multirate_outputBuffers
+%endfunction
+
+
+%% Function:SLibGetSysFcnBodyHelper =================
+%%
+%%
+%function SLibGetSysFcnBodyHelper(system, fcnType, dontChkEmpty)
+  %assign currentTid = system.CurrentTID
+ 
+  %assign dontChkEmpty = dontChkEmpty || ...
+    (fcnType == "OutputUpdate" && ...
+    LibSystemIsForceNonInline(system))
+  
+  %openfile retBuf
+
+  %assert TYPE(currentTid) == "Number" || ISEQUAL(currentTid, "")
+  
+  %if LibAsynchronousTriggeredTID(currentTid)
+    %% asynchronous tid
+    %assign hasFcnBody = (dontChkEmpty || ...
+      !LibSystemFcnIsEmptyForTID(system,fcnType)) && ...
+      !IsBaseSystem(system)
+  %elseif ISEQUAL(currentTid, "")
+    %% system is not rate grouped. passed in "" as tid
+    %assign hasFcnBody = dontChkEmpty || ...
+      !LibSystemFcnIsEmpty(system,fcnType) 
+  %else 
+    %% periodic tid
+    %assign hasFcnBody = dontChkEmpty || ...
+      !LibSystemFcnIsEmptyForTID(system,fcnType) 
+  %endif
+  
+  %if hasFcnBody
+    %assign  fcnBody =  SLibGetBody%<fcnType>FcnCache(system)
+    %<fcnBody>
+  %endif
+  %closefile retBuf
+  
+  %return retBuf
+%endfunction
+
+%% Function: SLibGetRateGroupedFcnBody ===========
+%%   Returned rate grouped Fcn body
+%%  Only "Update" "Output" "OutputUdate" fcn body can
+%%  be rate grouped.
+%%  If system tid is asynchronous tid,
+%%      always return rate grouped fcn body.
+%%  If system tid is synchronous tid,
+%%      - return rate grouped body if system is rate grouped
+%%      - otherwise, return non-rate-grouped body.
+%function SLibGetRateGroupedFcnBody(system, fcnType, dontChkEmpty)
+  %openfile retBuf
+  %%
+  %assert fcnType == "Update" || ...
+    fcnType == "Output" || fcnType == "OutputUpdate"
+ 
+  %if LibIsSingleRateSystem(system) || ...
+    system.Type == "function-call"
+    %assign ssTid = FcnGetSubsystemCodeBufTID(system) 
+
+    %% Single rate system
+    %% Always rate groupe async tid
+    %assign system.CurrentTID = ...
+      LibAsynchronousTriggeredTID(ssTid) ? ssTid : ""
+    
+    %<SLibGetSysFcnBodyHelper(system, fcnType, dontChkEmpty)>
+    
+    %assign system.CurrentTID = -1
+  %else
+    %if SLibSystemFcnRateGrouping(system, fcnType)
+      %% rate grouping sync tid
+      %foreach Tid = NumSynchronousSampleTimes
+        %assign system.CurrentTID = Tid
+        
+        %<SLibGetSysFcnBodyHelper(system, fcnType, dontChkEmpty)>
+        %assign system.CurrentTID = -1
+      %endforeach
+    %else
+      %assign system.CurrentTID = ""
+      
+      %<SLibGetSysFcnBodyHelper(system, fcnType, dontChkEmpty)>
+      
+      %assign system.CurrentTID = -1
+    %endif
+    %% always rate groupe async tid
+    %foreach Tid = LibGetNumAsyncTasks()
+      %assign system.CurrentTID = Tid+NumSynchronousSampleTimes
+      
+      %<SLibGetSysFcnBodyHelper(system, fcnType, dontChkEmpty)>
+
+      %assign system.CurrentTID = -1
+    %endforeach
+  %endif
+  %closefile retBuf
+  
+  %return retBuf
+%endfunction %% SLibGetRateGroupedFcnBody
+
+
+%% Function: SLibGetSystemFcnBodyCacheHelper ==================================
+%% Abstract:
+%%     Helper function for SLibGetSystemFcnBodyCache
+%%
+%function SLibGetSystemFcnBodyCacheHelper(system, needToDumpSysFcn)
+  %assign isRoot       = (system.Type == "root")
+  %assign dontChkEmpty = isRoot 
+  %openfile codeBuffer
+
+  %<SLibGetSystemStateflowFcnCache(system)>\
+  
+  %<LibGetSystemField(system, "CachedSubFunctions")>\
+  
+  %if needToDumpSysFcn
+    %if ISFIELD(system,"InitializeFcn")
+      %if !LibSystemFcnIsEmpty(system, "Initialize")
+	%<SLibGetBodyInitializeFcnCache(system)>
+      %endif
+    %endif
+    %% EnableFcn always exists
+    %if ISFIELD(system,"EnableFcn")
+      %if !LibSystemFcnIsEmpty(system,"Enable")
+	%<SLibGetBodyEnableFcnCache(system)>
+      %endif
+    %endif
+    %% DisableFcn always exists
+    %if ISFIELD(system,"DisableFcn")
+      %if !LibSystemFcnIsEmpty(system,"Disable")
+	%<SLibGetBodyDisableFcnCache(system)>
+      %endif
+    %endif
+    %% FinalizeDimsFcn may or may not exist
+    %if ISFIELD(system, "FinalizeDimsFcn")
+      %if !LibSystemFcnIsEmpty(system, "FinalizeDims")
+        %<SLibGetBodyFinalizeDimsFcnCache(system)>
+      %endif
+    %endif
+    %% SetDimsFcn may exist
+    %if ISFIELD(system, "SetDimsFcn")
+      %if !LibSystemFcnIsEmpty(system, "SetDims")
+        %<SLibGetBodySetDimsFcnCache(system)>
+      %endif
+    %endif
+    %% StartFcn always exists
+    %if ISFIELD(system,"StartFcn")
+      %if dontChkEmpty || !LibSystemFcnIsEmpty(system,"Start")
+	%<SLibGetBodyStartFcnCache(system)>
+      %endif
+    %endif
+    %if ISFIELD(system,"OutputFcn")
+      %<SLibGetRateGroupedFcnBody(system, "Output", dontChkEmpty)>
+    %endif
+    %if ISFIELD(system,"UpdateFcn")
+      %<SLibGetRateGroupedFcnBody(system, "Update", dontChkEmpty)>
+    %endif
+    %if ISFIELD(system,"DerivativeFcn") && (!isRoot || (NumContStates > 0))
+      %if dontChkEmpty || !LibSystemFcnIsEmpty(system,"Derivative")
+	%<SLibGetBodyDerivativeFcnCache(system)>
+      %endif
+    %endif
+    %if ISFIELD(system,"ProjectionFcn") && (!isRoot || (NumContStates > 0))
+      %if dontChkEmpty || !LibSystemFcnIsEmpty(system,"Projection")
+	%<SLibGetBodyProjectionFcnCache(system)>
+      %endif
+    %endif
+    %if ISFIELD(system,"ForcingFunctionFcn") && (ModelIsLinearlyImplicit == "yes") && (!isRoot || (NumContStates > 0))
+      %if dontChkEmpty || !LibSystemFcnIsEmpty(system,"ForcingFunction")
+	%<SLibGetBodyForcingFunctionFcnCache(system)>
+      %endif
+    %endif
+    %if ISFIELD(system,"MassMatrixFcn") && (ModelIsLinearlyImplicit == "yes") && (!isRoot || (NumContStates > 0))
+      %if dontChkEmpty || !LibSystemFcnIsEmpty(system,"MassMatrix")
+	%<SLibGetBodyMassMatrixFcnCache(system)>
+      %endif
+    %endif
+    %if ISFIELD(system,"ZeroCrossingFcn") && (!isRoot || (NumNonsampledZCs > 0))
+      %if dontChkEmpty || !LibSystemFcnIsEmpty(system,"ZeroCrossing")
+	%<SLibGetBodyZeroCrossingFcnCache(system)>
+      %endif
+    %endif
+    %if ISFIELD(system,"OutputUpdateFcn")
+      %<SLibGetRateGroupedFcnBody(system, "OutputUpdate", dontChkEmpty)>
+    %endif
+    %% TerminateFcn should always exist
+    %if (!isRoot || !Accelerator) && ...
+      (dontChkEmpty || !LibSystemFcnIsEmpty(system,"Terminate"))
+      %<SLibGetBodyTerminateFcnCache(system)>
+    %endif
+  %endif
+  %closefile codeBuffer
+  %return codeBuffer
+%endfunction
+
+%% Function: NotRootFileName ==================================================
+%% Abstract:
+%%    Return true if the code for this system does not go to model.c
+%%
+%function NotRootFileName(system)
+  %assign isRoot = (system.Type == "root")
+  %assign notRootFileName = 0
+  %if !isRoot
+    %assign rootFileName = GetRootSystemFileName()
+    %assign notRootFileName = (system.SystemFileName != rootFileName)
+  %endif
+  %return notRootFileName
+%endfunction
+
+%% Function: SLibDumpGlobalVarDeclaration =====================================
+%% Abstract:
+%%     Dump global variable declration in the specified file.
+%%
+%function SLibDumpGlobalVarDeclaration(system, file) void
+  %if !system.StandaloneSubsystem
+    %assign buf = LibDeclareGlobalVars(system,"")    
+    %if !WHITE_SPACE(buf)
+      %assign sysInfo = GetSystemNameForComments(system)
+      %openfile globalBuf
+      
+      /* Declare global variables for system: %<sysInfo> */
+      %<buf>\
+      %closefile globalBuf
+      %<SLibSetModelFileAttribute(file, "Declarations",globalBuf)>
+    %endif
+  %endif
+%endfunction
+
+
+%% Function: LibSetSharedFunctionOutputDir
+%function LibSetSharedFunctionOutputDir(system, includeSourceFile)
+      %assign duplicate = LibAddToReusableLibModelSources(system.SystemFileName)
+      %assign libname = SLibGetReusableLibraryOutputDirectory(system)
+      
+      %if includeSourceFile
+         %assign srcFile = SLibGetFileRecForSystemCode("sys_fcn_defn", system, TLC_TRUE)
+         %<LibSetSourceFileOutputDirectory(srcFile, libname)>
+      %endif
+      
+      %assign hdrFile = SLibGetFileRecForSystemCode("sys_fcn_decl", system, TLC_TRUE)
+      %<LibSetSourceFileOutputDirectory(hdrFile, libname)>
+      
+      %if LibIsSystemExistingLibrary(system) && !duplicate
+        %if includeSourceFile
+           %assign FileName  = SLibGetFileNameForSystemCode("sys_fcn_defn", system)
+           %assign sourceExt = ::LangFileExt
+           %<SLibAddGeneratedFileToList("%<FileName>.%<sourceExt>", ...
+              "utility","source",libname)>  
+           %<LibSetSourceFileSection(srcFile, "WrittenToDisk", TLC_TRUE)>
+        %endif
+        
+        %assign FileName  = SLibGetFileNameForSystemCode("sys_fcn_decl", system)
+        %<SLibAddGeneratedFileToList("%<FileName>.h","utility", ...
+          "header",libname)>  
+        %<LibSetSourceFileSection(hdrFile, "WrittenToDisk", TLC_TRUE)>
+      %endif
+      %return duplicate
+%endfunction
+
+
+%% Function: SLibGetSystemBodyCache ============================================
+%% Abstract:
+%%   Get or dump the cached body for the specified system (including root).
+%%
+%function SLibGetSystemBodyCache(system)
+  %if LibIsSystemDumped(system)
+    %return ""
+  %endif
+  %%if LibIsSystemExistingLibrary(system)
+    %%return ""
+  %%endif
+  %assign notRootFileName = NotRootFileName(system)
+
+  %% Dump any variables needed by standalone subsystems
+  %assign standVars = ""
+  %if system.StandaloneSubsystem
+    %assign standVars = SLibDumpStandaloneVarDeclarationsForSystem(system)
+  %endif
+  
+ %assign needToDumpSysFcn =  ((LibIsSystemNonEmpty(system) || ...
+    LibIsSystemTerminateNonEmpty(system) || ...
+    LibSystemIsForceNonInline(system) || ...
+    !ISEMPTY(standVars)) && ...
+    !LibSystemIsInlined(system))
+  
+  %% We are in the process of updating stateflow to mark the stateflow
+  %% subsystem as "Function", if it is generating a function for the
+  %% function call sybsystem. When all changes are in A, we can enable
+  %% the following Assertion.
+  %%
+  %% %assert(SLibSystemStateflowFcnCacheIsEmpty(system) || needToDump)
+  %%
+  %% For now, stateflow may be inlined, therefore, we need to check
+  %% the following:
+
+  %assign  needToDump = needToDumpSysFcn || ...
+    !ISEMPTY(LibGetSystemField(system, "CachedSubFunctions")) || ...
+    !SLibSystemStateflowFcnCacheIsEmpty(system)
+  
+  %if !needToDump
+    %if notRootFileName && (system.FileNameOwnerIdx == (system.SystemIdx))
+      %% For RLS's, if we're not generating a source file, make sure we still
+      %% specify that the header file is going to shared utilities, as it will still
+      %% be generated
+      %if LibSystemIsReusedLibraryFcn(system)
+        %assign dup = LibSetSharedFunctionOutputDir(system, TLC_FALSE)
+      %endif
+
+      %if !IsModelReferenceTarget()
+        %assign warnTxt = "The subsystem %<system.Name> specifies "...
+          "file name options. However, no code is generated for this subsystem. The specified "...
+          "source code file will not be created. "
+        %<LibReportWarning(warnTxt)>
+      %endif
+    %endif
+    %<LibSetSystemField(system, "SystemDumped", TLC_TRUE)>
+    %return ""
+  %endif
+
+  %assign codeBuffer = SLibGetSystemFcnBodyCacheHelper(system, needToDumpSysFcn)
+
+  %%
+  %% Comparing with CompiledModel.Name will not hold good for RTWSFCN/ACCEL
+  %% But, it's OK since we will not generate separate files for them
+  %% Systems generating into model.c are handled by srtbody.tlc and dumped
+  %% there directly
+
+  %assign retBuf = ""
+
+  %if notRootFileName
+    %assign modelName = ::CompiledModel.Name
+    %assign includeBuf = ""
+    %assign bannerBuf  = ""
+    
+    %% This is where we tell the emitter to put Reusable Library Code
+    %% and header files into their own Directory, not that of the model
+    %if LibSystemIsReusedLibraryFcn(system)
+      %assign duplicate = LibSetSharedFunctionOutputDir(system, TLC_TRUE)
+    %else
+      %assign duplicate = LibAddToModelSources(system.SystemFileName)
+    %endif
+
+    %assign ::CompiledModel.HaveSeparateSourceFiles = 1
+
+    %if !duplicate
+      %assign fileOwnerSys = ::CompiledModel.System[system.FileNameOwnerIdx]
+
+      %% If we are allowing nonreusable functions to live inside
+      %% reusable functions, then handle all necessary extern
+      %% global declarations in subsystem files.
+      %if ::CompiledModel.AllowNoArgFcnInReusedFcn
+        %<SLibGlobalFileHandling(fileOwnerSys, system)>
+      %endif
+      
+      %openfile bannerBuf
+      %% Dump comments, only if its the first time
+      /*
+      %<SLibSystemBanner(fileOwnerSys)>\
+      *
+      * Note that the functions contained in this file are part of a Simulink
+      * model, and are not self-contained algorithms.
+      */
+      %closefile bannerBuf
+      %openfile includeBuf
+
+      #include "%<system.SystemFileName>.h"
+
+      %% Do not put out an include for global data into a library source file
+      %if !LibSystemIsReusedLibraryFcn(system)
+        %if IsModelReferenceTarget()
+          %assign fileName = SLibGetSystemOutputFileBaseName(System[NumSystems-2])
+          %% Only include the header file if the system file name is different 
+          %% than the model reference base system file name. Note that 
+          %% system.SystemFileName is included above
+          %if fileName != system.SystemFileName
+            /* Include model header file for global data */
+            #include "%<fileName>.h"
+          %endif
+        %else
+          /* Include model header file for global data */
+          %<SLibIncludeModelHeader()>
+        %endif
+        %<SLibIncludePrivateHeader()>
+      %else
+        %% If we're an RLS, and there's any constant parameters, we need to include
+        %% the constant parameter extern declaration. 
+        %if SLibHasSharedConstantParameters()
+          %assign externDecls = LibGetSystemField(system, "SharedConstantsExterns")
+          %<externDecls>
+        %endif
+        %<LibDumpSharedDataIncludes(system)>
+      %endif
+      %if isRSim && (::CompiledModel.Name != system.SystemFileName)
+        %assign hasFrF = FcnCheckSystemForFromFileBlock(system)
+        %if hasFrF
+          extern FrFInfo %<::CompiledModel.Name>_gblFrFInfo[];
+        %endif
+      %endif
+        
+      %closefile includeBuf
+    %endif %% if !duplicate ... - comments dumped
+
+    %<SLibCacheSystemCodeToFile("sys_src_ban", system, bannerBuf)>
+    %<SLibCacheSystemCodeToFile("sys_src_incl", system, includeBuf)>
+    %<SLibCacheSystemCodeToFile("sys_fcn_defn", system, codeBuffer)>
+    %<SLibCacheSystemCodeToFile("sys_stand_var_decl", system, standVars)>
+    %if !LibSystemIsReusedLibraryFcn(system)
+      %assign opFile = SLibGetFileRecForSystemCode("sys_stand_var_decl", system, TLC_FALSE)
+    %else
+      %assign opFile = SLibGetFileRecForSystemCode("sys_stand_var_decl", system, TLC_TRUE)
+    %endif
+    %if !GenerateClassInterface
+      %<SLibDumpGlobalVarDeclaration(system, opFile)> 
+    %endif
+    %<LibSetSystemField(system, "SystemDumped", TLC_TRUE)>
+    %% retBuf is ""
+  %else %% dumping into root (model.c) or (model_acc.c)
+    %assert !IsModelReferenceTarget()
+    %<SLibCacheCodeToFile("mdl_stand_var_decl", standVars)>
+    %assign rootFile = SLibGetFileRecForCode("mdl_stand_var_decl")
+    %<SLibDumpGlobalVarDeclaration(system, rootFile)>
+
+    %openfile retBuf
+
+    %<codeBuffer>\
+    %closefile retBuf
+  %endif %% if notRootFileName
+
+  %return retBuf
+
+%endfunction %% SLibGetSystemBodyCache
+
+%% Function: FcnCheckSystemForFromFileBlock(system)
+%% Description: 
+%%    returns true if the system contains a FromFile block
+%%    false otherwise.
+%function FcnCheckSystemForFromFileBlock(system)
+  %foreach idx = system.NumTotalBlocks
+    %if system.Block[idx].Type == "FromFile"
+      %return 1
+    %endif
+  %endforeach
+  %return 0
+%endfunction %% FcnCheckSystemForFromFileBlock
+  
+%% Function: SLibGetBodyInitializeFcnCache(ss) =================================
+%% Description:
+%%      Generates the initialize function for these system types.
+%%        o enable (states reset)
+%%        o enable with trigger (states reset)
+%%
+%function SLibGetBodyInitializeFcnCache(ss) void
+  %openfile tmpBuffer
+  %<LibDumpFcnOpen(ss,"Initialize")>\
+  %<FcnDumpMRLocalVars(ss, "Initialize", "")>\
+  %<LibDumpSystemSSVars(ss,"Initialize")>\
+  %<LibGetSystemLocalVars(ss,"Initialize","")>
+  %<SLibGetFcnLocalVars(ss,"Initialize","")>
+  %<LibDumpSystemUserCode(ss,"Initialize","Header")>\
+  %<LibDumpGlobalVars(ss, "Initialize")>\
+  %<LibDumpFcnBegin(ss,"Initialize")>\
+  %<LibDumpSystemUserCode(ss,"Initialize","Body")>\
+  %<LibDumpSystemFcn(ss,"Initialize")>\
+  %<LibDumpSystemUserCode(ss,"Initialize","Trailer")>\
+  %<LibDumpFcnClose(ss,"Initialize")>
+  %closefile tmpBuffer
+  %assign retBuffer = ""
+  %if !WHITE_SPACE(tmpBuffer)
+    %openfile retBuffer
+    %if LibSystemIsInlined(ss)
+    %<SLibGetFcnComment(ss,"Initial conditions")>\
+    %else
+      %assign fcnAbstract = SLibGetFcnCommentContents(ss,"Initial conditions")
+      %assign fcnInfo = LibGetFcnInfo(ss, "Initialize", ss.CurrentTID)
+      %assign fcnBlockDescription = SLibGetBlockDescriptionForSS(ss, "Initial conditions")
+      %addtorecord fcnInfo Abstract fcnAbstract Category "model" GeneratedBy "commonbodlib.tlc" ...
+        Type "Initialize" GeneratedFor FcnGeneratedFor(ss) BlockDescription fcnBlockDescription    
+      %<SLibDumpFunctionBanner(fcnInfo)>
+      %undef fcnRec
+    %endif
+    %<tmpBuffer>\
+    %closefile retBuffer
+  %endif
+  %return retBuffer
+%endfunction
+
+
+%% Function: FcnLoadInitialState ===============================================
+%% Abstract:
+%%   Load Initial values for continuous and discrete states that are non-zero.
+%%
+%function FcnLoadInitialState() Output
+  %%
+  %% Continuous States
+  %%
+  %foreach csIdx = ContStates.NumContStates
+    %assign cs = ContStates.ContState[csIdx]
+    %assign ic = cs.InitialValue
+    %if ISEMPTY(ic) || !cs.DataLoggingOn
+      %continue
+    %endif
+    %assign sgnl = SLibContinuousState(cs,"","",0,NumSystems-1, TLC_FALSE)
+    %assign addr = "&" + sgnl
+    %if cs.Width == 1
+      %<sgnl> = %<ic[0]>;
+    %else
+      {
+	%assign comma = ""
+	%assign varName = "rtcs%<csIdx>_%<cs.Identifier>"
+	static const real_T %<varName>[%<cs.Width>] = {
+          %if SIZE(ic,1) == 1
+            %foreach idx = cs.Width
+              %<comma>%<ic[0]>
+              %assign comma = ","
+            %endforeach
+          %else
+            %foreach idx = cs.Width
+              %<comma>%<ic[idx]>
+              %assign comma = ","
+            %endforeach
+          %endif
+	};
+	(void) %<LibGenMemFcnCall("memcpy", addr, varName, ...
+	  "%<cs.Width>*sizeof(real_T)")>;
+      }
+    %endif
+    %%==========================================================
+    %% If the continuous is defined in an integrator, we 
+    %% need to tell the integrator block that the initial value
+    %% does not need to be loaded any more.
+    %%===========================================================
+    %if cs.SigSrc[0] >= 0 && cs.SigSrc[2] >=0
+      %assign system = System[cs.SigSrc[0]]
+      %assign block = System[cs.SigSrc[0]].Block[cs.SigSrc[2]]
+      %if block.Type=="Integrator"
+        %with system
+          %with block
+            %<GENERATE(block, "ClearICNeedsLoading", system)>
+          %endwith
+        %endwith
+      %endif
+    %endif
+    
+  %endforeach
+  %%
+  %% Discrete States
+  %%
+  %foreach dwIdx = DWorks.NumDWorks
+    %assign ds = DWorks.DWork[dwIdx]
+    %assign ic = ds.InitialValue
+    %if ISEMPTY(ic) || !ds.DataLoggingOn
+      %continue
+    %endif
+    %with System[NumSystems-1]
+      %with System[ds.SigSrc[0]].Block[ds.SigSrc[2]]
+        %if !ISFIELD(ds, "FirstRootIdx")
+          %addtorecord ds FirstRootIdx dwIdx
+        %endif
+	%assign sgnl = LibBlockDWork(ds,"","",0)
+	%assign addr = LibBlockDWorkAddr(ds,"","",0)
+      %endwith
+    %endwith
+    %if SLibDWorkWidth(ds) == 1
+      %<sgnl> = %<ic[0]>;
+    %else
+      {
+	%assign comma = ""
+	%assign varName = "rtds%<dwIdx>_%<LibGetRecordIdentifier(ds)>"
+	%assign dtype = SLibGetRecordDataTypeName(ds,"")
+	static const %<dtype> %<varName>[%<SLibDWorkWidth(ds)>] = {
+	  %if SLibDWorkIsComplex(ds)
+	    %foreach idx = SLibDWorkWidth(ds)
+	      %<comma>{%<REAL(ic[idx])>, %<IMAG(ic[idx])>}
+	      %assign comma = ","
+	    %endforeach
+	  %else
+	    %foreach idx = SLibDWorkWidth(ds)
+	      %<comma>%<ic[idx]>
+	      %assign comma = ","
+	    %endforeach
+	  %endif
+	};
+	(void) %<LibGenMemFcnCall("memcpy", addr, varName, ...
+	  "%<SLibDWorkWidth(ds)>*sizeof(%<dtype>)")>;
+      }
+    %endif
+
+  %endforeach
+%endfunction %% FcnLoadInitialState
+
+
+%% Function: SLibGetBodyStartFcnCache(ss) ======================================
+%% Description:
+%%      Generates the start function for systems
+%%
+%function SLibGetBodyStartFcnCache(ss) void
+  %assign isRootInSfcn = (ss.Type == "root") && ...
+    (CodeFormat == "S-Function") && !Accelerator
+
+  %openfile tmpBuffer
+  %<LibDumpFcnOpen(ss,"Start")>\
+  %<FcnDumpMRLocalVars(ss, "Start", "")>\
+  %if isRootInSfcn
+    %<LibDumpSfunTargetChecks()> \
+    {
+  %endif
+  %<LibDumpSystemSSVars(ss,"Start")>\
+  %<LibGetSystemLocalVars(ss,"Start","")>
+  %<SLibGetFcnLocalVars(ss,"Start","")>
+  %<LibDumpSystemUserCode(ss,"Start","Header")>\
+  %<LibDumpGlobalVars(ss, "Start")>\
+  %<LibDumpFcnBegin(ss,"Start")>\
+  %% open code
+  %openfile tmpBuffer2
+  %<LibDumpSystemUserCode(ss,"Start","Body")>\
+  %<LibDumpSystemFcn(ss,"Start")>\
+  %<LibDumpSystemUserCode(ss,"Start","Trailer")>\
+  %%
+  %% For some targets, we allow root to call Initialize and Enable
+  %% within the context of start
+  %%
+  %if (ss.Type == "root")
+    %if RootBodyStartCallsInitEnab
+      %if (!LibSystemFcnIsEmpty(ss, "Initialize"))
+	%assign fcnInfo = LibGetSystemField(ss, "Initialize" + "FcnInfo")
+	%assign comArgs = fcnInfo.CommonArgs
+	%<fcnInfo.Name>(%<comArgs>);
+      %endif
+      %if (!LibSystemFcnIsEmpty(ss, "Enable"))
+	%assign fcnInfo = LibGetSystemField(ss, "Enable" + "FcnInfo")
+	%assign comArgs = fcnInfo.CommonArgs
+	%<fcnInfo.Name>(%<comArgs>);
+      %endif
+    %endif
+    %% Load intial states if needed.
+    %<FncGenInitStatesInRootStart()>
+  %endif
+  %if isRootInSfcn
+    %assign prevBlockFcn = ::BlockFcn
+    %assign ::BlockFcn = "Start"
+    %assign buff = ""
+    %openfile buff
+    %<SLibInitPrevZCSignalStates()>
+    %closefile buff
+    %assign ::BlockFcn = prevBlockFcn
+    %if !WHITE_SPACE(buff)
+      
+      /* Previous zero-crossing state intialization */
+      %<buff>
+    %endif
+    }
+  %endif
+  %closefile tmpBuffer2
+  %% extra code for exported function to update external outputs
+  %if ExportFunctionsMode == 1 && !WHITE_SPACE(tmpBuffer2)
+    %<tmpBuffer2>
+    %<LibDumpExpFucUpdateRootOutput(ss,"Start")>\
+  %else
+    %<tmpBuffer2>\
+  %endif
+  %% close code
+  %<LibDumpFcnClose(ss,"Start")>
+  %closefile tmpBuffer
+  %assign retBuffer = ""
+  %if !WHITE_SPACE(tmpBuffer)
+    %openfile retBuffer
+    %if LibSystemIsInlined(ss)
+    %<SLibGetFcnComment(ss,"Start")>\
+    %else
+      %assign fcnAbstract = SLibGetFcnCommentContents(ss,"Start")
+      %assign fcnInfo = LibGetFcnInfo(ss, "Start", ss.CurrentTID)
+      %assign fcnBlockDescription = SLibGetBlockDescriptionForSS(ss, "Start")
+      %addtorecord fcnInfo Abstract fcnAbstract Category "model" GeneratedBy "commonbodlib.tlc" ...
+        Type "Start" GeneratedFor FcnGeneratedFor(ss) BlockDescription fcnBlockDescription
+      %<SLibDumpFunctionBanner(fcnInfo)>      
+    %endif
+    %<tmpBuffer>\
+    %closefile retBuffer
+  %endif
+  %return retBuffer
+%endfunction
+
+
+%% Function: SLibGetBodyOutputFcnCache(ss) =====================================
+%% Description:
+%%      Generates the output function for an enable subsystem.
+%%
+%function SLibGetBodyOutputFcnCache(ss) void
+  %if SLibSystemFcnRateGrouping(ss, "Output") || ...
+    LibAsynchronousTriggeredTID(ss.CurrentTID)
+    %assign tid = ss.CurrentTID
+  %else
+    %assign tid = ""
+  %endif
+
+  %if LibAsynchronousTriggeredTID(tid)
+    %if (ISEQUAL(tid, FcnGetSubsystemCodeBufTID(ss)) || ...
+		LibIsDeploymentDiagram())
+      %assign systemFcnIsEmpty = LibSystemFcnIsEmptyForTID(ss, "Output")
+    %else
+      %assign systemFcnIsEmpty = TLC_TRUE
+    %endif  
+  %else
+    %if ISEQUAL(tid, "") %%!SLibIsRateGrouping()
+      %% If not grouping rating, system output
+      %% fcn always exists
+      %assign systemFcnIsEmpty = TLC_FALSE
+    %else 
+      %assign systemFcnIsEmpty = LibSystemFcnIsEmptyForTID(ss, "Output")
+    %endif
+  %endif
+  
+  %if IsModelReferenceBaseSys(ss)
+    %% Create and initialize it here. It may be updated at the end
+    %% of the function
+    %addtorecord ss ModelRefOutputFcnIsEmpty%<tid> "yes"
+  %endif
+
+  %if systemFcnIsEmpty
+    %return ""
+  %endif
+
+  %openfile tmpBuffer
+  %if !LibIsDeploymentDiagram()
+    %<LibDumpFcnOpen(ss,"Output")>\
+  %endif
+  %<FcnDumpMRLocalVars(ss, "Output", tid)>\
+  %% Profiler declaration code
+  %<LibDumpSystemProfileCode(ss,"Output", "Decls")>\
+  %<LibDumpSystemSSVars(ss,"Output")>\
+  %if !LibIsDeploymentDiagram()
+    %<LibGetSystemLocalVars(ss,"Output",tid)>  
+    %<SLibGetFcnLocalVars(ss,"Output",tid)>
+  %endif
+  %<LibDumpSystemUserCode(ss,"Output","Header")>\
+  %if !LibSystemFcnIsEmpty(ss, "Output")
+    %<LibDumpGlobalVars(ss, "Output%<tid>")>\
+  %endif
+  %<LibDumpFcnBegin(ss,"Output")>\
+  
+  %%
+  %% Generated S-Function data store reads
+  %%
+  %if (ss.Type == "root") && (CodeFormat == "S-Function") && !Accelerator
+    %assign ::BlockFcn = "Output"
+    %<SLibGenDataStoreReads(tSimStruct)>
+    %assign ::BlockFcn = "Unknown"
+  %endif
+  
+  %% Profiler start code
+  %<LibDumpSystemProfileCode(ss,"Output", "Start")>\
+
+  %% When we are generating for model reference, write out
+  %% part of the ERT timing Engine.
+  %% output code
+  %<UpdateRateTransitionFlagsHelper(ss, tid, TLC_FALSE)>
+  %<LibDumpSystemUserCode(ss,"Output","Body")>\
+
+  %<LibDumpSystemFcn(ss,"Output%<tid>")>\
+  %<LibDumpSystemUserCode(ss,"Output","Trailer")>\
+  %<FcnHandlesUnusedTIDArg(ss, "Output")>
+  
+  %% Profiler finish code
+  %<LibDumpSystemProfileCode(ss,"Output", "End")>\
+
+  %%
+  %% Generated S-Function data store writes
+  %%
+  %if (ss.Type == "root") && (CodeFormat == "S-Function") && !Accelerator
+    %assign ::BlockFcn = "Output"
+    %<SLibGenDataStoreWrites(tSimStruct)>
+    %assign ::BlockFcn = "Unknown"
+  %endif
+  %if !LibIsDeploymentDiagram()
+    %<LibDumpFcnClose(ss,"Output")>
+  %endif
+  %closefile tmpBuffer
+  %assign retBuffer = ""
+  %if !WHITE_SPACE(tmpBuffer)
+    %openfile retBuffer 
+    %if LibSystemIsInlined(ss) && (!LibIsDeploymentDiagram())
+    %<SLibGetFcnComment(ss,"Outputs")>\
+    %elseif (!LibIsDeploymentDiagram())
+      %assign fcnAbstract = SLibGetFcnCommentContents(ss,"Outputs")
+      %assign fcnInfo = LibGetFcnInfo(ss, "Output", ss.CurrentTID)
+      %assign fcnBlockDescription = SLibGetBlockDescriptionForSS(ss,"Outputs")
+      %addtorecord fcnInfo Abstract fcnAbstract Category "model" GeneratedBy "commonbodlib.tlc" ...
+        Type "Output" GeneratedFor FcnGeneratedFor(ss) BlockDescription fcnBlockDescription
+      %<SLibDumpFunctionBanner(fcnInfo)>
+    %endif
+    %<tmpBuffer>\
+    %closefile retBuffer
+
+    %if IsModelReferenceBaseSys(ss)
+      %assign ss.ModelRefOutputFcnIsEmpty%<tid> = "no"
+    %endif
+
+  %endif
+
+  %return retBuffer
+%endfunction %% SLibGetBodyOutputFcnCache
+
+%% Function: SLibGetBodyUpdateFcnCache(ss) =====================================
+%% Description:
+%%      Generates the update function for an enable subsystem.
+%%
+%function SLibGetBodyUpdateFcnCache(ss) void
+  %if SLibSystemFcnRateGrouping(ss, "Update") || ...
+    LibAsynchronousTriggeredTID(ss.CurrentTID)
+    %assign tid = ss.CurrentTID
+  %else
+    %assign tid = ""
+  %endif
+
+  %if IsModelReferenceBaseSys(ss)
+    %addtorecord ss ModelRefUpdateFcnIsEmpty%<tid> "yes"
+  %endif
+
+  %openfile tmpBuffer
+  %if !LibIsDeploymentDiagram()
+    %<LibDumpFcnOpen(ss,"Update")>\
+  %endif
+  %<FcnDumpMRLocalVars(ss, "Update", tid)>\
+  %% Profiler declaration code
+  %<LibDumpSystemProfileCode(ss,"Update", "Decls")>\
+
+  %<LibDumpSystemSSVars(ss,"Update")>\
+  %if !LibIsDeploymentDiagram()
+    %<LibGetSystemLocalVars(ss,"Update",tid)>
+    %<SLibGetFcnLocalVars(ss,"Update",tid)>  
+  %endif
+  %<LibDumpSystemUserCode(ss,"Update","Header")>\
+  %<LibDumpGlobalVars(ss, "Update%<tid>")>\
+  %<LibDumpFcnBegin(ss,"Update")>\
+
+  %% Profiler start code
+  %<LibDumpSystemProfileCode(ss,"Update", "Start")>\
+  
+  %% open code
+  %<LibDumpSystemUserCode(ss,"Update","Body")>\
+  %<LibDumpSystemFcn(ss,"Update%<tid>")>\
+  %<LibDumpSystemUserCode(ss,"Update","Trailer")>\
+  %<FcnHandlesUnusedTIDArg(ss, "Update")>
+
+  %% Profiler finish code
+  %<LibDumpSystemProfileCode(ss,"Update", "End")>\
+  %if !LibIsDeploymentDiagram()
+    %<LibDumpFcnClose(ss,"Update")>
+  %endif
+  %closefile tmpBuffer
+  %assign retBuffer = ""
+  %if !WHITE_SPACE(tmpBuffer)
+    %openfile retBuffer
+    %if LibSystemIsInlined(ss) && (!LibIsDeploymentDiagram())
+    %<SLibGetFcnComment(ss,"Update")>\
+    %elseif (!LibIsDeploymentDiagram())
+      %assign fcnAbstract = SLibGetFcnCommentContents(ss,"Update")
+      %assign fcnInfo = LibGetFcnInfo(ss, "Update", ss.CurrentTID)
+      %assign fcnBlockDescription = SLibGetBlockDescriptionForSS(ss,"Update")
+      %addtorecord fcnInfo Abstract fcnAbstract Category "model" GeneratedBy "commonbodlib.tlc" ...
+        Type "Update" GeneratedFor FcnGeneratedFor(ss) BlockDescription fcnBlockDescription
+      %<SLibDumpFunctionBanner(fcnInfo)>
+    %endif
+    %<tmpBuffer>\
+    %closefile retBuffer
+    %if IsModelReferenceBaseSys(ss)
+      %assign ss.ModelRefUpdateFcnIsEmpty%<tid> = "no"
+    %endif
+  %endif
+  %return retBuffer
+%endfunction  %%SLibGetBodyUpdateFcnCache
+
+%% Function: SLibGetBodyDerivativeFcnCache(ss) =================================
+%% Description:
+%%      Generates the derivatives function for an enable system containing
+%%      continuous states.  Note that DerivativeFcn only exists if the
+%%      system has continuous states.
+%%
+%function SLibGetBodyDerivativeFcnCache(ss) void
+  %openfile tmpBuffer
+  %if (SLibIsERTCodeFormat()) && LibSystemIsRoot(ss)
+    %assign fcnRec = LibGetSystemField(ss, "DerivativeFcnInfo")
+    %if !GenerateClassInterface
+      %assign fcnName = "%<fcnRec.Name>"
+    %else
+      %assign classConfObj = FcnGetRTWCPPStepPrototypeRecord()
+      %assign fcnName = "%<classConfObj.ModelClassName>::%<fcnRec.Name>"
+    %endif
+    %<SLibIfNetPreprocessorCondition(ss)>
+    %<SLibGetFcnMemSecPragma(fcnName, "MemSecFuncExecute", "Pre")>\
+    %assign fcnReturns = "void"
+    %assign fcnParams = "%<SLibModelFcnArgs("Derivative",0,"")>"
+    %createrecord fcnInfo {Name fcnName; Returns fcnReturns; Params fcnParams}
+    %<fcnReturns> %<fcnName>(%<fcnParams>)
+    {
+  %else
+    %assign fcnInfo = LibGetFcnInfo(ss, "Derivative", ss.CurrentTID)
+    %<LibDumpFcnOpen(ss,"Derivative")>\
+  %endif
+  
+  %<FcnDumpMRLocalVars(ss, "Derivative", "")>\
+  %% Profiler declaration code
+  %<LibDumpSystemProfileCode(ss,"Derivative", "Decls")>\
+
+  %<LibDumpSystemSSVars(ss,"Derivative")>\
+  %<LibGetSystemLocalVars(ss,"Derivative","")>
+  %<SLibGetFcnLocalVars(ss,"Derivative","")>
+  %<LibDumpSystemUserCode(ss,"Derivative","Header")>\
+  %<LibDumpGlobalVars(ss, "Derivative")>\
+  %<LibDumpFcnBegin(ss,"Derivative")>\
+  
+  %% Profiler start code
+  %<LibDumpSystemProfileCode(ss,"Derivative", "Start")>\
+
+  %% open code
+  %<LibDumpSystemUserCode(ss,"Derivative","Body")>\
+  %<LibDumpSystemFcn(ss,"Derivative")>\
+  %<LibDumpSystemUserCode(ss,"Derivative","Trailer")>\
+  
+  %% Profiler finish code
+  %<LibDumpSystemProfileCode(ss,"Derivative", "End")>\
+
+  %%if (SLibIsERTCodeFormat()) && LibSystemIsRoot(ss)
+  %%  }
+  %%  %<SLibGetFcnMemSecPragma(fcnName, "MemSecFuncExecute", "Post")>
+  %%%else
+    %<LibDumpFcnClose(ss,"Derivative")>
+  %%%endif
+  %closefile tmpBuffer
+  %assign retBuffer = ""
+  %if !WHITE_SPACE(tmpBuffer)
+    %openfile retBuffer
+    %if LibSystemIsInlined(ss) && (!LibIsDeploymentDiagram())
+    %<SLibGetFcnComment(ss,"Derivatives")>\
+    %elseif (!LibIsDeploymentDiagram())
+      %assign fcnAbstract = SLibGetFcnCommentContents(ss,"Derivatives")
+      %assign fcnBlockDescription = SLibGetBlockDescriptionForSS(ss,"Derivatives")
+      %addtorecord fcnInfo Abstract fcnAbstract Category "model" GeneratedBy "commonbodlib.tlc" ...
+        Type "Derivative" GeneratedFor FcnGeneratedFor(ss) BlockDescription fcnBlockDescription
+      %<SLibDumpFunctionBanner(fcnInfo)>
+    %endif
+    %<tmpBuffer>\
+    %closefile retBuffer
+  %endif
+  %return retBuffer
+%endfunction
+
+
+%% Function: SLibGetBodyProjectionFcnCache(ss) =================================
+%% Description:
+%%      Generates the projection function for an enable system containing
+%%      continuous states.  Note that ProjectionFcn only exists if the
+%%      system has continuous states.
+%%
+%function SLibGetBodyProjectionFcnCache(ss) void
+  %assign tmpBuffer = ""
+  %if CodeFormat == "S-Function" && ModelHasProjections == "yes" || ...
+      CodeFormat != "S-Function"
+      %openfile tmpBuffer
+
+      %if (SLibIsERTCodeFormat()) && LibSystemIsRoot(ss) 
+        %assign fcnRec = LibGetSystemField(ss, "ProjectionFcnInfo")
+        %if !GenerateClassInterface
+          %assign fcnName = "%<fcnRec.Name>"
+        %else
+          %assign classConfObj = FcnGetRTWCPPStepPrototypeRecord()
+          %assign fcnName = "%<classConfObj.ModelClassName>::%<fcnRec.Name>"
+        %endif
+        %<SLibIfNetPreprocessorCondition(ss)>
+        %<SLibGetFcnMemSecPragma(fcnName, "MemSecFuncExecute", "Pre")>\
+      %assign fcnReturns = "void"
+      %assign fcnParams = SLibModelFcnArgs("Projection",0,"")
+      %createrecord fcnInfo {Name fcnName; Returns fcnReturns; Params fcnParams}
+      %<fcnReturns> %<fcnName>(%<fcnParams>)      
+        {
+      %else
+      %assign fcnInfo = LibGetFcnInfo(ss, "Projection", ss.CurrentTID)
+        %<LibDumpFcnOpen(ss,"Projection")>\
+      %endif
+
+    %<FcnDumpMRLocalVars(ss, "Projection", "")>\
+    %<LibDumpSystemSSVars(ss,"Projection")>\
+    %<LibGetSystemLocalVars(ss,"Projection","")>
+    %<SLibGetFcnLocalVars(ss,"Projection","")>
+    %<LibDumpSystemUserCode(ss,"Projection","Header")>\
+    %<LibDumpGlobalVars(ss, "Projection")>\
+    %<LibDumpFcnBegin(ss,"Projection")>\
+    %% open code
+    %<LibDumpSystemUserCode(ss,"Projection","Body")>\
+    %<LibDumpSystemFcn(ss,"Projection")>\
+    %<LibDumpSystemUserCode(ss,"Projection","Trailer")>\
+    %<LibDumpFcnClose(ss,"Projection")>
+    %closefile tmpBuffer
+  %endif
+  %assign retBuffer = ""
+  %if !WHITE_SPACE(tmpBuffer)
+    %openfile retBuffer
+    %if LibSystemIsInlined(ss) && (!LibIsDeploymentDiagram())
+    %<SLibGetFcnComment(ss,"Projection")>\
+    %elseif (!LibIsDeploymentDiagram())
+      %assign fcnAbstract = SLibGetFcnCommentContents(ss,"Projection")
+      %assign fcnBlockDescription = SLibGetBlockDescriptionForSS(ss,"Projection")
+      %addtorecord fcnInfo Abstract fcnAbstract Category "model" GeneratedBy "commonbodlib.tlc" ...
+        Type "Projection" GeneratedFor FcnGeneratedFor(ss) BlockDescription fcnBlockDescription
+      %<SLibDumpFunctionBanner(fcnInfo)>      
+    %endif
+    %<tmpBuffer>\
+    %closefile retBuffer
+  %endif
+  %return retBuffer
+%endfunction
+
+%% Function: SLibGetBodyForcingFunctionFcnCache(ss) =================================
+%% Description:
+%%      Generates the ForcingFunction function for an enable system containing
+%%      continuous states.  Note that ForcingFunctionFcn only exists if the
+%%      system has continuous states.
+%%
+%function SLibGetBodyForcingFunctionFcnCache(ss) void
+  %assign tmpBuffer = ""
+  %if ModelIsLinearlyImplicit == "yes" 
+    %openfile tmpBuffer
+    
+    %if (SLibIsERTCodeFormat()) && LibSystemIsRoot(ss)
+      %assign fcnRec = LibGetSystemField(ss, "ForcingFunctionFcnInfo")
+      %if !GenerateClassInterface
+        %assign fcnName = "%<fcnRec.Name>"
+      %else
+        %assign classConfObj = FcnGetRTWCPPStepPrototypeRecord()
+        %assign fcnName = "%<classConfObj.ModelClassName>::%<fcnRec.Name>"
+      %endif
+      %<SLibIfNetPreprocessorCondition(ss)>
+      %<SLibGetFcnMemSecPragma(fcnName, "MemSecFuncExecute", "Pre")>\
+      %assign fcnReturns = "void"
+      %assign fcnParams = SLibModelFcnArgs("ForcingFunction",0,"")
+      %createrecord fcnInfo {Name fcnName; Returns fcnReturns; Params fcnParams}
+      %<fcnReturns> %<fcnName>(%<fcnParams>)
+      {
+    %else
+      %assign fcnInfo = LibGetFcnInfo(ss, "ForcingFunction", ss.CurrentTID)
+      %<LibDumpFcnOpen(ss,"ForcingFunction")>\
+    %endif    
+    
+    %<FcnDumpMRLocalVars(ss, "ForcingFunction", "")>\
+    %<LibDumpSystemSSVars(ss,"ForcingFunction")>\
+    %<LibGetSystemLocalVars(ss,"ForcingFunction","")>
+    %<SLibGetFcnLocalVars(ss,"ForcingFunction","")>
+    %<LibDumpSystemUserCode(ss,"ForcingFunction","Header")>\
+    %<LibDumpGlobalVars(ss, "ForcingFunction")>\
+    %<LibDumpFcnBegin(ss,"ForcingFunction")>\
+    %% open code
+    %<LibDumpSystemUserCode(ss,"ForcingFunction","Body")>\
+    %<LibDumpSystemFcn(ss,"ForcingFunction")>\
+    %<LibDumpSystemUserCode(ss,"ForcingFunction","Trailer")>\
+    %% close code
+    %<LibDumpFcnClose(ss,"ForcingFunction")>
+    %closefile tmpBuffer
+  %endif
+  %assign retBuffer = ""
+  %if !WHITE_SPACE(tmpBuffer)
+    %openfile retBuffer
+    %if LibSystemIsInlined(ss) && (!LibIsDeploymentDiagram())
+      %<SLibGetFcnComment(ss,"ForcingFunction")>
+    %elseif (!LibIsDeploymentDiagram())
+      %assign fcnAbstract = SLibGetFcnCommentContents(ss,"ForcingFunction")
+      %assign fcnBlockDescription = SLibGetBlockDescriptionForSS(ss,"ForcingFunction")
+      %addtorecord fcnInfo Abstract fcnAbstract Category "model" GeneratedBy "commonbodlib.tlc" ...
+        Type "Forcing" GeneratedFor FcnGeneratedFor(ss) BlockDescription fcnBlockDescription
+      %<SLibDumpFunctionBanner(fcnInfo)>
+    %endif
+    %<tmpBuffer>\
+    %closefile retBuffer
+  %endif
+  %return retBuffer
+%endfunction
+
+
+%% Function: SLibGetBodyMassMatrixFcnCache(ss) =================================
+%% Description:
+%%      Generates the MassMatrix function for an enable system containing
+%%      continuous states.  Note that MassMatrixFcn only exists if the
+%%      system has continuous states.
+%%
+%function SLibGetBodyMassMatrixFcnCache(ss) void
+  %assign tmpBuffer = ""
+  %if ModelIsLinearlyImplicit == "yes" 
+    %openfile tmpBuffer
+    
+    %if (SLibIsERTCodeFormat()) && LibSystemIsRoot(ss)
+      %assign fcnRec = LibGetSystemField(ss, "MassMatrixFcnInfo")
+      %if !GenerateClassInterface
+        %assign fcnName = "%<fcnRec.Name>"
+      %else
+        %assign classConfObj = FcnGetRTWCPPStepPrototypeRecord()
+        %assign fcnName = "%<classConfObj.ModelClassName>::%<fcnRec.Name>"
+      %endif
+      %<SLibIfNetPreprocessorCondition(ss)>
+      %<SLibGetFcnMemSecPragma(fcnName, "MemSecFuncExecute", "Pre")>\
+      %assign fcnReturns = "void"
+      %assign fcnParams = SLibModelFcnArgs("MassMatrix",0,"")
+      %createrecord fcnInfo {Name fcnName; Returns fcnReturns; Params fcnParams}
+      %<fcnReturns> %<fcnName>(%<fcnParams>)
+      {
+    %else    
+      %assign fcnInfo = LibGetFcnInfo(ss, "MassMatrix", ss.CurrentTID)
+      %<LibDumpFcnOpen(ss,"MassMatrix")>\
+    %endif      
+    
+    %<FcnDumpMRLocalVars(ss, "MassMatrix", "")>\
+    %<LibDumpSystemSSVars(ss,"MassMatrix")>\
+    %<LibGetSystemLocalVars(ss,"MassMatrix","")>
+    %<SLibGetFcnLocalVars(ss,"MassMatrix","")>
+    %<LibDumpSystemUserCode(ss,"MassMatrix","Header")>\
+    %<LibDumpGlobalVars(ss, "MassMatrix")>\
+    %<LibDumpFcnBegin(ss,"MassMatrix")>\
+    %% open code
+    %<LibDumpSystemUserCode(ss,"MassMatrix","Body")>\
+    %<LibDumpSystemFcn(ss,"MassMatrix")>\
+    %<LibDumpSystemUserCode(ss,"MassMatrix","Trailer")>\
+    %% close code
+    %<LibDumpFcnClose(ss,"MassMatrix")>
+    %closefile tmpBuffer
+  %endif
+  %assign retBuffer = ""
+  %if !WHITE_SPACE(tmpBuffer)
+    %openfile retBuffer
+    %if LibSystemIsInlined(ss) && (!LibIsDeploymentDiagram())
+    %<SLibGetFcnComment(ss,"MassMatrix")>\
+    %elseif (!LibIsDeploymentDiagram())
+      %assign fcnAbstract = SLibGetFcnCommentContents(ss,"MassMatrix")
+      %assign fcnBlockDescription = SLibGetBlockDescriptionForSS(ss,"MassMatrix")
+      %addtorecord fcnInfo Abstract fcnAbstract Category "model" GeneratedBy "commonbodlib.tlc" ...
+        Type "MassMatrix" GeneratedFor FcnGeneratedFor(ss) BlockDescription fcnBlockDescription
+      %<SLibDumpFunctionBanner(fcnInfo)>
+    %endif
+    %<tmpBuffer>\
+    %closefile retBuffer
+  %endif
+  %return retBuffer
+%endfunction
+
+
+%% Function: SLibGetBodyZeroCrossingFcnCache(ss) ===============================
+%% Description:
+%%      Generates the ZeroCrossings function for an enable/atomic system
+%%      containing continuous states.
+%%
+%function SLibGetBodyZeroCrossingFcnCache(ss) void
+  %openfile tmpBuffer
+  %<LibDumpFcnOpen(ss,"ZeroCrossing")>\
+  %<FcnDumpMRLocalVars(ss, "ZeroCrossing", "")>\
+  %<LibDumpSystemSSVars(ss,"ZeroCrossing")>\
+  %<LibGetSystemLocalVars(ss,"ZeroCrossing","")>
+  %<SLibGetFcnLocalVars(ss,"ZeroCrossing","")>
+  %<LibDumpSystemUserCode(ss,"ZeroCrossing","Header")>\
+  %<LibDumpGlobalVars(ss, "ZeroCrossing")>\
+  %<LibDumpFcnBegin(ss,"ZeroCrossing")>\
+  %% open code
+  %<LibDumpSystemUserCode(ss,"ZeroCrossing","Body")>\
+  %<LibDumpSystemFcn(ss,"ZeroCrossing")>\
+  %<LibDumpSystemUserCode(ss,"ZeroCrossing","Trailer")>\
+  %% close code
+  %<LibDumpFcnClose(ss,"ZeroCrossing")>
+  %closefile tmpBuffer
+  %assign retBuffer = ""
+  %if !WHITE_SPACE(tmpBuffer)
+    %openfile retBuffer
+    %if LibSystemIsInlined(ss)
+    %<SLibGetFcnComment(ss,"ZeroCrossings")>\
+    %else
+      %assign fcnAbstract = SLibGetFcnCommentContents(ss,"ZeroCrossings")
+      %assign fcnInfo = LibGetFcnInfo(ss, "ZeroCrossing", ss.CurrentTID)
+      %assign fcnBlockDescription = SLibGetBlockDescriptionForSS(ss,"ZeroCrossings")
+      %addtorecord fcnInfo Abstract fcnAbstract  Category "model" GeneratedBy "commonbodlib.tlc" ...
+        Type "ZeroCrossing" GeneratedFor FcnGeneratedFor(ss) BlockDescription fcnBlockDescription
+      %<SLibDumpFunctionBanner(fcnInfo)>
+    %endif
+    %<tmpBuffer>\
+    %closefile retBuffer
+  %endif
+  %return retBuffer
+%endfunction
+
+
+%% Function: SLibGetBodyEnableFcnCache(ss) =====================================
+%% Description:
+%%      Generates the enable function for these system types.
+%%        o enable
+%%        o enable with trigger
+%%
+%function SLibGetBodyEnableFcnCache(ss) void
+  %openfile tmpBuffer
+  %<LibDumpFcnOpen(ss,"Enable")>\
+  %<FcnDumpMRLocalVars(ss, "Enable", "")>\
+  %<LibDumpSystemSSVars(ss,"Enable")>\
+  %<LibGetSystemLocalVars(ss,"Enable","")>
+  %<SLibGetFcnLocalVars(ss,"Enable","")>
+  %<LibDumpSystemUserCode(ss,"Enable","Header")>\
+  %<LibDumpGlobalVars(ss, "Enable")>\
+  %<LibDumpFcnBegin(ss,"Enable")>\
+  %<LibDumpSystemUserCode(ss,"Enable","Body")>\
+  %<LibDumpSystemFcn(ss,"Enable")>\
+  %<LibDumpSystemUserCode(ss,"Enable","Trailer")>\
+  %<LibDumpFcnClose(ss,"Enable")>
+  %closefile tmpBuffer
+  %assign retBuffer = ""
+  %if !WHITE_SPACE(tmpBuffer)
+    %openfile retBuffer
+    %if LibSystemIsInlined(ss)
+    %<SLibGetFcnComment(ss,"Enable")>\
+    %else
+      %assign fcnAbstract = SLibGetFcnCommentContents(ss,"Enable")
+      %assign fcnInfo = LibGetFcnInfo(ss, "Enable", ss.CurrentTID)
+      %assign fcnBlockDescription = SLibGetBlockDescriptionForSS(ss,"Enable")
+      %addtorecord fcnInfo Abstract fcnAbstract  Category "model" GeneratedBy "commonbodlib.tlc" ...
+        Type "Enable" GeneratedFor FcnGeneratedFor(ss) BlockDescription fcnBlockDescription
+      %<SLibDumpFunctionBanner(fcnInfo)>
+    %endif
+    %<tmpBuffer>\
+    %closefile retBuffer
+  %endif
+  %return retBuffer
+%endfunction
+
+
+%% Function: SLibGetBodyDisableFcnCache(ss) ====================================
+%% Description:
+%%      Generates the disable function for these system types.
+%%        o enable
+%%        o enable with trigger
+%%
+%function SLibGetBodyDisableFcnCache(ss) void
+  %openfile tmpBuffer
+  %<LibDumpFcnOpen(ss,"Disable")>\
+  %<FcnDumpMRLocalVars(ss, "Disable", "")>\
+  %<LibDumpSystemSSVars(ss,"Disable")>\
+  %<LibGetSystemLocalVars(ss,"Disable","")>
+  %<SLibGetFcnLocalVars(ss,"Disable","")>
+  %<LibDumpSystemUserCode(ss,"Disable","Header")>\
+  %<LibDumpGlobalVars(ss, "Disable")>\
+  %<LibDumpFcnBegin(ss,"Disable")>\
+  %% disable code
+  %openfile tmpBuffer2
+  %<LibDumpSystemUserCode(ss,"Disable","Body")>\
+  %<LibDumpSystemFcn(ss,"Disable")>\
+  %<LibDumpSystemUserCode(ss,"Disable","Trailer")>\
+  %closefile tmpBuffer2
+  %% extra code for exported function to update external outputs
+  %if ExportFunctionsMode == 1 && !WHITE_SPACE(tmpBuffer2)
+    %<tmpBuffer2>
+    %<LibDumpExpFucUpdateRootOutput(ss,"Disable")>\
+  %else
+    %<tmpBuffer2>\
+  %endif
+  %% close code
+  %<LibDumpFcnClose(ss,"Disable")>
+  %closefile tmpBuffer
+  %assign retBuffer = ""
+  %if !WHITE_SPACE(tmpBuffer)
+    %openfile retBuffer
+    %if LibSystemIsInlined(ss)
+    %<SLibGetFcnComment(ss,"Disable")>\
+    %else
+      %assign fcnAbstract = SLibGetFcnCommentContents(ss,"Disable")
+      %assign fcnInfo = LibGetFcnInfo(ss, "Disable", ss.CurrentTID)
+      %assign fcnBlockDescription = SLibGetBlockDescriptionForSS(ss,"Disable")
+      %addtorecord fcnInfo Abstract fcnAbstract  Category "model" GeneratedBy "commonbodlib.tlc" ...
+        Type "Disable" GeneratedFor FcnGeneratedFor(ss) BlockDescription fcnBlockDescription
+      %<SLibDumpFunctionBanner(fcnInfo)>
+    %endif
+    %<tmpBuffer>\
+    %closefile retBuffer
+  %endif
+  %return retBuffer
+%endfunction
+
+
+%function SLibGetBodyFinalizeDimsFcnCache(ss)  void
+  %openfile retBuffer
+  %if LibSystemIsInlined(ss)
+  %<SLibGetFcnComment(ss,"FinalizeDims")>\
+  %else
+    %assign fcnAbstract = SLibGetFcnCommentContents(ss,"FinalizeDims")
+    %assign fcnInfo = LibGetFcnInfo(ss, "FinalizeDims", ss.CurrentTID)
+    %addtorecord fcnInfo Abstract fcnAbstract Category "model" GeneratedBy "commonbodlib.tlc" ...
+      Type "FinalizeDims" GeneratedFor FcnGeneratedFor(ss) ...
+      BlockDescription SLibGetBlockDescriptionForSS(ss, "FinalizeDims")
+    %<SLibDumpFunctionBanner(fcnInfo)>
+  %endif
+  %<LibDumpFcnOpen(ss,"FinalizeDims")>\
+  %<FcnDumpMRLocalVars(ss, "FinalizeDims", "")>\
+  %<LibDumpSystemSSVars(ss,"FinalizeDims")>\
+  %<LibGetSystemLocalVars(ss,"FinalizeDims","")>
+  %<SLibGetFcnLocalVars(ss,"FinalizeDims","")>  
+  %<LibDumpGlobalVars(ss, "FinalizeDims")>\
+  %<LibDumpSystemFcn(ss, "FinalizeDims")>
+  %<LibDumpFcnClose(ss,"FinalizeDims")>
+  %closefile retBuffer
+  %return retBuffer
+%endfunction
+
+%function SLibGetBodySetDimsFcnCache(ss)  void
+  %openfile retBuffer
+  %if LibSystemIsInlined(ss)
+  %<SLibGetFcnComment(ss,"SetDims")>\
+  %else
+    %assign fcnAbstract = SLibGetFcnCommentContents(ss,"SetDims")
+    %assign fcnInfo = LibGetFcnInfo(ss, "SetDims", ss.CurrentTID)
+    %assign fcnBlockDescription = SLibGetBlockDescriptionForSS(ss,"Outputs")
+    %addtorecord fcnInfo Abstract fcnAbstract  Category "model" GeneratedBy "commonbodlib.tlc" ...
+      Type "SetDims" GeneratedFor FcnGeneratedFor(ss) BlockDescription fcnBlockDescription
+    %<SLibDumpFunctionBanner(fcnInfo)>
+  %endif
+  %<LibDumpFcnOpen(ss,"SetDims")>\
+  %<FcnDumpMRLocalVars(ss, "SetDims", "")>\
+  %<LibDumpSystemSSVars(ss,"SetDims")>\
+  %<LibGetSystemLocalVars(ss,"SetDims","")>
+  %<SLibGetFcnLocalVars(ss,"SetDims","")> 
+  %<LibDumpGlobalVars(ss, "SetDims")>\
+  %<LibDumpSystemFcn(ss, "SetDims")>
+  %<LibDumpFcnClose(ss,"SetDims")>
+  %closefile retBuffer
+  %return retBuffer
+%endfunction
+
+%% Function: FcnGetFcnCommentToken(ss, fcn, token, prefix) =======================================
+%% Description:
+%%    Return token's content for comments
+%%    Valid token: "FcnDescription", "GeneratedFor", "BlockDescription"
+%%
+%function FcnGetFcnCommentToken(ss, fcn, token, prefix) void
+  %assign retBuffer = ""
+  %if ExportFunctionsMode == 1 && ss.Exported == "yes" 
+    %assign ssIdentifier = LibGetRecordIdentifier(ss)
+    %if ISEQUAL(token, "FcnDescription")
+      %return "%<fcn> for exported function: %<ssIdentifier>"
+    %elseif ISEQUAL(token, "GeneratedFor")
+      %% Only return valid blockpath
+      %if !ISEMPTY(ssIdentifier) && ssIdentifier[0] == "<"
+        %return ssIdentifier
+      %else
+        %return ""
+      %endif
+    %elseif ISEQUAL(token, "BlockDescription")
+      %assign cs    = ss.CallSites
+      %assign numCs = SIZE(cs, 0)
+      %assert (numCs > 0)
+      %assign retOneBlk = (numCs == 1 || LibSystemIsInlined(ss))
+      %assign thisCs = cs[0]
+      %assign thisBlk = System[thisCs[2]].Block[thisCs[3]]
+    %endif
+  %elseif ss.Type == "atomic" && ss.CalledByBlock == "yes"
+%% do not return any thing
+    %return ""
+  %elseif (ss.Type == "root")
+    %if ISEQUAL(token, "FcnDescription")
+      %return "%<fcn> for %<ss.Type> system: '%<ss.Name>'"
+    %elseif ISEQUAL(token, "GeneratedFor") 
+      %return "'%<ss.Name>'"
+    %elseif ISEQUAL(token, "BlockDescription")
+      %return ""
+    %endif
+  %elseif IsModelReferenceBaseSys(ss)
+    %if ISEQUAL(token, "FcnDescription")
+      %return "%<fcn> for referenced model: '%<::CompiledModel.Name>'"
+    %elseif ISEQUAL(token, "GeneratedFor")
+      %return ""
+    %elseif ISEQUAL(token, "BlockDescription")
+      %return ""
+    %endif
+  %else
+    %assign cs    = ss.CallSites
+    %assign numCs = SIZE(cs, 0)
+    %assert (numCs > 0)
+    
+    %% If the system is an RLS, we don't care how many callsites it has for its description
+    %assign retOneBlk = (numCs == 1 || LibSystemIsInlined(ss) || LibSystemIsReusedLibraryFcn(ss))
+    %assign thisCs = cs[0]
+    %assign thisBlk = System[thisCs[2]].Block[thisCs[3]]
+    %if retOneBlk
+      %assign blkName = SLibGrBlockName(ss.GraphCallSites[0])
+      %if ISEQUAL(token, "FcnDescription")
+        %if LibSystemIsReusedLibraryFcn(ss) && ISFIELD(ss, "RLSCommentName")
+          %return "%<fcn> for %<ss.Type> system: %<ss.RLSCommentName>"
+        %else
+          %return "%<fcn> for %<ss.Type> system: '%<blkName>'"
+        %endif
+      %elseif ISEQUAL(token, "GeneratedFor")        
+        %return "'%<blkName>'"
+      %elseif ISEQUAL(token, "BlockDescription")
+        %assign blkName = SLibGrBlockName(ss.GraphCallSites[0])
+      %if LibSystemIsInlined(ss) && ISFIELD(thisBlk, "MaskType") && ...
+        thisBlk.MaskType == "Stateflow"
+          %assign retBuffer = "Chart description for: '%<blkName>'"
+        %else
+          %assign retBuffer = "Block description for: '%<blkName>'"
+	%endif
+      %endif
+    %else
+      %assign max = 10
+      %assign num = (numCs > max+1) ? max : numCs
+      %if ISEQUAL(token, "FcnDescription")
+        %assign retBuffer = "%<fcn> for %<ss.Type> system:\n"
+        %foreach cIdx = num
+          %assign blkName = SLibGrBlockName(ss.GraphCallSites[cIdx])
+          %assign retBuffer = retBuffer + prefix + "   '" + blkName + "'\n"
+        %endforeach
+        %if numCs > num
+          %return retBuffer + prefix + "   ...\n"
+        %else
+          %return retBuffer
+        %endif
+      %elseif ISEQUAL(token, "GeneratedFor")
+        %assign retBuffer = ""
+        %foreach cIdx = num
+          %assign blkName = SLibGrBlockName(ss.GraphCallSites[cIdx])
+          %if cIdx < num-1
+            %assign retBuffer = retBuffer + "'%<blkName>',\n"
+          %else
+            %assign retBuffer = retBuffer + "'%<blkName>'"
+          %endif
+        %endforeach
+        %if numCs > num
+          %return retBuffer + ",..."
+        %else
+          %return retBuffer
+	%endif
+      %elseif ISEQUAL(token, "BlockDescription")
+        %assign retBuffer = "Common block description:"
+      %endif
+    %endif
+  %endif
+  %assign ret_blockdescription = FcnGetBlockDescriptionInFcnBanner(thisBlk)
+  %if !ISEMPTY(ret_blockdescription)
+    %return retBuffer + "\n" + ret_blockdescription
+  %else
+    %return ""
+  %endif
+%endfunction
+
+%% Function: FcnGeneratedFor(ss) =======================================
+%% Description:
+%%    Return system or block path for function comments
+%%    If the system is reused, first 10(11) instances are returned
+%%
+%function FcnGeneratedFor(ss)
+  %return FcnGetFcnCommentToken(ss, "", "GeneratedFor", "")
+%endfunction
+ 
+%% Function: SLibGetBlockDescriptionForSS(ss) =======================================
+%% Description:
+%%    Return block description for system
+%% 
+%function SLibGetBlockDescriptionForSS(ss, fcn)
+  %assign needBlkDsc = !(ss.Type == "atomic" && ss.CalledByBlock == "yes") && ...
+    (ss.Type != "root") && !IsModelReferenceBaseSys(ss) && ...
+    !ss.DescInCallSite && ...
+    (fcn == "Output and update" || fcn == "Outputs" || fcn == "SetDims" || fcn == "FinalizeDims")
+  %if !needBlkDsc
+    %return ""
+  %endif
+  %return FcnGetFcnCommentToken(ss, fcn, "BlockDescription", "")
+%endfunction
+
+%% Function: SLibGetFcnComment(ss, fcn) =======================================
+%% Description:
+%%    Return comment for each function type with /* */ format. If the system is reused 
+%%    the comment includes the first 10(11) instances of the reused system.
+%%
+%function SLibGetFcnComment(ss, fcn) void
+  %assign retBuffer = "/* " + FcnGetFcnCommentToken(ss, fcn, "FcnDescription", " *  ") + " */"
+  %return retBuffer
+%endfunction
+
+%% Function: SLibGetFcnCommentContents(ss, fcn) =======================================
+%% Description:
+%%    Return comment for each function type without /* */ format. If the system is reused 
+%%    the comment includes the first 10(11) instances of the reused system.
+%%
+%function SLibGetFcnCommentContents(ss, fcn) void
+  %return FcnGetFcnCommentToken(ss, fcn, "FcnDescription", "")
+%endfunction
+
+%% Function: SLibGetBodyOutputUpdateFcnCache(ss) ===============================
+%% Description:
+%%      Generates the output/update function for systems that have output
+%%      and update combined into one function.
+%%      Note: a function-call is generated even if it is empty.
+%%
+%function SLibGetBodyOutputUpdateFcnCache(ss) void
+  %if SLibSystemFcnRateGrouping(ss, "OutputUpdate") || ...
+    LibAsynchronousTriggeredTID(ss.CurrentTID)
+    %assign tid = ss.CurrentTID
+  %else
+    %assign tid = ""
+  %endif
+  
+  %if LibAsynchronousTriggeredTID(tid)
+    %if ISEQUAL(tid, FcnGetSubsystemCodeBufTID(ss))
+      %assign systemFcnIsEmpty = LibSystemFcnIsEmptyForTID(ss, "Output")
+    %else
+      %assign systemFcnIsEmpty = TLC_TRUE
+    %endif  
+  %else
+    %if ISEQUAL(tid, "") %%!SLibIsRateGrouping()
+      %% If not grouping rating, system output
+      %% fcn always exists if FcnInfo exists
+      %assign systemFcnIsEmpty = WHITE_SPACE(LibGetFcnInfo(ss, "OutputUpdate",tid))
+    %else
+      %assign systemFcnIsEmpty = LibSystemFcnIsEmptyForTID(ss, "Output")
+    %endif
+  %endif
+  
+    
+  %if IsModelReferenceBaseSys(ss)
+    %% Create this field and initialize it to "yes"
+    %% This will be updated at the end of function
+    %addtorecord ss ModelRefOutputUpdateFcnIsEmpty%<tid> "yes"
+  %endif
+
+  %if !systemFcnIsEmpty 
+    %openfile tmpBuffer
+    %% open 
+    %if !LibIsDeploymentDiagram()
+      %<LibDumpFcnOpen(ss,"OutputUpdate")>\
+    %endif
+    %<FcnDumpMRLocalVars(ss, "OutputUpdate", tid)>\
+    %% Profiler declaration code
+    %<LibDumpSystemProfileCode(ss,"OutputUpdate", "Decls")>\
+    %% output declarations
+    %<LibDumpSystemSSVars(ss,"OutputUpdate")>\
+    %if !LibIsDeploymentDiagram()
+      %<LibGetSystemLocalVars(ss,"OutputUpdate",tid)>
+    %endif
+    %assign localOutputVars = SLibGetFcnLocalVars(ss, "Output", tid)
+    %assign localUpdateVars = SLibGetFcnLocalVars(ss, "Update", tid)
+    %assign needBraces = !ISEMPTY(localOutputVars) && !ISEMPTY(localUpdateVars)
+    %if !needBraces && !LibIsDeploymentDiagram()
+      %<localOutputVars>
+      %<localUpdateVars>
+    %endif
+    %if (SLibFcnProtoCtrlActive() || GenerateClassInterface) && ...
+        IsModelReferenceBaseSys(ss)
+        %if !GenerateClassInterface
+          %assign fcnData = FcnGetFunctionPrototypeRecord()
+        %else
+          %assign fcnData = FcnGetRTWCPPStepPrototypeRecord()
+        %endif
+      %<FcnModelStepFcnReturnCode(fcnData, "ReturnDeclaration")>
+      %<FcnModelStepBufferInputsCode(fcnData)>
+    %endif
+    %<LibDumpSystemUserCode(ss,"Output","Header")>\
+    %<LibDumpGlobalVars(ss, "OutputUpdate%<tid>")>\
+    %<LibDumpFcnBegin(ss,"OutputUpdate")>\
+    %% Profiler start code
+    %<LibDumpSystemProfileCode(ss,"OutputUpdate", "Start")>\
+    %% When we are generating for model reference, write out
+    %% part of the ERT timing Engine.
+    %assign mdlrefSys = IsModelReferenceBaseSys(ss)
+    %% output code
+    %<UpdateRateTransitionFlagsHelper(ss, tid, TLC_FALSE)>
+    %<LibDumpSystemUserCode(ss,"Output","Body")>\
+    %if needBraces && !ISEMPTY(localOutputVars)
+      %<"{">
+      %<localOutputVars>
+    %endif
+    %<LibDumpSystemFcn(ss,"Output%<tid>")>\
+    %if needBraces && !ISEMPTY(localOutputVars)
+      %<"}">
+    %endif    
+    %<LibDumpSystemUserCode(ss,"Output","Trailer")>\
+    %% update declarations
+    %%
+    %assign userCodeBuffer = ""
+    %openfile userCodeBuffer
+    %<LibDumpSystemUserCode(ss,"Update","Header")>\
+    %<LibDumpSystemUserCode(ss,"Update","Body")>\
+    %if needBraces && !ISEMPTY(localUpdateVars)
+      %<"{">
+      %<localUpdateVars>
+    %endif
+    %<LibDumpSystemFcn(ss,"Update%<tid>")>\
+    %if needBraces && !ISEMPTY(localUpdateVars)
+      %<"}">
+    %endif
+    %<LibDumpSystemUserCode(ss,"Update","Trailer")>\
+    %closefile userCodeBuffer
+    %%
+    %if !WHITE_SPACE(userCodeBuffer)
+      %assign needBrace = !LibSystemUserCodeIsEmpty(ss,"Update","Header")
+      %if needBrace
+        {
+        %endif
+        %<userCodeBuffer>
+        %if needBrace
+        }
+      %endif
+    %endif
+    %%
+    %<FcnHandlesUnusedTIDArg(ss, "Output")>
+    %%
+    %% extra code for exported function to update external outputs
+    %if ExportFunctionsMode == 1
+      %<LibDumpExpFucUpdateRootOutput(ss,"OutputUpdate")>\
+    %endif
+    %% Profiler finish code
+    %<LibDumpSystemProfileCode(ss,"OutputUpdate", "End")>\
+
+    %if (SLibFcnProtoCtrlActive() || GenerateClassInterface) && ...
+        IsModelReferenceBaseSys(ss)
+        %if !GenerateClassInterface
+          %assign fcnData = FcnGetFunctionPrototypeRecord()
+        %else
+          %assign fcnData = FcnGetRTWCPPStepPrototypeRecord()
+        %endif
+      %<FcnModelStepBufferOutputsCode(fcnData)>
+      %<FcnModelStepFcnReturnCode(fcnData,"ReturnStatement")>
+    %endif 
+    %if !LibIsDeploymentDiagram()
+      %<LibDumpFcnClose(ss,"OutputUpdate")>
+    %endif
+    %closefile tmpBuffer
+  %else
+    %assign tmpBuffer = ""
+  %endif
+  %assign retBuffer = ""
+  %openfile retBuffer
+  %if !WHITE_SPACE(tmpBuffer)
+    %if LibSystemIsInlined(ss) && (!LibIsDeploymentDiagram())
+    %<SLibGetFcnComment(ss,"Output and update")>\
+    %elseif (!LibIsDeploymentDiagram())
+      %assign fcnAbstract = SLibGetFcnCommentContents(ss,"Output and update")
+      %assign fcnInfo = LibGetFcnInfo(ss, "OutputUpdate", ss.CurrentTID)
+      %assign fcnBlockDescription = SLibGetBlockDescriptionForSS(ss,"Output and update")
+      %addtorecord fcnInfo Abstract fcnAbstract Category "model" GeneratedBy "commonbodlib.tlc" ...
+        Type "Output and update" GeneratedFor FcnGeneratedFor(ss) BlockDescription fcnBlockDescription
+      %<SLibDumpFunctionBanner(fcnInfo)>
+    %endif
+    %<tmpBuffer>\
+  %endif
+
+  %<SLibGenerateFNIStubs(ss)>\
+  %<SLibGenerateISRStubs(ss)>\
+  %closefile retBuffer
+  %if IsModelReferenceBaseSys(ss)
+    %assign ss.ModelRefOutputUpdateFcnIsEmpty%<tid> = "no"
+  %endif
+  %return retBuffer
+%endfunction
+
+
+%% Function: SLibGetBodyTerminateFcnCache(ss) ==================================
+%% Description:
+%%      Generates the terminate function for systems
+%%
+%function SLibGetBodyTerminateFcnCache(ss) void
+  %% We need to change the BlockFcn to terminate because the
+  %% rtModel is accessed here.  This currently does not cause
+  %% any problems, but it would make the Interface record incorrect.
+  %assign oldBlockFcn = ::BlockFcn
+  %assign ::BlockFcn = "Terminate"
+  %assign isRoot = (ss.Type == "root")
+  %%
+  %openfile tmpBuffer
+  %<LibDumpFcnOpen(ss,"Terminate")>\
+  %<FcnDumpMRLocalVars(ss, "Terminate", "")>\
+  %if IsBaseSystem(ss)
+    %<LibDumpSystemProfileCode(ss, "Terminate", "End")>
+  %endif
+  %<LibDumpSystemSSVars(ss,"Terminate")>\
+  %<LibGetSystemLocalVars(ss,"Terminate","")>  
+  %<SLibGetFcnLocalVars(ss,"Terminate","")>  
+  %<LibDumpSystemUserCode(ss,"Terminate","Header")>\
+  %<LibDumpGlobalVars(ss, "Terminate")>\
+  %<LibDumpFcnBegin(ss,"Terminate")>\
+  %<LibDumpSystemUserCode(ss,"Terminate","Body")>\
+  %<LibDumpSystemFcn(ss,"Terminate")>\
+  %if isRoot && UsingMalloc
+    %<SLibGenRootTermMemFreeCode()>\
+  %endif
+  %<LibDumpSystemUserCode(ss,"Terminate","Trailer")>\
+  %<LibDumpFcnClose(ss,"Terminate")>
+  %closefile tmpBuffer
+  %assign retBuffer = ""
+  %if !WHITE_SPACE(tmpBuffer)
+    %openfile retBuffer
+    %if LibSystemIsInlined(ss)
+      %<SLibGetFcnComment(ss,"Termination")>\
+    %else
+      %assign fcnAbstract = SLibGetFcnCommentContents(ss,"Termination")
+      %assign fcnInfo = LibGetFcnInfo(ss, "Terminate", ss.CurrentTID)
+      %assign fcnBlockDescription = SLibGetBlockDescriptionForSS(ss,"Termination")
+      %addtorecord fcnInfo Abstract fcnAbstract Category "model" GeneratedBy "commonbodlib.tlc" ...
+        Type "Terminate" GeneratedFor FcnGeneratedFor(ss) BlockDescription fcnBlockDescription
+      %<SLibDumpFunctionBanner(fcnInfo)>
+    %endif
+    %<tmpBuffer>\
+    %closefile retBuffer
+  %endif
+  %assign ::BlockFcn = oldBlockFcn
+  %return retBuffer
+%endfunction %% SLibGetBodyTerminateFcnCache
+
+
+%% Function: LibDumpSystemFcn(system,fcn) ======================================
+%% Description:
+%%      Outputs the cached contents of the specified function for a system.
+%%
+%function LibDumpSystemFcn(system,fcn) Output
+  %assign tempFcnName = "Cached" + fcn + "Fcn"
+  %assign code = LibGetSystemField(system, tempFcnName)
+  %if code != "/* rate grouped */"
+    %% don't dump this comment line
+    %% is comment line is only used
+    %% to indicate the code is not
+    %% empty, is rate grouped
+    %<LibTrapCacheAssert(code)>\
+    %<code>\
+  %endif
+%endfunction %% LibDumpSystemFcn
+
+
+%% Function: LibDumpSystemSSVars(system,fcn) ===================================
+%% Description:
+%%      Outputs the cached simstruct variables that are needed by the function.
+%%
+%function LibDumpSystemSSVars(system,fcn) Output
+  %assign tempSSVarsName  = "Cached" + fcn + "SSVars"
+  %assign code = LibGetSystemField(system, tempSSVarsName)
+  %<code>\
+%endfunction %% LibDumpSystemSSVars
+
+%% Function: LibDumpSystemProfileCode(system,fcn, part) ========================
+%% Description:
+%%      Outputs the cached profile code
+%%      fcn:  terminate, output, update, outputupdate, derivative
+%%      part: ProfileDecls, ProfileStart, ProfileEnd
+%%
+%function LibDumpSystemProfileCode(system,fcn, part) Output
+  %assign tempProfile  = "Cached" + fcn + "Profile"+ part + "Code"
+  %assign code = LibGetSystemField(system, tempProfile)
+  %<code>\
+%endfunction %% LibDumpSystemProfileCode
+
+%% Function: SLibGetFcnLocalVars ===============================================
+%% Abstract:
+%%   Returns the local variable declaration for a given system function and
+%%   task index.
+%%
+%function SLibGetFcnLocalVars(system, fcn, tid) void
+  %assign retVal = ""
+  %assign prefix = "Cached" + fcn
+  %if ISEMPTY(tid)
+    %assign retVal = LibGetSystemField(system, prefix + "LocalVars")
+    %if ISEMPTY(retVal) && LibIsSystemField(system, prefix + "0LocalVars")
+      %assign retVal = LibGetSystemField(system, prefix + "0LocalVars")
+    %endif
+  %else
+    %assign retVal = LibGetSystemField(system, prefix + "%<tid>LocalVars")
+    %if ISEMPTY(retVal) && LibIsSystemField(system, prefix + "LocalVars")
+      %assign retVal = LibGetSystemField(system, prefix + "LocalVars")
+    %endif
+  %endif
+  %return retVal
+%endfunction
+
+%% Function: SLibResetFcnLocalVars =============================================
+%% Abstract:
+%%   Resets the local variable declaration cache for a given system function
+%%   and task index.
+%%
+%function SLibResetFcnLocalVars(system, fcn, tid) void
+  %assign prefix = "Cached" + fcn
+  %if ISEMPTY(tid)
+    %assign retVal = LibGetSystemField(system, prefix + "LocalVars")
+    %if ISEMPTY(retVal) && LibIsSystemField(system, prefix + "0LocalVars")
+      %<LibSetSystemField(system, prefix + "0LocalVars", "")>
+    %else
+      %<LibSetSystemField(system, prefix + "LocalVars", "")>
+    %endif
+  %else
+    %assign retVal = LibGetSystemField(system, prefix + "%<tid>LocalVars")
+    %if ISEMPTY(retVal) && LibIsSystemField(system, prefix + "LocalVars")
+      %<LibSetSystemField(system, prefix + "LocalVars", "")>
+    %else
+      %<LibSetSystemField(system, prefix + "%<tid>LocalVars", "")>
+    %endif
+  %endif
+%endfunction
+
+%% Function: LibGetSystemLocalVars(system,fcn) =================================
+%% Description:
+%%      Outputs the cached local variables that are needed by the function.
+%%
+%function LibGetSystemLocalVars(system, fcn, tid) void
+  %assign tempLocalBOName = "Cached" + fcn + "%<tid>LocalBO"
+  %assign localVars = ""
+  %if LibIsSystemField(system, tempLocalBOName)
+    %assign code = LibGetSystemField(system, tempLocalBOName)
+    %if code != "/* rate grouped */"
+      %% don't dump this comment line
+      %% is comment line is only used
+      %% to indicate the code is not
+      %% empty, is rate grouped
+      %assign localVars = code
+    %endif
+  %endif
+  %return localVars
+%endfunction %% LibGetSystemLocalVars
+
+%% Function: SLibSystemFcnTypeMayUseTid(fcn) ===================================
+%% Abstract:
+%%   Return true if the fcn is the type that may use tid in its code body.
+%%
+%function SLibSystemFcnTypeMayUseTid(fcn) 
+  %return (fcn == "Output"   || fcn == "Outputs" || ...
+    fcn == "Update" || fcn == "RootUpdate" || ...
+    fcn == "OutputUpdate" || fcn == "UpdateContStates")
+%endfunction
+
+%% Function: LibSystemFcnNeedsTID(system,fcn) ==================================
+%% Description:
+%%      returns TLC_TRUE if the system function needs TID passed in,
+%%      else returns TLC_FALSE
+%%
+%function LibSystemFcnNeedsTID(system,fcn) void
+  %assign retVal = TLC_FALSE
+  %assign tidIsUsedInFcn = TLC_FALSE
+  
+  %% Only potential multirate function may use TID. 
+  %if !SLibSystemFcnTypeMayUseTid(fcn) 
+    %return retVal
+  %endif
+  
+  %% First, figure out whether the tid is used in the function.
+  %switch fcn
+    %case "UpdateContStates"
+    %case "Update"
+    %case "RootUpdate"
+      %assign tidIsUsedInFcn = LibGetSystemField(system, "NeedTIDInUpdate") 
+      %break
+    %case "Output"
+    %case "Outputs"
+    %case "OutputUpdate"
+      %assign tidIsUsedInFcn = LibGetSystemField(system, "NeedTIDInOutput")
+      %break
+    %default
+      %% Other function types are single rate.
+      %% always assert
+      %assert TLC_FALSE
+  %endswitch
+  
+  %% Second, find out if tid arg is required to pass in fcn. 
+  %if LibSystemIsRoot(system) 
+    %% If target requires tid at root.
+    %% Note: GRT target must pass in tid arg because external customers
+    %% may rely on this.
+    %if RootBodyTIDneeded
+      %assign retVal = TLC_TRUE
+    %else
+      %if SLibSystemFcnRateGrouping(system, fcn) 
+        %% Root level wrapper function that calls each rate-grouped 
+        %% step function, must pass in tid arg. 
+        %% This is the case to support static ert main
+        %assign retVal  = ISEQUAL(system.CurrentTID, "")
+      %endif
+      %if tidIsUsedInFcn && !retVal
+        %% tid is not passed in, but is used
+        %% add local tid in fcn scope. 
+        %<SLibSetNeedLocalTIDInSystem(system,fcn)>
+      %endif
+    %endif
+  %else
+    %if tidIsUsedInFcn
+      %assign retVal = TLC_TRUE
+    %else
+      %% If tid is not used, but the fcn callsite assume tid arg. 
+      %% (e.g. Non-inline sfcn). Force the fcn to have tid arg. 
+      %assign retVal =  SLibSystemFcnTypeMayUseTid(fcn) && FcnForcedHasTIDArg(system)
+    %endif
+  %endif
+  
+  %return retVal
+%endfunction %% LibSystemFcnNeedsTID
+
+
+%% Function: LibSystemFcnNeedsCPI(system,fcn) ==================================
+%% Description:
+%%      returns TLC_TRUE if the system function needs CPI (Control Port Index)
+%%      passed in, else returns TLC_FALSE
+%%
+%function LibSystemFcnNeedsCPI(system,fcn) void
+  %if fcn == "OutputUpdate" || ...
+    fcn == "Enable" || ...
+    fcn == "Disable"
+    %assign tempName = "NeedCPIIn" + fcn
+    %return LibGetSystemField(system, tempName)
+  %else
+    %return TLC_FALSE
+  %endif
+%endfunction %% LibSystemFcnNeedsCPI
+
+%% Function: SLibSystemTidMatch(system, tid)
+%% Abstract: 
+%%    Return trun if tid matches base tid of the subsystem.
+%%
+%function SLibSystemTidMatch(system, tid)
+  %assign sysTid = LibGetSubsystemTID(system, TLC_TRUE)
+
+  %if ISEQUAL(tid,"")
+    %return TLC_TRUE
+  %elseif ISEQUAL(tid, sysTid)
+    %return TLC_TRUE
+  %else
+    %assign tid01Eq = ISEQUAL(SolverType, "FixedStep") && FixedStepOpts.TID01EQ
+    %return tid01Eq && ...
+      (tid == 0 || tid == 1) && ...
+      (sysTid == 0 || sysTid == 1) 
+  %endif
+%endfunction
+
+%function SLibSystemUserDataIsEmpty(system, fcnType, tid)
+  %if TYPE(tid) == "Number" 
+    %assert tid >= 0
+    %% userCode is not rate grouped, when check if code for specific tid 
+    %% is empty, should not include user code unless the tid equal to
+    %% subsystem tid
+    %assign ssTid = FcnGetSubsystemCodeBufTID(system) 
+    %if !ISEQUAL(tid, ssTid)
+      %return TLC_TRUE
+    %endif
+  %endif
+  
+  %% Since CGIR will generate call-site code when %<fcnType>MethodHasUserData
+  %% is true. TLC must generate function for this fcnType even the code is empty. 
+  %% The only exceptions are:
+  %%  1. System is inlined,(no call site code is emitted by CGIR in this case).
+  %%  2. Is root system. (call site code is NOT emitted by CGIR, it is generate in TLC
+  %%  3. fcn type is terminate. All subsystem terminate code is placed in models 
+  %%     terminate function. (see ProcessRTWdata(RTWdata, system) in custcode.tlc)
+  %%  4. fcn type is initialize. (Custom initialize code is cached in in the system 
+  %%     if it has an initialize function, otherwise cache in models start function.
+  %% 
+  %if LibSystemIsInlined(system) || system.Type == "root" || ...
+    fcnType == "Terminate" || fcnType == "Initialize"
+    %if fcnType == "OutputUpdate" 
+      %assign userCodeIsEmpty = ...
+        WHITE_SPACE(LibGetSystemField(system, "OutputHeader" )) && ...
+        WHITE_SPACE(LibGetSystemField(system, "OutputBody"   )) && ...
+        WHITE_SPACE(LibGetSystemField(system, "OutputTrailer")) && ...
+        WHITE_SPACE(LibGetSystemField(system, "UpdateHeader" )) && ...
+        WHITE_SPACE(LibGetSystemField(system, "UpdateBody"   )) && ...
+        WHITE_SPACE(LibGetSystemField(system, "UpdateTrailer"))
+    %else
+      %assign userCodeIsEmpty = ...
+        WHITE_SPACE(LibGetSystemField(system, "%<fcnType>Header" )) && ...
+        WHITE_SPACE(LibGetSystemField(system, "%<fcnType>Body"   )) && ...
+        WHITE_SPACE(LibGetSystemField(system, "%<fcnType>Trailer"))
+    %endif
+  %else
+    %if fcnType == "OutputUpdate"
+      %assign fcnType = "Output"
+    %endif
+    %assign fieldname = "%<fcnType>MethodHasUserData"
+    %assign userCodeIsEmpty = !ISFIELD(system, fieldname) || !GETFIELD(system, fieldname)
+  %endif
+  
+  %return userCodeIsEmpty
+%endfunction
+
+%function LibSystemFcnIsEmptyHelper(system, fcn, tid)
+  %% Output may have been combined with update
+  %if fcn == "Output" && !ISFIELD(system,"OutputFcn") &&  ...
+      !(ISFIELD(system,"OutputCalledInUpdate") &&  ...
+      system.OutputCalledInUpdate == "yes")
+    %assign fcn = "OutputUpdate"
+  %endif
+  
+  %if SLibSystemFcnIsRateGroupType(fcn) 
+    %if !SLibIsMultiRateAndRateGrouping(system) && !LibAsynchronousTriggeredTID(tid)
+      %% system is not rate grouped, ignore tid value
+      %if SLibSystemTidMatch(system,tid)
+        %assign tid = "" 
+      %else
+        %return TLC_TRUE
+      %endif
+    %endif
+  %else
+    %% sysFcn is not rate grouped, ignore tid value
+    %assign tid = "" 
+  %endif
+  
+  %if !ISFIELD(system,"%<fcn>Fcn") && system.Type != "root"
+    %return TLC_TRUE
+  %endif
+  %if fcn == "OutputUpdate"    
+    %if system.DeletedInIR
+      %return TLC_TRUE
+    %endif
+    %assign rtwCode = LibGetSystemField(system, "CachedOutput%<tid>Fcn") + ...
+      LibGetSystemField(system, "CachedUpdate%<tid>Fcn")
+  %elseif fcn == "Output" && system.DeletedInIR
+    %return TLC_TRUE
+  %else
+    %assign rtwCode = LibGetSystemField(system, "Cached%<fcn>%<tid>Fcn")
+  %endif
+  
+  %assign ssCodeIsEmpty = TLC_TRUE
+  %if ISEQUAL(tid, "")
+    %assign ssCodeIsEmpty = ...
+      WHITE_SPACE(LibGetSystemField(system, "Cached%<fcn>ProfileDeclsCode")) && ...
+      WHITE_SPACE(LibGetSystemField(system, "Cached%<fcn>ProfileStartCode")) && ...
+      WHITE_SPACE(LibGetSystemField(system, "Cached%<fcn>ProfileEndCode"))
+  %endif
+  %assign rtwCodeIsEmpty = WHITE_SPACE(rtwCode)
+  %assign userCodeIsEmpty = SLibSystemUserDataIsEmpty(system, fcn, tid)
+  
+  %<LibTrapCacheAssert(rtwCode)>
+
+  %if (fcn == "Update" && !ISEQUAL(tid, ""))
+    %assign isEmpty = (rtwCodeIsEmpty && userCodeIsEmpty)
+  %else
+    %assign isEmpty= (rtwCodeIsEmpty && userCodeIsEmpty && ssCodeIsEmpty)
+  %endif
+
+  %if isEmpty == TLC_TRUE &&  ...
+    IsModelReferenceBaseSys(system) && ...
+    (fcn == "Output" || fcn == "Update" || fcn == "OutputUpdate")
+    %if ISFIELD(system, "ModelRef%<fcn>FcnIsEmpty%<tid>")
+      %% The code has already been dumped
+      %assign isEmpty = ISEQUAL(system.ModelRef%<fcn>FcnIsEmpty%<tid>, "yes")
+    %else
+      %% Assume it is not empty
+      %if !LibAsynchronousTriggeredTID(tid)
+        %assign isEmpty = TLC_FALSE
+      %endif
+    %endif
+  %endif
+
+  %return isEmpty
+%endfunction %%LibSystemFcnIsEmptyHelper
+
+%% Function: LibSystemFcnIsEmpty(system,fcn) ===================================
+%% Description:
+%%      Function that returns TLC_FALSE if the system contains cached code for
+%%      the specified function name for any task.
+%%
+%function LibSystemFcnIsEmpty(system,fcn) void
+  %assign isEmpty = LibSystemFcnIsEmptyHelper(system, fcn, "")
+  %if fcn == "Output" || fcn == "Update" || fcn == "OutputUpdate"
+    %foreach tid = NumSampleTimes
+      %assign isEmpty = isEmpty && LibSystemFcnIsEmptyHelper(system, fcn, tid)
+    %endforeach
+  %endif 
+
+  %return isEmpty
+%endfunction %% LibSystemFcnIsEmpty(system,fcn)
+
+%% Function: LibSystemFcnIsEmptyForTID(system,fcn) ===================================
+%% Description:
+%%      Function that returns TLC_FALSE if the system contains cached code for
+%%      the specified function name of specific Tid.
+%%
+%function LibSystemFcnIsEmptyForTID(system,fcn) void
+   %assign tid = SLibSystemFcnRateGrouping(system, fcn) ||...
+    LibAsynchronousTriggeredTID(system.CurrentTID) ? system.CurrentTID : ""
+  
+  %assign isEmpty = LibSystemFcnIsEmptyHelper(system, fcn, tid)
+
+  %return isEmpty
+%endfunction
+
+
+%% Function: LibSystemIsForceNonInline =========================================
+%%
+%% Abstract:
+%%    Accessor function for system's ForceNonInline flag
+%%
+%function LibSystemIsForceNonInline(system)
+  %return system.ForceNonInline
+%endfunction %% LibSystemIsForceNonInline
+
+%% Function: LibSystemCalledByNonInlineSfcn =========================================
+%%
+%% Abstract:
+%%    Accessor function for system's CalledByNonInlineSfcn flag
+%%
+%function LibSystemCalledByNonInlineSfcn(system)
+  %return system.CalledByNonInlineSfcn
+%endfunction %% LibSystemCalledByNonInlineSfcn
+
+%% Function: LibSystemIsInlined(system) void ===================================
+%% Description:
+%%      Returns TLC_TRUE if the system is inlined
+%%
+%function LibSystemIsInlined(system) void
+  %return system.RTWSystemCode == 0 
+%endfunction %% LibSystemIsInlined
+
+
+%% Function: LibSystemIsNonReusedFcn(system) void ==============================
+%% Description:
+%%      Returns TLC_TRUE if the subsystem is non-reused
+%%
+%function LibSystemIsNonReusedFcn(system) void
+  %return system.RTWSystemCode == 1
+%endfunction %% LibSystemIsNonReusedFcn
+
+
+%% Function: LibSystemIsReusedFcn(system) void =================================
+%% Description:
+%%      Returns TLC_TRUE if the subsystem is reused
+%%
+%function LibSystemIsReusedFcn(system) void
+  %return system.RTWSystemCode == 2
+%endfunction %% LibSystemIsReusedFcn
+
+%% Function: LibIsSystemExistingLibrary =======================================
+%% Abstract:
+%%    Returns the system dumped flag.
+%%
+%function LibIsSystemExistingLibrary(system)
+  %return EXISTS(system.LibrarySubsystemAlreadyWritten) &&  system.LibrarySubsystemAlreadyWritten == 1
+%endfunction
+
+%% Function: LibSystemIsReusedLibraryFcn(system) void =========================
+%% Description:
+%%      Returns TLC_TRUE if the subsystem is a reused library subsystem
+%%
+%function LibSystemIsReusedLibraryFcn(system) void
+  %return ::ReusableFunctionsAcrossModelBoundaries && ...
+             LibSystemIsReusedFcn(system) && ...
+             EXISTS(system.LibrarySubsystemName) && ...
+             system.LibrarySubsystemName != ""
+%endfunction %% LibSystemIsReusedLibraryFcn
+
+%% Function: LibSystemIsRoot(system) void ======================================
+%% Description:
+%%      Returns TLC_TRUE if the system is root
+%%
+%function LibSystemIsRoot(system) void
+  %return system.Type == "root"
+%endfunction %% LibSystemIsRoot
+
+
+%% Function: SLibSystemHasOwnDataScope(system) void ============================
+%% Description:
+%%      Returns TLC_TRUE if the system stores its data in a new scope.
+%%
+%function SLibSystemHasOwnDataScope(system) void
+  %return (system.HStructDeclSystemIdx == system.SystemIdx)
+%endfunction %% SLibSystemHasOwnDataScope
+
+
+
+
+%%
+%% Local Functions used only in this file.
+%%
+%% Function: FcnDeclareAccessedLocalVariables =============================
+%% Description:
+%%      A routine to declare all accessed local variables. Right now it
+%%      includs block output signals and local scratch DWorks. Once they
+%%      are declared, the "DeclareInFcnScope" fields for these local 
+%%      variables are reset to zero
+%% Syntax:
+%%      FcnDeclareAccessedLocalVariables(system)
+%%
+%function FcnDeclareAccessedLocalVariables(system) void
+  %assign outputLocalBO  = FcnDeclareAccessedLocalVariableGivenType( ...
+    system, "LocalBlockOuput")
+  %assign outputLocalSDW = FcnDeclareAccessedLocalVariableGivenType( ...
+    system, "LocalDWork")
+  
+  %% Merge outputLocalBO and outputLocalSDW
+  
+  %% - one of them could be an empty string, the other maybe a vector or a string.
+  %% - if any one of them is a vector, it cannot be an empty vector
+  %assert TYPE(outputLocalBO) == TYPE(outputLocalSDW) || ISEMPTY(outputLocalBO) || ISEMPTY(outputLocalSDW)
+  
+  %if TYPE(outputLocalBO) == "Vector" || TYPE(outputLocalSDW) == "Vector"
+    %assign localBOSize = SIZE(outputLocalBO, 1)
+    %assign localSDWSize= SIZE(outputLocalSDW,1)
+
+    %if localBOSize == 0
+      %assign retVal = outputLocalSDW
+    %elseif localSDWSize == 0
+      %assign retVal = outputLocalBO
+    %else  
+      %assign retVal = outputLocalBO
+      %foreach tid = localSDWSize
+        %assign retVal[tid] = retVal[tid] + outputLocalSDW[tid]
+      %endforeach
+    %endif
+  %else
+    %% BO/DWORK are either string/string, vector/string, string/vector
+    %assign retVal = outputLocalBO + outputLocalSDW
+  %endif
+
+  %return retVal
+%endfunction
+
+%% Function: FcnDeclareAccessedLocalVariableGivenType ========================
+%% Description:
+%%      A routine to declare all accessed local variables according to the
+%%      types, localBlockOutput or localDWork. Once they
+%%      are declared, the "DeclareInFcnScope" field for these block outputs is
+%%      reset to zero.
+%%
+%% Syntax:
+%%      FcnDeclareAccessedLocalVariableGivenType(system, type)
+%%
+%function FcnDeclareAccessedLocalVariableGivenType(system, type) void
+  %assign LocalBO_Buf = ""
+  %assign tid01Eq =  ISEQUAL(SolverType, "FixedStep") && FixedStepOpts.TID01EQ
+  %foreach tid = NumSampleTimes
+    %assign LocalBO_Buf%<tid> = ""
+  %endforeach
+  %assign activeFcn = FcnGetActiveFcnForDecl()
+  %assign declareInFcnScope = "DeclareIn" + activeFcn + "FcnScope"      
+
+  %switch type
+    %case "LocalBlockOuput"
+      %assign NumFlatFields = system.Variables.LocalBlockIODef.NumFlatFields
+      %assign FirstLocation = system.Variables.LocalBlockIODef.FirstLocation
+      %break
+    %case "LocalDWork"
+      %assign NumFlatFields = system.Interface.LocalSDWorkArgDef.NumFlatFields
+      %assign FirstLocation = system.Interface.LocalSDWorkArgDef.FirstLocation
+      %break
+  %endswitch
+
+  %if NumFlatFields > 0
+    %assign numLocs = 0
+    %foreach idx = NumFlatFields
+      %switch type
+        %case "LocalBlockOuput"
+          %assign localBO = BlockOutputs.LocalBlockOutput[FirstLocation + idx]
+          %%
+          %% If the local block output is allocated by a different compInfo from
+          %% where it is used, we may have a situation where a local variable is
+          %% used in a variant in a lower scope, but declared in a higher scope.
+          %% We can guard the declaration in the higher scope with the variant
+          %% associated with the lower scope.  A related geck is g742498.
+          %if ::RaiseLocalBlockOutputOwnership > 0 && ...
+            localBO.OwnerSysIdx[0] != -1
+            %assign ppStuff = SLibDataPreprocessorStuff(localBO)
+            %assign ppIf = ppStuff[0]
+            %assign ppFi = ppStuff[1]
+          %else      
+            %assign ppIf = ""
+            %assign ppFi = ""
+          %endif
+          %break
+        %case "LocalDWork"
+          %assign localBO = DWorks.DWork[FirstLocation + idx]
+          %assign ppIf = ""
+          %assign ppFi = ""
+          
+          %% For rapid accelerator parallel ForEach subsystem, local scratch DWork 
+          %% defined to use as iteration variable should not be declared because 
+          %% this variable has been moved to as an argument to the function.
+          %if SLibNeedHandleParallelForEachSS(system, activeFcn)
+            %if (FirstLocation + idx) == IDNUM(system.IndexingSigSrc)[1]
+              %continue
+            %endif
+          %endif
+          %break
+      %endswitch
+
+      %if localBO.%<declareInFcnScope> == 0 || localBO.VarGroupVarIdx > -1
+        %assert localBO.%<declareInFcnScope> == 0
+        %continue
+      %endif
+
+      %%
+      %assign numLocs = numLocs+1
+      %with localBO
+        %openfile tmpBuf
+        %assign width = LibGetRecordWidth(localBO)
+        %assign optWidth = LibOptionalVectorWidth(width)
+        %assign dataType = SLibGetRecordDataTypeName(localBO, "")
+        %assign dTypeId = SLibGetRecordDataTypeId(localBO)
+        %assign id = LibGetRecordIdentifier(localBO)
+        %%yz %<dataType> %<tLocalBlockIO>_%<id>%<optWidth>;
+        %if localBO.DeclareAsPointer == "no" 
+          %if ISFIELD(localBO, "Alignment") 
+            %% if it is struct type, emit the definition regardless of alignment value
+            %if localBO.Alignment == -1 || ...
+                ::CompiledModel.CGTypes.CGType[localBO.CGTypeIdx].Constructor == "struct" || ...
+                LibCGTypeIsComplex(localBO.CGTypeIdx)
+              %<dataType> %<id>%<optWidth>;
+            %elseif localAlign 
+              %assign align = SLibGetAlignmentSyntax(::CompiledModel.Name, ...
+                id, dataType, localBO.Alignment, "DATA_ALIGNMENT_LOCAL_VAR")
+              %<align> %<dataType> %<id>%<optWidth>;
+            %endif
+          %else
+            %<dataType> %<id>%<optWidth>;
+          %endif            
+        %else
+          %assert SLibAutosarActive()
+          %if width > 1
+            %assign arrayType = FcnAutosarArrayType("", dTypeId, width)
+            %<arrayType>* %<id>;
+          %else
+            %<dataType> *%<id>;
+          %endif
+        %endif
+        %closefile tmpBuf
+        %if !WHITE_SPACE(tmpBuf)
+          %assign tmpBuf = ppIf + "\n" + tmpBuf + ppFi + "\n"
+        %endif
+        
+        %if !SLibSystemFcnIsRateGroupType(activeFcn)
+          %assign LocalBO_Buf0 = LocalBO_Buf0 + tmpBuf
+        %else
+          %assign TIDlen = SIZE(TID,1)
+          %assign bufferIncludedForTID0 = TLC_FALSE
+          %foreach tidIdx = TIDlen
+            %assign tid = (TYPE(TID) == "Vector") ? TID[tidIdx]:TID
+            %if TYPE(tid) == "Number" && tid > tid01Eq
+              %assign LocalBO_Buf%<tid> = LocalBO_Buf%<tid> + tmpBuf
+            %elseif !bufferIncludedForTID0
+              %assign LocalBO_Buf0 = LocalBO_Buf0 + tmpBuf
+              %assign bufferIncludedForTID0 = TLC_TRUE
+            %endif
+          %endforeach
+        %endif
+      %endwith
+      %% Reset the DeclareInFcnScope flag to zero
+      %assign localBO.%<declareInFcnScope> = 0
+    %endforeach    
+
+    %% return a string for a non-rate-grouping fcn,
+    %% instead of a vector (for rate-grouping fcns).
+    %if !SLibSystemFcnIsRateGroupType(activeFcn)
+      %if !WHITE_SPACE(LocalBO_Buf0)
+        %switch type
+          %case "LocalBlockOuput"
+            %return "/* local block i/o variables */\n" + ...
+              LocalBO_Buf0 + "\n"
+            %%break
+          %case "LocalDWork"
+            %return "/* local scratch DWork variables */\n" + ...
+              LocalBO_Buf0 + "\n"
+            %%break
+        %endswitch
+      %else
+        %return ""
+      %endif
+    %endif
+
+    %%
+    %assign Multirate_LocalBOBuf = []
+    %foreach Tid = NumSampleTimes
+      %assign Multirate_LocalBOBuf = Multirate_LocalBOBuf + ""
+    %endforeach
+    
+    %% LocalBO of sync tid
+    %if SLibSystemFcnRateGrouping(system ,"Output")
+       %foreach Tid = NumSynchronousSampleTimes
+	%if !WHITE_SPACE(LocalBO_Buf%<Tid>)
+          %switch type
+            %case "LocalBlockOuput"
+              %assign tmpBuffer = "/* local block i/o variables */\n" ...
+                +  LocalBO_Buf%<Tid> + "\n"
+              %break
+            %case "LocalDWork"
+              %assign tmpBuffer = "/* local scratch DWork variables */\n" ...
+                +  LocalBO_Buf%<Tid> + "\n"  
+              %break
+          %endswitch
+	%else
+	  %assign tmpBuffer = ""
+	%endif
+	%assign Multirate_LocalBOBuf[Tid] = tmpBuffer
+      %endforeach
+      %assign Multirate_LocalBOBuf[0] = ...
+	LocalBO_Buf + Multirate_LocalBOBuf[0]
+    %elseif !LibAsynchronousTriggeredTID(LibGetSubsystemTID(system,TLC_TRUE))
+      %openfile tmpBuffer
+      %%
+      %% The following section is for testing purpose only. We write out
+      %% number of local variables into code comments if
+      %% BufferReuseCrossBoundaryTesting feature is ON
+      %%
+      %if FEVAL("feature", "BufferReuseCrossBoundaryTesting") == 1
+        /* Total number of local variables in mdlOutput is %<numLocs> */
+      %endif
+      %%
+      %if !WHITE_SPACE(LocalBO_Buf)
+        %<LocalBO_Buf>
+      %endif
+      %foreach Tid = NumSynchronousSampleTimes
+	%assign tmpBuf = LocalBO_Buf%<Tid>
+	%<tmpBuf>
+      %endforeach
+      %closefile tmpBuffer
+      %openfile mr_localBOBuf
+      %if !WHITE_SPACE(tmpBuffer)
+        %switch type
+          %case "LocalBlockOuput"
+            /* local block i/o variables */
+            %break
+          %case "LocalDWork"
+            /* local scratch DWork variables */          
+            %break
+        %endswitch
+        %<tmpBuffer>
+      %endif
+      %closefile mr_localBOBuf
+      %assign Multirate_LocalBOBuf[0] = mr_localBOBuf
+    %endif
+
+    %% LocalBO of async tid
+
+    %foreach tidIdx = LibGetNumAsyncTasks()
+      %assign tid = NumSynchronousSampleTimes + tidIdx
+
+      %if !WHITE_SPACE(LocalBO_Buf%<tid>)
+        %switch type
+          %case "LocalBlockOuput"
+            %assign tmpBuffer = "/* local block i/o variables */\n" ...
+              +  LocalBO_Buf%<tid> + "\n"
+            %break
+          %case "LocalDWork"
+            %assign tmpBuffer = "/* local scratch DWork variables */\n" ...
+              +  LocalBO_Buf%<tid> + "\n"
+            %break
+        %endswitch
+      %else
+	%assign tmpBuffer = ""
+      %endif
+      %assign Multirate_LocalBOBuf[tid] = tmpBuffer
+    %endforeach
+
+    %return Multirate_LocalBOBuf  %% return a vector.
+  %endif
+
+  %return "" %% return an empty string
+%endfunction %% FcnDeclareAccessedLocalVariableGivenType
+
+%% Function: SLibGenTerminateBody ==============================================
+%% Abstract:
+%%      Caches all terminate code
+%%
+%function SLibGenTerminateBody() void
+  %% Cache subsystems
+  %assign ::BlockFcn = "Terminate"
+  %foreach sysIdx = NumSystems-1
+    %if (!LibIsSystemTerminateCached(System[sysIdx]))
+      %<FcnGenSystemTerminate(System[sysIdx])>
+    %endif
+  %endforeach
+
+  %% we don't need to generate terminate function for
+  %% the root subsystem if current target is
+  %% model reference target.
+  %if !IsModelReferenceTarget() 
+    %assign rootSystem = System[NumSystems-1]
+
+    %% Cache terminate function
+    %% DSP Blockset uses terminate to manage it's database
+    %<FcnGenBodyTerminateFcnCache(rootSystem)>
+  %endif
+  %assign ::BlockFcn = "Unknown"
+%endfunction
+
+
+%% Function: SLibGetNumericTID==============================================
+%% Abstract:
+%%      get numeric TID. if TID is triggered, return TriggerTID of the block.
+%%   If it is constant, return 0, if it subsystem. return subsystemTID.
+%%
+%function SLibGetNumericTID(block)
+  %assign tid = ""
+  %with block
+    %assert TYPE(TID) != "Vector"
+    %if TYPE(TID) == "Number"
+      %assign tid = TID
+    %elseif ISEQUAL(TID,"triggered")
+      %assign tid = TriggerTID
+    %elseif ISEQUAL(TID,"constant")
+      %assign tid = 0
+    %elseif ISEQUAL(TID,"Subsystem")
+      %assign tid = ISEQUAL(SubsystemTID,"triggered") ? ...
+	            TriggerTID : SubsystemTID
+      %assign tid = ISEQUAL(tid,"constant") ? ...
+        0 : tid
+    %endif
+  %endwith
+  %return tid
+%endfunction
+
+%% Function FcnGenAsyncTopSSCode ===================================
+%% Abstract:
+%%     This function generates code for Async tid Top Subsystem.
+%%
+%%  This function is called after code generation of root system.
+%%
+%function FcnGenAsyncTopSSCode() void
+  %assert !IsModelReferenceTarget()
+  %assign orgBlockFcn = ::BlockFcn
+  %openfile retBuffer
+
+  %foreach idx = LibGetNumAsyncTasks()
+    %assign tid = idx + NumSynchronousSampleTimes
+    %if SampleTime[tid].IsVirtualTs == "yes"
+      %continue
+    %endif
+    %if SampleTime[tid].IsUnionTs == "yes" 
+      %if ISFIELD(SampleTime[tid],"TaskEntryFcnProtoType")
+        %assign fcnProtoType = SampleTime[tid].TaskEntryFcnProtoType
+      %else
+        %if CodeFormat == "S-Function"
+          %assign fcnProtoType = "void %<::CompiledModel.Name>_ASYNC%<tid>(%<tSimStructType>* %<tSimStruct>, int %<tControlPortIdx>, int %<tTID>)"
+        %else
+          %assign fcnProtoType = "void %<::CompiledModel.Name>_ASYNC%<tid>(int %<tControlPortIdx>)"
+        %endif
+      %endif
+      %<fcnProtoType> {
+        %<SLibDumpOutputUpdateCodeForAsyncTid(tid)>
+      }
+      %assign rootSystem = System[NumSystems-1]
+      %<LibAddToSystemField(rootSystem, "SystemFcnPrototype","%<fcnProtoType>;")>
+    %else  
+      %assign block = FcnGetTaskTopSfcnBlock(tid)
+      %if WHITE_SPACE(block)
+        %if ISFIELD(SampleTime[tid],"IsSimEventsTs")
+             %assign fcnProtoType = "void %<::CompiledModel.Name>_SIMEVENT%<tid>()"
+               %<fcnProtoType> {
+                 %<SLibDumpOutputUpdateCodeForAsyncTid(tid)>
+               }
+               %assign rootSystem = System[NumSystems-1]
+               %<LibAddToSystemField(rootSystem, "SystemFcnPrototype","%<fcnProtoType>;")>
+         %endif
+        %continue
+      %endif
+      %assign system = System[block.BlkSysIdx] 
+      %if !ISFIELD(block, "GenCodeForTopAsyncSS")
+        %continue
+      %endif
+      %if block.GenCodeForTopAsyncSS
+        %continue
+      %else
+        %assign block.GenCodeForTopAsyncSS = TLC_TRUE
+      %endif
+      %if block.SFunctionType == "TLC"
+        %openfile tmpBuffer
+        %with system
+          %with block
+            %assign ::BlockFcn = "OutputUpdate"
+            %<generateNonExprOutput(block, system, "", 0, TLC_FALSE)> \
+            %% For model reference with function-call inputs, also
+            %% generate the enable, disable and initialize
+            %if IsModelReferenceTarget() || ...
+              (FEVAL("slfeature", "RootFcnCallInportTopLevelBuild") > 0)
+              %assign ::BlockFcn = "Enable"
+              %<GENERATE(block, "Enable", system)> \
+              %assign ::BlockFcn = "Disable"
+              %<GENERATE(block, "Disable", system)> \
+            %endif
+          %endwith
+        %endwith
+        %closefile tmpBuffer
+        %if !WHITE_SPACE(tmpBuffer)
+          %if !ISFIELD(block, "AsyncCallerGenCode") 
+            %assign warnTxt = ...
+              "The following code generated from sfunction %<block.Name>"...
+              "will be discarded \n"...
+              "%<tmpBuffer> \n"...
+              "Flag AsyncSSCallerGenCode must be added to asynchronous "...
+              "sfunction %<block.Name> in BlockInstanceSetup function "...
+              "if the asynchronous caller itself generates code. "...
+              "Please see vxtask1.tlc for example. "
+            %<LibReportWarning(warnTxt)>
+          %endif
+        %endif
+        %assign fcnProtoType = ""
+        %if ISFIELD(block, "taskFcnName")
+          %assign fcnProtoType = "void %<block.taskFcnName>(void)"
+        %elseif ISFIELD(block,"SFcnParamSettings") && ...
+          ISFIELD(block.SFcnParamSettings,"ISRNames")
+          %assign elm       = CompiledModel.SampleTime[tid].AsyncSfcnBlkElm
+          %assign fcnProtoType = "void %<block.SFcnParamSettings.ISRNames[elm]>(void)"
+        %endif
+        %if !WHITE_SPACE(fcnProtoType)
+          %<LibAddToSystemField(rootSystem, "SystemFcnPrototype","%<fcnProtoType>;")>
+        %endif
+      %endif
+    %endif
+  %endforeach
+  %assign ::BlockFcn = orgBlockFcn
+  %closefile retBuffer
+  %return retBuffer
+%endfunction
+
+%% Fucntion: SLibGenerateModuleFcn =============================================
+%% Abstract:
+%%
+%function SLibGenerateModuleFcn(module, fcnType) void
+  %assign    block = FcnRootOpaqueBlock()
+  %assign fileName = module.TLCFileName + "_" + fcnType
+  %assign  fcnBuff = ""
+  %openfile fcnBuff
+  
+  %<GENERATE_TYPE(block, fcnType, fileName)>
+  %closefile fcnBuff
+  %assign unused = UNLOAD_GENERATE_TYPE(block, fileName)
+  %return fcnBuff
+%endfunction
+
+%% Function: SLibGenBodyCache ==================================================
+%% Abstract:
+%%      Caches all body code (minus the terminate code since mallocs occur
+%%      in the registration and block instance code).
+%%
+%function SLibGenBodyCache() void
+
+  %selectfile STDOUT
+  %if RTWVerbose
+### Caching model source code
+  %endif
+  %flushfile STDOUT
+  %selectfile NULL_FILE
+  %if Accelerator
+    %<LibAddToSystem(System[NumSystems-1], "FcnCallSubsystemPtrs", ...
+      SLibSetupFCSubsystemPtrs())>
+  %endif
+
+  %% Cache all custom registered symbols
+  %<SLibAddTLCCompileStatsCheckPoint(TLC_TRUE,"Generate custom registered symbols")>
+  %with RTWCGModules
+    %assign skipLast = IsModelReferenceTarget()
+    %foreach modIdx = NumRTWCGModules
+      %if skipLast && modIdx == NumRTWCGModules-1
+        %break
+      %endif
+      %assign module = RTWCGModule[modIdx]
+      %if ISFIELD(module, "CGSystemIdx")
+        %assign  fileSys = System[module.CGSystemIdx]
+        %if module.HasConstants
+          %assign constDef = SLibGenerateModuleFcn(module, "ModuleConstants")
+          %<SLibCacheSystemCodeToFile("sys_data_define", fileSys, ...
+            constDef)>
+        %endif
+        %if module.HasPublicTypes
+          %assign typeDef = SLibGenerateModuleFcn(module, "PublicModuleTypes")
+          %assign typeDefHFile = SLibGetFileRecForCode("mdl_data_typedef")
+          %<SLibSetModelFileAttributeWithRequiredInclude(typeDefHFile, "Typedefs", typeDef, "rtwtypes.h")>
+        %endif
+        %if module.HasExportedTypes
+          %assign typeDef = SLibGenerateModuleFcn(module, "ExportedModuleTypes")
+          %<SLibCacheCodeToFile("baseMdl_data_typedef", typeDef)>
+        %endif
+        %if module.HasVariables
+          %assign varDecl  = SLibGenerateModuleFcn(module, "ModuleVariables")
+          %<SLibCacheSystemCodeToFile("sys_data_decl", fileSys, varDecl)>
+        %endif
+      %endif
+    %endforeach
+  %endwith %% RTWCGModules
+  %<SLibAddTLCCompileStatsCheckPoint(TLC_FALSE,"Generate custom registered symbols")>
+
+  %<SLibAddTLCCompileStatsCheckPoint(TLC_TRUE,"Generate system body cache for all modules")>
+    
+  %assign skipLast = IsModelReferenceTarget()
+    
+  %foreach modIdx = RTWCGModules.NumRTWCGModules
+    %%%
+    %% When generating model reference target, we do not need to generate
+    %% code for root. (After cleanup, we should be abled to skip
+    %% code generation for root)
+    %%
+
+    %if skipLast && modIdx == RTWCGModules.NumRTWCGModules - 1
+      %break
+    %endif
+
+    %assign module = RTWCGModules.RTWCGModule[modIdx]
+    
+    %if ISFIELD(module, "CGSystemIdx")
+      %<FcnGenBodySysCache(module)>
+    %elseif modIdx == RTWCGModules.NumRTWCGModules - 1
+      %% Root system module
+      %addtorecord module CGSystemIdx NumSystems-1
+      %<FcnGenBodySysCache(module)>
+    %endif
+  %endforeach
+  %<SLibAddTLCCompileStatsCheckPoint(TLC_FALSE,"Generate system body cache for all modules")>
+   
+  %<SLibAddTLCCompileStatsCheckPoint(TLC_TRUE,"Generate async tid for top subsystem")>
+  %<SLibAddTLCCompileStatsCheckPoint(TLC_FALSE,"Generate async tid for top subsystem")>
+
+  %<SLibAddTLCCompileStatsCheckPoint(TLC_TRUE,"Generate data typedef for discrete derivative signals")>
+  %<SLibGetNonContDerivSig()>  
+  %<SLibAddTLCCompileStatsCheckPoint(TLC_FALSE,"Generate data typedef for discrete derivative signals")>
+
+  %<SLibAddTLCCompileStatsCheckPoint(TLC_TRUE,"Load fixed-point utilities")>
+  %<FixPt_LoadFixPtUtils()>
+  %<SLibAddTLCCompileStatsCheckPoint(TLC_FALSE,"Load fixed-point utilities")>
+  
+%endfunction %% SLibGenBodyCache
+
+
+%% Function:  SLibGenHeaderCache ===============================================
+%% Abstract:
+%%      Caches all system header files.
+%%
+%function SLibGenHeaderCache() void
+  %% Cache system headers
+  %<SLibAddTLCCompileStatsCheckPoint(TLC_TRUE,"Generate system headers cache for all modules")>
+  %foreach sysIdx = NumSystems
+    %assign system = System[sysIdx]
+    %assign skip = IsModelReferenceTarget() && sysIdx == NumSystems -1
+    %if !skip
+      %assert (!system.StandaloneSubsystem || StandaloneSSSupported)
+
+      %%%<SLibAddTLCCompileStatsCheckPoint(TLC_TRUE,"Generate system includes")>
+      %<LibCacheSystemIncludes(sysIdx)>
+      %%%<SLibAddTLCCompileStatsCheckPoint(TLC_FALSE,"Generate system includes")>
+
+      %%%<SLibAddTLCCompileStatsCheckPoint(TLC_TRUE,"Generate shared type includes")>
+      %<LibCacheSharedTypeIncludes(sysIdx)>
+      %%%<SLibAddTLCCompileStatsCheckPoint(TLC_FALSE,"Generate shared type includes")>
+
+      %%%<SLibAddTLCCompileStatsCheckPoint(TLC_TRUE,"Generate shared data includes")>
+      %<LibCacheSharedDataIncludes(sysIdx)>
+      %%%<SLibAddTLCCompileStatsCheckPoint(TLC_FALSE,"Generate shared data includes")>
+
+      %%%<SLibAddTLCCompileStatsCheckPoint(TLC_TRUE,"Generate block i/o struct def")>
+      %<LibCacheSystemBlkIOStructDef(sysIdx)>
+      %%%<SLibAddTLCCompileStatsCheckPoint(TLC_FALSE,"Generate block i/o struct def")>
+
+      %if ((CodeFormat != "S-Function") || Accelerator)
+        %%%<SLibAddTLCCompileStatsCheckPoint(TLC_TRUE,"Generate dwork struct def")>
+     	%<LibCacheSystemDWorkStructDef(sysIdx)>
+        %%%<SLibAddTLCCompileStatsCheckPoint(TLC_FALSE,"Generate dwork struct def")>
+      %endif
+      %%%<SLibAddTLCCompileStatsCheckPoint(TLC_TRUE,"Generate cstates struct def")>
+      %<LibCacheSystemCStatesStructDef(sysIdx)>
+      %%%<SLibAddTLCCompileStatsCheckPoint(TLC_FALSE,"Generate cstates struct def")>
+
+      %%%<SLibAddTLCCompileStatsCheckPoint(TLC_TRUE,"Generate state derivative struct def")>
+      %<LibCacheSystemStateDerivStructDef(sysIdx)>
+      %%%<SLibAddTLCCompileStatsCheckPoint(TLC_FALSE,"Generate state derivative struct def")>
+
+      %%%<SLibAddTLCCompileStatsCheckPoint(TLC_TRUE,"Generate state disabled struct def")>
+      %<LibCacheSystemStateDisabledStructDef(sysIdx)>
+      %%%<SLibAddTLCCompileStatsCheckPoint(TLC_FALSE,"Generate state disabled struct def")>
+
+      %%%<SLibAddTLCCompileStatsCheckPoint(TLC_TRUE,"Generate state absolute tolerance struct def")>
+      %<LibCacheSystemCStateAbsoluteToleranceStructDef(sysIdx)>
+      %%%<SLibAddTLCCompileStatsCheckPoint(TLC_FALSE,"Generate state absolute tolerance struct def")>
+
+      %%%<SLibAddTLCCompileStatsCheckPoint(TLC_TRUE,"Generate zero-crossing signal value struct def")>
+      %<LibCacheSystemZCSignalValueStructDef(sysIdx)>
+      %%%<SLibAddTLCCompileStatsCheckPoint(TLC_FALSE,"Generate zero-crossing signal value struct def")>
+
+      %%%<SLibAddTLCCompileStatsCheckPoint(TLC_TRUE,"Generate zero-crossing enable struct def")>
+      %<LibCacheSystemZCEStructDef(sysIdx)>
+      %%%<SLibAddTLCCompileStatsCheckPoint(TLC_FALSE,"Generate zero-crossing enable struct def")>
+      %if (ModelIsLinearlyImplicit == "yes")
+                
+        %% The global (model-wide) mass matrix is only generated at the root level.
+        %if (sysIdx == GetBaseSystemIdx())  
+          %%%<SLibAddTLCCompileStatsCheckPoint(TLC_TRUE,"Generate mass matrix global def")>
+          %<LibCacheSystemMassMatrixGlobalDef(sysIdx)>
+          %%%<SLibAddTLCCompileStatsCheckPoint(TLC_FALSE,"Generate mass matrix global def")>
+        %endif
+        
+      %endif  
+    %endif
+  %endforeach
+  %<SLibAddTLCCompileStatsCheckPoint(TLC_FALSE,"Generate system headers cache for all modules")>
+
+  %% Generate ANSI data type name info and rtwtypes.h. Need to pass whether full or 
+  %% minimized (ERT) version of rtwtypes.h is desired as well as the location to place
+  %% rtwtypes.h.
+  %if SLibIsERTTarget() && (::CompiledModel.ModelReferenceTargetType != "SIM") && ...
+    (!ConfigSet.GRTInterface ) && (::CompiledModel.NumChildSFunctions == 0)
+    %% There is a special case when we want overwrite rtwtypes.h with 'full' version. 
+    %% If not ERT target, must already be full version. 
+    %% If is ERT target and GRTInterface is on, as we didn't put
+    %% GRTInterface as one of the shared utilities checksum, it's possible
+    %% that the previously generated rtwtypes.h is minimized style. (we didn't
+    %% add it into checksum because modelref want to support the case top
+    %% model turn on GRTInterface, but sub models not).
+    %% Another condition is the first sub model doesn't contain non-inlined
+    %% sfunction, so we get minimized style rtwtypes.h. But top model or next
+    %% sub model does, we need to overwrite the minimized style with full
+    %% style rtwtypes.h.  (That's because we decide whether to use full or
+    %% minimized style rtwtypes.h depends on NumChildSfcn, NOT
+    %% SupportNonInlinedSFcns option).
+    %% 
+    %% Other special cases for overwriting rtwtypes.h exist in genRTWTYPESDOTH.m
+    %assign ::RTWTypesStyle = "minimized"
+  %else
+    %assign ::RTWTypesStyle = "full"
+  %endif
+  
+  %% Include IR based usage of multiword types.
+  %assign multiwordBits = ::CompiledModel.LargestMultiwordBits
+  %if ::CompiledModel.DeclaredFixedPointWordSizeUsage > multiwordBits
+    %if SLibIsERTTarget() && (::CompiledModel.ModelReferenceTargetType != "SIM") && ...
+      ConfigSet.ERTMultiwordTypeDef == "User defined"
+      %assign errTxt = "The largest multiword type definition needed (%<::CompiledModel.DeclaredFixedPointWordSizeUsage>) " ...
+        "is less than the largest multiword length available in the generated code (%<multiwordBits>)."
+      %<LibReportError(errTxt)>
+    %else
+      %assign multiwordBits = ::CompiledModel.DeclaredFixedPointWordSizeUsage
+    %endif
+  %endif
+  
+  %% Generate rtwtypes.h
+  %<SLibAddTLCCompileStatsCheckPoint(TLC_TRUE,"Generate rtwtypes.h")>
+  %assign rtwtypesFilename = SLibGetFileNameForCode("rtwtypes_hdr") + ".h"
+  %if ISEMPTY(GenUtilsPath)
+    %assign outputFileName = rtwtypesFilename
+  %else
+    %assign outputFileName = FEVAL("fullfile",GenUtilsPath,rtwtypesFilename)
+  %endif
+  %assign bFileExist = TLC_FALSE
+  %if FILE_EXISTS(outputFileName)
+    %assign bFileExist = TLC_TRUE
+  %endif
+  %assign genTimingBridge = IsModelReferenceTarget() || ...
+    HasModelReferenceBlocks()
+  %assign ::AnsiDataTypeName = FEVAL("rtwprivate", "wrap_genRTWTYPESDOTH", ...
+    LibGetModelName(), GenUtilsPath, RTWTypesStyle, ...
+    GenUtilsSrcInSharedLocation, multiwordBits, genTimingBridge)
+  %if TYPE(::AnsiDataTypeName) != "Scope"
+    %assign errmsg = FEVAL("lasterr")
+    %<LibReportError( "Error occurred when generating rtwtypes.h:      %<errmsg>")>
+  %endif 
+  %<SLibAddTLCCompileStatsCheckPoint(TLC_FALSE,"Generate rtwtypes.h")>
+  %if bFileExist && !::AnsiDataTypeName.overwritten
+    %assign rtwtypesdoth = SLibGetFileRecForCode("rtwtypes_hdr")
+    %<SLibSetModelFileAttribute(rtwtypesdoth, "Filter", 1)>
+    %<SLibAddGeneratedFileToList("rtwtypes.h", "utility", "header","")>
+  %else
+    %openfile fileContent
+    %include outputFileName
+    %closefile fileContent
+    %<SLibCacheCodeToFile("rtwtypes_defines", fileContent)>
+    %assign rtwtypesdoth = SLibGetFileRecForCode("rtwtypes_hdr")
+    %<LibSetSourceFileOutputDirectory(rtwtypesdoth, GenUtilsPath)>
+    %openfile fileBanner_buffer
+/*
+ * %<rtwtypesFilename>
+ *
+ %<SLibCommonUtilHeaderInfo()>\
+ */ 
+    %closefile fileBanner_buffer
+    %<SLibCacheCodeToFile("rtwtypes_hdr_ban", fileBanner_buffer)>
+  %endif
+%endfunction
+
+%function SLibGenConstBlkIOCache() void
+  %%
+  %% Those structures get accessed in the commonreglib and
+  %% this might alter the contents.
+  %%
+  %assign numSys = GetNumSystemsForCodeGen()
+  %foreach sysIdx = numSys
+    %<LibCacheSystemConstBlkIOStructDef(sysIdx)>
+  %endforeach
+%endfunction
+
+
+%% Function: SLibExtModeHostOnlyStub ===========================================
+%% Abstract:
+%%  Stubs out system that only runs on host (for external mode).
+%%
+%function SLibExtModeHostOnlyStub(system) void
+  %if ISFIELD(system,"StartFcn")
+    %<LibSetSystemField(system, "CachedStartFcn", "")>
+  %endif
+  %if ISFIELD(system,"EnableFcn")
+    %<LibSetSystemField(system, "CachedEnableFcn", "")>
+  %endif
+  %if ISFIELD(system,"InitializeFcn")
+    %<LibSetSystemField(system, "CachedInitializeFcn", "")>
+  %endif
+  %if ISFIELD(system,"OutputFcn")
+    %<LibSetSystemField(system, "CachedOutputFcn", "")>
+  %endif
+  %if ISFIELD(system,"OutputUpdateFcn")
+    %<LibSetSystemField(system, "CachedOutputFcn", "")>
+    %<LibSetSystemField(system, "CachedUpdateFcn", "")>
+  %endif
+  %if ISFIELD(system,"UpdateFcn")
+    %<LibSetSystemField(system, "CachedUpdateFcn", "")>
+  %endif
+  %if ISFIELD(system,"DerivativeFcn")
+    %<LibSetSystemField(system, "CachedDerivativeFcn", "")>
+  %endif
+  %if ISFIELD(system,"ProjectionFcn")
+    %<LibSetSystemField(system, "CachedProjectionFcn", "")>
+  %endif
+  %if ISFIELD(system,"ForcingFunctionFcn")
+    %<LibSetSystemField(system, "CachedForcingFunctionFcn", "")>
+  %endif
+  %if ISFIELD(system,"MassMatrixFcn")
+    %<LibSetSystemField(system, "CachedMassMatrixFcn", "")>
+  %endif  
+  %if ISFIELD(system,"InitSystemMatricesFcn")
+    %<LibSetSystemField(system, "CachedInitSystemMatricesFcn", "")>
+  %endif    
+  %if ISFIELD(system,"ZeroCrossingFcn")
+    %<LibSetSystemField(system, "CachedZeroCrossingFcn", "")>
+  %endif
+  %if ISFIELD(system,"DisableFcn")
+    %<LibSetSystemField(system, "CachedDisableFcn", "")>
+  %endif
+  %if ISFIELD(system,"TerminateFcn")
+    %<LibSetSystemField(system, "CachedTerminateFcn", "")>
+  %endif
+%endfunction %% SLibExtModeHostOnlyStub
+
+%endif %% _COMMONBODLIB_
+
+%% [EOF] commonbodlib.tlc

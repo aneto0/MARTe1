@@ -1,0 +1,70 @@
+%% $RCSfile: css.tlc,v $
+%% $Revision: 1.10.4.6.2.1 $ 
+%% $Date: 2012/06/18 15:15:13 $
+%%
+%% Copyright 1994-2009 The MathWorks, Inc.
+%%
+%% Abstract: Continuous State Space block target file
+
+%implements "StateSpace" "C"
+
+%% Function: BlockInstanceSetup ================================================
+%% Abstract:
+%%
+%function BlockInstanceSetup(block, system) void
+
+%endfunction
+
+
+%% InitializeConditions =======================================================
+%%
+%function InitializeConditions(block, system) Output
+  %if ContStates[0] > 0
+    %<LinLibInitializeConditions(block,system)>
+  %endif
+%endfunction
+
+
+%% Outputs ====================================================================
+%%
+%function Outputs(block, system) Output
+  {
+    %<LinLibOutputs(block, system)>\
+  }
+
+%endfunction
+
+
+%% Update ====================================================================
+%%
+%function Update(block, system) Output
+  %if EXISTS(AbsoluteTolerance)
+    {
+      %<LibUpdateBlockCStateAbsoluteTolerance(block, system)>
+    }
+  %endif
+%endfunction
+
+
+%% Derivatives ================================================================
+%%
+%function Derivatives(block, system) Output
+  %if ContStates[0] > 0
+    {
+      %<LinLibDerivatives(block, system)>\
+    }
+  %endif
+
+%endfunction
+
+
+%% ForcingFunction ============================================================
+%%
+%function ForcingFunction(block, system) Output  
+  %if ::CompiledModel.ModelIsLinearlyImplicit == "yes" 
+    %<Derivatives(block, system)>
+  %endif
+%endfunction
+
+
+%% [EOF] css.tlc

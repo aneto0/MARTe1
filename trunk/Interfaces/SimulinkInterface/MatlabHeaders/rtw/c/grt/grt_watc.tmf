@@ -1,0 +1,420 @@
+# Copyright 1994-2012 The MathWorks, Inc.
+#
+# File    : grt_watc.tmf 
+# Abstract:
+#	Template makefile for building a Windows-based stand-alone generic 
+#       real-time version of Simulink model using generated C code and the 
+#       Open Watcom compiler
+#
+#       The following defines (macro names) can be used to modify the behavior
+#       of the build:
+#	  OPT_OPTS       - Optimization option. Default is -oaxt. To enable
+#			   debugging specify as "OPT_OPTS=-d2".
+#	  OPTS           - User specific options.
+#         CPP_OPTS       - C++ Compiler Options
+#	  USER_OBJS      - Additional user objects, such as files needed by
+#			   S-functions.
+#         USER_PATH      - The directory path to the source (.c) files which
+#                          are used to create any .obj files specified in
+#                          USER_OBJS. Multiple paths must be separated
+#                          with a semicolon. For example:
+#                          "USER_PATH=path1;path2"
+#	  USER_INCLUDES  - Additional include paths (i.e.
+#			   "USER_INCLUDES=-Iinclude-path1 -Iinclude-path2")
+#
+#       In particular, note how the quotes are before the name of the macro
+#       name.
+#
+#       This template makefile is designed to be used with a system target
+#       file that contains 'rtwgensettings.BuildDirSuffix' see grt.tlc
+
+
+#------------------------ Macros read by make_rtw -----------------------------
+#
+# The following macros are read by the build procedure:
+#	MAKECMD - This is the command used to invoke the make utility
+#	HOST    - What platform this template makefile is targeted for
+#                 (i.e. PC or UNIX)
+#	BUILD   - Invoke make from the build procedure (yes/no)?
+#       TARGET  - Type of target Real-Time (RT) or Nonreal-Tie (NRT)
+#
+MAKECMD         = "%WATCOM%\binnt\wmake"
+HOST            = PC
+BUILD           = yes
+SYS_TARGET_FILE = grt.tlc
+BUILD_SUCCESS	= All targets are up to date.
+COMPILER_TOOL_CHAIN = watc
+
+#---------------------- Tokens expanded by make_rtw ---------------------------
+#
+# The following tokens, when wrapped with "|>" and "<|" are expanded by the
+# build procedure.
+#
+#  MODEL_NAME          - Name of the Simulink block diagram
+#  MODEL_MODULES_OBJ   - Object file name for any additional generated source
+#                        modules
+#  MAKEFILE_NAME       - Name of makefile created from template makefile
+#                        <model>.mk
+#  MATLAB_ROOT         - Path to where MATLAB is installed.
+#  MATLAB_BIN          - Path to MATLAB executable.
+#  S_FUNCTIONS_LIB     - List of S-functions libraries to link.
+#  S_FUNCTIONS_OBJ     - List of S-functions .obj sources
+#  SOLVER_OBJ          - Solver object file name
+#  NUMST               - Number of sample times
+#  TID01EQ             - yes (1) or no (0): Are sampling rates of continuous
+#                        task (tid=0) and 1st discrete task equal.
+#  NCSTATES            - Number of continuous states
+#  BUILDARGS           - Options passed in at the command line.
+#  MULTITASKING        - yes (1) or no (0): Is solver mode multitasking
+#  MAT_FILE            - yes (1) or no (0): Should mat file logging be done
+#  EXT_MODE            - yes (1) or no (0): Build for external mode
+#  TMW_EXTMODE_TESTING - yes (1) or no (0): Build ext_test.c for external mode
+#                        testing.
+#  EXTMODE_TRANSPORT   - Index of transport mechanism (e.g. tcpip, serial) for extmode
+#  EXTMODE_STATIC      - yes (1) or no (0): Use static instead of dynamic mem alloc.
+#  EXTMODE_STATIC_SIZE - Size of static memory allocation buffer.
+
+MODEL                = |>MODEL_NAME<|
+MODULES_OBJ          = |>MODEL_MODULES_OBJ<|
+MAKEFILE             = |>MAKEFILE_NAME<|
+MATLAB_ROOT          = |>MATLAB_ROOT<|
+ALT_MATLAB_ROOT      = |>ALT_MATLAB_ROOT<|
+MATLAB_BIN           = |>MATLAB_BIN<|
+ALT_MATLAB_BIN       = |>ALT_MATLAB_BIN<|
+MASTER_ANCHOR_DIR    = |>MASTER_ANCHOR_DIR<|
+START_DIR            = |>START_DIR<|
+S_FUNCTIONS          = |>S_FUNCTIONS_OBJ<|
+S_FUNCTIONS_LIB      = |>S_FUNCTIONS_LIB<|
+SOLVER               = |>SOLVER_OBJ<|
+NUMST                = |>NUMST<|
+TID01EQ              = |>TID01EQ<|
+NCSTATES             = |>NCSTATES<|
+BUILDARGS            = |>BUILDARGS<|
+MULTITASKING         = |>MULTITASKING<|
+MAT_FILE             = |>MAT_FILE<|
+EXT_MODE             = |>EXT_MODE<|
+TMW_EXTMODE_TESTING  = |>TMW_EXTMODE_TESTING<|
+EXTMODE_TRANSPORT    = |>EXTMODE_TRANSPORT<|
+EXTMODE_STATIC       = |>EXTMODE_STATIC_ALLOC<|
+EXTMODE_STATIC_SIZE  = |>EXTMODE_STATIC_ALLOC_SIZE<|
+
+CLASSIC_INTERFACE    = |>CLASSIC_INTERFACE<|
+# Optional for GRT
+ONESTEPFCN           = |>COMBINE_OUTPUT_UPDATE_FCNS<|
+TERMFCN              = 1
+MULTI_INSTANCE_CODE  = 0
+
+MODELREFS            = |>MODELREFS<|
+SHARED_SRC           = |>SHARED_SRC<|
+SHARED_SRC_DIR       = |>SHARED_SRC_DIR<|
+SHARED_BIN_DIR       = |>SHARED_BIN_DIR<|
+SHARED_LIB           = |>SHARED_LIB<|
+TARGET_LANG_EXT      = |>TARGET_LANG_EXT<|
+MEX_OPT_FILE         = |>MEX_OPT_FILE<|
+
+OPTIMIZATION_FLAGS   = |>OPTIMIZATION_FLAGS<|
+ADDITIONAL_LDFLAGS   = |>ADDITIONAL_LDFLAGS<|
+
+#--------------------------- Model and reference models -----------------------
+MODELLIB                  = |>MODELLIB<|
+MODELREF_LINK_LIBS        = |>MODELREF_LINK_LIBS<|
+MODELREF_INC_PATH         = |>START_MDLREFINC_EXPAND_INCLUDES<|-I|>MODELREF_INC_PATH<| |>END_MDLREFINC_EXPAND_INCLUDES<|
+RELATIVE_PATH_TO_ANCHOR   = |>RELATIVE_PATH_TO_ANCHOR<|
+MODELREF_TARGET_TYPE      = |>MODELREF_TARGET_TYPE<|
+
+#-- In the case when directory name contains space ---
+!ifneq MATLAB_ROOT $(ALT_MATLAB_ROOT)
+MATLAB_ROOT = $(ALT_MATLAB_ROOT)
+!endif
+!ifneq MATLAB_BIN $(ALT_MATLAB_BIN)
+MATLAB_BIN = $(ALT_MATLAB_BIN)
+!endif
+
+#--------------------------------- Tool Locations -----------------------------
+#
+# Modify the following macro to reflect where you have installed
+# the Watcom C/C++ Compiler.
+#
+!ifndef %WATCOM
+!error WATCOM environmental variable must be defined
+!else
+WATCOM = $(%WATCOM)
+!endif
+
+#---------------------------- Tool Definitions ---------------------------
+
+!include $(MATLAB_ROOT)\rtw\c\tools\watctools.mak
+
+
+#------------------------ External mode ---------------------------------------
+# Uncomment -DVERBOSE to have information printed to stdout
+# To add a new transport layer, see the comments in
+#   <matlabroot>/toolbox/simulink/simulink/extmode_transports.m
+!ifeq EXT_MODE 1
+EXT_CC_OPTS   = -DEXT_MODE -DWIN32 # -DVERBOSE
+EXTMODE_PATH  = $(MATLAB_ROOT)\rtw\c\src\ext_mode\common;$(MATLAB_ROOT)\rtw\c\src\rtiostream\rtiostreamtcpip;$(MATLAB_ROOT)\rtw\c\src\ext_mode\serial;$(MATLAB_ROOT)\rtw\c\src\ext_mode\custom;
+!ifeq EXTMODE_TRANSPORT 0 #tcpip
+EXT_OBJ = ext_svr.obj updown.obj ext_work.obj rtiostream_interface.obj rtiostream_tcpip.obj
+EXT_LIB = $(WATCOM)\lib386\nt\wsock32.lib
+!endif
+!ifeq EXTMODE_TRANSPORT 1 #serial_win32
+EXT_OBJ  = ext_svr.obj updown.obj ext_work.obj ext_svr_serial_transport.obj
+EXT_OBJ += ext_serial_pkt.obj rtiostream_serial_interface.obj rtiostream_serial.obj
+EXT_LIB  = 
+!endif
+!ifeq TMW_EXTMODE_TESTING 1
+EXT_OBJ     += ext_test.obj
+EXT_CC_OPTS += -DTMW_EXTMODE_TESTING
+!endif
+!ifeq EXTMODE_STATIC 1
+EXT_OBJ     += mem_mgr.obj
+EXT_CC_OPTS += -DEXTMODE_STATIC -DEXTMODE_STATIC_SIZE=$(EXTMODE_STATIC_SIZE)
+!endif
+!else
+EXT_OBJ      =
+EXT_CC_OPTS  =
+EXTMODE_PATH =
+EXT_LIB      = 
+!endif
+
+#------------------------ rtModel ----------------------------------------------
+RTM_CC_OPTS = -DUSE_RTMODEL
+
+#------------------------------ Include Path -----------------------------
+
+MATLAB_INCLUDES = &
+$(MATLAB_ROOT)\simulink\include;&
+$(MATLAB_ROOT)\extern\include;&
+$(MATLAB_ROOT)\rtw\c\src;&
+$(MATLAB_ROOT)\rtw\c\src\ext_mode\common;
+
+# Additional inludes
+ADD_INCLUDES = &
+|>START_EXPAND_INCLUDES<||>EXPAND_DIR_NAME<|;&
+|>END_EXPAND_INCLUDES<|
+
+COMPILER_INCLUDES = $(WATCOM)\h;$(WATCOM)\h\nt
+
+INCLUDES = .;..;$(RELATIVE_PATH_TO_ANCHOR);$(MATLAB_INCLUDES)$(ADD_INCLUDES)$(COMPILER_INCLUDES)
+
+!ifneq SHARED_SRC_DIR ""
+INCLUDES = $(INCLUDES);$(SHARED_SRC_DIR)
+!endif
+
+#-------------------------------- C Flags --------------------------------
+
+# Required Options
+REQ_OPTS = $(WATC_STD_OPTS)
+
+# Optimization Options.
+#   -oaxt : maximum optimization
+#   -d2   : debugging options
+#
+OPT_OPTS = $(DEFAULT_OPT_OPTS)
+
+!if "$(OPTIMIZATION_FLAGS)" != ""
+CC_OPTS = $(REQ_OPTS) $(OPTS) $(EXT_CC_OPTS) $(RTM_CC_OPTS) $(OPTIMIZATION_FLAGS)
+!else
+CC_OPTS = $(REQ_OPTS) $(OPT_OPTS) $(OPTS) $(EXT_CC_OPTS) $(RTM_CC_OPTS)
+!endif
+
+CPP_REQ_DEFINES = -DMODEL=$(MODEL) -DRT -DNUMST=$(NUMST) &
+                  -DTID01EQ=$(TID01EQ) -DNCSTATES=$(NCSTATES) &
+                  -DMT=$(MULTITASKING) -DHAVESTDIO -DMAT_FILE=$(MAT_FILE) &
+		  -DONESTEPFCN=$(ONESTEPFCN) -DTERMFCN=$(TERMFCN) &
+		  -DMULTI_INSTANCE_CODE=$(MULTI_INSTANCE_CODE) &
+		  -DCLASSIC_INTERFACE=$(CLASSIC_INTERFACE)
+
+CFLAGS = $(MODELREF_INC_PATH) $(CC_OPTS) $(CPP_REQ_DEFINES) $(USER_INCLUDES)
+CPPFLAGS = $(MODELREF_INC_PATH) $(CPP_OPTS) $(CC_OPTS) $(CPP_REQ_DEFINES) $(USER_INCLUDES)
+
+#------------------------------- Source Files ---------------------------------
+
+!if "$(MODELREF_TARGET_TYPE)" == "NONE"
+#Standalone executable
+PRODUCT   = $(RELATIVE_PATH_TO_ANCHOR)\$(MODEL).exe
+
+!if "$(CLASSIC_INTERFACE)" == "1"
+MAIN_OBJ  = classic_main.obj
+OTHER_OBJ = rt_sim.obj
+!else
+MAIN_OBJ  = rt_main.obj
+OTHER_OBJ =
+!endif
+REQ_OBJS  = $(MODEL).obj $(MODULES_OBJ) $(MAIN_OBJ) $(OTHER_OBJ)
+
+!else
+#Model Reference Target
+PRODUCT   = $(MODELLIB)
+REQ_OBJS  = $(MODULES_OBJ)
+!endif
+
+USER_OBJS =
+
+OBJS = $(REQ_OBJS) $(USER_OBJS) $(S_FUNCTIONS) $(SOLVER) $(EXT_OBJ)
+SHARED_OBJS = $(SHARED_SRC:.c*=.obj)
+
+#---------------------------- Additional Libraries ----------------------------
+
+LIBS =
+|>START_PRECOMP_LIBRARIES<|
+ADDLIB = |>EXPAND_LIBRARY_NAME<|.lib
+!ifeq OPT_OPTS $(DEFAULT_OPT_OPTS)
+# use the pre-compiled library with the default opts
+ADDLIB = |>EXPAND_LIBRARY_LOCATION<|\|>EXPAND_LIBRARY_NAME<|_openwatc.lib
+!endif
+LIBS += $+$(ADDLIB)$- |>END_PRECOMP_LIBRARIES<|
+|>START_EXPAND_LIBRARIES<|
+LIBS += |>EXPAND_LIBRARY_NAME<|.lib |>END_EXPAND_LIBRARIES<|
+
+LIBS += $(EXT_LIB)
+
+#-------------------------- Source Path ---------------------------------------
+
+# User source path
+
+!ifdef USER_PATH
+EXTRA_PATH = ;$(USER_PATH)
+!else
+EXTRA_PATH =
+!endif
+
+# Additional sources
+
+ADD_SOURCES = |>START_EXPAND_RULES<||>EXPAND_DIR_NAME<|;|>END_EXPAND_RULES<|
+
+# Source Path
+
+!ifeq CLASSIC_INTERFACE 1
+.c : ..;$(MATLAB_ROOT)\rtw\c\grt;$(MATLAB_ROOT)\rtw\c\src;$(MATLAB_ROOT)\simulink\src;$(EXTMODE_PATH)$(ADD_SOURCES)$(EXTRA_PATH)
+.cpp : ..;$(MATLAB_ROOT)\rtw\c\grt;$(MATLAB_ROOT)\rtw\c\src;$(MATLAB_ROOT)\simulink\src;$(EXTMODE_PATH)$(ADD_SOURCES)$(EXTRA_PATH)
+!else
+.c : ..;$(MATLAB_ROOT)\rtw\c\src\common;$(MATLAB_ROOT)\rtw\c\src;$(MATLAB_ROOT)\simulink\src;$(EXTMODE_PATH)$(ADD_SOURCES)$(EXTRA_PATH)
+.cpp : ..;$(MATLAB_ROOT)\rtw\c\src\common;$(MATLAB_ROOT)\rtw\c\src;$(MATLAB_ROOT)\simulink\src;$(EXTMODE_PATH)$(ADD_SOURCES)$(EXTRA_PATH)
+!endif
+
+
+#----------------------- Exported Environment Variables -----------------------
+#
+#  Setup path for tools.
+#
+PATH = $(WATCOM)\binnt;$(WATCOM)\binw
+
+
+#--------------------------------- Rules --------------------------------------
+SHARED_MODULES_LNK = $(SHARED_SRC_DIR)\shared_modules.lnk
+
+.ERASE
+
+.BEFORE
+	@set path=$(PATH)
+	@set INCLUDE=$(INCLUDES)
+	@set WATCOM=$(WATCOM)
+	@set MATLAB=$(MATLAB_ROOT)
+	@if exist $(MODEL).lnk @del $(MODEL).lnk
+	@echo DEBUG ALL >> $(MODEL).lnk
+	@for %i in ($(OBJS)) do @echo FILE %i >> $(MODEL).lnk
+	@for %i in ($(LIBS)) do @echo LIBRARY %i >> $(MODEL).lnk
+	@for %i in ($(S_FUNCTIONS_LIB)) do @echo LIBRARY %i >> $(MODEL).lnk
+	@for %i in ($(MODELREF_LINK_LIBS)) do @echo LIBRARY %i >> $(MODEL).lnk
+	@for %i in ($(SHARED_LIB)) do @echo LIBRARY %i >> $(MODEL).lnk
+
+all: $(PRODUCT) .symbolic
+	@echo $#$#$# $(BUILD_SUCCESS)
+
+!ifeq MODELREF_TARGET_TYPE NONE
+#  Stand-alone model $(MODEL).exe----------------------------------------------
+$(PRODUCT) : $(OBJS) $(LIBS) $(SHARED_LIB)
+	$(LD) NAME $@ $(LDFLAGS) $(ADDITIONAL_LDFLAGS) @$(MODEL).lnk
+	@echo $#$#$# Successfully Created: $(MODEL).exe
+	@del $(MODEL).lnk
+!else
+# Model reference Coder Target $(MODELLIB)---------------------------------------
+$(PRODUCT) : $(OBJS) $(SHARED_LIB)
+	@echo $#$#$# Linking $(PRODUCT) ...
+	$(LIBCMD) /n $@ $(OBJS) $(S_FUNCTIONS_LIB)
+	@if exist $(MODEL).lnk @del $(MODEL).lnk
+	@echo Successfully Created static library $(MODELLIB)
+
+!endif
+
+!ifeq CLASSIC_INTERFACE 1
+MAIN_SRC = classic_main.c
+!ifeq TARGET_LANG_EXT cpp
+$(MAIN_OBJ) : $(MATLAB_ROOT)\rtw\c\grt\$(MAIN_SRC)
+	@echo $#$#$# Compiling $[@
+	$(CPP) $(CPPFLAGS) $[@
+!else
+$(MAIN_OBJ) : $(MATLAB_ROOT)\rtw\c\grt\$(MAIN_SRC)
+	@echo $#$#$# Compiling $[@
+	$(CC) $(CFLAGS) $[@
+!endif
+!else
+MAIN_SRC = rt_main.c
+!ifeq TARGET_LANG_EXT cpp
+$(MAIN_OBJ) : $(MATLAB_ROOT)\rtw\c\src\common\$(MAIN_SRC)
+	@echo $#$#$# Compiling $[@
+	$(CPP) $(CPPFLAGS) $[@
+!else
+$(MAIN_OBJ) : $(MATLAB_ROOT)\rtw\c\src\common\$(MAIN_SRC)
+	@echo $#$#$# Compiling $[@
+	$(CC) $(CFLAGS) $[@
+!endif
+!endif
+
+.c.obj:
+	@echo $#$#$# Compiling $[@
+	$(CC) $(CFLAGS) $[@
+
+.cpp.obj:
+	@echo $#$#$# Compiling $[@
+	$(CPP) $(CPPFLAGS) $[@
+
+
+$(OBJS) : $(MAKEFILE) rtw_proj.tmw .AUTODEPEND
+
+# shared utilities library --------------------------------------------
+!ifneq SHARED_LIB ""
+$(SHARED_LIB) PHONY_TARGET: $(SHARED_SRC)
+	@echo $#$#$# Creating $@
+	@for %i in ($?) do @$(CC) $(CFLAGS) -Fo$(SHARED_BIN_DIR)\ %i
+#       the lnk file can't be pre-generated becasue it uses a *.obj directive
+#       and the OBJ files don't exist until they are compiled
+	@if exist $(SHARED_MODULES_LNK) @del $(SHARED_MODULES_LNK)
+	@for %i in ($(SHARED_OBJS)) do @echo %i >> $(SHARED_MODULES_LNK)
+	$(LIBCMD) /n $@ @$(SHARED_MODULES_LNK)
+	@del $(SHARED_MODULES_LNK)
+	@echo $#$#$# $@ Created
+!endif
+
+
+# Libraries:
+
+|>START_EXPAND_LIBRARIES<|MODULES_|>EXPAND_LIBRARY_NAME<| = &
+|>START_EXPAND_MODULES<|	|>EXPAND_MODULE_NAME<|.obj &
+|>END_EXPAND_MODULES<|
+
+
+|>EXPAND_LIBRARY_NAME<|.lib : rtw_proj.tmw $(MAKEFILE) $(MODULES_|>EXPAND_LIBRARY_NAME<|)
+	@echo $#$#$# Creating $@
+	@if exist $@ @del $@
+	@for %i in ($(MODULES_|>EXPAND_LIBRARY_NAME<|)) do $(LIBCMD) $@ +%i
+	@echo $#$#$# $@ Created
+
+|>END_EXPAND_LIBRARIES<|
+
+|>START_PRECOMP_LIBRARIES<|MODULES_|>EXPAND_LIBRARY_NAME<| = &
+|>START_EXPAND_MODULES<|	|>EXPAND_MODULE_NAME<|.obj &
+|>END_EXPAND_MODULES<|
+
+
+|>EXPAND_LIBRARY_NAME<|.lib : rtw_proj.tmw $(MAKEFILE) $(MODULES_|>EXPAND_LIBRARY_NAME<|)
+	@echo $#$#$# Creating $@
+	@if exist $@ @del $@
+	@for %i in ($(MODULES_|>EXPAND_LIBRARY_NAME<|)) do $(LIBCMD) $@ +%i
+	@echo $#$#$# $@ Created
+
+|>END_PRECOMP_LIBRARIES<|
+
+# [eof] grt_watc.tmf
+

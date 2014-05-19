@@ -1,0 +1,938 @@
+%% ============================================================================
+%% 
+%% 
+%%
+%% Abstract:
+%%   This system file creates <model>_msf.c for the S-Function wrapper.
+%%
+%% Copyright 1994-2012 The MathWorks, Inc.
+%%
+
+%include "sfcnutil.tlc"
+%% ============================================================================
+%% Setup of some common variables
+%%
+%with CompiledModel
+
+%assign thisSystem = System[NumSystems-2]
+
+%assign sFunctionName      = GetModelrefSFunctionName(Name)
+  
+%matlab evalin("base","clear %<sFunctionName>")
+
+%openfile tmpBuf
+#if !defined(S_FUNCTION_NAME)
+#define S_FUNCTION_NAME %<sFunctionName>
+#endif
+#define S_FUNCTION_LEVEL 2
+/* So mdlEnable and mdlDisable will be defined in the simstruc.h */  
+#if !defined(RTW_GENERATED_S_FUNCTION)
+#define RTW_GENERATED_S_FUNCTION
+#endif
+%if LibIsSystemField(thisSystem, "FcnCallInputInfo")
+  #define S_FUNCTION_EXPORTS_FUNCTION_CALLS
+  #define MODELREF_EXPORTS_FUNCTION_CALLS
+%endif
+
+#include <stdio.h>
+#include <math.h>
+#include "simstruc.h"
+#include "fixedpoint.h"
+
+%% We do not need the following .h file. However,
+%% model_mdl.h includes rt_logging.h 
+#define rt_logging_h
+%assign mdlTypesHdrFileName = SLibGetFileNameForCode("mdl_types_hdr")
+%if !WHITE_SPACE(mdlTypesHdrFileName)
+  #include "%<mdlTypesHdrFileName>.h"
+%endif
+
+%% Include subsystem.h
+%assign fileName = SLibGetSystemOutputFileBaseName(thisSystem)
+#include "%<fileName>.h"
+
+%% Private file is required for const parameter typede
+%<SLibIncludePrivateHeader()>
+
+%<SLibWriteMdlRefChildMdlsData()>
+%closefile tmpBuf
+%<SLibCacheCodeToFile("mdlsfcn_src_incl", tmpBuf)>
+
+%% Global parameter definitions (all in SimulinkGlobal)
+%if !SLibPrmBufferIsEmpty("UnstructuredSimulinkGlobal", "Instance")
+  %openfile tmpBuf
+  /* Model block global parameters (auto storage) */
+  %<SLibGetPrmBuffer("UnstructuredSimulinkGlobal", "Instance")>
+  %closefile tmpBuf
+  %<SLibCacheCodeToFile("mdlsfcn_data_defn", tmpBuf)>
+%endif
+
+%%
+%% Generate code for each of the s-function entry points
+%%
+%assign hasConstOutput = MdlRefHasConstantOutput()
+%assign isConstBlk     = MdlRefIsConstSampleBlock()
+
+%% Generate code for each function-call input
+%assign fcnCallBuffer = ""
+%if LibIsSystemField(thisSystem, "FcnCallInputInfo")
+  %assign fcnCallInfo = LibGetSystemField(thisSystem, "FcnCallInputInfo")
+  %assign origBlkFcn = ::BlockFcn
+  %openfile fcnBuf
+  %foreach idx = SIZE(fcnCallInfo.FcnCallInfo, 1)
+    %assign info = fcnCallInfo.FcnCallInfo[idx]
+    
+    %assign ::BlockFcn = "%<info.TaskName>"
+    
+    %assign taskFcnName = "%<info.TaskName>_sf"  
+      
+    %assign fcnCallBuffer = fcnCallBuffer + ...
+      SLibGetSSExportMethodCall(info, taskFcnName)
+    ssFcnCallErr_T %<taskFcnName>(SimStruct *S, int_T el, int_T idx) {
+      %assign declBuf = CommonDeclarationsAndInit(info.TID, TLC_TRUE)
+      %assign bothBuf = declBuf[0] + declBuf[1]
+      %<bothBuf>
+      %assign recArgs = SLibModelReferenceAppendInputsOutputs(TLC_TRUE, ...
+        ::BlockFcn, info.TaskName, TLC_TRUE, info.TID, [])
+      %<info.TaskName>(%<SLibSerializeFcnArgs(recArgs)>);
+      %<SLibGenOutportCurrentDimsWrites(::BlockFcn, info.TID, TLC_TRUE)>
+      
+      return SS_FCNCALL_NO_ERR;
+    }
+  %endforeach
+  %closefile fcnBuf
+  %assign ::BlockFcn = origBlkFcn
+  %<SetModelrefSFunctionField("CachedFcnCallInputBuffers", fcnBuf)>
+%endif
+
+    
+%if LibIsSystemField(thisSystem, "FcnCallOutputSimInfo")
+  %assign fcnCallInfo = LibGetSystemField(thisSystem, "FcnCallOutputSimInfo")
+  %foreach idx = SIZE(fcnCallInfo.FcnCallInfo, 1)
+    %assign info = fcnCallInfo.FcnCallInfo[idx]
+   
+    %assign srcKey         = info.SrcKey
+    %assign outputPortIdx  = info.OutputPortIdx
+    
+    %assign newCall = "ssSetModelRefSimFcnCallOutputInfo(S, \"%<srcKey>\", %<outputPortIdx>);"
+    
+    %assign fcnCallBuffer = fcnCallBuffer + newCall
+      
+  %endforeach
+%endif
+
+
+%% mdlInitializeSizes
+%openfile codeBuf
+  /* Tunable Parameters */
+  ssSetNumSFcnParams(S, 0);
+
+  %% Be U32Bit Region Compliant
+  %% If the generated S-Function calls published fixedpoint API functions 
+  %% to handle 33+ fixed point data, it must call set this flat to be 
+  %% U32BitRegionCompliant.
+  ssFxpSetU32BitRegionCompliant(S, 1);
+
+  %% Initialize nonfinites before any use of rtInf occurs
+  %<LibGenMathFcnCall("initnonfinite", FcnGetDataTypeIdFromName("double"), ...
+    "sizeof(real_T)", "")>;\
+  
+  %% Pass all the data so the consistency checks can be
+  %% done to compare this model with its parent.  We can 
+  %% push up this data now since it will just be cached.
+  
+  %% SolverType 1 => variable step, 2 => fixed step (see slSolverType)
+  %assign solverType = (SolverType == "FixedStep") ? 2 : 1
+  %assign frameDiagSetting = ::CompiledModel.ConfigSet.Diagnostics.FrameProcessingCompatibilityMsg
+  %if (frameDiagSetting == "none")
+    %assign frameDiagnostics = 0
+  %elseif (frameDiagSetting == "warning")
+    %assign frameDiagnostics = 1
+  %else
+    %assign frameDiagnostics = 2
+  %endif
+  if (S->mdlInfo->genericFcn != %<SLibGetNullDefinitionFromTfl()>) {
+    _GenericFcn fcn = S->mdlInfo->genericFcn;
+    real_T lifeSpan  = %<CompiledModel.ConfigSet.EvaledLifeSpan>;
+    real_T startTime = %<StartTime>;
+    real_T stopTime  = %<StopTime>;
+    int_T  hwSettings[13];
+    int_T  opSettings[1];
+    boolean_T concurrTaskSupport = %<SLibConcurrentTasks()>;
+    boolean_T hasDiscTs = %<CompiledModel.HasBlocksWithDiscreteSampleTime == "yes">;
+    %if SolverType == "FixedStep"
+      real_T fixedStep = %<FixedStepOpts.FixedStep>;
+    %else
+      %% Zero Crossing Control 0 => use local, 1 => enable all, 2 => disable all
+      %if ConfigSet.ZeroCrossControl == "EnableAll"    
+        %assign zcControl = 1
+      %else
+        %assign zcControl = (ConfigSet.ZeroCrossControl == "DisableAll") ? 2 : 0
+      %endif
+      %%
+      %assign VSOpts     = VariableStepOpts
+      %assign comma      = ""
+      
+      ModelRefChildSolverInfo solverInfo = { %<zcControl>, %<VSOpts.MaxOrder>,\
+      %<VSOpts.RelTol>,  %<VSOpts.MaxStep>,\
+      %<VSOpts.MinStep>,  %<VSOpts.InitialStep>};
+    %endif
+    
+    %% SolverType
+    (fcn)(S, GEN_FCN_CHK_MODELREF_SOLVER_TYPE_EARLY, %<solverType>, %<SLibGetNullDefinitionFromTfl()>);  
+    (fcn)(S, GEN_FCN_MODELREF_RATE_GROUPED, %<SLibIsRateGrouping()>, %<SLibGetNullDefinitionFromTfl()>);
+     
+    %% LifeSpan
+    if (!(fcn)(S, GEN_FCN_CHK_MODELREF_LIFE_SPAN, -1, &lifeSpan)) return;
+
+    %% StartTime
+    if (!(fcn)(S, GEN_FCN_CHK_MODELREF_START_TIME, -1, &startTime)) return;
+
+    %% StopTime
+    if (!(fcn)(S, GEN_FCN_CHK_MODELREF_STOP_TIME, -1, &stopTime)) return;
+
+    %% HardwareSettings
+    hwSettings[0] = %<CompiledModel.ConfigSet.ProdBitPerChar>;
+    hwSettings[1] = %<CompiledModel.ConfigSet.ProdBitPerShort>;
+    hwSettings[2] = %<CompiledModel.ConfigSet.ProdBitPerInt>;
+    hwSettings[3] = %<CompiledModel.ConfigSet.ProdBitPerLong>;
+    hwSettings[4] = %<CompiledModel.ConfigSet.ProdBitPerFloat>;
+    hwSettings[5] = %<CompiledModel.ConfigSet.ProdBitPerDouble>;
+    hwSettings[6] = %<CompiledModel.ConfigSet.ProdBitPerPointer>;
+    
+    %if CompiledModel.ConfigSet.ProdIntDivRoundTo == "Zero"
+      hwSettings[7] = 0;
+    %elseif CompiledModel.ConfigSet.ProdIntDivRoundTo == "Floor"
+      hwSettings[7] = 1;
+    %else
+      %assert CompiledModel.ConfigSet.ProdIntDivRoundTo == "Undefined"
+      hwSettings[7] = 2;
+    %endif
+    %if CompiledModel.ConfigSet.ProdEndianess == "Unspecified"
+      hwSettings[8] = 0;
+    %elseif CompiledModel.ConfigSet.ProdEndianess == "LittleEndian"
+      hwSettings[8] = 1;
+    %else
+      %assert CompiledModel.ConfigSet.ProdEndianess == "BigEndian"
+      hwSettings[8] = 2;
+    %endif
+    hwSettings[9] = %<CompiledModel.ConfigSet.ProdWordSize>;
+    hwSettings[10] = %<CompiledModel.ConfigSet.ProdShiftRightIntArith>;
+    
+    %if CompiledModel.ConfigSet.ProdLargestAtomicInteger == "Char"
+      hwSettings[11] = 0;
+    %elseif CompiledModel.ConfigSet.ProdLargestAtomicInteger == "Short"
+      hwSettings[11] = 1;
+    %elseif CompiledModel.ConfigSet.ProdLargestAtomicInteger == "Integer"
+      hwSettings[11] = 2;
+    %else
+      %assert CompiledModel.ConfigSet.ProdLargestAtomicInteger == "Long"
+      hwSettings[11] = 3;
+    %endif
+
+    %if CompiledModel.ConfigSet.ProdLargestAtomicFloat == "Float"
+      hwSettings[12] = 0;
+    %elseif CompiledModel.ConfigSet.ProdLargestAtomicFloat == "Double"
+      hwSettings[12] = 1;
+    %else
+      %assert CompiledModel.ConfigSet.ProdLargestAtomicFloat == "None"
+      hwSettings[12] = 2;
+    %endif
+
+    if (!(fcn)(S, GEN_FCN_CHK_MODELREF_HARDWARE_SETTINGS, 13, hwSettings)) return;
+
+    %% Optimization Settings
+    opSettings[0] = %<CompiledModel.ConfigSet.UseIntDivNetSlope>;
+    if (!(fcn)(S, GEN_FCN_CHK_MODELREF_OPTIM_SETTINGS, 1, opSettings)) return;
+
+    %% Concurrent tasks support
+    if (!(fcn)(S, GEN_FCN_CHK_MODELREF_CONCURRETNT_TASK_SUPPORT, (int_T)concurrTaskSupport, NULL)) return;    
+    
+    %% hasDiscTs
+    if (!(fcn)(S, GEN_FCN_CHK_MODELREF_SOLVER_TYPE, 0, &hasDiscTs)) return;
+    
+    %% Solver
+    if (!(fcn)(S, GEN_FCN_CHK_MODELREF_SOLVER_NAME, 0, (void *)"%<Solver>")) return;
+    
+    %if solverType == 2 %% FixedStep
+      %% SolverMode
+      %assign solverMode = ( (FixedStepOpts.SolverMode == "SingleTasking") ? \
+      "SOLVER_MODE_SINGLETASKING" : \
+      "SOLVER_MODE_MULTITASKING" )
+    %else
+      %assign solverMode = "SOLVER_MODE_SINGLETASKING"
+    %endif
+    
+    if (!(fcn)(S, GEN_FCN_CHK_MODELREF_SOLVER_MODE, %<solverMode>, %<SLibGetNullDefinitionFromTfl()>)) return;
+    
+    %if SolverType == "FixedStep"
+      if (!(fcn)(S, GEN_FCN_CHK_MODELREF_FIXED_STEP, 0, &fixedStep)) return;
+    %else
+      if (!(fcn)(S, GEN_FCN_CHK_MODELREF_VSOLVER_OPTS, -1, &solverInfo)) return;
+    %endif
+    (fcn)(S, GEN_FCN_CHK_MODELREF_FRAME_UPGRADE_DIAGNOSTICS, %<frameDiagnostics>, %<SLibGetNullDefinitionFromTfl()>);
+  }
+  
+  %% - Global parameters
+  %<SLibGenModelRefGlobalParamReg()>
+
+  %% - Parameter arguments (instance-specific tunable parameters)
+  %<SLibGenModelRefParamArgReg(thisSystem)>
+
+  ssSetRTWGeneratedSFcn(S, 2);
+
+  ssSetNumContStates(S, %<CompiledModel.NumContStates>);
+  ssSetNumDiscStates(S, 0);
+
+  %if ISEQUAL(ModelIsLinearlyImplicit, "yes")
+    ssSetMassMatrixType( S, %<ModelMassMatrixType>);
+    ssSetMassMatrixNzMax(S, %<ModelMassMatrixNzMax>);
+  %endif
+  
+  %<DumpSFcnExternalInputs()>
+  %<DumpSFcnExternalOutputs()>
+  %if ISFIELD(CompiledModel,"ExternalPortGroups")
+    %<DumpSFcnExternalPortGroups()>
+  %endif
+
+  %<fcnCallBuffer>
+  
+  %% If all of the sample times are associated with ports, use
+  %% port-based sample times not port-sample times assigned
+  %assign UsePortBasedTs = (CompiledModel.AllSampleTimesOnPorts == "yes")
+
+  %% DWorks
+  %assign mdlRefHasDWork = %<ModelrefBlockNeedsDwork()>
+  %assert(mdlRefHasDWork || IsModelRefScalableBuild())
+
+
+  %% Dump signal design min/max
+  %<GetSignalDesignMinMax()>
+  
+  %% Dump info related to port storage class and test point
+  %<GetSimstructRTWStorageInfo()>
+  
+  %% Signal logging save format
+  %<SLibDumpCompiledSignalLoggingSaveFormat()>
+
+  %if UsePortBasedTs
+    /*
+    * All sample times are available through ports.
+    * Use port based sample times
+    */
+    ssSetNumSampleTimes(S, PORT_BASED_SAMPLE_TIMES);
+  %else
+    /* Number of sample-times */
+    %if isConstBlk
+      %assign  nSamp = 1
+    %else
+      %assign nSamp = %<NumSampleTimes>+%<hasConstOutput>
+    %endif
+    ssSetNumSampleTimes(S, %<nSamp>);
+
+  %endif
+  ssSetNumRWork(S, 0);
+  ssSetNumIWork(S, 0);
+  ssSetNumPWork(S, 0);
+  ssSetNumModes(S, 0);
+  /* register all the zcSignalInfos */
+  {
+    int_T zcsIdx = 0;
+
+    %% For zc signals inside For Each subsystems, need to register multiple zc
+    %% signals for all the iterations. 
+    
+    %% Collect the map of each elements in the zc vector to block and zc signals 
+    %assign zcVectorLen = CompiledModel.ZCVectorlength
+    %assign blkZcIdx = FEVAL("zeros", zcVectorLen, 2)
+    %if zcVectorLen > 1
+      %foreach idx = CompiledModel.ZcRec.NumBlkZcRecs    
+        %assign blkZcRec = CompiledModel.ZcRec.BlkZcRec[idx]   
+        %foreach jdx = blkZcRec.NumZcSignalInfos
+          %assign zcSignalInfo = blkZcRec.ZcSignalInfo[jdx]
+          %foreach zcIdx = SIZE(zcSignalInfo.ZcVectorIndices)[1]
+            %assign blkZcIdx[zcSignalInfo.ZcVectorIndices[zcIdx]][0] = idx
+            %assign blkZcIdx[zcSignalInfo.ZcVectorIndices[zcIdx]][1] = jdx
+          %endforeach
+        %endforeach
+      %endforeach
+    %endif
+    
+    %% Loop through the map and register zc signals
+    %assign idx = 0
+    %foreach idx = zcVectorLen
+      %if zcVectorLen == 1
+        %assign zcSignalInfo = CompiledModel.ZcRec.BlkZcRec[blkZcIdx[0]].ZcSignalInfo[blkZcIdx[1]]
+      %else
+        %if blkZcIdx[idx][0] < 0
+          %continue
+        %else
+          %assign zcSignalInfo = CompiledModel.ZcRec.BlkZcRec[blkZcIdx[idx][0]].ZcSignalInfo[blkZcIdx[idx][1]]
+        %endif
+      %endif
+        zcsIdx = ssCreateAndAddZcSignalInfo(S);
+        ssSetZcSignalWidth(S, zcsIdx, %<zcSignalInfo.Width>);
+        ssSetZcSignalName(S,  zcsIdx, "%<zcSignalInfo.Name>");    
+        %if zcSignalInfo.Width > 1
+          %% One zc signal covers multiple elements in the zc vector. 
+          %% clear the map for the other elements of the sample zc signal 
+          %foreach dupIdx = zcSignalInfo.Width-1
+            %assign blkZcIdx[idx+1+dupIdx][0] = -1
+            %assign blkZcIdx[idx+1+dupIdx][1] = -1
+          %endforeach
+        %endif
+        %if zcSignalInfo.ZcSignalType == "Hybrid"
+          %assign myzcstype = "SL_ZCS_TYPE_HYBRID"
+        %elseif (zcSignalInfo.ZcSignalType == "Continuous")
+          %assign myzcstype = "SL_ZCS_TYPE_CONT"
+        %else
+          %assign myzcstype = "SL_ZCS_TYPE_DISC"
+        %endif
+        
+        ssSetZcSignalType(S, zcsIdx, %<myzcstype>);
+        
+        %if zcSignalInfo.ZcSignalType == "Hybrid"
+          %foreach elIdx = zcSignalInfo.Width
+            ssSetZcSignalIsZcElementDisc(S, zcsIdx, %<elIdx>, %<zcSignalInfo.IsElementDisc[elIdx]>);
+          %endforeach
+        %endif
+        
+        %assign myEventType =   "SL_ZCS_EVENT_" + zcSignalInfo.ZcEventType 
+        ssSetZcSignalZcEventType(S, zcsIdx, %<myEventType>);          
+        %%Same as in the simulation, we regiser no event
+        ssSetZcSignalNeedsEventNotification(S, zcsIdx, 0);                  
+    %endforeach
+  }
+  
+  %if MdlRefHasConstantOutput()
+    %with BlockOutputs
+      %foreach idx = NumConstBlockOutputs
+        %assign constOutput = BlockOutputs.ConstBlockOutput[idx]
+        %if (constOutput.DrivesModelRefRootOutport == "yes")
+          %assign portChecksum = constOutput.ConstantValueOutputChecksum
+          %assign portNum      = constOutput.DrivesModelRefRootOutportNum
+          
+          %assert !ISEMPTY(%<portChecksum>)
+          %assert (%<portNum> >= 0)
+          
+          %assign varName = "port%<portNum>CVChecksum"
+          %assign portChecksumStr = ...
+            "%<portChecksum[0]>,%<portChecksum[1]>,%<portChecksum[2]>,%<portChecksum[3]>"
+          {
+            uint32_T %<varName>[4] = {%<portChecksumStr>};
+            ssRegModelRefConstantValuedOutputChecksum(S, %<portNum>, &%<varName>);
+          }
+        %endif
+      %endforeach
+    %endwith %% BlockOutputs
+  %endif
+
+    
+  %% If the ZCCacheNeedsReset or DerivCacheReset flag is true set it.  This
+  %% is a global flag, so don't set it to false.
+  %if RTMIsVarStepSolver()
+    %if SolverResetInfo.ZCCacheNeedsReset
+      ssSetZCCacheNeedsReset(S, 1);
+    %endif
+    %if SolverResetInfo.DerivCacheNeedsReset
+      ssSetDerivCacheNeedsReset(S, 1);
+    %endif
+  %endif
+  
+  %assign numOutputs = ExternalOutputs.NumExternalOutputs
+  %assign numInputs = ExternalInputs.NumExternalInputs
+  %foreach idx = numOutputs
+    %assign val = ExternalOutputs.ExternalOutput[idx].NonContinuous
+    ssSetOutputPortIsNonContinuous(S, %<idx>, %<val>);
+    %assign val2 = ExternalOutputs.ExternalOutput[idx].FedByBlockWithModesNoZCs
+    ssSetOutputPortIsFedByBlockWithModesNoZCs(S, %<idx>, %<val2>);
+  %endforeach
+  %foreach idx = numInputs
+    %assign val = !ExternalInputs.ExternalInput[idx].FeedsDerivPort
+    ssSetInputPortIsNotDerivPort(S, %<idx>, %<val>);
+  %endforeach
+    
+  %if !ISEMPTY(NonIteratorAssignmentBlock)
+    ssSetNonIteratorAssignmentBlock(S, (void *) "%<STRING(NonIteratorAssignmentBlock)>");
+  %endif
+  
+  %% Specify the model reference inheritance rule of the model block
+  %% itself. This will be used when determining the model reference
+  %% inheritance rule of the parent model.
+  ssSetModelReferenceSampleTimeInheritanceRule(S, %<ModelRefTsInheritance>);
+  ssSetOptimizeModelRefInitCode(S, %<CompiledModel.ConfigSet.OptimizeModelRefInitCode>);
+  
+  %if EXISTS(ConsistentOutportInitialization) && ...
+    ConsistentOutportInitialization == "yes"
+    ssSetModelReferenceConsistentOutportInitialization(S, true);
+  %endif
+
+  ssSetAcceptsFcnCallInputs(S);
+
+  %with CompiledModel.ModelParameters
+    %if !ISEMPTY(ModelRefInlinedParamsList)
+      %% Parse the list to create an array of constant strings.  This
+      %% avoids creating a very long string which can cause MSVC to fail.
+      %assign comma = ""
+      %assign newline = ""
+      %assign inlinedList = ""
+      %assign values = ModelRefInlinedParamsList
+      %foreach idx = SIZE(values,1)
+        %assign inlinedList = inlinedList + comma + newline + "\"" + values[idx] + "\"" 
+        %assign comma = ", "
+        %assign newline = "\n"
+      %endforeach
+      {
+        static const char *inlinedVars[] = {%<inlinedList>};
+        ssSetModelRefInlinedVars(S, %<SIZE(values,1)>, (void *)inlinedVars);
+      }
+    %endif
+  %endwith
+  
+  ssSetModelReferenceNormalModeSupport(S, MDL_START_AND_MDL_PROCESS_PARAMS_OK);
+  
+  %% Register block's compliance with implicit iterator
+  %<SLibDumpSupportsMultipleExecInstancesFlag()>
+  
+  %<SLibDumpHasStateInsideForEachSSFlag()>
+
+  %<SLibDumpHasForEachSubsystemFlag()>
+  
+  %<SLibDumpHasVariantModelOrSubsystemFlag()>
+
+
+  /* exception free code */
+  ssSetOptions(S, SS_OPTION_EXCEPTION_FREE_CODE |
+                  %%Specified to disallow propagating constant to the block
+		  %if !isConstBlk || (CompiledModel.DWorks.NumSFcnWrapperDWorks >0)
+		    SS_OPTION_DISALLOW_CONSTANT_SAMPLE_TIME |
+		  %endif
+		  %% Specified to allow the block to specify constant
+		  %% on the ports it needs to
+		  %% We need this if we've got a constant block because
+		  %% we are still using port-sample-times-assigned
+                  %if hasConstOutput || isConstBlk
+		    SS_OPTION_ALLOW_CONSTANT_PORT_SAMPLE_TIME |
+		  %endif
+		  %if !UsePortBasedTs 
+                    %if ExternalInputs.NumExternalInputs > 0 || ExternalOutputs.NumExternalOutputs > 0 
+		    SS_OPTION_PORT_SAMPLE_TIMES_ASSIGNED |
+                    %endif
+		  %endif
+		  %% We assume that if any discrte rate can be inherited then
+		  %% it is ok to trigger, and constant blocks may be triggered
+                  %if !MdlRefDisallowSampleTimeInheritance() || ...
+                    MdlRefIsAPERTriggeredBlock() || ...
+                    isConstBlk
+                   SS_OPTION_ALLOW_PORT_SAMPLE_TIME_IN_TRIGSS |
+		  %endif
+		  SS_OPTION_SUPPORTS_ALIAS_DATA_TYPES |
+		  SS_OPTION_WORKS_WITH_CODE_REUSE);
+		  
+ if (S->mdlInfo->genericFcn != %<SLibGetNullDefinitionFromTfl()>) {
+   %% ChildModels
+   %<SLibWriteMdlRefChildMdlsReg()>
+ }
+
+%%-------------- export mdlinfos and mdlrefDWorkType  --------------------------------
+#if SS_SFCN_FOR_SIM 
+ if (S->mdlInfo->genericFcn != %<SLibGetNullDefinitionFromTfl()> &&
+   ssGetSimMode(S) != SS_SIMMODE_SIZES_CALL_ONLY) {
+   %% External ID's
+   %<SLibWriteMdlRefExportedMdlInfo()>
+ }
+#endif 
+
+%if (mdlRefHasDWork)
+  /* DWork */
+  if ( !ssSetNumDWork(S, 1)) {
+    return;
+  }
+  #if SS_SFCN_FOR_SIM
+  { 
+    int mdlrefDWTypeId;
+    
+    ssRegMdlRefDWorkType(S, &mdlrefDWTypeId);
+    if (mdlrefDWTypeId == INVALID_DTYPE_ID ) return;
+    
+    %assign sizeStr = "sizeof(%<thisSystem.Interface.tsysMdlrefDWorkType>)"
+    if(!ssSetDataTypeSize(S, mdlrefDWTypeId, %<sizeStr>)) return;
+    ssSetDWorkDataType(S, 0, mdlrefDWTypeId);
+    ssSetDWorkWidth(S, 0, 1);
+  }
+  #endif
+%else
+  /* DWork */
+  ssSetNumDWork(S, 0);
+%endif
+%%--------------------------------------------------------------------------------
+
+
+
+%if MdlRefIsFcnCallBlock()
+  %assign mdlRefFundTsVal = SampleTime[0].PeriodAndOffset
+  {
+    double mdlRefSFcnFundTs[2] = { %<mdlRefFundTsVal[0]>, %<mdlRefFundTsVal[1]> };
+    ssSetModelRefFundamentalSampleTimeInfo(S, SS_MDLREF_FUND_SAMPLETYPE_INFO_STR, "%<mdlRefFundTsVal>");
+    ssSetModelRefFundamentalSampleTimeInfo(S, SS_MDLREF_FUND_SAMPLETYPE_INFO_VAL, mdlRefSFcnFundTs);
+  }
+  ssSetModelRefTriggerTsTypeInfo(S, "%<CompiledModel.RootTriggerTsType>");
+%endif
+
+%if MdlRefIsFcnCallBlock() || MdlRefIsTriggerBlock()
+  ssSetModelRefTriggerType(S, "%<CompiledModel.RootTriggerType>");
+%endif
+
+%if SLibNeedAbsoluteTime()
+  ssSetNeedAbsoluteTime(S, 1);
+%endif
+
+%assign hasEnable = (CompiledModel.HasRootEnablePort == "yes") ? 1 : 0
+ssSetModelRefHasEnablePort(S, %<hasEnable>);
+
+%closefile codeBuf
+%<SetModelrefSFunctionField("CachedInitializeSizesDeclarations", "")>
+%<SetModelrefSFunctionField("CachedInitializeSizesBody", codeBuf)>
+
+%% mdlSetWorkWidths
+%openfile codeBuf
+
+if (S->mdlInfo->genericFcn != %<SLibGetNullDefinitionFromTfl()>) {
+  %% SolverType 1 => variable step, 2 => fixed step (see slSolverType)
+  _GenericFcn fcn  = S->mdlInfo->genericFcn;
+  
+  %% Variable sizing settings
+  %<SLibDumpOutputSizeComputeType()>
+  %<SLibDumpRegisterSetOutputSizeRuleTerms()>
+
+  %<SLibDumpDWorkResetForSizeChange()>
+  
+  %% State enabled subsystem compliance
+  %if EXISTS(AllowInStateEnabledSubsystem) 
+    %if AllowInStateEnabledSubsystem == "yes"
+      ssSetModelReferenceAllowInStateEnabledSubsystem(S, true);
+    %else
+      ssSetModelReferenceAllowInStateEnabledSubsystem(S, false);
+    %endif  
+  %endif
+}
+
+%assign fromFStr = "\"\"" 
+%assign toFStr = "\"\""
+
+%foreach idx = SIZE(UniqueFromFiles,1)
+  %assign ffStr = STRING(UniqueFromFiles[idx])
+  %if idx > 0
+    %assign fromFStr ="%<fromFStr>" + ","+ "\""+ "%<ffStr>" + "\""  
+  %else
+    %assign fromFStr ="\""+ "%<ffStr>" + "\""  
+  %endif 
+%endforeach
+
+%foreach idx = SIZE(UniqueToFiles,1)
+  %assign tfStr = STRING(UniqueToFiles[idx])
+  %if idx > 0
+    %assign toFStr = "%<toFStr>" + "," + "\""+ "%<tfStr>"+ "\"" 
+  %else
+    %assign toFStr = "\""+ "%<tfStr>"+ "\"" 
+  %endif
+%endforeach
+
+{
+  static const char* toFileNames[]   =  {%<toFStr>};  
+  static const char* fromFileNames[] =  {%<fromFStr>};    
+  %%If the model has ToFiles and FromFiles, cache them in the simstruc
+  if(!ssSetModelRefFromFiles(S, %<SIZE(UniqueFromFiles,1)>,fromFileNames)) return;
+  if(!ssSetModelRefToFiles(S, %<SIZE(UniqueToFiles,1)>,toFileNames)) return;
+}
+
+%closefile codeBuf
+%<SetModelrefSFunctionField("CachedSetWorkWidthsDeclarations", "")>
+%<SetModelrefSFunctionField("CachedSetWorkWidthsBody", codeBuf)>
+
+
+%% mdlInitalizeSampleTimes
+%% We are moving these to the class ModelRefSimTarget.
+%openfile codeBuf
+%if !::CompiledModel.PILSimTargetUnification
+  %if UsePortBasedTs
+    %% This is required to generated a non-empty function
+    /* Block has a port based sample time. */
+  %else
+    %if isConstBlk
+      ssSetSampleTime(S, 0, rtInf);
+      ssSetOffsetTime(S, 0, 0);
+    %else
+      %assert (MdlRefDisallowSampleTimeInheritance() && ...
+        !MdlRefIsAPERTriggeredBlock()) || !hasConstOutput
+      %if (MdlRefDisallowSampleTimeInheritance() && ...
+        !MdlRefIsAPERTriggeredBlock())
+        %assign numTs = NumSampleTimes
+
+        %foreach idx = numTs
+          %assign tid        = SampleTime[idx].TID
+          %assign sampleTime = SampleTime[idx].PeriodAndOffset[0]
+          %assign offset     = SampleTime[idx].PeriodAndOffset[1]
+
+          %if ((sampleTime==-1) && (offset<-1))
+            ssSetSampleTime(S, %<tid>, -1);
+            ssSetOffsetTime(S, %<tid>, %<LibRealNonFinite("-inf")>);
+          %else
+            ssSetSampleTime(S, %<tid>, %<sampleTime>);
+            %if (sampleTime==-2)
+              %assign uid = SampleTime[idx].FullUID              
+              ssSetVariableSampleTimeUID(S, %<tid>, "%<uid>");              
+            %else             
+              ssSetOffsetTime(S, %<tid>, %<offset>); 
+            %endif            
+          %endif
+        %endforeach
+        %if hasConstOutput
+          ssSetSampleTime(S, %<numTs>, rtInf);
+          ssSetOffsetTime(S, %<numTs>, 0);
+        %endif
+      %else
+        %% This is for a block with no ports that can inherit
+        ssSetSampleTime(S, 0, -1);
+      %endif
+    %endif
+  %endif
+%endif
+%closefile codeBuf
+
+%<SetModelrefSFunctionField("CachedInitializeSampleTimesDeclarations", "")>
+%<SetModelrefSFunctionField("CachedInitializeSampleTimesBody", codeBuf)>
+
+%% mdlInitializeConditions
+%if !::CompiledModel.PILSimTargetUnification && !hasEnable
+  %<CacheModelrefSysFcnMethod("InitializeConditions")>
+%endif
+
+%% mdlProcessParameters
+%assign callProcessParamsFcn = SLibCacheModelRefSFcnProcessParametersFcn()
+
+%% mdlStart
+%% We now call this directly in formatwide so that registration can
+%% modify the buffers: <CacheModelrefSysFcnMethod("Start")>
+%% Call the model_initialize function in the mdlStart function
+%% of the model reference s-function.  Also redefine the common
+%% declarations to include any arguments in the registration function.
+%% Need to cleanup GenerateSfunction with different code format
+%assert(IsModelReferenceSimTarget())
+%assign nonContArrayNeeded = TLC_FALSE
+%assign currBlockFcn = ::BlockFcn
+%assign ::BlockFcn = "RegistrationAndStart"
+%assign decInitBuf = CommonDeclarationsAndInit("", TLC_FALSE)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Dump all Declarations below
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Dump the common declarations
+%openfile declBuf
+%<decInitBuf[0]>\
+%assign ::BlockFcn = currBlockFcn
+%if SolverType == "VariableStep" && ...
+  EXISTS(SolverResetInfo.NonContOutputSignals)
+  %foreach idx = ExternalOutputs.NumExternalOutputs
+    %assign nonContOut = SolverResetInfo.NonContOutputSignals.NonContOutput[idx]
+    %if nonContOut.NumNonContOutputSignals > 0
+      ssNonContDerivSigFeedingOutports mr_nonContOutput%<idx>[%<nonContOut.NumNonContOutputSignals>];
+      %assign nonContArrayNeeded = TLC_TRUE
+    %endif
+  %endforeach
+  %if nonContArrayNeeded
+    ssNonContDerivSigFeedingOutports *mr_nonContOutputArray[%<ExternalOutputs.NumExternalOutputs>];
+  %endif
+%endif  
+void *sysRanPtr = %<SLibGetNullDefinitionFromTfl()>;
+int  sysTid = 0;
+
+%if SolverType == "VariableStep" && NumContStates > 0
+  %assign genAbsTolControl = TLC_FALSE
+   %foreach idx = NumContStates
+     %if VariableStepOpts.AbsTolControl[idx] == 1U
+       %assign genAbsTolControl = TLC_TRUE
+       %break
+     %endif
+   %endforeach
+   
+  %if genAbsTolControl 
+    uint8_T* absTolControl = ssGetAbsTolControlVector(S);
+  %endif
+%endif
+
+%closefile declBuf
+%<SetModelrefSFunctionField("CachedStartDeclarations", declBuf)>
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Dump all initialization below
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%openfile regAndStartBuf
+
+%% None finite values must be initialized in the start function
+%% See LibDumpSfunTargetChecks why do we check for RT_MALLOC!
+%assign nonFinitesBuffer = SLibGetSFcnNonFinite()
+%if !WHITE_SPACE(nonFinitesBuffer)
+  #if defined(MATLAB_MEX_FILE)
+  %<nonFinitesBuffer>\
+  #endif
+%endif
+
+%% Dump initialization buffer returned by CommonDeclarationsAndInit
+%<decInitBuf[1]>\
+
+ssGetContextSysRanBCPtr(S, &sysRanPtr);
+ssGetContextSysTid(S, &sysTid);
+
+%% If the tid comes back as constant, just use the base rate
+if (sysTid == CONSTANT_TID) {
+   sysTid = 0;
+}
+
+%% Set up absolute tolerance controls
+%% We only need to generate this line if the local tolerance is set
+%if SolverType == "VariableStep" && NumContStates > 0
+  %foreach idx = NumContStates
+    %if VariableStepOpts.AbsTolControl[idx] == 1U
+    absTolControl[%<idx>] = %<VariableStepOpts.AbsTolControl[idx]>;
+    %endif
+  %endforeach
+%endif
+
+%if SolverType == "VariableStep" && ...
+  EXISTS(SolverResetInfo.NonContOutputSignals) && nonContArrayNeeded
+  %foreach idx = ExternalOutputs.NumExternalOutputs
+    %if SolverResetInfo.NonContOutputSignals.NonContOutput[idx].NumNonContOutputSignals > 0
+      mr_nonContOutputArray[%<idx>] = mr_nonContOutput%<idx>;
+    %else
+      mr_nonContOutputArray[%<idx>] = %<SLibGetNullDefinitionFromTfl()>;
+    %endif
+  %endforeach
+%endif
+
+%<GetModelRefRegistrationFcnName()>(%<SLibModelReferenceRegFcnArgs(TLC_TRUE)>);
+%%
+%if (callProcessParamsFcn)
+  
+  mdlProcessParameters(S);
+%endif
+%%
+%assert(RTWCAPISignals)
+/* Set the ModelMappingInfo pointer back into Simulink for data logging */
+%if IsModelRefScalableBuild()
+  %assign dwork = FcnGetSFcnDWorkIdentifier(System[GetBaseSystemIdx()])
+  ssSetModelMappingInfoPtr(S, &(%<dwork>.rtm.DataMapInfo.mmi));
+%else
+  ssSetModelMappingInfoPtr(S, &(dw->rtm.DataMapInfo.mmi));
+%endif
+
+if (S->mdlInfo->genericFcn != %<SLibGetNullDefinitionFromTfl()>) {
+  _GenericFcn fcn = S->mdlInfo->genericFcn;
+  %if SolverType == "VariableStep" && ...
+    EXISTS(SolverResetInfo.NonContOutputSignals)
+    %foreach idx = ExternalOutputs.NumExternalOutputs
+      %assign nonContOut = SolverResetInfo.NonContOutputSignals.NonContOutput[idx]
+      %if nonContOut.NumNonContOutputSignals > 0
+        if (!(fcn)(S, GEN_FCN_REG_MODELREF_NONCONTSIGS, %<idx>, mr_nonContOutput%<idx>)) return;
+      %endif
+    %endforeach
+  %endif
+  
+}
+%closefile regAndStartBuf
+%<PrependToModelrefSFunctionField("CachedStartBody", regAndStartBuf)>
+
+%if !::CompiledModel.PILSimTargetUnification
+  %if !hasEnable
+    %%mdlEnable
+    %<CacheModelrefSysFcnMethod("Enable")>
+  %endif
+  
+  %%mdlDisable
+  %<CacheModelrefSysFcnMethod("Disable")>
+%endif
+
+%%mdlOutputs
+%% This must be before time conditioning.
+%% time conditioning may overwrite tid
+%%
+%% Const Outputs
+%openfile codeBuf1
+%assign ::BlockFcn = "Output"
+%if hasConstOutput
+  if (%<CompiledModel.GlobalScope.tTID> == CONSTANT_TID) {
+    %assert (NumModelOutputs > 0)
+    %<GenerateConstOutputSignalConditioning(CompiledModel.RollThreshold)>
+  }
+%endif
+%closefile codeBuf1
+
+%openfile codeBuf2
+%<GenModelReferenceSimTargetSFcnOutputOrUpdate("Output")>
+%closefile codeBuf2
+
+%openfile codeBuf
+%<codeBuf1>
+%if !WHITE_SPACE(codeBuf2)
+  if (%<CompiledModel.GlobalScope.tTID> != CONSTANT_TID) {
+    %<codeBuf2>
+  }
+%endif
+%closefile codeBuf
+%% Combine the declration and initialization buffer into one buffer for simplicity.
+%assign decInitBuf = CommonDeclarationsAndInit("", TLC_FALSE)
+%assign bothBuf   = decInitBuf[0] + decInitBuf[1]
+%openfile declBuf
+%<bothBuf>
+%closefile declBuf
+%assign ::BlockFcn = "Unknown"
+%<SetModelrefSFunctionField("CachedOutputsBody", codeBuf)>
+%<SetModelrefSFunctionField("CachedOutputsDeclarations", declBuf)>
+
+%% mdlUpdate
+%assign ::BlockFcn = "Update"
+%openfile codeBuf
+%<GenModelReferenceSimTargetSFcnOutputOrUpdate("Update")>
+%closefile codeBuf
+%assign decInitBuf = CommonDeclarationsAndInit("", TLC_FALSE)
+%assign bothBuf = decInitBuf[0] + decInitBuf[1]
+%openfile declBuf
+%<bothBuf>
+%closefile declBuf
+%assign ::BlockFcn = "Unknown"
+%<SetModelrefSFunctionField("CachedUpdateBody", codeBuf)>
+%<SetModelrefSFunctionField("CachedUpdateDeclarations", declBuf)>
+
+%% mdlDerivative
+%<CacheModelrefSysFcnMethod("Derivatives")>
+
+%% mdlProjection
+%<CacheModelrefSysFcnMethod("Projection")>
+
+%% mdlForcingFunction
+%<CacheModelrefSysFcnMethod("ForcingFunction")>
+
+%% mdlMassMatrix
+%<CacheModelrefSysFcnMethod("MassMatrix")>
+
+%% mdlZeroCrossings
+%<CacheModelrefSysFcnMethod("ZeroCrossings")>
+
+%if !::CompiledModel.PILSimTargetUnification
+  %% mdlTerminate
+  %<CacheModelrefSysFcnMethod("Terminate")>
+%endif
+
+%% We are moving these to the class ModelRefSimTarget.
+%openfile trailerBuf
+%if !::CompiledModel.PILSimTargetUnification
+#ifdef  MATLAB_MEX_FILE    /* Is this file being compiled as a MEX-file? */
+#include "simulink.c"      /* MEX-file interface mechanism */
+#include "fixedpoint.c"
+#else
+#include "cg_sfun.h"       /* Code generation registration function */
+#endif
+%endif
+%closefile trailerBuf
+
+%<SLibCacheCodeToFile("mdlsfcn_src_userBottom", trailerBuf)>
+%endwith %% CompiledModel

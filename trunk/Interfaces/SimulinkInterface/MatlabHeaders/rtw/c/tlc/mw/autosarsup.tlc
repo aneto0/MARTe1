@@ -1,0 +1,1429 @@
+%%
+%% Autosar tlc functions.
+%%
+%% Abstract:
+%%   Support Autosar
+%%
+%% =====================================================================
+
+%%   Copyright 2004-2012 The MathWorks, Inc.
+
+%selectfile NULL_FILE
+
+%% Function to extract ArgSpecData etc. from RTWAutosar class
+%function FcnGetAutosarRecord() void
+  %return FcnGetAutosarDataMap()
+%endfunction
+
+%% Function to extract Inputs/outputs etc. from RTWAutosar class. The data
+%% is mapped, hence is efficient
+%function FcnGetAutosarDataMap() void
+  %if !ISFIELD(::CompiledModel.RTWAutosar, "MapData")
+    %with ::CompiledModel.RTWAutosar.Object
+      %assign path = ...
+        FEVAL( "arxml.splitAbsolutePath", ObjectProperties.ComponentName)
+      %assign mainInterfaceName = path[SIZE(path, 1)-1]
+      
+      %createrecord mapData {                      \
+        InitRunnableName     ObjectProperties.InitRunnableName;     \
+        PeriodicRunnableName ObjectProperties.PeriodicRunnableName; \
+        InitEventName        ObjectProperties.InitEventName;        \
+        PeriodicEventName    ObjectProperties.PeriodicEventName;    \
+        ComponentName        ObjectProperties.ComponentName;        \
+        MainInterfaceName    mainInterfaceName;                     \
+        NumInputs            0;                                     \
+        NumOutputs           0;                                     \
+        Inputs               {}                                     \
+        Outputs              {}                                     \
+      }
+            
+      %if ISFIELD(ObjectProperties, "NumArgSpecData")
+        %foreach argDataIdx = ObjectProperties.NumArgSpecData
+          %assign argData = ...
+            ObjectProperties.ArgSpecData[argDataIdx].Object.ObjectProperties
+          %if argData.SLObjectType == "Inport"
+            %addtorecord mapData.Inputs Input%<argData.PortNum-1> argData
+            %assign mapData.NumInputs = mapData.NumInputs + 1
+          %elseif argData.SLObjectType == "Outport"
+            %addtorecord mapData.Outputs Output%<argData.PortNum-1> argData
+            %assign mapData.NumOutputs = mapData.NumOutputs + 1
+          %else
+            %<SLibReportErrorWithId("RTW:tlc:IncorrectMapData")>
+          %endif
+        %endforeach
+      %endif
+      %addtorecord ::CompiledModel.RTWAutosar MapData mapData
+    %endwith   %% CompiledModel.RTWAutosar.Object
+
+    %if !ISFIELD(::CompiledModel.RTWAutosar, "ExportedDataTypesIdx")
+      %addtorecord ::CompiledModel.RTWAutosar ExportedDataTypesIdx { }
+    %endif
+    
+    %if !ISFIELD(::CompiledModel.RTWAutosar, "ARPrimitiveTypes")
+      %addtorecord ::CompiledModel.RTWAutosar ARPrimitiveTypes {     \
+        Boolean    "boolean_T"     \
+        SInt4      "int8_T"        \
+        SInt8      "int8_T"        \
+        SInt16     "int16_T"       \
+        SInt32     "int32_T"       \
+        UInt4      "uint8_T"       \
+        UInt8      "uint8_T"       \
+        UInt16     "uint16_T"      \
+        UInt32     "uint32_T"      \
+        Float      "real32_T"       \
+        Double     "real_T"        \
+      }
+    %endif
+
+    %% Record data types as exported
+    %% check on Inports
+    %with ::CompiledModel.ExternalInputs
+      %foreach idx = NumExternalInputs
+        %assign ei = ExternalInput[idx]
+        %assign dtypeId = SLibGetRecordDataTypeId(ei)
+        %<SLibAutosarMarkDataTypeAsExported(dtypeId)>
+        %<SLibAutosarMarkChildrenDataTypeAsExported(dtypeId)>
+      %endforeach
+    %endwith
+
+    %% check on Outports
+    %with ::CompiledModel.ExternalOutputs
+      %foreach idx = NumExternalOutputs
+        %assign ei = ExternalOutput[idx]
+        %assign dtypeId = SLibGetRecordDataTypeId(ei)
+        %<SLibAutosarMarkDataTypeAsExported(dtypeId)>
+        %<SLibAutosarMarkChildrenDataTypeAsExported(dtypeId)>
+      %endforeach
+    %endwith
+
+    %% check on client blocks
+    %foreach sysIdx = ::CompiledModel.NumSystems
+      %with ::CompiledModel.System[sysIdx]
+        %foreach idx = NumBlocks
+          %assign blk = Block[idx]
+          %if (blk.Type == "S-Function") && (blk.ParamSettings.FunctionName == "sfun_autosar_clientop")
+            %foreach portIdx = blk.NumDataInputPorts
+              %assign port = blk.DataInputPort[portIdx]
+              %assign dtypeId = SLibGetRecordDataTypeId( port )
+              %<SLibAutosarMarkDataTypeAsExported(dtypeId)>
+              %<SLibAutosarMarkChildrenDataTypeAsExported(dtypeId)>
+            %endforeach
+            %foreach portIdx = blk.NumDataOutputPorts
+              %assign port = blk.DataOutputPort[portIdx]
+              %assign dtypeId = SLibGetRecordDataTypeId( port )
+              %<SLibAutosarMarkDataTypeAsExported(dtypeId)>
+              %<SLibAutosarMarkChildrenDataTypeAsExported(dtypeId)>
+            %endforeach
+          %endif
+        %endforeach
+      %endwith
+    %endforeach
+    
+    %% IRVs
+    %assign autosar = ::CompiledModel.RTWAutosar
+    %assign numPeriodicRunnables = SIZE(autosar.PeriodicRunnables.Runnable, 1)
+    %foreach rIdx = numPeriodicRunnables
+      %assign runnable = autosar.PeriodicRunnables.Runnable[rIdx]
+      %if !ISFIELD(runnable, "IOFunction")
+        %continue
+      %endif
+      %assign numIOFcns = SIZE(runnable.IOFunction, 1)
+      %foreach fIdx = numIOFcns
+        %assign ioFcn = runnable.IOFunction[fIdx]
+        %assign dtypeId = SLibGetRecordDataTypeId( ioFcn )
+        %switch ioFcn.Class
+          %case "ImplicitInterrunnableRead"
+          %case "ImplicitInterrunnableWrite"
+          %case "ExplicitInterrunnableRead"
+          %case "ExplicitInterrunnableWrite"
+            %<SLibAutosarMarkDataTypeAsExported(dtypeId)>
+            %<SLibAutosarMarkChildrenDataTypeAsExported(dtypeId)>
+            %break
+          %default
+            %% okay as it's not an IRV
+        %endswitch
+      %endforeach
+    %endforeach
+  %else
+    %% Do nothing
+  %endif
+  %return ::CompiledModel.RTWAutosar.MapData
+%endfunction
+
+%% Function: SLibAutosarCompilerAbstractionRequired =========================
+%% Abstract:
+%%   Checks whether code needs AUTOSAR compiler abstraction macros
+%%
+%function SLibAutosarCompilerAbstractionRequired() void
+  %return SLibAutosarActive() && ::CompiledModel.ConfigSet.AutosarCompilerAbstraction
+%endfunction
+
+%function SLibAutosarGetSchemaVersion() void
+  %% return model schema version, if we're not dealing with an autosar model return "UNDEFINED"
+  %if SLibAutosarActive()
+    %return ::CompiledModel.ConfigSet.AutosarSchemaVersion    
+  %else
+    %return "UNDEFINED"
+  %endif
+
+%endfunction
+
+
+%function SLibGetAutosarMemClass(memclasstype) void
+  %if !ISFIELD(::CompiledModel.RTWAutosar, "MemClass")
+    %addtorecord ::CompiledModel.RTWAutosar MemClass {}
+  %endif
+
+  %if !ISFIELD(::CompiledModel.RTWAutosar.MemClass, memclasstype)
+    %switch memclasstype
+      %case "FuncCalledByRTE"
+        %assign memclass = FEVAL( "upper", AutosarSWCName() ) + "_CODE"
+        %break
+      %case "FuncInternal"
+        %assign memclass = FEVAL( "upper", AutosarSWCName() ) + "_CODE_LOCAL"
+        %break
+      %case "DataGlobal"
+        %assign memclass = FEVAL( "upper", AutosarSWCName() ) + "_VAR"
+        %break
+      %case "DataAutomatic"
+        %assign memclass = "AUTOMATIC"
+        %break
+      %default
+        %<LibReportFatalError(...
+          "SLibAutosarGetMemClass: Invalid memclass type: " + memclasstype)>
+    %endswitch
+    %addtorecord ::CompiledModel.RTWAutosar.MemClass %<memclasstype> memclass
+  %endif
+
+  %return ::CompiledModel.RTWAutosar.MemClass.%<memclasstype>
+%endfunction
+
+
+%% Function: SLibAutosarCompilerAbstractionForFcnDeclRtnType =======================
+%% Abstract:
+%%    Appends AUTOSAR compiler abstraction macro to function declaration return type.
+%%
+%% Takes in a function type string:
+%% FuncCalledByRTE: Function is called by AUTOSAR RTE (only applicable to runnables)
+%% FuncInternal   : Function is locally called
+%% 
+%% e.g. SLibAutosarCompilerAbstractionForFcnDeclRtnType(void, "FuncCalledByRTE")
+%% returns: FUNC(void, <SWC>_CODE)
+%%
+%function SLibAutosarCompilerAbstractionForFcnDeclRtnType(rtnDataType, fcnType) void
+  %if SLibAutosarCompilerAbstractionRequired()
+    %% Model is configured for AUTOSAR
+    %% Note: (SLibAutosarActive == TLC_FALSE) for referenced models
+    %return "FUNC(" + rtnDataType +", " + SLibGetAutosarMemClass(fcnType) + ")"
+  %else
+    %return rtnDataType
+  %endif
+%endfunction
+
+
+%% Function: SLibAutosarCompilerAbstractionForDataDecl =======================
+%% Abstract:
+%%    Appends AUTOSAR compiler abstraction macro to data declarations
+%%
+%% Takes in a variable type string:
+%% DataGlobal   : Global data
+%% DataAutomatic: Automatic (stack allocated) data
+%% 
+%function SLibAutosarCompilerAbstractionForDataDecl(isConst, datatype, isPtr, ptrIsConst, name, varType) void
+
+  %if isPtr
+    %if ptrIsConst
+      %assign constPrefix = "CONST"
+    %else
+      %assign constPrefix = ""
+    %endif
+    %if isConst
+      %return "%<constPrefix>P2CONST(%<datatype>, %<SLibGetAutosarMemClass(varType)>, %<SLibGetAutosarMemClass("DataGlobal")>) %<name>"
+    %else
+      %return "%<constPrefix>P2VAR(%<datatype>, %<SLibGetAutosarMemClass(varType)>, %<SLibGetAutosarMemClass("DataGlobal")>) %<name>"
+    %endif   
+  %else
+    %if isConst
+      %return "CONST(%<datatype>, %<SLibGetAutosarMemClass(varType)>) %<name>"
+    %else
+      %return "VAR(%<datatype>, %<SLibGetAutosarMemClass(varType)>) %<name>"
+    %endif
+  %endif
+  
+%endfunction  
+
+%% Function to return init function call for use with SIL Sfcn
+%function SLibGetAutosarServerOperationModelInitSfcnCall() void
+  
+  %<SLibGenAutosarServerOperationModelStepAndInitSfcnCall()>
+  %return "%<::CompiledModel.RTWAutosar.ServerOperationSfcnPrototypes.sfcnInitCall>;"
+  
+%endfunction
+
+
+%% Function to return step function call for use with SIL Sfcn
+%function SLibGetAutosarServerOperationModelStepSfcnCall() void
+
+  %<SLibGenAutosarServerOperationModelStepAndInitSfcnCall()>
+  %return "%<::CompiledModel.RTWAutosar.ServerOperationSfcnPrototypes.sfcnStepCall>;"
+  
+%endfunction
+
+
+%function SLibGenAutosarServerOperationModelStepAndInitSfcnCall() void
+
+  %if !ISFIELD(::CompiledModel.RTWAutosar, "ServerOperationSfcnPrototypes")
+    %assign buildDir = FEVAL("rtwprivate", "rtwattic", "getBuildDir")
+    %assign output = FEVAL("arblk.createSfcnCall", LibGetModelName(), buildDir)
+    %if output.success != 1
+      %<SLibReportErrorWithIdAndArgs("RTW:tlc:GenericMessage", "%<output.txt>")>
+    %endif
+    %addtorecord ::CompiledModel.RTWAutosar ServerOperationSfcnPrototypes output
+  %endif
+
+%endfunction
+
+
+%function FcnAddAUTOSARRteInstanceToTypeFile(typesFile) void
+
+  %openfile tmpBuffer
+  typedef uint8_T Rte_Instance;
+  %closefile tmpBuffer
+  %<SLibSetModelFileAttributeWithRequiredInclude(typesFile, "Typedefs", tmpBuffer, "rtwtypes.h")>
+
+%endfunction
+
+%function SLibAutosarWriteOutPIMDefsForCodeInfo(pimObj) Output
+  %if SLibAutosarActive()
+    %<pimObj> = containers.Map;
+    %if ISFIELD(::CompiledModel.RTWAutosar, "PIMDef")
+      %assign identifiers = FIELDNAMES( ::CompiledModel.RTWAutosar.PIMDef )
+      %foreach idx = SIZE( identifiers, 1 )
+        %assign identifier = "%<identifiers[idx]>"
+        %assign typeDef = GETFIELD( ::CompiledModel.RTWAutosar.PIMDef, "%<identifier>" )
+        %% Remove white space
+        %assign typeDef = FEVAL( "regexprep", typeDef, "\\s+", " ")
+        %% Remove quotes
+        %assign typeDef = FEVAL( "regexprep", typeDef, "'", " ")
+        %<pimObj>('%<identifier>') = '%<typeDef>';
+      %endforeach
+    %endif
+  %endif
+
+%endfunction
+
+%function SLibAutosarAddPIMDef( identifier, typeDef ) void
+  %% Function to store typeDefs for PIM (model states)
+  
+  %if SLibAutosarActive()
+    %if !ISFIELD(::CompiledModel.RTWAutosar, "PIMDef")
+      %addtorecord ::CompiledModel.RTWAutosar PIMDef {}
+    %endif
+
+    %addtorecord ::CompiledModel.RTWAutosar.PIMDef %<identifier> typeDef
+  %endif
+
+%endfunction
+
+%% Function to add PIM typedefs to header file for usage
+%% with Model I/O Functions
+%function FcnAddAUTOSARPIMTypesToTypeFile(typesFile) void
+
+  %if ISFIELD(::CompiledModel.RTWAutosar, "PIMDef")
+  %assign identifiers = FIELDNAMES( ::CompiledModel.RTWAutosar.PIMDef )
+  %foreach idx = SIZE( identifiers, 1 )
+    %assign identifier = "%<identifiers[idx]>"
+    %assign typeDef = GETFIELD( ::CompiledModel.RTWAutosar.PIMDef, "%<identifier>" )
+    %openfile tmpBuffer
+    typedef %<typeDef> %<identifier>;
+    %closefile tmpBuffer
+    %<SLibSetModelFileAttributeWithRequiredInclude(typesFile, "Typedefs", tmpBuffer, "rtwtypes.h")>
+  %endforeach
+%endif
+
+%endfunction
+
+%% Function: SLibAutosarLocateFileInStubDir============================
+%% Abstract:
+%%    Place generated file in stub directory
+%% 
+%function SLibAutosarLocateFileInStubDir(fileH) void
+
+  %assign stubDirName = "stub"
+  %assign absBuildDir = FEVAL("rtwprivate", "rtwattic", "getBuildDir")
+  %assign absStubDir = "%<absBuildDir>/%<stubDirName>"
+  %assign relStubDir = "./%<stubDirName>"
+
+  %% Make sure directory exists
+  %if !FEVAL("exist", absStubDir, "dir")
+    %assign success = FEVAL( "mkdir", absBuildDir,  stubDirName )
+    %if success != 1
+      %<SLibReportErrorWithId("RTW:tlc:GenStubDir")>
+    %endif
+  %endif
+  
+  %% Determine if file is a header file (needed for buildInfo)
+  %<LibSetCodeTemplateComplianceLevel(2)>
+  %switch LibGetSourceFileSection(fileH,"Type")
+    %case "SystemHeader"
+      %assign isHeader = TLC_TRUE
+      %break
+    %case "SystemBody"
+      %assign isHeader = TLC_FALSE
+      %break
+    %default
+      %<SLibReportErrorWithIdAndArgs("RTW:tlc:UnknownFileAttr", fileAttr)>
+  %endswitch
+    
+  %% Inform code template where file will be located
+  %<LibSetSourceFileOutputDirectory(fileH, absStubDir)>
+
+  %% Update buildInfo so that model will build
+  %if !FEVAL("autosarModifyBuildInfo", ::CompiledModel.Name, absStubDir, LibGetSourceFileSection(fileH, "Name"), isHeader)
+    %<SLibReportErrorWithId("RTW:tlc:AutosarBuildInfo")>
+  %endif
+
+%endfunction
+
+
+%function SLibWriteAutosarModelStepAndInitFunction() void
+  %if SLibAutosarActive()
+    %assign autosarSpec = FcnGetAutosarRecord()
+
+    %assign stepRtnArg = SLibAutosarCompilerAbstractionForFcnDeclRtnType("void", "FuncCalledByRTE")
+    %assign stepFcnName = autosarSpec.PeriodicRunnableName
+    %assign stepArgs = SLibModelFcnArgs("OutputUpdate",TLC_FALSE,"")
+    %assign autosarStepProto = ...
+      "%<stepRtnArg> %<stepFcnName>(%<stepArgs>)"
+
+    %assign initRtnArg = SLibAutosarCompilerAbstractionForFcnDeclRtnType("void", "FuncCalledByRTE")
+    %assign initFcnName = autosarSpec.InitRunnableName
+    %assign initArgs = SLibModelFcnArgs("Initialize",TLC_FALSE,"")
+    %assign autosarInitProto = "%<initRtnArg> %<initFcnName>(%<initArgs>)"
+
+    %openfile autosarProtoBuf
+    %% Server Operation Prototype pushes own declarations
+    %if SLibAutosarIsServerOperation() == TLC_FALSE
+      %if ExportFunctionsMode == 0
+        /* Model step and init functions */
+        %<SLibGetFcnMemSecPragmaOnDecl(stepFcnName, "MemSecFuncExecute", "Pre")>\
+        %<LibExternInFcnDecls()>%<autosarStepProto>;
+        %<SLibGetFcnMemSecPragmaOnDecl(stepFcnName, "MemSecFuncExecute", "Post")>\
+      %else
+        /* Model init function */
+      %endif
+      %<SLibGetFcnMemSecPragmaOnDecl(initFcnName, "MemSecFuncInitTerm", "Pre")>\
+      %<LibExternInFcnDecls()>%<autosarInitProto>;
+      %<SLibGetFcnMemSecPragmaOnDecl(initFcnName, "MemSecFuncInitTerm", "Post")>\
+    %endif
+
+    %closefile autosarProtoBuf
+      
+    %<SLibCacheCodeToFile("mdl_fcn_decl", autosarProtoBuf)>
+    
+  %endif    
+%endfunction %%%%%%SLibWriteAutosarModelStepAndInitFunction
+
+%% Function to return an AUTOSAR array type string
+%% 
+%% alias types are not resolved: e.g. (Rte, MYFP, 10) => Rte_rt_Array_MYFP_10
+%function FcnAutosarArrayTypeWithoutAliasResolution(typeprefix, dTypeId, width) void
+  %assign dTypeName = LibGetDataTypeNameFromId(dTypeId)
+  %assign arrayTypeStr = "%<typeprefix>rt_Array__%<dTypeName>_%<width>"
+  %if ( SLibAutosarActive() && ...
+    (SIZE( arrayTypeStr, 1 ) > AutosarMaxShortNameLength) )
+    %assign arrayTypeStr = FEVAL( "arxml.arxml_private", "p_create_aridentifier", arrayTypeStr, AutosarMaxShortNameLength)
+  %endif
+  %return arrayTypeStr
+%endfunction
+
+%% Function to return an AUTOSAR array type string
+%% 
+%% alias types are resolved: e.g. (Rte, MYFP, 10) => Rte_rt_Array_int16_T_10
+%function FcnAutosarArrayType(typeprefix, dTypeId, width) void
+  %assign idAliasedThruTo = LibGetDataTypeIdAliasedThruToFromId(dTypeId)
+  %assign arrayTypeStr = FcnAutosarArrayTypeWithoutAliasResolution(typeprefix, idAliasedThruTo, width)
+  %return arrayTypeStr
+%endfunction
+
+%% Local function to add AUTOSAR array typedefs given isRteTypeHeader, dTypeId and width
+%%
+%% one typedef is added with alias types resolved - see FcnAutosarArrayType
+%% one typedef is conditionally added with alias types not resolved (used by codeInfo-based PIL) - see FcnAutosarArrayTypeWithoutAliasResolution
+%%
+%% see also FcnAddAutosarArrayTypedef
+%function FcnAddAutosarArrayTypedefs(arrayTypes, typesFile, isRteTypeHeader, dTypeId, width) void
+   %if isRteTypeHeader == TLC_TRUE
+      %% add prefix
+      %assign arrayTypePrefix = "Rte_"
+   %else
+      %% no prefix
+      %assign arrayTypePrefix = ""
+   %endif
+   %% array typedef without alias resolution
+   %assign arrayTypeName = FcnAutosarArrayTypeWithoutAliasResolution(arrayTypePrefix, dTypeId, width)      
+   %assign arrayTypes = FcnAddAutosarArrayTypedef(arrayTypes, typesFile, dTypeId, arrayTypeName, width)
+   %% array typedef with alias resolution
+   %assign arrayTypeNameAliasedThruTo = FcnAutosarArrayType(arrayTypePrefix, dTypeId, width)
+   %assign arrayTypes = FcnAddAutosarArrayTypedef(arrayTypes, typesFile, dTypeId, arrayTypeNameAliasedThruTo, width)
+   %return arrayTypes
+%endfunction
+
+%% Local function to add a single AUTOSAR array typedef given dTypeId, arrayTypeName and width
+%%
+%% e.g. (int16_T, Rte_rt_Array_MYFP_10, 10) => typedef int16_T Rte_rt_Array_MYFP_10[10];
+%function FcnAddAutosarArrayTypedef(arrayTypes, typesFile, dTypeId, arrayTypeName, width) void
+   %if !ISFIELD(arrayTypes, arrayTypeName)
+      %addtorecord arrayTypes %<arrayTypeName> "1"
+      %assign dTNameAliasedThruTo = LibGetDataTypeNameFromId(LibGetDataTypeIdAliasedThruToFromId(dTypeId))
+      %openfile tmpBuffer
+      typedef %<dTNameAliasedThruTo> %<arrayTypeName>[%<width>];
+      %closefile tmpBuffer
+      %<SLibSetModelFileAttributeWithRequiredInclude(typesFile, "Typedefs", tmpBuffer, "rtwtypes.h")>
+   %endif
+   %return arrayTypes
+%endfunction
+  
+%% Function to add AUTOSAR array types to header file for usage
+%% with Model I/O Functions
+%% 
+%% see also FcnAddAutosarArrayTypedefs
+%function FcnAddAUTOSARIOArrayTypesToTypeFile(typesFile, isRteTypeHeader) void
+  %createrecord arrayTypes {}
+  %% Inputs
+  %assign numExtIns = ExternalInputs.NumExternalInputs
+  %foreach idx = numExtIns
+    %assign ei = ExternalInputs.ExternalInput[idx]
+    %assign width = LibGetRecordWidth(ei)
+    %if width > 1
+      %assign dTypeId = LibGetRecordDataTypeId(ei)
+      %assign arrayTypes = FcnAddAutosarArrayTypedefs(arrayTypes, typesFile, isRteTypeHeader, dTypeId, width)
+    %endif
+  %endforeach
+  %% Outputs
+  %assign numExtOuts = ExternalOutputs.NumExternalOutputs
+  %foreach idx = numExtOuts
+    %assign eo = ExternalOutputs.ExternalOutput[idx]
+    %assign sysIdx       = eo.Block[0]
+    %assign blkIdx       = eo.Block[1]
+    %assign outportBlock = System[sysIdx].Block[blkIdx]
+    %assign slPortName = LibGetRecordIdentifier(outportBlock)
+    %with outportBlock
+      %assign width = LibBlockInputSignalWidth(0)
+      %assign dTypeId  = LibBlockInputSignalDataTypeId(0)
+    %endwith
+    %if width > 1
+      %assign arrayTypes = FcnAddAutosarArrayTypedefs(arrayTypes, typesFile, isRteTypeHeader, dTypeId, width)
+    %endif
+  %endforeach
+  %% Client blocks
+    %foreach sysIdx = ::CompiledModel.NumSystems
+    %foreach idx = ::CompiledModel.System[sysIdx].NumBlocks
+      %assign blk = ::CompiledModel.System[sysIdx].Block[idx]
+      %if (blk.Type == "S-Function")
+        %if blk.ParamSettings.FunctionName == "sfun_autosar_clientop"
+          %foreach portIdx = blk.NumDataInputPorts
+            %assign port = blk.DataInputPort[portIdx]
+            %assign width = LibGetRecordWidth( port )
+            %assign dTypeId = LibGetRecordDataTypeId( port )
+            %if width > 1
+              %assign arrayTypes = FcnAddAutosarArrayTypedefs(arrayTypes, typesFile, isRteTypeHeader, dTypeId, width)
+            %endif
+          %endforeach
+          %foreach portIdx = blk.NumDataOutputPorts
+            %assign port = blk.DataOutputPort[portIdx]
+            %assign width = LibGetRecordWidth( port )
+            %assign dTypeId = LibGetRecordDataTypeId( port )
+            %if width > 1
+              %assign arrayTypes = FcnAddAutosarArrayTypedefs(arrayTypes, typesFile, isRteTypeHeader, dTypeId, width)
+            %endif
+          %endforeach
+        %endif
+      %endif
+    %endforeach
+  %endforeach
+  %% Calibration parameters
+  %foreach idx = ::CompiledModel.ModelParameters.NumParameters
+    %if ::CompiledModel.ModelParameters.Parameter[idx].StorageClass == "Custom"
+      %if LibGetCustomStorageClassName(::CompiledModel.ModelParameters.Parameter[idx]) == "CalPrm" || LibGetCustomStorageClassName(::CompiledModel.ModelParameters.Parameter[idx]) == "InternalCalPrm" 
+        %assign prm = ::CompiledModel.ModelParameters.Parameter[idx]
+        %assign width = LibGetRecordWidth( prm )
+        %if width > 1
+           %assign dTypeId  = SLibGetRecordDataTypeId( prm )
+           %assign arrayTypes = FcnAddAutosarArrayTypedefs(arrayTypes, typesFile, isRteTypeHeader, dTypeId, width)        
+        %endif
+      %endif
+    %endif
+  %endforeach
+  %% Data Store Memorys
+  %foreach idx = ::CompiledModel.DWorks.NumDWorks
+    %if ::CompiledModel.DWorks.DWork[idx].StorageClass == "Custom"
+      %if ISFIELD(::CompiledModel.DWorks.DWork[idx], "AutosarPIMDSM")
+        %assign dw = ::CompiledModel.DWorks.DWork[idx]
+        %assign width = LibGetRecordWidth( dw )
+        %if width > 1
+           %assign dTypeId  = SLibGetRecordDataTypeId(dw)
+           %assign arrayTypes = FcnAddAutosarArrayTypedefs(arrayTypes, typesFile, isRteTypeHeader, dTypeId, width)
+        %endif
+      %endif
+    %endif
+  %endforeach
+  %% AUTOSAR IRVs 
+  %assign autosar = ::CompiledModel.RTWAutosar
+  %assign numPeriodicRunnables = SIZE(autosar.PeriodicRunnables.Runnable, 1)
+  %foreach rIdx = numPeriodicRunnables
+    %assign runnable = autosar.PeriodicRunnables.Runnable[rIdx]
+    %if !ISFIELD(runnable, "IOFunction")
+      %continue
+    %endif
+    %assign numIOFcns = SIZE(runnable.IOFunction, 1)
+    %foreach fIdx = numIOFcns
+      %assign ioFcn = runnable.IOFunction[fIdx]
+      %assign dTypeId = SLibGetRecordDataTypeId( ioFcn )
+      %switch ioFcn.Class
+        %case "ImplicitInterrunnableRead"
+        %case "ImplicitInterrunnableWrite"
+        %case "ExplicitInterrunnableRead"
+        %case "ExplicitInterrunnableWrite"
+          %assign width = LibGetRecordWidth( ioFcn )
+          %if width > 1
+            %assign arrayTypes = FcnAddAutosarArrayTypedefs(arrayTypes, typesFile, isRteTypeHeader, dTypeId, width)
+          %endif
+          %break
+        %default
+            %% okay as it's not an IRV
+      %endswitch
+    %endforeach
+  %endforeach
+%endfunction
+
+
+%% Function to add AUTOSAR primitive data types to header file
+%function FcnAddAUTOSARPrimitiveTypesToTypeFile(typesFile) void
+  %openfile tmpBuffer
+  %assign arTypes = FIELDNAMES( ::CompiledModel.RTWAutosar.ARPrimitiveTypes )
+  %foreach idx = SIZE( arTypes, 1 )
+    %assign arType = "%<arTypes[idx]>"
+    %assign slType = GETFIELD( ::CompiledModel.RTWAutosar.ARPrimitiveTypes, "%<arType>" )
+    %% skip floats for integer only model
+    %if PurelyIntegerCode && ( arType == "Float" || arType == "Double" )
+      %continue
+    %endif
+    #ifndef _DEFINED_TYPEDEF_FOR_%<arType>_
+    #define _DEFINED_TYPEDEF_FOR_%<arType>_
+    typedef %<slType> %<arType>;
+    #endif
+  %endforeach
+  %closefile tmpBuffer
+  %<SLibSetModelFileAttributeWithRequiredInclude(typesFile, "Typedefs", tmpBuffer, "rtwtypes.h")>
+%endfunction
+
+%% Function: FcnAddAUTOSARTypedefOverwrite ================================
+%% Abstract:
+%%   Overwrite some data type typedefs in Rte_Type.h for AUTOSAR exported
+%%   data types. For instance the alias type top->middle->bottom->uint8
+%%   is emitted as top->uint8 in Rte_Type.h and the generated guard macro
+%%   to avoid any redefinition error.
+%function FcnAddAUTOSARTypedefOverwrite(typesFile) void
+  %openfile tmpBuffer
+  %assign exportedTypes = FIELDNAMES(::CompiledModel.RTWAutosar.ExportedDataTypesIdx)
+  %foreach idx = SIZE(exportedTypes, 1)
+    %if ISEQUAL(::CompiledModel.RTWAutosar.ExportedDataTypesIdx.%<exportedTypes[idx]>, 1)
+      %assign typeId = IDNUM(exportedTypes[idx])[1]
+      %if LibIsAliasDataType(typeId)
+        %assign aliasedTypedId = LibGetDataTypeIdAliasedToFromId(typeId)
+        %assign bottomTypeId = LibGetDataTypeIdAliasedThruToFromId(typeId)
+        %if !LibIsFundamentalBuiltInDataType(aliasedTypedId) && ...
+            !ISEQUAL(typeId, bottomTypeId) && ...
+            !LibIsStructDataType(bottomTypeId) && ...
+            !LibIsEnumDataType(bottomTypeId)
+          %assign typeName = LibGetDataTypeNameFromId(typeId)
+          %assign bottomTypeName = LibGetDataTypeNameFromId(bottomTypeId)
+          #ifndef _DEFINED_TYPEDEF_FOR_%<typeName>_
+          #define _DEFINED_TYPEDEF_FOR_%<typeName>_
+          typedef %<bottomTypeName> %<typeName>;
+          #endif
+        %endif
+      %endif
+    %endif
+  %endforeach
+  %closefile tmpBuffer
+  %% Append the buffer at the end of the "Defines" section but before the 
+  %% "Typedefs" section 
+  %<SLibSetModelFileAttributeWithRequiredInclude(typesFile, "Defines", tmpBuffer, "rtwtypes.h")>
+%endfunction
+
+%function SLibAddTypesForAutosarClientBlks(component) Output
+%% Add Types from AUTOSAR client operation blks to codeinfo  
+
+tmpTypes = [];
+
+  %foreach sysIdx = ::CompiledModel.NumSystems
+    %foreach idx = ::CompiledModel.System[sysIdx].NumBlocks
+      %assign blk = ::CompiledModel.System[sysIdx].Block[idx]
+      %if (blk.Type == "S-Function")
+        %if blk.ParamSettings.FunctionName == "sfun_autosar_clientop"
+          %foreach portIdx = blk.NumDataInputPorts
+            %assign typeObj = SLibGetEmbeddedTypeObject(blk.DataInputPort[portIdx].CGTypeIdx, 0, 0)
+            tmpTypes = [tmpTypes; %<typeObj>];
+          %endforeach
+          %foreach portIdx = blk.NumDataOutputPorts
+            %assign typeObj = SLibGetEmbeddedTypeObject(blk.DataOutputPort[portIdx].CGTypeIdx, 0, 0)
+            tmpTypes = [tmpTypes; %<typeObj>];
+          %endforeach
+        %endif
+      %endif
+    %endforeach
+  %endforeach
+
+  %<component>.Types = [%<component>.Types; tmpTypes];
+  
+%endfunction
+
+%% Function: SLibAutosarGetTypesFileRecForDataType ====================
+%% Abstract:
+%% Returns file record for data type. Data type will be placed in Rte_Type.h for
+%% exported data types otherwise in model_types.h
+%% 
+%function SLibAutosarGetTypesFileRecForDataType(dtIdx, dtName, dtHeaderFile) void
+        
+      %% datatypes that are used on interface of SWC i.e. those referenced in
+      %% codeInfo are exported and will appear in the Rte_Type.h file which is 
+      %% generated by an RTE generator. Internal datatypes need to be present in model_types.h.
+      %if SLibAutosarIsDataTypeExported(dtIdx)
+        %%check that user has set header file correctly
+        %if dtHeaderFile == "" || dtHeaderFile == "\"Rte_Type.h\""
+          %% okay
+        %else
+          %<SLibReportErrorWithIdAndArgs("RTW:tlc:CannotExportDtype", dtName)>
+        %endif
+        
+        %% For struct data types we need to make sure that the type definition is also exported
+        %if LibIsStructDataType(dtIdx)
+          %assign idAliasedThruTo = LibGetDataTypeIdAliasedThruToFromId(dtIdx)
+          %if idAliasedThruTo != dtIdx
+            %assign nameAliasedThruTo = LibGetDataTypeNameFromId(idAliasedThruTo)
+            %if !SLibAutosarIsDataTypeExported(idAliasedThruTo)
+              %<SLibReportErrorWithIdAndArgs("RTW:tlc:CannotExportDtype2", ...
+                ["%<dtName>", "%<nameAliasedThruTo>", "%<dtName>", "%<dtName>"])>
+            %endif
+          %endif
+        %endif
+          
+        %assign typesFile = SLibGetFileRecForCode("mdl_data_typedef_ertsfcn")      
+      %else %% Internal DataType
+        %%check that user has set header file correctly
+        %if dtHeaderFile == "\"Rte_Type.h\""
+          %assign errTxt = "The data type " + dtName + " for your model has the header file property "
+          %assign errTxt = errTxt + "'Rte_Type.h', however it will be not exported. There are two situations where "
+          %assign errTxt = errTxt + "this can occur. First, the data type is internal with reference to your model, "
+          %assign errTxt = errTxt + "for example, the data type does not cross a root-level I/O boundary.  Second, "
+          %assign errTxt = errTxt + "the data type is associated with a root-level outport or client block, "
+          %assign errTxt = errTxt + "but the signal entering the port or block has a built-in type."
+          %<LibReportWarning(errTxt)>
+        %else
+          %% okay
+        %endif
+        %assign typesFile = SLibGetFileRecForCode("mdl_data_typedef")
+      %endif
+
+      %return typesFile
+      
+%endfunction
+
+
+%% Function: SLibAutosarMarkDataTypeAsExported ====================
+%% Abstract:
+%% Mark data type as exported and hence known by the RTE,
+%% exported data types do not need to be declared in model_type.h as they will
+%% be declared in the generated Rte_Type.h file
+%% 
+%function SLibAutosarMarkDataTypeAsExported(CGTypeIdx) void
+
+    %if !SLibAutosarActive()
+      %% Early return for non AUTOSAR model
+      %return
+    %endif
+  
+  
+    %if !ISFIELD(::CompiledModel.RTWAutosar, "ExportedDataTypesIdx")
+      %addtorecord ::CompiledModel.RTWAutosar ExportedDataTypesIdx { }
+    %endif
+  
+    %assign dtStr = "datatype%<CGTypeIdx>"
+    
+    %if !ISFIELD(::CompiledModel.RTWAutosar.ExportedDataTypesIdx, dtStr)
+    %addtorecord ::CompiledModel.RTWAutosar.ExportedDataTypesIdx %<dtStr> 1
+  %else
+    %% The data type has been already visited but force the flag
+    %assign ::CompiledModel.RTWAutosar.ExportedDataTypesIdx.%<dtStr> = 1
+    %return
+    %endif
+    
+  %% Recurse on alias types
+  %if LibIsAliasDataType(CGTypeIdx)
+    %assign aliasedToTypeId = LibGetDataTypeIdAliasedToFromId(CGTypeIdx)
+    %assign aliasedToTypeName = LibGetDataTypeNameFromId(aliasedToTypeId)
+    %assign aliasedToExported = SLibAutosarIsDataTypeExported(aliasedToTypeId)
+    %<SLibAutosarMarkDataTypeAsExported(aliasedToTypeId)>
+    %if !ISFIELD(::CompiledModel.RTWAutosar.ARPrimitiveTypes, aliasedToTypeName) &&...
+        !aliasedToExported && !LibIsEnumDataType(CGTypeIdx)
+      %% This aliased to type isn't an AUTOSAR primitive type nor a top level 
+      %% alias type -> need to report a warning about this type 
+      %assign ::CompiledModel.RTWAutosar.ExportedDataTypesIdx.datatype%<aliasedToTypeId> = 0      
+    %endif
+  %endif    
+%endfunction
+
+
+%% Function: SLibAutosarMarkChildrenDataTypeAsExported ====================
+%% Abstract:
+%% Mark the children data types of the data type as exported
+%%
+%function SLibAutosarMarkChildrenDataTypeAsExported( parentDataTypeId ) void
+  
+  %foreach idxE = LibDataTypeNumElements( parentDataTypeId )
+    %assign eDTypeId = LibDataTypeElementDataTypeId( parentDataTypeId, idxE )
+    %<SLibAutosarMarkDataTypeAsExported( eDTypeId )>
+    %<SLibAutosarMarkChildrenDataTypeAsExported( eDTypeId )>
+  %endforeach
+  
+%endfunction
+
+
+%% Function: SLibAutosarIsDataTypeExported ====================
+%% Abstract:
+%% Returns TLC_TRUE if data type is exported and hence known by the RTE,
+%% exported data types do not need to be declared in model_type.h as they will
+%% be declared in the generated Rte_Type.h file
+%% 
+%function SLibAutosarIsDataTypeExported(CGTypeIdx) void
+
+  %% Make sure that Autosar map is populated
+  %assign autosarSpec = FcnGetAutosarRecord()
+  
+  %assign dtStr = "datatype%<CGTypeIdx>"
+  %if ISFIELD(::CompiledModel.RTWAutosar.ExportedDataTypesIdx, dtStr) &&...
+      ISEQUAL(::CompiledModel.RTWAutosar.ExportedDataTypesIdx.%<dtStr>, 1)
+    %return TLC_TRUE
+  %else
+    %return TLC_FALSE
+  %endif
+  
+%endfunction
+
+%% Function: SLibAutosarGenerateRteContractPhaseAPIMapping =======================
+%% Abstract:
+%%    Generate the "RTE Contract" Phase api mapping as defined in the RTE
+%% specification
+%%
+%function SLibAutosarGenerateRteContractPhaseAPIMapping( functionName ) void
+  %% e.g. #define Rte_Call_p1_a Rte_Call_c1_p1_a
+  %assign functionNameWithSWC = FEVAL("regexprep", functionName, "Rte_([a-zA-Z0-9]*)", "Rte_$1_%<AutosarSWCName()>")
+  %assign define = "#define %<functionName> %<functionNameWithSWC>"
+  %return define
+%endfunction
+  
+
+%% Function: SLibAutosarExtractRteFunctionName =======================
+%% Abstract:
+%%    Extract Rte api function name from str
+%%
+%function SLibAutosarExtractRteFunctionName( str ) void
+  %assign output = FEVAL("regexp", str, "(?<api>Rte_(\\w)*)", "names", "once")
+  %return output.api
+%endfunction
+
+%function AutosarSWCName() void
+  %assign autosarSpec = FcnGetAutosarRecord()
+  %return autosarSpec.MainInterfaceName 
+%endfunction
+
+
+%function SLibAutosarIsMultiRunnableFcn(functionName)
+  %% are we dealing with a runnable?
+  %assign autosar = ::CompiledModel.RTWAutosar
+  %assign numPeriodicRunnables = SIZE(autosar.PeriodicRunnables.Runnable, 1)
+  %foreach rIdx = numPeriodicRunnables
+    %assign runnableName = autosar.PeriodicRunnables.Runnable[rIdx].Name
+    %if functionName == runnableName
+      %return TLC_TRUE
+    %endif
+  %endforeach
+  %return TLC_FALSE
+%endfunction
+
+
+%function MainAutosarInterfaceName() void
+  %assign autosarSpec = FcnGetAutosarRecord()
+  %return "Rte_" + autosarSpec.MainInterfaceName 
+%endfunction
+
+
+%function SLibAutosarWarnUserToDiscardFileForProduction() void
+  %openfile tmp
+
+/*
+*
+* This file contains dummy implementations of the AUTOSAR functions
+* used by this model for testing the code generated from Simulink.
+* Simulink invokes the generated code through its S-Function API.  
+* Note that this file is replaced with the real implementation 
+* when deploying the generated code outside of Simulink.
+*
+*/
+   %closefile tmp
+   %return tmp
+%endfunction
+
+
+%function SLibAutosarIsPassByPtr2BaseType()
+  %% Determine if array reference is by pointer to array base type
+  %if ISEQUAL(SLibAutosarGetSchemaVersion(), "4.0") && ...
+    FEVAL("eval", "slfeature('AutosarArrayReference')")
+    %return TLC_TRUE
+  %elseif FEVAL("eval", "slfeature('AutosarArrayReference')") >= 2
+    %return TLC_TRUE
+  %endif
+  %return TLC_FALSE
+%endfunction
+
+%function SLibAutosarGetArrayBaseTypeName(dtypeId)
+  %return LibGetDataTypeNameFromId(LibGetDataTypeIdAliasedThruToFromId( ...
+    dtypeId))
+%endfunction
+
+%function DumpRTEFile() void
+
+%assign mainAutosarInterface = MainAutosarInterfaceName()
+
+%% Generate Rte_<SWC>.h
+%assign rteFileH = LibCreateSourceFile("Header", "Custom", MainAutosarInterfaceName())
+%<SLibSetModelFileAttribute(rteFileH, "Group", "other")>
+%<SLibAutosarLocateFileInStubDir(rteFileH)>
+
+%openfile buffer
+%<SLibAutosarWarnUserToDiscardFileForProduction()>
+
+#include <string.h>
+#include "Rte_Type.h"
+#include "Compiler.h"
+%if EXISTS(::AUTOSARCalibNeeded)
+#include "%<mainAutosarInterface>_calib.h"
+%endif
+%if EXISTS(::AUTOSARPIMNeeded)
+  #include "%<MainAutosarInterfaceName()>_PIM.h"
+%endif
+
+%closefile buffer
+%<LibSetSourceFileSection(rteFileH, "Includes", buffer)>
+
+%openfile buffer
+%assign typesFile = SLibGetFileRecForCode("mdl_data_typedef_ertsfcn")
+%<LibSetSourceFileSection(typesFile, "Defines", SLibAutosarWarnUserToDiscardFileForProduction())>
+%<FcnAddAUTOSARTypedefOverwrite(typesFile)>
+%<FcnAddAUTOSARPrimitiveTypesToTypeFile(typesFile)>
+%<FcnAddAUTOSARRteInstanceToTypeFile(typesFile)>
+%<FcnAddAUTOSARPIMTypesToTypeFile(typesFile)>
+
+%createrecord functionsDefined {}
+%createrecord interrunnableVarsDefined {}
+%createrecord clientFunctionsDefined {}
+
+%% Determine if array reference is by pointer to array base type
+%assign passByPtr2ArrayBaseTypeFeatOn = SLibAutosarIsPassByPtr2BaseType()
+
+%assign fcns = ""
+%assign autosar = ::CompiledModel.RTWAutosar
+%assign numPeriodicRunnables = SIZE(autosar.PeriodicRunnables.Runnable, 1)
+%foreach rIdx = numPeriodicRunnables
+  %assign runnable = autosar.PeriodicRunnables.Runnable[rIdx]
+  %if !ISFIELD(runnable, "IOFunction")
+    %continue
+  %endif
+  %assign numIOFcns = SIZE(runnable.IOFunction, 1)
+  %foreach fIdx = numIOFcns
+    %assign ioFcn = runnable.IOFunction[fIdx]
+    %assign functionName = ioFcn.Name
+    %if ISFIELD(functionsDefined, functionName)
+      %continue
+    %endif
+    %addtorecord functionsDefined %<functionName> "1"
+    %assign dtypeId = ioFcn.DTypeId
+    %assign width = ioFcn.Width
+    %assign isStruct = LibIsStructDataType(dtypeId)
+    %assign dataType = LibGetDataTypeNameFromId(dtypeId)
+    %assign portIdx = ioFcn.ModelPortIndex
+    %if width > 1
+      %assign dataType = FcnAutosarArrayType("Rte_", dtypeId, width)
+    %endif
+    
+    %% Check on multiword, this is checked in the xml export stage, however this is after code compilation for SIL.
+    %assign dt = DataTypes.DataType[dtypeId]
+    %if dt.IsFixedPoint && dt.RequiredBits > 32
+      %<SLibReportErrorWithId("RTW:tlc:MultiWordInAutosar")>
+    %endif
+
+    %% define contract phase function name mapping
+    %<SLibAutosarGenerateRteContractPhaseAPIMapping( functionName )>
+
+    %switch ioFcn.Class
+      %case "ImplicitRead"
+      %case "ImplicitReadErrorStatus"
+        %if width > 1 && passByPtr2ArrayBaseTypeFeatOn
+          %% If the variable is an array and array should be passed by pointer
+          %% to the base type, then generate different function prototypes and
+          %% body.
+          %assign proto = SLibAutosarGetArrayBaseTypeName(dtypeId) + "* " + functionName + "(void)"
+          %<proto>;
+          %assign fcns = fcns + proto + "{\nreturn localIn" + "%<portIdx>" + ";\n}\n"
+        %elseif width > 1 || LibIsStructDataType(dtypeId)
+          %assign proto = dataType + "* " + functionName + "(void)"
+          %<proto>;
+          %assign fcns = fcns + proto + "{\nreturn &localIn" + "%<portIdx>" + ";\n}\n"
+        %else
+          %assign proto = dataType + " " + functionName + "(void)"
+          %<proto>;
+          %assign fcns = fcns + proto + "{\nreturn localIn" + "%<portIdx>" + ";\n}\n"
+        %endif
+        %break
+      %case "ImplicitInterrunnableRead"
+        %% Implicit IRV read and explicit IRV read has different API
+        %% for complex type.
+        %assign varName = ioFcn.ExtraStr
+        %if !ISFIELD(interrunnableVarsDefined, varName)
+          %assign fcns = fcns + "static %<dataType> local%<varName>;\n\n"
+          %addtorecord interrunnableVarsDefined %<varName> "1"
+        %endif
+        %if width > 1 && passByPtr2ArrayBaseTypeFeatOn
+          %% If the variable is an array and array should be passed by pointer
+          %% to the base type, then generate different function prototypes and
+          %% body.
+          %assign proto = SLibAutosarGetArrayBaseTypeName(dtypeId) + "* " + functionName + "(void)"
+          %<proto>;
+          %assign fcns = fcns + proto + "{\nreturn local" + varName + ";\n}\n"
+        %elseif width > 1 || LibIsStructDataType(dtypeId)
+          %assign proto = dataType + "* " + functionName + "(void)"
+          %<proto>;
+          %assign fcns = fcns + proto + "{\nreturn &local" + varName + ";\n}\n"
+        %else
+          %assign proto = dataType + " " + functionName + "(void)"
+          %<proto>;
+          %assign fcns = fcns + proto + "{\nreturn local" + varName + ";\n}\n"
+        %endif
+        %break
+      %case "ExplicitInterrunnableRead"
+        %assign varName = ioFcn.ExtraStr
+        %if !ISFIELD(interrunnableVarsDefined, varName)
+          %assign fcns = fcns + "static %<dataType> local%<varName>;\n\n"
+          %addtorecord interrunnableVarsDefined %<varName> "1"
+        %endif
+        %% For complex datatypes the variable is passed in as a pointer, 
+        %% and explicit IRV has the similar API as explicit read.
+        %if width > 1 && passByPtr2ArrayBaseTypeFeatOn
+          %% If the variable is an array and array should be passed by pointer
+          %% to the base type, then generate different function prototypes and
+          %% body.
+          %assign proto = "void " + functionName + "(" + SLibAutosarGetArrayBaseTypeName(dtypeId) + "* u)"
+          %<proto>;
+          %assign fcns = fcns + proto + "{\nmemcpy(u, local" + ...
+            "%<varName>" + ", sizeof(" + dataType + "));\n}\n"
+        %elseif width > 1 || LibIsStructDataType(dtypeId)
+          %assign proto = "void " + functionName + "(" + dataType + "* u)"
+          %<proto>;
+          %assign fcns = fcns + proto + "{\nmemcpy(u, &local" + ...
+            "%<varName>" + ", sizeof(" + dataType + "));\n}\n"
+        %else
+          %assign proto = dataType + " " + functionName + "(void)"
+          %<proto>;
+          %assign fcns = fcns + proto + "{\nreturn local" + varName + ";\n}\n"
+        %endif
+        %break
+      %case "ExplicitRead"
+      %case "QueuedExplicitRead"
+        %% Explicit Read always passes argument by pointer, however when
+        %% passing an array, and passByPtr2ArrayBaseTypeFeatOn feature is on
+        %% the prototype and body need to be changed.
+        %if ioFcn.ExtraInt >= 0
+          %% User is accessing an explicit read and wants the error status
+          %assign return_type = "uint8_T "
+          %assign return_stmt = "return localIn%<ioFcn.ExtraInt>;\n"
+        %else
+          %assign return_type = "void "
+          %assign return_stmt = ""
+        %endif
+        %if width > 1 && passByPtr2ArrayBaseTypeFeatOn
+          %% If the variable is an array and array should be passed by pointer
+          %% to the base type, then generate different function prototypes and
+          %% body.
+          %assign proto = return_type + functionName + "(" + SLibAutosarGetArrayBaseTypeName(dtypeId) + "* u)"
+          %<proto>;
+          %assign fcns = fcns + proto + "{\nmemcpy(u, localIn" + ...
+            "%<portIdx>" + ", sizeof(" + dataType + "));\n" + ...
+            return_stmt + "}\n"
+        %else
+          %assign proto = return_type + functionName + "(" + dataType + "* u)"
+          %<proto>;
+          %assign fcns = fcns + proto + "{\nmemcpy(u, &localIn" + ...
+            "%<portIdx>" + ", sizeof(" + dataType + "));\n" + ...
+            return_stmt + "}\n"
+        %endif
+        %break
+      %case "ExplicitReadErrorStatus"
+      %case "QueuedExplicitReadErrorStatus"
+        %% User wants to access the error status, however the data port may have been optimised 
+        %% away and so the "ExplicitRead" path (above) is not followed.
+        %assign ei = ::CompiledModel.ExternalInputs.ExternalInput[ioFcn.ExtraInt]
+        %assign dataType = SLibGetRecordDataTypeName(ei, "")
+        %assign dtypeId = SLibGetRecordDataTypeId(ei)
+        %assign width = LibGetRecordWidth(ei)
+        %if width > 1
+          %assign dataType = FcnAutosarArrayType("Rte_", dtypeId, width)
+        %endif
+        %if width > 1 && passByPtr2ArrayBaseTypeFeatOn
+          %% If the variable is an array and array should be passed by pointer
+          %% to the base type, then generate different function prototypes and
+          %% body.
+          %assign proto = "uint8_T " + functionName + "(" + SLibGetRecordDataTypeName(ei, "") + "* u)"
+          %<proto>;
+          %assign fcns = fcns + proto + "{\nmemcpy(u, localIn" ...
+            "%<ioFcn.ExtraInt>" + ", sizeof(" + dataType + "));\n" + ...
+            "return localIn%<portIdx>;\n}\n"
+        %else
+          %assign proto = "uint8_T " + functionName + "(" + dataType + "* u)"
+          %<proto>;
+          %assign fcns = fcns + proto + "{\nmemcpy(u, &localIn" ...
+            "%<ioFcn.ExtraInt>" + ", sizeof(" + dataType + "));\n" + ...
+            "return localIn%<portIdx>;\n}\n"
+        %endif
+        %break
+      %case "BasicSoftwareRead"
+        %if width > 1 && passByPtr2ArrayBaseTypeFeatOn
+          %assign proto = "void " + functionName + "(" + SLibAutosarGetArrayBaseTypeName(dtypeId) + "* u)"
+          %<proto>;
+          %assign fcns = fcns + proto + "{\nmemcpy(u, localIn" + ...
+            "%<portIdx>" + ", sizeof(" + dataType + "));\n}\n"
+        %else
+          %assign proto = "void " + functionName + "(" + dataType + "* u)"
+          %<proto>;
+          %assign fcns = fcns + proto + "{\nmemcpy(u, &localIn" + ...
+            "%<portIdx>" + ", sizeof(" + dataType + "));\n}\n"
+        %endif
+        %break
+      %case "ImplicitWrite"
+      %case "ExplicitWrite"
+      %case "BasicSoftwareWrite"
+        %if width > 1 && passByPtr2ArrayBaseTypeFeatOn
+          %% If the variable is an array and array should be passed by pointer
+          %% to the base type, then generate different function prototypes and
+          %% body.
+          %assign proto = "void " + functionName + "(" + SLibAutosarGetArrayBaseTypeName(dtypeId) + "* u)"
+          %<proto>;
+          %assign fcns = fcns + proto + "{\nmemcpy(localOut" + ...
+            "%<portIdx>" + ", u, sizeof(" + dataType + "));\n}\n"
+        %elseif width > 1 || LibIsStructDataType(dtypeId)
+          %assign proto = "void " + functionName + "(" + dataType + "* u)"
+          %<proto>;
+          %assign fcns = fcns + proto + "{\nmemcpy(&localOut" + ...
+            "%<portIdx>" + ", u, sizeof(" + dataType + "));\n}\n"
+        %else
+          %assign proto = "void " + functionName + "(" + dataType + " u)"
+          %<proto>;
+          %assign fcns = fcns + proto + "{\nmemcpy(&localOut" + ...
+            "%<portIdx>" + ", &u, sizeof(" + dataType + "));\n}\n"
+        %endif
+        %break
+      %case "ImplicitInterrunnableWrite"
+      %case "ExplicitInterrunnableWrite"
+        %assign varName = ioFcn.ExtraStr
+        %if !ISFIELD(interrunnableVarsDefined, varName)
+          %assign fcns = fcns + "static %<dataType> local%<varName>;\n\n"
+          %addtorecord interrunnableVarsDefined %<varName> "1"
+        %endif
+        %% IRV write has similar interface as Rte write
+        %if width > 1 && passByPtr2ArrayBaseTypeFeatOn
+          %% If the variable is an array and array should be passed by pointer
+          %% to the base type, then generate different function prototypes and
+          %% body.
+          %assign proto = "void " + functionName + "(" + SLibAutosarGetArrayBaseTypeName(dtypeId) + "* u)"
+          %<proto>;
+          %assign fcns = fcns + proto + "{\nmemcpy(local" + ...
+            varName + ", u, sizeof(" + dataType + "));\n}\n"
+        %elseif width > 1 || LibIsStructDataType(dtypeId)
+          %assign proto = "void " + functionName + "(" + dataType + "* u)"
+          %<proto>;
+          %assign fcns = fcns + proto + "{\nmemcpy(&local" + ...
+            varName + ", u, sizeof(" + dataType + "));\n}\n"
+        %else
+          %assign proto = "void " + functionName + "(" + dataType + " u)"
+          %<proto>;
+          %assign fcns = fcns + proto + "{\nmemcpy(&local" + ...
+            varName + ", &u, sizeof(" + dataType + "));\n}\n"
+        %endif
+        %break
+      %default
+        %assert 0
+    %endswitch
+  %endforeach
+%endforeach
+
+%% Client operation block
+%foreach sysIdx = ::CompiledModel.NumSystems
+  %foreach idx = ::CompiledModel.System[sysIdx].NumBlocks
+    %assign blk = ::CompiledModel.System[sysIdx].Block[idx]
+    %if (blk.Type == "S-Function")
+      %if blk.ParamSettings.FunctionName == "sfun_autosar_clientop"
+        %assign proto = blk.FcnCallProtoStr
+        %assign functionName = SLibAutosarExtractRteFunctionName( proto )
+        %if !ISFIELD(clientFunctionsDefined, functionName)
+          %addtorecord clientFunctionsDefined %<functionName> "1"
+          %<SLibAutosarGenerateRteContractPhaseAPIMapping( functionName )>
+          %<proto>;
+          %assign numOutports = %<LibBlockNumOutputPorts(blk)> 
+          %openfile fcnBuffer
+          {
+            %foreach portIdx = numOutports
+              %with blk
+                %assign dTypeId = %<LibBlockOutputSignalDataTypeId(portIdx)>
+                %assign width = %<LibBlockOutputSignalWidth(portIdx)>
+                %assign isComplex = %<LibBlockOutputSignalIsComplex(portIdx)>
+              %endwith
+              %if (portIdx == (numOutports-1)) && (blk.ShowErrorStatus=="on")
+                return %<SLibGetGroundValueFromId(dTypeId)>;
+              %else
+                %% Assign ground value to the output argument
+                %if (width > 1) && passByPtr2ArrayBaseTypeFeatOn
+                  %assign lhsName = "(%<blk.OutputArgNames[portIdx]>)"
+                %else
+                  %assign lhsName = "(*%<blk.OutputArgNames[portIdx]>)"
+                %endif
+                %<FcnInitializeAutosarRteOutportHelper(lhsName, 1, "", dTypeId, width, isComplex)>
+              %endif
+            %endforeach
+          }
+          %closefile fcnBuffer
+          %assign fcns = fcns + proto + fcnBuffer
+        %endif
+      %endif
+    %endif
+  %endforeach
+%endforeach
+%closefile buffer
+
+%<LibSetSourceFileSection(rteFileH, "Defines", buffer)>
+
+
+%% Server Operation PIM
+%if SLibAutosarIsServerOperation()
+  %assign buildDir = FEVAL("rtwprivate", "rtwattic", "getBuildDir")
+  %assign serverOperationInfo = FEVAL("arblk.createServerOperationWrapper", LibGetModelName(), buildDir)
+  %if serverOperationInfo.success != 1
+    %<SLibReportErrorWithId("RTW:tlc:GenericMsg", serverOperationInfo.txt)>
+  %endif
+  
+  %if !ISEMPTY(serverOperationInfo.rtePIMDecl)
+    %% Declare PIM RTE functions
+    %<LibSetSourceFileSection(rteFileH, "Defines", serverOperationInfo.rtePIMDecl)>
+    %% Declare PIM RTE functions
+    %<LibSetSourceFileSection(typesFile, "Defines", serverOperationInfo.rtePIMTypedef)>
+    %% store SIL sfcn implementation
+    %assign fcns = fcns + serverOperationInfo.rtePIMImpl + "\n"
+  %endif
+%endif
+
+%% Generate Compiler.h for Compiler Abstraction macros
+%assign compilerFileH = LibCreateSourceFile("Header", "Custom", "Compiler")
+%<SLibAutosarLocateFileInStubDir(compilerFileH)>
+%<SLibSetModelFileAttribute(compilerFileH, "Group", "other")>
+%openfile buffer
+%<SLibAutosarWarnUserToDiscardFileForProduction()>
+
+/*
+*
+* This header file specifies macros for the abstraction of compiler specific
+* keywords used for addressing data and code within declarations and
+* definitions.  This is used to overcome problems caused by the limited 16 bit
+* addressing range.
+*
+* For SIL/PIL macros behave as identity operators.
+*
+*/
+
+/* Compiler Abstractions for PC */
+#define FUNC(type, memclass) type
+#define P2VAR(ptrtype, memclass, ptrclass) ptrtype *
+#define P2CONST(ptrtype, memclass, ptrclass) const ptrtype *
+#define CONSTP2VAR(ptrtype, memclass, ptrclass) ptrtype * const
+#define CONSTP2CONST(ptrtype, memclass, ptrclass) const ptrtype * const
+%% #define P2FUNC(rettype, ptrclass, fctname) rettype (*fcnname)
+#define CONST(consttype, memclass) const consttype
+#define VAR( type, memclass ) type
+%closefile buffer
+%<LibSetSourceFileSection(compilerFileH, "Defines", buffer)>
+
+%openfile buffer2
+  void initializeAutosarRteVariables()
+  {
+    %<FcnInitializeAutosarRteInterrunnable()>
+    %<FcnInitializeAutosarRteOutports()>
+  }
+%closefile buffer2
+
+%openfile buffer3
+  void initializeNVRAMs()
+  {
+    %<FcnAutosarNVRAMInit()>
+  }
+%closefile buffer3
+
+%assign fcns = fcns + buffer2 + buffer3
+%return fcns
+%endfunction
+
+%function SLibInitializeAutosarRteVariables() void
+  %assign buffer = "initializeAutosarRteVariables();"
+  %return buffer
+%endfunction
+
+%function FcnAutosarNVRAMInit()
+  %openfile buffer
+  %% Data Store Memorys
+  %foreach idx = ::CompiledModel.DWorks.NumDWorks
+    %assign dw = ::CompiledModel.DWorks.DWork[idx]
+    %if dw.StorageClass == "Custom" && ISFIELD(dw, "AutosarPIMDSM")
+      %assign ca = LibGetCustomStorageAttributes(dw)
+      %if ISEMPTY(ca) || ...
+        !ISFIELD(ca, "needsNVRAMAccess") || ...
+        !ca.needsNVRAMAccess
+        %continue
+      %endif
+      %assign name = LibGetRecordIdentifier(dw) 
+      %<::CompiledModel.Name>_Init_Pim_%<name>();
+    %endif
+  %endforeach
+
+  %closefile buffer
+  %return buffer
+%endfunction
+
+%function SLibInitializeAutosarNVRAMs() void
+  %assign buffer = "initializeNVRAMs();"
+  %return buffer
+%endfunction
+
+%function FcnInitializeAutosarRteOutportHelper(lhsName, loopIdx, elem, dTypeId, width, isComplex) void
+  %openfile buffer
+  %if LibIsStructDataType(dTypeId)
+    %foreach eIdx = LibDataTypeNumElements(dTypeId)
+      %assign eDtypeId = LibDataTypeElementDataTypeId(dTypeId, eIdx)
+      %assign eWidth = LibDataTypeElementWidth(dTypeId, eIdx)
+      %assign eIsComplex = LibDataTypeElementIsComplex(dTypeId, eIdx)
+      %if width == 1
+        %assign eElem = elem + "." + LibDataTypeElementName(dTypeId, eIdx)
+        %<FcnInitializeAutosarRteOutportHelper(lhsName, loopIdx + 1, eElem, eDtypeId, eWidth, eIsComplex)>
+      %else
+        %assign eElem = elem + "[i%<loopIdx>]." + LibDataTypeElementName(dTypeId, eIdx)
+        {
+          int_T i%<loopIdx>;
+          for (i%<loopIdx> = 0; i%<loopIdx> < %<width>; i%<loopIdx>++) {
+            %<FcnInitializeAutosarRteOutportHelper(lhsName, loopIdx + 1, eElem, eDtypeId, eWidth, eIsComplex)>
+          }
+        }
+      %endif
+    %endforeach
+  %else
+    %if LibIsDataTypeMultiWordFixpt(dTypeId)
+      %assign defaultInitialValue = SLibGetDtGroundName(dTypeId, isComplex, tRealPart)
+    %else
+      %assign defaultInitialValue = SLibGetDtGroundValue(dTypeId, isComplex, tRealPart, 0)          
+    %endif
+    %if width == 1
+      %assign lhs = "%<lhsName>%<elem>"
+      %if isComplex 
+        %assign lhs = lhs + "." + tRealPart
+      %endif
+      %<lhs> = %<defaultInitialValue>;
+      %if isComplex
+        %assign lhs = "%<lhsName>%<elem>" + "." + tImagPart
+        %<lhs> = %<defaultInitialValue>;
+      %endif
+    %else
+      {
+        int_T i%<loopIdx>;
+        for (i%<loopIdx> = 0; i%<loopIdx> < %<width>; i%<loopIdx>++) {
+        %assign sigIndexer = SLibGet1DArrayIndexer(width, "i%<loopIdx>", "", 0)
+        %assign lhs = "%<lhsName>%<elem>" + sigIndexer
+        %if isComplex 
+          %assign lhs = lhs + "." + tRealPart
+        %endif
+        %<lhs> = %<defaultInitialValue>;
+        %if isComplex
+          %assign lhs = "%<lhsName>%<elem>" + sigIndexer + "." + tImagPart
+          %<lhs> = %<defaultInitialValue>;
+        %endif
+        }
+      }
+    %endif
+  %endif
+  %closefile buffer
+  %return buffer
+%endfunction
+
+%function FcnInitializeAutosarRteOutports() void
+  %openfile buffer
+  %assign rPart   = "%<tRealPart>0"
+  %assign iPart   = "%<tImagPart>0"
+  %foreach idx = ::CompiledModel.ExternalOutputs.NumExternalOutputs
+    %assign extOut       = CompiledModel.ExternalOutputs.ExternalOutput[idx]
+    %assign dTypeId = LibGetRecordDataTypeId(extOut)
+    %assign width   = LibGetRecordWidth(extOut)
+    %assign isComplex = LibGetRecordIsComplex(extOut)
+    %assign lhsName = "localOut%<idx>"
+    %<FcnInitializeAutosarRteOutportHelper(lhsName, 1, "", dTypeId, width, isComplex)>
+  %endforeach
+  %closefile buffer
+  %return buffer
+%endfunction
+
+%% Initialize interrunable variables 
+%function FcnInitializeAutosarRteInterrunnable() void
+  %openfile buffer
+  %createrecord interrunnableVarsDefined {}
+  %% Go through each runnable's IOFunction and initialize IRV
+  %assign autosar = ::CompiledModel.RTWAutosar
+  %assign numPeriodicRunnables = SIZE(autosar.PeriodicRunnables.Runnable, 1)
+  %foreach rIdx = numPeriodicRunnables
+    %assign runnable = autosar.PeriodicRunnables.Runnable[rIdx]
+    %if !ISFIELD(runnable, "IOFunction")
+      %continue
+    %endif
+    %assign numIOFcns = SIZE(runnable.IOFunction, 1)
+    %foreach fIdx = numIOFcns
+      %assign ioFcn = runnable.IOFunction[fIdx]
+      %assign dTypeId = SLibGetRecordDataTypeId( ioFcn )
+      %switch ioFcn.Class
+        %case "ImplicitInterrunnableRead"
+        %case "ImplicitInterrunnableWrite"
+        %case "ExplicitInterrunnableRead"
+        %case "ExplicitInterrunnableWrite"
+          %assign varName = ioFcn.ExtraStr
+          %if !ISFIELD(interrunnableVarsDefined, varName)
+            %addtorecord interrunnableVarsDefined %<varName> "1"
+            %assign width = LibGetRecordWidth( ioFcn )
+            %assign dTypeId = LibGetRecordDataTypeId( ioFcn )
+            %assign isComplex = LibGetRecordIsComplex( ioFcn )
+            %assign lhsName = "local%<varName>"
+            %<FcnInitializeAutosarRteOutportHelper(lhsName, 1, "", dTypeId, width, isComplex)>
+          %endif
+          %break
+        %default
+          %% okay as it's not an IRV
+      %endswitch
+    %endforeach
+  %endforeach
+  %closefile buffer
+  %return buffer
+%endfunction
+  
+
+%% [EOF] autosarsup.tlc

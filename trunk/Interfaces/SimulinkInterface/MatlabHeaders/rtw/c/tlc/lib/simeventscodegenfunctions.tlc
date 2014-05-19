@@ -1,0 +1,63 @@
+%% $Revision: 1.1.6.7 $  $Date: 2011/03/28 03:21:12 $
+%% Copyright 2005-2010 The MathWorks, Inc.
+%%
+%% Abstract: SimEvents code construction TLC function.
+%%
+
+
+%% Function: seRuntimeSetupCode ===============================================
+%% Abstract: Emit code that calls into SimEvents to set up the run-time 
+%%           engine environment. Since CGIR doesn't know how to refer to client
+%%           constructed global variables, this function exists.
+%function seRuntimeSetupCode(Id,dworkPtr) void
+{
+
+    %%<LibAddToCommonIncludes("se_cg_defs.h")> 
+    %<LibAddToCommonIncludes("SESubgraph%<Id>__seSetup_.h")>
+  
+  %openfile buff
+  { 
+    boolean_T tmp = simevents_rtSetup(numOfElem_myRTSeNode%<Id>, 
+                                      myRTSeNode%<Id>, myBParams%<Id>, myInSeConn%<Id>, 
+                                      myOutSeConn%<Id>, myInSlConn%<Id>, myOutSlConn%<Id>,
+                                      numOfElem_myAttributeInfo%<Id>,myAttributeInfo%<Id>,
+                                      numOfElem_myDesDataInfo%<Id>,myDesDataInfo%<Id>,
+                                      numOfElem_myDesDataDims%<Id>,myDesDataDims%<Id>,
+                                      myRTSeCfgPr%<Id>,
+                                      %<dworkPtr>,%<Id>);
+                                   
+     if (tmp) {
+                %<LibSetRTModelErrorStatus("\"Execution stopping due to error\"")>;
+                %<RTMSetStopRequested(1)>;
+               }
+   }
+               
+   %closefile buff
+
+   %return buff
+}
+%endfunction
+
+%% Function: seReactivePortOutputCode ===========================================
+%% Abstract: Emit code that run SimEvents reactive port. 
+%%           Since the block construction API doesn't allow input port 
+%%           specific output functions, this TLC exists.
+%function seReactivePortOutputCode(blockId,portId,ID) void
+{
+    %openfile buff
+    {
+         int32_T u = %<RTMGetStopRequested()>;
+         if (!u)
+         {
+            boolean_T tmp = simevents_inputUpdate(%<blockId>,%<portId>,%<ID>);
+            if (tmp) {
+                      %<LibSetRTModelErrorStatus("\"Execution stopping due to error\"")>;
+                      %<RTMSetStopRequested(1)>;
+                      }
+         }
+    }
+    %closefile buff
+    
+    %return buff
+}
+%endfunction
