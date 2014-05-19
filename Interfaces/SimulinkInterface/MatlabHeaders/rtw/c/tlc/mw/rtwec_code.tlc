@@ -1,0 +1,40 @@
+%% =============================================================================
+%% $RCSfile: rtwec_code.tlc,v $
+%% $Revision: 1.1.6.7 $
+%% $Date: 2010/09/13 14:19:29 $
+%%
+%% Abstract:
+%%   Included by Embedded Coder code templates to emit generate code.
+%%
+%% Copyright 1994-2010 The MathWorks, Inc.
+%%
+%assign needGuard = LibGetModelFileNeedHeaderGuard(fileIdx)
+%if needGuard
+  #ifndef RTW_HEADER_%<FileTag>_
+  #define RTW_HEADER_%<FileTag>_
+
+%endif
+%<LibGetSourceFileSection(fileIdx,"Includes")>\
+%<LibGetSourceFileSection(fileIdx,"ModelTypesIncludes")>\
+%<LibGetSourceFileSection(fileIdx,"ModelTypesDefines")>\
+%<LibGetSourceFileSection(fileIdx,"Defines")>\
+%<LibGetSourceFileSection(fileIdx,"ModelTypesTypedefs")>\
+%<LibGetSourceFileSection(fileIdx,"IntrinsicTypes")>\
+%<LibGetSourceFileSection(fileIdx,"PrimitiveTypedefs")>\
+%<LibGetSourceFileSection(fileIdx,"UserTop")>\
+%<LibGetSourceFileSection(fileIdx,"Typedefs")>\
+%<LibGetSourceFileSection(fileIdx,"Enums")>\
+%<LibGetSourceFileSection(fileIdx,"Definitions")>\
+%<LibGetSourceFileSection(fileIdx,"ExternData")>\
+%<LibGetSourceFileSection(fileIdx,"ExternFcns")>\
+%<LibGetSourceFileSection(fileIdx,"FcnPrototypes")>\
+%<LibGetSourceFileSection(fileIdx,"Declarations")>\
+%<LibGetSourceFileSection(fileIdx,"Functions")>\
+%<LibGetSourceFileSection(fileIdx,"CompilerErrors")>\
+%<LibGetSourceFileSection(fileIdx,"CompilerWarnings")>\
+%<LibGetSourceFileSection(fileIdx,"Documentation")>\
+%<LibGetSourceFileSection(fileIdx,"UserBottom")>\
+%if needGuard
+
+  #endif /* RTW_HEADER_%<FileTag>_ */
+%endif

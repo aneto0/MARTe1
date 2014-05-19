@@ -1,0 +1,1085 @@
+%% $RCSfile: samlib.tlc,v $
+%% $Revision: 1.1.6.8 $
+%% $Date: 2010/10/15 12:05:44 $
+%%
+%% Copyright 2008-2010 The MathWorks, Inc.
+%%
+%% Abstract:
+%%
+%if EXISTS("_SAMLIB_") == 0
+%assign _SAMLIB_ = 1
+
+%%
+%% SAM support library
+%%
+
+%% ------------------------------------------------- %%
+%%                                                   %%
+%% Exported functions                                %%
+%% ------------------                                %%
+%% - LibSamActive() void                             %%
+%% - LibSamSuppressRtm() void                        %%
+%% - LibSamContainedVarAccess() void                 %%
+%% - LibSamClassContainedVarAccess() void            %%
+%% - LibSamOutputTopCode(tid) void                   %%
+%% - LibSamOutputBottomCode(tid) void                %%
+%% - LibSamPrivateDeclarations()                     %%
+%% - LibSamPublicDeclarations()                      %%
+%% - LibSamProtectedDeclarations()                   %%
+%% - LibSamDeclareTaskCounters(external)             %%
+%% - LibSamSetUpdateRTBcode(update) void             %%
+%% - LibSamGetUpdateRTBcode() void                   %%
+%% - LibSamMayNeedUpdateRTBCounters() void           %%
+%% - LibSamUpdateRateTransitionCounters()            %%
+%% - LibSamIfaceIncludes()                           %%
+%% - LibSamGenPrototypes(external)                   %%
+%% - LibSamFixPrototype(fcnProto, fcn) void          %%
+%% - LibSamCacheExtApiProto(extApiProt) void         %%
+%% - LibSamCacheExtApiCode(extApiCode) void          %%
+%% - LibSamGetCGTypeFromSLType(slTypeIdx)            %%
+%% - LibSamGetCGTypeIdxFromSLTypeIdx(slTypeIdx) void %%
+%% - LibSamCGTypeIsFixed(cgTypeIdx) void             %%
+%%                                                   %%
+%% Internal functions                                %%
+%% ------------------                                %%
+%% - SLibSamClassContainedVar(var) void              %%
+%% - SLibSamClassContainedVarRef(var) void           %%
+%% - SLibSamGenTypedefs()                            %%
+%% - SLibSamDeclarePortIfaces() void                 %%
+%% - SLibSamDeclarePortIfacePointers()               %%
+%% - SLibSamDeclarePortIfaceSetters()                %%
+%% - SLibSamDefinePortGetterSetters()                %%
+%% - SLibSamMapType(typeName) void                   %%
+%% - SLibSamMapTypeIdx(cgTypeIdx) void               %%
+%% - SLibSamMapFxpType(cgTypeIdx) void               %%
+%% - SLibSamGetCGTypeIdx(typeName) void              %%
+%% - SLibSamSyncWithCodeGen() void                   %%
+%% - SLibSamFldAccess(isptr) void                    %%
+%%                                                   %%
+%% ------------------------------------------------- %%
+%%
+%% @todo Prefix exported functions with 'Lib' as in the list above to comply with coding conventions.
+%%
+
+%%
+%% - * - * - * - Exported functions - * - * - * -
+%%
+
+%%
+%% Is SAM active for current model?
+%%
+%function LibSamActive() void
+  %if !SLibSamHaveScpFeature()
+    %return TLC_FALSE
+  %else
+    %% Make sure to stay in sync with code generator when moving to another model.
+    %return SLibSamSyncWithCodeGen()
+  %endif
+%endfunction
+
+%function SLibSamHaveScpFeature() void
+  %if EXISTS("SamHaveScpFeature")
+    %return ::SamHaveScpFeature
+  %else
+    %assign s = FEVAL("exist", "scpFeature", "file")
+    %if s==2 || s==6 %% .m or .p file
+      %assign scpFeature = FEVAL("scpFeature", "scp")
+      %assign ::SamHaveScpFeature = scpFeature == 1
+    %else
+      %assign ::SamHaveScpFeature = TLC_FALSE
+      %endif
+    %return ::SamHaveScpFeature
+  %endif
+%endfunction
+
+%function LibSamIsCpp() void
+  %if LibSamActive()
+    %return ::SamIsCpp
+  %else
+    %return TLC_FALSE
+  %endif
+%endfunction
+
+%function LibSamClassMemberDefName(memberName) void
+  %if LibSamActive() && ::SamIsCpp
+    %return ::SamClassName + "::" + memberName
+  %else
+    %return memberName
+  %endif
+%endfunction
+
+%function LibSamSuppressRtm() void
+  %if LibSamActive()
+    %% In the first release of SCP, we always suppress the 'non-always required' fields.
+    %return TLC_TRUE
+  %else
+    %% Don't mess with standard logic.
+    %return TLC_FALSE
+  %endif
+%endfunction
+
+%%
+%% Access to class contained variables
+%%
+%function LibSamClassContainedVarAccess() void
+  %if LibSamActive()
+    %% If the variable is contained by a class (the software component or an adapter part),
+    %% ask the code generator how to access it.
+
+    %if ::SamClassContainer == ""
+      %return ""
+    %else
+      %return ::SamClassContainer + ::SamClassAccess
+    %endif
+  %else
+    %return ""
+  %endif
+%endfunction
+
+%function SLibSamClassContainedVar(var) void
+  %if LibSamActive()
+    %if ::SamClassContainer == ""
+      %return var
+    %else
+      %return ::SamClassContainer + ::SamClassAccess + var
+    %endif
+  %else
+    %return var
+  %endif
+%endfunction
+
+%function SLibSamClassContainedVarRef(var) void
+  %if LibSamActive()
+    %assign var = SLibSamClassContainedVar(var)
+    %return "&" + var    %% Parens around var?
+  %else
+    %return var
+  %endif
+%endfunction
+
+%function LibSamContainedVarAccess() void
+  %if LibSamActive()
+    %return ::SamVarAccess
+  %else
+    %% Fallback. Shouldn't get here.
+    %return "->"
+  %endif
+%endfunction
+
+
+%%
+%% - * - * - * - Runnable names - * - * - * - 
+%%
+
+%function LibSamPeriodicRunnableName(tid) void
+  %assign s = "%<tid>"
+  %assign t = IDNUM(s)[1]
+  %if t < ::CompiledModel.SWC.NumPeriodicRunnables
+    %return ::CompiledModel.SWC.PeriodicRunnables[t].RunnableName
+  %elseif ::CompiledModel.SWC.NumPeriodicRunnables == 1
+    %% Tell CodeInfo that all tasks invoke the single, base-rate runnable.
+    %return ::CompiledModel.SWC.PeriodicRunnables[0].RunnableName
+  %else
+    %assign errMsg = "Bad tid '%<tid>'"
+    %<LibReportError(errMsg)>
+    %return ""
+  %endif
+%endfunction
+
+%function LibSamInitRunnableName() void
+  %return ::CompiledModel.SWC.InitRunnableName
+%endfunction
+
+%function LibSamTermRunnableName() void
+  %return ::CompiledModel.SWC.TermRunnableName
+%endfunction
+
+%function LibSamHasInitRunnable() void
+  %return ::CompiledModel.SWC.InitRunnableName != ""
+%endfunction
+
+%function LibSamHasTermRunnable() void
+  %return ::CompiledModel.SWC.TermRunnableName != ""
+%endfunction
+
+%function LibSamIsRunnable(fcnName) void
+  %if fcnName == ::CompiledModel.SWC.InitRunnableName
+    %return TLC_TRUE
+  %elseif fcnName == ::CompiledModel.SWC.TermRunnableName
+    %return TLC_TRUE
+  %else
+    %foreach i = ::CompiledModel.SWC.NumPeriodicRunnables
+      %if fcnName == ::CompiledModel.SWC.PeriodicRunnables[i].RunnableName
+        %return TLC_TRUE
+      %endif
+    %endforeach
+  %endif
+  %return TLC_FALSE
+%endfunction
+
+%% @todo reconsider - remove, change into something else?
+%function LibSamInlineInit() void
+  %return ::CompiledModel.SWC.InitRunnableName != ""
+%endfunction
+
+%function LibSamInlineTerm() void
+  %return ::CompiledModel.SWC.TermRunnableName != ""
+%endfunction
+
+%function LibSamMustInline(fcnName) void
+  %% At present, we must inline model_initialize() and model_terminate() at TLC time.
+  %if ::CompiledModel.SWC.InitRunnableName != "" && ::CompiledModel.SWC.InitRunnableName == fcnName
+    %return TLC_TRUE
+  %elseif ::CompiledModel.SWC.TermRunnableName != "" && ::CompiledModel.SWC.TermRunnableName == fcnName
+    %return TLC_TRUE
+  %else
+    %return TLC_FALSE
+  %endif
+%endfunction
+
+%function LibSamInlineBodyParts(fcnName, fcnComment, defProto, declProto, localVars, fcnBody) void
+  %if LibSamIsInlined(fcnName)
+    %assign errMsg = "More than one body offered for inlining in function %<fcnName>."
+    %<LibReportError(errMsg)>
+  %else
+    %assign fcnIdx = ::CompiledModel.SWC.NumInlinedFcns
+    %addtorecord ::CompiledModel.SWC InlinedFcns {}
+    %addtorecord ::CompiledModel.SWC.InlinedFcns[fcnIdx] Name fcnName
+    %addtorecord ::CompiledModel.SWC.InlinedFcns[fcnIdx] Comment fcnComment
+    %addtorecord ::CompiledModel.SWC.InlinedFcns[fcnIdx] DefProto defProto
+    %addtorecord ::CompiledModel.SWC.InlinedFcns[fcnIdx] DeclProto declProto
+    %addtorecord ::CompiledModel.SWC.InlinedFcns[fcnIdx] LocalVars localVars
+    %addtorecord ::CompiledModel.SWC.InlinedFcns[fcnIdx] Body fcnBody
+    %assign ::CompiledModel.SWC.NumInlinedFcns = fcnIdx+1
+  %endif
+%endfunction
+
+%function LibSamGetBodyParts(fcnName) void
+  %foreach fcnIdx = ::CompiledModel.SWC.NumInlinedFcns
+    %if ::CompiledModel.SWC.InlinedFcns[fcnIdx].Name == fcnName
+      %return ::CompiledModel.SWC.InlinedFcns[fcnIdx]
+    %endif
+  %endforeach
+  %assign errMsg = "Could not retrieve body code for inlining for function %<fcnName>."
+  %<LibReportError(errMsg)>
+%endfunction
+
+%function LibSamIsInlined(fcnName) void
+  %foreach fcnIdx = ::CompiledModel.SWC.NumInlinedFcns
+    %if ::CompiledModel.SWC.InlinedFcns[fcnIdx].Name == fcnName
+      %return TLC_TRUE
+    %endif
+  %endforeach
+  %return TLC_FALSE
+%endfunction
+
+%function LibSamInline(runName, body, initTerm) void
+  %assign fcnName   = LibSamClassMemberDefName(runName)
+  %assign bodyParts = LibSamGetBodyParts(runName)
+
+  %if LibSamIsCpp()
+    %assign stClass = "" %% Must be empty.
+    /* Method: %<runnable> */
+  %else
+    %assign fcnName = LibSamClassMemberDefName(runName)
+    %assign stClass = "" %% May become 'extern' under certain conditions at some later time.
+    /* Function: %<runnable> */
+  %endif
+
+  %if initTerm
+    %assign msPragma = SLibGetFcnMemSecPragma(fcnName, "MemSecFuncInitTerm", "Pre")
+  %else
+    %assign msPragma = SLibGetFcnMemSecPragma(fcnName, "MemSecFuncExecute", "Pre")
+  %endif
+
+  %% Detect if we need to add braces around bodyParts.Body.
+  %% LibSamIsWhiteSpace works like WHITE_SPACE but also treats comments as white space.
+  %if !(ISEMPTY(bodyParts.LocalVars) && LibSamIsWhiteSpace(body)) && !LibSamIsWhiteSpace(bodyParts.Body)
+    %assign openScope  = "{"
+    %assign closeScope = "}"
+  %else
+    %assign openScope  = ""
+    %assign closeScope = ""
+  %endif
+
+  %% Inline runnable code and model code into single body.
+  %openfile fcnBuf
+  %<bodyParts.Comment>
+  %<stClass> %<msPragma> %<bodyParts.DefProto>
+  {
+    %if !ISEMPTY(bodyParts.LocalVars)
+      %<bodyParts.LocalVars[0]>
+    %endif
+    %<body>
+    %<openScope>
+    %<bodyParts.Body>
+    %<closeScope>
+  }
+  %closefile fcnBuf
+  %return fcnBuf
+%endfunction
+
+%function LibSamDeclareInit() void
+  %assign runName = LibSamInitRunnableName()
+  %return LibSamDeclareInitTerm(runName)
+%endfunction
+
+%function LibSamDeclareTerm() void
+  %assign runName = LibSamTermRunnableName()
+  %return LibSamDeclareInitTerm(runName)
+%endfunction
+
+%function LibSamDeclareInitTerm(runName) void
+  %assign bodyParts = LibSamGetBodyParts(runName)
+  %if LibSamIsCpp()
+    %assign fcnName = runName
+    %assign stClass = ""
+  %else
+    %assign fcnName = runName
+    %assign stClass = "extern"
+  %endif
+  %assign msPragma = SLibGetFcnMemSecPragma(fcnName, "MemSecFuncInitTerm", "Pre")
+  %assign fcnProto = FEVAL("SamCodegen.CodeGenerator.fixFcnName", bodyParts.DeclProto, "", "", TLC_TRUE)
+  %return "%<stClass> %<msPragma> %<fcnProto>;"
+%endfunction
+
+%% LibSamOutputTopCode(tid)
+%% LibSamOutputBottomCode(tid)
+%% ---------------------------
+%% ERT may add code at top and bottom of Outputs or combined Outputs/Update
+%% functions in the TLC stage. In SCP's optimized mode, the Outputs and
+%% Update functions are inlined in the generated scheduler, and hence
+%% SLibGenErtOutputUpdateFunction() is not invoked, which is where normally
+%% ErtOrModelrefGetTimingForTopOfOutputFcn() and ErtOrModelrefGetTimingForBottomOfUpdateFcn()
+%% are called.
+%%
+%% See also:
+%% - ertlib.tlc
+%%     SLibGenErtOutputUpdateFunction()
+%% - ertmdlreftiming.tlc
+%%     ErtOrModelrefGetTimingForTopOfOutputFcn()
+%%     ErtOrModelrefGetTimingForBottomOfUpdateFcn()
+%% - ertmdlrefabstime.tlc
+%%     SLibErtGenUpdateAbsoluteTimeCode()
+%%
+%function LibSamOutputTopCode(tid) void
+  %% Serious enough but I haven't pieced the right code together yet.
+  %openfile buf
+    /* Funky stuff for top of task index %<tid>. */
+  %closefile buf
+  %return buf
+%endfunction
+
+%function LibSamOutputBottomCode(tid) void
+  %% Serious enough but I haven't pieced the right code together yet.
+  %openfile buf
+    /* Funky stuff for bottom of task index %<tid>. */
+  %closefile buf
+  %return buf
+%endfunction
+
+
+%%
+%% - * - * - * - Class member declarations - * - * - * -
+%%
+
+
+%function LibSamPrivateDeclarations() void
+  %openfile samprivatedecls
+  %if LibSamActive()
+    %<LibSamDeclareTaskCounters(TLC_FALSE)>
+    %<SLibSamDeclarePortIfacePointers()>
+  %endif
+  %closefile samprivatedecls
+  %return samprivatedecls
+%endfunction
+
+%function LibSamPublicDeclarations() void
+  %openfile sampublicdecls
+  %if LibSamActive()
+    %<SLibSamDeclarePortIfaceSetters()>
+    %<SLibSamDefinePortGetterSetters()>
+  %endif
+  %closefile sampublicdecls
+  %return sampublicdecls
+%endfunction
+
+%function LibSamProtectedDeclarations() void
+  %openfile samprotecteddecls
+  %if LibSamActive()
+  %endif
+  %closefile samprotecteddecls
+  %return samprotecteddecls
+%endfunction
+
+
+
+%function LibSamDeclareTaskCounters(external) void
+  %% @todo We should query the UML model to make sure that model and code are in sync.
+
+  %openfile buf
+  %if ::CompiledModel.NumSampleTimes > 1
+    %if external
+      %assign xtrn = "extern"
+    %else
+      %assign xtrn = ""
+    %endif
+
+    %assign dtypeid  = ::CompiledModel.SampleTime[0].TaskCounterDataTypeId
+    %assign dtypeidx = LibGetDataTypeIdAliasedThruToFromId(dtypeid)
+    %assign typeName = LibCGTypeName(LibSamGetCGTypeIdxFromSLTypeIdx(dtypeidx))
+    %<xtrn> %<typeName> taskCounter[%<::CompiledModel.NumSampleTimes>]; /* Counters for scheduling rate groups. */
+  %endif
+  %closefile buf
+  %return buf
+%endfunction
+
+%% LibSamGetCGTypeIdxFromSLTypeIdx(slTypeIdx)
+%% ------------------------------------------
+%% - for built-in datatypes: CGTypeIdx equals SL DataTypeIdx
+%% - for all other datatypes: search in CGTypes and return index.
+%%
+%function LibSamGetCGTypeIdxFromSLTypeIdx(slTypeIdx) void
+  %if slTypeIdx < 0 || slTypeIdx >= ::CompiledModel.DataTypes.NumSLBuiltInDataTypes
+    %foreach i = ::CompiledModel.CGTypes.NumCGTypes
+      %if ::CompiledModel.CGTypes[i].SLTypeIdx == slTypeIdx
+        %return i
+      %endif
+    %endforeach
+    %% No CGType found with given SLTypeIdx.
+    %return slTypeIdx
+  %else
+    %return slTypeIdx
+  %endif
+%endfunction
+
+%function SLibSamDeclarePortIfaces() void
+  %with ::CompiledModel.SWC
+    %foreach portIdx = NumPorts
+      %if Ports[portIdx].IsFlowport
+        %assign portName = Ports[portIdx].Name
+        %assign portCapName = Ports[portIdx].CapName
+        %assign portDir  = Ports[portIdx].Dir
+        %assign portType = SLibSamMapType(Ports[portIdx].Type)
+        %assign ref      = Ports[portIdx].IsPtr ? " *" : ""
+
+        %assign ifName = "%<portCapName>_if"
+        %openfile ifFile="%<ifName>.h"
+        #ifndef _%<ifName>_h_
+        #define _%<ifName>_h_
+
+        #include "rtwtypes.h"
+
+        class %<ifName> {
+        public:
+        %if portDir == "in"
+          virtual %<portType> %<ref>get%<portCapName>() const = 0;
+        %else
+          virtual void set%<portCapName>(%<portType> %<ref>x) = 0;
+        %endif
+          virtual ~%<ifName>(){}
+        };
+        #endif /* _%<ifName>_h_ */
+        %closefile ifFile
+      %endif
+    %endforeach
+  %endwith
+%endfunction
+
+%function LibSamSetUpdateRTBcode(update) void
+  %assign ::SamUpdateRTBcode = update
+%endfunction
+
+%function LibSamGetUpdateRTBcode() void
+  %return ::SamUpdateRTBcode
+%endfunction
+
+%function LibSamMayNeedUpdateRTBCounters() void
+  %<LibSamSetUpdateRTBcode(TLC_TRUE)>
+%endfunction
+
+%function LibSamUpdateRateTransitionCounters() void
+  %% Update rate transition counters for all TIDs except the slowest.
+
+  %assign buf = ""
+  %assign rriSize = SIZE(::CompiledModel.MatrixOfRequireRateInteraction)
+  %assign numTIDs = rriSize[0]
+  %foreach TID = numTIDs - 1
+    %assign buf = buf + UpdateRateTransitionFlagsWhenSuppressMultiTaskScheduler(TID)
+  %endforeach
+  %return buf
+%endfunction
+
+%function LibSamIfaceIncludes() void
+  %% Generate #include directives for interface header files.
+
+  %openfile buf
+  %<SLibSamGenTypedefs()>
+  %with ::CompiledModel.SWC
+    %foreach portIdx = NumPorts
+      %if Ports[portIdx].IsFlowport
+        %assign portCapName = Ports[portIdx].CapName
+        %assign ifName = "%<portCapName>_if"
+        #include "%<ifName>.h"
+      %endif
+    %endforeach
+  %endwith
+  %closefile buf
+  %return buf
+%endfunction
+
+%function SLibSamGenTypedefs() void
+  %% Generate typedefs for certain types. For now, we should only find fixed-point types.
+
+  %openfile tpbuf
+  %with ::CompiledModel.SWC
+    %foreach typeIdx = NumTypes
+      %if Types[typeIdx].IsFixedPt
+        %assign typeName = Types[typeIdx].TypeName %% Alias type name.
+        %assign fxpName  = Types[typeIdx].FxpName  %% Standardized fixed-point type name.
+        %assign cgTypeIdx = SLibSamGetCGTypeIdx(fxpName)
+        %if LibSamCGTypeIsFixed(cgTypeIdx) %% Double check.
+          %assign mappedTypeIdx  = SLibSamMapFxpType(cgTypeIdx)
+          %assign defTypeIdx     = SLibSamDefFxpType(cgTypeIdx)
+          %assign mappedTypeName = ::CompiledModel.CGTypes.CGType[mappedTypeIdx].Name
+          %assign dataTypeIdx    = ::CompiledModel.CGTypes.CGType[defTypeIdx].SLTypeIdx
+          %assign dataType       = ::CompiledModel.DataTypes.DataType[dataTypeIdx]
+          /* Fixed-point type:   %<typeName>
+             %if typeName != fxpName
+               Standard type name: %<fxpName>
+             %endif
+             Number of bits:     %<dataType.RequiredBits>
+             Exponent:           %<dataType.FixedExp>
+             Bias:               %<dataType.Bias>
+             Fraction slope:     %<dataType.FracSlope>
+             Signed:             %<yesNo(dataType.IsSigned)>
+          */
+          typedef %<mappedTypeName> %<typeName>;
+        %else
+          %assign errMsg = "Unable to retrieve definition for type '%<typeName>' or its standard equivalent '%<fxpName>'."
+          %<LibReportError(errMsg)>
+        %endif
+      %endif
+    %endforeach
+  %endwith
+  %closefile tpbuf
+  %return tpbuf
+%endfunction
+
+%function yesNo(x) void
+  %if x
+    %return "yes"
+  %else
+    %return "no"
+  %endif
+%endfunction
+
+%function SLibSamDeclarePortIfacePointers() void
+  %% Generate .h files for interfaces.
+  %<SLibSamDeclarePortIfaces()>
+  %openfile buf
+
+  /* Service and flowport interface pointers */
+
+  %with ::CompiledModel.SWC
+    %foreach portIdx = NumPorts
+      %if Ports[portIdx].IsFlowport
+        %assign portName = Ports[portIdx].Name
+        %assign portCapName = Ports[portIdx].CapName
+        %<portCapName>_if *f%<portCapName>_if;
+      %endif
+    %endforeach
+  %endwith
+  %closefile buf
+  %return buf
+%endfunction
+
+%function SLibSamDeclarePortIfaceSetters() void
+  %openfile buf
+
+  /* Interface setter functions */
+
+  %with ::CompiledModel.SWC
+    %foreach portIdx = NumPorts
+      %if Ports[portIdx].IsFlowport
+        %assign portName = Ports[portIdx].Name
+        %assign portCapName = Ports[portIdx].CapName
+        inline void set_%<portCapName>_if(%<portCapName>_if *a%<portCapName>_if) {f%<portCapName>_if = a%<portCapName>_if;}
+      %endif
+    %endforeach
+  %endwith
+  %closefile buf
+  %return buf
+%endfunction
+
+%function SLibSamDefinePortGetterSetters() void
+  %openfile buf
+
+  /* Flowport access functions */
+
+  %with ::CompiledModel.SWC
+    %foreach portIdx = NumPorts
+      %if Ports[portIdx].IsFlowport
+        %assign portCapName = Ports[portIdx].CapName
+        %assign portDir  = Ports[portIdx].Dir
+        %assign portType = SLibSamMapType(Ports[portIdx].Type)
+        %assign ref      = Ports[portIdx].IsPtr ? " *" : ""
+
+        %if portDir == "in"
+          %% Generate getter function.
+          inline %<portType> %<ref>get%<portCapName>() {return f%<portCapName>_if->get%<portCapName>();}
+        %elseif portDir == "out"
+          %% Generate setter function.
+          inline void set%<portCapName>(%<portType> %<ref>x) {f%<portCapName>_if->set%<portCapName>(x);}
+        %else
+          %assign errMsg = "Illegal direction '%<portDir>' on software component port '%<Ports[portIdx].Name>'"
+          %<LibReportError(errMsg)>
+        %endif
+      %endif
+    %endforeach
+  %endwith
+  %closefile buf
+  %return buf
+%endfunction
+
+
+%%
+%% - * - * - * - Generate prototypes we don't get from ERT C++ Class Interface - * - * - * -
+%%
+
+%function LibSamGenPrototypes(external) void
+  %openfile buf
+  %if external
+    %assign xtrn = "extern"
+  %else
+    %assign xtrn = ""
+  %endif
+  %foreach modIdx = ::CompiledModel.RTWCGModules.NumRTWCGModules
+    %assign module = ::CompiledModel.RTWCGModules.RTWCGModule[modIdx]
+    %if ISFIELD(module, "CGSystemIdx")
+      %assign system = ::CompiledModel.System[module.CGSystemIdx]
+      %foreach fcnIdx = module.NumSubFunctions
+        %assign fcn = module.Function[fcnIdx]
+        %if fcn.BlockType != "Stateflow" && !LibSamIsExtApiFcn(fcn.Name) && !LibSamIsInlined(fcn.Name)
+          %<xtrn> %<SLibSamGenPrototype(system, fcn)>;
+        %endif
+      %endforeach
+    %endif
+  %endforeach
+  %closefile buf
+  %return buf
+%endfunction
+
+%function SLibSamGenPrototype(system, fcn) void
+  %assign hasPassThroughArgs = !ISEMPTY(fcn.PassThroughArgs)
+  %if hasPassThroughArgs
+    %assign fcnInfo = SLibSystemFcnInfoRecord(system, fcn.Name)
+    %assign passThroughArgDefs = fcnInfo.Params
+  %else
+    %assign passThroughArgDefs = ""
+  %endif
+  %assign fcnClose = ")"
+  %assign seperator = ", "
+  %if fcn.NumArgs == 0 || !hasPassThroughArgs
+    %assign seperator = ""
+    %if fcn.NumArgs == 0 && !hasPassThroughArgs
+      %assign fcnClose = "void)"
+    %endif
+  %endif
+  %assign fcnProto = fcn.ProtoType + seperator + passThroughArgDefs + fcnClose
+  %return FEVAL("SamCodegen.CodeGenerator.fixFcnName", fcnProto, "", "", TLC_TRUE)
+%endfunction
+
+%%
+%% - * - * - * - Modifications to standard (C target) FPC - * - * - * -
+%%
+
+%%
+%% 1) Add class name and scoping operator to function name.
+%% 2) Remove leading 'static' - functions 'static' in C targets must become 'private' in generated class.
+%%
+%function LibSamFixPrototype(fcnProto, fcn) void
+  %if LibSamActive()
+    %if fcn.BlockType != "Stateflow"
+      %assign fcnName = fcn.Name
+      %if LibSamIsCpp()
+        %assign qualFcnName = ::SamClassName + "::" + fcnName
+      %else
+        %assign qualFcnName = fcnName
+      %endif
+      %% Using FEVAL because TLC does not offer substitution functions.
+      %assign fcnProto = FEVAL("SamCodegen.CodeGenerator.fixFcnName", fcnProto, fcnName, qualFcnName, TLC_TRUE)
+    %endif
+  %endif
+  %return fcnProto
+%endfunction
+
+%function LibSamIsWhiteSpace(str) void
+  %assign ws = FEVAL("SamCodegen.CodeGenerator.isWhiteSpace", str)
+  %return ws
+%endfunction
+
+%function LibSamCacheExtApiProto(extApiProt) void
+  %if ::SamIsCpp
+    %% For C++ targets we generate method declarations in the class. Nothing to do here.
+  %else
+    %<SLibSetModelFileAttribute(::SamStubsH, "ExternFcns", extApiProt)>
+  %endif
+%endfunction
+
+%function LibSamCacheExtApiCode(extApiCode) void
+  %if ::SamIsCpp
+    %% For C++ targets we generate method implementations in the class. Nothing to do here.
+  %else
+    %<LibSetSourceFileSection(::SamStubsC, "Functions", extApiCode)>
+  %endif
+%endfunction
+
+%function SLibSamMapType(typeName) void
+  %with ::CompiledModel.CGTypes
+    %foreach cgTypeIdx = NumCGTypes
+      %if ISFIELD(CGType[cgTypeIdx], "Name") && CGType[cgTypeIdx].Name == typeName
+        %assign mappedCgTypeIdx = SLibSamMapTypeIdx(cgTypeIdx)
+        %return CGType[mappedCgTypeIdx].Name
+      %endif
+    %endforeach
+  %endwith
+  %return typeName
+%endfunction
+
+%function SLibSamMapTypeIdx(cgTypeIdx) void
+  %with ::CompiledModel.CGTypes
+    %if ISFIELD(CGType[cgTypeIdx], "SLTypeIdx") && CGType[cgTypeIdx].SLTypeIdx >= 0
+      %return cgTypeIdx
+    %elseif ISFIELD(CGType[cgTypeIdx], "BaseIdx")
+      %return SLibSamMapTypeIdx(CGType[cgTypeIdx].BaseIdx)
+    %else
+      %return cgTypeIdx
+    %endif
+  %endwith
+%endfunction
+
+%function SLibSamMapFxpType(cgTypeIdx) void
+  %with ::CompiledModel.CGTypes
+    %if CGType[cgTypeIdx].Constructor == "fixed"
+      %return SLibSamMapFxpType(CGType[cgTypeIdx].BaseIdx)
+    %else
+      %return cgTypeIdx
+    %endif
+  %endwith
+%endfunction
+
+%function SLibSamDefFxpType(cgTypeIdx) void
+  %with ::CompiledModel.CGTypes
+    %if CGType[cgTypeIdx].Constructor == "fixed" && CGType[cgTypeIdx].SLTypeIdx == -1
+      %return SLibSamDefFxpType(CGType[cgTypeIdx].BaseIdx)
+    %elseif CGType[cgTypeIdx].Constructor == "fixed"
+      %return cgTypeIdx
+    %else
+      %% Actually, this should be an error.
+      %return cgTypeIdx
+    %endif
+  %endwith
+%endfunction
+
+%function SLibSamGetCGTypeIdx(typeName) void
+  %with ::CompiledModel.CGTypes
+    %foreach typeIdx = NumCGTypes
+      %if ISFIELD(CGType[typeIdx], "Name") && CGType[typeIdx].Name == typeName
+        %return typeIdx
+      %endif
+    %endforeach
+  %endwith
+  %return -1
+%endfunction
+
+%function LibSamCGTypeIsFixed(cgTypeIdx) void
+  %foreach i = cgTypeIdx
+    %switch ::CompiledModel.CGTypes.CGType[cgTypeIdx].Constructor
+      %case "fixed"
+        %return TLC_TRUE
+      %case "renamed"
+        %assign cgTypeIdx = ::CompiledModel.CGTypes.CGType[cgTypeIdx].BaseIdx
+        %break
+      %default
+        %return TLC_FALSE
+    %endswitch
+  %endforeach
+  %return TLC_FALSE
+%endfunction
+
+%%
+%% - * - * - * - Query per-model static info from code generator - * - * - * -
+%%
+
+%function SLibSamSyncWithCodeGen() void
+  %assign mdl = ::CompiledModel.Name
+  %if EXISTS("SamActiveMdl") && (mdl == ::SamActiveMdl)
+    %% Cached info is up to date.
+    %return TLC_TRUE
+  %endif
+
+  %% Interrogate SamCodegen only once per model.
+  %if !EXISTS("SamCurrentMdl") || (mdl != ::SamCurrentMdl)
+    %assign ::SamCurrentMdl = mdl
+    %assign ::SamIsActive = FEVAL("SamCodegen.CodeGenerator.isActive",mdl)
+  %endif
+
+  %if !::SamIsActive
+    %return TLC_FALSE
+  %endif
+
+  %if !SLibIsERTTarget()
+    %assign errMsg = "In Configuration Parameters > Code Generation: "
+    %assign errMsg = "%<errMsg>SCP requires 'System target file' to be ert.tlc"
+    %<LibReportError(errMsg)>
+  %endif
+
+  %%
+  %% Get data from code generator that is static for the duration of a Simulink model.
+  %%
+
+  %assign ::SamTarget         = FEVAL("SamCodegen.CodeGenerator.getTarget",mdl)
+  %assign ::SamClassName      = FEVAL("SamCodegen.CodeGenerator.getClassName",mdl)
+  %assign ::SamClassContainer = FEVAL("SamCodegen.CodeGenerator.getClassContainer",mdl)
+  %assign ::SamClassAccess    = SLibSamFldAccess(FEVAL("SamCodegen.CodeGenerator.getClassByPointer",mdl))
+  %assign ::SamVarAccess      = SLibSamFldAccess(FEVAL("SamCodegen.CodeGenerator.getVarByPointer",mdl))
+
+  %assign ::SamUpdateRTBcode  = TLC_FALSE
+
+  %if LibIsEmpty(::SamTarget)
+    %assign ::SamClassName = ""
+  %endif
+
+  %if LibIsEmpty(::SamClassName)
+    %assign ::SamClassName = ""
+  %endif
+
+  %if LibIsEmpty(::SamClassContainer)
+    %assign ::SamClassContainer = ""
+  %endif
+
+  %if ::SamTarget == "Rhapsody"
+    %assign ::SamIsCpp = TLC_TRUE
+
+    %%
+    %% Avoid name clash between the class we generate and the class the XMI creates in the target UML tool.
+    %%
+    %assign ::SamClassName = ::SamClassName + "_impl"
+
+  %else
+    %assign ::SamIsCpp = TLC_FALSE
+  %endif
+
+  %%
+  %% Create and populate record CompiledModel.SWC
+  %% In first version of SCP, SamCodegen is interrogated for all elements.
+  %% Later, SamCodegen will write this record out as part of the .rtw file.
+  %%
+
+  %addtorecord ::CompiledModel \
+    SWC {                    \
+      NumPorts 0             \
+      NumTypes 0             \
+      NumPeriodicRunnables 0 \
+      NumExtApiFcns 0        \
+      NumInlinedFcns 0       \
+    }
+
+  %with ::CompiledModel
+    %assign numPorts = FEVAL("SamCodegen.CodeGenerator.getNumPorts", mdl)
+    %assign SWC.NumPorts = numPorts
+    %foreach portIdx = numPorts
+      %addtorecord SWC Ports {}
+
+      %assign portName    = FEVAL("SamCodegen.CodeGenerator.getPortName",    mdl, portIdx)
+      %assign portCapName = FEVAL("SamCodegen.CodeGenerator.getPortCapName", mdl, portIdx)
+      %assign isFlowport  = FEVAL("SamCodegen.CodeGenerator.isFlowport",     mdl, portIdx)
+
+      %addtorecord SWC.Ports[portIdx] Name       portName
+      %addtorecord SWC.Ports[portIdx] CapName    portCapName
+      %addtorecord SWC.Ports[portIdx] IsFlowport isFlowport
+
+      %if isFlowport
+        %assign portDir  = FEVAL("SamCodegen.CodeGenerator.getPortDir",  mdl, portIdx)
+        %assign portType = FEVAL("SamCodegen.CodeGenerator.getPortType", mdl, portIdx)
+        %assign isPtr    = FEVAL("SamCodegen.CodeGenerator.isPortPtr",   mdl, portIdx)
+
+        %addtorecord SWC.Ports[portIdx] Dir   portDir
+        %addtorecord SWC.Ports[portIdx] Type  portType
+        %addtorecord SWC.Ports[portIdx] IsPtr isPtr
+      %endif
+    %endforeach
+
+    %assign numTypes = FEVAL("SamCodegen.CodeGenerator.getNumTypes", mdl)
+    %assign SWC.NumTypes = numTypes
+    %foreach typeIdx = numTypes
+      %addtorecord SWC Types {}
+      %assign typeName = FEVAL("SamCodegen.CodeGenerator.getTypeName", mdl, typeIdx)
+      %assign fxpName  = FEVAL("SamCodegen.CodeGenerator.getFxpName",  mdl, typeIdx)
+      %if LibIsEmpty(fxpName) || fxpName == ""
+        %assign isFixedPt = TLC_FALSE
+      %else
+        %assign isFixedPt = TLC_TRUE
+      %endif
+      %addtorecord SWC.Types[typeIdx] TypeName  typeName
+      %addtorecord SWC.Types[typeIdx] FxpName   fxpName
+      %addtorecord SWC.Types[typeIdx] IsFixedPt isFixedPt
+    %endforeach
+
+    %assign numPeriodicRunnables = FEVAL("SamCodegen.CodeGenerator.getNumPeriodicRunnables", mdl)
+    %assign SWC.NumPeriodicRunnables = numPeriodicRunnables
+    %foreach runIdx = numPeriodicRunnables
+      %addtorecord SWC PeriodicRunnables {}
+      %assign runnableName = FEVAL("SamCodegen.CodeGenerator.getPeriodicRunnableName", mdl, runIdx)
+      %addtorecord SWC.PeriodicRunnables[runIdx] RunnableName runnableName
+    %endforeach
+
+    %assign initRunnableName = FEVAL("SamCodegen.CodeGenerator.getInitRunnableName", mdl)
+    %assign termRunnableName = FEVAL("SamCodegen.CodeGenerator.getTermRunnableName", mdl)
+    %addtorecord SWC InitRunnableName initRunnableName
+    %addtorecord SWC TermRunnableName termRunnableName
+
+    %assign numFcns = FEVAL("SamCodegen.CodeGenerator.getNumFcns", mdl)
+    %assign SWC.NumExtApiFcns = numFcns
+    %foreach fcnIdx = numFcns
+      %addtorecord SWC ExtApiFcns {}
+      %assign fcnName = FEVAL("SamCodegen.CodeGenerator.getFcnName", mdl, fcnIdx)
+      %assign extName = FEVAL("SamCodegen.CodeGenerator.getFcnExtName", mdl, fcnIdx)
+      %if LibIsEmpty(extName)
+        %assign extName = ""
+      %endif
+      %addtorecord SWC.ExtApiFcns[fcnIdx] Name    fcnName
+      %addtorecord SWC.ExtApiFcns[fcnIdx] ExtName extName
+    %endforeach
+
+    %% Functions to be inlined will be added as sub-functions are processed.
+    %assign SWC.NumInlinedFcns = 0
+
+  %endwith
+
+  %if !::SamIsCpp
+    %if ::CompiledModel.ConfigSet.MultiInstanceERTCode
+      %assign errMsg = "In Configuration Parameters > Code Generation > Code interface: "
+      %assign errMsg = "%<errMsg>SCP requires 'Generate reusable code' to be unchecked."
+      %<LibReportError(errMsg)>
+    %endif
+
+    %%
+    %% The target specific stub files creator creates a header and source file
+    %% to be populated with definitions that allow full compilation and linking.
+    %%
+    %assign stubFilesCreator = "samlib_" + ::SamTarget + ".tlc"
+    %include stubFilesCreator
+    %assign ::SamStubsH = LibSamCreateHeaderFile(::SamClassName)
+    %assign ::SamStubsC = LibSamCreateSourceFile(::SamClassName)
+
+    %% Declare and define taskcounters.
+    %assign fileH = LibGetModelDotHFile()
+    %assign tcDecl = LibSamDeclareTaskCounters(TLC_TRUE)
+    %% %<LibSetSourceFileSection(fileH, "Declarations", tcDecl)>
+
+    %assign fileC = LibGetModelDotCFile()
+    %assign tcDef = LibSamDeclareTaskCounters(TLC_FALSE)
+    %<LibSetSourceFileSection(fileC, "Definitions", tcDef)>
+  %endif
+
+  %% Done. Remember we sync-ed for mdl.
+  %assign ::SamActiveMdl = mdl
+  %return TLC_TRUE
+
+%endfunction
+
+%function LibSamHashInclude(fileName) void
+  %openfile incBuf
+  #include "%<fileName>.h"
+  %closefile incBuf
+  %return incBuf
+%endfunction
+
+%function LibSamExtraIncludes() void
+  %if LibSamActive() && !::SamIsCpp
+    %% Include to be added to the top-level C file (called from formatbody.tlc)
+    %assign fileName = LibSamGetFileName(::SamClassName)
+    %return LibSamHashInclude(fileName)
+  %else
+    %return ""
+  %endif
+%endfunction
+
+%function LibSamIsExtApiFcn(fcnName) void
+  %with ::CompiledModel.SWC
+    %foreach fcnIdx = NumExtApiFcns
+      %if ExtApiFcns[fcnIdx].Name == fcnName
+        %return TLC_TRUE
+      %endif
+    %endforeach
+  %endwith
+  %return TLC_FALSE
+%endfunction
+
+%function LibSamIsReplacedFcn(fcnName) void
+  %with ::CompiledModel.SWC
+    %foreach fcnIdx = NumExtApiFcns
+      %if ExtApiFcns[fcnIdx].ExtName == fcnName
+        %return TLC_TRUE
+      %endif
+    %endforeach
+  %endwith
+  %return TLC_FALSE
+%endfunction
+
+%function LibSamReplacesFcn(fcnName) void
+  %with ::CompiledModel.SWC
+    %foreach fcnIdx = NumExtApiFcns
+      %if ExtApiFcns[fcnIdx].Name == fcnName && ExtApiFcns[fcnIdx].ExtName != ""
+        %return TLC_TRUE
+      %endif
+    %endforeach
+  %endwith
+  %return TLC_FALSE
+%endfunction
+
+%function LibSamGetReplacedFcn(module, fcnName) void
+  %assign extName = ""
+  %with ::CompiledModel.SWC
+    %foreach fcnIdx = NumExtApiFcns
+      %if ExtApiFcns[fcnIdx].Name == fcnName && ExtApiFcns[fcnIdx].ExtName != ""
+        %assign extName = ExtApiFcns[fcnIdx].ExtName
+      %endif
+    %endforeach
+  %endwith
+
+  %foreach fcnIdx = module.NumSubFunctions
+    %assign fcn = module.Function[fcnIdx]
+    %if fcn.Name == extName
+      %return fcn
+    %endif
+  %endforeach
+
+  %assign errMsg = "Cannot find function %<extName> in module %<module.Name>."
+  %<LibReportError(errMsg)>
+  %return ""
+%endfunction
+
+%function LibSamProtoNameReplace(proto, oldName, newName)
+  %return FEVAL("SamCodegen.CodeGenerator.replace", proto, oldName, newName, TLC_FALSE)
+%endfunction
+
+%%
+%% - * - * - * - Support functions - * - * - * -
+%%
+
+%%
+%% Get syntax for access to struct, or to pointer to struct.
+%%
+%function SLibSamFldAccess(isptr) void
+  %if isptr
+    %return "->"
+  %else
+    %return "."
+  %endif
+%endfunction
+
+%endif %% _SAMLIB_
+

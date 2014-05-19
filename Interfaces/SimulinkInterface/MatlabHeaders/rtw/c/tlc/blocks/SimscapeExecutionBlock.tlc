@@ -1,0 +1,103 @@
+%% File: SimscapeExecutionBlock.tlc
+%% Abstract:
+%%     TLC file for Simscape Execution block code generation
+%%
+%% Copyright 2010 The MathWorks, Inc.
+
+%implements "SimscapeExecutionBlock" "C"
+
+%include FEVAL("matlabroot")+"/toolbox/physmod/simscape/engine/sli/m/tlc_c/"+...
+               "SimscapeExecutionBlock_implementation.tlc"
+
+%% Function: BlockTypeSetup ====================================================
+%% Abstract:
+%%      Cache an extern declarations for Network Engine
+%%
+%function BlockTypeSetup(block, system) void
+  %<LibCacheExtern(BlockTypeSetup_SimscapeExecutionBlock(block,system))>
+%endfunction
+
+%% Function: BlockInstanceSetup ===============================================
+%% Abstract:
+%%      Add required RTW modules
+%%
+%function BlockInstanceSetup(block, system) void
+  %<BlockInstanceSetup_SimscapeExecutionBlock(block,system)>  
+%endfunction
+
+%% Function: InitializeConditions ===============================================
+%% Abstract:
+%%   Initialize userdata which includes creating NeLinearAlgebra, getting
+%%   NeDynamicSystem, SolverParameters. All of these things are stored in NeUserData
+%%
+%function InitializeConditions(block, system) Output
+  %<InitializeConditions_SimscapeExecutionBlock(block,system)>  
+%endfunction
+
+%% Function:  Start ================================================
+%% Abstract:
+%%   
+%%
+%function Start(block, system) Output
+  %<Start_SimscapeExecutionBlock(block,system)>  
+%endfunction
+
+%% Function:  Outputs ================================================
+%% Abstract:
+%%   
+%%
+%function Outputs(block, system) Output
+  %<Outputs_SimscapeExecutionBlock(block,system)>  
+%endfunction
+
+%% Function:  Update ================================================
+%% Abstract:
+%%
+%function Update(block, system) Output
+  %<Update_SimscapeExecutionBlock(block,system)>  
+%endfunction
+
+%% Function:  Projection ================================================
+%% Abstract:
+%%
+%function Projection(block, system) Output
+  %<Projection_SimscapeExecutionBlock(block,system)>  
+%endfunction
+
+%% Function:  MassMatrix ===============================================
+%% Abstract:
+%%
+%function MassMatrix(block, system) Output
+  %<MassMatrix_SimscapeExecutionBlock(block,system)>  
+%endfunction
+
+%% Function:  Derivatives ===============================================
+%% Abstract:
+%%
+%function Derivatives(block, system) Output
+  %<Derivatives_SimscapeExecutionBlock(block,system)>  
+%endfunction
+
+%% Function:  ForcingFunction ===============================================
+%% Abstract:
+%%
+%function ForcingFunction(block, system) Output
+  %<ForcingFunction_SimscapeExecutionBlock(block,system)>  
+%endfunction
+
+%% Function:  ZeroCrossings ===============================================
+%% Abstract:
+%%
+%function ZeroCrossings(block, system) Output
+  %<ZeroCrossings_SimscapeExecutionBlock(block,system)>  
+%endfunction
+
+%% Function:  Terminate ===============================================
+%% Abstract:
+%%       Destroy NeslSimulator and the SampleHits vector
+%%
+%function Terminate(block, system) Output
+  %<Terminate_SimscapeExecutionBlock(block,system)>  
+%endfunction
+
+%% [EOF] SimscapeExecutionBlock.tlc

@@ -1,0 +1,184 @@
+W%% Copyright 2010-2012 The MathWorks, Inc.
+%%
+%% Abstract:
+%%   Implement execution profiling hooks for SIL/PIL execution profiling
+%%
+%if EXISTS("_SIL_PIL_PROF_") == 0
+%assign _SIL_PIL_PROF_ = 1
+
+%implements ProfilerType "C"
+
+%% Function: ProfilerTypeDefs ============================================
+%% Abstract:
+%%    Generate code for typedefs of profiler objects and macro definitions 
+%%    for CPU cycle counting
+%function ProfilerTypeDefs (ProfRec) void
+
+  %assign identifiers = FcnGetExecutionProfilerIdentifiers()
+  %assign macroLineSpliceChar = "\\"
+
+  %openfile tmpBuff
+  
+  #define %<identifiers.startMacroName>(SECTION_ID) %<macroLineSpliceChar>
+  xilProfilingTimerFreeze(); %<macroLineSpliceChar>
+  %<identifiers.startFcnName>(SECTION_ID); %<macroLineSpliceChar>
+  xilProfilingTimerUnFreeze()
+
+  #define %<identifiers.endMacroName>(SECTION_ID) %<macroLineSpliceChar>
+  xilProfilingTimerFreeze(); %<macroLineSpliceChar>
+  %<identifiers.endFcnName>(SECTION_ID); %<macroLineSpliceChar>
+  xilProfilingTimerUnFreeze()
+      
+  /* Declare global externs for profiler */
+  %assign idTypeSize = ...
+    FEVAL("coder.profile.ExecTimeConfig.getIdTypeSizeForModel", LibGetModelName())
+  %assign idTypeSize = SPRINTF("%d",idTypeSize)
+  extern void %<identifiers.startFcnName>(uint%<idTypeSize>_T);
+  extern void %<identifiers.endFcnName>(uint%<idTypeSize>_T);
+  extern void xilProfilingTimerFreeze(void);
+  extern void xilProfilingTimerUnFreeze(void);
+  
+  %closefile tmpBuff
+  %return tmpBuff
+  
+%endfunction
+
+
+%% Function: ProfilerSystemStart ============================================
+%% Abstract:
+%%    Generate code for  starting the profile operation at the beginning of the 
+%%    code segment for a System's fcn (Output/Update/OutputUpdate/Derivatives)
+%%    function
+%function ProfilerSystemStart(ProfRec, system, fcn) void
+
+  %assign identifiers = FcnGetExecutionProfilerIdentifiers()
+  %assign sectionIdx = FcnGetSectionIdx(ProfRec,system,fcn)
+  
+  %openfile tmpBuff
+
+  %assign profilingInstr  = "%<identifiers.startMacroName>(%<sectionIdx>);"
+ 
+  %if !LibSystemIsReusedLibraryFcn(system) 
+    %if sectionIdx=="DoNotProfile"
+      /* Execution profiling at this location is switched off by a block 
+      * tag set to %<sectionIdx>.
+      */
+    %elseif sectionIdx=="SuppressProfilingNoComment"
+      %% Suppress profiling and do not emit any comment
+    %else
+      %<profilingInstr>
+    %endif
+  %endif
+  
+  %closefile tmpBuff
+  %return tmpBuff
+  
+%endfunction
+
+%% Function: ProfilerSystemFinish ============================================
+%% Abstract:
+%%    Generate code for  ending the profile operation at the end of the 
+%%    code segment for a System's fcn (Output/Update/OutputUpdate/Derivatives)
+%%    function
+%function ProfilerSystemFinish(ProfRec, system, fcn) void
+    
+  %assign identifiers = FcnGetExecutionProfilerIdentifiers()
+  %assign sectionIdx = FcnGetSectionIdx(ProfRec,system,fcn)
+  
+  %assign profilingInstr  = "%<identifiers.endMacroName>(%<sectionIdx>);"
+
+  %openfile tmpBuff
+  
+  %if !LibSystemIsReusedLibraryFcn(system) 
+    %if sectionIdx=="DoNotProfile"
+      /* Block tag set to %<sectionIdx> suppresses profiling 
+      *  %<profilingInstr>
+      */
+    %elseif sectionIdx=="SuppressProfilingNoComment"
+      %% Suppress profiling and do not emit any comment
+    %else
+      %<profilingInstr>
+
+    %endif
+  %endif
+  
+  %closefile tmpBuff
+  %return tmpBuff
+
+%endfunction
+
+
+%function FcnGetExecutionProfilerIdentifiers() void
+
+  %if !EXISTS(::ExecutionProfilerIdentifiers)
+    %assign ::ExecutionProfilerIdentifiers = ...
+      FEVAL("coder.profile.ExecutionTimeRegistry.getCodeIdentifiers", LibGetModelName())
+  %endif
+  
+  %return ::ExecutionProfilerIdentifiers
+
+%endfunction
+  
+%function FcnGetSectionIdx(ProfRec, ss, fcn) void
+
+  %assign name = ss.Name
+  %assign codeSection = fcn
+  %assign thisTag=""
+
+  %if ISFIELD(ss, "CallSites")
+    %assign cs = ss.CallSites
+    %assign numCs = SIZE(ss.CallSites, 0)
+    %foreach idx = numCs
+      %assign thisCs = cs[idx]
+      %assign thisBlk = System[thisCs[2]].Block[thisCs[3]]
+      %if !ISEMPTY(thisBlk)
+        %if ISFIELD(thisBlk, "Tag")
+          %assign thisTag = thisBlk.Tag
+          %if thisTag=="DoNotProfile"
+            %break
+          %endif
+        %endif
+      %endif
+    %endforeach
+  %endif
+    
+  %assign lCallSites = ""
+  %if ISFIELD(ss, "GraphCallSites")
+    %assign found_valid_callsite = TLC_FALSE
+    %assign numCs = SIZE(ss.GraphCallSites, 0)
+    %foreach idx = numCs
+      %assign thisBlk = SLibGrBlock(ss.GraphCallSites[idx])
+      %if !ISEMPTY(thisBlk) && (ISFIELD(thisBlk, "SID") == TLC_TRUE)
+        %if found_valid_callsite == TLC_FALSE
+          %createrecord lCallSites{}
+          %assign found_valid_callsite = TLC_TRUE
+        %endif
+        %addtorecord lCallSites CallSite{BlockName thisBlk.Name; BlockSID thisBlk.SID}
+      %endif
+    %endforeach
+  %endif
+  
+  %if thisTag=="DoNotProfile"
+    %assign rtnVal=thisTag
+  %else
+    %assign  sectionIdx = ...
+      FEVAL("coder.profile.ExecutionTimeRegistry.requestIdentifierForCodeSection", ...
+      LibGetModelName(), name, codeSection, lCallSites)
+    %if ISEMPTY(sectionIdx) || (sectionIdx<0)
+      %exit Failed to get identifier for execution profiling
+    %endif
+    
+    %if sectionIdx==0
+      %% Suppress profiling (e.g. we have a hidden block inserted for 
+      %% export functions build)
+      %assign rtnVal="SuppressProfilingNoComment"
+    %else
+      %assign rtnVal = SPRINTF("%dU",sectionIdx)
+    %endif
+  %endif
+  
+  %return rtnVal
+
+%endfunction
+  
+%endif

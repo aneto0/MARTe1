@@ -1,0 +1,54 @@
+%% ========================================================================
+%% Abstract:
+%%   This file caches general info in the binfo.mat file. If you need to 
+%%   stuff into binfo, please consider adding them using this file. We'd 
+%%   like to minimize the number of times we call out to MATLAB and write 
+%%   to binfo.
+%%
+%% Copyright 2011 The MathWorks, Inc.
+%%
+
+%if EXISTS("_CACHEGENERALDATAINMATINFOFILE_") == 0
+%assign _CACHEGENERALDATAINMATINFOFILE_ = 1
+
+%% Function: cacheGeneralDataIntoMatInfoFile ==============================
+%% Abstract:
+%%     Cache general info in the mat file
+%function CacheGeneralDataIntoMatInfoFile() void
+  
+  %with CompiledModel
+
+    %createrecord GeneralDataToAddToBinfo { Name  "%<Name>"}
+    
+    %% Add RTMGetLoggingObject and RTMTPtrExpression. This information is 
+    %% required by SIL/PIL to support Matfile logging      
+    %if MatFileLogging==1 && GenRTModel
+      %addtorecord GeneralDataToAddToBinfo RTMLoggingObjectExpression RTMGetLoggingObject()        
+      %addtorecord GeneralDataToAddToBinfo RTMTPtrExpression RTMSpecAccsGetTPtr(RTMGetRTModelRecShell().TPtr,RTMGetModelSS())
+    %endif    
+
+  %endwith %% CompiledModel  
+
+  %<CacheDataInBinfoMatFile(Name, "addGeneralDataFromTLC", GeneralDataToAddToBinfo)>  
+
+%endfunction
+
+%% Function: CacheDataInMatInfoFile  =============================
+%% Abstract:
+%%      Store data in .mat file.
+
+%function CacheDataInBinfoMatFile(mdl, type, interface) void
+  
+  %if IsModelReferenceTarget()
+    %assign targetType = IsModelReferenceSimTarget() ? "SIM" : "RTW"
+  %else
+    %assign targetType = "NONE"
+  %endif  
+  %assign rtwinfomat = FEVAL("rtwprivate", "rtwinfomatman", ...
+    type, "binfo", "%<mdl>", ...
+    "%<targetType>", interface)
+
+
+%endfunction
+
+%endif %% _CACHEGENERALDATAINMATINFOFILE_

@@ -1,0 +1,4299 @@
+%%
+%% Copyright 1994-2012 The MathWorks, Inc.
+%%
+%% Abstract: Opaque block library
+
+%include "%<LibGetModelName()>_aux.tlc"
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Helper functions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Function: SLibCG_SE
+%% Abstract:
+%%   Provide a safe expression when integrating with a unknown environment.
+%%   This function will take a expression input and add parentheses around it
+%%   if this expression is not self contained, i.e. a symbol, or an expression
+%%   contained by parethese already
+%function SLibCG_SE(in) void
+  %%
+  %switch TYPE(in)
+      %%
+    %case "String"
+      %%
+      %assign eRetValNeedsParen = 1
+      %%
+      %assign retVal = NEEDS_PAREN(in)
+      %%
+      %if (retVal & eRetValNeedsParen)
+        %%
+        %return "(%<in>)"
+      %endif
+      %break
+    %case "Unsigned"
+      %%
+      %break
+      %%
+    %case "Real"
+    %case "Number"
+    %case "Real32"
+      %%
+      %if in < 0
+        %return "(%<in>)"
+      %endif
+      %%
+      %break
+      %%
+    %default
+      %<LibReportFatalError("Internal error: unhandled cases")>
+  %endswitch
+  %return in
+  %%
+%endfunction
+
+%function SLibCG_ReIm(accessStr, reim) void
+  %return ISEMPTY(reim) ? "" : accessStr + reim
+%endfunction
+
+%function SLibCG_ArrayIndexer(ucv, lcv, offset) void
+  %assign indexer = SLibGetStructFieldIndexExpr("", ucv, lcv, offset)
+  %return indexer == "[]" ? "" : indexer
+%endfunction %% SLibCG_ArrayIndexer
+
+%function SLibCG_AccessArg(aModuleIdx, aFcnIdx, aArgIdx) void
+  %assign fcn = ...
+    ::CompiledModel.RTWCGModules.RTWCGModule[aModuleIdx].Function[aFcnIdx]
+  %assert fcn.NumArgs > aArgIdx
+  %assign fcn.ArgAccessed[aArgIdx] = 1
+%endfunction
+
+%function SLibCG_UndoAccessArg(aModuleIdx, aFcnIdx, aArgIdx) void
+  %assign fcn = ...
+    ::CompiledModel.RTWCGModules.RTWCGModule[aModuleIdx].Function[aFcnIdx]
+  %assert fcn.NumArgs > aArgIdx
+  %assign fcn.ArgAccessed[aArgIdx] = 0
+%endfunction
+
+%function SLibCG_ArgAccessed(aModuleIdx, aFcnIdx, aArgIdx) void
+  %assign fcn = ...
+    ::CompiledModel.RTWCGModules.RTWCGModule[aModuleIdx].Function[aFcnIdx]
+  %assert fcn.NumArgs > aArgIdx
+  %return fcn.ArgAccessed[aArgIdx]
+%endfunction
+
+%function SLibCG_SetFcnProtoType(aModuleIdx, aFcnIdx, aFcnProtoType) void
+  %assign fcn = ...
+    ::CompiledModel.RTWCGModules.RTWCGModule[aModuleIdx].Function[aFcnIdx]
+  %assign fcn.ProtoType = aFcnProtoType
+%endfunction
+
+%function SLibCG_AccessLocal(aModuleIdx, aFcnIdx, aLocalIdx) void
+  %assign fcn = ...
+    ::CompiledModel.RTWCGModules.RTWCGModule[aModuleIdx].Function[aFcnIdx]
+  %assert fcn.NumLocals > aLocalIdx
+  %assign fcn.LocalAccessed[aLocalIdx] = 1
+%endfunction
+
+%function SLibCG_LocalAccessed(aModuleIdx, aFcnIdx, aLocalIdx) void
+  %assign fcn = ...
+    ::CompiledModel.RTWCGModules.RTWCGModule[aModuleIdx].Function[aFcnIdx]
+  %assert fcn.NumLocals > aLocalIdx
+  %return fcn.LocalAccessed[aLocalIdx]
+%endfunction
+
+%function SLibFcnGenBodySysFcn(system,blkFcnName,multiTID) void
+  %if blkFcnName == "Outputs"
+    %assign ::CompiledModel.GeneratingOutputsCode = 1
+  %endif
+  
+  %if SLibNonEmptyModel()
+    %with system
+      %assign rootOpaqueBlock = FcnRootOpaqueBlock()
+      %assign bodyFcn = FcnGenerateCodeFromModule(rootOpaqueBlock, system, blkFcnName)
+    %endwith
+  %elseif multiTID
+    %%Only Update and Output functions can have multiTID being true
+    %assert blkFcnName == "Update" || blkFcnName == "Outputs"
+    %assign Multirate_Buffers = [] 
+    %foreach Tid = NumSampleTimes
+      %assign Multirate_Buffers = Multirate_Buffers + ""
+    %endforeach
+  %endif
+
+  %% 
+  %if blkFcnName == "Outputs"
+    %assign ::CompiledModel.GeneratingOutputsCode = 0
+  %endif
+  
+  %if SLibNonEmptyModel() && !WHITE_SPACE(bodyFcn)
+    %return bodyFcn
+  %elseif multiTID
+    %return Multirate_Buffers
+  %else
+    %return ""
+  %endif
+%endfunction
+
+
+%function SLibFcnGenBodyFcnCache(system,sysFcnType,blkFcnName,profCode,multiTID) void
+  %if multiTID
+    %assign ::CompiledModel.NeedTID = 0 %% reset NeedTid flag
+  %endif
+  
+  %if sysFcnType == "OutputUpdate"
+    %assign updateFcn = SLibFcnGenBodySysFcn(system,"Update",TLC_TRUE)
+    %assign outputFcn = SLibFcnGenBodySysFcn(system,"Outputs",TLC_TRUE)
+  %else
+    %assign fcnBody = SLibFcnGenBodySysFcn(system,blkFcnName,multiTID)
+  %endif
+
+  %if sysFcnType == "OutputUpdate"
+    %<LibSetSystemFieldForTID(system, "Update","Fcn", updateFcn)>
+    %<LibSetSystemFieldForTID(system, "Output","Fcn",  outputFcn)>
+  %elseif multiTID
+    %<LibSetSystemFieldForTID(system, sysFcnType,"Fcn", fcnBody)>
+  %else
+    %assign cacheFieldName = "Cached" + sysFcnType + "Fcn"
+    %<LibSetSystemField(system, cacheFieldName, fcnBody)>
+  %endif
+ 
+  %<FcnCacheLocalVars(system, sysFcnType)>
+
+  %if sysFcnType == "OutputUpdate"
+    %<FcnSetSystemFcnNeedTIDFlag(system, "Output")>
+    %assign needCPIInOutputUpdate = ...
+      FcnDeclareCPIIfNeeded(system, "OutputUpdate") || LibSystemIsForceNonInline(system)
+    %<LibSetSystemField(system, "NeedCPIInOutputUpdate", needCPIInOutputUpdate)>
+  %elseif multiTID
+    %<FcnSetSystemFcnNeedTIDFlag(system, sysFcnType)>
+  %endif
+  
+  %if (sysFcnType != "Update" && sysFcnType != "Output") || ...
+      !IsModelReferenceBaseSys(system)
+    %% For the model reference base system's Update/Output function, we generate
+    %% the interface
+    %% and prototype in FcnGenBodySysCache.  This is because information
+    %% from Output may be needed in Update to determine if an 
+    %% rtModel argument is needed (one reason is the firstInitCond).
+    %<LibDefineSystemFcn(system, sysFcnType)>
+  %endif
+
+  %if profCode
+    %%
+    %% generate profiling code
+    %%
+    %if sysFcnType == "Derivative"
+      %assign profFcnName = "Derivatives"
+    %else
+      %assign profFcnName = sysFcnType
+    %endif
+    %assign declsProf = SLibGenProfSysDeclare(system, profFcnName)
+    %assign profField = "Cached" + sysFcnType + "ProfileDeclsCode"
+    %<LibSetSystemField(system, profField, declsProf)>
+    %assign startProf = SLibGenProfSysStart(system, profFcnName)
+    %assign profField = "Cached" + sysFcnType + "ProfileStartCode"
+    %<LibSetSystemField(system, profField, startProf)>
+    %assign endProf   = SLibGenProfSysEnd(system, profFcnName)
+    %assign profField = "Cached" + sysFcnType + "ProfileEndCode"
+    %<LibSetSystemField(system, profField, endProf)>
+  %endif
+  
+%endfunction
+
+
+%function SLibFcnGenBodySysFcnEntry(system,sysFcnType,blkFcnName,withOOCC,statusCheckPoint,profCode,multiTID) void
+   %assert !multiTID || sysFcnType == "Update" || sysFcnType == "Output" || ...
+           sysFcnType == "OutputUpdate"
+         
+   %if statusCheckPoint
+     %assign msg = "Generate " + sysFcnType + " function"
+     %<SLibAddTLCCompileStatsCheckPoint(TLC_TRUE,msg)>
+   %endif
+   
+   %if sysFcnType == "Update" && system.Type == "root"
+     %assign ::BlockFcn = "RootUpdate"
+   %else
+     %assign ::BlockFcn = sysFcnType
+   %endif
+   %<LibSetGlobalSysFcnsForArgAccess([])>
+   %if withOOCC
+     %assign ooccField = []
+     %if sysFcnType == "OutputUpdate"
+       %if ISFIELD(system, "OutputOOCC")
+         %if ISFIELD(system, "UpdateOOCC")
+           %assign ooccField = system.OutputOOCC
+           %foreach idx = SIZE(system.UpdateOOCC,1)
+             %assign ooccField = ooccField + system.UpdateOOCC[idx]
+           %endforeach
+         %else
+           %assign ooccField = system.OutputOOCC
+         %endif
+       %endif
+     %else
+       %assign ooccFieldName = sysFcnType + "OOCC"
+       %if ISFIELD(system, ooccFieldName)
+         %assign ooccField = GETFIELD(system, ooccFieldName)
+       %endif
+     %endif
+   
+     %if ooccField != []
+       %<LibSetGlobalSysFcnsForArgAccess(ooccField)>
+     %endif
+   %endif
+
+   %<SLibFcnGenBodyFcnCache(system,sysFcnType,blkFcnName,profCode,multiTID)>
+
+   %assign ::BlockFcn = "Unknown"
+   %<LibSetGlobalSysFcnsForArgAccess([])>
+    
+   %if statusCheckPoint
+     %<SLibAddTLCCompileStatsCheckPoint(TLC_FALSE,msg)>
+   %endif
+%endfunction
+
+
+%% Function: SLibInsertSolverResetCode =========================
+%%  This function should never be directly called from the TLC
+%%  code base. It is supposed to be called by the generated opaque block
+%%  TLC files.
+%function SLibInsertAsyncTaskInitializeCode(system) Output
+  %assert system.Type == "root"
+  %with system
+    %% Initialized flags that are used when asynchronous task 
+    %% read absolute time from base rate
+    %foreach idx = LibGetNumAsyncTasks()
+      %assign tid = idx + NumSynchronousSampleTimes
+      %if RTMAbsTimeNeedTransProtection(tid) 
+        %if SLibConcurrentTasks()
+          %<SLibCGIRMutexOp(0,SLibGetTimerSemID(tid))>
+        %elseif RTMAbsTimeNeedNoPriorityTrans(tid) 
+          %% Initialized flags that are used when asynchronous task 
+          %% read absolute time from base rate
+          %<SLibGetDbBufReadBuf(tid)>   = 0xFF;
+          %<SLibGetDbBufWriteBuf(tid)>  = 0xFF;
+          %<SLibGetDbBufLastBufWr(tid)> = 0;
+        %endif
+      %endif
+    %endforeach
+  %endwith
+%endfunction
+
+
+%% Function: SLibInsertMdlOutputForProjectionFcn =========================
+%%  This function should never be directly called from the TLC
+%%  code base. It is supposed to be called by the generated opaque block
+%%  TLC files.
+%function SLibInsertMdlOutputForProjectionFcn(system) Output
+  %assert (system.Type == "root") && (ModelHasProjections == "yes") && ...
+          (isRSim)
+  
+  %% If Model registered Projection function, the ODE solvers must call
+  %% MdlOutputs before calling MdlProjection. MdlProjection is generated/called
+  %% always, but MdlOutputs should only be called if needed.
+  %if !isRSimWithSolverModule %% RSim with an ODE solver
+    /* Update Outputs before calling Projections */
+    MdlOutputs(0);
+  %endif
+%endfunction
+
+
+
+%% Function: SLibInsertInitSystemMatricesFcn ===================
+%% Abstract:
+%%   This function generates code that initializes system matrices.
+%%   This function should never be directly called from the TLC
+%%   code base. It is supposed to be called by the generated opaque block
+%%   TLC files.
+%%
+%function SLibInsertInitSystemMatricesFcn(system) Output
+  %assert (ModelIsLinearlyImplicit == "yes") && ...
+          (!Accelerator) && ...
+          (!IsModelReferenceTarget()) && ...
+          (system.Type == "root")
+        
+  %if !LibIsDeploymentDiagram()      
+      /* Root-level InitSystemMatrices */    
+      {      
+        %assign nx  = %<NumContStates>
+        %assign nnz = %<ModelMassMatrixJc[nx]>
+        
+        static int_T modelMassMatrixIr[%<nnz>] = {\
+          %assign comma = ""
+          %foreach idx = nnz
+            %<comma>%<ModelMassMatrixIr[idx]>\
+            %assign comma = ", "
+          %endforeach
+        };      
+        %assign njc = nx+1    
+        static int_T modelMassMatrixJc[%<njc>] = {\
+          %assign comma = ""
+          %foreach idx = njc
+            %<comma>%<ModelMassMatrixJc[idx]>\
+            %assign comma = ", "
+          %endforeach
+        };
+        static real_T modelMassMatrixPr[%<nnz>] = {\
+          %assign comma = ""
+          %foreach idx = nnz
+            %<comma>1.0\
+            %assign comma = ", "
+          %endforeach
+        };              
+        
+        %% global Ir
+        %assign copyAddr = LibGetMassMatrixGlobalIr()
+        %assign copySize = "%<nnz>*sizeof(int_T)"    
+        (void) %<LibGenMemFcnCall("memcpy", copyAddr, "modelMassMatrixIr", copySize)>;
+        
+        %% global Jc
+        %assign copyAddr = LibGetMassMatrixGlobalJc()
+        %assign copySize = "%<njc>*sizeof(int_T)"    
+        (void) %<LibGenMemFcnCall("memcpy", copyAddr, "modelMassMatrixJc", copySize)>;
+        
+        %% global Pr
+        %assign copyAddr = LibGetMassMatrixGlobalPr()
+        %assign copySize = "%<nnz>*sizeof(real_T)"    
+        (void) %<LibGenMemFcnCall("memcpy", copyAddr, "modelMassMatrixPr", copySize)>;            
+        
+      }
+  %endif  %% LibIsDeploymentDiagram()
+  
+%endfunction   %% SLibInsertInitSystemMatricesFcn
+
+
+%% Function: SLibInsertSolverResetCode =========================
+%%  This function should never be directly called from the TLC
+%%  code base. It is supposed to be called by the generated opaque block
+%%  TLC files.
+%function SLibInsertSolverResetCode() Output
+
+  %if   CodeFormat != "S-Function" || Accelerator || ...
+        SolverType != "VariableStep"
+        %return
+  %endif
+  
+  
+  %% Reset solver if needed
+  %openfile resetSolverBuffer
+    %assign nDU = SolverResetInfo.NumNonContDerivSignals
+    %if nDU > 0
+      %assign dU  = "nonContDerivSigCache"
+
+      {
+	%assign varName = "pNonContDerivSig"
+	%<dU> *%<varName> = (%<dU> *)%<RTMGet("LocalNonContDerivSig")>;
+	%foreach idx = nDU
+	  %%
+	  %assign sigSrc = SolverResetInfo.NonContDerivSignal[idx].SigSrc
+	  %assign startEl = SolverResetInfo.NonContDerivSignal[idx].StartEl
+	  %assign regLen = SolverResetInfo.NonContDerivSignal[idx].RegionLen
+	  %%
+	  %assign idNum = IDNUM(sigSrc)
+	  %assert (idNum[0] == "B")
+	  %if idNum[1] < BlockOutputs.NumGlobalBlockOutputs
+	    %assign bo = BlockOutputs.GlobalBlockOutput[idNum[1]]
+	    %assert (LibGetRecordWidth(bo) >= regLen + startEl)
+	    %assert (bo.Invariant == "no")
+	    %assert (!LibGetRecordIsComplex(bo))
+	    %%
+            
+            %% For NonContDerivSignal inside For Each subsystem, we need to
+            %% index each For Each vargroup level by right index
+            %if ISFIELD(SolverResetInfo.NonContDerivSignal[idx], "ForEachSSIterIndices")
+              %assign ::UseConstantForVarGroupIdx = TLC_TRUE
+              %assign ::VarGroupIndexVector = SolverResetInfo.NonContDerivSignal[idx].ForEachSSIterIndices
+              %assign ::VarGroupIndexVectorSize = SIZE(::VarGroupIndexVector, 1)
+              %assign ::VarGroupIndexVectorIdx = ::VarGroupIndexVectorSize - 1
+            %endif
+            %assign name = SLibGetBlockOutputIdentifierFromRecord(bo, NumSystems-1)
+            %if ISFIELD(SolverResetInfo.NonContDerivSignal[idx], "ForEachSSIterIndices")
+              %assign ::UseConstantForVarGroupIdx = TLC_FALSE
+              %assign ::VarGroupIndexVectorIdx = ::VarGroupIndexVectorSize - 1
+            %endif
+	  %else
+	    %assign nExternalOp = BlockOutputs.NumExternalBlockOutputs
+	    %foreach iExOp = nExternalOp
+	      %if BlockOutputs.ExternalBlockOutput[iExOp].LogicalSrc == sigSrc
+		%assign bo = BlockOutputs.ExternalBlockOutput[iExOp]
+		%break
+	      %endif
+	    %endforeach
+	    %assign name = "%<bo.SigLabel>"
+	  %endif
+	  %assign opW  = (LibGetRecordWidth(bo) == 1) ? "" : "[%<startEl>]"
+	  %assign addr = "&%<name>%<opW>"
+	  %assign dType = LibGetDataTypeNameFromId(LibGetRecordDataTypeId(bo))
+	  %assign sizeInBytes = "%<regLen>*sizeof(%<dType>)"
+
+	  if (%<LibGenMemFcnCall("memcmp", "%<varName>->cache_%<idx>", ...
+	    "(char *)%<addr>", sizeInBytes)> != 0) {
+	    (void) %<LibGenMemFcnCall("memcpy", "%<varName>->cache_%<idx>", ...
+	      "(char *)%<addr>", sizeInBytes)>;
+	    ssSetSolverNeedsReset(%<tSimStruct>);
+	  }
+	%endforeach
+      }
+    %endif
+  %closefile resetSolverBuffer
+  
+  %<resetSolverBuffer>
+  
+%endfunction %% SLibInsertSolverResetCode
+
+
+%% Function: SLibSLibGenerateExtModeOutput(system) ===================================
+%% Description:
+%%      Generates the External Mode Outputs code for an enabled, triggered, or
+%%      enabled & triggered subsystem to update the extmode active dwork.
+%%      This function should only be called from generated TLC files.
+%%
+%function SLibGenerateExtModeOutput(system) Output
+  %assert ExtMode == 1
+
+  %with system
+    %openfile extBuf
+    %if Type == "trigger" || Type == "enable_with_trigger" || Type == "enable" || ...
+      Type == "function-call" || Type == "action"
+      %assign callSites      = CallSites
+      %assign graphParentSys = ::CompiledModel.System[callSites[0][2]]
+      %assign ssBlock        = graphParentSys.Block[callSites[0][3]]
+      %with ssBlock
+        %foreach i = NumDWork
+          %assign dwRec  = DWork[i]
+          %assign dwName = LibBlockDWorkName(dwRec)
+          %assign dwIdx  = dwRec.FirstRootIdx
+          %if dwName == SLibGetNameOfExtModeActiveDWork()
+            %assign mode = SLibGetSubsystemActiveVector(dwIdx)
+            %<mode> = EXTMODE_SUBSYS_ENABLED;
+          %endif
+        %endforeach
+      %endwith
+    %endif
+    %closefile extBuf
+  %endwith
+  
+  %if !ISEMPTY(extBuf) && !WHITE_SPACE(extBuf)
+    %<extBuf>
+  %endif
+  
+%endfunction %% SLibSLibGenerateExtModeOutput
+
+
+%% Function: SLibRSimUpdateExtU === ============================================
+%% Abstract:
+%%   Get inport data from file
+%%   This function should only be called from generated TLC files.
+%%
+%function SLibGetRootInportsFromFile(system) Output
+  %assert isRSim && system.Type == "root" && !IsModelReferenceTarget()
+  
+  %with system
+  %openfile inportBuf     
+  %if NumModelInputs > 0
+    /* Read data from the mat file of inport block */
+    if(gblInportFileName != %<SLibGetNullDefinitionFromTfl()>)
+    { 
+    %assign useTid = !LibIsSingleRateModel() 
+    %if !useTid 
+      real_T time = %<LibGetT()>;
+    %endif  
+    int_T currTimeIdx;
+    
+    int_T i;
+    
+    %%
+    %foreach idx  = ExternalInputs.NumExternalInputs
+      %assign extInp  = ExternalInputs.ExternalInput[idx]
+      %assign cgTypeIdx = LibGetRecordCGTypeIdx(extInp)
+      %assign numDims = LibCGTypeNumDimensions(cgTypeIdx)
+      %assign interp  = extInp.Interpolation
+      %%
+      
+      /*
+       *  Read in data from mat file for root inport %<LibGetRecordIdentifier(extInp)>
+       */
+      %if useTid    
+        %assign tid = extInp.TID 
+        if(%<LibIsSampleHit(tid)>)
+      %endif   
+      {              
+      %assign dTypeId = LibGetDataTypeIdAliasedThruToFromId(...
+        SLibGetRecordDataTypeId(extInp))
+      %assign dTypeRec = FixPt_GetDataTypeFromIndex(dTypeId)
+      %assign dTypeName = LibGetDataTypeNameFromId(...
+        SLibGetRecordDataTypeId(extInp))
+      %assign width   = LibGetRecordWidth(extInp)
+      %%
+      %if interp
+        %assign dTypeSize = "sizeof("+ dTypeName +")"    
+      %endif 
+      %%
+      %if useTid 
+        real_T time = %<LibGetTaskTime(tid)>;
+      %endif   
+      %%
+      
+      %if interp
+        int k = 1;
+        if(gblInportTUtables[%<idx>].nTimePoints == 1){
+          k = 0;
+        }
+      %endif 
+      
+      currTimeIdx = rt_getTimeIdx(gblInportTUtables[%<idx>].time, time, 
+      gblInportTUtables[%<idx>].nTimePoints,
+      gblInportTUtables[%<idx>].currTimeIdx,
+      %<interp>);
+      %%
+      
+      gblInportTUtables[%<idx>].currTimeIdx = currTimeIdx;                 
+      %%                                  
+      %if numDims >= 2 
+        %assign dataOffset1 = "%<width>" + "*currTimeIdx + i"
+        %assign dataOffset2 = width
+      %else           
+        %assign baseLength = "i*gblInportTUtables[%<idx>].nTimePoints +"        
+        %assign dataOffset1 = baseLength + "currTimeIdx"
+        %assign dataOffset2 = "1"
+      %endif      
+      
+      
+      for (i = 0; i < %<width>; i++)      
+      {              
+        %<dTypeName>* realPtr1 = (%<dTypeName>*)gblInportTUtables[%<idx>].ur + 
+        %<dataOffset1>;
+        
+        %assign yout1  =  SLibGetExtUIdentifier(extInp, "i", "%<tRealPart>")
+        %assign yout   = "&" + yout1 
+        
+        %if interp      
+          %<dTypeName>* realPtr2 = realPtr1 + %<dataOffset2>*k;
+                                
+          (void)rt_Interpolate_Datatype(
+          realPtr1,
+          realPtr2,
+          %<yout>,
+          time,  
+          gblInportTUtables[%<idx>].time[currTimeIdx],
+          gblInportTUtables[%<idx>].time[currTimeIdx + k],
+          gblInportTUtables[%<idx>].uDataType );
+
+          %if LibGetRecordIsComplex(extInp) 
+            
+            %assign yout1  =  SLibGetExtUIdentifier(extInp, "i", "%<tImagPart>")
+            %assign yout   = "&" + yout1
+            if(gblInportTUtables[%<idx>].complex == 0){
+              %<yout1> = %<FixPt_GetGroundValueOrNameFromDataTypeRec(dTypeRec, TLC_FALSE)>; 
+            }else{
+              %<dTypeName>* imagPtr1 = (%<dTypeName>*)gblInportTUtables[%<idx>].ui + %<dataOffset1>; 
+              %<dTypeName>* imagPtr2 = imagPtr1 + %<dataOffset2>*k;
+                  
+              (void)rt_Interpolate_Datatype(
+              imagPtr1,
+              imagPtr2,
+              %<yout>,
+              time,  
+              gblInportTUtables[%<idx>].time[currTimeIdx],
+              gblInportTUtables[%<idx>].time[currTimeIdx + k],
+              gblInportTUtables[%<idx>].uDataType );
+            }
+          %endif
+        %else          
+          if(currTimeIdx == -1){
+            %<yout1>   = %<FixPt_GetGroundValueOrNameFromDataTypeRec(dTypeRec, TLC_FALSE)>;
+            %if LibGetRecordIsComplex(extInp)
+              %assign youtIm1  =  SLibGetExtUIdentifier(extInp, "i", "%<tImagPart>")
+              %assign youtIm   = "&" + youtIm1
+              %<youtIm1>   = %<FixPt_GetGroundValueOrNameFromDataTypeRec(dTypeRec, TLC_FALSE)>;          
+            %endif
+          }else{
+            %<yout1> = *realPtr1;            
+            %if LibGetRecordIsComplex(extInp)
+              %assign yout1  =  SLibGetExtUIdentifier(extInp, "i", "%<tImagPart>")
+              %assign yout   = "&" + yout1
+              if(gblInportTUtables[%<idx>].complex == 0){
+                %<yout1> = %<FixPt_GetGroundValueOrNameFromDataTypeRec(dTypeRec, TLC_FALSE)>;
+              }else{             
+                %<dTypeName>* imagPtr1 = (%<dTypeName>*)gblInportTUtables[%<idx>].ui + %<dataOffset1>;
+                %<yout1> = *imagPtr1; 
+              }
+            %endif  
+          }         
+        %endif
+      }         
+    }
+  %endforeach
+}  
+/* end read inport data from file */
+%endif
+%closefile inportBuf
+%endwith
+
+%if !WHITE_SPACE(inportBuf)
+  %assign inportBuf = "\n" + inportBuf
+  %<inportBuf>
+%endif
+
+%endfunction  %% SLibGetRootInportsFromFile
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Function: FcnSysVarGroupIndex
+%%   type: "DWork", "BlockIO","ConstBlockIO","Parameter"
+%%         "ConstParameter", "ContStates", "ContStatesDisabled"
+%%         "ContStatesDerivative", "ZCSV", "ZCEvent"
+%%         "ExternalInput", "ExternalOutput", 
+%%         "MassMatrixOffset" "ConstParameterWithInit"
+%%
+%function FcnSysVarGroupIndex(system, type, callSiteIdx) void
+  %assign hStructSystem = System[system.HStructDeclSystemIdx]
+  %assign varGroupIdx   = -1
+  
+  %if callSiteIdx < 0
+    %assign callSiteIdx = 0
+  %endif
+  
+  %assign indexStr = type + "VarGroupIndex"
+  %if ISFIELD(hStructSystem, indexStr)
+    %assign varGroupIdx = GETFIELD(hStructSystem, indexStr)[callSiteIdx]
+  %endif
+  %return varGroupIdx
+%endfunction
+
+%% Function: SLibVarGroupType ==================================================
+%% Abstract:
+%%   Returns the structured type for a given VarGroup index and type (class).
+%%
+%function SLibVarGroupType(varGroupIdx, type) void
+  %assign retStr = ""
+  %if varGroupIdx >= 0
+    %assign varGroup = ::CompiledModel.VarGroups.VarGroup[varGroupIdx]
+    %assign cgType = ::CompiledModel.CGTypes.CGType[varGroup.CGTypeIdx] 
+    %if SLibVarGroupUsedAsMatrix(cgType)
+      %assert type == "DWork" || type == "BlockIO" || ...
+              type == "ZCEvent" || type == "ZCSV"  || ...
+              type == "ContStates" || type == "ContStatesDerivative" || ...
+              type == "ContStatesDisabled" || type == "ContStatesAbsoluteTolerance"
+      %assign cgType = SLibGetBaseTypeForVarGroupUsedAsMatrix(cgType)
+    %endif
+    %assign retStr = cgType.Name
+  %elseif type == "MassMatrixOffset"
+    %% TODO: JK For now only -- till we get a proper (VarGroup) solution
+    %assign retStr = tMassMatrixOffset + "_" + system.Identifier
+  %endif 
+  
+  %return retStr
+%endfunction
+
+%% Function: FcnSysVarGroupType
+%%   type: "DWork", "BlockIO","ConstBlockIO","Parameter"
+%%         "ConstParameter", "ContStates", "ContStatesDisabled"
+%%         "ContStatesDerivative", "ZCSV", "ZCEvent"
+%%         "ExternalInput", "ExternalOutput", 
+%%         "MassMatrixOffset" "ConstParameterWithInit"
+%%
+%function FcnSysVarGroupType(system, type) void
+  %assign varGroupIdx = FcnSysVarGroupIndex(system, type, 0)
+  %return SLibVarGroupType(varGroupIdx, type)
+%endfunction 
+
+%% Function: FcnSysVarGroupNonreusedName
+%%   type: "DWork", "BlockIO","ConstBlockIO","Parameter"
+%%         "ConstParameter", "ContStates", "ContStatesDisabled"
+%%         "ContStatesDerivative", "ZCSV", "ZCEvent"
+%%         "ExternalInput", "ExternalOutput", 
+%%         "MassMatrixOffset" "ConstParameterWithInit"
+%%
+%function FcnSysVarGroupNonreusedName(system, type) void
+  %assign varGroupIdx = FcnSysVarGroupIndex(system, type, 0)
+  %assign retStr = ""
+  %if varGroupIdx >= 0
+    %assign varGroup = ::CompiledModel.VarGroups.VarGroup[varGroupIdx]
+    %return varGroup.NonreusedName
+  %else
+    %return ""
+  %endif
+%endfunction
+
+%% Function: SLibVarGroupName ==================================================
+%% Abstract:
+%%   Returns the VarGroup name for a given VarGroup index.
+%%
+%function SLibVarGroupName(varGroupIdx) void
+  %return ::CompiledModel.VarGroups.VarGroup[varGroupIdx].Name
+%endfunction
+
+%% Function: SLibVarGroupParentIndex ===========================================
+%% Abstract:
+%%   Returns the VarGroup parent index for a given VarGroup index.
+%%
+%function SLibVarGroupParentIndex(varGroupIdx) void
+  %return ::CompiledModel.VarGroups.VarGroup[varGroupIdx].ParentVarGroupIdx
+%endfunction
+
+
+%function SLibVarGroupMember(varGroupIdx, memberIdx)
+  %assign varGroup          = ::CompiledModel.VarGroups.VarGroup[varGroupIdx]
+  %assign varGroupTypeIdx   = varGroup.CGTypeIdx
+  %assign varGroupType      = ::CompiledModel.CGTypes.CGType[varGroupTypeIdx]
+  %if SLibVarGroupUsedAsMatrix(varGroupType)
+    %assign varGroupType = SLibGetBaseTypeForVarGroupUsedAsMatrix(varGroupType)
+  %endif
+  %return varGroupType.Members.Member[memberIdx]
+%endfunction
+
+%function SLibCGVarGroupMemberCGTypeIdx(varGroupIdx, memberIdx)
+  %assign member = SLibVarGroupMember(varGroupIdx, memberIdx)
+  %return member.CGTypeIdx
+%endfunction
+
+%function SLibCGVarGroupMemberName(varGroupIdx, memberIdx)
+  %assign member = SLibVarGroupMember(varGroupIdx, memberIdx)
+  %return member.Name
+%endfunction
+
+%function SLibCGIRSAccessRecord(dataRec, accTid) void
+  %assign activeFcn = FcnGetActiveFcnForDecl()
+  %assign declareInFcnScope = "DeclareIn%<activeFcn>FcnScope"
+  %assign dataRec.%<declareInFcnScope> = 1
+  %if SLibIsRateGrouping() && ...
+    SLibSystemFcnIsRateGroupType(activeFcn) && accTid >= 0
+    %if !ISEQUAL(dataRec.TID, accTid)
+      %assign temp = []
+      %foreach i = NumSampleTimes
+	%assign temp = temp + 0
+      %endforeach
+
+      %if TYPE(dataRec.TID) == "Vector"
+	%foreach i = SIZE(dataRec.TID,1)
+	  %assign idx = (dataRec.TID[i] > 0) ? dataRec.TID[i] : 0
+	  %assign temp[idx] = 1
+	%endforeach
+      %elseif TYPE(dataRec.TID) == "Number"
+        %assert dataRec.TID >= 0
+        %assign temp[dataRec.TID] = 1
+      %endif
+      %assign temp[accTid] =1 
+      %assign dataRec.TID = []
+      %foreach i = NumSampleTimes
+	%if temp[i] == 1
+	  %assign dataRec.TID = dataRec.TID + i
+	%endif
+      %endforeach
+    %endif
+  %endif
+%endfunction
+
+%function SLibCGIRAccessLocalVar(varIndex, accTid) void
+  %assign localBO = ::CompiledModel.BlockOutputs.LocalBlockOutput[varIndex]
+  %<SLibCGIRSAccessRecord(localBO, accTid)>
+%endfunction
+
+%function SLibCGIRAccessLocalDWork(varIndex, accTid) void
+  %assign localDW = ::CompiledModel.DWorks.DWork[varIndex]
+  %<SLibCGIRSAccessRecord(localDW, accTid)>
+%endfunction
+
+%function SLibCG_GetInterfaceData(accSysIdx, fcnType, argType)
+  %if TLC_FALSE && AccessDataUseRTM(accSysIdx, fcnType)
+    %assign interfaceData = System[accSysIdx].Interface.RTMArgDef
+  %else
+    %assign interfaceData = System[accSysIdx].Interface.%<argType>ArgDef
+  %endif
+  %return interfaceData
+%endfunction
+
+%%
+%% this function is only used when PreTLCBinding is off.
+%%
+%function SLibCG_ReplaceSystemFcnArg(aSystem, aVarGroup) void
+  %assert aSystem.GeneratingSubFunctions
+  %assert aSystem.SystemIdx == aVarGroup.SysIdx
+  %%
+  %% Subfunction called by iterator systems get the address of a 
+  %% BlockIO or DWork array element passed not just the base pointer.
+  %%
+  %% e.g. subfcn_call(&localBlockIO[iterBlock_idx])
+  %%
+  %% The array element is accessed by pointer dereference inside
+  %% of the sub-function.
+  %%
+  %% e.g. localBlockIO->someElement
+  %%
+  %assign argNotAdded = TLC_TRUE
+  %foreach replIdx = SIZE(aSystem.ArgumentReplacements, 1)/2
+    %assign argIdx = replIdx * 2
+    %if aSystem.ArgumentReplacements[argIdx] == aVarGroup.LocalName
+      %assign argNotAdded = TLC_FALSE
+      %break
+    %endif
+  %endforeach
+  %%
+  %% Registering the array index expression as a replacement for the
+  %% passthrough argument, because we are using a simple pointer
+  %% dereference inside of a subfunction to access work vector elements.
+  %%
+  %if argNotAdded
+    %assign aSystem.ArgumentReplacements = ...
+      aSystem.ArgumentReplacements + aVarGroup.LocalName
+    %assign replacement = "&" + ...
+      SLibGetIndexedCGIRVarGroupPathForISSLoopBoundReuse(aVarGroup, ...
+      aVarGroup.LocalName, aVarGroup.SysIdx)
+    %assign aSystem.ArgumentReplacements = ...
+      aSystem.ArgumentReplacements + replacement
+  %endif  
+%endfunction %% SLibCG_ReplaceSystemFcnArg
+
+%function SLibCGIRVarGroupPath(varGroupIdx, accSysIdx, cross) void
+  %assign varGroup             = ::CompiledModel.VarGroups.VarGroup[varGroupIdx]
+  %assign sysIdx               = varGroup.SysIdx
+  %assign savedAccSysIdx       = accSysIdx
+  %assign accSysIdx            = System[accSysIdx].ReusedParentSystemIdx
+  %assign globalAccess         = (accSysIdx == (::CompiledModel.NumSystems - 1))
+  %assign isMdlRefSys          = IsModelReferenceBaseSys(System[sysIdx])
+  %assign isAccSysMdlRefSys    = IsModelReferenceBaseSys(System[accSysIdx])
+  %assign isConstBlockIO       = varGroup.Category == "ConstBlockIO"
+  %assign isMachineData        = varGroup.Category == "MachineLocalData"
+  %assign isParameter          = varGroup.Category == "Parameter"
+  %assign isMdlRefConstBlockIO = isConstBlockIO && isMdlRefSys
+  %assign isMdlRefRegistration = ::BlockFcn == "Registration" && isMdlRefSys
+  %assign isERTSFcnTunParams   = ::BlockFcn == "Unknown" && isParameter
+  %assign isERTSFcnOutputsFcn  = ::BlockFcn == "SFunctionOutputs"
+  %assign isConstBlockIOAccInMdlRefSys = isConstBlockIO && isAccSysMdlRefSys
+  %assign isBlockIO       = varGroup.Category == "BlockIO" 
+  %assign isBlockIOAccInMdlRefSys      = isBlockIO && isAccSysMdlRefSys
+  %assign forceDerivFromRTM    = ...
+    (varGroup.Category == "ContStatesDerivative" || varGroup.Category == "ContStatesDisabled") && ...
+    (::BlockFcn == "Derivative" || ::BlockFcn == "ForcingFunction")
+  %assign rootSysPointer       = varGroup.IsPointer ? "->" : "."
+
+  %assert !isERTSFcnTunParams || (GenerateErtSFunction == 1)
+
+  %if isERTSFcnTunParams
+    %assign rootSysPointer = IOQualifier
+  %elseif isERTSFcnOutputsFcn || isMachineData
+    %assign rootSysPointer = "."
+  %elseif forceDerivFromRTM
+    %assign rootSysPointer = "->"
+  %elseif GenerateClassInterface && ...
+    (sysIdx == GetBaseSystemIdx())
+    %if ISFIELD(::CompiledModel,"InGeneratingGMM") &&...
+        ::CompiledModel.InGeneratingGMM
+        %if !isConstBlockIO 
+          %assign rootSysPointer = "->"
+        %endif
+    %elseif accSysIdx == GetBaseSystemIdx() || ...
+            System[accSysIdx].ReusedParentSystemIdx == GetBaseSystemIdx()
+      %assign rootSysPointer = "."
+    %else
+      %assign rootSysPointer = "->"
+    %endif
+  %endif
+    
+  %% Track access if not tuning params in ERT SFcn wrapper, or
+  %% const block IO for mdlref although if it is global access for
+  %% const block IO for mdlref, then track it in that one case
+  %if !isERTSFcnTunParams && !isMachineData &&...
+    sysIdx == accSysIdx && ...
+    (!isConstBlockIOAccInMdlRefSys || globalAccess)
+    %assign interfaceData = SLibCG_GetInterfaceData(accSysIdx,::BlockFcn,varGroup.Category)
+    %<SLibAccessArgHelper(interfaceData,"", FcnGetCurrentAccessTid())>
+  %endif
+
+  %% Root system
+  %if sysIdx == (NumSystems-1) || isMdlRefConstBlockIO || ...
+      (isMdlRefSys && GenerateClassInterface)
+    %assign tmpHasSimStructVars = ::CompiledModel.HasSimStructVars
+    %assign ::CompiledModel.HasSimStructVars = AccessDataUseRTM(sysIdx,::BlockFcn,cross)
+    
+    %if LibIsDeploymentDiagram() && ...
+      (varGroup.Category == "ContStatesDerivative" || ...
+      varGroup.Category == "ContStatesDisabled" || ...
+      varGroup.Category == "ContStates")
+      %% For deployment diagram, need to pass the task in the argument
+      %assign retStr = ...
+        SLibDeploymentGet%<varGroup.Category>Struct(savedAccSysIdx,forceDerivFromRTM) + ...
+        rootSysPointer
+    %elseif isMachineData
+      %return  varGroup.Name + "."
+    %else
+      %assign retStr = LibGet%<varGroup.Category>Struct() + rootSysPointer
+    %endif
+    %assign ::CompiledModel.HasSimStructVars = tmpHasSimStructVars
+    %return retStr
+    %% Standalone subsystem  
+  %elseif varGroup.ParentVarGroupIdx == -1
+    %return varGroup.Name + "."
+     
+  %% Local access; wait until sysIdx is up to a noninlined boundary, 
+  %% e.g. not inside an inlined variant subsystem
+  %elseif sysIdx == accSysIdx && System[sysIdx].RTWSystemCode == 2
+
+    %% Local access of nonreusable inside reusable
+    %if cross && !isMdlRefRegistration
+
+      %assign interfaceData = System[sysIdx].Interface.%<varGroup.Category>ArgDef
+      %<SLibAccessArgHelper(interfaceData, "Global", FcnGetCurrentAccessTid())>
+      %if SLibVarGroupUsedAsMatrix(CGTypes.CGType[varGroup.CGTypeIdx]) && ...
+        ISFIELD(System[sysIdx], "IndexingSigSrc")
+        %% If varGroup is matrix and it's an IIS, the subsystem is capable of reuse
+        %% for loop bound, and the path should be indexed.
+        %return SLibGetIndexedCGIRVarGroupPathForISSLoopBoundReuse(varGroup, varGroup.NonreuseName, sysIdx) + "."
+      %else
+        %return varGroup.NonreusedName + "->"
+      %endif
+      
+    %% local access inside reusable subsystem
+    %else
+      %assign system = System[sysIdx]
+      %if SLibVarGroupUsedAsMatrix(CGTypes.CGType[varGroup.CGTypeIdx]) && ...
+        ISFIELD(system, "IndexingSigSrc")
+        %% If varGroup is matrix and it's an IIS, the subsystem is 
+        %% capable of reuse for loop bound, and the path should be indexed.
+        %if system.GeneratingSubFunctions
+          %<SLibCG_ReplaceSystemFcnArg(system, varGroup)>
+          %return varGroup.LocalName + "->"
+        %else
+          %return SLibGetIndexedCGIRVarGroupPathForISSLoopBoundReuse( ...
+            varGroup, varGroup.LocalName, sysIdx) + "."
+        %endif
+      %else
+        %return varGroup.LocalName + "->"
+      %endif
+    %endif
+
+  %% parameter is accessed via the root system when from below
+  %elseif isParameter && (sysIdx > accSysIdx)
+    %return SLibCGIRVarGroupPath(varGroupIdx, NumSystems-1, cross)
+    
+  %elseif isMdlRefSys && !isAccSysMdlRefSys
+    %return FcnGetSFcnDWorkIdentifier(System[sysIdx]) + "." + ...
+      SLibGetVarGroupRTMName(varGroup.Category) + "."
+  %% non-local access of reusable subsystem
+  %else
+    %% (DJia) This is a temporary solution
+    %% For dwork in Indexing Subsystem, return the last region since
+    %% for-iterator subsystem always logging the later iteration    
+    %if SLibVarGroupUsedAsMatrix(CGTypes.CGType[varGroup.CGTypeIdx])
+      %return SLibGetIndexedCGIRVarGroupPathForISSNoLoopBoundReuse(varGroupIdx, varGroup.Name, sysIdx, accSysIdx, cross)
+    %else
+      %% Pop up a level
+      %return ...
+        SLibCGIRVarGroupPath(varGroup.ParentVarGroupIdx, accSysIdx,cross) + ...
+            varGroup.Name + "."
+    %endif
+  %endif
+%endfunction
+
+%% Function: SLibCG_GetOptSubStruct =============================================
+%% Abstract:
+%%   Returns a optional sub-structure reference, if a vargroup element is located
+%%   in a substructure (e.g. bit-field).
+%%
+%function SLibCG_GetOptSubStruct(varGroupIdx, memberIdx)
+  %assign varGroup = ::CompiledModel.VarGroups.VarGroup[varGroupIdx]
+  %if varGroup.NumSubStructs > 0
+    %assign subStructIdx = varGroup.SubStructIndex[memberIdx]
+    %if subStructIdx > -1
+      %return varGroup.SubStuctNames[subStructIdx] + "."
+    %endif
+  %endif
+  %return ""
+%endfunction
+
+%% Function: SLibCG_GetVarGroupElementPath =====================================
+%% Abstract:
+%%   Gets to full path to a vargoup element.
+%%
+%function SLibCG_GetVarGroupElementPath(varGroupIdx, accSysIdx, cross) void
+  %assign varGroup = ::CompiledModel.VarGroups.VarGroup[varGroupIdx[0]]
+  %assign memberEl = FcnSLibCGIRGetVarGroupMember(varGroup, varGroupIdx[1])
+  %assign subStruct = SLibCG_GetOptSubStruct(varGroupIdx[0], varGroupIdx[1])
+  %assign varGroupPath = SLibCGIRVarGroupPath(varGroupIdx[0], accSysIdx, cross)
+  %return varGroupPath + subStruct + memberEl.Name
+%endfunction
+
+%% Function: SLibCG_GetMultiWordID =============================================
+%% Abstract:
+%%   This function returns a chunk access string for any given chunk index
+%%   greater or equal to zero.
+%%
+%function SLibCG_GetMultiWordID(chunkIdx) void
+  %if chunkIdx >= 0
+    %return ".chunks[%<chunkIdx>]"
+  %endif
+  %return ""
+%endfunction %% SLibCG_GetMultiWordID
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Functions for custom storage class
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%function FcnCGIRCSCDataHelper(record, width, memberStr, chunkIdx, ucv, indexExpr, addr) void
+  %assign tmpVect = SLibGetReimAndIdx(indexExpr)
+  %assign reim = tmpVect[0]
+  %assign idx = tmpVect[1]
+  %assign sigIndexer = SLibGet1DStructFieldIndexer(width, memberStr, ucv, "", idx)
+  %if chunkIdx >= 0
+    %assign errTxt = "Custom storage classes don't support multi-word " ...
+      "fix-point operations at this point."
+    %<LibReportError(errTxt)>
+  %endif
+  %if addr
+    %if !LibCustomDataIsAddressable(record)
+      %assign errTxt = "%<record.RecordType> %<LibGetRecordVarName(record)> " + ...
+        "is not addressable because of its custom storage class."
+      %<LibReportFatalError(errTxt)>
+    %endif
+    %return LibCustomData(record,"address",sigIndexer,reim)
+  %else
+    %return LibCustomData(record,"contents",sigIndexer,reim)
+  %endif
+%endfunction
+
+%function SLibCGIR_CSCP(paramIdx, width, memberStr, chunkIdx, ucv, indexExpr) void
+  %return FcnCGIRCSCDataHelper(::CompiledModel.ModelParameters.Parameter[paramIdx], width, memberStr, chunkIdx, ucv, indexExpr, TLC_FALSE)
+%endfunction
+
+%function SLibCGIR_CSCPAddr(paramIdx, width, memberStr, chunkIdx, ucv, indexExpr) void
+  %assign param = ::CompiledModel.ModelParameters.Parameter[paramIdx]
+  %assign pAddr = FcnCGIRCSCDataHelper(param, width, memberStr, chunkIdx, ucv, indexExpr, TLC_TRUE)
+  %return pAddr
+%endfunction
+
+%function SLibCG_CSCDW(dworkIdx, width, memberStr, chunkIdx, ucv, indexExpr) void
+  %return FcnCGIRCSCDataHelper(::CompiledModel.DWorks.DWork[dworkIdx], width, memberStr, chunkIdx, ucv, indexExpr, TLC_FALSE)
+%endfunction
+
+%function SLibCG_CSCDWAddr(dworkIdx, width, memberStr, chunkIdx, ucv, indexExpr) void
+  %return FcnCGIRCSCDataHelper(::CompiledModel.DWorks.DWork[dworkIdx], width, memberStr, chunkIdx, ucv, indexExpr, TLC_TRUE)
+%endfunction
+
+%function SLibCG_BOCSC(bufIdx, width, memberStr, chunkIdx, ucv, indexExpr) void
+  %return FcnCGIRCSCDataHelper(::CompiledModel.BlockOutputs.ExternalBlockOutput[bufIdx], width, memberStr, chunkIdx, ucv, indexExpr, TLC_FALSE)
+%endfunction
+
+%function SLibCG_BOCSCAddr(bufIdx, width, memberStr, chunkIdx, ucv, indexExpr) void
+  %return FcnCGIRCSCDataHelper(::CompiledModel.BlockOutputs.ExternalBlockOutput[bufIdx], width, memberStr, chunkIdx, ucv, indexExpr, TLC_TRUE)
+%endfunction
+
+%function SLibCG_SetCSCData(record, width, memberStr, chunkIdx, ucv, indexExpr, rhs) void
+  %assert record.StorageClass == "Custom"
+  %if chunkIdx >= 0
+    %assign errTxt = "Custom storage classes don't support multi-word " ...
+      "fix-point operations at this point."
+    %<LibReportError(errTxt)>
+  %endif  
+  %if record.CustomStorageClassVersion > 1
+    %assign tmpVect = SLibGetReimAndIdx(indexExpr)
+    %assign reim = tmpVect[0]
+    %assign idx = tmpVect[1]
+    %assign sigIndexer = SLibGet1DStructFieldIndexer(width, memberStr, ucv, "", idx)
+    %return LibAccessCustomData(record,"set",sigIndexer,reim,rhs)
+  %else
+    %assign lhs = FcnCGIRCSCDataHelper(record, width, memberStr, chunkIdx, ...
+      ucv, indexExpr, TLC_FALSE)
+    %return lhs + " = " + rhs + ";\n"
+  %endif
+%endfunction
+ 
+%function SLibCG_SetCSCDW(dworkIdx, width, memberStr, chunkIdx, ucv, indexExpr, rhs) void
+  %assign record = ::CompiledModel.DWorks.DWork[dworkIdx]
+  %return SLibCG_SetCSCData(record, width, memberStr, chunkIdx, ucv, indexExpr, rhs)
+%endfunction
+ 
+%function SLibCG_SetBOCSC(bufIdx, width, memberStr, chunkIdx, ucv, indexExpr, rhs) void
+  %assign record = ::CompiledModel.BlockOutputs.ExternalBlockOutput[bufIdx]
+  %return SLibCG_SetCSCData(record, width, memberStr, chunkIdx, ucv, indexExpr, rhs)
+%endfunction
+ 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Functions for "simple" and local cgVars
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%function FcnCGIRSimpleCGVarHelper(identifier, isPointer, width, memberStr, chunkIdx, ucv, indexExpr, addr) void
+  %assign tmpVect = SLibGetReimAndIdx(indexExpr)
+  %assign reim = tmpVect[0]
+  %if reim != "" 
+    %assign reim = "." + reim
+  %endif
+  %assign idx = tmpVect[1]
+  %assign sigIndexer = SLibGet1DStructFieldIndexer(width, memberStr, ucv, "", idx)
+  %assign followingId = sigIndexer + reim
+  %assign chunk = SLibCG_GetMultiWordID(chunkIdx)
+  %% sigIndexer may look like .b.c[3] or [3] or ""
+  %% if followingId starts with [, don't add *
+  %% if followingId starts with .,       add *
+  %% if followingId is empty, add * if we want content.
+
+  %if ISEMPTY(followingId)
+    %if isPointer
+      %if !addr
+        %return "(*%<identifier>)" + chunk
+      %else
+        %if ISEMPTY(chunk)
+          %return identifier
+        %else
+          %return "&(*" + identifier + ")" + chunk  
+        %endif
+      %endif
+    %endif
+  %elseif isPointer
+    %assign identifier = "(*" + identifier + ")"
+  %endif
+  
+  %if addr
+    %return "&" + identifier + followingId + chunk
+  %else
+    %return identifier + followingId + chunk
+  %endif
+%endfunction
+
+%function SLibCG_V(identifier, isPointer, width, memberStr, chunkIdx, ucv, indexExpr)
+  %return FcnCGIRSimpleCGVarHelper(identifier, isPointer, width, memberStr, chunkIdx, ucv, indexExpr, TLC_FALSE)
+%endfunction
+
+%function SLibCG_VAddr(identifier, isPointer, width, memberStr, chunkIdx, ucv, indexExpr) void
+  %return FcnCGIRSimpleCGVarHelper(identifier, isPointer, width, memberStr, chunkIdx, ucv, indexExpr, TLC_TRUE)
+%endfunction
+
+%function SLibCG_SetV(identifier, isPointer, width, memberStr, chunkIdx, ucv, indexExpr, rhs) void
+  %assign lhs = SLibCG_V(identifier, isPointer, width, memberStr, chunkIdx, ...
+    ucv, indexExpr)
+  %return lhs + " = " + rhs + ";\n"
+%endfunction
+
+%function SLibCG_SetASOVAddr(boRecordIdx, width, accTid, memberStr, chunkIdx, ucv, indexExpr, rhs) void
+  %assign blkOutputRec = ::CompiledModel.BlockOutputs.LocalBlockOutput[boRecordIdx]
+  %assert blkOutputRec.DeclareAsPointer == "yes"
+  %<SLibCGIRSAccessRecord(blkOutputRec, accTid)>
+  %assign blkOutputId = blkOutputRec.Identifier
+  %return "%<SLibCG_V(blkOutputId, TLC_FALSE, 1, "", chunkIdx, "", 0)> = %<rhs>;\n"
+%endfunction
+
+%function SLibCG_SetASOV(boRecordIdx, accTid, width, memberStr, chunkIdx, ucv, indexExpr, rhs) void
+  %assign blkOutputRec = ::CompiledModel.BlockOutputs.LocalBlockOutput[boRecordIdx]
+  %assert blkOutputRec.DeclareAsPointer == "yes"
+  %<SLibCGIRSAccessRecord(blkOutputRec, accTid)>
+  %assign blkOutputId = blkOutputRec.Identifier
+  %assign lhs = SLibCG_V(blkOutputId, TLC_TRUE, width, memberStr, chunkIdx, ...
+    ucv, indexExpr)
+  %return lhs + " = " + rhs + ";\n"
+%endfunction
+
+%function SLibCG_ASOV(boRecordIdx, accTid, width, memberStr, chunkIdx, ucv, indexExpr) void
+  %assign blkOutputRec = ::CompiledModel.BlockOutputs.LocalBlockOutput[boRecordIdx]
+  %assert blkOutputRec.DeclareAsPointer == "yes"
+  %<SLibCGIRSAccessRecord(blkOutputRec, accTid)>
+  %assign blkOutputId = blkOutputRec.Identifier
+  %return SLibCG_V(blkOutputId, TLC_TRUE, width, memberStr, chunkIdx, ucv, indexExpr)
+%endfunction
+
+%function SLibCG_ASOVAddr(boRecordIdx, accTid, width, memberStr, chunkIdx, ucv, indexExpr) void
+  %assign blkOutputRec = ::CompiledModel.BlockOutputs.LocalBlockOutput[boRecordIdx]
+  %<SLibCGIRSAccessRecord(blkOutputRec, accTid)>
+  %assert blkOutputRec.DeclareAsPointer == "yes"
+  %assign blkOutputId = blkOutputRec.Identifier
+  %return SLibCG_VAddr(blkOutputId, TLC_TRUE, width, memberStr, chunkIdx, ucv, indexExpr)
+%endfunction
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Functions for canonical arguments
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%function SLibCGIRArg(argDef, cross, width, memberStr, chunkIdx, ucv, indexExpr, addr, isPointer, iterVar)
+  %assign accessTid = FcnGetCurrentAccessTid() 
+  %if cross
+    %assign identifier = argDef.GlobalIdentifier
+  %else
+    %assign identifier = argDef.Identifier
+  %endif
+ 
+  %if iterVar != ""
+    %assign identifier = identifier + "[" + iterVar + "]"
+  %endif
+  
+  %if addr
+    %return SLibCG_VAddr(identifier, isPointer, width, ...
+      memberStr, chunkIdx, ucv, indexExpr)
+  %else
+    %return SLibCG_V(identifier, isPointer, width, ...
+      memberStr, chunkIdx, ucv, indexExpr)
+  %endif
+%endfunction 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Functions for hierarchical structures
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%function FcnCGIRParamCGVarHelper(paramIdx, cross, accSysIdx, width, memberStr, chunkIdx, ucv, indexExpr, baseaddr) void
+  %with ::CompiledModel.System[accSysIdx]
+  %assign opaqueBlock = FcnRootOpaqueBlock()
+  %with opaqueBlock
+    
+  %assign tmpVect    = SLibGetReimAndIdx(indexExpr)
+  %assign reim       = tmpVect[0]
+  %assign idx        = tmpVect[1]
+  %assign sigIndexer = SLibGet1DStructFieldIndexer(width, memberStr, ucv, "", idx)
+  %assign mdlParam   = ::CompiledModel.ModelParameters.Parameter[paramIdx]
+  %assign value      = mdlParam.Value
+  %assign nCols      = SIZE(value, 1)
+  %assign address    = ""
+  %assign chunk      = SLibCG_GetMultiWordID(chunkIdx)
+  
+  %assign retString = ""
+  
+  %if baseaddr || !ISEMPTY(memberStr)
+    %assign nRows = SIZE(value, 0)  
+    %if nRows > 1
+      %assert idx == 0
+      %assert ucv == ""
+      %assert memberStr == ""
+      %assign sigIndexer = SLibGet2DArrayIndexer(0,nRows,"","",0,nCols,"","",0)
+    %endif
+    %assign cast         = ""    
+    %% Cast away volatility if necessary
+    %if baseaddr && ...
+      (mdlParam.InConstSection || mdlParam.InConstWithInitSection) && ...
+      SLibGetGlobalConstantMemorySectionHasVolatile()      
+      %assign dtypeName = LibGetRecordCompositeDataTypeName(mdlParam)
+      %assign cast = "("
+      %if (mdlParam.InConstSection)
+        %assign cast = cast + "const "
+      %endif      
+      %assign cast = cast + dtypeName + "*)"
+    %endif      
+    %if !ISEMPTY(reim)
+      %assign reim = "." + reim
+    %endif
+    %if ISEMPTY(reim) && ISEMPTY(chunk) && baseaddr
+      %assign retString = ...
+        cast + FcnAccessModelParameterRef(mdlParam, sigIndexer)
+    %else
+      %assign optAddr      = baseaddr ? "&" : ""
+      %assign retString = ...
+        cast + optAddr + FcnAccessModelParameter(mdlParam, sigIndexer) + reim + chunk
+    %endif
+  %else
+    %if (ucv != "") && (nCols > 1)
+      %assign retString = FcnGenerateNonEmptyUcvParameter(mdlParam, sigIndexer, reim) + chunk
+    %elseif InlineParameters != 0 && !LibIsDataTypeMultiWordFixpt(mdlParam.OriginalDataTypeIdx)
+      %assign value = FcnGenerateInlinedParameter("", mdlParam, sigIndexer, ...
+        "", idx, reim)      
+      %assign retString = "%<value>" + chunk
+    %else
+       %assign retString = FcnGenerateNonInlinedParameter("", mdlParam, sigIndexer, ...
+        "", reim) + chunk
+    %endif
+  %endif
+  %endwith
+  %endwith
+  
+  %return retString
+%endfunction
+
+%function SLibCGIR_PV(paramIdx, cross, accSysIdx, width, memberStr, chunkIdx, ucv, indexExpr) void
+  %return FcnCGIRParamCGVarHelper(paramIdx, cross, accSysIdx, width, memberStr, ...
+    chunkIdx, ucv, indexExpr, TLC_FALSE)
+%endfunction
+
+%function SLibCGIR_PVAddr(paramIdx, cross, accSysIdx, width, memberStr, chunkIdx, ucv, indexExpr) void
+  %return FcnCGIRParamCGVarHelper(paramIdx, cross, accSysIdx, width, memberStr,...
+    chunkIdx, ucv, indexExpr, TLC_TRUE)
+%endfunction
+
+%%function FcnCGIRCGVarIdentifier
+%% Abstract: This function returns the CGIR var identifier
+%%  This function allows you to control select value or reference.
+%%  If you need to read the value of var, you can use FcnCGIRCGVarHelper
+%%  If you need to read address of the var, you can use FcnCGIRCGVarRefHelper
+%function FcnCGIRCGVarIdentifier(varGroupIdx, memberIdx, cross, accSysIdx, width, memberStr, chunkIdx, ucv, indexExpr, isPointer, getRef) void
+  %assign tmpVect         = SLibGetReimAndIdx(indexExpr)
+  %assign reim            = tmpVect[0]
+  %if reim != "" 
+    %assign reim = "." + reim
+  %endif
+  %assign idx             = tmpVect[1]
+  %assign varGroup        = ::CompiledModel.VarGroups.VarGroup[varGroupIdx]
+  %assign varGroupMember  = FcnSLibCGIRGetVarGroupMember(varGroup, memberIdx)
+  %assign memberId        = varGroupMember.Name
+  %assign sigIndexer      = SLibGet1DStructFieldIndexer(width, memberStr, ucv, "", idx)
+  %assign varGroupPath    = SLibCGIRVarGroupPath(varGroupIdx, accSysIdx,cross)
+  %assign subStruct       = SLibCG_GetOptSubStruct(varGroupIdx, memberIdx)
+  %assign chunk           = SLibCG_GetMultiWordID(chunkIdx)
+  %assign var = varGroupPath + subStruct + memberId
+  %if isPointer
+    %assign var = "(*" + var + ")" 
+  %endif
+  %if getRef
+    %if ISEMPTY(reim) && ISEMPTY(chunk) && width > 1 && FEVAL("strcmp",sigIndexer,"[0]") 
+      %return var
+    %else
+      %return "&" + var + sigIndexer + reim + chunk
+    %endif
+  %else
+    %return var + sigIndexer + reim + chunk
+  %endif
+%endfunction
+
+%function FcnCGIRCGVarHelper(varGroupIdx, memberIdx, cross, accSysIdx, width, memberStr, chunkIdx, ucv, indexExpr, isPointer) void
+  %return FcnCGIRCGVarIdentifier(varGroupIdx, memberIdx, cross, accSysIdx, width, memberStr, chunkIdx, ucv, indexExpr, isPointer, TLC_FALSE)
+%endfunction
+
+%function FcnCGIRCGVarRefHelper(varGroupIdx, memberIdx, cross, accSysIdx, width, memberStr, chunkIdx, ucv, indexExpr, isPointer) void
+  %return FcnCGIRCGVarIdentifier(varGroupIdx, memberIdx, cross, accSysIdx, width, memberStr, chunkIdx, ucv, indexExpr, isPointer, TLC_TRUE)
+%endfunction
+
+%function SLibCG_VarGroupElement(varGroupIdx, memberIdx, cross, accSysIdx, width, ucv, indexExpr) void
+  %return FcnCGIRCGVarHelper(varGroupIdx, memberIdx, cross, accSysIdx, ...
+    width, "", -1, ucv, indexExpr, TLC_FALSE)
+%endfunction
+
+%function SLibCG_CS(csIdx, cross, accSysIdx, width, chunkIdx, ucv, indexExpr) void
+  %assign cs = ::CompiledModel.ContStates.ContState[csIdx]
+  %return FcnCGIRCGVarHelper(cs.VarGroupIdx[0], cs.VarGroupIdx[4], cross, ...
+    accSysIdx, width, "", chunkIdx, ucv, indexExpr, TLC_FALSE)
+%endfunction
+
+%function SLibCG_CSAddr(csIdx, cross, accSysIdx, width, chunkIdx, ucv, indexExpr) void
+  %return "&" + SLibCG_CS(csIdx, cross, accSysIdx, width, chunkIdx, ...
+    ucv, indexExpr)
+%endfunction
+
+%function SLibCG_CSD(csIdx, cross, accSysIdx, width, chunkIdx, ucv, indexExpr) void
+  %assign cs = ::CompiledModel.ContStates.ContState[csIdx]
+  %return FcnCGIRCGVarHelper(cs.VarGroupIdx[1], cs.VarGroupIdx[4], cross, ...
+    accSysIdx, width, "", chunkIdx, ucv, indexExpr, TLC_FALSE)
+%endfunction
+
+%function SLibCG_CSDAddr(csIdx, cross, accSysIdx, width, chunkIdx, ucv, indexExpr) void  
+  %return "&" + SLibCG_CSD(csIdx, cross, accSysIdx, width, chunkIdx, ucv, indexExpr)
+%endfunction
+
+
+%function SLibCG_CSDAgg(sysIdx, instIdx, cross, accSysIdx, width, chunkIdx, ucv, indexExpr) void
+  %assign varIdx = ::CompiledModel.System[sysIdx].ContStatesVarGroupIndex[instIdx]
+  %assign var = ::CompiledModel.VarGroups.VarGroup[varIdx]
+  %assign varGroupIdx = var.ParentVarGroupIdx
+  %assign memberIdx = var.MemberIdxInParent
+
+  %return FcnCGIRCGVarHelper(varGroupIdx, memberIdx,  cross, ...
+    accSysIdx, 1, "", chunkIdx, ucv, indexExpr, TLC_FALSE)
+%endfunction
+
+%function SLibCG_CSDAggAddr(sysIdx, instIdx, cross, accSysIdx, width, chunkIdx, ucv, indexExpr) void  
+  %return "&" + SLibCG_CSDAgg(sysIdx, instIdx, cross, accSysIdx, width, chunkIdx, ucv, indexExpr)
+%endfunction
+
+%function SLibCG_DRV(csIdx, cross, accSysIdx, width, chunkIdx, ucv, indexExpr) void 
+  %assign cs = ::CompiledModel.ContStates.ContState[csIdx]
+  %return FcnCGIRCGVarHelper(cs.VarGroupIdx[2], cs.VarGroupIdx[4], cross, ...
+    accSysIdx, width, "", chunkIdx, ucv, indexExpr, TLC_FALSE)
+%endfunction
+
+%function SLibCG_DRVAddr(csIdx, cross, accSysIdx, width, chunkIdx, ucv, indexExpr) void  
+  %return "&" + SLibCG_DRV(csIdx, cross, accSysIdx, width, chunkIdx, ...
+    ucv, indexExpr)
+%endfunction
+
+%function SLibCG_CSAbsTol(csIdx, cross, accSysIdx, width, chunkIdx, ucv, indexExpr) void
+  %assign cs = ::CompiledModel.ContStates.ContState[csIdx]
+  %return FcnCGIRCGVarHelper(cs.VarGroupIdx[3], cs.VarGroupIdx[4], cross, ...
+    accSysIdx, width, "", chunkIdx, ucv, indexExpr, TLC_FALSE)
+%endfunction
+
+%function SLibCG_CSAbsTolAddr(csIdx, cross, accSysIdx, width, chunkIdx, ucv, indexExpr) void  
+  %return "&" + SLibCG_CSAbsTol(csIdx, cross, accSysIdx, width, chunkIdx, ucv, indexExpr)
+%endfunction
+
+%function SLibCG_ZCSV(zcIdx, zcElIdx, cross, accSysIdx, width, chunkIdx, ucv, indexExpr) void
+  %assign zcInfo = ::CompiledModel.ZcRec.BlkZcRec[zcIdx].ZcSignalInfo[zcElIdx]
+  %return FcnCGIRCGVarHelper(zcInfo.VarGroupIdx[2], zcInfo.VarGroupIdx[3], ...
+    cross, accSysIdx, width, "", chunkIdx, ucv, indexExpr, TLC_FALSE)
+%endfunction
+
+%function SLibCG_ZCSVAddr(zcIdx, zcElIdx, cross, accSysIdx, width, chunkIdx, ucv, indexExpr) void  
+  %return "&" + SLibCG_ZCSV(zcIdx, zcElIdx, cross, accSysIdx, width, chunkIdx, ucv, indexExpr)
+%endfunction
+
+%function SLibCG_ZCSVAgg(sysIdx, instIdx, cross, accSysIdx, width, chunkIdx, ucv, indexExpr) void
+  %assign varIdx = ::CompiledModel.System[sysIdx].ZCSVVarGroupIndex[instIdx]
+  %assign var = ::CompiledModel.VarGroups.VarGroup[varIdx]
+  %assign varGroupIdx = var.ParentVarGroupIdx
+  %assign memberIdx = var.MemberIdxInParent
+
+  %return FcnCGIRCGVarHelper(varGroupIdx, memberIdx, ...
+    cross, accSysIdx, width, "", chunkIdx, ucv, indexExpr, TLC_FALSE)
+%endfunction
+
+%function SLibCG_ZCSVAggAddr(sysIdx, instIdx, cross, accSysIdx, width, chunkIdx, ucv, indexExpr) void  
+  %return "&" + SLibCG_ZCSVAgg(sysIdx, instIdx, cross, accSysIdx, width, chunkIdx, ucv, indexExpr)
+%endfunction
+
+%function SLibCG_ZCE(zcIdx, zcElIdx, cross, accSysIdx, width, chunkIdx, ucv, indexExpr) void  
+  %assign zcInfo = ::CompiledModel.ZcRec.BlkZcRec[zcIdx].ZcSignalInfo[zcElIdx]
+  %return FcnCGIRCGVarHelper(zcInfo.VarGroupIdx[0], zcInfo.VarGroupIdx[1], ...
+    cross, accSysIdx, width, "", chunkIdx, ucv, indexExpr, TLC_FALSE)
+%endfunction
+
+%function SLibCG_ZCEAddr(zcIdx, zcElIdx, cross, accSysIdx, width, chunkIdx, ucv, indexExpr) void  
+  %return "&" + SLibCG_ZCE(zcIdx, zcElIdx, cross, accSysIdx, width, chunkIdx, ucv, indexExpr)
+%endfunction
+
+%function SLibCG_DWV(dwIdx, cross, accSysIdx, width, memberStr, chunkIdx, ucv, indexExpr) void
+  %assign dw = ::CompiledModel.DWorks.DWork[dwIdx]
+  %if CodeFormat == "S-Function" && !Accelerator
+    %assign varGroupIdx = dw.VarGroupIdx[0]
+    %assign varGroup = ::CompiledModel.VarGroups.VarGroup[varGroupIdx]
+    %return FcnCGIRSFcnCGVarHelper("ssGetDWork", TLC_FALSE, "", ...
+      varGroupIdx, dw.VarGroupIdx[1], varGroup.GlobalOffset, ...
+      width, memberStr, chunkIdx, ucv, indexExpr)
+  %else
+    %return FcnCGIRCGVarHelper(dw.VarGroupIdx[0], dw.VarGroupIdx[1], ...
+      cross, accSysIdx, width, memberStr, chunkIdx, ucv, indexExpr, TLC_FALSE)
+  %endif
+%endfunction
+
+%function SLibCG_DWVAddr(dwIdx, cross, accSysIdx, width, memberStr, chunkIdx, ucv, indexExpr) void
+  %assign dw = ::CompiledModel.DWorks.DWork[dwIdx]
+  %if CodeFormat == "S-Function" && !Accelerator
+    %return "&" + SLibCG_DWV(dwIdx, cross, accSysIdx, width, memberStr, ...
+      chunkIdx, ucv, indexExpr)
+  %else
+    %return FcnCGIRCGVarRefHelper(dw.VarGroupIdx[0], dw.VarGroupIdx[1], ...
+      cross, accSysIdx, width, memberStr, chunkIdx, ucv, indexExpr, TLC_FALSE)
+  %endif
+%endfunction
+
+%function SLibCG_SetDWV(dwIdx, cross, accSysIdx, width, memberStr, chunkIdx, ucv, indexExpr, rhs) void
+  %assign lhs = SLibCG_DWV(dwIdx, cross, accSysIdx, width, memberStr, ...
+    chunkIdx, ucv, indexExpr)
+  %return lhs + " = " + rhs + ";\n"
+%endfunction
+
+%function SLibCGIRDWorkGlobalCGVarBaseAddr(varGroupIdx, memberIdx, cross) void
+  %assign varGroup             = ::CompiledModel.VarGroups.VarGroup[varGroupIdx]
+  %assign pureSFcnTarget       = CodeFormat == "S-Function" && !Accelerator
+  %assign pureSFcnTargetDWork  = varGroup.Category == "DWork" && pureSFcnTarget
+  %assign width                = LibGetRecordWidth(SLibVarGroupMember(varGroupIdx, memberIdx))
+  %if pureSFcnTargetDWork
+    %return "&" + FcnCGIRSFcnCGVarHelper("ssGetDWork", TLC_FALSE, "", ...
+      varGroupIdx, memberIdx, varGroup.GlobalOffset, width, "", -1, "", "0")
+  %else
+    %assign accSysIdx = ::CompiledModel.NumSystems - 1 
+    %if isGRTMallocOnERT()
+      %return FcnCGIRCGVarRefHelper(varGroupIdx, memberIdx, TLC_TRUE,  accSysIdx, width, "", -1, "", "0", TLC_FALSE)
+    %elseif cross && MultiInstanceERTCode && !GenerateClassInterface
+      %return FcnCGIRCGVarRefHelper(varGroupIdx, memberIdx, TLC_TRUE,  accSysIdx, width, "", -1, "", "0", TLC_FALSE)
+    %else
+      %return FcnCGIRCGVarRefHelper(varGroupIdx, memberIdx, TLC_FALSE, accSysIdx, width, "", -1, "", "0", TLC_FALSE)
+    %endif
+  %endif
+%endfunction
+
+%function SLibCG_VGE(vgeIdx, cross, accSysIdx, width, memberStr, chunkIdx, ucv, indexExpr) void
+  %assign varGroupIdx = ::CompiledModel.VarGroups.VarGroupVarIdx[vgeIdx]
+  %return FcnCGIRCGVarHelper(varGroupIdx[0], varGroupIdx[1], ...
+    cross, accSysIdx, width, memberStr, chunkIdx, ucv, indexExpr, TLC_FALSE)
+%endfunction
+
+%function SLibCG_VGEAddr(vgeIdx, cross, accSysIdx, width, memberStr, chunkIdx, ucv, indexExpr) void
+  %return "&" + SLibCG_VGE(vgeIdx, cross, accSysIdx, width, memberStr, ...
+    chunkIdx, ucv, indexExpr)
+%endfunction
+
+%function SLibCG_SetVGE(vgeIdx, cross, accSysIdx, width, memberStr, chunkIdx, ucv, indexExpr, rhs) void
+  %assign lhs = SLibCG_VGE(vgeIdx, cross, accSysIdx, width, memberStr, ...
+    chunkIdx, ucv, indexExpr )
+  %return lhs + " = " + rhs + ";\n"
+%endfunction
+
+%function SLibCG_SetVGEAddr(vgeIdx, cross, accSysIdx, width, memberStr, chunkIdx, ucv, indexExpr, rhs) void
+  %assign bo = ::CompiledModel.BlockOutputs.GlobalBlockOutput[vgeIdx]
+  %assign lhs = FcnCGIRCGVarHelper(bo.VarGroupIdx[0], bo.VarGroupIdx[1], ...
+    cross, accSysIdx, 1, memberStr, chunkIdx, ucv, indexExpr, TLC_FALSE)
+  %return lhs + " = " + rhs + ";\n"
+%endfunction
+
+%function SLibCG_BOV(bufIdx, cross, accSysIdx, width, memberStr, chunkIdx, ucv, indexExpr) void
+  %assign bo = ::CompiledModel.BlockOutputs.GlobalBlockOutput[bufIdx]
+  %assign isPointer = bo.DeclareAsPointer == "yes"
+  %return FcnCGIRCGVarHelper(bo.VarGroupIdx[0], bo.VarGroupIdx[1], ...
+    cross, accSysIdx, width, memberStr, chunkIdx, ucv, indexExpr, isPointer)
+%endfunction
+
+%function SLibCG_BOVAddr(bufIdx, cross, accSysIdx, width, memberStr, chunkIdx, ucv, indexExpr) void
+  %return "&" + SLibCG_BOV(bufIdx, cross, accSysIdx, width, memberStr, ...
+    chunkIdx, ucv, indexExpr)
+%endfunction
+
+%function SLibCG_SetBOV(bufIdx, cross, accSysIdx, width, memberStr, chunkIdx, ucv, indexExpr, rhs) void
+  %assign lhs = SLibCG_BOV(bufIdx, cross, accSysIdx, width, memberStr, ...
+    chunkIdx, ucv, indexExpr )
+  %return lhs + " = " + rhs + ";\n"
+%endfunction
+
+%function SLibCG_SetBOVAddr(bufIdx, cross, accSysIdx, width, memberStr, chunkIdx, ucv, indexExpr, rhs) void
+  %assign bo = ::CompiledModel.BlockOutputs.GlobalBlockOutput[bufIdx]
+  %assign lhs = FcnCGIRCGVarHelper(bo.VarGroupIdx[0], bo.VarGroupIdx[1], ...
+    cross, accSysIdx, 1, memberStr, chunkIdx, ucv, indexExpr, TLC_FALSE)
+  %return lhs + " = " + rhs + ";\n"
+%endfunction
+
+%function SLibCG_CBOV(bufIdx, cross, accSysIdx, width, memberStr, chunkIdx, ucv, indexExpr) void
+  %assign bo = ::CompiledModel.BlockOutputs.ConstBlockOutput[bufIdx]
+  %if !GeneratingDeadCode
+    %assign bo.RequiredInConstBlockIO = 1
+  %endif
+  %return FcnCGIRCGVarHelper(bo.VarGroupIdx[0], bo.VarGroupIdx[1], ...
+    cross, accSysIdx, width, memberStr, chunkIdx, ucv, indexExpr, TLC_FALSE)
+%endfunction
+
+%function SLibCG_CBOVAddr(bufIdx, cross, accSysIdx, width, memberStr, chunkIdx, ucv, indexExpr) void
+  %return "&" + SLibCG_CBOV(bufIdx, cross, accSysIdx, width, memberStr, chunkIdx, ucv, ...
+    indexExpr)
+%endfunction
+
+%function SLibCG_SetCBOV(bufIdx, cross, accSysIdx, width, memberStr, chunkIdx, ucv, indexExpr, rhs) void
+  %%START_ASSERT
+  %assign grSrc = ::CompiledModel.BlockOutputs.ConstBlockOutput[bufIdx].GrSrc
+  %assign msg = "Try to set constant block output port of %<SLibGrBlockPath(grSrc)>. " ...
+    "This will cause compiler error. Consider putting a 'Signal Specification' block at "...
+    "one of the block input port, specify a non-constant sample through the "...
+    "'Signal Specification' block"
+  %<LibReportFatalError(msg)>
+  %%END_ASSERT
+%endfunction
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Functions we'd like to obsolete since we've moved the data into IR
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%function SLibCG_P(prmIdx, width, chunkIdx, ucv, indexExpr) void
+  %assign chunk = SLibCG_GetMultiWordID(chunkIdx)
+  %return LibBlockParameter(Parameter[prmIdx],  ucv, "", indexExpr) + chunk
+%endfunction
+
+%function SLibCG_PBaseAddr(parmIdx, width, chunkIdx, ucv, indexExpr) void
+  %assign nRows = SIZE(Parameter[parmIdx].Value, 0)
+  %assign chunk = SLibCG_GetMultiWordID(chunkIdx)
+  %if nRows > 1
+    %return LibBlockMatrixParameterBaseAddr(Parameter[parmIdx]) + chunk
+  %else
+    %return LibBlockParameterBaseAddr(Parameter[parmIdx]) + chunk
+  %endif
+%endfunction
+
+%function SLibCG_BIAddr(portIdx, width, memberStr, chunkIdx, ucv, sigIdx) void
+  %if ISEMPTY(memberStr)
+    %return LibBlockInputSignalAddr(portIdx, ucv, "", sigIdx) + ...
+      SLibCG_GetMultiWordID(chunkIdx)
+  %else
+    %assign busSignal = LibBlockInputSignal(portIdx, "", "", 0)
+    %return SLibCG_VAddr(busSignal, TLC_FALSE, width, memberStr, chunkIdx, ucv, sigIdx)
+  %endif
+%endfunction
+
+%function SLibCG_BI(portIdx, width, memberStr, chunkIdx, ucv, sigIdx) void
+  %if ISEMPTY(memberStr)
+    %return LibBlockInputSignal(portIdx, ucv, "", sigIdx) + ...
+      SLibCG_GetMultiWordID(chunkIdx)
+  %else
+    %assign blkInput = LibBlockInputSignal(portIdx, "", "", 0)
+    %return SLibCG_V(blkInput, TLC_FALSE, width, memberStr, chunkIdx, ucv, sigIdx)
+  %endif
+%endfunction
+
+%function SLibCG_SetBO(portIdx, width, memberStr, chunkIdx, ucv, sigIdx, rhs) void
+  %if ISEMPTY(memberStr) &&  chunkIdx < 0
+    %return LibBlockAssignOutputSignal(portIdx, ucv, "", sigIdx, rhs)
+  %else
+    %assign lhs = SLibCG_BO(portIdx, width, memberStr, chunkIdx, ucv, sigIdx)
+    %return lhs + " = " + rhs + ";\n"
+  %endif
+%endfunction
+
+%function SLibCG_BO(portIdx, width, memberStr, chunkIdx, ucv, sigIdx) void  
+  %if LibBlockOutputSignalIsExpr(portIdx)
+    %assign srcSys = ::CompiledModel.System[BlockIdx[0]]
+    %assign srcBlk = srcSys.Block[BlockIdx[2]]
+    %return SLibBlockOutputSignal(srcBlk,srcSys,portIdx,ucv,"",sigIdx,"Signal") + ...
+       SLibCG_GetMultiWordID(chunkIdx)
+  %elseif ISEMPTY(memberStr)
+    %return FcnGetInputOrOutputSignal("output", portIdx, ucv, "", sigIdx) + ...
+      SLibCG_GetMultiWordID(chunkIdx)
+  %else
+    %assign blkOutput = LibBlockOutputSignal(portIdx, "", "", 0)
+    %return SLibCG_V(blkOutput, TLC_FALSE, width, memberStr, chunkIdx, ucv, sigIdx)
+  %endif
+%endfunction %% SLibCG_BO
+
+%function SLibCG_BOAddr(portIdx, memberStr, chunkIdx, ucv, sigIdx) void  
+  %assert !LibBlockOutputSignalIsExpr(portIdx)  
+  %if ISEMPTY(memberStr)
+    %return FcnGetInputOrOutputSignal("outputAddr", portIdx, ucv, "", sigIdx) + ...
+      SLibCG_GetMultiWordID(chunkIdx)
+  %else
+    %assign blockOutput = SLibCG_BO(portIdx, memberStr, chunkIdx, ucv, sigIdx)
+    %return "&" + blockOutput
+  %endif
+%endfunction %% SLibCGIRBlockOutputSignalAddr
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Functions for which we have not yet moved data into IR
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% SLibCGIRZCFcn =========================================
+%%  Generate call to rt_ZCFcn() or rt_I32ZCFcn()
+%%
+%function SLibCGIRZCFcn(zcDir, pzc, zcSig, dtypeId) void
+  %assert(LibIsBuiltInDataType(dtypeId))
+
+  %assign FcnName = "rt_zcFcn"
+  %assign RTWType = FcnGetMathDataTypeNameFromId(dtypeId)
+
+  %if !LibMathFcnExists(FcnName,dtypeId)
+    %assign msg = "Database has no function '%<FcnName>' returning '%<RTWType>'"
+    %<LibReportFatalError(msg)>
+  %endif
+  
+  %createrecord zcFcnRec {Name FcnName; RetTypeId tSS_INT32; NumArgs 3}
+  %addtorecord zcFcnRec ArgList { Expr "zcDir"; TypeId tSS_INT32; IsPtr 0; IsCplx 0; IsConst 1 }
+  %addtorecord zcFcnRec ArgList { Expr "pzc"; TypeId tSS_UINT8; IsPtr 0; IsCplx 0; IsConst 1 }
+  %addtorecord zcFcnRec ArgList { Expr "zcSig"; TypeId dtypeId; IsPtr 0; IsCplx 0; IsConst 1 }
+    
+  %assign zcFcnRec.ArgList[0].Expr = zcDir
+  %assign zcFcnRec.ArgList[1].Expr = "&%<pzc>"
+  %assign zcFcnRec.ArgList[2].Expr = "(%<zcSig>)"
+
+  %% This generates a call to either rt_ZCFcn() or rt_I32ZCFcn() 
+  %% depending on whether dtypeId is real or integer
+  %return SLibGenRTLibFcnCallForDataTypeId(zcFcnRec, dtypeId)
+
+%endfunction
+
+%% SLibCGIRInlineSignFcn =========================================
+%%  Inline code to get sign of non_builtin data types
+%%
+
+%function SLibCGIRInlineSignFcn(sigSign,sig, dtypeId) void
+  %openfile retBuf
+
+  %assert(!LibIsBuiltInDataType(dtypeId))
+  %assign signFcn  = LibSignTLCFcnName(dtypeId)
+  
+  %if signFcn == ""
+    %assign dataTypeName = LibGetDataTypeNameFromId(dtypeId)
+    %assign errTxt = "The data type '%<dataTypeName>' " ...
+      "is not supported because it has no Sign function."
+    %<LibReportFatalError(errTxt)>
+  %endif
+  
+  %assign status = %<signFcn> (dtypeId, sig, "", sigSign)
+  %if status != 1
+    %assign msg = "Invalid sign function of customer data type"
+    %<LibReportFatalError(msg)>
+  %endif
+    
+  %closefile retBuf
+  %return retBuf
+%endfunction
+
+
+%% SLibCGIRInlineIsPositiveFcn =========================================
+%%  Inline code to get isPositive of non_builtin data types
+%%
+
+%function SLibCGIRInlineIsPositiveFcn(sigIsPositive,sig, dtypeId) void
+  %openfile retBuf
+
+  %assert(!LibIsBuiltInDataType(dtypeId))
+  %assign signFcn  = LibIsPositiveTLCFcnName(dtypeId)
+  
+  %if signFcn == ""
+    %assign dataTypeName = LibGetDataTypeNameFromId(dtypeId)
+    %assign errTxt = "The data type '%<dataTypeName>' " ...
+      "is not supported because it has no IsPositive function."
+    %<LibReportFatalError(errTxt)>
+  %endif
+  
+  %assign status = %<signFcn> (dtypeId, sig, "", sigIsPositive)
+  %if status != 1
+    %assign msg = "Invalid isPositive function of customer data type"
+    %<LibReportFatalError(msg)>
+  %endif
+    
+  %closefile retBuf
+  %return retBuf
+%endfunction
+
+%% SLibCGIRCustomCastFcn =========================================
+%%  Inline code to get cast of non_builtin data types
+%%
+
+%function SLibCGIRCustomCastFcn(outputVar,inputVar,outputDtypeId,inputDtypeId) void
+  %openfile retBuf
+
+  %assign castFcn = LibConvertBetweenTLCFcnName(inputDtypeId)
+  
+  %if castFcn == ""
+    %assign dataTypeName = LibGetDataTypeNameFromId(inputDtypeId)
+    %assign errTxt = "The data type '%<dataTypeName>' " ...
+      "is not supported because it has no CustomCast function."
+    %<LibReportFatalError(errTxt)>
+  %endif
+  
+  %assign status = %<castFcn> (outputDtypeId, inputDtypeId, inputVar, "", outputVar)
+  %if status != 1
+    %assign msg = "Invalid cast function of customer data type"
+    %<LibReportFatalError(msg)>
+  %endif
+    
+  %closefile retBuf
+  %return retBuf
+%endfunction
+
+%function SLibCG_EOAddr(port, width, memberStr, chunkIdx, ucv, indexExpr) void
+  %return FcnCGIRExtOutputHelper(port, width, memberStr, chunkIdx, ucv, indexExpr, TLC_TRUE)
+%endfunction
+  
+%function SLibCG_EO(port, width, memberStr, chunkIdx, ucv, indexExpr) void
+  %return FcnCGIRExtOutputHelper(port, width, memberStr, chunkIdx, ucv, indexExpr, TLC_FALSE)
+%endfunction
+
+%function SLibCG_TrackEO(port) void
+  %assign extOut = ::CompiledModel.ExternalOutputs.ExternalOutput[port]
+  %<SLibAccessArgHelper(extOut,"",System[SystemIdx].CurrentTID)>
+%endfunction
+
+%function FcnCGIRExtOutputHelper(port, width, memberStr, chunkIdx, ucv, indexExpr, addr) void
+  %% SLibCG_EO and SLibCG_EOAddr should not be called in a reusable subsystem
+  
+  %assert SystemIdx == NumSystems-1 || RTWSystemCode != 2
+  %assert !IsModelReferenceSimTarget() && !IsModelReferenceRTWTarget()
+  %assign extOut      = ::CompiledModel.ExternalOutputs.ExternalOutput[port]
+  %assign varGroupIdx = extOut.VarGroupIdx[0]
+  %assign memberIdx   = extOut.VarGroupIdx[1]
+  %assign varGroup    = ::CompiledModel.VarGroups.VarGroup[varGroupIdx]
+  %assign portVar     = FcnSLibCGIRGetVarGroupMember(varGroup, memberIdx)
+  %assign currentTID  = System[SystemIdx].CurrentTID
+  %assign isPointer   = TLC_FALSE
+
+  %if CodeFormat == "S-Function" %% && !Accelerator
+    %assign sfcnExtOut = FcnCGIRSFcnCGVarHelper("ssGetOutputPortSignal",...
+      TLC_FALSE, "",...
+      varGroupIdx, memberIdx, 0, width, memberStr, chunkIdx, ucv, indexExpr)
+    %if addr
+      %return "&%<sfcnExtOut>"
+    %else
+      %return sfcnExtOut
+    %endif
+  %endif
+  %<SLibAccessArgHelper(extOut,"",currentTID)>
+  %assert UsingMalloc
+
+  %% set tmpHasSimStructVars so that access extern outport through rtM. 
+  %% when system is not reusable. For GRTMalloc target, root system 
+  %% is reuable system. All other subsystem must be non-resuable system to get here.
+  %% see assertion at the beginning of this function. 
+  %assign tmpHasSimStructVars = ::CompiledModel.HasSimStructVars
+  %assign ::CompiledModel.HasSimStructVars = AccessDataUseRTM(SystemIdx,::BlockFcn, TLC_FALSE)
+  %assign cross = System[SystemIdx].CrossNoArgFcnBound 
+  %assign identifier = "%<SLibGetExternalOutputStruct(TLC_TRUE,TLC_TRUE,cross)>%<YQualifier>%<portVar.Name>"
+  %assign ::CompiledModel.HasSimStructVars = tmpHasSimStructVars
+  %<SLibAccessArgHelper(extOut,"",currentTID)>
+
+  %return FcnCGIRSimpleCGVarHelper(identifier, isPointer, width, memberStr, chunkIdx, ucv, indexExpr, addr)
+%endfunction
+
+%function FcnCGIRSFcnCGVarHelper(macro, isPointer, qualifier,...
+  varGroupIdx, memberIdx, offset, width, memberStr, chunkIdx, ucv, indexExpr) void
+  %assign sysIdx    = ::CompiledModel.VarGroups.VarGroup[varGroupIdx].SysIdx
+  %<SLibAccessArgHelper(::CompiledModel.System[sysIdx].Interface.RTMArgDef,"",...
+    ::CompiledModel.System[sysIdx].CurrentTID)>
+
+  %assign cgTypeIdx = SLibCGVarGroupMemberCGTypeIdx(varGroupIdx, memberIdx)
+  %assign isComplex = LibCGTypeIsComplex(cgTypeIdx)
+
+  %assign tmpVect   = SLibGetReimAndIdx(indexExpr)
+  %assign reim      = tmpVect[0]
+  %assign idx       = tmpVect[1]
+
+  %assign sigIndexer  = SLibGet1DStructFieldIndexer(width, memberStr, ucv, "", idx)
+  %if sigIndexer == ""
+    %assign sigIndexer = "[0]"
+  %endif
+  
+  %%
+  %% functions like ssGetInputPortSignalPtrs return a void*, need to cast to
+  %% the portVar type first. The portVar type is given by cgTypeIdx 
+  %%  
+  %if qualifier != ""
+    %assign qualifier = qualifier + " "
+  %endif
+  %assign deref = isPointer ? "**" : "*"	
+  %assign cast  = qualifier + LibCGTypeName(cgTypeIdx) + " " + deref
+
+  %% all followings are possible
+  %%  1.   ((NumericType*)ssGet())[i]     (isPointer is false)
+  %%  2.   *((NumericType**)ssGet())[i]   (isPointer is true)
+  %%  3.   (*(BusType*)ssGet()).a.b[i]    (bus, isPointer is false)
+  %%  4.   (**(BusType**)ssGet()).a.b[i]  (bus, isPointer is true)
+  %%  5.   ((BusType*)ssGet())[0].a.b[i]   (array of bus, isPointer is false)
+  %%  6.   (*(BusType**)ssGet())[0].a.b[i] (array of bus, isPointer is true)
+
+  %assign ssGet = "%<macro>(%<tSimStruct>, %<memberIdx+offset>)"
+  %if ISEMPTY(memberStr)
+    %if !isPointer
+      %% case 1
+      %assign retSignal = "((%<cast>)%<ssGet>)%<sigIndexer>"
+    %else
+      %% case 2
+      %assign retSignal = "(*((%<cast>)%<ssGet>)%<sigIndexer>)"
+    %endif
+  %else
+    %% case 3, 4, 5, 6
+    %assign arrayOfStructs = LibCGTypeIsArrayOfStructs(cgTypeIdx)
+    %assign deref = arrayOfStructs ? "" : "*"
+    %assign deref = isPointer ? deref + "*" : deref
+    %assign retSignal = "(%<deref>(%<cast>)%<ssGet>)%<sigIndexer>"
+  %endif
+  
+  %if reim != ""
+    %assign retSignal = "%<retSignal>.%<reim>"
+  %endif
+
+  %return retSignal + SLibCG_GetMultiWordID(chunkIdx)
+%endfunction
+
+%%
+%% this function is not unified with FcnCGIRSFcnCGVarHelper
+%% because:
+%% - we are passing portIdx rather than vargroup member idx
+%% - ssGetCurrentInputPortDimensions takes 3 arguments while
+%%   ssGetInputPortSignal takes 2 arguments.
+%%
+%function FcnCGIRSFcnSizeVarHelper(macro, isPointer, qualifier,...
+  cgTypeIdx, portIdx, width, memberStr, ucv, indexExpr) void
+  %assign isComplex = LibCGTypeIsComplex(cgTypeIdx)
+
+  %assign tmpVect   = SLibGetReimAndIdx(indexExpr)
+  %assign reim      = tmpVect[0]
+  %assign idx       = tmpVect[1]
+
+  %assign sigIndexer  = SLibGet1DStructFieldIndexer(width, memberStr, ucv, "", idx)
+  %if sigIndexer == ""
+    %assign sigIndexer = "[0]"
+  %endif
+    
+  %%
+  %% functions like ssGetInputPortSignalPtrs return a void*, need to cast to
+  %% the portVar type first. The portVar type is given by cgTypeIdx 
+  %%  
+  %if qualifier != ""
+    %assign qualifier = qualifier + " "
+  %endif
+  %assign deref = isPointer ? "**" : "*"
+  %assign cast  = qualifier + LibCGTypeName(cgTypeIdx) + " " + deref
+
+  %% if the I/O port is not structure type, it is always accessed as an array(contiguous or non-contiguous)
+  %% and sigIndexer is always present.
+  %% if the I/O port is a structure type, it is accessed as a structure(of course contiguous).
+  %if ISEMPTY(memberStr)
+    %assign retSignal = "((%<cast>)&%<macro>(%<tSimStruct>, %<portIdx>, 0))%<sigIndexer>"
+  %else
+    %assign retSignal = "(%<deref>((%<cast>)&%<macro>(%<tSimStruct>, %<portIdx>, 0)))%<sigIndexer>"
+    %assign isPointer = TLC_FALSE
+  %endif
+
+  %if isPointer
+      %assign retSignal = "(*(%<retSignal>))"
+  %endif
+  %if reim != ""
+    %assign retSignal = "%<retSignal>.%<reim>"
+  %endif
+
+  %return retSignal
+%endfunction
+
+%function FcnGetFcnDataForPort(fcnData, portType, portNum) void
+  %foreach idx = fcnData.NumArgSpecData
+    %assign spec = fcnData.ArgSpecData[idx]
+    %if spec.SLObjectType != portType
+      %continue
+    %endif
+    %if spec.PortNum == portNum
+      %return spec
+    %endif
+  %endforeach  
+  %<LibReportFatalError("should not be here")>
+%endfunction
+   
+
+%% Function: FcnCG_DSMHelper ================================================
+%% Abstract:
+%%    This function is a helper function for accessing a global DSM 
+%%    when using the model reference sim target
+%function FcnCG_DSMHelper(dsmIdx, dworkIdx, width, memberStr, chunkIdx, ucv, indexExpr, addr) void
+  %assign record = ::CompiledModel.DWorks.DWork[dworkIdx]
+  %assign tmpVect = SLibGetReimAndIdx(indexExpr)
+  %assign reim = tmpVect[0]
+  %if reim != "" 
+    %assign reim = "." + reim
+  %endif
+  %assign idx = tmpVect[1]
+  %assign sigIndexer = SLibGet1DStructFieldIndexer(width, memberStr, ucv, "", idx)
+  %assign chunk = SLibCG_GetMultiWordID(chunkIdx)
+  %assign dtName = SLibGetRecordContainerTypeName(record)
+  %assign dsmPtr = "((" + dtName + "*) " + ...
+    ::CompiledModel.Name + "_DSM[" + "%<dsmIdx>" + "])"
+  %if ISEMPTY(sigIndexer)
+    %assign dsmVal = "(*" + dsmPtr + ")" + reim + chunk
+  %else
+    %if ISEMPTY(memberStr)
+      %assign dsmVal = dsmPtr + sigIndexer + reim + chunk      
+    %else
+      %assert(SupportTunableStructParam)
+      %assert(FEVAL("slfeature", "DSMBuses") > 0) 
+      %assert(LibDataTypeIsBus(LibGetRecordDataTypeId(record)))
+      %if sigIndexer[0] == "["
+        %assign dsmVal = dsmPtr + sigIndexer + reim + chunk
+      %else
+        %assign dsmVal = "(*" + dsmPtr + ")" + sigIndexer + reim + chunk
+      %endif
+    %endif
+  %endif
+  
+  %if addr
+    %return "&(" + dsmVal + ")"
+  %else
+    %return dsmVal
+  %endif
+%endfunction
+
+%% Function: SLibCG_DSM =======================================================
+%% Abstract:
+%%    This function reads from a global DSM when using the model reference
+%%    sim target
+%function SLibCG_DSM(dsmIdx, dtIdx, width, memberStr, chunkIdx, ucv, indexExpr) void
+  %return FcnCG_DSMHelper(dsmIdx, dtIdx, width, memberStr, chunkIdx, ucv, indexExpr, TLC_FALSE)
+%endfunction
+
+%% Function: SLibCG_DSMAddr ==================================================
+%% Abstract:
+%%    This function reads from a global DSM when using the model reference
+%%    sim target
+%function SLibCG_DSMAddr(dsmIdx, dtIdx, width, memberStr, chunkIdx, ucv, indexExpr) void
+  %return FcnCG_DSMHelper(dsmIdx, dtIdx, width, memberStr, chunkIdx, ucv, indexExpr, TLC_TRUE)
+%endfunction
+
+%% Function: SLibCG_SetDSM ====================================================
+%% Abstract:
+%%    This function writes toa global DSM when using the model reference
+%%    sim target
+%function SLibCG_SetDSM(dsmIdx, dtIdx, width, memberStr, chunkIdx, ucv, indexExpr, rhs) void
+  %return SLibCG_DSM(dsmIdx, dtIdx, width, memberStr, chunkIdx, ucv, indexExpr) + " = " + rhs + ";"
+%endfunction
+
+%% Function: SLibCG_EI ========================================================
+%% Abstract:
+%%    This function dump outs the variable for the given external
+%%    inport block with auto storage class
+%%
+%function SLibCG_EI(port, width, memberStr, chunkIdx, ucv, indexExpr) void
+  %return FcnCGIRExtInputHelper(port, width, memberStr, chunkIdx, ucv, indexExpr, TLC_FALSE)
+%endfunction
+
+%function SLibCG_EIAddr(port, width, memberStr, chunkIdx, ucv, indexExpr) void
+  %return FcnCGIRExtInputHelper(port, width, memberStr, chunkIdx, ucv, indexExpr, TLC_TRUE)
+%endfunction
+
+%% CGIR generated TLC file calls this function to track root inport access.
+%function SLibCG_TrackEI(port) void
+  %assign extInp = ::CompiledModel.ExternalInputs.ExternalInput[port]
+  %<SLibAccessArgHelper(extInp,"",System[SystemIdx].CurrentTID)>
+%endfunction
+
+%% CGIR generated TLC file calls this function to track global RTM access.
+%function SLibCG_TrackGlobalRTMArg(accSysIdx) void
+  %if !::GenRTModel
+    %return
+  %endif
+  
+  %assign blkSysIdx   = System[accSysIdx].ReusedParentSystemIdx
+  %assign interface   = System[blkSysIdx].Interface
+  %assign rtmArg = interface.RTMArgDef
+  %<SLibAccessArgHelper(rtmArg,"Global", FcnGetCurrentAccessTid())>
+  %<SLibAccessArgHelper(rtmArg,"", FcnGetCurrentAccessTid())> 
+%endfunction
+
+%% CGIR generated TLC file calls this function to track dwork access.
+%function SLibCG_TrackDW(accSysIdx) void
+  %assign interfaceData = SLibCG_GetInterfaceData(accSysIdx, ::BlockFcn, "DWork")
+  %<SLibAccessArgHelper(interfaceData,"", FcnGetCurrentAccessTid())>
+%endfunction
+
+%% CGIR generated TLC file calls this function to track dworks that
+%% are accessed cross no arg function boundary.
+%function SLibCG_TrackGlobalDW(accSysIdx) void
+  %assign interfaceData = SLibCG_GetInterfaceData(accSysIdx, ::BlockFcn, "DWork")
+  %<SLibAccessArgHelper(interfaceData,"Global", FcnGetCurrentAccessTid())>
+  %<SLibAccessArgHelper(interfaceData,"", FcnGetCurrentAccessTid())>
+%endfunction
+
+%% CGIR generated TLC file calls this function to track blockIO access.
+%function SLibCG_TrackBlockIO(accSysIdx) void
+  %assign interfaceData = SLibCG_GetInterfaceData(accSysIdx, ::BlockFcn, "BlockIO")
+  %<SLibAccessArgHelper(interfaceData,"", FcnGetCurrentAccessTid())>
+%endfunction
+
+%% CGIR generated TLC file calls this function to track blockIO that
+%% are accessed cross no arg function boundary.
+%function SLibCG_TrackGlobalBlockIO(accSysIdx) void
+  %assign interfaceData = SLibCG_GetInterfaceData(accSysIdx, ::BlockFcn, "BlockIO")
+  %<SLibAccessArgHelper(interfaceData,"Global", FcnGetCurrentAccessTid())>
+  %<SLibAccessArgHelper(interfaceData,"", FcnGetCurrentAccessTid())>
+%endfunction
+
+%% CGIR generated TLC file calls this function to track constant blockIO access.
+%function SLibCG_TrackConstBlockIO(accSysIdx) void
+  %assign interfaceData = System[accSysIdx].Interface.ConstBlockIOArgDef
+  %<SLibAccessArgHelper(interfaceData,"", FcnGetCurrentAccessTid())>
+%endfunction
+
+%% CGIR generated TLC file calls this function to track constant blockIO that
+%% are accessed cross no arg function boundary.
+%function SLibCG_TrackGlobalConstBlockIO(accSysIdx) void
+  %assign interfaceData = System[accSysIdx].Interface.ConstBlockIOArgDef
+  %<SLibAccessArgHelper(interfaceData,"Global", FcnGetCurrentAccessTid())>
+  %<SLibAccessArgHelper(interfaceData,"", FcnGetCurrentAccessTid())>
+%endfunction
+
+%% CGIR generated TLC file calls this function to track parameter access.
+%function SLibCG_TrackParam(accSysIdx) void
+  %assign interfaceData = SLibCG_GetInterfaceData(accSysIdx, ::BlockFcn, "Parameter")
+  %<SLibAccessArgHelper(interfaceData,"", FcnGetCurrentAccessTid())>
+%endfunction
+
+%% CGIR generated TLC file calls this function to track parameter that
+%% are accessed cross no arg function boundary.
+%function SLibCG_TrackGlobalParam(accSysIdx) void
+  %assign interfaceData = SLibCG_GetInterfaceData(accSysIdx, ::BlockFcn, "Parameter")
+  %<SLibAccessArgHelper(interfaceData,"Global", FcnGetCurrentAccessTid())>
+  %<SLibAccessArgHelper(interfaceData,"", FcnGetCurrentAccessTid())>
+%endfunction
+
+%% CGIR generated TLC file calls this function to track continues states access.
+%function SLibCG_TrackContStates(accSysIdx) void
+  %assign interfaceData = System[accSysIdx].Interface.ContStatesArgDef
+  %<SLibAccessArgHelper(interfaceData,"", FcnGetCurrentAccessTid())>
+%endfunction
+
+%% CGIR generated TLC file calls this function to track continues states that
+%% are accessed cross no arg function boundary.
+%function SLibCG_TrackGlobalContStates(accSysIdx) void
+  %assign interfaceData = System[accSysIdx].Interface.ContStatesArgDef
+  %<SLibAccessArgHelper(interfaceData,"Global", FcnGetCurrentAccessTid())>
+  %<SLibAccessArgHelper(interfaceData,"", FcnGetCurrentAccessTid())>
+%endfunction
+
+%% CGIR generated TLC file calls this function to track continues states 
+%% derivative access.
+%function SLibCG_TrackContStatesDerivative(accSysIdx) void
+  %assign interfaceData = System[accSysIdx].Interface.ContStatesDerivativeArgDef
+  %<SLibAccessArgHelper(interfaceData,"", FcnGetCurrentAccessTid())>
+%endfunction
+
+%% CGIR generated TLC file calls this function to track continues states 
+%% derivative that are accessed cross no arg function boundary.
+%function SLibCG_TrackGlobalContStatesDerivative(accSysIdx) void
+  %assign interfaceData = System[accSysIdx].Interface.ContStatesDerivativeArgDef
+  %<SLibAccessArgHelper(interfaceData,"Global", FcnGetCurrentAccessTid())>
+  %<SLibAccessArgHelper(interfaceData,"", FcnGetCurrentAccessTid())>
+%endfunction
+
+%% CGIR generated TLC file calls this function to track continues states 
+%% disable access.
+%function SLibCG_TrackContStatesDisable(accSysIdx) void
+  %assign interfaceData = System[accSysIdx].Interface.ContStatesDisableArgDef
+  %<SLibAccessArgHelper(interfaceData,"", FcnGetCurrentAccessTid())>
+%endfunction
+
+%% CGIR generated TLC file calls this function to track continues states 
+%% disable that are accessed cross no arg function boundary.
+%function SLibCG_TrackGlobalContStatesDisable(accSysIdx) void
+  %assign interfaceData = System[accSysIdx].Interface.ContStatesDisableArgDef
+  %<SLibAccessArgHelper(interfaceData,"Global", FcnGetCurrentAccessTid())>
+  %<SLibAccessArgHelper(interfaceData,"", FcnGetCurrentAccessTid())>
+%endfunction
+
+%% CGIR generated TLC file calls this function to track continues states 
+%% absolute tolerance
+%function SLibCG_TrackContStatesAbsoluteTolerance(accSysIdx) void
+  %assign interfaceData = System[accSysIdx].Interface.ContStatesAbsoluteToleranceArgDef
+  %<SLibAccessArgHelper(interfaceData,"", FcnGetCurrentAccessTid())>
+%endfunction
+
+%% CGIR generated TLC file calls this function to track continues states 
+%% absolute tolerance that are accessed cross no arg function boundary.
+%function SLibCG_TrackGlobalContStatesAbsoluteTolerance(accSysIdx) void
+  %assign interfaceData = System[accSysIdx].Interface.ContStatesAbsoluteToleranceArgDef
+  %<SLibAccessArgHelper(interfaceData,"Global", FcnGetCurrentAccessTid())>
+  %<SLibAccessArgHelper(interfaceData,"", FcnGetCurrentAccessTid())>
+%endfunction
+
+
+%% CGIR generated TLC file calls this function to track zero crossing signal
+%% values access.
+%function SLibCG_TrackZCSV(accSysIdx) void
+  %assign interfaceData = System[accSysIdx].Interface.ZCSVArgDef
+  %<SLibAccessArgHelper(interfaceData,"", FcnGetCurrentAccessTid())>
+%endfunction
+
+%% CGIR generated TLC file calls this function to track zero crossing signal
+%% values that are accessed cross no arg function boundary.
+%function SLibCG_TrackGlobalZCSV(accSysIdx) void
+  %assign interfaceData = System[accSysIdx].Interface.ZCSVArgDef
+  %<SLibAccessArgHelper(interfaceData,"Global", FcnGetCurrentAccessTid())>
+  %<SLibAccessArgHelper(interfaceData,"", FcnGetCurrentAccessTid())>
+%endfunction
+
+%% CGIR generated TLC file calls this function to track zero crossing event
+%% access.
+%function SLibCG_TrackZCEvent(accSysIdx) void
+  %assign interfaceData = System[accSysIdx].Interface.ZCEventArgDef
+  %<SLibAccessArgHelper(interfaceData,"", FcnGetCurrentAccessTid())>
+%endfunction
+
+%% CGIR generated TLC file calls this function to track zero crossing events
+%% that are accessed cross no arg function boundary.
+%function SLibCG_TrackGlobalZCEvent(accSysIdx) void
+  %assign interfaceData = System[accSysIdx].Interface.ZCEventArgDef
+  %<SLibAccessArgHelper(interfaceData,"Global", FcnGetCurrentAccessTid())>
+  %<SLibAccessArgHelper(interfaceData,"", FcnGetCurrentAccessTid())>
+%endfunction
+
+
+%function SLibCG_TrackIArg(accSysIdx, argIdx, cross, tid) void
+  %assign blkSysIdx   = System[accSysIdx].ReusedParentSystemIdx
+  %assign interface   = System[blkSysIdx].Interface
+  %assign canInputArg = interface.CanonicalInputArgDef[argIdx]
+  %<LibAccessArgTID(canInputArg, tid)>
+  %if cross
+     %<LibAccessGlobalArgTID(canInputArg, tid)>
+  %endif
+%endfunction
+
+%function SLibCG_TrackOArg(accSysIdx, argIdx, cross, tid) void
+  %assign blkSysIdx   = System[accSysIdx].ReusedParentSystemIdx
+  %assign interface   = System[blkSysIdx].Interface
+  %assign canOutputArg = interface.CanonicalOutputArgDef[argIdx]
+  %<LibAccessArgTID(canOutputArg, tid)>
+  %if cross
+     %<LibAccessGlobalArgTID(canOutputArg, tid)>
+  %endif
+%endfunction
+
+%function SLibCG_TrackPArg(accSysIdx, argIdx, cross, tid) void
+  %assign blkSysIdx   = System[accSysIdx].ReusedParentSystemIdx
+  %assign interface   = System[blkSysIdx].Interface
+  %assign canPrmArg = interface.CanonicalPrmArgDef[argIdx]
+  %<LibAccessArgTID(canPrmArg, tid)>
+  %if cross
+     %<LibAccessGlobalArgTID(canPrmArg, tid)>
+  %endif
+%endfunction
+
+%function SLibCG_TrackDwArg(accSysIdx, argIdx, cross, tid) void
+  %assign blkSysIdx   = System[accSysIdx].ReusedParentSystemIdx
+  %assign interface   = System[blkSysIdx].Interface
+  %assign canDworkArg = interface.CanonicalDWorkArgDef[argIdx]
+  %<LibAccessArgTID(canDworkArg, tid)>
+  %if cross
+     %<LibAccessGlobalArgTID(canDworkArg, tid)>
+  %endif
+%endfunction
+
+%function SLibGetDWorkStructPtr() void
+  %return SLibGetDWorkPointerFromRTM(TLC_TRUE)
+%endfunction
+
+%function SLibGetBlockIOStructPtr() void
+  %return SLibGetBlockIOPointerFromRTM(TLC_TRUE)
+%endfunction
+
+%function SLibGetConstBlockIOStructPtr() void
+  %return SLibGetConstBlockIOPointerFromRTM()
+%endfunction
+
+%function SLibGetParamStructPtr() void
+  %return SLibGetRaramPointerFromRTM(TLC_TRUE)
+%endfunction
+
+%function SLibGetContStatesStructPtr() void
+  %return SLibGetContStatesPointerFromRTM(TLC_TRUE)
+%endfunction
+
+%function SLibGetContStatesDerivativeStructPtr() void
+  %return SLibGetContStateDerivativesStructFromRTM()
+%endfunction
+
+%function SLibGetContStatesDisabledStructPtr() void
+  %return SLibGetContStateDisabledStructFromRTM()
+%endfunction
+
+%function SLibGetContStatesAbsoluteToleranceStructPtr() void
+  %return SLibGetContStatesAbsoluteToleranceStructFromRTM()
+%endfunction
+
+%function SLibGetPreviousZCStructPtr() void
+  %return SLibGetPreviousZCStructFromRTM(TLC_TRUE)
+%endfunction
+
+%function SLibGetZCSignalValueStrucPtr() void
+  %return SLibGetZCSignalValueStructFromRTM(TLC_TRUE)
+%endfunction %% SLibGetZCSignalValueStructPtr
+
+%function FcnCGIRExtInputHelper(port, width, memberStr, chunkIdx, ucv, indexExpr, addr)
+  %% SLibCG_EI and SLibCG_EIAddr should not be called in a reusable subsystem
+  %assert SystemIdx == NumSystems-1 || RTWSystemCode != 2
+  %assign extInp = ::CompiledModel.ExternalInputs.ExternalInput[port]
+  %assert extInp.StorageClass == "Auto"
+  %assign varGroupIdx = extInp.VarGroupIdx[0]
+  %assign memberIdx   = extInp.VarGroupIdx[1]
+  %assign varGroup    = ::CompiledModel.VarGroups.VarGroup[varGroupIdx]
+  %assign portVar  = FcnSLibCGIRGetVarGroupMember(varGroup, memberIdx)
+  
+  %assign isPointer   = TLC_FALSE
+
+  %if CodeFormat == "S-Function" && !Accelerator
+    %if ISFIELD(extInp, "HasVarDims")
+      %assign sfcnInput = FcnCGIRSFcnCGVarHelper("ssGetInputPortSignal", ...
+        TLC_FALSE, "const", ...
+        varGroupIdx, memberIdx, 0, width, memberStr, chunkIdx, ucv, indexExpr)
+    %else
+      %assign sfcnInput = FcnCGIRSFcnCGVarHelper("ssGetInputPortSignalPtrs",...
+        TLC_TRUE, "const",...
+        varGroupIdx, memberIdx, 0, width, memberStr, chunkIdx, ucv, indexExpr)
+    %endif
+    %if addr
+      %return "&" + sfcnInput + SLibCG_GetMultiWordID(chunkIdx)
+    %else
+      %return sfcnInput + SLibCG_GetMultiWordID(chunkIdx)
+    %endif
+  %endif
+
+  %<SLibAccessArgHelper(extInp,"",System[SystemIdx].CurrentTID)>
+   
+  %assert Accelerator || UsingMalloc
+
+  %assign cross = System[SystemIdx].CrossNoArgFcnBound 
+  %assign identifier = "%<SLibGetExternalInputStruct(TLC_TRUE,TLC_TRUE,cross)>%<UQualifier>%<portVar.Name>"
+  %assign isPointer = PassExtInpByRef(extInp)
+  %return FcnCGIRSimpleCGVarHelper(identifier, isPointer, width, memberStr, chunkIdx, ucv, indexExpr, addr)
+%endfunction
+
+%function FcnSLibCGIRGetVarGroupMember(varGroup, memberIdx) void
+  %assign CGType = ::CompiledModel.CGTypes.CGType[varGroup.CGTypeIdx]
+  %if SLibVarGroupUsedAsMatrix(CGType)
+    %assign CGType = SLibGetBaseTypeForVarGroupUsedAsMatrix(CGType)
+  %endif
+  %return CGType.Members.Member[memberIdx]
+%endfunction
+
+%% Function: SLibCG_EI_CSC ====================================================
+%% Abstract:
+%%    This function dump outs the variable for the given external
+%%    inport block with custom storage class
+%%
+%function SLibCG_EI_CSC(port, width, memberStr, chunkIdx, ucv, indexExpr) void
+  %return FcnCGIRExtInputCSCHelper(port, width, memberStr, chunkIdx, ucv, indexExpr, TLC_FALSE)
+%endfunction
+
+%function SLibCG_EI_CSCAddr(port, width, memberStr, chunkIdx, ucv, indexExpr) void
+  %return FcnCGIRExtInputCSCHelper(port, width, memberStr, chunkIdx, ucv, indexExpr, TLC_TRUE)
+%endfunction
+
+%function FcnCGIRExtInputCSCHelper(port, width, memberStr, chunkIdx, ucv, indexExpr, addr) void
+  %assign extIn = ::CompiledModel.ExternalInputs.ExternalInput[port]
+  %assert extIn.StorageClass == "Custom"
+  %return FcnCGIRCSCDataHelper(extIn, width, memberStr, chunkIdx, ucv, indexExpr, addr)
+%endfunction
+
+%% Function: SLibCG_Grnd =======================================================
+%% Abstract:
+%%    This function returns the ground value for a given datatype.
+%%
+%function SLibCG_Grnd(isComplex, dataTypeID, width, memberStr, chunkIdx, ucv, indexExpr) void
+  %if LibDataTypeIsBus(dataTypeID)
+    %<SLibSetDataTypeGroundReqInMemory(dataTypeID)>
+    %assign grndVar = SLibGetDtGroundName(dataTypeID, TLC_FALSE, "")
+    %return SLibCG_V(grndVar, TLC_FALSE, width, memberStr, chunkIdx, ucv, indexExpr)
+  %endif
+
+  %assign tmpVect = SLibGetReimAndIdx(indexExpr)
+  %assign reim    = tmpVect[0]
+  %assign sigIdx  = tmpVect[1]
+  %assert sigIdx == 0
+  %return "%<FcnGetGroundSignalValue(dataTypeID, isComplex, reim)>" + ...
+    SLibCG_GetMultiWordID(chunkIdx)
+%endfunction
+
+%% Function: SLibCG_GrndAddr ===================================================
+%% Abstract:
+%%    This function returns the address to a ground valued for a given datatype.
+%%
+%function SLibCG_GrndAddr(isComplex, dataTypeID, width, memberStr, chunkIdx, ucv, indexExpr) void
+  %if LibDataTypeIsBus(dataTypeID)
+    %<SLibSetDataTypeGroundReqInMemory(dataTypeID)>
+    %assign grndVar = SLibGetDtGroundName(dataTypeID, TLC_FALSE, "")
+    %return SLibCG_VAddr(grndVar, TLC_FALSE, width, memberStr, chunkIdx, ucv, indexExpr)
+  %endif
+  %assign tmpVect = SLibGetReimAndIdx(indexExpr)
+  %assign reim    = tmpVect[0]
+  %assign sigIdx  = tmpVect[1]
+  %assert sigIdx == 0
+  %if chunkIdx >= 0
+    %%
+    %% Returns &MultiWordGround.chunk[chunkIdx]
+    %%
+    %return "&" + FcnGetGroundSignalValue(dataTypeID, isComplex, reim) + ...
+      SLibCG_GetMultiWordID(chunkIdx)
+  %else
+    %return FcnGetGroundSignalAddr(dataTypeID, isComplex, reim)
+  %endif
+%endfunction
+
+
+%% Function: CGInputExpr =======================================================
+%% Abstract:
+%%    This function returns a expression or address express based on
+%%    signal type.
+%%
+%function CGInputExpr(sigType, sysIdx, blkIdx, pIdx, chunkIdx, ucv, idxExpr) void
+  %if sigType == "Signal"
+    %assign outputType = "output"
+  %else
+    %assert sigType == "SignalAddr"
+    %assign outputType = "outputAddr"
+  %endif
+  %assign srcSys = System[sysIdx]
+  %assign srcBlk = srcSys.Block[blkIdx]
+  %if chunkIdx >= 0
+    %assign errTxt = "Blocks output ports of mult-word fixpoint type " ...
+      "should not output expressions"
+    %<LibReportError(errTxt)>
+  %endif
+  %with srcSys %% switch system context if needed
+    %if srcBlk.DataOutputPort[pIdx].OutputExpression
+      %assign cast = LibOutputExprCast(srcBlk, pIdx)
+      %assign retSignal = ...
+        SLibBlockOutputSignal(srcBlk, srcSys, pIdx, ucv, "", idxExpr, sigType)
+      %if cast != ""
+        %assign retSignal = "(%<cast>%<retSignal>)"
+      %endif    
+      %assign retSignal = SLibProcessSafeExpression(srcBlk.Name, retSignal, 1)
+    %else
+      %with srcBlk
+      %assign retSignal = ...
+        FcnGetInputOrOutputSignal(outputType, pIdx, ucv, "", idxExpr)
+      %endwith
+    %endif
+  %endwith
+  %return retSignal
+%endfunction
+
+%% Function: SLibCG_Expr =======================================================
+%% Abstract:
+%%    This function returns the output expression for a given block in RTW.
+%%
+%function SLibCG_Expr(sysIdx, blkIdx, portIdx, width, strEl, chunkIdx, ucv, sigIdx) void
+  %if ISEMPTY(strEl)
+    %return CGInputExpr("Signal", sysIdx, blkIdx, portIdx, chunkIdx, ucv,sigIdx) 
+  %else
+    %assign expr = CGInputExpr("Signal", sysIdx, blkIdx, portIdx, chunkIdx, "",0)
+    %return SLibCG_V(expr, TLC_FALSE, width, strEl, chunkIdx, ucv, sigIdx)
+  %endif
+%endfunction
+
+%% Function: SLibCG_ExprAddr ===================================================
+%% Abstract:
+%%    Error condtion for TLC based expression folding.
+%%
+%function SLibCG_ExprAddr(sysIdx, blkIdx, pIdx, width, strEl, chunkIdx, ucv, sigIdx) void
+  %if ISEMPTY(strEl)
+    %return CGInputExpr("SignalAddr", sysIdx, blkIdx, pIdx, chunkIdx, ucv,sigIdx)
+  %else
+    %assign expr = CGInputExpr("SignalAddr", sysIdx, blkIdx, pIdx, chunkIdx,"",0)
+    %return SLibCG_VAddr(expr, TLC_FALSE, width, strEl, chunkIdx, ucv, sigIdx)
+  %endif
+%endfunction
+
+%%
+%% TLC function used to generate code that get root inport size.
+%% It is used for S-function targets including Accelerator mode
+%%
+%% dwIdx is the dwork index for root inport dim size
+%% width is the width of the inport size var, i.e. the number of dimensions
+%% of the root inport.
+%%
+%function SLibGetInportSize(portIdxOrDWIdx, width, memberStr, chunkIdx, ucv, indexExpr) void
+  %% SLibGetInportSize should not be called in a reusable subsystem
+  %assert SystemIdx == NumSystems-1 || RTWSystemCode != 2
+  %if CodeFormat == "S-Function" && !Accelerator
+    %% generate function calls to access SimStruct data
+    %% for generated S-Function targets.
+    %% 
+    %assign portIdx = portIdxOrDWIdx
+    %assign extInp = ::CompiledModel.ExternalInputs.ExternalInput[portIdx]
+    
+    %if ISFIELD(extInp,"SizeVarGroupIdx")
+      %assign cgTypeIdx = SLibCGVarGroupMemberCGTypeIdx(...
+            extInp.SizeVarGroupIdx[0], ...
+            extInp.SizeVarGroupIdx[1])
+    %elseif ISFIELD(extInp,"DimSizeDWork")
+      %assign sizeCGType = LibGetRecordCGTypeIdx(CompiledModel.DWorks.DWork[extInp.DimSizeDWork])
+    %endif
+    
+    %assign sfcnInputSize = FcnCGIRSFcnSizeVarHelper("ssGetCurrentInputPortDimensions", ...
+      TLC_FALSE, "const", ...
+      cgTypeIdx, portIdx, width, memberStr, ucv, indexExpr)
+    %return sfcnInputSize
+  %elseif Accelerator 
+    %assert CodeFormat == "S-Function"
+    %assign dwIdx = portIdxOrDWIdx
+    %assign dw = ::CompiledModel.DWorks.DWork[dwIdx]
+
+    %assign isPointer = TLC_FALSE %% root inport cannot be pointer
+    %assign varGroupIdx = dw.VarGroupIdx[0]
+    %assign memberIdx   = dw.VarGroupIdx[1]
+    
+    %assign varGroup        = ::CompiledModel.VarGroups.VarGroup[varGroupIdx]
+    %assign portVar         = FcnSLibCGIRGetVarGroupMember(varGroup, memberIdx)
+    %assign identifier      = "((%<tDWorkType> *) ssGetRootDWork(S))->%<portVar.Name>"
+    
+    %assign idnum = IDNUM(varGroup.VarGroupElements[dw.VarGroupIdx[1]])
+    %assign recType = idnum[0]
+    %assign recIdx  = idnum[1]
+    %return FcnCGIRSimpleCGVarHelper(identifier, ...
+      isPointer, width, memberStr, chunkIdx, ucv, indexExpr, TLC_FALSE)
+  %else
+    %% generate access to members of the flat
+    %% ExternalInputSizeVarGroup.
+    %% cannot use SLibCGIRVarGroupPath because it tracks arguments.
+    %%
+    %assign portIdx = portIdxOrDWIdx
+    %assign extInp = ::CompiledModel.ExternalInputs.ExternalInput[portIdx]
+    %assign isPointer = TLC_FALSE %% root outport cannot be pointer
+   
+    %if ISFIELD(extInp,"SizeVarGroupIdx")
+        %assign varGroupIdx = extInp.SizeVarGroupIdx[0]
+        %assign memberIdx   = extInp.SizeVarGroupIdx[1]
+        %assign varGroup    = ::CompiledModel.VarGroups.VarGroup[varGroupIdx]
+        %assign portVar  = FcnSLibCGIRGetVarGroupMember(varGroup, memberIdx)
+        %assign identifier = varGroup.Name + "." + portVar.Name
+    %elseif ISFIELD(extInp,"DimSizeDWork")
+        %assign dWrec = ::CompiledModel.DWorks.DWork[extInp.DimSizeDWork]
+        %assign identifier = dWrec.Identifier
+    %endif
+
+    %return FcnCGIRSimpleCGVarHelper(identifier, ...
+        isPointer, width, memberStr, chunkIdx, ucv, indexExpr, TLC_FALSE)
+  %endif
+%endfunction
+
+%%
+%% TLC function used to generate code that set root outport size.
+%% It is used for S-function target only.
+%% 
+%% width is the width of the outport size var, i.e. the number of dimensions
+%% of the root outport.
+%%
+%function SLibGetOutportSize(portIdx, width, memberStr, chunkIdx, ucv, indexExpr) void
+  %% SLibGetOutportSize should not be called in a reusable subsystem
+  %assert SystemIdx == NumSystems-1 || RTWSystemCode != 2
+  %assign extOutp = ::CompiledModel.ExternalOutputs.ExternalOutput[portIdx]
+
+  %if CodeFormat == "S-Function" && !Accelerator 
+    %% generate function calls to access SimStruct data
+    %% for generated S-Function targets.
+    %assign cgTypeIdx = SLibCGVarGroupMemberCGTypeIdx(...
+    extOutp.SizeVarGroupIdx[0], ...
+    extOutp.SizeVarGroupIdx[1])
+    %assign sfcnOutputSize = FcnCGIRSFcnSizeVarHelper("ssGetCurrentOutputPortDimensions", ...
+      TLC_FALSE, "", ...
+      cgTypeIdx, portIdx, width, memberStr, ucv, indexExpr)
+    %return sfcnOutputSize
+  %elseif MultiInstanceERTCode
+    %% External output size var is still in the DWork VarGroup.
+    %% need to clean it up. (Hongbo)
+    %assign varGroupIdx = extOutp.SizeVarGroupIdx[0]
+    %assign memberIdx   = extOutp.SizeVarGroupIdx[1]
+    %return FcnCGIRCGVarHelper(varGroupIdx, memberIdx, TLC_FALSE, ...
+      System[SystemIdx].HStructDeclSystemIdx, ...
+      width, memberStr, chunkIdx, ucv, indexExpr, TLC_FALSE)
+  %else 
+    %% generate access to members of the flat
+    %% ExternalOutputSizeVarGroup.
+    %% cannot use SLibCGIRVarGroupPath because it tracks arguments.
+    %%
+    %assign isPointer = TLC_FALSE %% root outport cannot be pointer
+    %assign varGroupIdx = extOutp.SizeVarGroupIdx[0]
+    %assign memberIdx   = extOutp.SizeVarGroupIdx[1]
+    %assign varGroup    = ::CompiledModel.VarGroups.VarGroup[varGroupIdx]
+    %assign portVar  = FcnSLibCGIRGetVarGroupMember(varGroup, memberIdx)
+    %assign identifier = varGroup.Name + "." + portVar.Name
+    %return FcnCGIRSimpleCGVarHelper(identifier, ...
+      isPointer, width, memberStr, chunkIdx, ucv, indexExpr, TLC_FALSE)
+  %endif
+%endfunction
+
+%%
+%% TLC function used to pass root inport size to a reusable
+%% function.
+%% dwIdx is the dwork index for root inport dim size
+%%
+%function SLibGetInportSizeAddr(portIdxOrDWIdx, width, memberStr, chunkIdx, ucv, indexExpr) void
+  %% SLibGetInportSize should not be called in a reusable subsystem
+  %assign sfcnInputSize = SLibGetInportSize(portIdxOrDWIdx, width, memberStr, chunkIdx, ucv, indexExpr)
+  %return "&" + sfcnInputSize
+%endfunction
+
+%function SLibCGIRGetLoopVarName(sysIdx) void
+  %return SLibCGIRGetIteratorName(sysIdx)
+%endfunction
+
+%% Function: SLibCGIRZeroOutDerivativesForSystem ===============================
+%% Abstract:
+%%   This function calls a function to zero out the derivatives for a given
+%%   system.
+%%
+%function SLibCGIRZeroOutDerivativesForSystem(sysIdx, ssBlkSysIdx, ssBlkIdx) Output
+  %assign system  = ::CompiledModel.System[sysIdx]
+  %assign ssSystem  = ::CompiledModel.System[ssBlkSysIdx]
+  %assign ssBlock = ssSystem.Block[ssBlkIdx]
+  %%
+  %if ISFIELD(ssBlock, "ParamSettings")
+    %with ssBlock
+      %assign cStates = LibBlockParamSetting("", "SystemContStates")
+    %endwith
+  %else
+    %with ssBlock
+      %assign cStates = LibBlockParamSetting("Subsystem", "SystemContStates")
+    %endwith
+  %endif
+  %%
+  %assign ncStates = cStates[0]
+  %%
+  %if ncStates == 0
+    %return 
+  %elseif ncStates > 1
+    %assign needDxAndI = 1
+  %else
+    %assign needDxAndI = 0
+  %endif
+  %%
+  %openfile tmpZero
+  %<SLibIfLocalPreprocessorCondition(ssBlock)>
+  %assign ::PartialIndexingInDerivFcn = TLC_TRUE
+  %assign ::PartialIdxBoundarySysystemIndex = sysIdx
+  %<SLibZeroOutDerivativesForSystem(ssBlock, system)>\
+  %assign ::PartialIndexingInDerivFcn = TLC_FALSE
+  %<SLibEndIfLocalPreprocessorCondition(ssBlock)>
+  %closefile tmpZero
+  %%
+  %if tmpZero != ""
+    %if needDxAndI
+      {
+        real_T *dx;
+        int_T   i;
+    %endif
+        %<tmpZero>\
+    %if needDxAndI
+      }
+    %endif
+  %endif
+%endfunction
+
+%% Function: SLibCGIRZeroOutZeroCrossingsForSystem =============================
+%% Abstract:
+%%    Zero out the zero crossings for a given subsystem.
+%%
+%function SLibCGIRZeroOutZeroCrossingsForSystem(sysIdx, ssBlkSysIdx, ssBlkIdx) Output
+  %assign system  = ::CompiledModel.System[sysIdx]
+  %assign ssSystem  = ::CompiledModel.System[ssBlkSysIdx]
+  %assign ssBlock = ssSystem.Block[ssBlkIdx]
+  %%
+  %if ISFIELD(ssBlock, "ParamSettings")
+    %assign numNonsampledZCs = ssBlock.ParamSettings.NumNonsampledZCs 
+  %else
+    %assign numNonsampledZCs = ssBlock.SubsystemParamSettings.NumNonsampledZCs 
+  %endif
+  %%
+  %%
+  %if numNonsampledZCs > 0
+  %<SLibIfLocalPreprocessorCondition(ssBlock)>
+    {
+      %<SLibZeroOutZcSignalsForSystem(ssBlock, system)>
+    }
+  %<SLibEndIfLocalPreprocessorCondition(ssBlock)>
+  %endif
+%endfunction
+
+
+%function SLibCGIRInitPrevZcSignalStatesForBlock(cgIdx, sysIdx, blkIdx) Output
+  %assign buf = ""
+  %with System[baseSystemIdx] %% base system
+    /* Zero-crossing state initialization */
+    %assign numBlkZcRec = ZcRec.NumBlkZcRecs
+    %foreach blkZcRecIdx = numBlkZcRec
+      %assign blkZcRec = ZcRec.BlkZcRec[blkZcRecIdx]
+      %assign sigsrc = blkZcRec.SigSrc
+      %if sigsrc[0] == sysIdx && ...
+        sigsrc[1] == cgIdx && ...
+        sigsrc[2] == blkIdx
+        %assert blkZcRec.InitInStart
+        %with System[blkZcRec.SysCsIdx[0]]
+          %assign buf = SLibInitPrevZCSignalStateForBlk(blkZcRec, "", "")
+        %endwith
+        %break
+      %endif
+    %endforeach
+  %endwith
+  %if !WHITE_SPACE(buf)
+    %<buf>
+  %endif
+%endfunction
+
+%function SLibCGIRInitGlobalIOForBlock(sigsrc, ownerSysIdx) Output
+  %assign csgInitBuffer = ""  %% for invariant, or signal object InitialValue
+  %assign straightInitBuffer = ""
+  %assign useLoopVarInitBuffer = ""
+  %assign maxctrtype = "int_T"
+  %assign maxctrsize = 0
+  %assign memsetToZeroNeeded = 0
+  
+  %%
+  %assign bo = BlockOutputs.GlobalBlockOutput[sigsrc]
+  %assert bo.InitInStart
+  %assign sys = System[ownerSysIdx]
+  %assign ret = SLibInitBlockIOForBufferHelper(bo, sys.NonInlinedParentSystemIdx, TLC_FALSE, maxctrtype, maxctrsize)
+  %assign csgInitBuffer = ret[0]
+  %assign straightInitBuffer = ret[1]
+  %assign useLoopVarInitBuffer = ret[2]
+  %assign maxctrtype = ret[4]
+  %assign maxctrsize = ret[5]
+  
+  %% Memset on all block io buffer will be handled by SLibInitBlockIOHelper
+  
+  %if  !WHITE_SPACE(csgInitBuffer) ...
+    || !WHITE_SPACE(straightInitBuffer) ...
+    || !WHITE_SPACE(useLoopVarInitBuffer)
+    %% SLibGetBlockOutputFromRecord above took care of LibAccessArg
+    {
+      %if  !WHITE_SPACE(useLoopVarInitBuffer)
+        %<maxctrtype> i;
+        %<useLoopVarInitBuffer>\
+      %endif
+      %<straightInitBuffer>\
+      %<csgInitBuffer>\
+    }
+  %endif
+%endfunction
+
+%function SLibCGIRInitDWorkForBlock(sigsrc, ownerSysIdx) Output
+  %assign dwRec = DWorks.DWork[sigsrc]
+  
+  %assign stdSSBuf = CacheStandaloneSystemDWorkInfo()
+  %assign idx = SLibGetSystemAndCallSideIndex(dwRec)
+  %if SigSrcLivesInStandaloneSS(idx)
+    %assign baseSystemIdx = StandaloneParentSysIdxOfDataRec(dwRec)
+  %else
+    %assign baseSystemIdx = GetBaseSystemIdx()
+  %endif
+  %assign stdIdx = System[baseSystemIdx].IndexInStandaloneSubsystemArray
+
+  %assign sys = System[ownerSysIdx]
+  %if ForceBlockIOInitOptimize
+    %assign oldInitBuf = SLibInitDWorkOldHelper(stdSSBuf, stdIdx, -1, -1, 0, "", "", sys.NonInlinedParentSystemIdx, dwRec, TLC_TRUE, "", "")
+    %assign stdSSBuf = oldInitBuf[0]
+  %else
+    %assign cross = System[NonInlinedParentSystemIdx].CrossNoArgFcnBound
+    %assign stdSSBuf = SLibInitDWorkHelper(stdSSBuf, stdIdx, sys.NonInlinedParentSystemIdx, cross, dwRec, TLC_TRUE, "", "")
+  %endif
+  
+  %if  !WHITE_SPACE(stdSSBuf.DWorkBuff[0].initBuffer)
+    %<stdSSBuf.DWorkBuff[0].initBuffer>
+  %endif
+%endfunction
+
+%% Function: SLibCGIRSetSolverNeedsReset =======================================
+%% Abstract:
+%%    This function outputs code to reset the solver if need be.
+%%
+%function SLibCGIRSetSolverNeedsReset() Output
+  %<RTMSetSolverNeedsReset()>;
+%endfunction
+
+%% Function: SLibCGIRSkipSystem ================================================
+%% Abstract:
+%%   This function set a flag to skip codegeneration for a given system and its
+%%   child systems.
+%%
+%%   Note that we only skip this system and its children if the system is
+%%   inlined. If it is reused, other instances may need to be generated
+%%   and we'd get wrong answers if we did not. If the
+%%   system is function the user may want to have it generated anyway.
+%%
+%function SLibCGIRSkipSystem(sysIdx) void
+   %if LibSystemIsInlined(::CompiledModel.System[sysIdx])
+    %assign ::CompiledModel.System[sysIdx].DeletedInIR = TLC_TRUE
+    %with ::CompiledModel.System[sysIdx]
+      %foreach idx=NumChildSystems
+	%<SLibCGIRSkipSystem(ChildSystems[idx][0])>
+      %endforeach
+    %endwith
+  %endif
+%endfunction
+
+%% Function: SLibCGIRDumpSystemUserCode ========================================
+%% Abstract:
+%%   This function dumpes the user code for a given system index, 
+%%   block function and location information. Location can be "header", "body"
+%%   and "trailer".
+%%
+%function SLibCGIRDumpSystemUserCode(sysIdx, blockFcn, location) Output
+  %assign ss = ::CompiledModel.System[sysIdx]
+  %assign prevTID = ss.CurrentTID
+  %assign ss.CurrentTID = CurrentTID
+  %assign buff = ""
+  %%
+  %%
+  %openfile buff
+  %<LibDumpSystemUserCodeNoCheck(ss, blockFcn, location)>
+  %closefile buff
+  %%
+  %if location == "Header"
+    %if !LibSystemUserCodeIsEmpty(ss,blockFcn,"Header") 
+      %% has possible variable declaration
+      {
+    %endif
+  %endif
+  %<buff>\
+  %if location == "Trailer"
+    %if !LibSystemUserCodeIsEmpty(ss,blockFcn,"Header") 
+      %% has possible variable declaration
+      }
+    %endif
+  %endif
+  %assign ss.CurrentTID = prevTID
+ 
+%endfunction
+
+%% Function: SLibCGIRDumpSystemProfCode ========================================
+%% Abstract:
+%%    This function dumps the profile code for a given system index,
+%%    lock function and location information.
+%%
+%%    Location can be:
+%%
+%%            "Declare", "Start", "End", "Terminate"
+%%
+%function SLibCGIRDumpSystemProfCode(sysIdx, blockFcn, location) Output
+  %assign ss = ::CompiledModel.System[sysIdx]
+
+  %if blockFcn == "Terminate"
+    %<SLibGenProfSysTerminate(ss)>
+  %else
+    %if location == "Declare"
+      %<SLibGenProfSysDeclare(ss, blockFcn)>
+    %elseif location == "Start"
+      %<SLibGenProfSysStart(ss, blockFcn)>
+    %elseif location == "End"
+      %<SLibGenProfSysEnd(ss, blockFcn)>
+    %else
+      %assign msg = "Invalid profile code location: '%<location>'"
+      %<LibReportFatalError(msg)>
+    %endif
+  %endif
+%endfunction
+
+%% Function: SLibCGIRGetIteratorName ===========================================
+%% Abstract:
+%%    Get the name of the iterator. Either it was set before by the iterator
+%%    subsystem or it's constructed via TLC code and we need to call the old
+%%    function.
+%function SLibCGIRGetIteratorName(sysIdx) void
+  %if ISFIELD(::CompiledModel.System[sysIdx], "IteratorName")
+    %return ::CompiledModel.System[sysIdx].IteratorName
+  %else
+    %assign loopSuffix = ::CompiledModel.System[sysIdx].SysName
+    %return "iter%<loopSuffix>"
+  %endif
+%endfunction  
+
+%% Function: SLibCGIRSetIteratorName ===========================================
+%% Abstract:
+%%    Set the name of the iterator.
+%function SLibCGIRSetIteratorName(sysIdx, iterName) void
+  %if !ISFIELD(::CompiledModel.System[sysIdx], "IteratorName")
+    %addtorecord ::CompiledModel.System[sysIdx] IteratorName iterName
+  %endif
+%endfunction  
+
+%% Function: SLibCGIREmptyFcn ==================================================
+%% Abstract:
+%%    An empty function used to keep CGIR from optimizing code with side effect
+%%
+%function SLibCGIREmptyFcn() void
+  %return ""
+%endfunction
+
+%% Function: SLibCGIRIteratorContainer ==================================================
+%% Abstract:
+%%    An empty function used to keep CGIR from dead code eliminating interator variables
+%%    we're interested in.
+%function SLibCGIRIteratorContainer(unused1, unused2) void
+  %return ""
+%endfunction
+
+
+%% Function: SLibCGIRSetStatesDisabled =========================================
+%% Description: 
+%%    Generate code to reset constinuous state. This function is called 
+%%    by enable subsystem in variable step solver model. 
+%%
+%function SLibCGIRSetStatesDisabled(ssBlkSysIdx, ssBlkIdx, value) Output
+  %assign ssBlock = ::CompiledModel.System[ssBlkSysIdx].Block[ssBlkIdx]
+  %assign system  = ::CompiledModel.System[ssBlock.CallSiteInfo.SystemIdx]
+  %<SLibSetStatesDisabled(ssBlock,system,value)>
+%endfunction
+
+%% Function: SLibCGIRSetStatesDisabledForMassMatrix ============================
+%% Description: 
+%%    Generate code to set/clear state disabled. Used in linearly implicit
+%%    models to properly indicate the eye() portion of the mass matrix.
+%%
+%function SLibCGIRSetStatesDisabledForMassMatrix(ssBlkSysIdx, ssBlkIdx, value) Output
+  %assign ssSystem  = ::CompiledModel.System[ssBlkSysIdx]
+  %assign ssBlock   = ssSystem.Block[ssBlkIdx] 
+  %<SLibSetStatesDisabled(ssBlock,ssSystem,value)>
+%endfunction
+
+
+%% Function: SLibCGIRModelrefCacheVarStepSolverResetCode =======================
+%% Description: 
+%%    Generate code to reset constinuous state for model reference.
+%%
+%function SLibCGIRModelrefCacheVarStepSolverResetCode(sysIdx) Output
+  %assign system  = ::CompiledModel.System[sysIdx]
+  %assert IsModelReferenceBaseSys(system)
+  %assert ::CompiledModel.SolverType == "VariableStep"
+  %if IsModelReferenceForASimstructBasedTarget()
+    %<ModelrefCacheVarStepSolverResetCode(system)>
+  %endif
+%endfunction
+
+%% Function: SLibCGIRGetFcnTypeName ============================================
+%%
+%function SLibCGIRGetFcnTypeName(sysFcnType)
+  
+  %switch(sysFcnType)
+      %case 0 
+        %return "Start"
+      %case 1 
+        %return "VirtualOutportStart"
+      %case 2
+        %return "Initialize"
+      %case 3 
+        %return "Output"
+      %case 4
+        %return "Update"
+      %case 5
+        %return "Derivative"
+      %case 6 
+        %return "Projection"
+      %case 7
+        %return "ForcingFunction"
+      %case 8
+        %return "MassMatrix"
+      %case 9
+        %return "ZeroCrossing"
+      %case 10
+        %return "Enable"
+      %case 11 
+        %return "Disable"
+      %case 12
+        %return "FinalizeDims"
+      %case 13
+        %return "SetDims"
+      %case 14
+        %return "Terminate"
+      %case 15 
+        %return "DeadCode"
+      %default
+        %% always assert
+        %assert TLC_FALSE
+    %endswitch
+%endfunction
+
+%% Function: SLibCG_SystemFcnArgAccessed =======================================
+%% Abstract:
+%%    Returns true if a given system function argument has been accessed.
+%%
+%function SLibCG_SystemFcnArgAccessed(fcnName, sysIdx, argIdx) void
+  %assign thisSystem = ::CompiledModel.System[sysIdx]
+  %assign modIdx = thisSystem.CGIRModuleIdx
+  %assign ownerModule = ::CompiledModel.RTWCGModules.RTWCGModule[modIdx]
+  %assert ISFIELD(ownerModule.SystemFunctions, fcnName)
+  %assign fcnIdx = ownerModule.SystemFunctions.%<fcnName>
+  %assign fcn = ownerModule.Function[fcnIdx]
+  %return fcn.ArgAccessed[argIdx]
+%endfunction %% SLibCG_SystemFcnArgAccessed
+
+%% Function ========================================
+%% Description:
+%%  generate fcn call statement.
+%%
+%function SLibCGIRGenReusableSysCall(fcnName, canIO, sysIdx, csIdx, ...
+  sysFcnType, tid, parentFcnType, accSysIdx) void
+  %assign retBuf = ""
+  %openfile retBuf
+  %assign fcnTypeName = SLibCGIRGetFcnTypeName(sysFcnType)
+  %assign parentFcnTypeName = SLibCGIRGetFcnTypeName(parentFcnType)
+  %assign ss = ::CompiledModel.System[sysIdx]
+  %assign cs = ss.CallSites[csIdx]
+  %assign dataGrBlk = System[cs[2]].Block[cs[3]]
+  %assert dataGrBlk.Type == "SubSystem"
+  %assign parentSys = ::CompiledModel.System[cs[0]]
+  %assign prevTID = ss.CurrentTID
+  %assign ss.CurrentTID = tid
+  %assign tmpTid = SLibSystemTidUsedByRateGroup(ss,fcnTypeName)
+  %if !LibSystemFcnIsEmptyHelper(ss, fcnTypeName, tmpTid)
+    %assign ifPreprocessorCondition = ""
+    %assign endifPreprocessorCondition = ""
+    %if dataGrBlk.PreprocessorConditionsInIR == 0 && ...
+      (accSysIdx != sysIdx) && (SLibCGIRGetFcnTypeName(sysFcnType) != "Output")
+      %assign ifPreprocessorCondition = SLibIfLocalPreprocessorCondition(dataGrBlk)
+      %assign endifPreprocessorCondition = SLibEndIfLocalPreprocessorCondition(dataGrBlk)
+    %endif
+    %if SLibSystemFcnIsRateGroupType(fcnTypeName)
+      %assign ss.CurrentTID = tmpTid
+    %endif
+    %if fcnTypeName == "Output" && !ISFIELD(ss,"OutputFcn") &&  ...
+      !(ISFIELD(ss,"OutputCalledInUpdate") &&  ...
+      ss.OutputCalledInUpdate == "yes")
+      %assign fcnTypeName = "OutputUpdate"
+    %endif
+    %<ifPreprocessorCondition>
+    %if LibSystemIsInlined(ss)
+      %assign buffer = SLibGetBody%<fcnTypeName>FcnCache(ss)
+      %if dataGrBlk.PreprocessorConditionsInIR == 1
+        %assign needsBlockComment = ...
+          SimulinkBlockComments && NEEDS_COMMENT(buffer)
+        %<WriteBlockComments(dataGrBlk, needsBlockComment)>
+      %endif
+      %<buffer>\
+    %else
+      %assign fcnInfo = LibGetFcnInfo(ss, fcnTypeName, tmpTid)
+      %<LibGenSubsystemFcnCall(canIO, fcnInfo, SystemIdx, sysIdx, csIdx)>\
+    %endif
+    %if LibSystemFcnNeedsTID(ss,fcnTypeName)
+      %% Let TLC know that tid is required.
+      %<LibNeedTID()>
+    %endif
+    %if sysFcnType != parentFcnType
+      %assign accessSysIdx = System[SystemIdx].HStructDeclSystemIdx
+      %copyrecord origInterface System[accessSysIdx].Interface
+      %assign parentTid = ...
+        SLibSystemFcnRateGrouping(parentSys, parentFcnTypeName) ? tid : ""
+      %<SLibCopyArgAccessedFlags(SystemIdx, fcnTypeName, parentFcnTypeName, parentTid, TLC_FALSE)>
+      %assign System[accessSysIdx].Interface = origInterface
+    %endif
+    %<endifPreprocessorCondition>
+  %endif
+  %closefile retBuf
+  %assign ss.CurrentTID = prevTID  
+  %return retBuf
+%endfunction
+
+%% Function: OpaqueTLCBlockFcn =================================================
+%% Abstract:
+%%   Inlines the block code generated by its TLC implementation. This function
+%%   will be called by the autogenerated  opaque block TLC code for block that 
+%%   don't support CGIR.
+%%
+%function OpaqueTLCBlockFcn(blkFcn, sysIdx, blkIdx, modIdx, fcnIdx) void
+  %assign buff = ""
+  %assign isOutputs = (blkFcn == "Outputs")
+  %assign prevGenOutputs  = ::CompiledModel.GeneratingOutputsCode
+  %assign prevModuleIdx   = ::CurrentModuleIdx
+  %assign prevFunctionIdx = ::CurrentFunctionIdx
+  %assign ::CurrentModuleIdx = modIdx
+  %assign ::CurrentFunctionIdx = fcnIdx
+  %assign ::CompiledModel.GeneratingOutputsCode = isOutputs
+  %assign tmpTid = CurrentTID
+  %with ::CompiledModel
+    %assign system  = System[sysIdx]
+    %assign prevTID = system.CurrentTID
+    %assign system.CurrentTID = tmpTid
+    %with system
+      %assign block = Block[blkIdx]
+      %assert block.Type != "Opaque"
+      %assert block.BlockIdx[0] == sysIdx
+      %assert block.BlockIdx[2] == blkIdx
+      %with block
+        %if isOutputs
+          %if !LibBlockAllOutputSignalsAreExpr()
+            %assign buff = ...
+              generateNonExprOutput(block, system, "", 0, TLC_FALSE)
+          %endif
+        %else
+          %openfile buff
+          %<GENERATE(block, blkFcn, system)> \
+          %closefile buff    
+          %if WHITE_SPACE(buff)
+            %assign buff = ""
+          %elseif SimulinkBlockComments && NEEDS_COMMENT(buff)
+            %% get block start comments
+            %assign startComment = "/* " + blkFcn + " for " + ...
+              SLibBlkType(block) + ": '" + SLibBlkName(block) + "'"
+            %if (writePolySpaceStartComments(block))
+              %assign pSpaceStartComment = FcnGetPolySpaceStartComments(block)
+              %assign startComment = startComment + "\n" + pSpaceStartComment + "\n"
+            %endif
+            %assign startComment = startComment + " */"
+
+            %% get block end comments
+            %assign endComment = ""
+            %if (writePolySpaceEndComments(block))
+              %assign pSpaceEndComment = FcnGetPolySpaceEndComments(block)
+              %assign endComment = "/" + pSpaceEndComment + " */\n"
+            %endif
+            %assign buff = startComment + buff + endComment
+          %endif
+        %endif
+      %endwith %% block
+    %endwith %% system
+    %assign system.CurrentTID = prevTID
+  %endwith %% CompiledModel
+  %assign ::CompiledModel.GeneratingOutputsCode = prevGenOutputs
+  %assign ::CurrentModuleIdx = prevModuleIdx
+  %assign ::CurrentFunctionIdx = prevFunctionIdx
+  %return buff
+%endfunction
+
+%function OpaqueTLCBlockFcnForTID(blkFcn, sysIdx, blkIdx, tid, ...
+  modIdx, fcnIdx) void
+  %assign buff     = ""
+  %assign isOutputs = (blkFcn == "Outputs")
+  %assign prevGenOutputs = ::CompiledModel.GeneratingOutputsCode
+  %assign ::CompiledModel.GeneratingOutputsCode = isOutputs
+  %assign prevModuleIdx   = ::CurrentModuleIdx
+  %assign prevFunctionIdx = ::CurrentFunctionIdx
+  %assign ::CurrentModuleIdx = modIdx
+  %assign ::CurrentFunctionIdx = fcnIdx
+  %assert (isOutputs || blkFcn == "Update")
+  %assign tmpTid = CurrentTID  
+  %with ::CompiledModel
+    %assign tid01Eq = ISEQUAL(SolverType, "FixedStep") && FixedStepOpts.TID01EQ
+    %assign system = System[sysIdx]
+    %assign prevTID = system.CurrentTID
+    %assign system.CurrentTID = tmpTid
+    %with system
+      %assign block = Block[blkIdx]
+      %assert block.Type != "Opaque"
+      %assert block.BlockIdx[0] == sysIdx
+      %assert block.BlockIdx[2] == blkIdx
+      %with block
+        %assign isSFcn = (block.Type == "S-Function")
+        %assign nonInlinedSFcn = isSFcn && block.SFunctionType != "TLC"
+        %if nonInlinedSFcn || !SLibBlockFcnRateGrouping(block, blkFcn)
+          %%
+          %% !(tid01Eq && tmpTid == 1 && ISFIELD(block, "HasTid0Code"))
+          %%
+          %if !tid01Eq || tmpTid != 1 || !ISFIELD(block, "HasTid0Code")
+            %openfile buff
+            
+            %<GENERATE(block, blkFcn, system)> \
+            %closefile buff    
+            %if WHITE_SPACE(buff)
+              %assign buff = ""
+            %else
+              %if SLibBlkHasMultirateCode(block) && !nonInlinedSFcn && ...
+                !FcnBlkIsAsyncTopSfcn(block)
+                %assign warnTxt = ...
+                  "Code of update function for multirate "...
+                  "block '%<Name>' is guarded by sample hit checks "...
+                  "rather than being rate grouped. This will generate "...
+                  "the same code for all rates used by the block, "...
+                  "possibly generating dead code. To avoid dead "...
+                  "code, you must update the TLC file for the block."
+                %<LibReportWarning(warnTxt)>
+                %assign warnTxt = ...
+                  "/* Because the %<blkFcn> function of multirate block \n"...
+                  "   %<Name> is not rate grouped, \n"...
+                  "   the following code might contain unreachable blocks of code. \n"...
+                  "   To avoid this, you must update your block TLC file. */"
+                %assign buff = warnTxt + buff
+              %endif
+            %endif
+            %if tmpTid == 0 && !ISFIELD(block, "HasTid0Code")
+              %addtorecord block HasTid0Code TLC_TRUE
+            %endif
+          %endif
+          
+        %else
+          %assign sfcnName = isSFcn ? ParamSettings.FunctionName : ""
+          %if isOutputs
+            %if !LibBlockAllOutputSignalsAreExpr() 
+              %assign buff = ...
+                generateNonExprOutput(block, system, sfcnName, tid, TLC_TRUE)
+            %endif
+          %else                    
+            %openfile buff
+            
+            %if isSFcn
+              %<GENERATE_TYPE(block, "UpdateForTID", sfcnName, system, tid)> \
+            %else
+              %<GENERATE(block, "UpdateForTID", system, tid)> \
+            %endif
+            %closefile buff    
+            %if WHITE_SPACE(buff)
+              %assign buff = ""
+            %endif
+          %endif
+        %endif
+      %endwith %% block
+    %endwith %% system
+    %assign system.CurrentTID = prevTID
+  %endwith %% CompiledModel
+  %assign ::CompiledModel.GeneratingOutputsCode = prevGenOutputs
+  %assign ::CurrentModuleIdx = prevModuleIdx
+  %assign ::CurrentFunctionIdx = prevFunctionIdx
+  %return buff
+%endfunction
+
+%function OpaqueTLCBlockFcnForSetDims(blkFcn, sysIdx, blkIdx, oidx, ridx, ...
+  moduleIdx, fcnIdx) void
+  %assign buff = ""
+  %assign prevModuleIdx   = ::CurrentModuleIdx
+  %assign prevFunctionIdx = ::CurrentFunctionIdx
+  %assign ::CurrentModuleIdx = moduleIdx
+  %assign ::CurrentFunctionIdx = fcnIdx
+  %with ::CompiledModel
+    %assign system  = System[sysIdx]
+    %with system
+      %assign block = Block[blkIdx]
+      %assert block.Type != "Opaque"
+      %assert block.BlockIdx[0] == sysIdx
+      %assert block.BlockIdx[2] == blkIdx
+      %with block
+        %openfile buff          
+        %<GENERATE(block, blkFcn, system, oidx, ridx)> \
+        %closefile buff    
+        %if WHITE_SPACE(buff)
+          %assign buff = ""
+        %endif
+      %endwith %% block
+    %endwith %% system
+  %endwith %% CompiledModel
+  %assign ::CurrentModuleIdx = prevModuleIdx
+  %assign ::CurrentFunctionIdx = prevFunctionIdx
+  %return buff
+%endfunction
+
+%function SLibCG_DumpSSCode(openComment, ssBody, closeComment) void
+  %if WHITE_SPACE(ssBody)
+    %return ""
+  %else
+    %return openComment + ssBody + closeComment
+  %endif
+%endfunction
+
+%function SLibOpaqueDumpSystemSSVars(sysIdx, blkFcn) Output
+  %<LibDumpSystemSSVars(::CompiledModel.System[sysIdx],blkFcn)>\
+%endfunction
+  
+%function FcnRootOpaqueBlock() void
+  %assign rootSystem = ::CompiledModel.System[::CompiledModel.NumSystems-1]
+  %assign rootOpaqueBlock = rootSystem.Block[rootSystem.NumBlocks-1]
+  %return rootOpaqueBlock
+%endfunction
+
+%% Function FcnSysModuleIsRateGrouping(system, sysFcnType) ==================
+%% Abstract:
+%%   Return true if the system module generates rate grouping code.
+%% If a module generates rate grouping code, baseTidOfTasks is written out.
+%% This is a array for all base tid for each task in the module.
+%%
+%function FcnSysModuleIsRateGrouping(system, sysFcnType)
+  %assign retVal = TLC_FALSE
+  %if SLibSystemFcnIsRateGroupType(sysFcnType)
+    %assign moduleIdx   = system.CGIRModuleIdx
+    %assign moduleRec   = ::CompiledModel.RTWCGModules.RTWCGModule[moduleIdx]
+    %if ISFIELD(moduleRec, "RTWFcnConst")
+      %assign rtwFcnConst = moduleRec.RTWFcnConst
+      %assign retVal = ISFIELD(rtwFcnConst, "baseTidOfTasks")
+    %endif
+  %endif
+  %return retVal
+%endfunction
+
+%function RTWCGBlockExecuteAsyncEntryFcn(callIdx, tidVal)
+  %assert SampleTime[tidVal].IsUnionTs == "yes"
+  %if CodeFormat == "S-Function"
+    %assign retStr = "%<::CompiledModel.Name>_ASYNC%<tidVal>(%<tSimStruct>, %<callIdx>,%<LibTID()>);" 
+    %assign protoType = "void %<::CompiledModel.Name>_ASYNC%<tidVal>(%<tSimStructType>* %<tSimStruct>, int %<tControlPortIdx>, int %<tTID>)"
+  %else
+    %assign retStr = "%<::CompiledModel.Name>_ASYNC%<tidVal>(%<callIdx>);" 
+    %assign protoType = "void %<::CompiledModel.Name>_ASYNC%<tidVal>(int %<tControlPortIdx>)"
+  %endif
+  %if !ISFIELD(SampleTime[tidVal], "TaskEntryFcnProtoType")     
+    %addtorecord SampleTime[tidVal] TaskEntryFcnProtoType protoType
+  %endif
+  %assert SampleTime[tidVal].TaskEntryFcnProtoType == protoType
+  %return retStr
+%endfunction
+
+%% Function: SLibGetAsyncSysCodeForTaskTopBlk ==========================
+%% Abstract: 
+%%   Go back to the s-function initiating this async task and 
+%% call all downstream function-call subsystems and Model blocks.
+%function SLibGetAsyncSysCodeForTaskTopBlk(taskTopBlk, tid, blockType, sysIdx) void
+  %% It is more robust Async sys code 
+  %% to call async code from fcn-call initiator. Need find out
+  %% the callIdx conresponding to this subsystem. 
+  %openfile retBuf
+  %if !ISFIELD(SampleTime[tid], "DumpedAsyncOutputCode")
+    %assign foundExpCalledFC = TLC_FALSE
+    %% Go over each output function-call signal
+    %foreach callIdx = taskTopBlk.NumSFcnSysOutputCalls
+      %% Jump out of for-loop if expected called block has been found
+      %if foundExpCalledFC
+        %break
+      %endif
+      
+      %assign startingIdx = taskTopBlk.SFcnSystemOutputCallMappingInfo[callIdx].StartingIdx
+      %assign nCalledFC   = taskTopBlk.SFcnSystemOutputCallMappingInfo[callIdx].NumOfCalledFC
+      
+      %foreach fcIdx = nCalledFC
+        %assign recIdx = startingIdx + fcIdx
+        
+        %% Get the first block called by the element
+        %assign fcnCallBlkIdx = taskTopBlk.SFcnSystemOutputCall[recIdx].BlockToCall
+        %if ISEQUAL(fcnCallBlkIdx, "unconnected")
+          %continue
+        %endif
+        %assign fcnCallBlk = System[fcnCallBlkIdx[0]].Block[fcnCallBlkIdx[1]]
+        %assign fcnCallPort = taskTopBlk.SFcnSystemOutputCall[recIdx].FcnPortIdx
+        
+        %% For a fcn-call subsystem, we only need the systemIdx to determine if
+        %% this is the right subsystem, but for a Model block, we need the full
+        %% System, Block and Port indexes.
+        %assign makeCall = TLC_FALSE
+        %if (fcnCallBlk.Type == blockType)
+          %switch blockType
+            %case "SubSystem"
+              %assert SIZE(sysIdx,1) == 1
+              %assign makeCall = (sysIdx == fcnCallBlk.CallSiteInfo.SystemIdx)
+              %break
+              
+            %case "ModelReference"
+              %% For model reference, sysIdx will have this form:
+              %%
+              %%    [%<sysIdx>, %<blkIdx>, %<portIdx>]
+              %% 
+              %% See SLibCallModelBlockFcnCallInput in modelrefutil.tlc
+              %assert SIZE(sysIdx,1) == 3
+              %assign makeCall = (sysIdx[0] == fcnCallBlkIdx[0]) && ...
+                (sysIdx[1] == fcnCallBlkIdx[1]) && (sysIdx[2] == fcnCallPort)
+              %break
+              
+            %default
+              %assert 0
+              %break
+          %endswitch
+        %endif
+        %if makeCall
+          %<LibBlockExecuteFcnCall(taskTopBlk, callIdx)>\
+          %assign foundExpCalledFC = TLC_TRUE %% found expected called block
+          %break
+        %endif
+      %endforeach %% foreach fcIdx = nCalledFC
+    %endforeach %% foreach callIdx = taskTopBlk.NumSFcnSysOutputCalls
+    %addtorecord SampleTime[tid] DumpedAsyncOutputCode TLC_TRUE
+  %endif
+  %closefile retBuf
+  %return retBuf
+%endfunction  
+  
+%% Function: OpaqueTLCBlockGetAsyncSysCode ==========================
+%% Abstract: 
+%%   This function is called by the async sfcn block. The function 
+%% gets asyn code for called async subsystem. 
+%% 
+%function OpaqueTLCBlockGetAsyncSysCode(ssFcn, sysIdx, tid) void
+  %assert LibAsynchronousTriggeredTID(tid)
+  %assign taskTopBlk = FcnGetTaskTopSfcnBlock(tid)
+  %assign sysTid =  LibGetSubsystemTID(System[sysIdx],TLC_TRUE)
+
+  %openfile retBuf
+  %if (ssFcn == "Outputs" || ssFcn == "Output") && ...
+    tid == sysTid && !WHITE_SPACE(taskTopBlk)
+    %<SLibGetAsyncSysCodeForTaskTopBlk(taskTopBlk, tid, ...
+      "SubSystem", sysIdx)>
+  %else
+    %assign sys = System[sysIdx]
+    %if ssFcn == "Outputs" 
+      %assign ssFcn = "Output"
+    %endif
+    %if LibSystemIsInlined(sys) || !ISEQUAL(tid,sysTid)
+      %assign fieldname = "Cached%<ssFcn>%<tid>Fcn"
+      %if ISFIELD(System[sysIdx].InstanceCache, fieldname)
+        %<LibGetSystemField(System[sysIdx],fieldname)>
+      %endif
+    %else
+      %if !LibSystemFcnIsEmptyHelper(sys,ssFcn,tid)
+        %assign fcnInfo = LibGetFcnInfo(sys, ssFcn, tid)
+        %<fcnInfo.Name>(%<fcnInfo.CommonArgs>);
+      %endif
+    %endif
+  %endif
+  %closefile retBuf
+  
+  %return retBuf
+%endfunction
+
+%function OpaqueTLCBlockGetAsyncSysOutputCode(sysIdx, tid) void
+  %return OpaqueTLCBlockGetAsyncSysCode("Outputs", sysIdx, tid) 
+%endfunction
+
+%% Given a fcn type used in RTWFcnConst, find the corresponding
+%% BlockFcn value.
+%function SLibGetBlockFcnForFcnType(fcnType)
+
+  %switch fcnType
+    %case "InitializeConditions"
+      %return "Initialize"
+      %%break
+    %case "Outputs"
+      %return "Output"
+      %%break
+    %case "Derivatives"
+      %return "Derivative"
+      %%break
+    %case  "ZeroCrossings"
+      %return "ZeroCrossing"
+      %%break
+    %default
+      %return fcnType
+  %endswitch
+
+%endfunction
+
+%% Function FcnGenerateCodeFromModule ==========================
+%% Abstract:
+%%
+%function FcnGenerateCodeFromModule(block, system, fcnType) Output
+  %if SLibSystemFcnIsRateGroupType(fcnType)
+    %assign MultiTask_CodeBuffers = []
+    %foreach idx = NumSampleTimes
+      %assign MultiTask_CodeBuffers = MultiTask_CodeBuffers + ""
+    %endforeach
+    %assign moduleIdx   = system.CGIRModuleIdx
+    %assign moduleRec   = ::CompiledModel.RTWCGModules.RTWCGModule[moduleIdx]
+    %%Mark the accessed variables
+    %assign accessTid = FcnGetCurrentAccessTid() 
+    %assign fcnConst = "%<fcnType>_Function"
+    
+    %if FcnSysModuleIsRateGrouping(system, fcnType)
+      %assign baseTidOfTasks = %<moduleRec.RTWFcnConst.baseTidOfTasks>
+      %foreach i = SIZE(baseTidOfTasks,1)
+        %assign tid = baseTidOfTasks[i]
+        %assign bufIdx = ...
+          (SLibSystemFcnRateGrouping(system,fcnType) || ...
+          LibAsynchronousTriggeredTID(tid)) ? tid : 0
+        %assign MultiTask_CodeBuffers[bufIdx] = ...
+           FcnGenRateGroupedCodeFromModule(block, system, fcnType, tid)
+      %endforeach
+    %else
+      %assign bufIdx = FcnGetSubsystemCodeBufTID(system)
+      %assign MultiTask_CodeBuffers[bufIdx] = ...
+        FcnGenRateGroupedCodeFromModule(block, system, fcnType, "")
+    %endif
+    %assign tid01Eq = ISEQUAL(SolverType, "FixedStep") && FixedStepOpts.TID01EQ
+    %if tid01Eq
+      %assign localFcnType = (fcnType == "Outputs") ? "Output" : fcnType        
+      %%
+      %if LibIsSystemField(system, "Cached%<localFcnType>0LocalVars")
+        %%
+        %% combine buffer for tid0 and tid1 
+        %%
+        %assert WHITE_SPACE(MultiTask_CodeBuffers[0]) || ...
+          WHITE_SPACE(MultiTask_CodeBuffers[1])
+        %%
+        %assign localsForTID0 = ...
+          LibGetSystemField(system, "Cached%<localFcnType>0LocalVars")
+        %assign localsForTID1 = ...
+          LibGetSystemField(system, "Cached%<localFcnType>1LocalVars")
+        %<LibSetSystemField(system, "Cached%<localFcnType>1LocalVars", "")>
+        %assert ISEMPTY(localsForTID0) || ISEMPTY(localsForTID1)
+        %if ISEMPTY(localsForTID0)
+          %<LibSetSystemField(system, "Cached%<localFcnType>0LocalVars", ...
+            localsForTID1)>
+        %endif
+      %endif
+      %assign MultiTask_CodeBuffers[0] = ...
+        MultiTask_CodeBuffers[0] + MultiTask_CodeBuffers[1] 
+      %assign MultiTask_CodeBuffers[1] = ""
+    %endif
+    %return MultiTask_CodeBuffers
+  %else
+    %return FcnGenRateGroupedCodeFromModule(block, system, fcnType, "")
+  %endif
+%endfunction
+
+%function RTWFcnHasArgTid(fcnRec)
+  %return ISFIELD(fcnRec, "HasTidArg") && fcnRec.HasTidArg
+%endfunction
+
+%function RTWFcnHasArgCpi(fcnRec)
+  %return ISFIELD(fcnRec, "HasCpiArg") && fcnRec.HasCpiArg
+%endfunction
+
+%function SLibCGGenSystemFcn(system)
+  %if LibSystemIsReusedFcn(system) || ... 
+    system.SystemIdx == NumSystems-1 ||...
+      IsModelReferenceBaseSys(system)       
+    %% LibSystemIsReusedFcn(system) : call site code is generate in TLC
+    %% root system does not have call site code
+    %% mdlRef base system generates call site call in TLC
+    %% do nothing when call site code is generate in TLC. 
+    %% TLC tracks usage of tid. 
+    %return TLC_FALSE
+  %else
+    %return TLC_TRUE
+  %endif
+%endfunction
+
+
+%function FcnGenRateGroupedCodeFromModule(block, system, fcnType, tid) Output
+  %assign retBuf = ""
+  %assign genRateGroupedCode = (TYPE(tid) == "Number")
+  %assign moduleIdx   = system.CGIRModuleIdx
+  %assign moduleRec   = ::CompiledModel.RTWCGModules.RTWCGModule[moduleIdx]
+  %if moduleRec.CGSystemIdx == system.SystemIdx && ...
+    moduleRec.IsSignificantModuleFcnConst == "yes"
+    %assign ::activeSysIdx = system.SystemIdx
+    %assign fcnConst   = "%<fcnType>_Function"
+    %if genRateGroupedCode
+      %assign fcnConst = "%<fcnConst>TID%<tid>" 
+      %assign system.CurrentTID = tid
+    %else
+      %assign system.CurrentTID = LibGetSubsystemTID(system,TLC_TRUE)
+    %endif
+    
+    %%
+    %openfile retBuf
+    %if ISFIELD(moduleRec.RTWFcnConst, fcnConst)
+      %assign functionRec = moduleRec.RTWFcnConst.%<fcnConst>
+      %assign genType     = "Module%<moduleIdx>::%<fcnType>"
+      %assign filePath    = functionRec.TLCFileName
+      %generatefile "%<genType>" "%<filePath>"
+      %openfile tmpBuf
+      %if genRateGroupedCode
+        %assign tmpType = "%<fcnType>ForTID"
+        %<GENERATE_TYPE(block, tmpType, filePath, system,tid)>
+      %else
+        %<GENERATE_TYPE(block, fcnType, filePath, system)>
+      %endif
+      %assign unused = UNLOAD_GENERATE_TYPE(block, filePath)
+      %closefile tmpBuf 
+      %%
+      %if (NumContStates > 0  || isGRTMallocOnERT()) && ...
+        system.Type == "root" && fcnType == "Outputs" &&...
+        (!genRateGroupedCode || ISEQUAL(tid,0))
+        %<SLibAccessArgHelper(system.Interface.RTMArgDef,"",tid)>
+      %endif  
+      %if SLibCGGenSystemFcn(system) 
+        %if RTWFcnHasArgCpi(functionRec)
+          %% IR code need cpi. Info TLC that tid is required.
+          %%
+          %% Since tid can always hard code for rate grouped code
+          %% RTWFcn should need has tid arg if it is rate grouping. 
+          %<LibNeedCPI(system)>
+        %endif
+        %if RTWFcnHasArgTid(functionRec)
+          %% Since tid can always hard code for rate grouped code
+          %% RTWFcn should not have tid arg if it is rate grouping. 
+          %assert !genRateGroupedCode
+        %elseif FcnSysAccessedTID() && SLibSystemFcnTypeMayUseTid(fcnType)
+          %% code that is not in IR needs tid. Add local tid variable.
+          %<SLibSetNeedLocalTIDInSystem(system, fcnType)>
+        %endif
+      %endif
+      %assign genTimeManagementCode = TLC_FALSE
+      %if FcnSubsystemIsAsycnTopSS(system)
+        %assign sysTid = LibGetSubsystemTID(system, TLC_TRUE)
+        %assign genTimeManagementCode = !SLibAsyncSampleTimeGeneratesTimeManagementCode(sysTid)
+      %elseif (system.Type == "root")
+        %assign sysTid = tid
+        %assign genTimeManagementCode = LibAsynchronousTriggeredTID(sysTid) && ...
+          SLibAsyncSampleTimeGeneratesTimeManagementCode(sysTid)
+      %endif
+      %if genTimeManagementCode
+        %<FcnGenerateTimeManagementForAsyncTs(fcnType, sysTid,"top")>
+        %<tmpBuf>
+        %<FcnGenerateTimeManagementForAsyncTs(fcnType, sysTid,"bottom")>
+      %else
+        %<tmpBuf>
+      %endif
+    %endif
+    %closefile retBuf
+  %endif
+  %return retBuf
+  
+%endfunction
+
+%% Function: SLibCGSysFcnIsEmptyForTid =================================
+%% Abstract:
+%%    RTWCG calls this function before generate
+%% call site code for a subsystem function. When functions returns true, function
+%% body is empty and is elimiated in TLC.  No call site code should be generated. 
+%%
+%function SLibCGSysFcnIsEmptyForTid(system, fcn, callerTid) 
+  %if SLibSystemFcnRateGrouping(system, fcn) 
+    %assign calleeTid = LibGetSubsystemTID(system,TLC_TRUE)
+    %assign tid = LibAsynchronousTriggeredTID(calleeTid) ? calleeTid : callerTid
+    %assign isEmpty = LibSystemFcnIsEmptyHelper(system, fcn, tid)
+  %else
+    %assign isEmpty = LibSystemFcnIsEmpty(system,fcn)
+  %endif
+  
+  %return isEmpty
+%endfunction
+
+%% Function: SLibInsertUtility =================================================
+%% Abstract:
+%%   Registers a utility function to be processed by the TLC program.
+%%
+%function SLibInsertUtility(fcnName) void 
+  %assert !ISFIELD(::CompiledModel.SharedFunctions, fcnName)
+  %addtorecord ::CompiledModel.SharedFunctions %<fcnName> 1 
+  %<SETFIELD(FixPtUtils, fcnName, 1)>
+%endfunction
+
+%% Function: SLibLookupUtility =================================================
+%% Abstract:
+%%   Returns TLC_TRUE for a utility function name that has been procressed by
+%%   the TLC program already and TLC_FALSE otherwise.
+%%
+%function SLibLookupUtility(fcnName) void
+  %if ISFIELD(FixPtUtils, fcnName)
+    %%
+    %% Return true since the shared function has already been registered as
+    %% a fix-point utility before.
+    %%
+    %if !ISFIELD(::CompiledModel.SharedFunctions, fcnName)
+      %<SLibInsertUtility(fcnName)>
+    %endif
+    %return TLC_TRUE
+  %else
+    %%
+    %% The utility function will be handled as a regular shared function,
+    %% if it is not a fixpoint utility function that has been registered
+    %% already.
+    %%
+    %if ISFIELD(::CompiledModel.SharedFunctions, fcnName)
+      %return TLC_TRUE
+    %else
+      %return TLC_FALSE
+    %endif
+  %endif
+%endfunction
+
+%% Function: SLibLookupUtilityDecl =============================================
+%% Abstract:
+%%   Returns TLC_TRUE for a utility function declaration that has been
+%%   registered with the TLC program already and TLC_FALSE otherwise.
+%%
+%function SLibLookupUtilityDecl(fcnName) void
+  %return ISFIELD(::CompiledModel.SharedFunctionDecls, fcnName)
+%endfunction
+
+%% Function: SLibInsertUtilityDecl =============================================
+%% Abstract:
+%%   Registers a utility function declaration with the TLC program.
+%%
+%function SLibInsertUtilityDecl(fcnName) void 
+  %assert !ISFIELD(::CompiledModel.SharedFunctionDecls, fcnName)
+  %addtorecord ::CompiledModel.SharedFunctionDecls %<fcnName> 1 
+%endfunction
+
+%% Function SLibStartMdlRefGlobalDSM ===========================================
+%% Abstract:
+%%   Generate code to initialize a global DSM for the case of mdlref sim
+%function SLibStartMdlRefGlobalDSM(DataStoreName, DataStoreDataType, ModelIndex)
+  %assign simS = RTMGet("MdlRefSfcnS")
+  %openfile buffer
+  ssGetSFcnGlobalDataStoreNameAddrIdx(%<simS>, "%<DataStoreName>", "%<DataStoreDataType>", &(%<::CompiledModel.Name>_DSM[%<ModelIndex>]),&(%<::CompiledModel.Name>_DSMIdx[%<ModelIndex>] ));
+  %closefile buffer
+  %return buffer
+%endfunction
+
+%% Function SLibRegisterDSMAccess ======================================
+%% Abstract:
+%%   Generate code to register accessing a DSM
+%function SLibRegisterDSMAccess(simS, dsmIdx, readWrite, blockPath, idx, idxWidth) Output
+  %assign accessIdx = idx
+  %if ISEMPTY(idx)
+    %if idxWidth == 0
+      ss%<readWrite>DataStoreWithPath(%<simS>, ...
+        %<dsmIdx>, ...
+        "%<blockPath>", ...
+        NULL);
+    %else
+      ss%<readWrite>DataStoreRegionWithPath(%<simS>, ...
+        %<dsmIdx>, ...
+        "%<blockPath>", ...
+        NULL, ...
+        NULL);
+    %endif
+  %else
+    %if idxWidth > 1
+      {
+        int i;
+        for (i = 0; i < %<idxWidth>; i++) {
+      %assign accessIdx = accessIdx + "[i]"
+      ss%<readWrite>DataStoreElementWithPath(%<simS>, ...
+        %<dsmIdx>, ...
+        "%<blockPath>", ...
+        NULL, ...
+        %<accessIdx>);
+    %else
+      ss%<readWrite>DataStoreElementWithPath(%<simS>, ...
+        %<dsmIdx>, ...
+        "%<blockPath>", ...
+        NULL, ...
+        %<accessIdx>);
+    %endif
+  %endif
+  %if idxWidth > 1
+      }
+    }
+  %endif
+%endfunction
+
+%% Function SLibRegisterReadLocalDSM ======================================
+%% Abstract:
+%%   Generate code to register reading a local DSM
+%function SLibRegisterReadLocalDSM(dataStoreSource, blockPath, idx, idxWidth) Output
+  %assert Accelerator
+  %assign simS = "S"
+  %assign dsmIdx = dataStoreSource
+  %<SLibRegisterDSMAccess(simS, dsmIdx, "ReadFrom", blockPath, idx, idxWidth)>
+%endfunction
+
+%% Function SLibRegisterWriteLocalDSM =====================================
+%% Abstract:
+%%   Generate code to register writing to a local DSM
+%function SLibRegisterWriteLocalDSM(dataStoreSource, blockPath, idx, idxWidth) Output
+  %assert Accelerator
+  %assign simS = "S"
+  %assign dsmIdx = dataStoreSource
+  %<SLibRegisterDSMAccess(simS, dsmIdx, "WriteTo", blockPath, idx, idxWidth)>
+%endfunction
+
+%% Function SLibRegisterReadGlobalDSM ======================================
+%% Abstract:
+%%   Generate code to register reading a global DSM
+%function SLibRegisterReadGlobalDSM(dataStoreSource, blockPath, idx, idxWidth) Output
+  %if Accelerator
+    %assign simS = "S"
+    %assign dsmIdx = dataStoreSource
+  %else
+    %assign simS = RTMGet("MdlRefSfcnS")
+    %assign dsmIdx = "%<::CompiledModel.Name>_DSMIdx[%<dataStoreSource>]"
+  %endif
+  %<SLibRegisterDSMAccess(simS, dsmIdx, "ReadFrom", blockPath, idx, idxWidth)>
+%endfunction
+
+%% Function SLibRegisterWriteGlobalDSM =====================================
+%% Abstract:
+%%   Generate code to register writing to a global DSM
+%function SLibRegisterWriteGlobalDSM(dataStoreSource, blockPath, idx, idxWidth) Output
+  %if Accelerator
+    %assign simS = "S"
+    %assign dsmIdx = dataStoreSource
+  %else
+    %assign simS = RTMGet("MdlRefSfcnS")
+    %assign dsmIdx = "%<::CompiledModel.Name>_DSMIdx[%<dataStoreSource>]"
+  %endif
+  %<SLibRegisterDSMAccess(simS, dsmIdx, "WriteTo", blockPath, idx, idxWidth)>
+%endfunction
+
+%% Function: SLibGetVarGroupRTMName ============================================
+%% Abstract:
+%%   Returns the model reference root model structure element name for a 
+%%   var-group type.
+%%
+%function SLibGetVarGroupRTMName(varGroupCategory) void
+  %switch varGroupCategory
+    %case "BlockIO"
+      %return "rtb"
+      %%break
+    %case "DWork"
+      %return "rtdw"
+      %%break
+    %case "ZCEvent"
+      %return "rtzce"
+      %%break
+    %default
+      %assert TLC_FALSE
+  %endswitch
+  %return "rtm"
+%endfunction
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%   Functions handle VarGroup and cgType                    %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Function SLibGetDataRecForVarGroupMember ====================================
+%% Abstract: 
+%%    Return the record associated with the data 
+%%    of a member in vargroup. 
+%% 
+%%  + root
+%%  | data
+%%  |----+ subSysNode1
+%%  |    |  data1
+%%  |    |---+ reusableSys11
+%%  |    |     data11
+%%  |    |---+ subsystem12
+%%  |          data12
+%%  |----+ reusableSysNode2
+%%  |      data21
+%%  |----+ subSysNode3
+%%         data31
+%%
+%% The order of data in vargroups is sorded by hstructure as following
+%%        data
+%%        data1
+%%        data12
+%%        data31
+%%        NestStrcutFor reusableSys11
+%%        NestStrcutFor reusableSys2
+%% 
+%% Dwork, blockIO and ConstBlkIO use the same order. 
+%%
+%% ContStates, ContStatesDisabled, ContStatesDerivative and
+%% ZCEvent, ZCSignal use different order, which is: 
+%%        data
+%%        data1
+%%        NestStrcutFor reusableSys11
+%%        data12
+%%        NestStrcutFor reusableSys2
+%%        data31
+%%
+%%  Since vargroup doesn't support this ordering yet. We can't use
+%%  vargroup to generate def for these datas. 
+%%  RTWCG should create vargroup using above order for 
+%%  ContStates, ContStatesDisabled, ContStatesDerivative and
+%%  ZCEvent, ZCSignal. byu
+%% 
+%function SLibGetDataRecForVarGroupMember(recType, recIdx)
+  %assert recIdx >= 0
+  %switch recType
+    %case "W"
+    %case "LDW"
+      %return DWorks.DWork[recIdx]
+      %%break
+    %case "B"
+      %return BlockOutputs.GlobalBlockOutput[recIdx]
+      %%break
+    %case "C"
+      %return BlockOutputs.ConstBlockOutput[recIdx]
+      %%break
+    %case "L"
+      %return BlockOutputs.LocalBlockOutput[recIdx]
+      %%break
+    %case "S"  %% StackVar
+    %case "UB" %% UnusedBits
+    %case "VG" %% VarGroup
+    %case "PD" %% padd element
+      %break
+    %default
+      %assert TLC_FALSE
+  %endswitch
+  %return ""
+%endfunction
+
+%function SLibVarGroupTypeNameForRecordType(recType)
+  %switch recType
+    %case "W"
+      %return "DWork"
+      %%break
+    %case "B"
+      %return "BlockIO"
+      %%break
+    %case "C"
+      %return "ConstBlockIO"
+      %%break
+    %case "S"  %% StackVar      
+    %case "UB" %% UnusedBits
+    %case "VG" %% VarGroup
+    %case "PD" %% padd element
+    %case "L"  %% local block output converted to global
+    %case "LDW" %% local scratch dwork converted to global
+      %break
+    %default
+      %assert TLC_FALSE
+  %endswitch
+  %return ""
+%endfunction
+
+%function SLibGetTypeNameFromCGType(cgType)
+  %assign typeName = ""
+  %if ISFIELD(cgType, "Name")
+    %assign typeName = cgType.Name
+  %else
+    %if cgType.Width > 1
+      %assign baseCGType = ::CompiledModel.CGTypes.CGType[cgType.BaseIdx]
+      %assign typeName   = SLibGetTypeNameFromCGType(baseCGType)
+    %elseif cgType.Constructor == "pointer"
+      %assign baseCGType = ::CompiledModel.CGTypes.CGType[cgType.BaseIdx]
+      %assign typeName   = SLibGetTypeNameFromCGType(baseCGType) + "*"
+    %elseif cgType.Constructor == "complex"
+      %assign baseCGType = ::CompiledModel.CGTypes.CGType[cgType.BaseIdx]
+      %assign typeName   = "c" + SLibGetTypeNameFromCGType(baseCGType)
+    %elseif cgType.Constructor == "matrix"
+      %assign baseCGType = ::CompiledModel.CGTypes.CGType[cgType.BaseIdx]
+      %assign typeName   = SLibGetTypeNameFromCGType(baseCGType)
+    %elseif cgType.Constructor == "string"
+      %assign typeName   = "char*"
+    %else
+      %% Always assert
+      %assert TLC_FALSE
+    %endif
+  %endif
+  %return typeName
+%endfunction 
+
+%function SLibGetDataDefFromCGType(cgType, dataName, bitFieldWidth, comment) void
+  %assign typeName = SLibGetTypeNameFromCGType(cgType)
+  %assign width = cgType.Width
+  
+   %if (ISEQUAL(typeName,"CAN_MESSAGE_STANDARD") || ISEQUAL(typeName,"CAN_MESSAGE_EXTENDED") || ISEQUAL(typeName,"CAN_MESSAGE"))
+    %assign typeName = "CAN_DATATYPE"
+  %endif
+  
+  %if (ISEQUAL(typeName,"SCP_RX") || ISEQUAL(typeName,"SCP_TX"))
+    %assign typeName = "SCP_FRAME"
+  %endif
+
+  %assign retBuf = ""
+  %assign c_comment = ISEMPTY(comment) ? "" : "/* " + comment + " */"
+  %openfile retBuf
+  %if width == 1 && cgType.Constructor != "matrix"
+    %assign optBitField = bitFieldWidth > 0 ? ":%<bitFieldWidth>" : ""
+    %<typeName> %<dataName>%<optBitField>; %<c_comment>
+  %else
+    %assert bitFieldWidth == 0
+    %<typeName> %<dataName>[%<width>]; %<c_comment>
+  %endif
+  %closefile retBuf
+  %return retBuf
+%endfunction
+
+%% Function: SLibGetVarGroupTypeDef ===========================================
+%% Abstract: 
+%%  Returns the structured type definition for a given vargroup.
+%%
+%function SLibGetVarGroupTypeDef(aVarGroup)
+  %assign cgType = ::CompiledModel.CGTypes.CGType[aVarGroup.CGTypeIdx] 
+  %assert cgType.Constructor == "struct"
+  %openfile tmpBuffer
+  %assign define = "_" + FEVAL("upper", cgType.Name) + "_"
+  typedef struct {
+    %foreach mIdx = cgType.Members.NumMembers
+      %assign member = cgType.Members.Member[mIdx]
+      %assign memberType = ::CompiledModel.CGTypes.CGType[member.CGTypeIdx]
+      %<SLibGetDataDefFromCGType(memberType, member.Name, 0, "")>
+    %endforeach
+  } %<cgType.Name>;
+  %closefile tmpBuffer
+  %return tmpBuffer
+%endfunction
+
+%function SLibGetSystemDataDefUsingVarGroup(sysIdx, aVarGroupType) void
+  %assign res  = ["", 0, 0]  %% the third element is the struct alignment
+  %assign varGroupIdx = FcnSysVarGroupIndex(System[sysIdx], aVarGroupType, 0)
+  %assign numFields = 0
+  %if varGroupIdx >= 0
+    %assign varGroup = ::CompiledModel.VarGroups.VarGroup[varGroupIdx]
+    %assign cgType   = ::CompiledModel.CGTypes.CGType[varGroup.CGTypeIdx] 
+    %% The following two variables are used to control the names of items in
+    %% the code to prevent empty structure types in the case of code variants
+    %assign hasElement = varGroup.HasElement
+    %assign dummyElementName = "_rt_unused"
+    
+    %if cgType.Constructor == "matrix"
+      %assign cgType = ::CompiledModel.CGTypes.CGType[cgType.BaseIdx]
+    %endif
+    
+    %assert cgType.Constructor == "struct"
+    %assert cgType.Members.NumMembers == varGroup.NumVarGroupElements
+    %assign res[2] = cgType.StructAlignment
+    %with cgType.Members
+      %openfile tmpBuf
+      %assign hasDataArg = TLC_FALSE
+      %assign hasUnconditionalElement = TLC_FALSE
+      %assign prevSubStructIdx = -1
+      %foreach mIdx = NumMembers
+        %assign idnum   = IDNUM(varGroup.VarGroupElements[mIdx])
+        %assign subStructIdx  = varGroup.NumSubStructs > 0 ? ...
+          varGroup.SubStructIndex[mIdx] : -1
+        %assign recType = idnum[0]
+        %assign recIdx  = idnum[1]
+        %assign dataRec = ""
+        %assign cgTypeIdxOfMember = Member[mIdx].CGTypeIdx
+        %assign cgTypeOfMember    = ::CompiledModel.CGTypes.CGType[cgTypeIdxOfMember]
+        %assign PreprocessorCond_start = ""
+        %assign PreprocessorCond_end   = ""
+        %assign dataDefFromRec         = ""
+        %assign padding                = ""
+        %assign typeQualifier          = ""
+        %assign bitFieldWidth          = 0
+        %assign needGenDataDefFromVarGroup = TLC_FALSE
+        %assign mayRequireDataRecGenDef    = TLC_TRUE
+        %if recType != "VG" %% not a vargroup          
+          %assign dataRec     = SLibGetDataRecForVarGroupMember(recType, recIdx)
+          %assign recTypeName = SLibVarGroupTypeNameForRecordType(recType)
+          %assign dataGrBlk   = ...
+            ISEMPTY(dataRec) ? [] : SLibGrBlock(dataRec.GrSrc)
+          %switch recType
+            %case "B"
+              %assign needGenDataDefFromVarGroup = ...
+                !dataRec.RequiredInBlockIO[0] == 0
+              %break
+            %case "C"
+              %assign typeQualifier = dataRec.DoNotConstify ? "" : "const"
+              %assign needGenDataDefFromVarGroup = ...
+                ::CompiledModel.PadderActive || dataRec.RequiredInConstBlockIO
+              %assign mayRequireDataRecGenDef = TLC_FALSE
+              %break
+            %case "W"
+              %if dataRec.SigSrc[0] >= 0 && dataRec.SigSrc[2] >= 0 %% not virtual
+                %assign ownerBlk = ...
+                  ::CompiledModel.System[dataRec.SigSrc[0]].Block[dataRec.SigSrc[2]]
+                %if ownerBlk.Type == "ModelReference"
+                  %assign PreprocessorCond_start = ...
+                    SLibMdlRefIfLocalPreprocessorCondition(ownerBlk)
+                  %assign PreprocessorCond_end   = ...
+                    SLibMdlRefEndIfLocalPreprocessorCondition(ownerBlk)
+                %endif
+                %assign needGenDataDefFromVarGroup = ...
+                  dataRec.StorageClass == "Auto" && ...
+                  !dataRec.OptimizedAwayInTLC && ...
+                  !FcnIsDWorkFromMdlBlockWithCppEncapLang(dataRec)
+              %elseif ISFIELD(::CompiledModel.System[sysIdx], "Block")
+                %assign dataRec.SigSrc[0] = sysIdx
+                %assign needGenDataDefFromVarGroup = TLC_TRUE
+              %else 
+              %% special handling for the case where a root inport 
+              %% expects undefined signal
+                %assign needGenDataDefFromVarGroup = TLC_FALSE
+              %endif 
+              %break
+            %case "L"
+            %case "LDW"
+            %case "S"
+            %case "PD"
+              %assign needGenDataDefFromVarGroup = TLC_TRUE
+              %assign mayRequireDataRecGenDef    = TLC_FALSE
+              %break
+            %case "UB"
+              %assign needGenDataDefFromVarGroup = TLC_TRUE
+              %assign mayRequireDataRecGenDef    = TLC_FALSE
+              %assign bitFieldWidth              = recIdx
+              %break
+            %default
+              %assert TLC_FALSE
+          %endswitch
+          %if needGenDataDefFromVarGroup && mayRequireDataRecGenDef
+            %assign dataDefFromRec = ...
+              FcnGen%<recTypeName>DefNotHandledInVarGroup(dataRec)
+            %if !WHITE_SPACE(dataDefFromRec)
+              %assign needGenDataDefFromVarGroup = TLC_FALSE
+              %assign hasDataArg = TLC_TRUE
+            %endif
+          %endif
+          %if !ISEMPTY(dataRec) && dataRec.Padding != 0 
+            %assign optPadWidth = LibOptionalVectorWidth(dataRec.Padding)
+            %assign padding =  "char pad_%<Member[mIdx].Name>%<optPadWidth>;"
+          %endif
+          %if ISEMPTY(dataRec)
+            %assign comment = ""
+          %else
+            %assign comment = SLibReferencedBy(dataRec)
+          %endif
+        %else
+          %assign subVarGroup = ::CompiledModel.VarGroups.VarGroup[recIdx]
+          %assign cs = ...
+            System[subVarGroup.SysIdx].CallSites[subVarGroup.InstanceIdx]
+          %assign dataGrBlk = System[cs[2]].Block[cs[3]]
+          %assert dataGrBlk.Type == "SubSystem"
+          %assign PreprocessorCond_start = ...
+            SLibIfLocalPreprocessorCondition(dataGrBlk)
+          %assign PreprocessorCond_end   = ...
+            SLibEndIfLocalPreprocessorCondition(dataGrBlk)
+          %assign dataGrSysIdx = dataGrBlk.CallSiteInfo.SystemIdx
+          %assign dataGrSys    = System[dataGrSysIdx]
+          %assign needGenDataDefFromVarGroup = ...
+            !dataGrSys.StandaloneSubsystem && (dataGrSys.Has%<aVarGroupType>Arg)
+          %assign comment = ""
+          %if !ISEMPTY(dataGrBlk) 
+            %assign comment = LibGetChildSystemStructCommentName(sysIdx, dataGrBlk)
+          %endif
+        %endif
+        %%
+        %%
+        %% handling sub-structures
+        %%
+        %openfile subStructBuffer
+        %if prevSubStructIdx != subStructIdx
+          %if prevSubStructIdx != -1
+             } %<varGroup.SubStuctNames[prevSubStructIdx]>;
+           %endif
+           %if subStructIdx != -1
+             struct {
+           %endif
+           %assign prevSubStructIdx = subStructIdx           
+        %endif
+        %if needGenDataDefFromVarGroup
+          %assign align=""
+          %assign alignment = varGroup.Alignment
+          %if !ISEMPTY(Member[mIdx]) && Member[mIdx].Alignment > alignment
+            %assign alignment = Member[mIdx].Alignment
+          %endif
+          
+          %if alignment > 0 && fieldAlign %% if aligning field is supported
+            %assign align = SLibGetAlignmentSyntax(::CompiledModel.Name, Member[mIdx].Name, ...
+              typeQualifier, alignment, "DATA_ALIGNMENT_STRUCT_FIELD")
+          %else
+            %if alignment > res[2]  %% propagate to struct alignment if aligning field is not supported
+              %assign res[2] = alignment
+            %endif
+          %endif
+          %<align> %<typeQualifier> %<SLibGetDataDefFromCGType(cgTypeOfMember, ...
+                                    Member[mIdx].Name, bitFieldWidth, comment)>
+          %assign hasDataArg = TLC_TRUE
+        %else
+          %<dataDefFromRec>
+        %endif
+        %<padding>
+        %closefile subStructBuffer
+        %%
+        %if !WHITE_SPACE(subStructBuffer)
+          %% PreprocessorCond_start/end are empty except for variants
+          %<PreprocessorCond_start>
+          %<subStructBuffer>
+          %if ISEMPTY(PreprocessorCond_start)
+            %assign hasUnconditionalElement = TLC_TRUE
+          %else       
+            # define %<hasElement>
+          %endif
+          %<PreprocessorCond_end>
+        %endif
+        %%
+        %if hasDataArg
+          %if !System[sysIdx].Has%<aVarGroupType>Arg
+            %assign System[sysIdx].Has%<aVarGroupType>Arg = TLC_TRUE
+            %% For model reference, we igore anything set in the root system
+            %if !(IsModelReferenceTarget() && (NumSystems-1 == sysIdx))
+              %assign ::CompiledModel.Has%<aVarGroupType>Arg = TLC_TRUE
+            %endif
+          %endif
+          %assign numFields = numFields + 1
+        %endif
+      %endforeach
+      %%
+      %% Closing a possible open sub-structure
+      %%
+      %if prevSubStructIdx != -1
+        } %<varGroup.SubStuctNames[prevSubStructIdx]>;
+      %endif
+      %if !hasUnconditionalElement
+        #ifndef %<hasElement>
+        char %<dummyElementName>;
+        #endif
+      %endif        
+      %closefile tmpBuf
+      %assign res[0] = tmpBuf
+      %assign res[1] = numFields
+    %endwith
+  %endif
+  %<LibSetFieldSet(System[sysIdx], "Has" + aVarGroupType + "Arg")>
+  %return res
+%endfunction
+
+%% Function SLibCGIRMutexOp ====================================================
+%% Abstract: 
+%%    This dummy function is an example for target author to write their own 
+%%    LibGenTargetSpecificMutex.
+%%    MutextOpType is the type of operation for mutual exclusion (e.g. mutex):
+%%      0: Create or initialize mutual exclusion. 
+%%      1: Lock  
+%%      2: Unlock
+%%      3: Destroy mutual exclusion
+%%
+%%    mutexDW is a void pointer. This is a block DWork used to
+%%    save mutual exclusion pointer or ID. 
+%%
+%function SLibCGIRMutexOp(MutexOpType, mutexDW)  
+  %if TargetRegistMutexOp && SLibConcurrentTasks() 
+    %assign doTflLookup = FEVAL("slfeature","TFLEnableSemaphoreSupport")
+    %if doTflLookup == 1
+      %return SLibGenPlatformSpecificMutexThruTFLLookup(MutexOpType, mutexDW)
+    %else
+      %return LibGenTargetSpecificMutex(MutexOpType, mutexDW)
+    %endif
+  %else
+    %if ::CompiledModel.ConcurrentTasks == "yes" 
+      %assign warnTxt = "Generating example Mutex code for illustration purpose only. "...
+        "To support data transfer for concurrent tasks, target must include "...
+        "'TargetRegisterMutexOp = 1' in target system file and "...
+        "provide tlc file to generate target specific mutex implementation code"
+      %<LibReportWarning(warnTxt)>
+      %assign ::CompiledModel.ConcurrentTasks = "dummy"
+    %endif
+    %return SLibCGIRDummyMutex(MutexOpType, mutexDW)
+  %endif
+%endfunction
+
+%function SLibCGIRDummyMutex(MutexOpType,mutexDW)
+  %switch (MutexOpType)
+    %case 0
+      %return " /* %<mutexDW> = semBCreate(SEM_Q_PRIORITY, SEM_EMPTY); */ \n" 
+    %case 1 
+      %return"/* semTake(%<mutexDW>, WAIT_FOREVER) */ \n"
+    %case 2 
+      %return "/* semGive(%<mutexDW>)  */ \n"
+    %case 3
+      %return "/* semDelete(%<mutexDW>) */ \n"
+    %default
+      %return " error out \n"
+  %endswitch
+%endfunction
+
+%% Function SLibCGIRSynchroOp ==================================================
+%% Abstract: 
+%%    This dummy function is an example for target author to write their own 
+%%    LibGenTargetSpecificSynchro.
+%%    SynchroOpType is the type of operation for synchronization:
+%%      0: Create or initialize synchronization operation (e.g. semaphore) 
+%%      1: Wait for synchronization 
+%%      2: Send synchronization request
+%%      3: Destroy synchronization operation.
+%%
+%%    synchroDW is a void pointer. This is a block DWork used to save the 
+%%       synchronization pointer or ID. 
+%%
+%%    initVal is an integer used to specify the initial value of the semaphore.
+%%
+%function SLibCGIRSynchroOp(SynchroOpType, synchroDW, initVal) void 
+  %if TargetRegistSynchroOp && SLibConcurrentTasks()
+    %assign doTflLookup = FEVAL("slfeature","TFLEnableSemaphoreSupport")
+    %if doTflLookup == 1
+      %% START_ASSERT
+      %assign msg = "TLC TFL solution is not supported for Synchronous Semaphore mode"
+      %<LibReportFatalError(msg)>
+      %% END_ASSERT
+    %else
+      %return LibGenTargetSpecificSynchro(SynchroOpType, synchroDW, initVal)
+    %endif
+  %else  
+    %if ::CompiledModel.ConcurrentTasks == "yes" 
+      %assign warnTxt = "Generating example Semaphore code for illustration purpose only. "...
+        "To support data transfer for concurrent tasks, target must include "...
+        "'TargetRegisterSynchroOp = 1' in target system file and "...
+        "provide tlc file to generate target specific semaphore implementation code"
+      %<LibReportWarning(warnTxt)>
+      %assign ::CompiledModel.ConcurrentTasks = "dummy"
+    %endif
+    %return SLibCGIRDummySynchro(SynchroOpType,synchroDW, initVal)
+  %endif
+%endfunction
+
+%function  SLibCGIRDummySynchro(SynchroOpType, synchroDW, initVal) void
+  %switch (SynchroOpType)
+    %case 0
+      %return " /* %<synchroDW> = semBCreate(SEM_Q_PRIORITY, SEM_EMPTY); */ \n" 
+    %case 1 
+      %return"/* semTake(%<synchroDW>, WAIT_FOREVER) */ \n"
+    %case 2 
+      %return "/* semGive(%<synchroDW>)  */ \n"
+    %case 3
+      %return "/* semDelete(%<synchroDW>) */ \n"
+    %default
+      %return " error out \n"
+  %endswitch
+%endfunction
+
+
+%function SLibCGIRIsSampleHit(tid, compIdx) void
+  %if !LibIsDeploymentDiagram()
+    %return LibIsSampleHit(tid)
+  %else
+    %return SLibDeploymentIsSampleHit(tid, compIdx)
+  %endif
+%endfunction
+
+  
+%function SLibCreateRecordForMutex(key)
+  %createrecord FcnRec {Name key; NumArgs 1; NumDWorkArgs 1}  
+  %addtorecord FcnRec ArgList {Expr ""; TypeId tSS_VOID; IsPtr 0; IsCplx 0; IsConst 0} 
+  %addtorecord FcnRec DWorkArgList {Expr ""; TypeId tSS_VOID; IsPtr 1; IsDoublePtr 0; IsCplx 0; IsConst 0}
+  %return FcnRec
+%endfunction %% SLibCreateRecord 
+
+
+%function SLibGenPlatformSpecificMutexThruTFLLookup(MutexOpType, mutexDW)
+  %% create record to query TFL
+  %switch(MutexOpType)
+    %case 0
+      %assign key = "RTW_MUTEX_INIT"
+      %break
+    %case 1
+      %assign key = "RTW_MUTEX_LOCK"
+      %break
+    %case 2
+      %assign key = "RTW_MUTEX_UNLOCK"
+      %break
+    %case 3
+      %assign key = "RTW_MUTEX_DESTROY"
+      %break
+    %default
+      %return " error out \n"
+      %%break
+  %endswitch    
+  
+  %assign FcnRec = SLibCreateRecordForMutex(key)
+  %assign FcnRec.DWorkArgList.Expr = mutexDW
+
+  %assign FcnInfo = SLibGenFcnCallInfo(FcnRec, TLC_FALSE)
+  %assign callExpr = "%<FcnInfo.Expr>; \n"
+  %return callExpr
+
+%endfunction %% SLibGenPlatformSpecificMutexThruTFLLookup
+    
+  
+/%  LocalWords:  DWork ZCSV ZC GMM SLib rhs Iter Concat Addr zc pzc YQualifier
+ %/
+/%  LocalWords:  deref ret reim UQualifier Expr iter ASYNC Proto Async Cpi DSM
+ %/
+/%  LocalWords:  rtb rtdw rtzce rtm UB DATATYPE SCP
+ %/

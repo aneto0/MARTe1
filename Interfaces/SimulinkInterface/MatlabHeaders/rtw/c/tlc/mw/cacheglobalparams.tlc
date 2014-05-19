@@ -1,0 +1,89 @@
+%% ============================================================================
+%% Abstract:
+%%   This file contains helper functions to cache data in the binfo.mat file
+%%
+%% Copyright 1994-2010 The MathWorks, Inc.
+%%
+
+%if EXISTS("_CACHEGLOBALPARAMS_") == 0
+%assign _CACHEGLOBALPARAMS_ = 1
+
+%% Function: GenAndCacheGlobalParamsInMatFile  =====================
+%% Abstract:
+%%     Cache global params data in the mat file
+%function GenAndCacheGlobalParamsInMatFile() void
+  
+  %with ::CompiledModel  
+    %% mdlRTW: no code is generated. this information is cached in binfo.mat
+    %assign rootIdx    = NumSystems-1
+    %assign sysIdx     = NumSystems-2
+    %if IsModelReferenceTarget()    
+      %assign thisSystem = System[sysIdx]
+    %else
+      %assign thisSystem = System[rootIdx]
+    %endif
+    %assign interface  = thisSystem.Interface
+    
+    %with interface
+      
+      %createrecord blkInterface { Name  "%<Name>"}
+      
+      %% Add IgnoreCustomStorageClasses (needed for checking GlobalParamsChecksum)
+      %addtorecord blkInterface IgnoreCustomStorageClasses %<IgnoreCustomStorageClasses>
+      
+      %% The GlobalParamsList is a vector of strings (parameter-names).
+      %% We store this in the mat-file as a comma-seperated list of variables
+      %% which is used for checksum testing in several places. Currently, code
+      %% that relies on this list is not robust to white-space between the 
+      %% parameters, so we cannot simply dump the vector using ...
+      %% %assign csv = "%<values>"
+      %% %if !ISEMPTY(csv)
+      %%    %assign csv[0] = "\""
+      %%    assign csv[SIZE(csv,1)-1] = "\""
+      %% %endif
+
+      %assign values = ::CompiledModel.ModelParameters.GlobalParamsList
+      %assign varList = "\"\""
+      %if !ISEMPTY(values)
+        %assign comma = ","
+        %assign varList = "\""
+        %foreach idx = SIZE(values,1)
+          %assign varList = varList + values[idx] + comma
+        %endforeach
+        %assign varList[SIZE(varList,1)-1] = "\""
+      %endif
+      
+      %% Add GlobalParamInfo
+      %with ModelParameters
+	%createrecord globalParamInfo { \
+	  VarList  %<varList>; \
+	  Checksum "%<GlobalParamsChecksum>" \
+	}
+      %endwith %% ModelParameters
+      %addtorecord blkInterface GlobalParamInfo %<globalParamInfo>
+
+    %endwith %% interface
+    
+  %endwith %% CompiledModel
+  
+  %<CacheDataInMatInfoFile(Name, "addGlobalsInfo", blkInterface)>
+%endfunction
+
+%% Function: CacheDataInMatInfoFile  =============================
+%% Abstract:
+%%      Store data in .mat file.
+
+%function CacheDataInMatInfoFile(mdlref, type, interface) void
+  
+  %if IsModelReferenceTarget()
+    %assign targetType = IsModelReferenceSimTarget() ? "SIM" : "RTW"
+  %else
+    %assign targetType = "NONE"
+  %endif
+  %assign rtwinfomat = FEVAL("rtwprivate", "rtwinfomatman", ...
+    type, "binfo", "%<mdlref>", "%<targetType>", interface)
+
+
+%endfunction
+
+%endif %% _CACHEGLOBALPARAMS_

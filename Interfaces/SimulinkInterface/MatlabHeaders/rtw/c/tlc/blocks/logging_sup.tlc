@@ -1,0 +1,318 @@
+%%
+%% Copyright 2011 The MathWorks, Inc.
+%%
+%% Abstract: Logging helper functions target file
+
+%% Function: createH5LoggingCollectionWriteCall =================================
+%function createH5LoggingCollectionWriteCall( ...
+  block, ...
+  system, ...
+  portIdx, ...
+  leafIdx, ...
+  tt, ...
+  varPath ...
+  ) Output
+  
+  {
+    real_T t;
+    void *u;
+    t = %<tt>;
+    u = (void *)%<varPath>;
+    errMsg = rtwH5LoggingCollectionWrite( ...
+      %<::CompiledModel.ErrorXMLMode>, ...
+      fp, ...
+      %<leafIdx>, ...
+      t, ...
+      u ...
+      );
+    %assign nulldef = SLibGetNullDefinitionFromTfl()
+    if (errMsg != %<nulldef>) {
+      %<RTMSetErrStat("errMsg")>;
+      return;
+    }
+  }
+%endfunction %% createH5LoggingCollectionWriteCall
+
+%% Function: createH5LoggingCollectionWriteCallsRecursion =======================
+%function createH5LoggingCollectionWriteCallsRecursion( ...
+  block, ...
+  system, ...
+  varPath, ...
+  dTypeId, ...
+  leafIdx, ...
+  tt ...
+  ) Output
+  %assign nChildren = LibDataTypeNumElements(dTypeId)
+  %if nChildren == 0
+    %<createH5LoggingCollectionWriteCall(block, system, 0, leafIdx, tt, varPath)>
+    %assign leafIdx = leafIdx + 1
+  %else
+    %foreach childNo = nChildren
+      %assign childDTypeId = LibDataTypeElementDataTypeId(dTypeId, childNo)
+      %assign childSignalName = LibDataTypeElementName(dTypeId, childNo)
+      %assign childVarPath = varPath + "." + childSignalName
+      %assign leafIdx = %<createH5LoggingCollectionWriteCallsRecursion( ...
+        block, ...
+        system, ...
+        childVarPath, ...
+        childDTypeId, ...
+        leafIdx, ...
+        tt ...
+        )>
+    %endforeach
+  %endif
+  %return leafIdx
+%endfunction %% createH5LoggingCollectionWriteCallsRecursion
+
+%% Function: createH5LoggingCollectionWriteCallsRecursionTop ====================
+%function createH5LoggingCollectionWriteCallsRecursionTop( ...
+  block, ...
+  system, ...
+  tt ...
+  ) Output
+  %assign dTypeId = LibBlockInputSignalDataTypeId(0)
+  %assign varPath = LibBlockInputSignalAddr(0, "", "", 0)
+  %assign leafIdx = 0
+  %assign tmp = %<createH5LoggingCollectionWriteCallsRecursion( ...
+    block, ...
+    system, ...
+    varPath, ...
+    dTypeId, ...
+    leafIdx, ...
+    tt ...
+    )>
+%endfunction %% createH5LoggingCollectionWriteCallsRecursionTop
+
+%% Function: getPortTid =========================================================
+%function getPortTid(block, system, portIdx) void
+  %if EXISTS(InputPortTIDs)
+    %assign portTid = InputPortTIDs[portIdx]
+  %elseif ISEQUAL(TID, "constant")
+    %assign portTid = -2
+  %else
+    %assign portTid = TID
+  %endif
+  %return portTid
+%endfunction %% getPortTid
+
+%% Function: logMatFileV4 =======================================================
+%function logMatFileV4(block, system, tt) Output
+  %assign nulldef = SLibGetNullDefinitionFromTfl()
+  %assign width = LibGetRecordWidth(DataInputPort[0])   
+  %assign decimation = LibBlockIWork(Decimation, "", "", 0)
+  %assign condStr = "!(++%<decimation> % %<ParamSettings.Decimation>)"
+  %assign maxEls = 100000000 %% 10^8
+  %assign condStr = condStr + " && " + ...
+    "(%<LibBlockIWork(Count, "", "", 0)>*%<width + 1>)+1 < %<maxEls>"
+  if ( %<condStr> ) {
+    FILE *fp = (FILE *) %<LibBlockPWork(FilePtr, "", "", 0)>;
+    
+    if(fp != %<nulldef>) {
+      real_T u[%<width + 1>];
+      
+      %<decimation> = 0;
+      
+      u[0] = %<tt>;
+      %foreach idx = width
+        u[%<idx+1>] = %<LibBlockInputSignal(0, "", "", idx)>;
+      %endforeach
+      
+      if (fwrite(u, sizeof(real_T), %<width+1>, fp) != %<width+1>) {
+        %assign fnStr  = STRING(ParamSettings.Filename)
+        %assign errMsg = "\"Error writing to MAT-file %<fnStr>\""
+        %<RTMSetErrStat(errMsg)>;
+        return;
+      }
+      
+      if (((++%<LibBlockIWork(Count, "", "", 0)>)*%<width + 1>)+1 >= %<maxEls>) {
+        %assign fnStr  = STRING(ParamSettings.Filename)
+        (void)fprintf(stdout,
+        "*** The ToFile block will stop logging data before\n"
+        "    the simulation has ended, because it has reached\n"
+        "    the maximum number of elements (%<maxEls>)\n"
+        "    allowed in MAT-file %<fnStr>.\n");
+      }
+    }
+  }
+%endfunction %% logMatFileV4
+
+%% Function: logMatFileV73 ======================================================
+%function logMatFileV73(block, system, portIdx, tt) Output
+  %assign nulldef = SLibGetNullDefinitionFromTfl()
+  %assign busLogging = ParamSettings.busLogging
+  const char *errMsg = %<nulldef>;
+  void *fp = (void *) %<LibBlockPWork(FilePtr, "", "", 0)>;
+  if(fp != %<nulldef>) {
+    %if busLogging
+      %<logMatFileV73BusLoggingOn(block, system, portIdx, tt)>
+    %else
+      %assert(%<portIdx> == 0)
+      %<logMatFileV73BusLoggingOff(block, system, tt)>
+    %endif
+  }
+%endfunction %% logMatFileV73
+
+%% Function: logMatFileV73BusLoggingOff =========================================
+%function logMatFileV73BusLoggingOff(block, system, tt) Output
+  %assign nulldef = SLibGetNullDefinitionFromTfl()
+  {
+    real_T t;
+    void *u;
+    t = %<tt>;
+    u = (void *)%<LibBlockInputSignalAddr(0, "", "", 0)>;
+    errMsg = rtwH5LoggingWrite(%<::CompiledModel.ErrorXMLMode>, fp, t, u);
+    if (errMsg != %<nulldef>) {
+      %<RTMSetErrStat("errMsg")>;
+      return;
+    }
+  }
+%endfunction %% logMatFileV73BusLoggingOff
+
+%% Function: logMatFileV73BusLoggingOn ==========================================
+%function logMatFileV73BusLoggingOn(block, system, portIdx, tt) Output
+  %if block.NumDataInputPorts == 1
+    %assert(%<portIdx> == 0)
+    %<createH5LoggingCollectionWriteCallsRecursionTop(block, system, tt)>
+  %else
+    %assign varPath = LibBlockInputSignalAddr(portIdx, "", "", 0)
+    %<createH5LoggingCollectionWriteCall( ...
+      block, ...
+      system, ...
+      portIdx, ...
+      portIdx, ...
+      tt, ...
+      varPath ...
+      )>
+  %endif
+%endfunction %% logMatFileV73BusLoggingOn
+
+%% Function: logMultitasking ====================================================
+%function logMultitasking(block, system, tid) Output
+  %if !ISEQUAL(TID, "constant")
+    %<logSampleWithLogOutputCheck(block, system, tid)>
+  %endif
+%endfunction %% logMultitasking
+
+%% Function: logSample ==========================================================
+%function logSample(block, system, tid) Output
+  %% Iterate over all ports
+  %foreach portIdx = block.NumDataInputPorts
+    %% Check this ports sample time
+    %assign portTid = getPortTid(block, system, portIdx)
+    %if LibTriggeredTID(tid) || (!LibTriggeredTID(portTid) && portTid == tid)
+      {
+        %assign tt = tid2time(block, system, tid)
+        %if block.Type == "ToWorkspace"
+          %<logSampleToWks(block, system, portIdx, tt)>
+        %else
+          %assert(block.Type == "ToFile")
+          %<logSampleToFile(block, system, portIdx, tt)>
+        %endif
+      }
+    %endif
+  %endforeach
+%endfunction %% logSample
+
+%% Function: logSampleToFile ====================================================
+%function logSampleToFile(block, system, portIdx, tt) Output 
+  %if !ParamSettings.useHDF5 && Accelerator 
+    %assert(0)
+  %else       
+    %if ParamSettings.useHDF5
+      %<logMatFileV73(block, system, portIdx, tt)>
+    %else
+      %assert(%<portIdx> == 0)
+      %<logMatFileV4(block, system, tt)>
+    %endif
+  %endif
+%endfunction %% logSampleToFile
+
+%% Function: logSampleToWks =====================================================
+%function logSampleToWks(block, system, portIdx, tt) Output 
+  %assign simS = RTMsGet(system, "MdlRefSfcnS")
+  %assign u = LibBlockInputSignalAddr(portIdx, "", "", 0)
+
+  %% Pwork
+  %if ParamSettings.HierInfoIndex[0] < 0
+    %assign pwork  = LibBlockPWork(LoggedData, "", "", portIdx)
+  %else
+    %assign pwork  = LibBlockPWork(LoggedData, "", "", 0)
+  %endif
+  
+  ssLoggerUpdateTimeseries(%<simS>, 
+                           %<pwork>, 
+                           %<portIdx>,
+                           %<tt>,
+                           (const char *)%<u>);
+%endfunction %% logSampleToWks
+
+%% Function: logSampleWithLogOutputCheck ========================================
+%function logSampleWithLogOutputCheck(block, system, tid) Output
+  %% Check if the model is logging output - this handles the
+  %% refine factor for variable-step solvers
+  %if block.Type == "ToWorkspace"
+    if( ssGetLogOutput(%<RTMsGet(system, "MdlRefSfcnS")>) ) {
+      %<logSample(block, system, tid)>
+    }
+  %else
+    %assert(block.Type == "ToFile")
+    %assign condStrIsUsed = isRSimWithSolverModule || ...
+      ((Accelerator || IsModelReferenceSimTarget()) && ...
+      SolverType == "VariableStep")
+    %if condStrIsUsed 
+      %assign condStr = RTMGet("LogOutput")
+      if ( %<condStr> ) {
+    %endif
+    %<logSample(block, system, tid)>
+    %% Close bracket for condStrIsUsed IF
+    %if condStrIsUsed           
+    }
+    %endif
+  %endif
+%endfunction %% logSampleWithLogOutputCheck
+
+%% Function: logSingletasking ===================================================
+%function logSingletasking(block, system) Output
+    
+  %if ISEQUAL(TID, "constant")    
+    %% All constant sample rate signals processed in Start
+    
+  %elseif LibTriggeredTID(TID)      
+    %% Triggered sample time should always be processed
+    %<logSampleWithLogOutputCheck(block, system, TID)>
+    
+  %else      
+    %% Call update for each non-const TID
+    %foreach idx = SIZE(TID, 1)
+      %if block.TID[idx] != -2
+        %% For all other TIDs, we need to check for sample hits if there is
+        %% more than 1 TID
+        %if SIZE(TID, 1) > 1
+          if( %<LibIsSampleHit(block.TID[idx])> ) {
+        %endif
+
+        %<logSampleWithLogOutputCheck(block, system, block.TID[idx])>
+          
+        %% Close bracket for sample time IF
+        %if SIZE(TID, 1) > 1
+        }
+        %endif
+      %endif
+    %endforeach
+    
+  %endif
+%endfunction %% logSingletasking
+
+%% Function: tid2time ===========================================================
+%function tid2time(block, system, tid) void
+  %if LibTriggeredTID(tid) && EXISTS(block.TriggerTID)
+    %assign tt = LibGetTaskTime(block.TriggerTID)
+  %elseif tid == -2
+    %assign tt = LibGetT()
+  %else
+    %assign tt = LibGetTaskTime(tid)
+  %endif
+  %return tt
+%endfunction %% tid2time
+
+%% [EOF] logging_sup.tlc

@@ -1,0 +1,162 @@
+%% ============================================================================
+%% 
+%% 
+%%
+%% Copyright 2011 The MathWorks, Inc.
+%%
+
+%function SLibGenPthreadSpecificSem(SemOpType, semaphoreDW, initVal)
+  %<LibAddToCommonIncludes("<semaphore.h>")>
+  %<LibAddToCommonIncludes("<stdlib.h>")>
+  %switch (SemOpType)
+    %case 0
+      %assign isMac = FEVAL("ismac")
+      %openfile buf
+      %if isMac
+        %assign semName = "%<semaphoreDW>"
+        %assign len = SIZE(semName)  
+        %assign finalName = ""
+        %if len[1] > 10 
+          %% Truncate semaphore name to last 10 chars
+          %foreach idx = 10
+            %assign finalName = "%<semName[len[1]-idx-1]>%<finalName>"
+          %endforeach
+        %else 
+          %assign finalName = semName
+        %endif
+        %<semaphoreDW> = sem_open("%<finalName>", O_CREAT | O_EXCL, 0777, %<initVal>);
+      %else
+        %<semaphoreDW> = malloc(sizeof(sem_t)); 
+        sem_init(%<semaphoreDW>, 0, %<initVal>);
+      %endif
+      %closefile buf
+      %return buf 
+    %case 1 
+      %return "sem_wait(%<semaphoreDW>); \n"
+    %case 2 
+      %return "sem_post(%<semaphoreDW>); \n"
+    %case 3 
+      %assign isMac = FEVAL("ismac") 
+      %openfile buf
+      %if isMac   
+        %assign semName = "%<semaphoreDW>"
+        %assign len = SIZE(semName)  
+        %assign finalName = ""
+        %if len[1] > 10 
+          %% Truncate semaphore name to last 10 chars
+          %foreach idx = 10
+            %assign finalName = "%<semName[len[1]-idx-1]>%<finalName>"
+          %endforeach
+        %else 
+          %assign finalName = semName
+        %endif
+        sem_unlink("%<finalName>");
+      %else
+      sem_destroy(%<semaphoreDW>);    
+      free(%<semaphoreDW>);
+      %endif
+      %closefile buf
+      %return buf
+    %default
+      %return " error out \n"
+  %endswitch
+%endfunction
+
+%function SLibGenWindowsSpecificSem(SemOpType, semaphoreDW, initVal)
+  %<LibAddToCommonIncludes("<windows.h>")>
+
+  %switch (SemOpType)
+    %case 0
+      %if ISEQUAL(initVal, 0) || ISEQUAL(initVal, "0")
+        %assign buf = "%<semaphoreDW> =  CreateSemaphore(NULL, 0, 1, NULL); \n" 
+      %else
+        %assign buf = "%<semaphoreDW> =  CreateSemaphore(NULL, %<initVal>, %<initVal>, NULL); \n" 
+      %endif
+      %return buf
+    %case 1 
+      %return "WaitForSingleObject(%<semaphoreDW>, INFINITE); \n"
+    %case 2 
+      %return "ReleaseSemaphore(%<semaphoreDW>, 1, NULL); \n"
+    %case 3
+      %return "CloseHandle(%<semaphoreDW>); \n"
+    %default
+      %return " error out \n"
+  %endswitch
+%endfunction
+
+%function SLibGenPthreadSpecificMutex(MutexOpType, mutexDW)
+  %<LibAddToCommonIncludes("<pthread.h>")>
+  %<LibAddToCommonIncludes("<stdlib.h>")>
+  %switch (MutexOpType)
+    %case 0
+      %assign defBuf = "#define __USE_UNIX98 \n"
+      %<SLibCacheCodeToFile("mdl_src_ban", defBuf)>
+      %openfile buf
+      { 
+        pthread_mutexattr_t attr; 
+        pthread_mutexattr_setprotocol(&attr, 1); /* PTHREAD_PRIO_INHERIT */
+        %<mutexDW> = malloc(sizeof(pthread_mutex_t)); 
+        pthread_mutex_init((pthread_mutex_t *)%<mutexDW>, &attr);
+      }
+      %closefile buf
+      %return buf
+    %case 1 
+      %return "pthread_mutex_lock((pthread_mutex_t *)%<mutexDW>); \n"
+    %case 2 
+      %return "pthread_mutex_unlock((pthread_mutex_t *)%<mutexDW>); \n"
+    %case 3
+      %return "pthread_mutex_destroy((pthread_mutex_t *)%<mutexDW>); \n free(%<mutexDW>); \n"
+    %default
+      %return "error out \n"
+  %endswitch
+%endfunction
+
+%function SLibGenWindowsSpecificMutex(MutexOpType,mutexDW)
+  %<LibAddToCommonIncludes("<windows.h>")>
+
+  %switch (MutexOpType)
+    %case 0
+      %return "%<mutexDW> =  CreateMutex(NULL, FALSE, NULL); \n" 
+    %case 1 
+      %return "WaitForSingleObject(%<mutexDW>, INFINITE); \n"
+    %case 2 
+      %return "ReleaseMutex(%<mutexDW>); \n"
+    %case 3
+      %return "CloseHandle(%<mutexDW>); \n"
+    %default
+      %return " error out \n"
+  %endswitch
+%endfunction
+
+%function LibGenTargetSpecificMutex(MutexOpType, mutexDW)
+  %assign isWin = FEVAL("ispc")
+  %assign doTflLookup = FEVAL("slfeature","TFLEnableSemaphoreSupport")
+  %if doTflLookup == 1
+    %return SLibGenPlatformSpecificMutexThruTFLLookup(MutexOpType, mutexDW)
+  %else 
+    %if isWin 
+      %return SLibGenWindowsSpecificMutex(MutexOpType, mutexDW)
+    %else
+      %return SLibGenPthreadSpecificMutex(MutexOpType, mutexDW)
+    %endif
+  %endif
+%endfunction
+
+%function LibGenTargetSpecificSynchro(SemOpType, semaphoreDW, initVal)
+  %assign isWin = FEVAL("ispc")
+  %assign doTflLookup = FEVAL("slfeature","TFLEnableSemaphoreSupport")
+  %if doTflLookup == 1
+    %% START_ASSERT
+    %assign msg = "TLC TFL solution is not supported for Synchronous Semaphore mode"
+    %<LibReportFatalError(msg)>
+    %% END_ASSERT
+  %else
+    %if isWin  
+      %return SLibGenWindowsSpecificSem(SemOpType, semaphoreDW, initVal)
+    %else
+      %return SLibGenPthreadSpecificSem(SemOpType, semaphoreDW, initVal)
+    %endif
+  %endif
+%endfunction
+
+

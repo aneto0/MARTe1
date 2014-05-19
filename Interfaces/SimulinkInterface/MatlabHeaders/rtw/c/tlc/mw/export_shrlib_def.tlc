@@ -1,0 +1,190 @@
+%% =======================================================================
+%% File: export_shrlib_def.tlc
+%% 
+%% Abstract: Create module definition file <model>.def for DLL export on 
+%% Windows OS Create version script symbol map file for Unix OS
+%% 
+%% 
+%% Copyright 2006-2011 The MathWorks, Inc.
+%% ======================================================================
+
+%selectfile NULL_FILE
+%if EXISTS("_EXPDLLDEF_") == 0
+%assign _EXPDLLDEF_ = 1
+
+%with ::CompiledModel
+%% Define file extension
+%assign fileExtension="def"
+%assign expfileName = "%<Name>.%<fileExtension>"
+
+%% Define leading underscore for MAC OS
+%if FEVAL("ismac") == TLC_TRUE
+	%assign leadingUs="_"
+%else
+	%assign leadingUs=""
+%endif
+
+%% Define trailing semicolon for UNIX non-MAC OS
+%if FEVAL("isunix")==TLC_TRUE && FEVAL("ismac")==TLC_FALSE
+	%assign trailingSc=";"
+%else
+	%assign trailingSc=""
+%endif
+
+%%=========================================================================
+%%  Function: ExportModelStepSymbols(tid)
+%%    This function lists the step function symbols to be exported to DLL
+%%
+%%=========================================================================
+%function ExportModelStepSymbols(tid) void
+%openfile tmpFcnBuf
+%if GenerateSampleERTMain && SLibIsAsyncTaskOnlyModel()
+  %% step function is empty, does not exist.
+  %return 
+%endif
+%if CombineOutputUpdateFcns
+%<leadingUs>%<SLibModelStepFcnName(tid)>%<trailingSc>\
+%else
+%<leadingUs>%<Name>_output%<tid>%<trailingSc>
+%<leadingUs>%<Name>_update%<tid>%<trailingSc>\
+%endif
+%closefile tmpFcnBuf
+%return tmpFcnBuf
+%endfunction %% ExportModelStepSymbols(tid)
+
+%%=========================================================================
+%% Function: ExportGlobalSignalSymbols 
+%% Abstract:
+%%      Export global signals
+%%
+%%=========================================================================
+%function ExportGlobalSignalSymbols() void
+%if ::CompiledModel.NumExportedGlobalSignals > 0
+  %openfile tmpFcnBuffer
+  %% external root inport signals
+  %if ExternalInputs.NumExportedGlobalSignals > 0
+  %foreach idx = ExternalInputs.NumExternalInputs
+    %assign extInp = ExternalInputs.ExternalInput[idx]
+	%if extInp.StorageClass == "ExportedGlobal"
+%<leadingUs>%<LibGetRecordIdentifier(extInp)>%<trailingSc>
+    %endif
+  %endforeach
+  %endif
+  %% external block io signals
+  %if BlockOutputs.NumExportedGlobalSignals > 0
+  %foreach boIdx = BlockOutputs.NumExternalBlockOutputs
+    %assign bo = BlockOutputs.ExternalBlockOutput[boIdx]
+	%if bo.StorageClass == "ExportedGlobal"
+%<leadingUs>%<LibGetRecordIdentifier(bo)>%<trailingSc>
+	%endif
+  %endforeach
+  %endif
+%closefile tmpFcnBuffer
+%return tmpFcnBuffer
+%endif
+%endfunction %% ExportGlobalSignalSymbols
+
+%%=========================================================================
+%% Function: ExportTunableParamSymbols 
+%% Abstract:
+%%      Export tunable  parameters
+%%
+%%=========================================================================
+%function ExportTunableParamSymbols() void
+%with ::CompiledModel.ModelParameters
+%if NumParameters > 0
+  %openfile tmpFcnBuffer
+  %foreach idx = NumParameters
+    %assign extParam = Parameter[idx]
+	%if extParam.StorageClass == "ExportedGlobal"
+%<leadingUs>%<LibGetRecordIdentifier(extParam)>%<trailingSc>
+    %endif
+  %endforeach
+%if !LibParametersStructIsEmpty()
+%<leadingUs>%<LibGetParametersStruct()>%<trailingSc>
+%endif
+%closefile tmpFcnBuffer
+%return tmpFcnBuffer
+%endif
+%endwith
+%endfunction %% ExportTunableParamSymbols
+
+%%==================================================================
+%% writing .def file
+%%
+%%==================================================================
+%openfile exportdefId = "%<expfileName>", "w"
+%if FEVAL("ispc")==TLC_TRUE
+EXPORTS
+%elseif FEVAL("ismac")==TLC_TRUE
+%else
+{
+global:
+%endif
+%if (!EmptyRealTimeObject) && (!MultiInstanceERTCode)
+%<leadingUs>%<tSimStruct>_%<trailingSc>
+%<leadingUs>%<tSimStruct>%<trailingSc>
+%endif
+%if !LibExternalInputsStructIsEmpty() && (!MultiInstanceERTCode)
+%<leadingUs>%<LibGetExternalInputStruct()>%<trailingSc>
+%endif
+%if !LibExternalOutputsStructIsEmpty() && (!MultiInstanceERTCode)
+%<leadingUs>%<LibGetExternalOutputStruct()>%<trailingSc>
+%endif
+%<leadingUs>%<SLibModelInitFcnName()>%<trailingSc>
+%if (SLibSingleTasking() || (!SLibSingleTasking() && !GenerateSampleERTMain))&& !SLibIsAsyncTaskOnlyModel()
+  %if CombineOutputUpdateFcns
+%<leadingUs>%<SLibModelStepFcnName("")>%<trailingSc>
+  %else
+%<leadingUs>%<Name>_output%<trailingSc>
+%<leadingUs>%<Name>_update%<trailingSc>
+  %endif
+%endif
+%if !SLibSingleTasking()
+  %if SLibHasSetEventsForThisBaseRateFcn()
+%<leadingUs>%<Name>_SetEventsForThisBaseStep%<trailingSc>
+  %endif
+  %% Call the step function for the base rate
+%<ExportModelStepSymbols(0)>
+  %if LibGetNumSyncPeriodicTasks() > 2
+    %% Multiple subrates
+    %%for (i = %<1+tid01Eq>; i < %<FcnNumST()>; i++) {
+    %foreach tid = %<FcnNumST()>
+      %if tid >= 1+FixedStepOpts.TID01EQ
+%<ExportModelStepSymbols(tid)>
+      %endif
+    %endforeach
+  %else
+    %% Single subrate
+    %assign tid = FcnNumST()-1  
+%<ExportModelStepSymbols(tid)>
+  %endif
+%endif
+%if IncludeMdlTerminateFcn
+%<leadingUs>%<Name>_terminate%<trailingSc>
+%endif
+
+%% If MatFileLogging is ON, export rt_StopDataLogging symbol. Additionally, 
+%% export rt_UpdateTXYLogVars symbol if CombineOutputUpdateFcns is OFF.
+%if MatFileLogging
+  %if !::IncludeLoggingInstrumentation
+    %<leadingUs>rt_UpdateTXYLogVars%<trailingSc>
+  %endif
+  %<leadingUs>rt_StopDataLogging%<trailingSc>
+%endif
+
+%if (!MultiInstanceERTCode)
+%<ExportGlobalSignalSymbols()>\
+%<ExportTunableParamSymbols()>\
+%endif
+%if ::RTWCAPI==1
+%<leadingUs>%<Name>_GetCAPIStaticMap%<trailingSc>
+%endif
+%if FEVAL("isunix")==TLC_TRUE && FEVAL("ismac")==TLC_FALSE
+local:
+		*;
+};
+%endif
+%closefile exportdefId
+%endwith
+%endif %% _EXPDLLDEF_

@@ -1,0 +1,62 @@
+%% $RCSfile: czp.tlc,v $
+%% $Revision: 1.8.4.5.2.1 $ 
+%% $Date: 2012/06/18 15:15:15 $
+%%
+%% Copyright 1994-2009 The MathWorks, Inc.
+%%
+%% Abstract: Continuous Zero Pole block target file
+
+%implements "ZeroPole" "C"
+
+%% InitializeConditions =======================================================
+%%
+%function InitializeConditions(block, system) Output
+  %if ContStates[0] > 0
+    %<LinLibInitializeConditions(block,system)>
+  %endif
+
+%endfunction %% InitializeConditions
+
+
+%% Outputs ====================================================================
+%%
+%function Outputs(block, system) Output
+  {
+    %<LinLibOutputs(block, system)>\
+  }
+
+%endfunction %% Outputs
+
+%% Update ====================================================================
+%%
+%function Update(block, system) Output
+  %if EXISTS(AbsoluteTolerance)
+    {
+      %<LibUpdateBlockCStateAbsoluteTolerance(block, system)>
+    }
+  %endif
+%endfunction
+
+
+%% Derivatives ================================================================
+%%
+%function Derivatives(block, system) Output
+  %if ContStates[0] > 0
+    {
+      %<LinLibDerivatives(block, system)>\
+    }
+  %endif
+
+%endfunction %% Derivatives
+
+
+%% ForcingFunction ============================================================
+%%
+%function ForcingFunction(block, system) Output
+  %if ::CompiledModel.ModelIsLinearlyImplicit == "yes" 
+    %<Derivatives(block,system)>
+  %endif
+%endfunction %% ForcingFunction
+  
+
+%% [EOF] czp.tlc

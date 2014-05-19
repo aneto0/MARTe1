@@ -1,0 +1,283 @@
+%% Copyright 1994-2012 The MathWorks, Inc.
+%%
+%% Abstract: Product block target file.
+
+%implements Product "C"
+
+
+%% Function: BlockTypeSetup ====================================================
+%% Abstract:
+%%
+%function BlockTypeSetup(block, system) void
+
+%endfunction
+
+%% Function: StartClassic=======================================================
+%% Abstract:
+%%      Initialize the identity matrix (DWork4) if the block is configured
+%%      as a matrix multiplication/inversion where the last data input port
+%%      has a matrix inversion operator specified.
+%%
+%function StartClassic(block, system) Output
+  %if ParamSettings.Multiplication == "Matrix(*)"
+      %% The following tlc code assumes the identity matrix has same 
+      %% dimensionality of first matrix operation.  If this assumption changes
+      %% in the future, the dimensionality must be calculated 
+      %% (square-root of size of dwork) or written to .rtw file
+      %assign inputs = ParamSettings.Inputs
+      %assign inputsSize = SIZE(inputs)
+      %if inputs[inputsSize[1]-1] == "/"
+        %assign dwIdx = 3   %% %<SLibMatrixOperand(-4)>
+        %assign dwork = DWork[dwIdx]
+        %assign dworkAddr = LibBlockDWorkAddr(dwork, "", "", 0)
+        %assign width = LibBlockDWorkWidth(dwork)
+	%assign dTypeId = LibBlockOutputSignalAliasedThruDataTypeId(0)
+	/* Create Identity Matrix for Block: '%<Name>' */
+        {
+	  int_T i;
+	%if dTypeId == tSS_DOUBLE
+	  real_T *dWork = %<dworkAddr>;
+        %else
+	  real32_T *dWork = %<dworkAddr>;
+	%endif
+          for (i = 0; i < %<width>; i++) {
+            *dWork++ = 0.0;
+          }
+          %assign dims = ParamSettings.Dimensions[0]
+          %assign matrixWidth = dims[0]*dims[0]
+          dWork = %<dworkAddr>;
+          while( dWork < %<dworkAddr>+%<matrixWidth>){
+            *dWork = 1;
+            dWork += %<dims[0]+1>;
+          }
+        }
+      %endif
+  %endif
+%endfunction %% Start
+
+%% Function: Start ==============================================================
+%% Abstract:
+%%      Initialize the identity matrix (DWork4) if the block is configured
+%%      as a matrix multiplication/inversion where the last data input port
+%%      has a matrix inversion operator specified.
+%%
+%function Start(block, system) Output
+  %<StartClassic(block, system)>
+%endfunction
+
+
+
+
+%% Function: Outputslassic ==========================================================
+%% Abstract:
+%%      How this block operates depends on whether it has a single input or
+%%      multiple inputs.  For the single input case, it produces a scalar
+%%      output consisting of the product of the elements of the input vector.
+%%      For the multi-input case, it behaves as the dual of the "sum" block.
+%%      Thus each port can be labeled as a multiply (*) or a divide (/).
+%%      Each element of the output vector is then composed of the product
+%%      or reciprocal of each corresponding input element.
+%%
+%%      The inputs can be of any type except boolean and may be complex.
+%function OutputsClassic(block, system) Output
+  %%
+      {
+      %% Perform matrix multiplication
+      %assign ops = ParamSettings.OperandComplexity
+      %assign opsSize = SIZE(ops)
+      %assign operators = ParamSettings.Operators
+      %assign numMulSteps = opsSize[1]
+      %assign Dims = ParamSettings.Dimensions
+      %%
+      %assign dimsLength = numMulSteps * 3
+      %%
+      static const int_T dims[%<dimsLength>] = { \
+      %foreach matOp = numMulSteps
+	%assign dims = Dims[matOp]
+	 %<dims[0]>, %<dims[1]>, %<dims[2]> \
+	%if matOp != (numMulSteps-1)
+	  , \
+	%endif
+      %endforeach
+      };
+      %%
+      %assign allPortReal = TLC_TRUE
+      %assign allPortComplex = TLC_TRUE
+      %%
+      %foreach iIdx = NumDataInputPorts
+	%%
+	%if LibBlockInputSignalIsComplex(iIdx)
+	  %assign allPortReal = TLC_FALSE
+	%else
+	  %assign allPortComplex = TLC_FALSE
+	%endif
+	%%
+      %endforeach
+      %%
+      %assign dTypeId = LibBlockOutputSignalAliasedThruDataTypeId(0)
+      %assign dType   = [%<LibGetDataTypeNameFromId(dTypeId)>, ...
+	%<LibGetDataTypeComplexNameFromId(dTypeId)>]
+      %if dTypeId == tSS_DOUBLE
+	%assign fcnNameType = "_Dbl"
+      %else
+	%assign fcnNameType = "_Sgl"
+      %endif
+      %foreach matOp = numMulSteps
+	%assign fcnName = "%<ops[matOp]>%<fcnNameType>"
+	%assign operand = ParamSettings.Operands[matOp]
+	%assign complexity = ParamSettings.Complexities[matOp]
+	%%
+	%assign y = SLibMatrixOperand(block, operand[0])
+	%assign a = SLibMatrixOperand(block, operand[1])
+	%assign b = SLibMatrixOperand(block, operand[2])
+	%% We do not need cast if
+	%%  1. all port are real, OR
+	%%  2. all port complex and it is not dwork
+	%%
+	%% We need cast if
+	%%   1. it is dwork and not all port real, OR
+	%%   2. numeric type is heterogeneous
+	%%
+	%if allPortReal || (operand[0] >= 0 && allPortComplex)
+	  %assign dTy = ""
+	%else 
+	  %% DWORK needs cast	  
+	  %assign dTy = "(%<dType[complexity[0]]>*)"
+	%endif
+	%%  
+	%if allPortReal || (operand[1] >= 0 && allPortComplex)
+	  %if operand[1] > 0
+	    %% inputs
+	    %assign inTypeName = LibBlockInputSignalDataTypeName(operand[1]-1, "")
+	    %%
+	    %if inTypeName == dType[complexity[1]]
+	      %%
+	      %assign portObj = FcnGetInputPortRecord(operand[1]-1)
+	      %assign sigRec  = SLibGetSourceRecord(portObj, 0)
+	      %%
+	      %if sigRec.Invariant != "yes"
+		%assign dTa = ""
+	      %else 
+		%assign dTa = "(%<dType[complexity[1]]>*)"
+	      %endif
+	    %else
+	      %assign dTa = "(%<dType[complexity[1]]>*)"
+	    %endif
+	  %else
+	    %% output or dwork
+	    %assign dTa = ""
+	  %endif
+	  %%
+	%else 
+	  %% DWORK and not all real input needs cast	  
+	  %assign dTa = "(%<dType[complexity[1]]>*)"
+	%endif
+	%%
+	%if allPortReal || (operand[2] >= 0 && allPortComplex)
+	  %%
+	  %if operand[2] > 0
+	    %% input could be invariant
+	    %assign portObj = FcnGetInputPortRecord(operand[2]-1)
+	    %assign sigRec  = SLibGetSourceRecord(portObj, 0)
+	    %%
+	    %if sigRec.Invariant != "yes"
+	      %assign dTb = ""
+	    %else 
+	      %assign dTb = "(%<dType[complexity[1]]>*)"
+	    %endif
+	  %else
+	    %% output or dwork
+	    %assign dTb = ""
+	  %endif
+	%else 
+	  %% DWORK needs cast
+	  %assign dTb = "(%<dType[complexity[2]]>*)"
+	%endif
+	%%
+	%assign curIdxForDims = matOp * 3
+	%%
+	%if operators[matOp] == "*"
+
+      %% call TFL query to generate proper rt_ function
+      %% rt_MatMult%<fcnName>(%<dTy>%<y>, %<dTa>%<a>, %<dTb>%<b>, &dims[%<curIdxForDims>]);
+      %createrecord FcnRec{Name "rt_MatMult"; NumArgs 4}
+      %addtorecord FcnRec ArgList{Expr "%<dTy>%<y>"; TypeId dTypeId; IsPtr 1; IsCplx complexity[0]; IsConst 0}
+      %addtorecord FcnRec ArgList{Expr " %<dTa>%<a>"; TypeId dTypeId; IsPtr 1; IsCplx complexity[1]; IsConst 0}
+      %addtorecord FcnRec ArgList{Expr " %<dTb>%<b>"; TypeId dTypeId; IsPtr 1; IsCplx complexity[2]; IsConst 0}
+      %addtorecord FcnRec ArgList{Expr " &dims[%<curIdxForDims>]"; TypeId tSS_INTEGER; IsPtr 1; IsCplx 0; IsConst 0}
+      %<LibGenFcnCall(FcnRec, 0)>;
+	  
+	%else
+	  %assign divBufs = ParamSettings.DivisionBuffers
+	  %assign lu  = SLibMatrixOperand(block, divBufs[0])
+	  %assign piv = SLibMatrixOperand(block, divBufs[1])
+	  %assign x   = SLibMatrixOperand(block, divBufs[2])
+	  %% DWORK needs cast
+	  %assign dTlu = "(%<dType[complexity[1]]>*)"
+	  %assign dTx  = "(%<dType[complexity[0]]>*)"
+
+      %% call TFL query to generate proper rt_ function
+	  %% rt_MatDiv%<fcnName>(%<dTy>%<y>, %<dTa>%<a>, %<dTb>%<b>,%<dTlu>%<lu>, %<piv>, %<dTx>%<x>, &dims[%<curIdxForDims>]);
+      %createrecord FcnRec{Name "rt_MatDiv"; NumArgs 7}
+      %addtorecord FcnRec ArgList{Expr "%<dTy>%<y>"; TypeId dTypeId; IsPtr 1; IsCplx complexity[0]; IsConst 0}
+      %addtorecord FcnRec ArgList{Expr " %<dTa>%<a>"; TypeId dTypeId; IsPtr 1; IsCplx complexity[1]; IsConst 0}
+      %addtorecord FcnRec ArgList{Expr " %<dTb>%<b>"; TypeId dTypeId; IsPtr 1; IsCplx complexity[2]; IsConst 0}
+      %addtorecord FcnRec ArgList{Expr " %<dTlu>%<lu>"; TypeId dTypeId; IsPtr 1; IsCplx complexity[1]; IsConst 0}
+      %addtorecord FcnRec ArgList{Expr " %<piv>"; TypeId tSS_INT32; IsPtr 1; IsCplx 0; IsConst 0}
+      %addtorecord FcnRec ArgList{Expr " %<dTx>%<x>"; TypeId dTypeId; IsPtr 1; IsCplx complexity[0]; IsConst 0}
+      %addtorecord FcnRec ArgList{Expr " &dims[%<curIdxForDims>]"; TypeId tSS_INTEGER; IsPtr 1; IsCplx 0; IsConst 0}
+      %<LibGenFcnCall(FcnRec, 0)>;
+
+	%endif
+	%%
+      %endforeach
+      }
+  
+%endfunction
+
+
+%% Function: Outputs ===============================================
+%% Abstract:
+%% 	Output function
+%%
+%function Outputs(block, system) Output
+  %<OutputsClassic(block, system)>
+%endfunction
+
+
+%% Function: SLibMatrixOperand =================================================
+%%
+%% Purpose:
+%%      Determine address of matrix multiplication/inversion operand
+%%
+%% Syntax:
+%%      SLibMatrixOperand(block, opIdx)
+%%
+%% Arguments:
+%%      block: block scope
+%%      opIdx: Integer index specifying operand index and type
+%%      Legend for interpreting opIdx:
+%%         zero - operand is block output
+%%         greater than zero - operand is block data input port
+%%         negative - operand is dwork
+%%
+%% Returns:
+%%      The address of the specified operand.
+%%
+%% Description:
+%%      SLibMatrixOperand returns the address of the specified operand.
+%%
+%function SLibMatrixOperand(block, opIdx) void
+
+  %if opIdx == 0
+    %return LibBlockOutputSignalAddr(0, "", "", 0)
+  %elseif opIdx > 0
+    %return  LibBlockInputSignalAddr(opIdx-1, "", "", 0)
+  %else
+    %assign dwIdx = (opIdx * -1) - 1
+    %return LibBlockDWorkAddr(block.DWork[dwIdx], "", "", 0)
+  %endif
+%endfunction %% SLibMatrixOperand
+
+
+%% [EOF] product.tlc
