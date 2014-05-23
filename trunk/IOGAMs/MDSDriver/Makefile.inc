@@ -25,6 +25,8 @@ CFLAGS+= -I../../Interfaces/MDSInterface
 
 CFLAGS+= -I../../MARTe/MARTeSupportLib
 CFLAGS+= -I/usr/local/mdsplus/include
+LIBRARIES += -L/usr/local/mdsplus/lib64
+LIBRARIES += -lMdsObjectsCppShr
 
 
 all: $(OBJS)  \

@@ -152,37 +152,40 @@ static char *css = "table.bltable {"
 	{
 	    if((refWaveformIdxs[i] = MDSInterface::prepareWaveParameterReadout(deviceIdx, refWaveformNames[i])) == -1)
  	    {
-    	    	AssertErrorCondition(FatalError,
+    	    AssertErrorCondition(FatalError,
     			"MDSDriver::PulseStart: %s Reference Waveform %s is not declared in the target MDS device", Name(),  refWaveformNames[i]);
-    	    	return False;
-    	    }
+    	    return False;
+    	}
 	}
 	MDSInterface::resetSignals(deviceIdx);
  	for(int i = 0; i < numOutSignals; i++)
 	{
-            if((outSignalIdxs[i] = MDSInterface::declareSignal(deviceIdx, outSignalNames[i], outSignalDescriptions[i])) == -1)
+         if((outSignalIdxs[i] = MDSInterface::declareSignal(deviceIdx, outSignalNames[i], outSignalDescriptions[i])) == -1)
  	    {
     	    	AssertErrorCondition(FatalError,
     			"MDSDriver::PulseStart: %s Error declaring out signal %s for device idx %d", Name(),  outSignalNames[i], deviceIdx);
     	    	return False;
-    	    }
+    	}
 	}
+    prevTime = -1;
 	return true;
     }
   
     bool MDSDriver::WriteData(uint32 usecTime, const int32 *buffer)
     {
-	float time = usecTime * 1E-6;
+        if(usecTime == prevTime) return True;
+        prevTime = usecTime;
+	    float time = usecTime * 1E-6;
 //	printf("WRITE SIGNALS: %d %d", usecTime, numOutSignals);
-	for(int i = 0; i < numOutSignals; i++)
-	{
-	    currOutputs[i] = ((float *)buffer)[i];
-	    MDSInterface::reportSignal(deviceIdx, outSignalIdxs[i], ((float *)buffer)[i], time);
+	    for(int i = 0; i < numOutSignals; i++)
+	    {
+	        currOutputs[i] = ((float *)buffer)[i];
+	        MDSInterface::reportSignal(deviceIdx, outSignalIdxs[i], ((float *)buffer)[i], time);
 
 //	    printf("%f ", currOutputs[i]);
-	}
+	    }
 //	printf("\n");
-	return true;
+	    return true;
     }
 
     int32 MDSDriver::GetData(uint32 usecTime, int32 *buffer, int32 bufferNumber)
