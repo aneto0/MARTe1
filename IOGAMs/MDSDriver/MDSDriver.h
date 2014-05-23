@@ -16,6 +16,7 @@ class MDSDriver: public GenericAcqModule
 // framework object registration macro
 private:
     int deviceIdx;
+    int prevTime;
 // Reference Waveform settings
     char **refWaveformNames;
     int numRefWaveforms;
@@ -57,6 +58,7 @@ public:
     {
 	numRefWaveforms = numOutSignals = 0;
 	deviceIdx = -1;
+    prevTime = -1;
     }
     /** Destructor */
     ~MDSDriver()
