@@ -25,7 +25,7 @@ CFLAGS+= -I../../BaseLib2/Level5
 CFLAGS+= -I../../BaseLib2/Level6
 CFLAGS+= -I../../BaseLib2/LoggerService
 CFLAGS+= -I/usr/local/mdsplus/include
-LIBRARIES += -L/usr/local/mdsplus/lib
+LIBRARIES += -L/usr/local/mdsplus/lib64
 LIBRARIES += -L../../BaseLib2/linux
 LIBRARIES += -lMdsObjectsCppShr
 
