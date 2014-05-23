@@ -19,6 +19,7 @@
 #define DEBUG
 OBJECTLOADREGISTER(MDSInterface,"$Id: MDSInterface.cpp,v 1.26 2009/10/16 08:05:45 gmandu Exp $")
 
+bool MDSInterface::initializing =  false;
 
 //Semaphore and Event management for signal buffering management
 static bool sharedSemCreated;
@@ -81,9 +82,9 @@ bool MDSInterface::ObjectLoadSetup(ConfigurationDataBase& info,StreamInterface* 
     {
 	dataStorageThreadStarted = true;
 	int runOnCpu;
-	if(!cdbx.ReadInt32(runOnCpu, "ExecuteOnCpu", 1))
+	if(!cdbx.ReadInt32(runOnCpu, "RunOnCpu", 1))
 	{
-	    AssertErrorCondition(InitialisationError,"MDSInterface::ObjectLoadSetup: ExecuteOnCpu has not been specified");
+	    AssertErrorCondition(InitialisationError,"MDSInterface::ObjectLoadSetup: RunOnCpu has not been specified");
       	    return False;
 	}
 	treeWriter = new TreeWriter(runOnCpu, signalBufferQueue);
@@ -156,7 +157,9 @@ const char* MDSInterface::css = "table.bltable {"
 void MdsEvent::run()
 {
     int size;
+    printf("Received MDSPlus Event\n");
     Data *data = getData();
+    printf("Received MDSPlus Event %s\n", data->decompile());
     mdsInterface->handleMdsEvent(data);
     deleteData(data);
 }
@@ -198,26 +201,34 @@ void MDSInterface::handleMdsEvent(Data *eventData)
     //Event SETUP defines the Tree and shot to be open and the nid of the field containing the configuation file (as a string array)
     if(!strcmp(eventName, "SETUP"))
     {
+        initializing = true;
       	char treeName[256];
-	char controlName[512];
+	    char controlName[512];
       	int shot, parameterNid, waveParameterNid, signalNid, deviceIdx;
 //Event data brinf information about tree name, tree shot, device Id, parameters root nid, signals root nid
       	sscanf(eventBuf, "%s %s %s %d %d %d %d %d", eventName, treeName, controlName, &shot, &deviceIdx, &parameterNid, &waveParameterNid, &signalNid);
-	delete[] eventBuf;
-	int handlerIdx = 0;
-	for(handlerIdx = 0; handlerIdx < deviceHandlers.size(); handlerIdx++)
-	{
-	    if(deviceHandlers[handlerIdx]->getDeviceIdx() == deviceIdx)
-		break;
-	}
-	if(handlerIdx == deviceHandlers.size())
-	    deviceHandlers.push_back(new DeviceHandler(deviceIdx, controlName));
-	deviceHandlers[handlerIdx]->loadParameters(treeName, shot, parameterNid, waveParameterNid, signalNid);
-        return; //Error message already assered by method
+	    delete[] eventBuf;
+	    int handlerIdx = 0;
+	    for(handlerIdx = 0; handlerIdx < deviceHandlers.size(); handlerIdx++)
+	    {
+	        if(deviceHandlers[handlerIdx]->getDeviceIdx() == deviceIdx)
+		    break;
+	    }
+	    if(handlerIdx == deviceHandlers.size())
+	        deviceHandlers.push_back(new DeviceHandler(deviceIdx, controlName));
+	    deviceHandlers[handlerIdx]->loadParameters(treeName, shot, parameterNid, waveParameterNid, signalNid);
+//Reset signals ONLY if segments flushed
+        for(int i = 0; i < deviceHandlers.size(); i++)
+        {
+	        if(deviceHandlers[i]->getDeviceIdx() == deviceIdx)
+      	      	deviceHandlers[i]->resetSignals();
+        }
+        initializing = false;
+        return; //Error message already asserted by method
     }
     if(!strcmp(eventName, "LOAD"))
     {
-	loadConfiguration();
+	    loadConfiguration();
 	return;
     }
 
@@ -233,17 +244,8 @@ void MDSInterface::handleMdsEvent(Data *eventData)
           return;
       }
     }
-    if(!strcmp(eventName, "PRE_REQ"))
-    {
-      int deviceIdx;
-      sscanf(eventBuf, "%s %d", eventName, &deviceIdx);
-      delete[] eventBuf;
-      for(int i = 0; i < deviceHandlers.size(); i++)
-      {
-	  if(deviceHandlers[i]->getDeviceIdx() == deviceIdx)
-      	  	deviceHandlers[i]->resetSignals();
-      }
-    }
+
+
 // If execution arrives here, this is a request for a state transition
     int evCode = getEventCode(eventName, strlen(eventName));
     MessageCode msgCode(evCode);
@@ -507,32 +509,32 @@ bool MDSInterface::getFloatParameter(int deviceIdx, char *name, float &retVal)
 
 /** Get the specified parameter. Memory for data and dims is allocated by the caller. If the parameter is Scalar return nDims = 0; 
     return NULL if parameter not found */ 
-int *MDSInterface::getIntArrayParameter(int deviceIdx, char *name)
+int *MDSInterface::getIntArrayParameter(int deviceIdx, char *name, int &nElements)
 {
     for(int i = 0; i < deviceHandlers.size(); i++)
     {
 	if(deviceHandlers[i]->getDeviceIdx() == deviceIdx)
-	return deviceHandlers[i]->getIntArrayParameter(name);
+	return deviceHandlers[i]->getIntArrayParameter(name, nElements);
     }
     return 0;
 }
 
-double *MDSInterface::getDoubleArrayParameter(int deviceIdx, char *name)
+double *MDSInterface::getDoubleArrayParameter(int deviceIdx, char *name, int &nElements)
 {
     for(int i = 0; i < deviceHandlers.size(); i++)
     {
 	if(deviceHandlers[i]->getDeviceIdx() == deviceIdx)
-	return deviceHandlers[i]->getDoubleArrayParameter(name);
+	return deviceHandlers[i]->getDoubleArrayParameter(name, nElements);
     }
     return 0;
 }
 
-float *MDSInterface::getFloatArrayParameter(int deviceIdx, char *name)
+float *MDSInterface::getFloatArrayParameter(int deviceIdx, char *name, int &nElements)
 {
     for(int i = 0; i < deviceHandlers.size(); i++)
     {
 	if(deviceHandlers[i]->getDeviceIdx() == deviceIdx)
-	return deviceHandlers[i]->getFloatArrayParameter(name);
+	return deviceHandlers[i]->getFloatArrayParameter(name, nElements);
     }
     return 0;
 }
@@ -552,6 +554,9 @@ int MDSInterface::prepareWaveParameterReadout(int deviceIdx, char *name)
 /** Realtine interpolated data readout */
 double MDSInterface::getWaveParameter(int deviceIdx, int waveId, double time)
 {
+
+    if(initializing) return 0; //To avoid core dump in case of SETUP at wrong time
+
     for(int i = 0; i < deviceHandlers.size(); i++)
     {
 	if(deviceHandlers[i]->getDeviceIdx() == deviceIdx)
@@ -612,7 +617,11 @@ MDSInterface::DeviceHandler::~DeviceHandler()
 /** Read configuration from the pulse file, called in response to a MDSplus Configuration event */
 bool MDSInterface::DeviceHandler::loadParameters(char *treeName, int shot, int rootParameterNid, int rootWaveNid, int rootSignalNid)
 {
-//    if(tree) delete tree;
+    if(tree)
+    {
+        delete tree;
+        tree = NULL;
+    }
     this->rootSignalNid = rootSignalNid;
     try {
 //Deallocate and empty first data and name vectors
@@ -677,6 +686,8 @@ bool MDSInterface::DeviceHandler::loadParameters(char *treeName, int shot, int r
 	    delete currNode;
 	    currNid += 6;
 	}
+
+printf("FATTI PARAMETRI\n");
 //Read Waveform Parameters and prepare arrays for realtime waveform interpolation
 //Note: while Parameters are not expected to be real in real-time, waveform samples will be read in realtime
 	currNode = new MDSplus::TreeNode(rootWaveNid + 1, tree);
@@ -692,6 +703,8 @@ bool MDSInterface::DeviceHandler::loadParameters(char *treeName, int shot, int r
 	wavesY = new double *[numWaves];
 	wavesDiff = new double *[numWaves];
  
+printf("PASSO ALLE WAVES\n");
+
 	for(int waveIdx = 0; waveIdx < numWaves; waveIdx++)
 	{
 	    currNode = new TreeNode(currNid + 2 + waveIdx * 5, tree);
@@ -703,7 +716,9 @@ bool MDSInterface::DeviceHandler::loadParameters(char *treeName, int shot, int r
 	    deleteData(currData);
 	    delete currNode;
 	    currNode = new TreeNode(currNid + 3 + waveIdx * 5, tree);
+        std::cout << "Letto node " << currNode->decompile() <<"\n"; 
 	    currData = currNode->data();
+	    std::cout << "Wave Data " << waveIdx << ":  " << currData << "\n";
 	    int numPoints;
 	    if(verbose)
 		std::cout << "X: " << currData;
@@ -815,9 +830,8 @@ bool MDSInterface::DeviceHandler::getFloatParameter(char *name, float  &retVal)
 
 /** Get the specified parameter. Memory for data and dims is allocated by the caller. If the parameter is Scalar return nDims = 0; 
     return NULL if parameter not found */ 
-int *MDSInterface::DeviceHandler::getIntArrayParameter(char *name)
+int *MDSInterface::DeviceHandler::getIntArrayParameter(char *name, int &nElements)
 {
-    int nElements;
     for(int parIdx = 0; parIdx < paramNames.size(); parIdx++)
     {
 	if(!strcmp(name, paramNames.at(parIdx)))
@@ -830,9 +844,8 @@ int *MDSInterface::DeviceHandler::getIntArrayParameter(char *name)
     }
     return NULL;
 }
-double *MDSInterface::DeviceHandler::getDoubleArrayParameter(char *name)
+double *MDSInterface::DeviceHandler::getDoubleArrayParameter(char *name, int &nElements)
 {
-    int nElements;
     for(int parIdx = 0; parIdx < paramNames.size(); parIdx++)
     {
 	if(!strcmp(name, paramNames.at(parIdx)))
@@ -846,9 +859,8 @@ double *MDSInterface::DeviceHandler::getDoubleArrayParameter(char *name)
     return NULL;
 }
 
-float *MDSInterface::DeviceHandler::getFloatArrayParameter(char *name)
+float *MDSInterface::DeviceHandler::getFloatArrayParameter(char *name, int &nElements)
 {
-    int nElements;
     for(int parIdx = 0; parIdx < paramNames.size(); parIdx++)
     {
 	if(!strcmp(name, paramNames.at(parIdx)))
@@ -919,36 +931,39 @@ int  MDSInterface::DeviceHandler::declareSignal(char const * name, char const * 
 //   printf("DECLARE SIGNAL %x %d %d %s\n", tree, rootSignalNid, signalBuffers.size(), name);
    try {
     //SIGNAL_XXX subtree: NAME, DESCRIPTION, DATA
+        
+
+
         MDSplus::TreeNode *currNode = new MDSplus::TreeNode(rootSignalNid + 3 + 4 * signalBuffers.size(), tree);
  
 
-       MDSplus::Data *currData = new MDSplus::String(name);
-	currNode->putData(currData);
-	deleteData(currData);
-	delete currNode;
-	if(description)
-	{
-            currNode = new MDSplus::TreeNode(rootSignalNid + 4 + 4* signalBuffers.size(), tree);
-            currData = new MDSplus::String(description);
+        MDSplus::Data *currData = new MDSplus::String(name);
 	    currNode->putData(currData);
 	    deleteData(currData);
 	    delete currNode;
-	}
-	currNode = new MDSplus::TreeNode(rootSignalNid + 5 + 4 * signalBuffers.size(), tree);
-	currNode->deleteData();
+	    if(description)
+	    {
+            currNode = new MDSplus::TreeNode(rootSignalNid + 4 + 4* signalBuffers.size(), tree);
+            currData = new MDSplus::String(description);
+	        currNode->putData(currData);
+	        deleteData(currData);
+	        delete currNode;
+	    }
+	    currNode = new MDSplus::TreeNode(rootSignalNid + 5 + 4 * signalBuffers.size(), tree);
+	    currNode->deleteData();
      	SignalBuffer *sigBuffer = new SignalBuffer(segmentSize, currNode);
- 	currNode = new MDSplus::TreeNode(rootSignalNid + 5 + 4 * signalBuffers.size(), tree);
+ 	    currNode = new MDSplus::TreeNode(rootSignalNid + 5 + 4 * signalBuffers.size(), tree);
      	SignalBuffer *sigAltBuffer = new SignalBuffer(segmentSize, currNode);
     	bool isAlternate = false;
     	signalBuffers.push_back(sigBuffer);
     	signalAltBuffers.push_back(sigAltBuffer);
     	isAltBuffer.push_back(isAlternate);
-	segmentsFlushed = false;
+	    segmentsFlushed = false;
     	return signalBuffers.size() - 1;
     } catch(MdsException &exc)
     {
 printf("DECLARE  SIGNAL %s FAILED %s\n", name, exc.what());
-	return -1;
+	    return -1;
     }
 }
 
@@ -956,33 +971,33 @@ bool MDSInterface::DeviceHandler::reportSignal(int userIdx, float val, float tim
 {
     if(segmentsFlushed)
     {
-	return true;
+	    return true;
     }
     if(userIdx < 0 || userIdx >= signalBuffers.size())
-	return false;
+	    return false;
     SignalBuffer *currBuffer, *nextBuffer;
     if(isAltBuffer[userIdx])
     {
-	currBuffer = signalAltBuffers[userIdx];
-	nextBuffer = signalBuffers[userIdx];
+	    currBuffer = signalAltBuffers[userIdx];
+	    nextBuffer = signalBuffers[userIdx];
     }
     else
     {
-	currBuffer = signalBuffers[userIdx];
-	nextBuffer = signalAltBuffers[userIdx];
+	    currBuffer = signalBuffers[userIdx];
+	    nextBuffer = signalAltBuffers[userIdx];
     }
 
     currBuffer->putSample(val, time);
 
     if(currBuffer->isFull())
     {
-	queue->putSignalBuffer(currBuffer);
-	if(!nextBuffer->isSaved())
-	{
-	    std::cout << "OVERFLOW!!!\n";
-	    return false;
-	}
-	isAltBuffer[userIdx] = !isAltBuffer[userIdx];
+	    queue->putSignalBuffer(currBuffer);
+	    if(!nextBuffer->isSaved())
+	    {
+	        std::cout << "OVERFLOW!!!\n";
+	        return false;
+	    }
+	    isAltBuffer[userIdx] = !isAltBuffer[userIdx];
     }
     return true;
 }
@@ -1005,17 +1020,17 @@ void  MDSInterface::DeviceHandler::flushLastSegment(SignalBufferQueue *queue)
     	for(int userIdx = 0; userIdx < numSignals; userIdx++)
     	{    
             MDSplus::TreeNode *currNode = new MDSplus::TreeNode(rootSignalNid + 3 + 4 * userIdx, tree);
-	    MDSplus::Data *currData = currNode->getData();
-	    names[userIdx] = currData->getString();
-	    deleteData(currData);
+	        MDSplus::Data *currData = currNode->getData();
+	        names[userIdx] = currData->getString();
+	        deleteData(currData);
+	        delete currNode;
+        }
+	    MDSplus::TreeNode *currNode = new MDSplus::TreeNode(rootSignalNid + 1, tree); //NAMES
+	    MDSplus::Data *namesData = new MDSplus::StringArray(names, numSignals);
+	    currNode->putData(namesData);
+	    deleteData(namesData);
 	    delete currNode;
-	}
-	MDSplus::TreeNode *currNode = new MDSplus::TreeNode(rootSignalNid + 1, tree); //NAMES
-	MDSplus::Data *namesData = new MDSplus::StringArray(names, numSignals);
-	currNode->putData(namesData);
-	deleteData(namesData);
-	delete currNode;
-	segmentsFlushed = true;
+	    segmentsFlushed = true;
     }catch(MdsException &exc)
     {
 	std::cout << "Cannot store signal names: " << exc.what() << "\n";
@@ -1027,8 +1042,8 @@ void MDSInterface::DeviceHandler::resetSignals()
 //Free all data structures for signals
     for(int i = 0; i < signalBuffers.size(); i++)
     {
-	delete signalBuffers[i];
-	delete signalAltBuffers[i];
+	    delete signalBuffers[i];
+	    delete signalAltBuffers[i];
     }
     signalBuffers.clear();
     signalAltBuffers.clear();

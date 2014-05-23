@@ -57,6 +57,9 @@ using namespace MDSplus;
 //Maximum number of handled signals
 #define MAX_NUM_SIGNALS 10000
 
+//Invalid MDSplus time, used to enable recording in MDSDriver
+#define INVALID_MDSPLUS_TIME -1E-6
+
 class MdsEvent;
 
 static struct EventDescr {
@@ -89,6 +92,7 @@ private:
 
     static int segmentSize ;
     int runOnCpu;
+    static bool initializing;
 
 public:
 ///////////////////////////////////////////////////////////////////////////////
@@ -99,6 +103,7 @@ public:
 	segmentSize = DEFAULT_SEGMENT_SIZE;
 	treeWriter = 0;
 	signalBufferQueue = new SignalBufferQueue();
+    initializing = false;
     }
 /** Destructor */
     ~MDSInterface();
@@ -147,9 +152,9 @@ public:
   static bool getFloatParameter(int deviceIdx, char *name, float &retVal);
 /** Get the specified parameter. Memory for data and dims is allocated by the caller. If the parameter is Scalar return nDims = 0; 
     return NULL if parameter not found */ 
-  static int *getIntArrayParameter(int deviceIdx, char *name);
-  static double *getDoubleArrayParameter(int deviceIdx, char *name);
-  static float *getFloatArrayParameter(int deviceIdx, char *name);
+  static int *getIntArrayParameter(int deviceIdx, char *name, int &nElements);
+  static double *getDoubleArrayParameter(int deviceIdx, char *name, int &nElements);
+  static float *getFloatArrayParameter(int deviceIdx, char *name, int &nElements);
 
 /** Preparation of realtime waveform sample readout. The returned integer id will be use to get interpolated waveform samples.
     -1 is returned if the waveform name is not found; */
@@ -235,13 +240,14 @@ public:
     std::vector<bool>isAltBuffer;
 //Used to discard fake write outside pulses
     bool segmentsFlushed;
-
+    
 
 
 public:
     DeviceHandler(int deviceIdx, char *controlName, bool verbose = true);
 /** Read configuration from the pulse file, called in response to a MDSplus Configuration event. 
     Return true of all parameters read, false otherwise */
+    bool isFlushed() {return segmentsFlushed;}
     int getDeviceIdx() {return deviceIdx;}
     char *getControlName() {return controlName;}
     bool loadParameters(char *treeName, int shot, int rootParameterNid, int rootWaveNid, int rootSignalNid);
@@ -253,9 +259,9 @@ public:
     bool getFloatParameter(char *name, float &retVal);
 /** Get the specified parameter. Memory for data and dims is allocated by the caller. If the parameter is Scalar return nDims = 0; 
     return NULL if parameter not found */ 
-    int *getIntArrayParameter(char *name);
-    double *getDoubleArrayParameter(char *name);
-    float *getFloatArrayParameter(char *name);
+    int *getIntArrayParameter(char *name, int &nElements);
+    double *getDoubleArrayParameter(char *name, int &nElements);
+    float *getFloatArrayParameter(char *name, int &nElements);
 /** Preparation of realtime waveform sample readout. The returned integer id will be use to get interpolated waveform samples.
     -1 is returned if the waveform name is not found; */
     int prepareWaveParameterReadout(char *name);
