@@ -1,0 +1,21 @@
+#*******************************************************************************
+#
+#      $Log: Makefile.linux,v $
+#      Revision 1.2  2008/05/08 17:44:35  fpiccolo
+#      Moved dependency generation into Makefile.inc
+#      Minor bug corrections
+#
+#      Revision 1.1  2008/05/08 09:56:02  fpiccolo
+#      *** empty log message ***
+#
+#*******************************************************************************/
+
+TARGET=linux
+
+include Makefile.inc
+
+LIBRARIES   += -L../../BaseLib2/$(TARGET) -lBaseLib2
+LIBRARIES   += -L../../MARTe/MARTeSupportLib/$(TARGET) -lMARTeSupLib
+LIBRARIES   += -L/opt/codac-3.1/epics/base/lib/linux-x86_64 -lca
+
+OPTIM=
