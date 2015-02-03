@@ -1,0 +1,111 @@
+##############################################################
+#
+# Copyright 2011 EFDA | European Fusion Development Agreement
+#
+# Licensed under the EUPL, Version 1.1 or - as soon they 
+# will be approved by the European Commission - subsequent  
+# versions of the EUPL (the "Licence"); 
+# You may not use this work except in compliance with the 
+# Licence. 
+# You may obtain a copy of the Licence at: 
+#  
+# http://ec.europa.eu/idabc/eupl
+#
+# Unless required by applicable law or agreed to in 
+# writing, software distributed under the Licence is 
+# distributed on an "AS IS" basis, 
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
+# express or implied. 
+# See the Licence for the specific language governing 
+# permissions and limitations under the Licence. 
+#
+# $Id$
+#
+#############################################################
+
+$(BUILD_DIR)/%.obj : %.cpp
+	$(COMPILER) -c $(CFLAGS) $(CFLAGSPEC) $(DEBUG) $(OPTIM)  $*.cpp  -Fa
+	@touch $(BUILD_DIR)/$*.obj >temp/temp
+	@rm $(BUILD_DIR)/$*.obj >temp/temp
+	@mv $*.obj $(BUILD_DIR) >temp/temp
+	@touch $(BUILD_DIR)/$*.asm >temp/temp
+	@rm $(BUILD_DIR)/$*.asm >temp/temp
+	@touch $*.asm >temp/temp
+	@mv $*.asm $(BUILD_DIR) >temp/temp
+
+
+$(BUILD_DIR)/%.obj : %.c
+	$(COMPILER) -c $(CFLAGS) $(CFLAGSPEC) $(DEBUG) $(OPTIM)  $*.c  -Fa
+	@touch $(BUILD_DIR)/$*.obj >temp/temp
+	@rm $(BUILD_DIR)/$*.obj >temp/temp
+	@mv $*.obj $(BUILD_DIR) >temp/temp
+	@touch $(BUILD_DIR)/$*.asm >temp/temp
+	@rm $(BUILD_DIR)/$*.asm >temp/temp
+	@touch $*.asm >temp/temp
+	@mv $*.asm $(BUILD_DIR) >temp/temp
+
+$(BUILD_DIR)/%.obj : %.f
+	$(FCOMPILER) -compile_only $(FFLAGS) $(FOPTS) $*.f  
+	@touch $(BUILD_DIR)/$*.obj >temp/temp
+	@rm $(BUILD_DIR)/$*.obj >temp/temp
+	@mv $*.obj $(BUILD_DIR) >temp/temp
+
+$(BUILD_DIR)/%.pp :  %.cpp
+	$(COMPILER) -E $(CFLAGS) $(CFLAGSPEC) $(DEBUG) $(OPTIM)  $*.cpp > $(BUILD_DIR)/$*.pp
+	echo done
+
+%.ifo :  %.h
+	$(COMPILER) -E $(CFLAGS) $(CFLAGSPEC) $(DEBUG) $(OPTIM)  $*.h > temp/temp.pp
+	
+	cint  -i temp/temp.pp $(MAKEDEFAULTDIR)/MakeIfo.cxx $* > $*.ifo
+
+%.sinfo.cpp :  %.h
+	$(COMPILER) -D_CINT -E $(CFLAGS) $(CFLAGSPEC) $(DEBUG) $(OPTIM)  $*.h > temp/temp.pp
+	
+	cint.exe   -i  $(MAKEDEFAULTDIR)/MakeIfo.cxx $* > $*.sinfo.cpp
+#-DINCL=temp/temp.pp
+
+	
+$(BUILD_DIR)/%.lib : $(OBJS) $(OBJSRTTI)
+	@touch $@
+	@rm $(BUILD_DIR)/$*.lib
+	lib -OUT:$@  $(OBJS) -NODEFAULTLIB
+
+$(BUILD_DIR)/%.exe : $(BUILD_DIR)/%.obj $(OBJS) $(LIBRARIES) 
+	$(COMPILER)  $(LFLAGS)  $(DEBUG) $(OBJS) $(BUILD_DIR)/$*.obj $(LIBRARIES) -o $@ $(LOPTS)
+
+$(BUILD_DIR)/%.dll : $(BUILD_DIR)/%.obj $(OBJS)  $(LIBRARIES)  %.def
+	$(COMPILER)  $(LFLAGS) -LDd -Zi $(OBJS) $(BUILD_DIR)/$*.obj $(LIBRARIES) $*.def -o $@
+
+$(BUILD_DIR)/%.drv : $(BUILD_DIR)/%.obj $(OBJS)  $(LIBRARIES)  %.def
+	$(COMPILER)  $(LFLAGS) -LDd -Zi $(OBJS) $(BUILD_DIR)/$*.obj $(LIBRARIES) $*.def -o $@
+
+depends.$(BUILD_DIR): dependsRaw.$(BUILD_DIR)
+	@echo "/\.o:/s/^/$(subst /,\/,$(BUILD_DIR))\//" > CreateMSCDepends.sed
+	sed -f CreateMSCDepends.sed depends.nt > depends.$(BUILD_DIR)
+	rm -f CreateMSCDepends.sed 
+
+dependsRaw.$(BUILD_DIR): 
+	gcc -MM -D_CY32 -DWIN32 $(CFLAGS) *.c* > dependsRaw.$(BUILD_DIR)
+	@mkdir -p temp
+	@mkdir -p $(BUILD_DIR)
+
+$(BUILD_DIR)/%.gam : $(BUILD_DIR)/%.obj $(OBJS)  $(LIBRARIES)  %.def
+	$(COMPILER)  $(LFLAGS) -LDd -Zi $(OBJS) $(BUILD_DIR)/$*.obj $(LIBRARIES) $*.def -o $@
+
+%.spb : 
+	$(MAKE) -C $* -f Makefile.$(TARGET)
+
+%.spc : 
+	$(MAKE) -C $* -f Makefile.$(TARGET) clean
+
+
+clean:  $(SUBPROJC)
+	@rm -f depends.*
+	@rm -f $(BUILD_DIR)/*$(OBJEXT)
+	@rm -f $(BUILD_DIR)/*$(DLLEXT)
+	@rm -f $(BUILD_DIR)/*$(EXEEXT)
+	@rm -f $(BUILD_DIR)/*$(LIBEXT)
+	@rm -f $(BUILD_DIR)/*$(DRVEXT)
+	@rm -f $(BUILD_DIR)/*$(GAMEXT)
+
