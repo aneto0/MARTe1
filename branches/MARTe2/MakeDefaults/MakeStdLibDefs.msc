@@ -32,9 +32,9 @@ DLLEXT=.dll
 DRVEXT=.drv
 GAMEXT=.gam
 
-OBJS=   $(OBJSX:%.x=msc/%.obj) 
-OBJS2=  $(OBJSX2:%.x=msc/%.obj) 
-OBJS3=  $(OBJSX3:%.x=msc/%.obj) 
+OBJS=   $(OBJSX:%.x=$(BUILD_DIR)/%.obj) 
+OBJS2=  $(OBJSX2:%.x=$(BUILD_DIR)/%.obj) 
+OBJS3=  $(OBJSX3:%.x=$(BUILD_DIR)/%.obj) 
 
 PP=   $(PPX:%.x=msc/%.pp) 
 
@@ -53,7 +53,7 @@ MAKE     =   make
 COMPILER =   cl 
 FCOMPILER =  f77
 DEBUG    =   -Zi
-OPTIM    =   -O2 -G6 -Ob2
+OPTIM    =   -O2 -Ob2
 CFLAGSPEC=   -MD -GR -DARCHITECTURE=x86_cl -DOPERATING_SYSTEM=windows
 LFLAGS   =   
 LOPTS    =  

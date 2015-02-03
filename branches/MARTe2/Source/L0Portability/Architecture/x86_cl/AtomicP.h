@@ -33,7 +33,7 @@
 
 /** A collector of functions that are executed atomically even on multiprocessor machines. */
 /** Atomically increment a 32 bit integer in memory. */
-static inline void AtomicIncrement32 (volatile int32 *p ){
+inline void AtomicIncrement32 (volatile int32 *p ){
     __asm  {
         mov   ebx,p
             lock inc DWORD PTR[ebx]
@@ -41,7 +41,7 @@ static inline void AtomicIncrement32 (volatile int32 *p ){
 }
 
 /** Atomically increment a 16 bit integer in memory. */
-static inline void AtomicIncrement16 (volatile int16 *p){
+inline void AtomicIncrement16 (volatile int16 *p){
     __asm  {
         mov   ebx,p
             lock inc WORD PTR[ebx]
@@ -49,7 +49,7 @@ static inline void AtomicIncrement16 (volatile int16 *p){
 }
 
 /** Atomically increment a 8 bit integer in memory. */
-static inline void AtomicIncrement8 (volatile int8 *p){
+inline void AtomicIncrement8 (volatile int8 *p){
     __asm  {
         mov   ebx,p
             lock inc [ebx]
@@ -57,7 +57,7 @@ static inline void AtomicIncrement8 (volatile int8 *p){
 }
 
 /** Atomically decrement a 32 bit integer in memory. */
-static inline void AtomicDecrement32 (volatile int32 *p){
+inline void AtomicDecrement32 (volatile int32 *p){
     __asm  {
         mov   ebx,p
             lock dec DWORD PTR[ebx]
@@ -65,7 +65,7 @@ static inline void AtomicDecrement32 (volatile int32 *p){
 }
 
 /** Atomically decrement a 16 bit integer in memory. */
-static inline void AtomicDecrement16 (volatile int16 *p){
+inline void AtomicDecrement16 (volatile int16 *p){
     __asm  {
         mov   ebx,p
             lock dec WORD PTR[ebx]
@@ -73,7 +73,7 @@ static inline void AtomicDecrement16 (volatile int16 *p){
 }
 
 /** Atomically decrement a 8 bit integer in memory. */
-static inline void AtomicDecrement8 (volatile int8 *p){
+inline void AtomicDecrement8 (volatile int8 *p){
     __asm  {
         mov   ebx,p
             lock dec [ebx]
@@ -81,67 +81,68 @@ static inline void AtomicDecrement8 (volatile int8 *p){
 }
 
 /** Atomically exchange the contents of a variable with the specified memory location. */
-static inline int32 AtomicExchange32 (volatile int32 *p, int32 v){
+inline int32 AtomicExchange32 (volatile int32 *p, int32 v){
     __asm  {
         mov   ebx,p
             mov   eax,v
             lock xchg  DWORD PTR [ebx], eax
     }
+}
 
-    /** Test and set a 32 bit memory location in a thread safe way. */
-    static inline bool AtomicTestAndSet32(int32 volatile *p){
-        int32 temp;
-        __asm  {
-            mov   ebx,p
-                mov   eax,1
-                xchg  DWORD PTR [ebx], eax
-                mov   temp,eax
-        }
+/** Test and set a 32 bit memory location in a thread safe way. */
+inline bool AtomicTestAndSet32(int32 volatile *p){
+    int32 temp;
+    __asm  {
+        mov   ebx,p
+            mov   eax,1
+            xchg  DWORD PTR [ebx], eax
+            mov   temp,eax
     }
+}
 
-    /** Test and set a 16 bit memory location in a thread safe way. */
-    static inline bool AtomicTestAndSet16(int16 volatile *p){
-        int16 temp;
-        __asm  {
-            mov   ebx,p
-                mov   ax,1
-                xchg  WORD PTR [ebx], ax
-                mov   temp,ax
-        }
+/** Test and set a 16 bit memory location in a thread safe way. */
+inline bool AtomicTestAndSet16(int16 volatile *p){
+    int16 temp;
+    __asm  {
+        mov   ebx,p
+            mov   ax,1
+            xchg  WORD PTR [ebx], ax
+            mov   temp,ax
     }
+}
 
-    /** Test and set a 8 bit memory location in a thread safe way. */
-    static inline bool AtomicTestAndSet8(int8  volatile *p){
-        int8 temp;
-        __asm  {
-            mov   ebx,p
-                mov   al,1
-                xchg   [ebx], al
-                mov   temp,al
-        }
+/** Test and set a 8 bit memory location in a thread safe way. */
+inline bool AtomicTestAndSet8(int8  volatile *p){
+    int8 temp;
+    __asm  {
+        mov   ebx,p
+            mov   al,1
+            xchg   [ebx], al
+            mov   temp,al
     }
+}
 
-    /**
-     * Atomic addition
-     */
-    static inline void AtomicAdd32 (volatile int32 *p, int32 value) {
-        __asm  {
-            mov   ebx,p
-                mov   eax,p
-                lock add DWORD PTR[ebx], eax
-        }
+/**
+ * Atomic addition
+ */
+inline void AtomicAdd32 (volatile int32 *p, int32 value) {
+    __asm  {
+        mov   ebx,p
+            mov   eax,p
+            lock add DWORD PTR[ebx], eax
     }
+}
 
-    /**
-     * Atomic subtraction
-     */
-    static inline void AtomicSub32 (volatile int32 *p, int32 value) {
-        __asm  {
-            mov   ebx,p
-                mov   eax,p
-                lock add DWORD PTR[ebx], eax
-        }
+/**
+ * Atomic subtraction
+ */
+inline void AtomicSub32 (volatile int32 *p, int32 value) {
+    __asm  {
+        mov   ebx,p
+            mov   eax,p
+            lock add DWORD PTR[ebx], eax
     }
+}
 
 #endif
 
