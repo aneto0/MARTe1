@@ -65,7 +65,7 @@ CFLAGS = -fPIC
 
 CPPFLAGS = -fPIC -frtti 
 
-CFLAGSPEC= -DARCHITECTURE=x86_gcc -DOPERATING_SYSTEM=linux -DUSE_PTHREAD -pthread
+CFLAGSPEC= -DARCHITECTURE=x86_gcc -DOPERATING_SYSTEM=Linux -DUSE_PTHREAD -pthread
 
 LIBRARIES =  -lm -ldl -lnsl -lpthread -lrt -lncurses
 

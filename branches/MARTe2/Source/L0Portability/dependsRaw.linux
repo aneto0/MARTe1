@@ -1,0 +1,6 @@
+Atomic.o: Atomic.cpp Atomic.h GeneralDefinitions.h \
+ Architecture/x86_gcc/GeneralDefinitionsP.h \
+ Architecture/x86_gcc/AtomicP.h
+Processor.o: Processor.cpp Processor.h GeneralDefinitions.h \
+ Architecture/x86_gcc/GeneralDefinitionsP.h \
+ OperatingSystem/Linux/ProcessorOS.h Architecture/x86_gcc/ProcessorP.h

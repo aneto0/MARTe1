@@ -23,7 +23,8 @@
 #
 #############################################################
 
-OBJSX=  Atomic.x 
+OBJSX=  Atomic.x \
+        Processor.x 
 
 TBD= SPAtomic.x \
         StreamInterface.x \
