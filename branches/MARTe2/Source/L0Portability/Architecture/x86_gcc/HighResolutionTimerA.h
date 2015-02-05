@@ -35,7 +35,7 @@
 
 
 /** Reads the High Resolution Timer as 32 bit.Fast inline assembler. */
-inline uint32 HighResolutionTimerRead32() {
+static inline uint32 HighResolutionTimerRead32() {
     uint64 perf;
     uint32 *pperf = (uint32 *)&perf;
     asm(
@@ -50,7 +50,7 @@ inline uint32 HighResolutionTimerRead32() {
 
 
 /** Reads the High Resolution Timer as 64 bit int. Fast inline */
-inline int64 HighResolutionTimerRead64 () {
+static inline int64 HighResolutionTimerRead64 () {
     volatile int64 perf;
     uint32 *pperf = (uint32 *)&perf;
     asm volatile(
@@ -60,62 +60,6 @@ inline int64 HighResolutionTimerRead64 () {
     );
     return perf;
 }
-
-
-extern "C" {
-    /** the frequency of the HRT Clock. */
-    int64   HRTClockRate();
-
-    /** the HRT Clock period in seconds */
-    double  HRTClockCycle();
-
-    /** how many ticks in a msec for the HRT */
-    uint32  HRTMSecTics();
-
-    /** how many seconds from start of system as calculated using the HRT */
-    uint32  HRTSystemMsecTime();
-
-}
-
-
-/** Access to a calibrated high frequency counter. Uses the CPU internal register */
-class HRT{
-
-public:
-
-    /** an high resolution time counter. Only valid on pentiums CPUs and above */
-    static inline int64 HRTCounter(){
-        return HRTRead64();
-    }
-
-    /** an high resolution time counter. Only valid on pentiums CPUs and above */
-    static inline uint32 HRTCounter32(){
-        return HRTRead32();
-    }
-
-    /** to interpret the value returned by HRTCounter. Also the CPU clock!! */
-    static inline int64 HRTFrequency(){
-        return HRTClockRate();
-    }
-
-    /** The length of a clock period in seconds */
-    static inline double HRTPeriod(){
-        return HRTClockCycle();
-    }
-
-    /** converts HRT ticks to time */
-    static inline double TicksToTime(int64 tStop,int64 tStart = 0){
-        int64 dT = tStop-tStart;
-        return dT * HRTPeriod();
-    }
-
-    /** use with care: the object must be Created
-    This is a roughly 1 msec counter counting up */
-    uint32 SystemMsecTime(){
-        return HRTSystemMsecTime();
-    }
-
-};
 
 #endif
 

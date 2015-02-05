@@ -26,31 +26,23 @@
 #define PROCESSOR_P_H
 
 // executes the CPUID function
-inline void ProcessorCPUID(uint32 type,uint32 &A,uint32 &B,uint32 &C,uint32 &D){
-    int a[8];
-    asm(
-        "movl %%eax,16(%0)\n"
-        "movl %%ebx,20(%0)\n"
-        "movl %%ecx,24(%0)\n"
-        "movl %%edx,28(%0)\n"
-        "movl %1,%%eax\n"
-        "cpuid\n"
-        "movl %%eax, (%0)\n"
-        "movl %%ebx, 4(%0)\n"
-        "movl %%ecx, 8(%0)\n"
-        "movl %%edx, 12(%0)\n"
-        "movl 16(%0), %%eax\n"
-        "movl 20(%0), %%ebx\n"
-        "movl 24(%0), %%ecx\n"
-        "movl 28(%0), %%edx\n"
-        :
-        : "r" (&a[0]) ,"r" (type)
-        : "eax","ebx","ecx","edx"
-        );
-    A=a[0];
-    B=a[1];
-    C=a[2];
-    D=a[3];
+static inline void ProcessorCPUID(uint32 op, uint32 &eax,uint32 &ebx,uint32 &ecx,uint32 &edx){
+
+}
+
+/** The processor family INTEL MOTOROLA ...
+    @return The processor family
+*/
+static inline uint32 ProcessorFamily(){
+    return FAMILY_INTEL_X86;
+}
+
+/** 
+    @return The processor name
+*/
+static inline void ProcessorName(char *name){
+    uint32 maxop;
+    ProcessorCPUID(0, maxop, (uint32 &)name[0], (uint32 &)name[8], (uint32 &)name[4]);
 }
 #endif
 

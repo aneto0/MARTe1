@@ -29,27 +29,26 @@
 #ifndef PROCESSOR_H
 #define PROCESSOR_H
 
+/** Defines the Processor Family for the Intel */
+#define FAMILY_INTEL_X86     0x10010000
+/** Defines the Processor Family for the 68K */
+#define FAMILY_MOTOROLA_68K  0x20010000
+/** Defines the Processor Family for the PPC */
+#define FAMILY_MOTOROLA_PPC  0x20020000
+/** Defines the Processor Family for the Sparc */
+#define FAMILY_SPARC         0x40010000
+
 #include "GeneralDefinitions.h"
 #include INCLUDE_FILE_OPERATING_SYSTEM(OPERATING_SYSTEM,ProcessorOS.h)
-#include INCLUDE_FILE_ARCHITECTURE(ARCHITECTURE,ProcessorP.h)
+#include INCLUDE_FILE_ARCHITECTURE(ARCHITECTURE,ProcessorA.h)
 
 /** Defines some methods to get information about the processor. */
 class Processor {
 public:
 
-    /** The high resolution timer clock in hertz (=CPU in some platforms). */
-    static uint64 ClockFrequency(){
-        return  ProcessorClockFrequency();
-    }
-
-    /** The clock period in seconds. */
-    static double ClockPeriod(){
-        return  ProcessorClockPeriod();
-    }
-
     /** The processor type. */
-    static const char *Name(){
-        return  ProcessorName();
+    static void Name(char *name){
+        return  ProcessorName(name);
     }
 
     /** The processor family INTEL/MOTOROLA/\.\.. */

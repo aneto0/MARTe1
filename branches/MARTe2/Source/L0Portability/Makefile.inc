@@ -24,7 +24,8 @@
 #############################################################
 
 OBJSX=  Atomic.x \
-        Processor.x 
+        Processor.x \
+		HighResolutionTimer.x
 
 TBD= SPAtomic.x \
         StreamInterface.x \
@@ -51,7 +52,8 @@ MAKEDEFAULTDIR=../../MakeDefaults
 include $(MAKEDEFAULTDIR)/MakeStdLibDefs.$(TARGET)
 
 all: $(OBJS)    \
-                $(BUILD_DIR)/L0Portability$(LIBEXT)
+                $(BUILD_DIR)/L0Portability$(LIBEXT) \
+                $(BUILD_DIR)/Test$(EXEEXT)
 	echo  $(OBJS)
 
 include depends.$(TARGET)

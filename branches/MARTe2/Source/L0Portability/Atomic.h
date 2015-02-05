@@ -32,7 +32,7 @@
 #define ATOMIC_H
 
 #include "GeneralDefinitions.h"
-#include INCLUDE_FILE_ARCHITECTURE(ARCHITECTURE,AtomicP.h)
+#include INCLUDE_FILE_ARCHITECTURE(ARCHITECTURE,AtomicA.h)
 
 /** A collector of functions that are executed atomically even on multiprocessor machines. */
 class Atomic{

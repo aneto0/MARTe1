@@ -32,65 +32,54 @@
  * SOME CODE
  * double totalTime = (HRT::HRTCounter() - t1) * HRT::HRTPeriod();
  */
-#ifndef __HRT_H___
-#define __HRT_H___
+#ifndef HIGH_RESOLUTION_TIMER_H
+#define HIGH_RESOLUTION_TIMER_H
 
 #include "GeneralDefinitions.h"
-#include INCLUDE_FILE_ARCHITECTURE(ARCHITECTURE,AtomicP.h)
+#include INCLUDE_FILE_ARCHITECTURE(ARCHITECTURE,HighResolutionTimerA.h)
 
 extern "C" {
     /** the frequency of the HRT Clock. */
-    int64   HRTClockRate();
+    int64   HighResolutionTimerFrequency();
 
     /** the HRT Clock period in seconds */
-    double  HRTClockCycle();
+    double  HighResolutionTimerPeriod();
 
     /** how many ticks in a msec for the HRT */
-    uint32  HRTMSecTics();
-
-    /** how many seconds from start of system as calculated using the HRT */
-    uint32  HRTSystemMsecTime();
-
+    uint32  HighResolutionTimerMSecTics();
 }
 
 
 /** Access to a calibrated high frequency counter. Uses the CPU internal register */
-class HRT{
+class HighResolutionTimer{
 
 public:
 
     /** an high resolution time counter. Only valid on pentiums CPUs and above */
-    static inline int64 HRTCounter(){
+    static inline int64 Counter(){
         return HighResolutionTimerRead64();
     }
 
     /** an high resolution time counter. Only valid on pentiums CPUs and above */
-    static inline uint32 HRTCounter32(){
+    static inline uint32 Counter32(){
         return HighResolutionTimerRead32();
     }
 
     /** to interpret the value returned by HRTCounter. Also the CPU clock!! */
-    static inline int64 HRTFrequency(){
-        return HRTClockRate();
+    static inline int64 Frequency(){
+        return HighResolutionTimerFrequency();
     }
 
     /** The length of a clock period in seconds */
-    static inline double HRTPeriod(){
-        return HRTClockCycle();
+    static inline double Period(){
+        return HighResolutionTimerMSecTics();
     }
 
     /** converts HRT ticks to time */
     static inline double TicksToTime(int64 tStop,int64 tStart = 0){
         int64 dT = tStop-tStart;
-        return dT * HRTPeriod();
+        return dT * Period();
     }
-
-    /** use with care: the object must be Created
-    This is a roughly 1 msec counter counting up */
-    uint32 SystemMsecTime(){
-        return HRTSystemMsecTime();
-    }
-
 };
 
 #endif
