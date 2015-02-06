@@ -39,26 +39,35 @@
 #define FAMILY_SPARC         0x40010000
 
 #include "GeneralDefinitions.h"
-#include INCLUDE_FILE_OPERATING_SYSTEM(OPERATING_SYSTEM,ProcessorOS.h)
-#include INCLUDE_FILE_ARCHITECTURE(ARCHITECTURE,ProcessorA.h)
+
+extern "C" {
+
+    uint32 ProcessorFamily();
+
+    const char *ProcessorName();
+
+    int32 ProcessorsAvailable();
+
+}
+
 
 /** Defines some methods to get information about the processor. */
 class Processor {
 public:
 
     /** The processor type. */
-    static void Name(char *name){
-        return  ProcessorName(name);
+    static inline const char *Name() const{
+        return  ProcessorName();
     }
 
     /** The processor family INTEL/MOTOROLA/\.\.. */
-    static uint32 Family(){
+    static inline uint32 Family() const {
         return  ProcessorFamily();
     }
 
    
     /** The number of cpus avaible */
-    static int32 Available(){
+    static inline int32 Available() const {
         return ProcessorsAvailable();
     }
 };

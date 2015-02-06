@@ -38,7 +38,7 @@ static inline void ProcessorCPUID(uint32 info, uint32 &eax,uint32 &ebx,uint32 &e
 /** The processor family INTEL MOTOROLA ...
     @return The processor family
 */
-static inline uint32 ProcessorFamily(){
+uint32 ProcessorFamily(){
     uint32 eax = 0;
     uint32 ebx = 0;
     uint32 ecx = 0;
@@ -51,12 +51,19 @@ static inline uint32 ProcessorFamily(){
     return family;
 }
 
+static char processorNameReserveSpace[13];
 /** 
     @return The processor name
 */
-static inline void ProcessorName(char *name){
+const char *ProcessorName(){
+
     uint32 eax = 0;
-    ProcessorCPUID(0, eax, (uint32 &)name[0], (uint32 &)name[8], (uint32 &)name[4]);
+    ProcessorCPUID(0, eax, 
+		(uint32 &)processorNameReserveSpace[0], 
+		(uint32 &)processorNameReserveSpace[8], 
+		(uint32 &)processorNameReserveSpace[4]);
+    processorNameReserveSpace[12]=0;
+    return &processorNameReserveSpace[0];
 }
 #endif
 

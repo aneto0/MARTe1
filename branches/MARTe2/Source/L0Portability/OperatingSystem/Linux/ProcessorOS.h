@@ -32,7 +32,7 @@
 #include <unistd.h>
 
 /** The number of cpus avaible */
-static inline int32 ProcessorsAvailable(){
+int32 ProcessorsAvailable(){
     return sysconf(_SC_NPROCESSORS_ONLN);
 }
 

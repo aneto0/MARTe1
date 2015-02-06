@@ -24,3 +24,7 @@
 
 #include "Processor.h"
 
+#include INCLUDE_FILE_OPERATING_SYSTEM(OPERATING_SYSTEM,ProcessorOS.h)
+#include INCLUDE_FILE_ARCHITECTURE(ARCHITECTURE,ProcessorA.h)
+
+
