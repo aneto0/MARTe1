@@ -26,23 +26,37 @@
 #define PROCESSOR_P_H
 
 // executes the CPUID function
-static inline void ProcessorCPUID(uint32 op, uint32 &eax,uint32 &ebx,uint32 &ecx,uint32 &edx){
-
+static inline void ProcessorCPUID(uint32 info, uint32 &eax,uint32 &ebx,uint32 &ecx,uint32 &edx){
+    __asm__(
+        "cpuid;"                                            /* assembly code */
+        :"=a" (eax), "=b" (ebx), "=c" (ecx), "=d" (edx) /* outputs */
+        :"a" (info)                                         /* input: info into eax */
+                                                            /* clobbers: none */
+    );
 }
 
 /** The processor family INTEL MOTOROLA ...
     @return The processor family
 */
 static inline uint32 ProcessorFamily(){
-    return FAMILY_INTEL_X86;
+    uint32 eax = 0;
+    uint32 ebx = 0;
+    uint32 ecx = 0;
+    uint32 edx = 0;
+    ProcessorCPUID(1, eax, ebx, ecx, edx);
+    uint32 family = (eax >> 8) & 0xf;
+    if(family == 0xf){
+        family += (eax >> 20) & 0xf;
+    }
+    return family;
 }
 
 /** 
     @return The processor name
 */
 static inline void ProcessorName(char *name){
-    uint32 maxop;
-    ProcessorCPUID(0, maxop, (uint32 &)name[0], (uint32 &)name[8], (uint32 &)name[4]);
+    uint32 eax = 0;
+    ProcessorCPUID(0, eax, (uint32 &)name[0], (uint32 &)name[8], (uint32 &)name[4]);
 }
 #endif
 
