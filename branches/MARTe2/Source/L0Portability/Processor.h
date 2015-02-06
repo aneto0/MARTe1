@@ -56,18 +56,18 @@ class Processor {
 public:
 
     /** The processor type. */
-    static inline const char *Name() const{
+    static inline const char *Name(){
         return  ProcessorName();
     }
 
     /** The processor family INTEL/MOTOROLA/\.\.. */
-    static inline uint32 Family() const {
+    static inline uint32 Family(){
         return  ProcessorFamily();
     }
 
    
     /** The number of cpus avaible */
-    static inline int32 Available() const {
+        static inline int32 Available(){
         return ProcessorsAvailable();
     }
 };
