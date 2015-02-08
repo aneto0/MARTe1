@@ -25,7 +25,14 @@
 #ifndef PROCESSOR_P_H
 #define PROCESSOR_P_H
 
-// executes the CPUID function
+/**
+ * Implementation of the cpuid function for x86 and gcc
+ * @param info drives the type of request being asked, e.g. 0 for Vendor, 1 for Family and Model, ...
+ * @param eax the CPU EAX register
+ * @param ebx the CPU EBX register
+ * @param ecx the CPU ECX register
+ * @param edx the CPU EDX register
+ */
 static inline void ProcessorCPUID(uint32 info, uint32 &eax,uint32 &ebx,uint32 &ecx,uint32 &edx){
     __asm__(
         "cpuid;"                                            /* assembly code */
@@ -35,9 +42,9 @@ static inline void ProcessorCPUID(uint32 info, uint32 &eax,uint32 &ebx,uint32 &e
     );
 }
 
-/** The processor family INTEL MOTOROLA ...
-    @return The processor family
-*/
+/** 
+ * @see Processor::Family()
+ */
 uint32 ProcessorFamily(){
     uint32 eax = 0;
     uint32 ebx = 0;
@@ -51,19 +58,35 @@ uint32 ProcessorFamily(){
     return family;
 }
 
-static char processorNameReserveSpace[13];
 /** 
-    @return The processor name
-*/
-const char *ProcessorName(){
+ * @see Processor::Model()
+ */
+uint32 ProcessorModel(){
+    uint32 eax = 0;
+    uint32 ebx = 0;
+    uint32 ecx = 0;
+    uint32 edx = 0;
+    ProcessorCPUID(1, eax, ebx, ecx, edx);
+    return (eax >> 4) & 0xf;
+}
+
+/**
+ * Stores the processor vendor
+ */
+static char processorVendorId[13];
+
+/** 
+ * @see Processor::VendorId()
+ */
+const char *ProcessorVendorId(){
 
     uint32 eax = 0;
     ProcessorCPUID(0, eax, 
-		(uint32 &)processorNameReserveSpace[0], 
-		(uint32 &)processorNameReserveSpace[8], 
-		(uint32 &)processorNameReserveSpace[4]);
-    processorNameReserveSpace[12]=0;
-    return &processorNameReserveSpace[0];
+		(uint32 &)processorVendorId[0], 
+		(uint32 &)processorVendorId[8], 
+		(uint32 &)processorVendorId[4]);
+    processorVendorId[12]=0;
+    return &processorVendorId[0];
 }
 #endif
 

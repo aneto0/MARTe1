@@ -61,7 +61,7 @@ OPTIM =
 
 LFLAGS =  
 
-CFLAGS = -fPIC
+CFLAGS = -fPIC -Wall
 
 CPPFLAGS = -fPIC -frtti 
 

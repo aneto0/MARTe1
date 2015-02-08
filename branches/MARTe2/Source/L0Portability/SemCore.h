@@ -23,20 +23,49 @@
  *
 **/
 /**
- * @file
- * Access processor's information
+ * @file 
+ * Common functionalities shared by all semaphore types
  */
-#ifndef PROCESSOR_OS_H
-#define PROCESSOR_OS_H
+#ifndef SEM_CORE_H
+#define SEM_CORE_H
 
-#include <unistd.h>
-
+#include "GeneralDefinitions.h"
 /**
- * @see Processors::Available()
- */
-uint32 ProcessorsAvailable(){
-    return (uint32)sysconf(_SC_NPROCESSORS_ONLN);
-}
+   This class provides basic facilities to use semaphores.
+*/
+class SemCore {
+protected:
+    /** A number associated to te semaphore. */
+    HANDLE semH;
+public:
+    /** Set the semaphore handle to 0. */
+    void Init(){
+        semH = (HANDLE)0;
+    }
+    /** Set the semaphore. */
+    void Init(HANDLE s){
+        semH = s;
+    }
+    
+    /** Calls Init(s). */
+    SemCore(HANDLE s){
+        Init(s);
+    }
 
+    /** Calls Init(). */
+    SemCore(){
+        Init();
+    }
+
+    /** */
+    void operator=(SemCore &s){
+        semH = s.semH;
+    }
+
+    /** the operating system handle */
+    inline HANDLE Handle(){
+        return semH;
+    }
+};
 #endif
 

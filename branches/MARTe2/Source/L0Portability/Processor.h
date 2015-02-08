@@ -1,5 +1,6 @@
 /*
- * Copyright 2011 EFDA | European Fusion Development Agreement
+ * Copyright 2015 F4E | European Joint Undertaking for 
+ * ITER and the Development of Fusion Energy ('Fusion for Energy')
  *
  * Licensed under the EUPL, Version 1.1 or - as soon they 
    will be approved by the European Commission - subsequent  
@@ -15,13 +16,12 @@
    distributed on an "AS IS" basis, 
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
    express or implied. 
- * See the Licence for the specific language governing 
+ * See the Licence  
    permissions and limitations under the Licence. 
  *
- * $Id: Processor.h 43 2012-02-08 17:07:58Z astephen $
+ * $Id: Endianity.h 3 2012-01-15 16:26:07Z aneto $
  *
 **/
-
 /**
  * @file
  * Access processor's information
@@ -29,25 +29,17 @@
 #ifndef PROCESSOR_H
 #define PROCESSOR_H
 
-/** Defines the Processor Family for the Intel */
-#define FAMILY_INTEL_X86     0x10010000
-/** Defines the Processor Family for the 68K */
-#define FAMILY_MOTOROLA_68K  0x20010000
-/** Defines the Processor Family for the PPC */
-#define FAMILY_MOTOROLA_PPC  0x20020000
-/** Defines the Processor Family for the Sparc */
-#define FAMILY_SPARC         0x40010000
-
 #include "GeneralDefinitions.h"
 
 extern "C" {
 
     uint32 ProcessorFamily();
 
-    const char *ProcessorName();
+    const char *ProcessorVendorId();
 
-    int32 ProcessorsAvailable();
+    uint32 ProcessorsAvailable();
 
+    uint32 ProcessorModel();
 }
 
 
@@ -56,18 +48,22 @@ class Processor {
 public:
 
     /** The processor type. */
-    static inline const char *Name(){
-        return  ProcessorName();
+    static inline const char *VendorId(){
+        return  ProcessorVendorId();
     }
 
-    /** The processor family INTEL/MOTOROLA/\.\.. */
+    /** The processor family */
     static inline uint32 Family(){
         return  ProcessorFamily();
     }
 
-   
+    /** The processor family */
+    static inline uint32 Model(){
+        return  ProcessorModel();
+    }
+
     /** The number of cpus avaible */
-        static inline int32 Available(){
+    static inline uint32 Available(){
         return ProcessorsAvailable();
     }
 };

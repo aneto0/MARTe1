@@ -1,0 +1,20 @@
+EndianityTest.o: EndianityTest.cpp \
+ ../../Source/L0Portability/GeneralDefinitions.h \
+ ../../Source/L0Portability/Architecture/x86_gcc/GeneralDefinitionsA.h \
+ EndianityTest.h ../../Source/L0Portability/Endianity.h \
+ ../../Source/L0Portability/Architecture/x86_gcc/EndianityA.h
+Test.o: Test.cpp ../../Source/L0Portability/Processor.h \
+ ../../Source/L0Portability/GeneralDefinitions.h \
+ ../../Source/L0Portability/Architecture/x86_gcc/GeneralDefinitionsA.h \
+ ../../Source/L0Portability/FastMath.h \
+ ../../Source/L0Portability/Architecture/x86_gcc/FastMathA.h \
+ ../../Source/L0Portability/HighResolutionTimer.h \
+ ../../Source/L0Portability/Architecture/x86_gcc/HighResolutionTimerA.h \
+ ../../Source/L0Portability/Endianity.h \
+ ../../Source/L0Portability/Architecture/x86_gcc/EndianityA.h \
+ EndianityTest.h ../../Source/L0Portability/MutexSem.h \
+ ../../Source/L0Portability/OperatingSystem/Linux/MutexSemOS.h \
+ ../../Source/L0Portability/OperatingSystem/Linux/../../TimeoutType.h \
+ ../../Source/L0Portability/OperatingSystem/Linux/../../GeneralDefinitions.h \
+ ../../Source/L0Portability/OperatingSystem/Linux/../../HighResolutionTimer.h \
+ ../../Source/L0Portability/SemCore.h

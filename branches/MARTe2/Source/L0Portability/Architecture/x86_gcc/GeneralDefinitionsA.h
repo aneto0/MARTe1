@@ -57,5 +57,7 @@ typedef signed   char      int8;
     1024 has been used to avoid alignment problems. */
 #define msizeof(type,field) sizeof(((type *)1024)->field)
 
+#define HANDLE intptr
+
 #endif
 

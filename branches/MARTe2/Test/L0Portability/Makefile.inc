@@ -24,37 +24,16 @@
 #
 #############################################################
 
-OBJSX=  Atomic.x \
-        Processor.x \
-        Endianity.x \
-		HighResolutionTimer.x
-
-TBD= SPAtomic.x \
-        StreamInterface.x \
-        ErrorManagement.x \
-        CStream.x \
-        Processor.x \
-        HRT.x \
-        Threads.x  \
-        ThreadsDatabase.x  \
-        Sleep.x \
-        Memory.x\
-        SemCore.x \
-        InternetAddress.x \
-        BasicSocket.x \
-        BasicATMSocket.x \
-        BasicFile.x \
-        BasicConsole.x \
-        BString.x \
-        ProcessorType.x \
-		Timer.x
+OBJSX=  EndianityTest.x 
 
 MAKEDEFAULTDIR=../../MakeDefaults
 
 include $(MAKEDEFAULTDIR)/MakeStdLibDefs.$(TARGET)
 
+CFLAGS+= -I../../Source/L0Portability
+
 all: $(OBJS)    \
-                $(BUILD_DIR)/L0Portability$(LIBEXT) 
+                $(BUILD_DIR)/Test$(EXEEXT)
 	echo  $(OBJS)
 
 include depends.$(TARGET)

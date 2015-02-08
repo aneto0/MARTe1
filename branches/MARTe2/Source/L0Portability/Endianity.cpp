@@ -22,21 +22,11 @@
  * $Id: Endianity.h 3 2012-01-15 16:26:07Z aneto $
  *
 **/
-/**
- * @file
- * Access processor's information
- */
-#ifndef PROCESSOR_OS_H
-#define PROCESSOR_OS_H
 
-#include <unistd.h>
+#include "GeneralDefinitions.h"
+#include "Endianity.h"
 
-/**
- * @see Processors::Available()
- */
-uint32 ProcessorsAvailable(){
-    return (uint32)sysconf(_SC_NPROCESSORS_ONLN);
-}
+bool  Endianity::endianityTypeChecked = False;
+uint8 Endianity::endianityType        = 3;
 
-#endif
 

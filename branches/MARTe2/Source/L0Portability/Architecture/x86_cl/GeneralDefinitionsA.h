@@ -1,5 +1,6 @@
 /*
- * Copyright 2011 EFDA | European Fusion Development Agreement
+ * Copyright 2015 F4E | European Joint Undertaking for 
+ * ITER and the Development of Fusion Energy ('Fusion for Energy')
  *
  * Licensed under the EUPL, Version 1.1 or - as soon they 
    will be approved by the European Commission - subsequent  
@@ -15,13 +16,12 @@
    distributed on an "AS IS" basis, 
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
    express or implied. 
- * See the Licence for the specific language governing 
+ * See the Licence  
    permissions and limitations under the Licence. 
  *
- * $Id: GenDefs.h 3 2012-01-15 16:26:07Z aneto $
+ * $Id: Endianity.h 3 2012-01-15 16:26:07Z aneto $
  *
 **/
-
 /** 
  * @file
  * Definition of the basic properties and types.

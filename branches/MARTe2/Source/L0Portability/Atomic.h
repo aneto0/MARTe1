@@ -1,26 +1,27 @@
 /*
- * Copyright 2011 EFDA | European Fusion Development Agreement
+ * Copyright 2015 F4E | European Joint Undertaking for 
+ * ITER and the Development of Fusion Energy ('Fusion for Energy')
  *
- * Licensed under the EUPL, Version 1.1 or – as soon they 
- will be approved by the European Commission - subsequent  
- versions of the EUPL (the "Licence"); 
+ * Licensed under the EUPL, Version 1.1 or - as soon they 
+   will be approved by the European Commission - subsequent  
+   versions of the EUPL (the "Licence"); 
  * You may not use this work except in compliance with the 
- Licence. 
+   Licence. 
  * You may obtain a copy of the Licence at: 
  *  
  * http://ec.europa.eu/idabc/eupl
  *
  * Unless required by applicable law or agreed to in 
- writing, software distributed under the Licence is 
- distributed on an "AS IS" basis, 
+   writing, software distributed under the Licence is 
+   distributed on an "AS IS" basis, 
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
- express or implied. 
- * See the Licence for the specific language governing 
- permissions and limitations under the Licence. 
+   express or implied. 
+ * See the Licence  
+   permissions and limitations under the Licence. 
  *
- * $Id: Atomic.h 75 2012-11-07 09:42:41Z aneto $
+ * $Id: Endianity.h 3 2012-01-15 16:26:07Z aneto $
  *
- **/
+**/
 
 /**
  * @file
@@ -70,22 +71,22 @@ public:
 
     /** Atomically exchange the contents of a variable with the specified memory location. */
     static inline int32 Exchange (volatile int32 *p, int32 v){
-        AtomicExchange32(p, v);
+        return AtomicExchange32(p, v);
     }
 
     /** Test and set a 32 bit memory location in a thread safe way. */
     static inline bool TestAndSet(int32 volatile *p){
-        AtomicTestAndSet32(p);
+        return AtomicTestAndSet32(p);
     }
 
     /** Test and set a 16 bit memory location in a thread safe way. */
     static inline bool TestAndSet(int16 volatile *p){
-        AtomicTestAndSet16(p);
+        return AtomicTestAndSet16(p);
     }
 
     /** Test and set a 8 bit memory location in a thread safe way. */
     static inline bool TestAndSet(int8  volatile *p){
-        AtomicTestAndSet8(p);
+        return AtomicTestAndSet8(p);
     }
 
     /**

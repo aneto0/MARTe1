@@ -22,21 +22,45 @@
  * $Id: Endianity.h 3 2012-01-15 16:26:07Z aneto $
  *
 **/
-/**
- * @file
- * Access processor's information
- */
-#ifndef PROCESSOR_OS_H
-#define PROCESSOR_OS_H
 
-#include <unistd.h>
+#ifndef FAST_MATH_A_H
+#define FAST_MATH_A_H
 
 /**
- * @see Processors::Available()
+ * @see FastMath::Sin
  */
-uint32 ProcessorsAvailable(){
-    return (uint32)sysconf(_SC_NPROCESSORS_ONLN);
+static inline float FastMathSin(float angle){
+   volatile float output;
+    __asm__ __volatile__(
+        "fsin" 
+        : "=t" (output) : "0" (angle)
+    );
+    return output;
 }
 
+/**
+ * @see FastMath::Cos
+ */
+static inline float FastMathCos(float angle){
+    volatile float output;
+    __asm__ __volatile__(
+         "fcos;"
+        : "=t" (output) : "0" (angle)
+    );
+    return output;
+}
+
+/** 
+ * @see FastMath::FloatToInt 
+ */
+static inline int32 FastMathFloatToInt(float input){
+   volatile int32 output;
+    __asm__ __volatile__(
+        "fld   %1;\n"
+        "fistpl %0;"
+        : "=m" (output) : "m" (input)
+        );
+    return output;
+}
 #endif
 
