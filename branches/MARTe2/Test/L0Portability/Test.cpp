@@ -80,7 +80,7 @@ int main(int argc, char **argv){
     EndianityTest<float> floatTest(0.12345f);
     ExpectSuccess(floatTest.All());
 
-    EndianityTest<double> doubleTest(0.123456789d);
+    EndianityTest<double> doubleTest(0.123456789);
     ExpectSuccess(doubleTest.All());
 
     //Missing test classes
