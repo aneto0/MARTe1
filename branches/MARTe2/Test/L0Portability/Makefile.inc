@@ -24,16 +24,19 @@
 #
 #############################################################
 
-OBJSX=  EndianityTest.x 
+OBJSX=  EndianityTest.x
 
 MAKEDEFAULTDIR=../../MakeDefaults
 
 include $(MAKEDEFAULTDIR)/MakeStdLibDefs.$(TARGET)
 
-CFLAGS+= -I../../Source/L0Portability
+TESTING_LIBRARY=L0Portability
 
-all: $(OBJS)    \
-                $(BUILD_DIR)/Test$(EXEEXT)
+BUILD_DIR=../../Build/$(TARGET)/$(TESTING_LIBRARY)/Test
+CFLAGS+= -I../../Source/$(TESTING_LIBRARY)
+
+all: $(OBJS) \
+                $(BUILD_DIR)/L0PortabilityTest$(LIBEXT)
 	echo  $(OBJS)
 
 include depends.$(TARGET)

@@ -31,6 +31,8 @@ OBJEXT=.obj
 DLLEXT=.dll
 DRVEXT=.drv
 GAMEXT=.gam
+GCNOEXT=.gcno
+GCDAEXT=.gcda
 
 OBJS=   $(OBJSX:%.x=$(BUILD_DIR)/%.obj) 
 OBJS2=  $(OBJSX2:%.x=$(BUILD_DIR)/%.obj) 

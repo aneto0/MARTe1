@@ -61,7 +61,7 @@ public:
 
         bool isLittleEndian = (testValue == valueLittleEndian);
         bool isBigEndian    = (testValue == valueBigEndian);
-        if(Endianity::Type() == Endianity::LITTLE_ENDIAN){
+        if(Endianity::Type() == Endianity::ENDIANITY_LITTLE_ENDIAN){
             return isLittleEndian && !isBigEndian;
         }
         else{
@@ -88,7 +88,7 @@ public:
 
         bool isLittleEndian = (testValue == valueLittleEndian);
         bool isBigEndian    = (testValue == valueBigEndian);
-        if(Endianity::Type() == Endianity::LITTLE_ENDIAN){
+        if(Endianity::Type() == Endianity::ENDIANITY_LITTLE_ENDIAN){
             return isLittleEndian && !isBigEndian;
         }
         else{
@@ -120,7 +120,7 @@ public:
         isBigEndian      = isBigEndian && (testArray[1] == arrayBigEndian[1]);
         isBigEndian      = isBigEndian && (testArray[2] == arrayBigEndian[2]);
 
-        if(Endianity::Type() == Endianity::LITTLE_ENDIAN){
+        if(Endianity::Type() == Endianity::ENDIANITY_LITTLE_ENDIAN){
             return isLittleEndian && !isBigEndian;
         }
         else{
@@ -152,7 +152,7 @@ public:
         isBigEndian      = isBigEndian && (testArray[1] == arrayBigEndian[1]);
         isBigEndian      = isBigEndian && (testArray[2] == arrayBigEndian[2]);
 
-        if(Endianity::Type() == Endianity::LITTLE_ENDIAN){
+        if(Endianity::Type() == Endianity::ENDIANITY_LITTLE_ENDIAN){
             return isLittleEndian && !isBigEndian;
         }
         else{

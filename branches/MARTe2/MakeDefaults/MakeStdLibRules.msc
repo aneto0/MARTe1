@@ -108,4 +108,6 @@ clean:  $(SUBPROJC)
 	@rm -f $(BUILD_DIR)/*$(LIBEXT)
 	@rm -f $(BUILD_DIR)/*$(DRVEXT)
 	@rm -f $(BUILD_DIR)/*$(GAMEXT)
+	@rm -f $(BUILD_DIR)/*$(GCNOEXT)
+	@rm -f $(BUILD_DIR)/*$(GCDAEXT)
 

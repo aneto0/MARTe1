@@ -26,23 +26,17 @@
 BUILD_DIR=../../Build/$(TARGET)/$(lastword $(subst /,\ ,$(CURDIR)))
 
 EXEEXT=.ex
-
 DLLEXT=.so
-
 LIBEXT=.a
-
 OBJEXT=.o
-
 ASMEXT=.s
-
 DRVEXT=.drv
-
 GAMEXT=.gam
+GCNOEXT = .gcno
+GCDAEXT = .gcda
 
 OBJS=   $(OBJSX:%.x=$(BUILD_DIR)/%.o) 
-
 OBJS2=  $(OBJSX2:%.x=$(BUILD_DIR)/%.o) 
-
 OBJS3=  $(OBJSX3:%.x=$(BUILD_DIR)/%.o) 
 
 SUBPROJ = $(SPB:%.x=%.spb)
@@ -56,18 +50,11 @@ MAKE     = make
 
 #-maltivec -mabi=altivec
 DEBUG = -g -ggdb
-
 OPTIM = 
-
 LFLAGS =  
-
 CFLAGS = -fPIC -Wall
-
 CPPFLAGS = -fPIC -frtti 
-
 CFLAGSPEC= -DARCHITECTURE=x86_gcc -DOPERATING_SYSTEM=Linux -DUSE_PTHREAD -pthread
-
 LIBRARIES =  -lm -ldl -lnsl -lpthread -lrt -lncurses
-
 .SUFFIXES:   .c  .cpp  .o .a .exe .ex .ex_ .so .gam
 
