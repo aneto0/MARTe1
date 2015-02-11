@@ -30,6 +30,7 @@
 #ifndef ENDIANITY_H
 #define ENDIANITY_H
 
+#include "GeneralDefinitions.h"
 #include INCLUDE_FILE_ARCHITECTURE(ARCHITECTURE,EndianityA.h)
 class Endianity {
 private:
@@ -47,11 +48,11 @@ public:
 /**
      * Definition of little endian
      */
-    static const uint8 LITTLE_ENDIAN = 1;
+    static const uint8 ENDIANITY_LITTLE_ENDIAN = 1;
     /**
      * Definition of big endian
      */
-    static const uint8 BIG_ENDIAN = 2;
+    static const uint8 ENDIANITY_BIG_ENDIAN = 2;
     /**
      * @return LITTLE_ENDIAN if the target architecture is little endian. BIG_ENDIAN if the target architecture is big endian.
      */
@@ -60,7 +61,7 @@ public:
             uint16 value = 0xAABB;
             uint16 test  = value;
             ToLittleEndian(test);
-            (test == value) ? endianityType = LITTLE_ENDIAN : endianityType = BIG_ENDIAN; //If the value has not changed then this platform is little endian
+            (test == value) ? endianityType = ENDIANITY_LITTLE_ENDIAN : endianityType = ENDIANITY_BIG_ENDIAN; //If the value has not changed then this platform is little endian
             endianityTypeChecked = True;
         }
         return endianityType;
