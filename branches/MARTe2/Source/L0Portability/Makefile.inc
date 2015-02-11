@@ -27,6 +27,7 @@
 OBJSX=  Atomic.x \
         Processor.x \
         Endianity.x \
+        Memory.x \
 		HighResolutionTimer.x
 
 TBD= SPAtomic.x \

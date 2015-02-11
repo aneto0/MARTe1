@@ -24,7 +24,7 @@
 **/
 /**
  *  @file 
- *  Mutex semafore
+ *  Mutex semafore Linux implementation
  */
 
 #ifndef MUTEX_SEM_OS_H
@@ -55,7 +55,7 @@ public:
         if(pthread_mutexattr_settype(&mutexAttributes,PTHREAD_MUTEX_RECURSIVE)!=0)     return False;
         if(pthread_mutex_init(&mutexHandle,&mutexAttributes)!=0)                       return False;
         return True;
-    }
+        }
 
     /** */
     bool Close(){
@@ -98,7 +98,7 @@ public:
 };
 
 /** open the semafore with a given initial state */
-bool MutexSemCreate(HANDLE semH, bool locked){
+static bool MutexSemCreate(HANDLE semH, bool locked){
     if(semH != (HANDLE)NULL){
         delete (PrivateMutexSemStruct *)semH;
     }
@@ -122,7 +122,7 @@ bool MutexSemCreate(HANDLE semH, bool locked){
 }
 
 /** close the semafore handle */
-bool MutexSemClose(HANDLE semH){
+static inline bool MutexSemClose(HANDLE semH){
     if (semH==(HANDLE)NULL){
         return True;
     }
@@ -131,7 +131,7 @@ bool MutexSemClose(HANDLE semH){
 }
 
 /** grab the semafore */
-bool MutexSemLock(HANDLE semH, TimeoutType msecTimeout){
+static inline bool MutexSemLock(HANDLE semH, TimeoutType msecTimeout){
     if(semH == (HANDLE)NULL){
         return False;
     }
@@ -139,7 +139,7 @@ bool MutexSemLock(HANDLE semH, TimeoutType msecTimeout){
 }
 
 /** returns the ownership */
-bool MutexSemUnLock(HANDLE semH){
+static inline bool MutexSemUnLock(HANDLE semH){
     if(semH == (HANDLE)NULL){
         return False;
     }
@@ -147,7 +147,7 @@ bool MutexSemUnLock(HANDLE semH){
 }
 
 /** locks without wasting time */
-inline bool MutexSemFastLock(HANDLE semH, TimeoutType msecTimeout){
+static inline bool MutexSemFastLock(HANDLE semH, TimeoutType msecTimeout){
     if(semH == (HANDLE)NULL){
         return False;
     }
@@ -156,7 +156,7 @@ inline bool MutexSemFastLock(HANDLE semH, TimeoutType msecTimeout){
 
 
 /** unlock semafore fast */
-inline bool MutexSemFastUnLock(HANDLE semH){
+static inline bool MutexSemFastUnLock(HANDLE semH){
     if(semH == (HANDLE)NULL){
         return False;
     }
@@ -164,7 +164,7 @@ inline bool MutexSemFastUnLock(HANDLE semH){
 }
 
 /** just try to lock it returning immediately */
-inline bool MutexSemFastTryLock(HANDLE semH){
+static inline bool MutexSemFastTryLock(HANDLE semH){
     if(semH == (HANDLE)NULL){
         return False;
     }
