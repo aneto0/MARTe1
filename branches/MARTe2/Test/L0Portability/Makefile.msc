@@ -26,8 +26,4 @@ TARGET=msc
 
 include Makefile.inc
 
-<<<<<<< .mine
-LIBRARIES   += ../../Build/$(TARGET)/$(TESTING_LIBRARY)/L0Portability$(LIBEXT)=======
-LIBRARIES   += ../../Build/$(TARGET)/L0Portability/L0Portability$(LIBEXT)
-
->>>>>>> .r139
+LIBRARIES   += ../../Build/$(TARGET)/$(TESTING_LIBRARY)/L0Portability$(LIBEXT)
