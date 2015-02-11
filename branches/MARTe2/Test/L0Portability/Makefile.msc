@@ -26,3 +26,5 @@ TARGET=msc
 
 include Makefile.inc
 
+LIBRARIES   += ../../Build/$(TARGET)/L0Portability/L0Portability$(LIBEXT)
+

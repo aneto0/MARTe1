@@ -42,7 +42,9 @@ private:
      */
     static uint8 endianityType;
 public:
-    /**
+    
+
+/**
      * Definition of little endian
      */
     static const uint8 LITTLE_ENDIAN = 1;
@@ -63,6 +65,7 @@ public:
         }
         return endianityType;
     }
+
     /**
      * Converts a number from big endian to the target operating system endianity
      * @param x the number to convert
@@ -122,27 +125,27 @@ public:
      * Converts a number from little endian to the target operating system endianity
      * @param x the number to convert
      */
-    static inline void FromLittleEndian(volatile uint32 &x){ EndianityFromLittleEndianUInt32(x); };
+    static inline void FromLittleEndian(volatile uint32 &x){ EndianityFromLittleEndianUInt32(x); }
     /**
      * Converts a number from little endian to the target operating system endianity
      * @param x the number to convert
      */
-    static inline void FromLittleEndian(volatile uint16 &x){ EndianityFromLittleEndianUInt16(x); };
+    static inline void FromLittleEndian(volatile uint16 &x){ EndianityFromLittleEndianUInt16(x); }
     /**
      * Converts a number from little endian to the target operating system endianity
      * @param x the number to convert
      */
-    static inline void FromLittleEndian(volatile int64 &x) { EndianityFromLittleEndianInt64(x); };
+    static inline void FromLittleEndian(volatile int64 &x) { EndianityFromLittleEndianInt64(x); }
     /**
      * Converts a number from little endian to the target operating system endianity
      * @param x the number to convert
      */
-    static inline void FromLittleEndian(volatile int32 &x) { EndianityFromLittleEndianInt32(x); };
+    static inline void FromLittleEndian(volatile int32 &x) { EndianityFromLittleEndianInt32(x); }
     /**
      * Converts a number from little endian to the target operating system endianity
      * @param x the number to convert
      */
-    static inline void FromLittleEndian(volatile int16 &x) { EndianityFromLittleEndianInt16(x); };
+    static inline void FromLittleEndian(volatile int16 &x) { EndianityFromLittleEndianInt16(x); }
     /** 
      * Converts a number from the target operating system endianity to big endian
      * @param x the number to convert
@@ -187,42 +190,42 @@ public:
      * Converts a number from the target operating system endianity to little endian
      * @param x the number to convert
      */
-    static inline void ToLittleEndian(volatile double &x){ EndianityToLittleEndianDouble(x); };
+    static inline void ToLittleEndian(volatile double &x){ EndianityToLittleEndianDouble(x); }
     /** 
      * Converts a number from the target operating system endianity to little endian
      * @param x the number to convert
      */
-    static inline void ToLittleEndian(volatile float &x) { EndianityToLittleEndianFloat(x); };
+    static inline void ToLittleEndian(volatile float &x) { EndianityToLittleEndianFloat(x); }
     /** 
      * Converts a number from the target operating system endianity to little endian
      * @param x the number to convert
      */
-    static inline void ToLittleEndian(volatile uint64 &x){ EndianityToLittleEndianUInt64(x); };
+    static inline void ToLittleEndian(volatile uint64 &x){ EndianityToLittleEndianUInt64(x); }
     /** 
      * Converts a number from the target operating system endianity to little endian
      * @param x the number to convert
      */
-    static inline void ToLittleEndian(volatile uint32 &x){ EndianityToLittleEndianUInt32(x); };
+    static inline void ToLittleEndian(volatile uint32 &x){ EndianityToLittleEndianUInt32(x); }
     /** 
      * Converts a number from the target operating system endianity to little endian
      * @param x the number to convert
      */
-    static inline void ToLittleEndian(volatile uint16 &x){ EndianityToLittleEndianUInt16(x); };
+    static inline void ToLittleEndian(volatile uint16 &x){ EndianityToLittleEndianUInt16(x); }
     /** 
      * Converts a number from the target operating system endianity to little endian
      * @param x the number to convert
      */
-    static inline void ToLittleEndian(volatile int64 &x) { EndianityToLittleEndianInt64(x); };
+    static inline void ToLittleEndian(volatile int64 &x) { EndianityToLittleEndianInt64(x); }
     /** 
      * Converts a number from the target operating system endianity to little endian
      * @param x the number to convert
      */
-    static inline void ToLittleEndian(volatile int32 &x) { EndianityToLittleEndianInt32(x); };
+    static inline void ToLittleEndian(volatile int32 &x) { EndianityToLittleEndianInt32(x); }
     /** 
      * Converts a number from the target operating system endianity to little endian
      * @param x the number to convert
      */
-    static inline void ToLittleEndian(volatile int16 &x) { EndianityToLittleEndianInt16(x); };
+    static inline void ToLittleEndian(volatile int16 &x) { EndianityToLittleEndianInt16(x); }
     /** 
      * Copies a block of memory and converts from big endian to the target operating system endianity
      * @param dest the destination
