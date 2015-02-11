@@ -42,7 +42,6 @@ extern "C" {
     uint32 ProcessorModel();
 }
 
-
 /** Defines some methods to get information about the processor. */
 class Processor {
 public:
