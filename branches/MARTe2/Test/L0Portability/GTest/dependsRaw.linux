@@ -1,0 +1,6 @@
+EndianityGTest.o: EndianityGTest.cpp ../EndianityTest.h \
+ ../../../Source/L0Portability/Endianity.h \
+ ../../../Source/L0Portability/GeneralDefinitions.h \
+ ../../../Source/L0Portability/Architecture/x86_gcc/GeneralDefinitionsA.h \
+ ../../../Source/L0Portability/Architecture/x86_gcc/EndianityA.h
+MainGTest.o: MainGTest.cpp
