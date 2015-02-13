@@ -24,7 +24,8 @@
 #
 #############################################################
 
-OBJSX=  EndianityGTest.x 
+OBJSX=  EndianityGTest.x \
+        FastMathGTest.x 
 
 MAKEDEFAULTDIR=../../../MakeDefaults
 
