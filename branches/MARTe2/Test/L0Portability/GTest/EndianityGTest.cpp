@@ -13,8 +13,6 @@ protected:
 	virtual void SetUp() {
 		// Code here will be called immediately after the constructor 
 		// (right before each test).
-
-		RecordProperty("Endianity", Endianity::Type());
 	}
 
 	virtual void TearDown() {

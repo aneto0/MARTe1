@@ -25,6 +25,7 @@
 #############################################################
 
 OBJSX=  EndianityTest.x \
+        ThreadsTest.x \
         FastMathTest.x
 
 MAKEDEFAULTDIR=../../MakeDefaults

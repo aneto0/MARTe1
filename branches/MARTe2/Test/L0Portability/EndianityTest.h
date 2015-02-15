@@ -22,6 +22,11 @@
  * $Id: Endianity.h 3 2012-01-15 16:26:07Z aneto $
  *
 **/
+/**
+ * @file 
+ * Tests the Endianity class and associated functions
+ */
+
 
 #ifndef ENDIANITY_TEST_H
 #define ENDIANITY_TEST_H
@@ -35,6 +40,10 @@ private:
     T testArray[3];
 
 public:
+    /**
+     * @param testValue the value to be tested by the all
+     * the test functions
+     */
     EndianityTest(T testValue){
         this->testValue     = testValue;
         this->testArray[0]  = testValue;

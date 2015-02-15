@@ -2,5 +2,29 @@ EndianityGTest.o: EndianityGTest.cpp ../EndianityTest.h \
  ../../../Source/L0Portability/Endianity.h \
  ../../../Source/L0Portability/GeneralDefinitions.h \
  ../../../Source/L0Portability/Architecture/x86_gcc/GeneralDefinitionsA.h \
+ ../../../Source/L0Portability/OperatingSystem/Linux/GeneralDefinitionsOS.h \
  ../../../Source/L0Portability/Architecture/x86_gcc/EndianityA.h
+FastMathGTest.o: FastMathGTest.cpp ../FastMathTest.h \
+ ../../../Source/L0Portability/FastMath.h \
+ ../../../Source/L0Portability/GeneralDefinitions.h \
+ ../../../Source/L0Portability/Architecture/x86_gcc/GeneralDefinitionsA.h \
+ ../../../Source/L0Portability/OperatingSystem/Linux/GeneralDefinitionsOS.h \
+ ../../../Source/L0Portability/Architecture/x86_gcc/FastMathA.h
 MainGTest.o: MainGTest.cpp
+ThreadsGTest.o: ThreadsGTest.cpp ../ThreadsTest.h \
+ ../../../Source/L0Portability/Threads.h \
+ ../../../Source/L0Portability/GeneralDefinitions.h \
+ ../../../Source/L0Portability/Architecture/x86_gcc/GeneralDefinitionsA.h \
+ ../../../Source/L0Portability/OperatingSystem/Linux/GeneralDefinitionsOS.h \
+ ../../../Source/L0Portability/ThreadInformation.h \
+ ../../../Source/L0Portability/EventSem.h \
+ ../../../Source/L0Portability/SemCore.h \
+ ../../../Source/L0Portability/OperatingSystem/Linux/EventSemOS.h \
+ ../../../Source/L0Portability/OperatingSystem/Linux/../../TimeoutType.h \
+ ../../../Source/L0Portability/OperatingSystem/Linux/../../GeneralDefinitions.h \
+ ../../../Source/L0Portability/OperatingSystem/Linux/../../HighResolutionTimer.h \
+ ../../../Source/L0Portability/OperatingSystem/Linux/../../Architecture/x86_gcc/HighResolutionTimerA.h \
+ ../../../Source/L0Portability/Memory.h \
+ ../../../Source/L0Portability/ExceptionHandler.h \
+ ../../../Source/L0Portability/ProcessorType.h \
+ ../../../Source/L0Portability/EventSem.h

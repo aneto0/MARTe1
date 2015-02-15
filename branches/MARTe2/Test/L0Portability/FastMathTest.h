@@ -52,7 +52,7 @@ public:
     bool TestFloatToInt32(float testFloat, int32 expectedValue){
         int32 testInt32 = 0;
 
-	testInt32 = FastMath::FloatToInt(testFloat);
+        testInt32 = FastMath::FloatToInt(testFloat);
 
         return (testInt32 == expectedValue);
     }
