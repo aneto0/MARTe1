@@ -23,11 +23,11 @@
  *
 **/
 
-#include "Memory.h"
 #include "GeneralDefinitions.h"
 #ifdef MEMORY_STATISTICS
 #include "MemoryStatistics.h"
 #endif
+#include "Memory.h"
 
 #include INCLUDE_FILE_OPERATING_SYSTEM(OPERATING_SYSTEM,MemoryOS.h)
 
@@ -45,7 +45,7 @@ void *MemoryMalloc(uint32 size, MemoryAllocationFlags allocFlags){
     return data;
 }
 
-void *MemoryRealloc(void *&data, int32 newSize){
+void *MemoryRealloc(void *&data, uint32 newSize){
     if(newSize == 0){
         if(data == NULL){
             return NULL;

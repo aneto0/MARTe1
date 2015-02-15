@@ -32,6 +32,7 @@
 
 #include "../../TimeoutType.h"
 #include <pthread.h>
+#include <math.h>
 #include <sys/timeb.h>
 
 /** Private structure used for solaris adn linux when using pThread. */
@@ -145,14 +146,14 @@ public:
         if(pthread_mutex_unlock(&mutexHandle) != 0){
             return False;
         }
+        return stop;
     }
-
 };
 
 /** 
  * @see EventSem::Create
  */
-static bool EventSemCreate(HANDLE semH){
+static bool EventSemCreate(HANDLE &semH){
     if(semH != (HANDLE)NULL){
         delete (PrivateEventSemStruct *)semH;
     }
@@ -173,7 +174,7 @@ static bool EventSemCreate(HANDLE semH){
 /**
  * @see EventSem::Close
  */
-static bool EventSemClose(HANDLE semH){
+static bool EventSemClose(HANDLE &semH){
     if(semH == (HANDLE)NULL){
         return True;
     }
@@ -186,7 +187,7 @@ static bool EventSemClose(HANDLE semH){
 /** 
  * @see EventSem::Wait
  */
-static inline bool EventSemWait(HANDLE semH, TimeoutType msecTimeout = TTInfiniteWait){
+static inline bool EventSemWait(HANDLE &semH, TimeoutType msecTimeout = TTInfiniteWait){
     if(semH == (HANDLE)NULL){
         return False;
     }
@@ -196,7 +197,7 @@ static inline bool EventSemWait(HANDLE semH, TimeoutType msecTimeout = TTInfinit
 /**
  * @see EventSem::Post
  */
-static inline bool EventSemPost(HANDLE semH){
+static inline bool EventSemPost(HANDLE &semH){
     if(semH == (HANDLE)NULL){
         return False;
     }
@@ -206,7 +207,7 @@ static inline bool EventSemPost(HANDLE semH){
 /** 
  * @see EventSem::Reset
  */ 
-static inline bool EventSemReset(HANDLE semH){
+static inline bool EventSemReset(HANDLE &semH){
     if(semH == (HANDLE)NULL){
         return False;
     }
@@ -216,7 +217,7 @@ static inline bool EventSemReset(HANDLE semH){
 /** 
  * @see EventSem::ResetWait
  */
-static inline bool EventSemResetWait(HANDLE semH, TimeoutType msecTimeout = TTInfiniteWait){
+static inline bool EventSemResetWait(HANDLE &semH, TimeoutType msecTimeout = TTInfiniteWait){
     EventSemReset(semH);
     return EventSemWait(semH, msecTimeout);
 }

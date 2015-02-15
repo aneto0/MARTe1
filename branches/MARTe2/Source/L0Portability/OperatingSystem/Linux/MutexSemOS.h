@@ -98,7 +98,7 @@ public:
 };
 
 /** open the semafore with a given initial state */
-static bool MutexSemCreate(HANDLE semH, bool locked){
+static bool MutexSemOSCreate(HANDLE &semH, bool locked){
     if(semH != (HANDLE)NULL){
         delete (PrivateMutexSemStruct *)semH;
     }
@@ -122,7 +122,7 @@ static bool MutexSemCreate(HANDLE semH, bool locked){
 }
 
 /** close the semafore handle */
-static inline bool MutexSemClose(HANDLE semH){
+static inline bool MutexSemOSClose(HANDLE &semH){
     if (semH==(HANDLE)NULL){
         return True;
     }
@@ -131,7 +131,7 @@ static inline bool MutexSemClose(HANDLE semH){
 }
 
 /** grab the semafore */
-static inline bool MutexSemLock(HANDLE semH, TimeoutType msecTimeout){
+static inline bool MutexSemOSLock(HANDLE &semH, TimeoutType msecTimeout){
     if(semH == (HANDLE)NULL){
         return False;
     }
@@ -139,7 +139,7 @@ static inline bool MutexSemLock(HANDLE semH, TimeoutType msecTimeout){
 }
 
 /** returns the ownership */
-static inline bool MutexSemUnLock(HANDLE semH){
+static inline bool MutexSemOSUnLock(HANDLE &semH){
     if(semH == (HANDLE)NULL){
         return False;
     }
@@ -147,7 +147,7 @@ static inline bool MutexSemUnLock(HANDLE semH){
 }
 
 /** locks without wasting time */
-static inline bool MutexSemFastLock(HANDLE semH, TimeoutType msecTimeout){
+static inline bool MutexSemOSFastLock(HANDLE &semH, TimeoutType msecTimeout){
     if(semH == (HANDLE)NULL){
         return False;
     }
@@ -156,7 +156,7 @@ static inline bool MutexSemFastLock(HANDLE semH, TimeoutType msecTimeout){
 
 
 /** unlock semafore fast */
-static inline bool MutexSemFastUnLock(HANDLE semH){
+static inline bool MutexSemOSFastUnLock(HANDLE &semH){
     if(semH == (HANDLE)NULL){
         return False;
     }
@@ -164,7 +164,7 @@ static inline bool MutexSemFastUnLock(HANDLE semH){
 }
 
 /** just try to lock it returning immediately */
-static inline bool MutexSemFastTryLock(HANDLE semH){
+static inline bool MutexSemOSFastTryLock(HANDLE &semH){
     if(semH == (HANDLE)NULL){
         return False;
     }

@@ -53,37 +53,37 @@ public:
 
     /** open the semafore with a given initial state */
     bool Create(bool locked=False){
-        return MutexSemCreate(semH, locked);
+        return MutexSemOSCreate(semH, locked);
     }
 
     /** close the semafore handle */
     bool Close(){
-        return MutexSemClose(semH);
+        return MutexSemOSClose(semH);
     }
 
     /** grab the semafore */
     bool Lock(TimeoutType msecTimeout = TTInfiniteWait){
-        return MutexSemLock(semH, msecTimeout);
+        return MutexSemOSLock(semH, msecTimeout);
     }
 
     /** returns the ownership */
     bool UnLock(){
-        return MutexSemUnLock(semH);
+        return MutexSemOSUnLock(semH);
     }
 
     /** locks without wasting time */
     inline bool FastLock(TimeoutType msecTimeout = TTInfiniteWait){
-        return MutexSemFastLock(semH, msecTimeout);
+        return MutexSemOSFastLock(semH, msecTimeout);
     }
 
     /** unlock semafore fast */
     inline bool FastUnLock(){
-        return MutexSemFastUnLock(semH);
+        return MutexSemOSFastUnLock(semH);
     }
 
     /** just try to lock it returning immediately */
     inline bool FastTryLock(){
-        return MutexSemFastTryLock(semH);
+        return MutexSemOSFastTryLock(semH);
     }
 };
 #endif

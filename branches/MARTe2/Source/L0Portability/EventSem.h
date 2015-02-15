@@ -36,9 +36,8 @@
 #define EVENT_SEM_H
 
 #include "GeneralDefinitions.h"
-#include INCLUDE_FILE_OPERATING_SYSTEM(OPERATING_SYSTEM,EventSemOS.h)
 #include "SemCore.h"
-
+#include INCLUDE_FILE_OPERATING_SYSTEM(OPERATING_SYSTEM,EventSemOS.h)
 
 /** Definition of an event shemaphore. */
 class EventSem: public SemCore{

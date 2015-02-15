@@ -25,21 +25,19 @@
 #############################################################
 
 OBJSX=  Atomic.x \
-        Processor.x \
         Endianity.x \
+		HighResolutionTimer.x \
         Memory.x \
-		HighResolutionTimer.x
+        Processor.x \
+        ProcessorType.x \
+        Threads.x  \
+        ThreadsDatabase.x \
+        Sleep.x 
 
 TBD= SPAtomic.x \
         StreamInterface.x \
         ErrorManagement.x \
         CStream.x \
-        Processor.x \
-        HRT.x \
-        Threads.x  \
-        ThreadsDatabase.x  \
-        Sleep.x \
-        Memory.x\
         SemCore.x \
         InternetAddress.x \
         BasicSocket.x \
@@ -47,7 +45,6 @@ TBD= SPAtomic.x \
         BasicFile.x \
         BasicConsole.x \
         BString.x \
-        ProcessorType.x \
 		Timer.x
 
 MAKEDEFAULTDIR=../../MakeDefaults

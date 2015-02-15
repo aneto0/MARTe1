@@ -52,10 +52,20 @@ public:
     }
 
     /** constructor from HRT ticks */
-    void SetTimeOutHRTTicks(int64 ticks){
+    void SetTimeOutHighResolutionTimerTicks(int64 ticks){
         if (ticks < 0) ticks = 0;
         double msDT = 1000.0 *(ticks * HighResolutionTimer::Period());
         msecTimeout = (uint32)msDT;
+    }
+
+    /** Timeout in HighResolutionTimer Ticks*/
+    int64 HighResolutionTimerTicks() const{
+        double dT   = msecTimeout;
+        dT          = dT * 1e-3;
+        double freq = HighResolutionTimer::Frequency();
+        dT          = dT * freq;
+        int64 ticks = (int64)dT;
+        return ticks;
     }
 
     /** bounded reduction */
