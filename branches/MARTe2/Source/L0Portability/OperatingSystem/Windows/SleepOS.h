@@ -33,7 +33,7 @@
 #include "time.h"
 
 #ifndef WIN_SLEEP_FREQ
-#define WIN_SLEEP_FREQ 100
+#define WIN_SLEEP_FREQ 1000
 #endif
 
 /**

@@ -42,11 +42,12 @@ public:
      */
     bool TestSleepAtleast(double sec){
     	bool testResult = false;
+    	double maxSleepTime = 2*1000*sec; /* 100% margin */
     	int initialTime = clock();
 
     	SleepAtLeast(sec);
 
-    	testResult = (((clock()-initialTime)/(CLOCKS_PER_SEC/1000)) >= sec*1000);
+    	testResult = (((clock()-initialTime)/(CLOCKS_PER_SEC/1000)) <= maxSleepTime);
 
         return testResult;
     }
@@ -56,11 +57,12 @@ public:
      */
     bool TestSleepNoMore(double sec){
     	bool testResult = false;
+    	double maxSleepTime = 2*1000*sec; /* 100% margin */
     	int initialTime = clock();
 
     	SleepNoMore(sec);
 
-    	testResult = (((clock()-initialTime)/(CLOCKS_PER_SEC/1000)) < sec*1000);
+    	testResult = (((clock()-initialTime)/(CLOCKS_PER_SEC/1000)) <= maxSleepTime);
 
         return testResult;
     }
@@ -71,11 +73,12 @@ public:
      */
     bool TestSleepSec(double sec){
     	bool testResult = false;
+    	double maxSleepTime = 2*1000*sec; /* 100% margin */
     	int initialTime = clock();
 
     	SleepSec(sec);
 
-    	testResult = (((clock()-initialTime)/(CLOCKS_PER_SEC/1000)) >= sec*1000);
+    	testResult = (((clock()-initialTime)/(CLOCKS_PER_SEC/1000)) <= maxSleepTime);
 
         return testResult;
     }
@@ -86,11 +89,12 @@ public:
 	 */
 	bool TestSleepSec(float sec){
 		bool testResult = false;
+		float maxSleepTime = 2*1000*sec; /* 100% margin */
 		int initialTime = clock();
 
 		SleepSec(sec);
 
-		testResult = (((clock()-initialTime)/(CLOCKS_PER_SEC/1000)) >= sec*1000);
+		testResult = (((clock()-initialTime)/(CLOCKS_PER_SEC/1000)) <= maxSleepTime);
 
 		return testResult;
 	}
@@ -100,11 +104,12 @@ public:
 	 */
 	bool TestSleepMSec(int32 msec){
 		bool testResult = false;
+		double maxSleepTime = 2*msec; /* 100% margin */
 		int initialTime = clock();
 
 		SleepMSec(msec);
 
-		testResult = (((clock()-initialTime)/(CLOCKS_PER_SEC/1000)) >= msec);
+		testResult = (((clock()-initialTime)/(CLOCKS_PER_SEC/1000)) <= maxSleepTime);
 
 		return testResult;
 	}
@@ -114,11 +119,12 @@ public:
 	 */
 	bool TestSleepBusy(double sec){
 		bool testResult = false;
+		double maxSleepTime = 2*1000*sec; /* 100% margin */
 		int initialTime = clock();
 
 		SleepBusy(sec);
 
-		testResult = (((clock()-initialTime)/(CLOCKS_PER_SEC/1000)) >= sec*1000);
+		testResult = (((clock()-initialTime)/(CLOCKS_PER_SEC/1000)) <= maxSleepTime);
 
 		return testResult;
 	}
@@ -128,11 +134,12 @@ public:
 	 */
 	bool TestSemiBusy(double totalSleepSec, double nonBusySleepSec){
 		bool testResult = false;
+		double maxSleepTime = 2*1000*totalSleepSec; /* 100% margin */
 		int initialTime = clock();
 
 		SleepSemiBusy(totalSleepSec, nonBusySleepSec);
 
-		testResult = (((clock()-initialTime)/(CLOCKS_PER_SEC/1000)) >= totalSleepSec*1000);
+		testResult = (((clock()-initialTime)/(CLOCKS_PER_SEC/1000)) <= maxSleepTime);
 
 		return testResult;
 	}
