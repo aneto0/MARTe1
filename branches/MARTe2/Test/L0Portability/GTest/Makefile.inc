@@ -26,7 +26,9 @@
 
 OBJSX=  EndianityGTest.x \
         ThreadsGTest.x \
-        FastMathGTest.x 
+        FastMathGTest.x \
+        SleepGTest.x \
+        ProcessorGTest.x
 
 MAKEDEFAULTDIR=../../../MakeDefaults
 
