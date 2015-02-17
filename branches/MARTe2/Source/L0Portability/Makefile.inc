@@ -32,7 +32,8 @@ OBJSX=  Atomic.x \
         ProcessorType.x \
         Threads.x  \
         ThreadsDatabase.x \
-        Sleep.x 
+        Sleep.x \
+        FastMath.x
 
 TBD= SPAtomic.x \
         StreamInterface.x \

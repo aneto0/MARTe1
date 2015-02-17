@@ -30,16 +30,16 @@
 
 class FastMathTest {
 private:
-    static const float SIN_1    = 0.841470984807;
-    static const float SIN_PI_2 = 1.0;
-    static const float SIN_PI_4 = 0.707106781186;
 
-    static const float COS_1    = 0.540302305868;
-    static const float COS_PI_2 = 0.0;
-    static const float COS_PI_4 = 0.707106781186;
+	static const float SIN_1;
+	static const float SIN_PI_2;
+	static const float SIN_PI_4;
 
-    static const float EPSILON  = 0.000001;
-    
+	static const float COS_1;
+	static const float COS_PI_2;
+	static const float COS_PI_4;
+
+	static const float EPSILON;
 
 
 public:

@@ -38,7 +38,8 @@ BUILD_DIR=../../Build/$(TARGET)/$(TESTING_LIBRARY)/Test
 CFLAGS+= -I../../Source/$(TESTING_LIBRARY)
 
 all: $(OBJS) \
-                $(BUILD_DIR)/L0PortabilityTest$(LIBEXT)
+                $(BUILD_DIR)/L0PortabilityTest$(LIBEXT) \
+                $(BUILD_DIR)/Test$(EXEEXT) 
 	echo  $(OBJS)
 
 include depends.$(TARGET)

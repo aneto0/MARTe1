@@ -86,14 +86,14 @@ $(BUILD_DIR)/%.drv : $(BUILD_DIR)/%.o $(OBJS)
 
 
 clean:  $(SUBPROJC)
-	rm -f depends*
-	rm -f $(BUILD_DIR)/*$(OBJEXT)
-	rm -f $(BUILD_DIR)/*$(DLLEXT)
-	rm -f $(BUILD_DIR)/*$(EXEEXT)
-	rm -f $(BUILD_DIR)/*$(LIBEXT)
-	rm -f $(BUILD_DIR)/*$(GAMEXT)
-	rm -f $(BUILD_DIR)/*$(DRVEXT)
-	rm -f $(BUILD_DIR)/*$(ASMEXT)
-	rm -f $(BUILD_DIR)/*$(GCNOEXT)
-	rm -f $(BUILD_DIR)/*$(GCDAEXT)
+	@rm -f depends*
+	@rm -f $(BUILD_DIR)/*$(OBJEXT)
+	@rm -f $(BUILD_DIR)/*$(DLLEXT)
+	@rm -f $(BUILD_DIR)/*$(EXEEXT)
+	@rm -f $(BUILD_DIR)/*$(LIBEXT)
+	@rm -f $(BUILD_DIR)/*$(GAMEXT)
+	@rm -f $(BUILD_DIR)/*$(DRVEXT)
+	@rm -f $(BUILD_DIR)/*$(ASMEXT)
+	@rm -f $(BUILD_DIR)/*$(GCNOEXT)
+	@rm -f $(BUILD_DIR)/*$(GCDAEXT)
 

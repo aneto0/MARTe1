@@ -25,6 +25,7 @@
 
 $(BUILD_DIR)/%.obj : %.cpp
 	$(COMPILER) -c $(CFLAGS) $(CFLAGSPEC) $(DEBUG) $(OPTIM)  $*.cpp  -Fa
+	@mkdir -p $(BUILD_DIR)
 	@touch $(BUILD_DIR)/$*.obj >temp/temp
 	@rm $(BUILD_DIR)/$*.obj >temp/temp
 	@mv $*.obj $(BUILD_DIR) >temp/temp
@@ -33,9 +34,9 @@ $(BUILD_DIR)/%.obj : %.cpp
 	@touch $*.asm >temp/temp
 	@mv $*.asm $(BUILD_DIR) >temp/temp
 
-
 $(BUILD_DIR)/%.obj : %.c
 	$(COMPILER) -c $(CFLAGS) $(CFLAGSPEC) $(DEBUG) $(OPTIM)  $*.c  -Fa
+	@mkdir -p $(BUILD_DIR)
 	@touch $(BUILD_DIR)/$*.obj >temp/temp
 	@rm $(BUILD_DIR)/$*.obj >temp/temp
 	@mv $*.obj $(BUILD_DIR) >temp/temp
@@ -45,7 +46,8 @@ $(BUILD_DIR)/%.obj : %.c
 	@mv $*.asm $(BUILD_DIR) >temp/temp
 
 $(BUILD_DIR)/%.obj : %.f
-	$(FCOMPILER) -compile_only $(FFLAGS) $(FOPTS) $*.f  
+	$(FCOMPILER) -compile_only $(FFLAGS) $(FOPTS) $*.f
+	@mkdir -p $(BUILD_DIR)  
 	@touch $(BUILD_DIR)/$*.obj >temp/temp
 	@rm $(BUILD_DIR)/$*.obj >temp/temp
 	@mv $*.obj $(BUILD_DIR) >temp/temp
@@ -71,9 +73,9 @@ $(BUILD_DIR)/%.lib : $(OBJS) $(OBJSRTTI)
 	@rm $(BUILD_DIR)/$*.lib
 	lib -OUT:$@  $(OBJS) -NODEFAULTLIB
 
-$(BUILD_DIR)/%.exe : $(BUILD_DIR)/%.obj $(OBJS) $(LIBRARIES) 
+$(BUILD_DIR)/%.exe : $(BUILD_DIR)/%.obj $(OBJS) $(LIBRARIES)
 	$(COMPILER)  $(LFLAGS)  $(DEBUG) $(OBJS) $(BUILD_DIR)/$*.obj $(LIBRARIES) -o $@ $(LOPTS)
-
+	
 $(BUILD_DIR)/%.dll : $(BUILD_DIR)/%.obj $(OBJS)  $(LIBRARIES)  %.def
 	$(COMPILER)  $(LFLAGS) -LDd -Zi $(OBJS) $(BUILD_DIR)/$*.obj $(LIBRARIES) $*.def -o $@
 
@@ -86,7 +88,7 @@ depends.msc : dependsRaw.msc
 	rm -f CreateMSCDepends.sed 
 
 dependsRaw.msc: 
-	gcc -MM -D_CY32 -DWIN32 -DARCHITECTURE=x86_cl -DOPERATING_SYSTEM=windows *.c* > dependsRaw.msc
+	gcc -MM -D_CY32 -DWIN32 $(CFLAGS) -DARCHITECTURE=x86_cl -DOPERATING_SYSTEM=windows *.c* > dependsRaw.msc
 	@mkdir -p temp
 	@mkdir -p $(BUILD_DIR)
 
@@ -103,11 +105,13 @@ $(BUILD_DIR)/%.gam : $(BUILD_DIR)/%.obj $(OBJS)  $(LIBRARIES)  %.def
 clean:  $(SUBPROJC)
 	@rm -f depends.*
 	@rm -f $(BUILD_DIR)/*$(OBJEXT)
-	@rm -f $(BUILD_DIR)/*$(DLLEXT)
+	@rm -f $(BUILD_DIR)/*$(DLLEXT)	
 	@rm -f $(BUILD_DIR)/*$(EXEEXT)
 	@rm -f $(BUILD_DIR)/*$(LIBEXT)
-	@rm -f $(BUILD_DIR)/*$(DRVEXT)
 	@rm -f $(BUILD_DIR)/*$(GAMEXT)
+	@rm -f $(BUILD_DIR)/*$(DRVEXT)
+	@rm -f $(BUILD_DIR)/*$(ASMEXT)
 	@rm -f $(BUILD_DIR)/*$(GCNOEXT)
 	@rm -f $(BUILD_DIR)/*$(GCDAEXT)
-
+	@rm -f $(BUILD_DIR)/*$(ILKEXT)
+	@rm -f $(BUILD_DIR)/*$(PDBEXT)

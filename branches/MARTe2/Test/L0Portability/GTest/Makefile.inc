@@ -35,9 +35,8 @@ include $(MAKEDEFAULTDIR)/MakeStdLibDefs.$(TARGET)
 TESTING_LIBRARY=L0Portability
 
 BUILD_DIR=../../../Build/$(TARGET)/$(TESTING_LIBRARY)/$(lastword $(subst /,\ ,$(CURDIR)))
-CFLAGS+= -I../ -I../../../Source/$(TESTING_LIBRARY)
-CPPFLAGS+= -fprofile-arcs -ftest-coverage -coverage
-LIBRARIES+= -lgtest -lgtest_main -lgcov 
+CFLAGS+= -I../ -I../../../Source/$(TESTING_LIBRARY) 
+CFLAGS+= -I../../../Lib/gtest-1.7.0/include
 
 all: $(OBJS)    \
                 $(BUILD_DIR)/MainGTest$(EXEEXT)

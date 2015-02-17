@@ -26,13 +26,16 @@
 BUILD_DIR=../../Build/$(TARGET)/$(lastword $(subst /,\ ,$(CURDIR)))
 
 EXEEXT=.exe
+DLLEXT=.dll
 LIBEXT=.lib
 OBJEXT=.obj
-DLLEXT=.dll
+ASMEXT=.asm
 DRVEXT=.drv
 GAMEXT=.gam
 GCNOEXT=.gcno
 GCDAEXT=.gcda
+ILKEXT=.ilk
+PDBEXT=.pdb
 
 OBJS=   $(OBJSX:%.x=$(BUILD_DIR)/%.obj) 
 OBJS2=  $(OBJSX2:%.x=$(BUILD_DIR)/%.obj) 
@@ -55,11 +58,11 @@ MAKE     =   make
 COMPILER =   cl 
 FCOMPILER =  f77
 DEBUG    =   -Zi
-OPTIM    =   -O2 -Ob2
+OPTIM    =   -W1 -O2 -Ob2
 CFLAGSPEC=   -MD -GR -DARCHITECTURE=x86_cl -DOPERATING_SYSTEM=Windows
 LFLAGS   =   
 LOPTS    =  
-CFLAGS   =   -W1 
+CFLAGS   =    
 FFLAGS   =   
 FOPTS    =   -optimize:4
 

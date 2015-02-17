@@ -29,8 +29,6 @@
 #ifndef PROCESSOR_OS_H
 #define PROCESSOR_OS_H
 
-#include <windows.h>
-
 /**
  * @see Processors::Available()
  */

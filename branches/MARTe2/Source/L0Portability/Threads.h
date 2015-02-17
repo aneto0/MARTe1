@@ -140,11 +140,11 @@ public:
     /**
      * List of possible priority classes in ascending order of priority
      */
-    static const uint32 UNKNOWN_PRIORITY_CLASS   = 0;
-    static const uint32 IDLE_PRIORITY_CLASS      = 1;
-    static const uint32 NORMAL_PRIORITY_CLASS    = 2;
-    static const uint32 HIGH_PRIORITY_CLASS      = 3;
-    static const uint32 REAL_TIME_PRIORITY_CLASS = 4;
+    static const uint32 PRIORITY_CLASS_UNKNOWN   = 0;
+    static const uint32 PRIORITY_CLASS_IDLE      = 1;
+    static const uint32 PRIORITY_CLASS_NORMAL    = 2;
+    static const uint32 PRIORITY_CLASS_HIGH      = 3;
+    static const uint32 PRIORITY_CLASS_REAL_TIME = 4;
 
     /**
      * List of possible priorities. Each of the above classes can contain any of the 
@@ -153,7 +153,7 @@ public:
      * has more priority than HIGH_PRIORITY_CLASS with PRIORITY_TIME_CRITICAL
      */
     static const uint32 PRIORITY_UNKNOWN       = 0;  
-    static const uint32 PRIORITY_IDLE          = 1;  
+    static const uint32 PRIORITY_IDLE          = 1;
     static const uint32 PRIORITY_LOWEST        = 2; 
     static const uint32 PRIORITY_BELOW_NORMAL  = 3; 
     static const uint32 PRIORITY_NORMAL        = 4; 

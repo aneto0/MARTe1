@@ -41,7 +41,7 @@ void __thread_decl SystemThreadFunction(void *threadData){
     ThreadsDatabase::UnLock();
 
     threadInfo->priorityLevel = Threads::PRIORITY_NORMAL;
-    Threads::SetPriorityClass(Threads::Id(), Threads::NORMAL_PRIORITY_CLASS);
+    Threads::SetPriorityClass(Threads::Id(), Threads::PRIORITY_CLASS_NORMAL);
     //Guarantee that the OS finishes the housekeeping before releasing the thread to the user
     threadInfo->ThreadWait();
     //Start the user thread
@@ -174,7 +174,7 @@ uint32 ThreadsGetPriorityLevel(TID threadId){
 }
 
 uint32 ThreadsGetPriorityClass(TID threadId){
-    uint32 priorityClass = Threads::UNKNOWN_PRIORITY_CLASS;
+    uint32 priorityClass = Threads::PRIORITY_CLASS_UNKNOWN;
     ThreadsDatabase::Lock();
     ThreadInformation *threadInfo = ThreadsDatabase::GetThreadInformation(threadId);
     if(threadInfo != NULL){

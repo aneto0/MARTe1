@@ -30,6 +30,8 @@
 #ifndef GENERAL_DEFINITIONS_P_H
 #define GENERAL_DEFINITIONS_P_H
 
+#include <windows.h>
+
 /** 64 Bit unsigned integer. */
 typedef unsigned _int64    uint64;
 /** 64 Bit signed integer. */
@@ -53,6 +55,8 @@ typedef signed   char      int8;
 #define indexof(type,field) ((intptr)&(((type *)0)->field))
 /** A tool to find the size of structures fields. */
 #define msizeof(type,field) sizeof(((type *)0)->field)
+
+#define HANDLE void *
 
 #endif
 
