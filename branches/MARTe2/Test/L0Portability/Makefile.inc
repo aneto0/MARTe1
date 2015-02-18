@@ -28,7 +28,8 @@ OBJSX=  EndianityTest.x \
         ThreadsTest.x \
         FastMathTest.x \
         SleepTest.x \
-        ProcessorTest.x
+        ProcessorTest.x \
+        AtomicTest.x
 
 MAKEDEFAULTDIR=../../MakeDefaults
 

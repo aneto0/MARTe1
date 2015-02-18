@@ -1,5 +1,5 @@
 /*
- *  FastMathGTest.cpp
+ *  ProcessorGTest.cpp
  *
  *  Created on: Feb 13, 2015
  */
@@ -23,22 +23,22 @@ protected:
 };
 
 
-TEST_F(ProcessorGTest,VendorId){
+TEST_F(ProcessorGTest,VendorIdTest){
 	ProcessorTest processorTest;
 	ASSERT_TRUE(processorTest.TestVendorId());
 }
 
-TEST_F(ProcessorGTest,Family){
+TEST_F(ProcessorGTest,FamilyTest){
 	ProcessorTest processorTest;
 	ASSERT_TRUE(processorTest.TestFamily());
 }
 
-TEST_F(ProcessorGTest,Model){
+TEST_F(ProcessorGTest,ModelTest){
 	ProcessorTest processorTest;
 	ASSERT_TRUE(processorTest.TestModel());
 }
 
-TEST_F(ProcessorGTest,Available){
+TEST_F(ProcessorGTest,AvailableTest){
 	ProcessorTest processorTest;
 	ASSERT_TRUE(processorTest.TestAvailable());
 }

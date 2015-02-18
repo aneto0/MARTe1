@@ -128,8 +128,8 @@ inline bool AtomicTestAndSet8(int8  volatile *p){
 inline void AtomicAdd32 (volatile int32 *p, int32 value) {
     __asm  {
         mov   ebx,p
-            mov   eax,p
-            lock add DWORD PTR[ebx], eax
+		mov   eax,value
+		lock add DWORD PTR[ebx], eax
     }
 }
 
@@ -139,8 +139,8 @@ inline void AtomicAdd32 (volatile int32 *p, int32 value) {
 inline void AtomicSub32 (volatile int32 *p, int32 value) {
     __asm  {
         mov   ebx,p
-            mov   eax,p
-            lock add DWORD PTR[ebx], eax
+		mov   eax,value
+		lock sub DWORD PTR[ebx], eax
     }
 }
 

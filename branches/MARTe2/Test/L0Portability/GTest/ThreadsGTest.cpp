@@ -41,12 +41,12 @@ protected:
 };
 
 
-TEST_F(ThreadsGTest,beginThread){
+TEST_F(ThreadsGTest,BeginThreadTest){
     ThreadsTest beginThread;
 	ASSERT_TRUE(beginThread.BeginThread(100));
 }
 
-TEST_F(ThreadsGTest,prioritiesThread){
+TEST_F(ThreadsGTest,PrioritiesThreadTest){
     ThreadsTest prioritiesThread;
 	ASSERT_TRUE(prioritiesThread.Priorities());
 }
