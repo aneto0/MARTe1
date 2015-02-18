@@ -98,6 +98,7 @@ inline bool AtomicTestAndSet32(int32 volatile *p){
             xchg  DWORD PTR [ebx], eax
             mov   temp,eax
     }
+    return (temp == 0);
 }
 
 /** Test and set a 16 bit memory location in a thread safe way. */
@@ -109,6 +110,7 @@ inline bool AtomicTestAndSet16(int16 volatile *p){
             xchg  WORD PTR [ebx], ax
             mov   temp,ax
     }
+    return (temp == 0);
 }
 
 /** Test and set a 8 bit memory location in a thread safe way. */
@@ -120,6 +122,7 @@ inline bool AtomicTestAndSet8(int8  volatile *p){
             xchg   [ebx], al
             mov   temp,al
     }
+    return (temp == 0);
 }
 
 /**
