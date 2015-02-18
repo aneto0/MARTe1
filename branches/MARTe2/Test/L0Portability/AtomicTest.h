@@ -27,7 +27,7 @@
 #define ATOMIC_TEST_H
 
 #include "Atomic.h"
-#include <iostream>
+
 
 template <class T>
 class AtomicTest {
@@ -75,7 +75,20 @@ public:
 	 * Tests the test and set function
 	 */
 	bool TestTestAndSet(){
-		return Atomic::TestAndSet(&testValue);
+		T testVal = 0;
+		bool ok = false;
+
+		// Set the semaphore
+		ok = Atomic::TestAndSet(&testVal);
+
+		// When the semaphore is set, the test and set function should fail
+		ok = ok && !Atomic::TestAndSet(&testVal);
+
+		// Unset the semaphore and set it again
+		testVal = 0;
+		ok = ok && Atomic::TestAndSet(&testVal);
+
+		return ok;
 	}
 
 	/**
