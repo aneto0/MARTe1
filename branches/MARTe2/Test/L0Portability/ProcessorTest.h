@@ -53,9 +53,10 @@ public:
     bool TestFamily(){
     	bool testResult = false;
     	uint32 family = -1;
+    	uint32 familyAux = family;
 
     	family = Processor::Family();
-    	testResult = (family != -1);
+    	testResult = (family != familyAux);
 
         return testResult;
     }
@@ -66,9 +67,10 @@ public:
     bool TestModel(){
     	bool testResult = false;
     	uint32 model = -1;
+    	uint32 modelAux = model;
 
     	model = Processor::Model();
-		testResult = (model != -1);
+		testResult = (model != modelAux);
 
         return testResult;
     }
@@ -79,9 +81,10 @@ public:
     bool TestAvailable(){
     	bool testResult = false;
     	uint32 available = -1;
+    	uint32 availableAux = available;
 
     	available = Processor::Available();
-		testResult = (available != -1);
+		testResult = (available != availableAux);
 
         return testResult;
     }
