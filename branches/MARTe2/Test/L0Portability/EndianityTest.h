@@ -19,15 +19,16 @@
  * See the Licence  
    permissions and limitations under the Licence. 
  *
- * $Id: Endianity.h 3 2012-01-15 16:26:07Z aneto $
+ * $Id: $
  *
 **/
 /**
- * @file 
- * Tests the Endianity class and associated functions
+ * @class EndianityTest
+ * @brief Tests all the Endianity class functions.
+ * This class is designed to test all the Endianity functions,
+ * for all the supported MARTe types.
+ *
  */
-
-
 #ifndef ENDIANITY_TEST_H
 #define ENDIANITY_TEST_H
 
@@ -42,7 +43,7 @@ private:
 public:
     /**
      * @param testValue the value to be tested by the all
-     * the test functions
+     * the test functions.
      */
     EndianityTest(T testValue){
         this->testValue     = testValue;
@@ -52,7 +53,8 @@ public:
     }
 
     /**
-     * Converts the testValue to little endian and to big endian
+     * @brief Converts the testValue to little endian and to big endian.
+     *
      * If the target architecture is little endian:
      * - the test value and the little endian value must be the same
      * - the test value and the big endian value must be different

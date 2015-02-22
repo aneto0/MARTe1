@@ -30,6 +30,7 @@
 #include "Endianity.h"
 #include "EndianityTest.h"
 #include "MutexSem.h"
+#include "TimerTest.h"
 
 void Success(bool ret, const char *file, uint32 line, const char *command){
     if(!ret){
@@ -89,5 +90,8 @@ int main(int argc, char **argv){
 
     //Missing test classes
     MutexSem mux;
+
+    TimerTest tt;
+    ExpectSuccess(tt.ConfigAndStartTimerTest());
 }
 

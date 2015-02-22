@@ -29,7 +29,30 @@
 #define GENERAL_DEFINITIONS_OS_H
 
 #include <pthread.h>
+#include <termio.h>
 #define TID pthread_t
+
+typedef struct termio HANDLE_CONSOLE;
+
+enum Colours{
+    Black = 0,
+    Red = 1,
+    Green = 2,
+    Yellow = 3,
+    Blue = 4,
+    Purple = 5,
+    Cyan = 6,
+    White = 7,
+    Grey = 8,
+    DarkRed = 9,
+    DarkGreen = 10,
+    DarkYellow = 11,
+    DarkBlue = 12,
+    DarkPurple = 13,
+    DarkCyan = 14,
+    DarkGrey = 15
+
+};
 
 #endif
 

@@ -33,7 +33,10 @@ OBJSX=  Atomic.x \
         Threads.x  \
         ThreadsDatabase.x \
         Sleep.x \
-        FastMath.x
+		BasicConsole.x \
+		LoadableLibrary.x \
+		Timer.x \
+		FastMath.x
 
 TBD= SPAtomic.x \
         StreamInterface.x \
@@ -44,9 +47,7 @@ TBD= SPAtomic.x \
         BasicSocket.x \
         BasicATMSocket.x \
         BasicFile.x \
-        BasicConsole.x \
         BString.x \
-		Timer.x
 
 MAKEDEFAULTDIR=../../MakeDefaults
 

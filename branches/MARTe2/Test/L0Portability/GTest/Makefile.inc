@@ -30,7 +30,9 @@ OBJSX=  EndianityGTest.x \
         SleepGTest.x \
         ProcessorGTest.x \
         AtomicGTest.x \
-	ProcessorTypeGTest.x
+		ProcessorTypeGTest.x \
+		EventSemGTest.x \
+		TimerGTest.x
 
 MAKEDEFAULTDIR=../../../MakeDefaults
 
