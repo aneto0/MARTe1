@@ -143,7 +143,7 @@ static inline bool MutexSemOSUnLock(HANDLE &semH){
     if(semH == (HANDLE)NULL){
         return False;
     }
-    return True;
+    return ((PrivateMutexSemStruct *)semH)->UnLock();
 }
 
 /** locks without wasting time */
