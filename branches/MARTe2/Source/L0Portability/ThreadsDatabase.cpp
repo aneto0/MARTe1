@@ -109,9 +109,7 @@ bool ThreadsDatabaseNewEntry(ThreadInformation *threadInfo){
 }
 
 /** destroy TDB entry  */
-ThreadInformation *ThreadsDatabaseRemoveEntry(){
-    TID threadId = Threads::Id();
-
+ThreadInformation *ThreadsDatabaseRemoveEntry(TID threadId){
     // search for empty space staring from guess
     int index = 0;
     while(index < ThreadsDatabase::maxNOfEntries){
@@ -142,12 +140,11 @@ ThreadInformation *ThreadsDatabaseRemoveEntry(){
     on timeout returns NULL
     threadId = 0 --> current TID */
 ThreadInformation *ThreadsDatabaseGetThreadInformation(TID threadId){
-
     // search for empty space staring from guess
     int32 index = 0;
     while(index < ThreadsDatabase::maxNOfEntries){
         ThreadInformation *threadInfo = ThreadsDatabase::entries[index];
-        if(threadInfo != NULL){
+		if(threadInfo != NULL){
             if(threadInfo->threadId == threadId){
                 return threadInfo;
             }

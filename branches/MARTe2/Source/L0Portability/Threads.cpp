@@ -48,7 +48,7 @@ void __thread_decl SystemThreadFunction(void *threadData){
     threadInfo->UserThreadFunction();
 
     ThreadsDatabase::Lock();
-    ThreadInformation *threadInfo2 = ThreadsDatabase::RemoveEntry();
+    ThreadInformation *threadInfo2 = ThreadsDatabase::RemoveEntry(Threads::Id());
     ThreadsDatabase::UnLock();
 
     if (threadInfo != threadInfo2){
@@ -129,6 +129,9 @@ TID ThreadsId(){
 }
 
 bool ThreadsKill(TID threadId){
+	ThreadsDatabase::Lock();
+    ThreadsDatabase::RemoveEntry(threadId);
+    ThreadsDatabase::UnLock();
     return ThreadsOSKill(threadId);
 }
 
@@ -193,11 +196,11 @@ void ThreadsEndThread(){
 }
 
 const char *ThreadsName(TID threadId){
-    ThreadInformation threadInfo;
-    ThreadsDatabase::Lock();
-    if(ThreadsDatabase::GetInfo(threadInfo, -1, Threads::Id())){
+	ThreadsDatabase::Lock();
+    ThreadInformation *threadInfo = ThreadsDatabase::GetThreadInformation(threadId);
+    if(threadInfo != NULL){
         ThreadsDatabase::UnLock();
-        return threadInfo.ThreadName();
+        return threadInfo->ThreadName();
     }
     ThreadsDatabase::UnLock();
     return NULL;

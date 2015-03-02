@@ -39,7 +39,7 @@ extern "C" {
     bool ThreadsDatabaseNewEntry(ThreadInformation *ti);
 
     /** @see ThreadsDatabase::RemoveEntry */
-    ThreadInformation *ThreadsDatabaseRemoveEntry();
+    ThreadInformation *ThreadsDatabaseRemoveEntry(TID tid);
 
     /** @see ThreadsDatabase::GetThreadInformation */
     ThreadInformation *ThreadsDatabaseGetThreadInformation(TID tid);
@@ -83,7 +83,7 @@ private:
     static bool AllocMore();
 public:
     friend bool               ThreadsDatabaseNewEntry(ThreadInformation *ti);
-    friend ThreadInformation *ThreadsDatabaseRemoveEntry();
+    friend ThreadInformation *ThreadsDatabaseRemoveEntry(TID tid);
     friend ThreadInformation *ThreadsDatabaseGetThreadInformation(TID tid);
     friend bool               ThreadsDatabaseLock(TimeoutType tt);
     friend bool               ThreadsDatabaseUnLock();
@@ -99,8 +99,8 @@ public:
     }
 
     /** destroy TDB entry  */
-    static ThreadInformation *RemoveEntry(){
-        return ThreadsDatabaseRemoveEntry();
+    static ThreadInformation *RemoveEntry(TID tid){
+        return ThreadsDatabaseRemoveEntry(tid);
     }
 
     /** access private thread information
