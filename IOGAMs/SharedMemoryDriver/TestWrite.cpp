@@ -41,7 +41,9 @@ int main(int argc, char **argv){
     }
     if(argc > 2){
         printf("Going to write on memory mapped on key: %d at %p\n", key, mem);
-        *((float *)mem) = atof(argv[2]);
+        //*((float *)mem) = atof(argv[2]);
+        while(1)
+        *((int32*)mem) = atoi(argv[2]);
     }
     SharedMemoryFree(mem);
 }
