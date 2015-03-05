@@ -32,7 +32,12 @@ OBJSX=  EndianityTest.x \
         AtomicTest.x \
 		ProcessorTypeTest.x \
 		EventSemTest.x \
-		TimerTest.x
+		TimerTest.x \
+		MutexTest.x \
+		BasicConsoleTest.x \
+		HRTTest.x \
+		ThreadsDatabaseTest.x	 
+		
 
 MAKEDEFAULTDIR=../../MakeDefaults
 

@@ -90,6 +90,6 @@ bool EventSemTest::WaitTimeoutTestFailure(uint32 nOfThreads) {
     return !TestWait(nOfThreads);
 }
 
-bool EventSemTest::WaitTimeoutTestFailureFollowedBySuccess(uint32 nOfThreads){
+bool EventSemTest::WaitTimeoutTestFailureFollowedBySuccess(uint32 nOfThreads) {
     return WaitTimeoutTestFailure(nOfThreads) && WaitNoTimeoutTest(nOfThreads);
 }

@@ -3,25 +3,25 @@
  * ITER and the Development of Fusion Energy ('Fusion for Energy')
  *
  * Licensed under the EUPL, Version 1.1 or - as soon they 
-   will be approved by the European Commission - subsequent  
-   versions of the EUPL (the "Licence"); 
+ will be approved by the European Commission - subsequent  
+ versions of the EUPL (the "Licence"); 
  * You may not use this work except in compliance with the 
-   Licence. 
+ Licence. 
  * You may obtain a copy of the Licence at: 
  *  
  * http://ec.europa.eu/idabc/eupl
  *
  * Unless required by applicable law or agreed to in 
-   writing, software distributed under the Licence is 
-   distributed on an "AS IS" basis, 
+ writing, software distributed under the Licence is 
+ distributed on an "AS IS" basis, 
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
-   express or implied. 
+ express or implied. 
  * See the Licence  
-   permissions and limitations under the Licence. 
+ permissions and limitations under the Licence. 
  *
  * $Id: $
  *
-**/
+ **/
 /**
  * @class EndianityTest
  * @brief Tests all the Endianity class functions.
@@ -34,7 +34,7 @@
 
 #include "Endianity.h"
 
-template <class T>
+template<class T>
 class EndianityTest {
 private:
     T testValue;
@@ -45,11 +45,11 @@ public:
      * @param testValue the value to be tested by the all
      * the test functions.
      */
-    EndianityTest(T testValue){
-        this->testValue     = testValue;
-        this->testArray[0]  = testValue;
-        this->testArray[1]  = testValue + 1;
-        this->testArray[2]  = testValue - 1 ;
+    EndianityTest(T testValue) {
+        this->testValue = testValue;
+        this->testArray[0] = testValue;
+        this->testArray[1] = testValue + 1;
+        this->testArray[2] = testValue - 1;
     }
 
     /**
@@ -63,19 +63,19 @@ public:
      * - the test value and the big endian value must the same
      * @return True if the test is successful
      */
-    bool ToEndian(){
+    bool ToEndian() {
         T valueLittleEndian = testValue;
-        T valueBigEndian    = testValue;
+        T valueBigEndian = testValue;
 
         Endianity::ToLittleEndian(valueLittleEndian);
         Endianity::ToBigEndian(valueBigEndian);
 
         bool isLittleEndian = (testValue == valueLittleEndian);
-        bool isBigEndian    = (testValue == valueBigEndian);
-        if(Endianity::Type() == Endianity::ENDIANITY_LITTLE_ENDIAN){
+        bool isBigEndian = (testValue == valueBigEndian);
+        if (Endianity::Type() == Endianity::ENDIANITY_LITTLE_ENDIAN) {
             return isLittleEndian && !isBigEndian;
         }
-        else{
+        else {
             return !isLittleEndian && isBigEndian;
         }
     }
@@ -90,19 +90,19 @@ public:
      * - the test value and the big endian value must the same
      * @return True if the test is successful
      */
-    bool FromEndian(){
+    bool FromEndian() {
         T valueLittleEndian = testValue;
-        T valueBigEndian    = testValue;
+        T valueBigEndian = testValue;
 
         Endianity::FromLittleEndian(valueLittleEndian);
         Endianity::FromBigEndian(valueBigEndian);
 
         bool isLittleEndian = (testValue == valueLittleEndian);
-        bool isBigEndian    = (testValue == valueBigEndian);
-        if(Endianity::Type() == Endianity::ENDIANITY_LITTLE_ENDIAN){
+        bool isBigEndian = (testValue == valueBigEndian);
+        if (Endianity::Type() == Endianity::ENDIANITY_LITTLE_ENDIAN) {
             return isLittleEndian && !isBigEndian;
         }
-        else{
+        else {
             return !isLittleEndian && isBigEndian;
         }
     }
@@ -117,24 +117,27 @@ public:
      * - each element of the test array and the big endian array must be the same
      * @return True if the test is successful
      */
-    bool MemCopyToEndian(){
+    bool MemCopyToEndian() {
         T arrayLittleEndian[3];
         T arrayBigEndian[3];
-        Endianity::MemCopyToLittleEndian((T *)arrayLittleEndian, (T *)testArray, 3);
-        Endianity::MemCopyToBigEndian((T *)arrayBigEndian, (T *)testArray, 3);
+        Endianity::MemCopyToLittleEndian((T *) arrayLittleEndian,
+                                         (T *) testArray, 3);
+        Endianity::MemCopyToBigEndian((T *) arrayBigEndian, (T *) testArray, 3);
 
         bool isLittleEndian = (testArray[0] == arrayLittleEndian[0]);
-        isLittleEndian      = isLittleEndian && (testArray[1] == arrayLittleEndian[1]);
-        isLittleEndian      = isLittleEndian && (testArray[2] == arrayLittleEndian[2]);
+        isLittleEndian = isLittleEndian
+                && (testArray[1] == arrayLittleEndian[1]);
+        isLittleEndian = isLittleEndian
+                && (testArray[2] == arrayLittleEndian[2]);
 
         bool isBigEndian = (testArray[0] == arrayBigEndian[0]);
-        isBigEndian      = isBigEndian && (testArray[1] == arrayBigEndian[1]);
-        isBigEndian      = isBigEndian && (testArray[2] == arrayBigEndian[2]);
+        isBigEndian = isBigEndian && (testArray[1] == arrayBigEndian[1]);
+        isBigEndian = isBigEndian && (testArray[2] == arrayBigEndian[2]);
 
-        if(Endianity::Type() == Endianity::ENDIANITY_LITTLE_ENDIAN){
+        if (Endianity::Type() == Endianity::ENDIANITY_LITTLE_ENDIAN) {
             return isLittleEndian && !isBigEndian;
         }
-        else{
+        else {
             return !isLittleEndian && isBigEndian;
         }
     }
@@ -149,24 +152,28 @@ public:
      * - each element of the test array and the big endian array must be the same
      * @return True if the test is successful
      */
-    bool MemCopyFromEndian(){
+    bool MemCopyFromEndian() {
         T arrayLittleEndian[3];
         T arrayBigEndian[3];
-        Endianity::MemCopyFromLittleEndian((T *)arrayLittleEndian, (T *)testArray, 3);
-        Endianity::MemCopyFromBigEndian((T *)arrayBigEndian, (T *)testArray, 3);
+        Endianity::MemCopyFromLittleEndian((T *) arrayLittleEndian,
+                                           (T *) testArray, 3);
+        Endianity::MemCopyFromBigEndian((T *) arrayBigEndian, (T *) testArray,
+                                        3);
 
         bool isLittleEndian = (testArray[0] == arrayLittleEndian[0]);
-        isLittleEndian      = isLittleEndian && (testArray[1] == arrayLittleEndian[1]);
-        isLittleEndian      = isLittleEndian && (testArray[2] == arrayLittleEndian[2]);
+        isLittleEndian = isLittleEndian
+                && (testArray[1] == arrayLittleEndian[1]);
+        isLittleEndian = isLittleEndian
+                && (testArray[2] == arrayLittleEndian[2]);
 
         bool isBigEndian = (testArray[0] == arrayBigEndian[0]);
-        isBigEndian      = isBigEndian && (testArray[1] == arrayBigEndian[1]);
-        isBigEndian      = isBigEndian && (testArray[2] == arrayBigEndian[2]);
+        isBigEndian = isBigEndian && (testArray[1] == arrayBigEndian[1]);
+        isBigEndian = isBigEndian && (testArray[2] == arrayBigEndian[2]);
 
-        if(Endianity::Type() == Endianity::ENDIANITY_LITTLE_ENDIAN){
+        if (Endianity::Type() == Endianity::ENDIANITY_LITTLE_ENDIAN) {
             return isLittleEndian && !isBigEndian;
         }
-        else{
+        else {
             return !isLittleEndian && isBigEndian;
         }
     }
@@ -177,9 +184,9 @@ public:
      * value
      * @return True if the test is successful
      */
-    bool ToFromEndian(){
+    bool ToFromEndian() {
         T valueLittleEndian = testValue;
-        T valueBigEndian    = testValue;
+        T valueBigEndian = testValue;
 
         Endianity::ToLittleEndian(valueLittleEndian);
         Endianity::FromLittleEndian(valueLittleEndian);
@@ -195,37 +202,39 @@ public:
      * value
      * @return True if the test is successful
      */
-    bool MemCopyToFromEndian(){
+    bool MemCopyToFromEndian() {
         T arrayLittleEndian[3];
         T arrayBigEndian[3];
         T arrayToFrom[3];
-        Endianity::MemCopyToLittleEndian((T *)arrayLittleEndian, (T *)testArray, 3);
-        Endianity::MemCopyFromLittleEndian((T *)arrayToFrom, (T *)arrayLittleEndian, 3);
-        
+        Endianity::MemCopyToLittleEndian((T *) arrayLittleEndian,
+                                         (T *) testArray, 3);
+        Endianity::MemCopyFromLittleEndian((T *) arrayToFrom,
+                                           (T *) arrayLittleEndian, 3);
+
         bool okLittleEndian = (testArray[0] == arrayToFrom[0]);
         okLittleEndian = okLittleEndian && (testArray[1] == arrayToFrom[1]);
         okLittleEndian = okLittleEndian && (testArray[2] == arrayToFrom[2]);
 
-        Endianity::MemCopyToBigEndian((T *)arrayBigEndian, (T *)testArray, 3);
-        Endianity::MemCopyFromBigEndian((T *)arrayToFrom, (T *)arrayBigEndian, 3);
+        Endianity::MemCopyToBigEndian((T *) arrayBigEndian, (T *) testArray, 3);
+        Endianity::MemCopyFromBigEndian((T *) arrayToFrom, (T *) arrayBigEndian,
+                                        3);
         bool okBigEndian = (testArray[0] == arrayToFrom[0]);
-        okBigEndian      = okBigEndian && (testArray[1] == arrayToFrom[1]);
-        okBigEndian      = okBigEndian && (testArray[2] == arrayToFrom[2]);
+        okBigEndian = okBigEndian && (testArray[1] == arrayToFrom[1]);
+        okBigEndian = okBigEndian && (testArray[2] == arrayToFrom[2]);
 
         return (okLittleEndian && okBigEndian);
     }
 
-
     /**
      * Executes all the tests
      */
-    bool All(){
+    bool All() {
         bool ok = ToEndian();
-        ok      = ok && FromEndian();
-        ok      = ok && MemCopyToEndian();
-        ok      = ok && MemCopyFromEndian();
-        ok      = ok && ToFromEndian();
-        ok      = ok && MemCopyToFromEndian();
+        ok = ok && FromEndian();
+        ok = ok && MemCopyToEndian();
+        ok = ok && MemCopyFromEndian();
+        ok = ok && ToFromEndian();
+        ok = ok && MemCopyToFromEndian();
         return ok;
     }
 };

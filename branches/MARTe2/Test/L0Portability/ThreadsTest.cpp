@@ -54,7 +54,8 @@ bool ThreadsTest::BeginThread(uint32 nOfThreads) {
     for (i = 0; i < nOfThreads; i++) {
         //Each thread will increment incrementCounter and its value should arrive
         //to nOfThreads
-        Threads::BeginThread((ThreadFunctionType) ThreadsTestIncrementCounter, this);
+        Threads::BeginThread((ThreadFunctionType) ThreadsTestIncrementCounter,
+                             this);
     }
     //Give some time for all the threads to have started...
     while (incrementCounter != nOfThreads) {

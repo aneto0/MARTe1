@@ -32,8 +32,12 @@ OBJSX=  EndianityGTest.x \
         AtomicGTest.x \
 		ProcessorTypeGTest.x \
 		EventSemGTest.x \
-		TimerGTest.x
-
+		TimerGTest.x \
+		MutexGTest.x \
+		BasicConsoleGTest.x \
+		HRTGTest.x \
+		ThreadsDatabaseGTest.x
+	
 MAKEDEFAULTDIR=../../../MakeDefaults
 
 include $(MAKEDEFAULTDIR)/MakeStdLibDefs.$(TARGET)
