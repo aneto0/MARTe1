@@ -27,14 +27,16 @@
 #include INCLUDE_FILE_OPERATING_SYSTEM(OPERATING_SYSTEM,BasicConsoleOS.h)
 
 bool BasicConsoleOpen(BasicConsole &con, ConsoleOpeningMode openingMode,
-                      int32 numberOfColumns, int32 numberOfRows,
-                      TimeoutType msecTimeout) {
+        int32 numberOfColumns, int32 numberOfRows,
+        TimeoutType msecTimeout)
+{
 
     con.msecTimeout = msecTimeout;
     con.lineCount = 0;
     con.lastPagingTime = 0;
     con.openingMode = openingMode;
-
+    con.numberOfColumns=numberOfColumns;
+    con.numberOfRows=numberOfRows;
     return BasicConsoleOSOpen(con, numberOfColumns, numberOfRows);
 }
 
@@ -67,24 +69,32 @@ bool BasicConsoleWrite(BasicConsole &con, const void* buffer, uint32 &size,
         char *p = (char *) buffer;
         uint32 index = 0;
         int start = 0;
+        uint32 sizeT;
+        bool end = False;
         while (index < size) {
-            while ((con.lineCount < (numberOfRows - 1)) && (index < size)) {
+            while ((con.lineCount < (numberOfRows - 1)) && (index < size)
+                    && !end) {
                 if (p[index] == '\n')
                     con.lineCount++;
+                if (p[index] == '\0')
+                    end = True;
+
                 index++;
             }
-            size = index - start;
-            BasicConsoleOSWrite(con, p + start, size);
+            sizeT = index - start;
+            BasicConsoleOSWrite(con, p + start, sizeT);
+            if (end)
+                return True;
             if (con.lineCount >= (numberOfRows - 1)) {
                 start = index;
                 con.lastPagingTime = t1;
                 con.lineCount = 0;
                 const char *message = "[PAGING] ENTER TO CONTINUE\015";
-                size = strlen(message);
-                BasicConsoleOSWrite(con, message, size);
+                sizeT = strlen(message);
+                BasicConsoleOSWrite(con, message, sizeT);
                 char buffer[32];
-                uint32 size = 1;
-                BasicConsoleRead(con, buffer, size, msecTimeout);
+                sizeT = 2;
+                BasicConsoleRead(con, buffer, sizeT, msecTimeout);
             }
         }
         return True;
@@ -113,12 +123,13 @@ bool BasicConsoleGetWindowSize(BasicConsole &con, int32 &numberOfColumns,
     return BasicConsoleOSGetWindowSize(con, numberOfColumns, numberOfRows);
 }
 
-bool BasicConsoleConsoleSetSize(BasicConsole &con, int32 numberOfColumns, int32 numberOfRows) {
+bool BasicConsoleSetSize(BasicConsole &con, int32 numberOfColumns,
+                         int32 numberOfRows) {
     return BasicConsoleOSSetSize(con, numberOfColumns, numberOfRows);
 }
 
 bool BasicConsoleGetSize(BasicConsole &con, int32 &numberOfColumns,
-                    int &numberOfRows) {
+                         int &numberOfRows) {
     return BasicConsoleOSGetSize(con, numberOfColumns, numberOfRows);
 }
 
@@ -126,12 +137,13 @@ bool BasicConsoleSetCursorPosition(BasicConsole &con, int32 column, int32 row) {
     return BasicConsoleOSSetCursorPosition(con, column, row);
 }
 
-bool BasicConsoleGetCursorPosition(BasicConsole &con, int32 &column, int32 &row) {
+bool BasicConsoleGetCursorPosition(BasicConsole &con, int32 &column,
+                                   int32 &row) {
     return BasicConsoleOSGetCursorPosition(con, column, row);
 }
 
 bool BasicConsoleSetColour(BasicConsole &con, Colours foreGroundColour,
-                      Colours backGroundColour) {
+                           Colours backGroundColour) {
     return BasicConsoleOSSetColour(con, foreGroundColour, backGroundColour);
 }
 
@@ -140,7 +152,8 @@ bool BasicConsoleClear(BasicConsole &con) {
 }
 
 bool BasicConsolePlotChar(BasicConsole &con, char c, Colours foreGroundColour,
-                     Colours backGroundColour, int32 column, int32 row) {
-    return BasicConsoleOSPlotChar(con, c, foreGroundColour, backGroundColour, column, row);
+                          Colours backGroundColour, int32 column, int32 row) {
+    return BasicConsoleOSPlotChar(con, c, foreGroundColour, backGroundColour,
+                                  column, row);
 }
 

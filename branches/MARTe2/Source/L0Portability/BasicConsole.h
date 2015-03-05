@@ -145,6 +145,11 @@ public:
     /** sets of flags describing the console status*/
     ConsoleOpeningMode openingMode;
     /** */
+
+    int32 numberOfColumns;
+
+    int32 numberOfRows; ///////////////////////////////////////////////////////////////////////////////
+
     struct termio inputConsoleHandle;
 
     /** */
