@@ -35,7 +35,7 @@ OBJSX=  EndianityGTest.x \
 		TimerGTest.x \
 		MutexGTest.x \
 		BasicConsoleGTest.x \
-		HRTGTest.x \
+		HighResolutionTimerGTest.x \
 		ThreadsDatabaseGTest.x
 	
 MAKEDEFAULTDIR=../../../MakeDefaults

@@ -35,7 +35,7 @@ OBJSX=  EndianityTest.x \
 		TimerTest.x \
 		MutexTest.x \
 		BasicConsoleTest.x \
-		HRTTest.x \
+		HighResolutionTimerTest.x \
 		ThreadsDatabaseTest.x	 
 		
 
