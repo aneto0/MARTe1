@@ -59,7 +59,8 @@ public:
             return False;
         //This was pthread PTHREAD_MUTEX_RECURSIVE but it was crashing when a deadlock was forced on purpose
         //with PTHREAD_MUTEX_NORMAL if the same thread cannot lock the semaphore without unlocking it first.
-        if (pthread_mutexattr_settype(&mutexAttributes, PTHREAD_MUTEX_NORMAL) != 0)
+        if (pthread_mutexattr_settype(&mutexAttributes, PTHREAD_MUTEX_NORMAL)
+                != 0)
             return False;
         if (pthread_mutex_init(&mutexHandle, &mutexAttributes) != 0)
             return False;
@@ -79,7 +80,7 @@ public:
     bool Lock(TimeoutType msecTimeout = TTInfiniteWait) {
         if (msecTimeout == TTInfiniteWait) {
             if (pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL) != 0)
-                return False; 
+                return False;
 
             if (pthread_mutex_lock(&mutexHandle) != 0)
                 return False;
@@ -106,7 +107,7 @@ public:
     bool UnLock() {
         bool condition = (pthread_mutex_unlock(&mutexHandle) == 0);
         return condition
-                && pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL) == 0; 
+                && pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL) == 0;
     }
 
     /** */

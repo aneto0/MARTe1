@@ -36,7 +36,7 @@
  */
 void LoadableLibraryOSClose(LoadableLibrary &ll) {
     if (ll.module != 0) {
-        dlclose (ll.module);
+        dlclose(ll.module);
     }
 }
 

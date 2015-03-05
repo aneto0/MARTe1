@@ -3,25 +3,25 @@
  * ITER and the Development of Fusion Energy ('Fusion for Energy')
  *
  * Licensed under the EUPL, Version 1.1 or - as soon they 
-   will be approved by the European Commission - subsequent  
-   versions of the EUPL (the "Licence"); 
+ will be approved by the European Commission - subsequent  
+ versions of the EUPL (the "Licence"); 
  * You may not use this work except in compliance with the 
-   Licence. 
+ Licence. 
  * You may obtain a copy of the Licence at: 
  *  
  * http://ec.europa.eu/idabc/eupl
  *
  * Unless required by applicable law or agreed to in 
-   writing, software distributed under the Licence is 
-   distributed on an "AS IS" basis, 
+ writing, software distributed under the Licence is 
+ distributed on an "AS IS" basis, 
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
-   express or implied. 
+ express or implied. 
  * See the Licence  
-   permissions and limitations under the Licence. 
+ permissions and limitations under the Licence. 
  *
  * $Id: Endianity.h 3 2012-01-15 16:26:07Z aneto $
  *
-**/
+ **/
 /** 
  * @file
  * Definition of the basic properties and types.
@@ -33,23 +33,23 @@
 #include <windows.h>
 
 /** 64 Bit unsigned integer. */
-typedef unsigned _int64    uint64;
+typedef unsigned _int64 uint64;
 /** 64 Bit signed integer. */
-typedef _int64             int64;
+typedef _int64 int64;
 
-    /** 32 Bit unsigned integer. */
-typedef unsigned int       uint32;
+/** 32 Bit unsigned integer. */
+typedef unsigned int uint32;
 /** 32 Bit signed integer. */
-typedef signed int         int32;
+typedef signed int int32;
 
 /** 16 Bit unsigned integer. */
-typedef unsigned short     uint16;
+typedef unsigned short uint16;
 /** 16 Bit signed integer. */
-typedef signed   short     int16;
+typedef signed short int16;
 /** 8 Bit unsigned integer. */
-typedef unsigned char      uint8;
+typedef unsigned char uint8;
 /** 8 Bit signed integer. */
-typedef signed   char      int8;
+typedef signed char int8;
 
 /** A tool to find indexes of structures fields. */
 #define indexof(type,field) ((intptr)&(((type *)0)->field))

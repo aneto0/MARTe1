@@ -3,25 +3,25 @@
  * ITER and the Development of Fusion Energy ('Fusion for Energy')
  *
  * Licensed under the EUPL, Version 1.1 or - as soon they 
-   will be approved by the European Commission - subsequent  
-   versions of the EUPL (the "Licence"); 
+ will be approved by the European Commission - subsequent  
+ versions of the EUPL (the "Licence"); 
  * You may not use this work except in compliance with the 
-   Licence. 
+ Licence. 
  * You may obtain a copy of the Licence at: 
  *  
  * http://ec.europa.eu/idabc/eupl
  *
  * Unless required by applicable law or agreed to in 
-   writing, software distributed under the Licence is 
-   distributed on an "AS IS" basis, 
+ writing, software distributed under the Licence is 
+ distributed on an "AS IS" basis, 
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
-   express or implied. 
+ express or implied. 
  * See the Licence  
-   permissions and limitations under the Licence. 
+ permissions and limitations under the Licence. 
  *
  * $Id: Endianity.h 3 2012-01-15 16:26:07Z aneto $
  *
-**/
+ **/
 /**
  * @file
  * Access processor's information
@@ -34,8 +34,8 @@
 /**
  * @see Processors::Available()
  */
-uint32 ProcessorsAvailable(){
-    return (uint32)sysconf(_SC_NPROCESSORS_ONLN);
+uint32 ProcessorsAvailable() {
+    return (uint32) sysconf(_SC_NPROCESSORS_ONLN);
 }
 
 #endif

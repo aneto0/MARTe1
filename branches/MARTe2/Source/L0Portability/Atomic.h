@@ -3,25 +3,25 @@
  * ITER and the Development of Fusion Energy ('Fusion for Energy')
  *
  * Licensed under the EUPL, Version 1.1 or - as soon they 
-   will be approved by the European Commission - subsequent  
-   versions of the EUPL (the "Licence"); 
+ will be approved by the European Commission - subsequent  
+ versions of the EUPL (the "Licence"); 
  * You may not use this work except in compliance with the 
-   Licence. 
+ Licence. 
  * You may obtain a copy of the Licence at: 
  *  
  * http://ec.europa.eu/idabc/eupl
  *
  * Unless required by applicable law or agreed to in 
-   writing, software distributed under the Licence is 
-   distributed on an "AS IS" basis, 
+ writing, software distributed under the Licence is 
+ distributed on an "AS IS" basis, 
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
-   express or implied. 
+ express or implied. 
  * See the Licence  
-   permissions and limitations under the Licence. 
+ permissions and limitations under the Licence. 
  *
  * $Id: $
  *
-**/
+ **/
 
 /**
  * @file
@@ -36,56 +36,56 @@
 #include INCLUDE_FILE_ARCHITECTURE(ARCHITECTURE,AtomicA.h)
 
 /** A collector of functions that are executed atomically even on multiprocessor machines. */
-class Atomic{
+class Atomic {
 
 public:
     /** Atomically increment a 32 bit integer in memory. */
-    static inline void Increment (volatile int32 *p ){
+    static inline void Increment (volatile int32 *p ) {
         AtomicIncrement32(p);
     }
 
     /** Atomically increment a 16 bit integer in memory. */
-    static inline void Increment (volatile int16 *p){
+    static inline void Increment (volatile int16 *p) {
         AtomicIncrement16(p);
     }
 
     /** Atomically increment a 8 bit integer in memory. */
-    static inline void Increment (volatile int8 *p){
+    static inline void Increment (volatile int8 *p) {
         AtomicIncrement8(p);
     }
 
     /** Atomically decrement a 32 bit integer in memory. */
-    static inline void Decrement (volatile int32 *p){
+    static inline void Decrement (volatile int32 *p) {
         AtomicDecrement32(p);
     }
 
     /** Atomically decrement a 16 bit integer in memory. */
-    static inline void Decrement (volatile int16 *p){
+    static inline void Decrement (volatile int16 *p) {
         AtomicDecrement16(p);
     }
 
     /** Atomically decrement a 8 bit integer in memory. */
-    static inline void Decrement (volatile int8 *p){
+    static inline void Decrement (volatile int8 *p) {
         AtomicDecrement8(p);
     }
 
     /** Atomically exchange the contents of a variable with the specified memory location. */
-    static inline int32 Exchange (volatile int32 *p, int32 v){
+    static inline int32 Exchange (volatile int32 *p, int32 v) {
         return AtomicExchange32(p, v);
     }
 
     /** Test and set a 32 bit memory location in a thread safe way. */
-    static inline bool TestAndSet(int32 volatile *p){
+    static inline bool TestAndSet(int32 volatile *p) {
         return AtomicTestAndSet32(p);
     }
 
     /** Test and set a 16 bit memory location in a thread safe way. */
-    static inline bool TestAndSet(int16 volatile *p){
+    static inline bool TestAndSet(int16 volatile *p) {
         return AtomicTestAndSet16(p);
     }
 
     /** Test and set a 8 bit memory location in a thread safe way. */
-    static inline bool TestAndSet(int8  volatile *p){
+    static inline bool TestAndSet(int8 volatile *p) {
         return AtomicTestAndSet8(p);
     }
 

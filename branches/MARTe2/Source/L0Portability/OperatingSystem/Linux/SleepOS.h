@@ -3,25 +3,25 @@
  * ITER and the Development of Fusion Energy ('Fusion for Energy')
  *
  * Licensed under the EUPL, Version 1.1 or - as soon they 
-   will be approved by the European Commission - subsequent  
-   versions of the EUPL (the "Licence"); 
+ will be approved by the European Commission - subsequent  
+ versions of the EUPL (the "Licence"); 
  * You may not use this work except in compliance with the 
-   Licence. 
+ Licence. 
  * You may obtain a copy of the Licence at: 
  *  
  * http://ec.europa.eu/idabc/eupl
  *
  * Unless required by applicable law or agreed to in 
-   writing, software distributed under the Licence is 
-   distributed on an "AS IS" basis, 
+ writing, software distributed under the Licence is 
+ distributed on an "AS IS" basis, 
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
-   express or implied. 
+ express or implied. 
  * See the Licence  
-   permissions and limitations under the Licence. 
+ permissions and limitations under the Licence. 
  *
  * $Id: $
  *
-**/
+ **/
 /**
  * @file
  * Implentation of task sleeping in Linux
@@ -41,30 +41,31 @@
 /**
  * @see Sleep.h SleepAtLeast
  */
-static inline void SleepOSAtLeast(double sec){
-    int64                 hrtCounter;
-    int32                 nsecRemainder;
-    struct timespec       timesValues;
-    struct timespec       remTimesValues;
-    double roundValue   = floor(sec);
-    timesValues.tv_sec  = (time_t)roundValue;
-    timesValues.tv_nsec = (long)((sec-roundValue)*1E9);
-    hrtCounter          = HighResolutionTimer::Counter();
-    while(1){
-        while(nanosleep(&timesValues, &remTimesValues) == -1){
-            if(errno != EINTR){
+static inline void SleepOSAtLeast(double sec) {
+    int64 hrtCounter;
+    int32 nsecRemainder;
+    struct timespec timesValues;
+    struct timespec remTimesValues;
+    double roundValue = floor(sec);
+    timesValues.tv_sec = (time_t) roundValue;
+    timesValues.tv_nsec = (long) ((sec - roundValue) * 1E9);
+    hrtCounter = HighResolutionTimer::Counter();
+    while (1) {
+        while (nanosleep(&timesValues, &remTimesValues) == -1) {
+            if (errno != EINTR) {
                 return;
             }
             memcpy(&timesValues, &remTimesValues, sizeof(struct timespec));
         }
-    
-        nsecRemainder = (int32)(((HighResolutionTimer::Counter() - hrtCounter) * HighResolutionTimer::Period() - sec)*1E9);
-        if(nsecRemainder >= 0){
+
+        nsecRemainder = (int32) (((HighResolutionTimer::Counter() - hrtCounter)
+                * HighResolutionTimer::Period() - sec) * 1E9);
+        if (nsecRemainder >= 0) {
             break;
         }
         else {
-             timesValues.tv_sec  = 0;
-             timesValues.tv_nsec = nsecRemainder;
+            timesValues.tv_sec = 0;
+            timesValues.tv_nsec = nsecRemainder;
         }
     }
 }
@@ -72,38 +73,39 @@ static inline void SleepOSAtLeast(double sec){
 /** 
  * @see Sleep.h SleepNoMore
  */
-static inline void SleepOSNoMore(double sec){
-    int64 secCounts = (int64)(sec * HighResolutionTimer::Frequency());
-    sec        -= LINUX_SLEEP_NO_MORE_MIN_USEC_TIME * 1e-6;
+static inline void SleepOSNoMore(double sec) {
+    int64 secCounts = (int64) (sec * HighResolutionTimer::Frequency());
+    sec -= LINUX_SLEEP_NO_MORE_MIN_USEC_TIME * 1e-6;
     int64 start = HighResolutionTimer::Counter();
-    if(sec > 0){
-        struct timespec       timesValues;
-        struct timespec       remTimesValues;
-        double roundValue   = floor(sec);
-        timesValues.tv_sec  = (time_t)roundValue;
-        timesValues.tv_nsec = (long)((sec-roundValue)*1E9);
-        while(nanosleep(&timesValues, &remTimesValues) == -1) {
-            if(errno != EINTR) {
+    if (sec > 0) {
+        struct timespec timesValues;
+        struct timespec remTimesValues;
+        double roundValue = floor(sec);
+        timesValues.tv_sec = (time_t) roundValue;
+        timesValues.tv_nsec = (long) ((sec - roundValue) * 1E9);
+        while (nanosleep(&timesValues, &remTimesValues) == -1) {
+            if (errno != EINTR) {
                 return;
             }
             memcpy(&timesValues, &remTimesValues, sizeof(struct timespec));
         }
     }
     int64 sleepUntil = secCounts + start;
-    while(HighResolutionTimer::Counter() < sleepUntil);
+    while (HighResolutionTimer::Counter() < sleepUntil)
+        ;
 }
 
 /** 
  * @see Sleep.h SleepSec
  */
-static inline void SleepOSSecDouble(double sec){
-    struct timespec       timesValues;
-    struct timespec       remTimesValues;
-    double roundValue   = floor(sec);
-    timesValues.tv_sec  = (time_t)roundValue;
-    timesValues.tv_nsec = (long)((sec-roundValue)*1E9);
-    while(nanosleep(&timesValues, &remTimesValues) == -1) {
-        if(errno != EINTR) {
+static inline void SleepOSSecDouble(double sec) {
+    struct timespec timesValues;
+    struct timespec remTimesValues;
+    double roundValue = floor(sec);
+    timesValues.tv_sec = (time_t) roundValue;
+    timesValues.tv_nsec = (long) ((sec - roundValue) * 1E9);
+    while (nanosleep(&timesValues, &remTimesValues) == -1) {
+        if (errno != EINTR) {
             return;
         }
         memcpy(&timesValues, &remTimesValues, sizeof(struct timespec));
@@ -113,30 +115,30 @@ static inline void SleepOSSecDouble(double sec){
 /** 
  * @see Sleep.h SleepSec
  */
-static inline void SleepOSSecFloat(float sec){
+static inline void SleepOSSecFloat(float sec) {
     SleepOSSecDouble(sec);
 }
 
 /** 
  * @see Sleep.h SleepOSSec
  */
-static inline void SleepOSMSec(int32 msec){
-    int32 sec     = 0;
+static inline void SleepOSMSec(int32 msec) {
+    int32 sec = 0;
     int32 nanosec = 0;
-    if(msec >=1000){
-        sec     = (int32)(msec/1000);
-        nanosec = (int32)((msec - sec*1000)*1E6);
+    if (msec >= 1000) {
+        sec = (int32) (msec / 1000);
+        nanosec = (int32) ((msec - sec * 1000) * 1E6);
     }
-    else{
+    else {
         sec = 0;
-        nanosec = (int32)(msec*1E6);
+        nanosec = (int32) (msec * 1E6);
     }
-    struct timespec       timesValues;
-    struct timespec       remTimesValues;
-    timesValues.tv_sec  = (time_t)sec;
-    timesValues.tv_nsec = (long)nanosec;
-    while(nanosleep(&timesValues, &remTimesValues) == -1) {
-        if(errno != EINTR) {
+    struct timespec timesValues;
+    struct timespec remTimesValues;
+    timesValues.tv_sec = (time_t) sec;
+    timesValues.tv_nsec = (long) nanosec;
+    while (nanosleep(&timesValues, &remTimesValues) == -1) {
+        if (errno != EINTR) {
             return;
         }
         memcpy(&timesValues, &remTimesValues, sizeof(struct timespec));
@@ -146,27 +148,30 @@ static inline void SleepOSMSec(int32 msec){
 /** 
  * @see Sleep.h SleepSemiBusy
  */
-static inline void SleepOSSemiBusy(double totalSleepSec, double nonBusySleepSec) {
-    int64 startCounter      = HighResolutionTimer::Counter();
-    int64 sleepUntilCounter = startCounter + (int64)(totalSleepSec*HighResolutionTimer::Frequency());
-    if((nonBusySleepSec < totalSleepSec) && (nonBusySleepSec > 0.0)) {
-        struct timespec   timesValues;
-        struct timespec   remTimesValues;
-        double roundValue   = floor(nonBusySleepSec);
-        timesValues.tv_sec  = (time_t)roundValue;
-        timesValues.tv_nsec = (long)((nonBusySleepSec-roundValue)*1E9);
-        while(nanosleep(&timesValues, &remTimesValues) == -1) {
-            if(errno != EINTR) {
+static inline void SleepOSSemiBusy(double totalSleepSec,
+                                   double nonBusySleepSec) {
+    int64 startCounter = HighResolutionTimer::Counter();
+    int64 sleepUntilCounter = startCounter
+            + (int64) (totalSleepSec * HighResolutionTimer::Frequency());
+    if ((nonBusySleepSec < totalSleepSec) && (nonBusySleepSec > 0.0)) {
+        struct timespec timesValues;
+        struct timespec remTimesValues;
+        double roundValue = floor(nonBusySleepSec);
+        timesValues.tv_sec = (time_t) roundValue;
+        timesValues.tv_nsec = (long) ((nonBusySleepSec - roundValue) * 1E9);
+        while (nanosleep(&timesValues, &remTimesValues) == -1) {
+            if (errno != EINTR) {
                 return;
             }
             memcpy(&timesValues, &remTimesValues, sizeof(struct timespec));
         }
     }
-    while(HighResolutionTimer::Counter() < sleepUntilCounter);
+    while (HighResolutionTimer::Counter() < sleepUntilCounter)
+        ;
 }
 
-static int32 SleepOSGetDateSeconds(){
-    return (int32)time((time_t *)NULL);
+static int32 SleepOSGetDateSeconds() {
+    return (int32) time((time_t *) NULL);
 }
 #endif
 

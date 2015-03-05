@@ -3,25 +3,25 @@
  * ITER and the Development of Fusion Energy ('Fusion for Energy')
  *
  * Licensed under the EUPL, Version 1.1 or - as soon they 
-   will be approved by the European Commission - subsequent  
-   versions of the EUPL (the "Licence"); 
+ will be approved by the European Commission - subsequent  
+ versions of the EUPL (the "Licence"); 
  * You may not use this work except in compliance with the 
-   Licence. 
+ Licence. 
  * You may obtain a copy of the Licence at: 
  *  
  * http://ec.europa.eu/idabc/eupl
  *
  * Unless required by applicable law or agreed to in 
-   writing, software distributed under the Licence is 
-   distributed on an "AS IS" basis, 
+ writing, software distributed under the Licence is 
+ distributed on an "AS IS" basis, 
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
-   express or implied. 
+ express or implied. 
  * See the Licence  
-   permissions and limitations under the Licence. 
+ permissions and limitations under the Licence. 
  *
  * $Id: Endianity.h 3 2012-01-15 16:26:07Z aneto $
  *
-**/
+ **/
 
 /**
  * @file 
@@ -40,54 +40,54 @@
 #include INCLUDE_FILE_OPERATING_SYSTEM(OPERATING_SYSTEM,EventSemOS.h)
 
 /** Definition of an event shemaphore. */
-class EventSem: public SemCore{
+class EventSem: public SemCore {
 public:
     /** */
-    EventSem(){
+    EventSem() {
     }
 
     /** */
-    EventSem(HANDLE h){
+    EventSem(HANDLE h) {
         Init(h);
     }
 
     /** copies semaphore and special infos as well. */
-    void operator=(EventSem &s){
+    void operator=(EventSem &s) {
         *this = s;
     }
 
     /** */
-    ~EventSem(){
+    ~EventSem() {
         Close();
     }
 
     /** Creates the semafore */
-    bool Create(){
+    bool Create() {
         return EventSemCreate(semH);
-   }
+    }
 
     /** closes the semafore */
-    bool Close(void){
+    bool Close(void) {
         return EventSemClose(semH);
     }
 
     /** wait for an event */
-    bool Wait(TimeoutType msecTimeout = TTInfiniteWait){
+    bool Wait(TimeoutType msecTimeout = TTInfiniteWait) {
         return EventSemWait(semH, msecTimeout);
     }
 
     /** resets the semafore and then waits*/
-    bool ResetWait(TimeoutType msecTimeout = TTInfiniteWait){
+    bool ResetWait(TimeoutType msecTimeout = TTInfiniteWait) {
         return EventSemResetWait(semH, msecTimeout);
     }
 
     /** Send an event to semafore */
-    bool Post(){
+    bool Post() {
         return EventSemPost(semH);
     }
 
     /** reset the semafore to its unposted state */
-    bool Reset(){
+    bool Reset() {
         return EventSemReset(semH);
     }
 };

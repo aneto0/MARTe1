@@ -39,7 +39,7 @@ void __thread_decl SystemThreadFunction(void *threadData)
     }
 
     ThreadsDatabase::Lock();
-    threadInfo->threadId=Threads::Id(); 
+    threadInfo->threadId=Threads::Id();
     ThreadsDatabase::NewEntry(threadInfo);
     ThreadsDatabase::UnLock();
 
@@ -138,20 +138,20 @@ TID ThreadsId() {
 }
 
 bool ThreadsIsAlive(TID threadId) {
-    ThreadsDatabase::Lock(); 
+    ThreadsDatabase::Lock();
     bool condition = (ThreadsDatabase::GetThreadInformation(threadId) != NULL);
     ThreadsDatabase::UnLock();
-    if(condition){
-	return ThreadsOSIsAlive(threadId);
+    if (condition) {
+        return ThreadsOSIsAlive(threadId);
     }
-    else{
+    else {
         return False;
     }
 }
 
 bool ThreadsKill(TID threadId) {
-    if (!ThreadsIsAlive(threadId)){
-        return False; 
+    if (!ThreadsIsAlive(threadId)) {
+        return False;
     }
     ThreadsDatabase::Lock();
     ThreadsDatabase::RemoveEntry(threadId);

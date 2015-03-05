@@ -3,25 +3,25 @@
  * ITER and the Development of Fusion Energy ('Fusion for Energy')
  *
  * Licensed under the EUPL, Version 1.1 or - as soon they 
-   will be approved by the European Commission - subsequent  
-   versions of the EUPL (the "Licence"); 
+ will be approved by the European Commission - subsequent  
+ versions of the EUPL (the "Licence"); 
  * You may not use this work except in compliance with the 
-   Licence. 
+ Licence. 
  * You may obtain a copy of the Licence at: 
  *  
  * http://ec.europa.eu/idabc/eupl
  *
  * Unless required by applicable law or agreed to in 
-   writing, software distributed under the Licence is 
-   distributed on an "AS IS" basis, 
+ writing, software distributed under the Licence is 
+ distributed on an "AS IS" basis, 
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
-   express or implied. 
+ express or implied. 
  * See the Licence  
-   permissions and limitations under the Licence. 
+ permissions and limitations under the Licence. 
  *
  * $Id: $
  *
-**/
+ **/
 /**
  * @file
  * Basic memory management
@@ -38,68 +38,83 @@
  */
 typedef void *(*StandardThreadFunction)(void *args);
 
-void ThreadsOSEndThread(){
-	_endthread();
+void ThreadsOSEndThread() {
+    _endthread();
 }
 
 /**
  * Not implemented in Windows
  */
-uint32 ThreadsOSGetState(TID threadId){
+uint32 ThreadsOSGetState(TID threadId) {
     return Threads::STATE_UNKNOWN;
 }
 
-int32 ThreadsOSGetCPUs(TID threadId){
+int32 ThreadsOSGetCPUs(TID threadId) {
     return -1;
 }
 
-TID ThreadsOSId(){
-	return (TID)GetCurrentThreadId();
+TID ThreadsOSId() {
+    return (TID) GetCurrentThreadId();
 }
 
-void ThreadsOSSetPriorityLevel(TID threadId, uint32 priorityClass, uint32 priorityLevel){
-	priorityLevel /= 5;
+void ThreadsOSSetPriorityLevel(TID threadId, uint32 priorityClass,
+                               uint32 priorityLevel) {
+    priorityLevel /= 5;
 
-	switch (GetPriorityClass(GetCurrentProcess())){
-		case IDLE_PRIORITY_CLASS     :
-			if (priorityLevel > 5) priorityLevel = 5;
-			break;
-		case REALTIME_PRIORITY_CLASS :
-			if (priorityLevel > 6) priorityLevel = 6;
-			break;
-		case HIGH_PRIORITY_CLASS     :
-		case NORMAL_PRIORITY_CLASS   :
-		default:
-			if (priorityLevel > 5) priorityLevel = 5;
-			if (priorityLevel == 0) priorityLevel = 1;
-			break;
-	}
+    switch (GetPriorityClass(GetCurrentProcess())) {
+        case IDLE_PRIORITY_CLASS :
+        if (priorityLevel > 5) priorityLevel = 5;
+        break;
+        case REALTIME_PRIORITY_CLASS :
+        if (priorityLevel > 6) priorityLevel = 6;
+        break;
+        case HIGH_PRIORITY_CLASS :
+        case NORMAL_PRIORITY_CLASS :
+        default:
+        if (priorityLevel > 5) priorityLevel = 5;
+        if (priorityLevel == 0) priorityLevel = 1;
+        break;
+    }
 
-	switch (priorityLevel){
-		case 0: SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_IDLE);         break;
-		case 1: SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_LOWEST);       break;
-		case 2: SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_BELOW_NORMAL); break;
-		case 3: SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_NORMAL);       break;
-		case 4: SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_ABOVE_NORMAL); break;
-		case 5: SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_HIGHEST);      break;
-		case 6: SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_TIME_CRITICAL);break;
-	}
+    switch (priorityLevel) {
+    case 0:
+        SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_IDLE);
+        break;
+    case 1:
+        SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_LOWEST);
+        break;
+    case 2:
+        SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_BELOW_NORMAL);
+        break;
+    case 3:
+        SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_NORMAL);
+        break;
+    case 4:
+        SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_ABOVE_NORMAL);
+        break;
+    case 5:
+        SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
+        break;
+    case 6:
+        SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_TIME_CRITICAL);
+        break;
+    }
 }
 
-bool ThreadsOSKill(TID threadId){
-	if(TerminateThread((HANDLE)threadId,0)==FALSE)return False;
-	return True;
+bool ThreadsOSKill(TID threadId) {
+    if (TerminateThread((HANDLE) threadId, 0) == FALSE)
+        return False;
+    return True;
 }
 
-bool ThreadsOSIsAlive(TID threadId){
-	return (GetThreadPriority((HANDLE)threadId) != THREAD_PRIORITY_ERROR_RETURN);
+bool ThreadsOSIsAlive(TID threadId) {
+    return (GetThreadPriority((HANDLE) threadId) != THREAD_PRIORITY_ERROR_RETURN);
 }
 
 TID ThreadsOSBeginThread(StandardThreadFunction function,
-                        ThreadInformation *threadInfo,
-                        uint32 stacksize,
-                        ProcessorType runOnCPUs){
-	return (HANDLE)_beginthread((void (__cdecl *)(void *))function,stacksize,threadInfo);
+                         ThreadInformation *threadInfo, uint32 stacksize,
+                         ProcessorType runOnCPUs) {
+return (HANDLE)_beginthread((void (__cdecl *)(void *))function,stacksize,threadInfo);
 }
 #endif
 

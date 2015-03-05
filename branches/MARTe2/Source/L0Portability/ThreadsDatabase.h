@@ -3,25 +3,25 @@
  * ITER and the Development of Fusion Energy ('Fusion for Energy')
  *
  * Licensed under the EUPL, Version 1.1 or - as soon they 
-   will be approved by the European Commission - subsequent  
-   versions of the EUPL (the "Licence"); 
+ will be approved by the European Commission - subsequent  
+ versions of the EUPL (the "Licence"); 
  * You may not use this work except in compliance with the 
-   Licence. 
+ Licence. 
  * You may obtain a copy of the Licence at: 
  *  
  * http://ec.europa.eu/idabc/eupl
  *
  * Unless required by applicable law or agreed to in 
-   writing, software distributed under the Licence is 
-   distributed on an "AS IS" basis, 
+ writing, software distributed under the Licence is 
+ distributed on an "AS IS" basis, 
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
-   express or implied. 
+ express or implied. 
  * See the Licence  
-   permissions and limitations under the Licence. 
+ permissions and limitations under the Licence. 
  *
  * $Id: $
  *
-**/
+ **/
 
 /**
  * @file
@@ -35,36 +35,36 @@
 
 extern "C" {
 
-    /** @see ThreadsDatabase::DatabaseNewEntry */
-    bool ThreadsDatabaseNewEntry(ThreadInformation *ti);
+/** @see ThreadsDatabase::DatabaseNewEntry */
+bool ThreadsDatabaseNewEntry(ThreadInformation *ti);
 
-    /** @see ThreadsDatabase::RemoveEntry */
-    ThreadInformation *ThreadsDatabaseRemoveEntry(TID tid);
+/** @see ThreadsDatabase::RemoveEntry */
+ThreadInformation *ThreadsDatabaseRemoveEntry(TID tid);
 
-    /** @see ThreadsDatabase::GetThreadInformation */
-    ThreadInformation *ThreadsDatabaseGetThreadInformation(TID tid);
+/** @see ThreadsDatabase::GetThreadInformation */
+ThreadInformation *ThreadsDatabaseGetThreadInformation(TID tid);
 
-    /** @see ThreadsDatabase::Lock */
-    bool ThreadsDatabaseLock(TimeoutType tt);
+/** @see ThreadsDatabase::Lock */
+bool ThreadsDatabaseLock(TimeoutType tt);
 
-    /** @see ThreadsDatabase::UnLock*/
-    bool ThreadsDatabaseUnLock();
+/** @see ThreadsDatabase::UnLock*/
+bool ThreadsDatabaseUnLock();
 
-    /** @see ThreadsDatabase::NumberOfThreads*/
-    int32 ThreadsDatabaseNumberOfThreads();
+/** @see ThreadsDatabase::NumberOfThreads*/
+int32 ThreadsDatabaseNumberOfThreads();
 
-    /** @see ThreadsDatabase::GetThreadId*/
-    TID ThreadsDatabaseGetThreadID(int32 n);
+/** @see ThreadsDatabase::GetThreadId*/
+TID ThreadsDatabaseGetThreadID(int32 n);
 
-    /** @see ThreadsDatabase::GetInfo*/
-    bool ThreadsDatabaseGetInfo(ThreadInformation &tiCopy, int32 n, TID tid);
+/** @see ThreadsDatabase::GetInfo*/
+bool ThreadsDatabaseGetInfo(ThreadInformation &tiCopy, int32 n, TID tid);
 
 }
 
-class ThreadsDatabase{
+class ThreadsDatabase {
 private:
     /** Number of ThreadInformation objects that are created each time 
-      a request for more space in the entries array is needed*/
+     a request for more space in the entries array is needed*/
     static const int32 GRANULARITY = 64;
 
     /* Fast ram semafore using Atomic TestAndSet*/
@@ -82,60 +82,62 @@ private:
     /** Allocate more space in the database*/
     static bool AllocMore();
 public:
-    friend bool               ThreadsDatabaseNewEntry(ThreadInformation *ti);
+    friend bool ThreadsDatabaseNewEntry(ThreadInformation *ti);
     friend ThreadInformation *ThreadsDatabaseRemoveEntry(TID tid);
     friend ThreadInformation *ThreadsDatabaseGetThreadInformation(TID tid);
-    friend bool               ThreadsDatabaseLock(TimeoutType tt);
-    friend bool               ThreadsDatabaseUnLock();
-    friend int32              ThreadsDatabaseNumberOfThreads();
-    friend TID                ThreadsDatabaseGetThreadID(int32 n);
-    friend TID                ThreadsDatabaseFind(const char *name);
-    friend bool               ThreadsDatabaseGetInfo(ThreadInformation &tiCopy, int32 n, TID tid);
+    friend bool ThreadsDatabaseLock(TimeoutType tt);
+    friend bool ThreadsDatabaseUnLock();
+    friend int32 ThreadsDatabaseNumberOfThreads();
+    friend TID ThreadsDatabaseGetThreadID(int32 n);
+    friend TID ThreadsDatabaseFind(const char *name);
+    friend bool ThreadsDatabaseGetInfo(ThreadInformation &tiCopy, int32 n,
+                                       TID tid);
 
 public:
     /** create new TDB entry associated to the ti */
-    static bool NewEntry(ThreadInformation *ti){
+    static bool NewEntry(ThreadInformation *ti) {
         return ThreadsDatabaseNewEntry(ti);
     }
 
     /** destroy TDB entry  */
-    static ThreadInformation *RemoveEntry(TID tid){
+    static ThreadInformation *RemoveEntry(TID tid) {
         return ThreadsDatabaseRemoveEntry(tid);
     }
 
     /** access private thread information
-        on timeout returns NULL
-        tid = 0 --> current TID */
-    static ThreadInformation *GetThreadInformation(TID tid){
+     on timeout returns NULL
+     tid = 0 --> current TID */
+    static ThreadInformation *GetThreadInformation(TID tid) {
         return ThreadsDatabaseGetThreadInformation(tid);
     }
 
     /** must be locked before accessing TDB information */
-    static bool Lock(TimeoutType tt = TTInfiniteWait){
+    static bool Lock(TimeoutType tt = TTInfiniteWait) {
         return ThreadsDatabaseLock(tt);
     }
 
     /** must be unlocked after accessing TDB information */
-    static bool UnLock(){
+    static bool UnLock() {
         return ThreadsDatabaseUnLock();
     }
 
     /** how many threads are registered
-        value meaningful only between Lock/UnLock*/
-    static int32 NumberOfThreads(){
+     value meaningful only between Lock/UnLock*/
+    static int32 NumberOfThreads() {
         return ThreadsDatabaseNumberOfThreads();
     }
 
     /** the TID of thread #n
-        value meaningful only between Lock/UnLock*/
-    static TID GetThreadID(int32 n){
+     value meaningful only between Lock/UnLock*/
+    static TID GetThreadID(int32 n) {
         return ThreadsDatabaseGetThreadID(n);
     }
 
     /** retrieves information about a thread identified either by name or TID or index
-        tid = 0 ==> current tid
-        to be called between Lock/UnLock*/
-    static bool GetInfo(ThreadInformation &tiCopy, int32 n=-1, TID tid=(TID)-1){
+     tid = 0 ==> current tid
+     to be called between Lock/UnLock*/
+    static bool GetInfo(ThreadInformation &tiCopy, int32 n = -1,
+                        TID tid = (TID) - 1) {
         return ThreadsDatabaseGetInfo(tiCopy, n, tid);
     }
 };

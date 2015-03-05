@@ -80,7 +80,6 @@ bool BasicConsoleOSShow(BasicConsole &con) {
     return True;
 }
 
-
 /**
  * @see Console::Write
  */
@@ -137,7 +136,7 @@ bool BasicConsoleOSRead(BasicConsole &con, void* buffer, uint32 &size,
         if ((n = strlen(temp)) > 0) {
             size = n;
         }
-        temp[n] = '\0'; 
+        temp[n] = '\0';
     }
     return (n > 0);
 }
