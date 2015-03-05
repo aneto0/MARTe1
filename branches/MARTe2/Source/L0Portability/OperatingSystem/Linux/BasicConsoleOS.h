@@ -80,13 +80,44 @@ bool BasicConsoleOSShow(BasicConsole &con) {
     return True;
 }
 
+
 /**
  * @see Console::Write
  */
 bool BasicConsoleOSWrite(BasicConsole &con, const void* buffer, uint32 &size) {
-    uint32 n = write(STDOUT, buffer, size);
+    char* buffString = (char*) buffer;
+    char nextRow = '\n';
+    int32 n = 0;
+    uint32 index = 0, sizeT = 0, start = 0;
+    int32 columnLimit = con.numberOfColumns;
+    while (1) {
+        while (sizeT < columnLimit && index < size) {
+            if (buffString[index] == '\0' || buffString[index] == '\n')
+                break;
+            index++;
+            sizeT = index - start;
+        }
+
+        if (sizeT > 0)
+            n += write(STDOUT, buffString + start, sizeT);
+
+        if (index >= size)
+            break;
+        if (buffString[index] == '\0')
+            break;
+
+        write(STDOUT, &nextRow, 1);
+        if (buffString[index] == '\n') {
+            index++;
+            n++;
+        }
+        start = index;
+        sizeT = 0;
+    }
+
     size = n;
     return n > 0;
+
 }
 
 /**
@@ -106,6 +137,7 @@ bool BasicConsoleOSRead(BasicConsole &con, void* buffer, uint32 &size,
         if ((n = strlen(temp)) > 0) {
             size = n;
         }
+        temp[n] = '\0'; 
     }
     return (n > 0);
 }
@@ -122,7 +154,9 @@ bool BasicConsoleOSSetTitleBar(BasicConsole &con, const char *title) {
  */
 bool BasicConsoleOSSetWindowSize(BasicConsole &con, int numberOfColumns,
                                  int numberOfRows) {
-    return False;
+    con.numberOfColumns = numberOfColumns;
+    con.numberOfRows = numberOfRows;
+    return True;
 }
 
 /**
@@ -130,9 +164,9 @@ bool BasicConsoleOSSetWindowSize(BasicConsole &con, int numberOfColumns,
  */
 bool BasicConsoleOSGetWindowSize(BasicConsole &con, int &numberOfColumns,
                                  int &numberOfRows) {
-    numberOfColumns = -1;
-    numberOfRows = -1;
-    return False;
+    numberOfColumns = con.numberOfColumns;
+    numberOfRows = con.numberOfRows;
+    return True;
 }
 
 /**
@@ -140,7 +174,9 @@ bool BasicConsoleOSGetWindowSize(BasicConsole &con, int &numberOfColumns,
  */
 bool BasicConsoleOSSetSize(BasicConsole &con, int numberOfColumns,
                            int numberOfRows) {
-    return False;
+    con.numberOfColumns = numberOfColumns;
+    con.numberOfRows = numberOfRows;
+    return True;
 }
 
 /**
@@ -148,7 +184,9 @@ bool BasicConsoleOSSetSize(BasicConsole &con, int numberOfColumns,
  */
 bool BasicConsoleOSGetSize(BasicConsole &con, int &numberOfColumns,
                            int &numberOfRows) {
-    return False;
+    numberOfColumns = con.numberOfColumns;
+    numberOfRows = con.numberOfRows;
+    return True;
 }
 
 /**
