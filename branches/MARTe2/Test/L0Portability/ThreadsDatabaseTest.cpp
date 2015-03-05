@@ -130,7 +130,7 @@ bool ThreadsDatabaseTest::TestGetInfoAndLock(int32 nOfThreads) {
             returnValue=False;
             break;
         } 
-            SleepSec(1e-3);
+            SleepSec(100e-3);
     }
     return returnValue && (nDatabasedThreads() == 0);
 
@@ -152,9 +152,11 @@ bool ThreadsDatabaseTest::TestRemoveEntry(int32 nOfThreads) {
     //wait that all threads begin
     while (exitCondition < nOfThreads) {
         if(j++>10*nOfThreads) {
-            return False;
+            for (int32 i = 0; i < tidsDim; i++) {
+                Threads::Kill(tids[i]);
+            }
         } 
-        SleepSec(1e-3);
+        SleepSec(10e-3);
     }
 
     //for each thread...
@@ -231,7 +233,7 @@ bool ThreadsDatabaseTest::TestGetId(int32 nOfThreads) {
             }
             return False;
         } 
-        SleepSec(1e-3);
+        SleepSec(10e-3);
     }
 
     tidsDim++;
@@ -245,7 +247,7 @@ bool ThreadsDatabaseTest::TestGetId(int32 nOfThreads) {
         if(j++>10*nOfThreads) {
             returnValue=False;
         }
-        SleepSec(1e-3);
+        SleepSec(10e-3);
     }
 
     //check if the database is empty
