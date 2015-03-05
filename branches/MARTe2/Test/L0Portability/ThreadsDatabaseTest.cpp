@@ -181,8 +181,9 @@ bool ThreadsDatabaseTest::TestRemoveEntry(int32 nOfThreads) {
         else {
             returnValue = False;
         }
-        if (!returnValue)
+        if (!returnValue) {
             break;
+        }
     }
 
     //check if the database is empty
@@ -225,8 +226,9 @@ bool ThreadsDatabaseTest::TestGetId(int32 nOfThreads) {
     }
 
     //check if the database is empty
-    if (returnValue)
+    if (returnValue) {
         return returnValue && (nDatabasedThreads() == 0);
+    }
     else {
         for (int32 i = 0; i < tidsDim; i++) {
             if (Threads::IsAlive(tids[i])) {
