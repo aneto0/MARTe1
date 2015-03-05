@@ -51,10 +51,10 @@ MAKE     = make
 #-maltivec -mabi=altivec
 DEBUG = -g -ggdb
 OPTIM = 
-LFLAGS =  
+LFLAGS = -Wl,--no-as-needed  
 CFLAGS = -fPIC -Wall
 CPPFLAGS = -fPIC -frtti 
 CFLAGSPEC= -DARCHITECTURE=x86_gcc -DOPERATING_SYSTEM=Linux -DUSE_PTHREAD -pthread
-LIBRARIES =  -lm -ldl -lnsl -lpthread -lrt -lncurses
+LIBRARIES =  -lm -lnsl -lpthread -lrt -lncurses -ldl
 .SUFFIXES:   .c  .cpp  .o .a .exe .ex .ex_ .so .gam
 
