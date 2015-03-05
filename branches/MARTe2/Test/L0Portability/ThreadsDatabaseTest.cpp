@@ -58,9 +58,10 @@ void GetInfo(ThreadsDatabaseTest &threadDatabaseTest) {
             && (threadDatabaseTest.threadInfo->threadId == Threads::Id());
     threadDatabaseTest.exitCondition++;
     if (threadDatabaseTest.exitCondition != state + 1) {
-        threadDatabaseTest.returnValue = False;
-    ThreadsDatabase::UnLock();
+        threadDatabaseTest.returnValue = False; 
     }
+    ThreadsDatabase::UnLock();
+    
 }
 
 //The thread that calls this function, gets tids from database and kill the other threads. Then, checks if it remains alone in the database and exit.
@@ -123,8 +124,13 @@ bool ThreadsDatabaseTest::TestGetInfoAndLock(int32 nOfThreads) {
     for (int32 i = 0; i < nOfThreads; i++) {
         Threads::BeginThread((ThreadFunctionType) GetInfo, this);
     }
+    int32 j=0;
     while (exitCondition < nOfThreads) {
-        SleepSec(1e-3);
+        if(j++>10*nOfThreads) {
+            returnValue=False;
+            break;
+        } 
+            SleepSec(1e-3);
     }
     return returnValue && (nDatabasedThreads() == 0);
 
@@ -141,8 +147,13 @@ bool ThreadsDatabaseTest::TestRemoveEntry(int32 nOfThreads) {
         tidsDim++;
     }
 
+    int32 j=0;   
+  
     //wait that all threads begin
     while (exitCondition < nOfThreads) {
+        if(j++>10*nOfThreads) {
+            return False;
+        } 
         SleepSec(1e-3);
     }
 
@@ -181,9 +192,8 @@ bool ThreadsDatabaseTest::TestRemoveEntry(int32 nOfThreads) {
         else {
             returnValue = False;
         }
-        if (!returnValue) {
+        if (!returnValue)
             break;
-        }
     }
 
     //check if the database is empty
@@ -211,8 +221,16 @@ bool ThreadsDatabaseTest::TestGetId(int32 nOfThreads) {
         tidsDim++;
     }
 
+    int32 j=0;
+
     //wait that all threads begin
     while (exitCondition < nOfThreads - 1) {
+        if(j++>10*nOfThreads) {
+            for (int32 i = 0; i < tidsDim; i++) {
+                Threads::Kill(tids[i]);
+            }
+            return False;
+        } 
         SleepSec(1e-3);
     }
 
@@ -221,14 +239,18 @@ bool ThreadsDatabaseTest::TestGetId(int32 nOfThreads) {
     //launch a thread with GetId function. It obtains tids of the other threads from database and kill them all.
     Threads::BeginThread((ThreadFunctionType) GetId, this);
 
+    j=0;
+
     while (exitCondition < nOfThreads) {
+        if(j++>10*nOfThreads) {
+            returnValue=False;
+        }
         SleepSec(1e-3);
     }
 
     //check if the database is empty
-    if (returnValue) {
+    if (returnValue)
         return returnValue && (nDatabasedThreads() == 0);
-    }
     else {
         for (int32 i = 0; i < tidsDim; i++) {
             if (Threads::IsAlive(tids[i])) {

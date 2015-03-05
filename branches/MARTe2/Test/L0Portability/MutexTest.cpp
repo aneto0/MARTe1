@@ -200,8 +200,11 @@ bool MutexTest::TestSync(int32 nOfThreads) {
     for (int32 i = 0; i < nOfThreads; i++) {
         Threads::BeginThread((ThreadFunctionType) Increment, this);
     }
-
+    int32 j=0;
     while (exitCondition < nOfThreads) {
+        if(j++>10*nOfThreads){
+            return False;
+        }
         SleepSec(10e-3);
     }
     return (sharedVariable == 10 * nOfThreads);
@@ -219,7 +222,11 @@ bool MutexTest::TestSyncTimeout(TimeoutType timeout, int32 nOfThreads) {
     for (int32 i = 0; i < nOfThreads; i++) {
         Threads::BeginThread((ThreadFunctionType) TimeoutFunction, this);
     }
+    int32 j=0;
     while (exitCondition < nOfThreads) {
+        if(j++>10*timeout.msecTimeout){
+            return False;
+        }
         SleepSec(10e-3);
     }
     return (sharedVariable == 10 * nOfThreads);
@@ -237,7 +244,11 @@ bool MutexTest::TestSyncFast(int32 nOfThreads) {
     for (int32 i = 0; i < nOfThreads; i++) {
         Threads::BeginThread((ThreadFunctionType) Increment, this);
     }
+    int32 j=0;
     while (exitCondition < nOfThreads) {
+        if(j++>10*nOfThreads){
+            return False;
+        }
         SleepSec(10e-3);
     }
     return (sharedVariable == 10 * nOfThreads);
@@ -255,7 +266,11 @@ bool MutexTest::TestSyncTimeoutFast(TimeoutType timeout, int32 nOfThreads) {
     for (int32 i = 0; i < nOfThreads; i++) {
         Threads::BeginThread((ThreadFunctionType) TimeoutFunction, this);
     }
+    int32 j=0;
     while (exitCondition < nOfThreads) {
+        if(j++>10*timeout.msecTimeout){
+            return False;
+        }
         SleepSec(10e-3);
     }
     return (sharedVariable == 10 * nOfThreads);
@@ -272,7 +287,11 @@ bool MutexTest::FakeLock() {
     deadlock = False;
     mutexSem[1].Lock();
     Threads::BeginThread((ThreadFunctionType) Increment, this);
+    int32 j=0;
     while (exitCondition < 1) {
+        if(j++>100){
+            return False;
+        }
         SleepSec(10e-3);
     }
     return (sharedVariable == 0);
