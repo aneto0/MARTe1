@@ -3,25 +3,25 @@
  * ITER and the Development of Fusion Energy ('Fusion for Energy')
  *
  * Licensed under the EUPL, Version 1.1 or - as soon they 
-   will be approved by the European Commission - subsequent  
-   versions of the EUPL (the "Licence"); 
+ will be approved by the European Commission - subsequent  
+ versions of the EUPL (the "Licence"); 
  * You may not use this work except in compliance with the 
-   Licence. 
+ Licence. 
  * You may obtain a copy of the Licence at: 
  *  
  * http://ec.europa.eu/idabc/eupl
  *
  * Unless required by applicable law or agreed to in 
-   writing, software distributed under the Licence is 
-   distributed on an "AS IS" basis, 
+ writing, software distributed under the Licence is 
+ distributed on an "AS IS" basis, 
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
-   express or implied. 
+ express or implied. 
  * See the Licence  
-   permissions and limitations under the Licence. 
+ permissions and limitations under the Licence. 
  *
  * $Id: Endianity.h 3 2012-01-15 16:26:07Z aneto $
  *
-**/
+ **/
 
 /**
  * @file
@@ -39,46 +39,46 @@
 #include "GeneralDefinitions.h"
 #include INCLUDE_FILE_ARCHITECTURE(ARCHITECTURE,HighResolutionTimerA.h)
 
-extern "C" {
+extern "C"
+{
     /** the frequency of the HRT Clock. */
-    int64   HighResolutionTimerFrequency();
+    int64 HighResolutionTimerFrequency();
 
     /** the HRT Clock period in seconds */
-    double  HighResolutionTimerPeriod();
+    double HighResolutionTimerPeriod();
 
     /** how many ticks in a msec for the HRT */
-    uint32  HighResolutionTimerMSecTics();
+    uint32 HighResolutionTimerMSecTics();
 }
 
-
 /** Access to a calibrated high frequency counter. Uses the CPU internal register */
-class HighResolutionTimer{
+class HighResolutionTimer {
 
 public:
 
     /** an high resolution time counter. Only valid on pentiums CPUs and above */
-    static inline int64 Counter(){
+    static inline int64 Counter() {
         return HighResolutionTimerRead64();
     }
 
     /** an high resolution time counter. Only valid on pentiums CPUs and above */
-    static inline uint32 Counter32(){
+    static inline uint32 Counter32() {
         return HighResolutionTimerRead32();
     }
 
     /** to interpret the value returned by HRTCounter. Also the CPU clock!! */
-    static inline int64 Frequency(){
+    static inline int64 Frequency() {
         return HighResolutionTimerFrequency();
     }
 
     /** The length of a clock period in seconds */
-    static inline double Period(){
-        return HighResolutionTimerMSecTics();
+    static inline double Period() {
+        return HighResolutionTimerPeriod();
     }
 
     /** converts HRT ticks to time */
-    static inline double TicksToTime(int64 tStop,int64 tStart = 0){
-        int64 dT = tStop-tStart;
+    static inline double TicksToTime(int64 tStop, int64 tStart = 0) {
+        int64 dT = tStop - tStart;
         return dT * Period();
     }
 };
