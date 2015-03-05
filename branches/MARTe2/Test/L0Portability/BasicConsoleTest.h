@@ -54,13 +54,13 @@ public:
     }
 
     /** 
-     * @see Test the correct opening of the console with different options.
+     * Tests the correct opening of the console with different options.
      * @param ConsoleOpeningMode is a flag with define the properties of the console.
      * @return true if the console is open correctly. **/
     bool TestOpen(ConsoleOpeningMode = ConsoleDefault);
 
     /** 
-     * @see Test the correct behavior of the write operations. If we give in input a size of the string greater than the size of the string passed, the write function must write only the string passed (until 
+     * Tests the correct behavior of the write operations. If we give in input a size of the string greater than the size of the string passed, the write function must write only the string passed (until 
      * the character '\0') and size must be reduced at the real string size. 
      * @param string is the string to write.
      * @param padding is the difference between the size that we want to pass to the write function and the real string size.
@@ -68,14 +68,14 @@ public:
     bool TestWrite(char* string, int32 padding);
 
     /**
-     * @see Test if the string read by console is the same of the string passed by argument (the user must write in console the same word) with the same size.
+     * Tests if the string read by console is the same of the string passed by argument (the user must write in console the same word) with the same size.
      * @param stringArg is the string to match with the read string. 
      * @param sizeArg is the size to match with the read string size.
      * @return true if the read string is equal to the passed argument. **/
     bool TestRead(char* stringArg, int32 sizeArg);
 
     /**
-     * @see Test the behavior of the paging property. This means that if the rows of string to write exceeds the row dimension of the console, you must press enter to begin a new page. 
+     * Tests the behavior of the paging property. This means that if the rows of string to write exceeds the row dimension of the console, you must press enter to begin a new page. 
      * @param overflow is the difference between the rows of the string to write and the row dimension of the console.
      * @param rows is the desired row dimension of the console.
      * @param columns is the desired column dimension of the console.
@@ -83,7 +83,7 @@ public:
     bool TestPaging(int32 overflow, int32 rows, int32 columns);
 
     /**
-     * @see Test the behavior of the PerfChar property, namely an immediate return after the first character read.
+     * Tests the behavior of the PerfChar property, namely an immediate return after the first character read.
      * @return true if the size of the read string is equal to one. **/
     bool TestPerfChar();
 

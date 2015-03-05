@@ -57,9 +57,10 @@ void GetInfo(ThreadsDatabaseTest &threadDatabaseTest) {
     threadDatabaseTest.returnValue = threadDatabaseTest.returnValue
             && (threadDatabaseTest.threadInfo->threadId == Threads::Id());
     threadDatabaseTest.exitCondition++;
-    if (threadDatabaseTest.exitCondition != state + 1)
+    if (threadDatabaseTest.exitCondition != state + 1) {
         threadDatabaseTest.returnValue = False;
     ThreadsDatabase::UnLock();
+    }
 }
 
 //The thread that calls this function, gets tids from database and kill the other threads. Then, checks if it remains alone in the database and exit.
@@ -68,13 +69,16 @@ void GetId(ThreadsDatabaseTest &threadDatabaseTest) {
     for (int32 i = 0; i < threadDatabaseTest.tidsDim; i++) {
         threadDatabaseTest.returnValue = threadDatabaseTest.returnValue
                 && ((tid = ThreadsDatabase::GetThreadID(0)) != 0);
-        if (!threadDatabaseTest.returnValue)
+        if (!threadDatabaseTest.returnValue) {
             break;
-        if (tid != Threads::Id())
+        }
+        if (tid != Threads::Id()) {
             threadDatabaseTest.returnValue = threadDatabaseTest.returnValue
                     && Threads::Kill(tid);
-        if (!threadDatabaseTest.returnValue)
+        }
+        if (!threadDatabaseTest.returnValue) {
             break;
+        }
     }
     threadDatabaseTest.exitCondition++;
     threadDatabaseTest.returnValue = threadDatabaseTest.returnValue

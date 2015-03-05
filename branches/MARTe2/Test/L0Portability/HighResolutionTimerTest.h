@@ -43,12 +43,12 @@ public:
     HighResolutionTimerTest() {
     }
     /**
-     * @see Check The functions Period() and Frequency() comparing the returned frequency with the mutual of the period 
+     * Check The functions Period() and Frequency() comparing the returned frequency with the mutual of the period 
      * @reurn true if period and frequency are mutual, false otherwise. **/
     bool TestFrequency();
 
     /**
-     * @see Sleep for sleepTime time and check if the time measured with Counter() is more or less the same. 
+     * Sleep for sleepTime time and check if the time measured with Counter() is more or less the same. 
      * @param sleepTime, time to sleep.
      * @return true if the measured time is the same of the sleep time less than a tolerance, false otherwise. **/
     bool TestCounter(double);
