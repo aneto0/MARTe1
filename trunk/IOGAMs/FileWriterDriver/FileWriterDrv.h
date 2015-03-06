@@ -114,6 +114,11 @@ private:
     int32 threadPriority;
 
     /**
+     * Number of bytes being written for the last second (statistics only)
+     */
+    int32 bytesPerSecond;
+
+    /**
      * The writer thread is stopped by the message
      * This has to be called by the state machine to properly close all the files...
      */
@@ -135,6 +140,7 @@ public:
         cpuMask = 1;
         threadID = 0;
         threadPriority = 0;
+        bytesPerSecond = 0;
     }
 
     virtual ~FileWriterDrv(){

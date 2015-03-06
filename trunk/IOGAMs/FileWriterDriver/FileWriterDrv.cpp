@@ -42,16 +42,23 @@ void FileWriterDrv::WriteDataToDisk(){
     uint32 size  = 0;
     bool ok = False;
     running = True;
+    int64 start = HRT::HRTCounter();
     while(running){
         //Wait for the next buffer to be free
         sharedBufferMux.FastLock();
         sharedBufferSem.Reset();
         sharedBufferMux.FastUnLock();
         sharedBufferSem.Wait();
+	int64 ellapsed = HRT::HRTCounter() - start;
+	if(ellapsed * HRT::HRTPeriod() > 10.0){
+	    start = HRT::HRTCounter();
+	    bytesPerSecond = 0;
+	}
         while(sharedBuffer[i][0] == 1){
             //Write to disk
             for(j=0; j<numberOfOutputFiles; j++){
                 size = numberOfBytesPerSignal;
+		bytesPerSecond += size;
                 ok = outputFiles[j].Write(&sharedBuffer[i][1] + j * numberOfWordsPerSignal, size);
                 if(!ok){
                     AssertErrorCondition(FatalError,"FileWriterDrv::WriteDataToDisk: %s Could not write data for file: %s",Name(),outputFilenames[j].Buffer());
@@ -125,7 +132,7 @@ bool FileWriterDrv::ObjectLoadSetup(ConfigurationDataBase &info,StreamInterface 
         AssertErrorCondition(InitialisationError,"FileWriterDrv::ObjectLoadSetup: %s at least one buffer must be specified. NumberOfBuffers = %d",Name(), numberOfBuffers);
         return False;
     }
-    numberOfBytesPerSignal = numberOfOutputChannels / numberOfOutputFiles;
+    numberOfBytesPerSignal = numberOfOutputChannels / numberOfOutputFiles * sizeof(int32);
     numberOfWordsPerSignal = numberOfBytesPerSignal / sizeof(int32);
     //Allocate the shared memory
     int32 i=0;
@@ -137,7 +144,7 @@ bool FileWriterDrv::ObjectLoadSetup(ConfigurationDataBase &info,StreamInterface 
     for(i=0; i<numberOfBuffers; i++){
         //First item is used to mark if the buffer should be consumed, this is why we have +1
         //Each buffer holds all the samples (this also supports arrays of data) for all the channels per control cycle 
-        sharedBuffer[i] = new int32[numberOfOutputChannels / sizeof(int32) + 1];
+        sharedBuffer[i] = new int32[numberOfOutputChannels + 1];
         if(sharedBuffer[i] == NULL){
             AssertErrorCondition(FatalError, "FileWriterDrv::ObjectLoadSetup: %s Failed to allocated sharedBuffer for %d bytes", Name(), numberOfBytesPerSignal + sizeof(int32));
             return False;
@@ -257,7 +264,6 @@ bool FileWriterDrv::WriteData(uint32 usecTime, const int32 *ibuffer){
         return False;
     }
     sharedBufferMux.FastUnLock();
-
     memcpy(&sharedBuffer[lastWriteIdx][1], ibuffer, numberOfBytesPerSignal * numberOfOutputFiles);
     sharedBufferMux.FastLock();
     sharedBuffer[lastWriteIdx][0] = 1;
@@ -290,6 +296,7 @@ bool FileWriterDrv::ProcessHttpMessage(HttpStream &hStream) {
     hStream.Printf("<body>\n");
 
     hStream.Printf("<h1>Shared buffer status</h1>\n");
+    hStream.Printf("Bytes written last second = %d\n<br>\n", bytesPerSecond);
     /* Data table */
     hStream.Printf("<table border=\"1\" align=\"left\">\n");
     int32 i=0;
