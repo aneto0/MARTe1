@@ -34,6 +34,8 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
+#include <termios.h>
+#include "../../GeneralDefinitions.h"
 
 #define STDOUT 1
 #define STDIN  0
