@@ -29,6 +29,7 @@
 #ifndef ENDIANITY_A_H
 #define ENDIANITY_A_H
 
+#include "../../GeneralDefinitions.h"
 /** 
  * EndianitySwaps the 4 bytes in a 32 bit number.  
  * @param x the number to be swapped
@@ -235,21 +236,18 @@ static inline void EndianityFromBigEndianInt16(volatile int16 &x) {
  * @param x the number to convert
  */
 static inline void EndianityFromLittleEndianDouble(volatile double &x) {
-    x = x;
 }
 /**
  * NOOP since the system is already little endian
  * @param x the number to convert
  */
 static inline void EndianityFromLittleEndianFloat(volatile float &x) {
-    x = x;
 }
 /**
  * NOOP since the system is already little endian
  * @param x the number to convert
  */
 static inline void EndianityFromLittleEndianUInt64(volatile uint64 &x) {
-    x = x;
 }
 ;
 /**
@@ -257,7 +255,6 @@ static inline void EndianityFromLittleEndianUInt64(volatile uint64 &x) {
  * @param x the number to convert
  */
 static inline void EndianityFromLittleEndianUInt32(volatile uint32 &x) {
-    x = x;
 }
 ;
 /**
@@ -265,7 +262,6 @@ static inline void EndianityFromLittleEndianUInt32(volatile uint32 &x) {
  * @param x the number to convert
  */
 static inline void EndianityFromLittleEndianUInt16(volatile uint16 &x) {
-    x = x;
 }
 ;
 /**
@@ -273,7 +269,6 @@ static inline void EndianityFromLittleEndianUInt16(volatile uint16 &x) {
  * @param x the number to convert
  */
 static inline void EndianityFromLittleEndianInt64(volatile int64 &x) {
-    x = x;
 }
 ;
 /**
@@ -281,7 +276,6 @@ static inline void EndianityFromLittleEndianInt64(volatile int64 &x) {
  * @param x the number to convert
  */
 static inline void EndianityFromLittleEndianInt32(volatile int32 &x) {
-    x = x;
 }
 ;
 /**
@@ -289,7 +283,6 @@ static inline void EndianityFromLittleEndianInt32(volatile int32 &x) {
  * @param x the number to convert
  */
 static inline void EndianityFromLittleEndianInt16(volatile int16 &x) {
-    x = x;
 }
 ;
 /** 
@@ -353,7 +346,6 @@ static inline void EndianityToBigEndianInt16(volatile int16 &x) {
  * @param x the number to convert
  */
 static inline void EndianityToLittleEndianDouble(volatile double &x) {
-    x = x;
 }
 ;
 /** 
@@ -361,7 +353,6 @@ static inline void EndianityToLittleEndianDouble(volatile double &x) {
  * @param x the number to convert
  */
 static inline void EndianityToLittleEndianFloat(volatile float &x) {
-    x = x;
 }
 ;
 /** 
@@ -369,7 +360,6 @@ static inline void EndianityToLittleEndianFloat(volatile float &x) {
  * @param x the number to convert
  */
 static inline void EndianityToLittleEndianUInt64(volatile uint64 &x) {
-    x = x;
 }
 ;
 /** 
@@ -377,7 +367,6 @@ static inline void EndianityToLittleEndianUInt64(volatile uint64 &x) {
  * @param x the number to convert
  */
 static inline void EndianityToLittleEndianUInt32(volatile uint32 &x) {
-    x = x;
 }
 ;
 /** 
@@ -385,7 +374,6 @@ static inline void EndianityToLittleEndianUInt32(volatile uint32 &x) {
  * @param x the number to convert
  */
 static inline void EndianityToLittleEndianUInt16(volatile uint16 &x) {
-    x = x;
 }
 ;
 /** 
@@ -393,7 +381,6 @@ static inline void EndianityToLittleEndianUInt16(volatile uint16 &x) {
  * @param x the number to convert
  */
 static inline void EndianityToLittleEndianInt64(volatile int64 &x) {
-    x = x;
 }
 ;
 /** 
@@ -401,7 +388,6 @@ static inline void EndianityToLittleEndianInt64(volatile int64 &x) {
  * @param x the number to convert
  */
 static inline void EndianityToLittleEndianInt32(volatile int32 &x) {
-    x = x;
 }
 ;
 /** 
@@ -409,7 +395,6 @@ static inline void EndianityToLittleEndianInt32(volatile int32 &x) {
  * @param x the number to convert
  */
 static inline void EndianityToLittleEndianInt16(volatile int16 &x) {
-    x = x;
 }
 ;
 /** 
