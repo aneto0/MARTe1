@@ -44,8 +44,49 @@ TEST_F(ThreadsGTest,BeginThreadTest) {
     ASSERT_TRUE(beginThread.BeginThread(100));
 }
 
+
 TEST_F(ThreadsGTest,PrioritiesThreadTest) {
     ThreadsTest prioritiesThread;
     ASSERT_TRUE(prioritiesThread.Priorities());
 }
+
+TEST_F(ThreadsGTest,PrioritiesPropagationStartFirst) {
+    ThreadsTest prioritiesPropagationStartFirst;
+    ASSERT_TRUE(prioritiesPropagationStartFirst.PrioritiesPropagationStartFirst());
+}
+
+
+TEST_F(ThreadsGTest,ThreadIdTest) {
+    ThreadsTest threadIdTest;
+    ASSERT_TRUE(threadIdTest.ThreadIdTest());
+}
+
+
+TEST_F(ThreadsGTest,ThreadKillTest) {
+    ThreadsTest threadKillTest;
+    ASSERT_TRUE(threadKillTest.ThreadKillTest());
+}
+
+TEST_F(ThreadsGTest,ThreadNameTest) {
+    ThreadsTest threadNameTest;
+    ASSERT_TRUE(threadNameTest.ThreadNameTest());
+}
+
+TEST_F(ThreadsGTest,ThreadEndTest) {
+    ThreadsTest threadEndTest;
+    ASSERT_TRUE(threadEndTest.ThreadEndTest());
+}
+
+
+TEST_F(ThreadsGTest,CpuRunTest) {
+    ThreadsTest cpuRunTest;
+    ASSERT_TRUE(cpuRunTest.CpuRunTest());
+}
+
+/*
+TEST_F(ThreadsGTest,Prova) {
+    ThreadsTest prova;
+    ASSERT_TRUE(prova.Prova());
+}
+*/
 
