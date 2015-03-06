@@ -31,7 +31,6 @@
 
 void ThreadsTestIncrementCounter(ThreadsTest &tt) {
     tt.incrementCounter++;
-
 }
 
 void ThreadsTestWaitIncrementCounter(ThreadsTest &tt) {
@@ -100,7 +99,7 @@ void PrioritiesCallback(ThreadsTest &tt) {
 
     Threads::SetPriorityLevel(threadId, Threads::PRIORITY_LOWEST);
     //Verify that the class was not changed
-    ok = ok && (priorityClass == Threads::GetPriorityClass(threadId));
+    ok = ok && ((int32) priorityClass == Threads::GetPriorityClass(threadId));
     //verify that the priority is as expected
     ok = ok
             && (Threads::PRIORITY_LOWEST
@@ -110,7 +109,7 @@ void PrioritiesCallback(ThreadsTest &tt) {
         priorityLevel = ConvertPriorityLevelNumberToPriorityLevelName(i);
         //set the priority level to the level specified in priorityLevel
         Threads::SetPriorityLevel(threadId, priorityLevel);
-        // check that the priorityLevel is still what it is expected
+        //check that the priorityLevel is still what it is expected
         ok = ok
                 && (priorityLevel
                         == ((uint32) Threads::GetPriorityLevel(threadId)));
@@ -129,7 +128,6 @@ void PrioritiesCallback(ThreadsTest &tt) {
     }
     tt.callbackTestSuccessful = ok;
     tt.eventSem.Post();
-
 }
 
 bool ThreadsTest::BeginThread(uint32 nOfThreads) {
@@ -141,11 +139,11 @@ bool ThreadsTest::BeginThread(uint32 nOfThreads) {
                              this);
     }
     //Give some time for all the threads to have started...
-    while (incrementCounter != nOfThreads) {
+    while (incrementCounter != (int32) nOfThreads) {
         SleepMSec(20);
         i--;
         //Waited 20 ms x nOfThreads and the value of the incrementCounter is still
-        //not nOfThreads which likely indicates a problem with the creation of the thread
+        //Not nOfThreads which likely indicates a problem with the creation of the thread
         if (i == 0) {
             return False;
         }
@@ -165,7 +163,7 @@ bool ThreadsTest::Priorities() {
 }
 
 void PriorityClassRunFirst(ThreadsTest &tt) {
-    //this part of code is protected
+    //This part of code is protected
     if (!tt.mutexSem.Lock()) {
         printf("\n\nCan not lock PriorityClassRunFirst\n");
     }
@@ -177,10 +175,6 @@ void PriorityClassRunFirst(ThreadsTest &tt) {
         i++;
         j = 0;
     }
-    /*
-     printf("\ni = %d\n",i);
-     printf("\nj = %d\n",j);
-     */
     TID threadId = Threads::Id();
     Threads::SetPriorityClass(threadId, i);
     ThreadsSetPriorityLevel(threadId, j);
@@ -194,14 +188,9 @@ void PriorityClassRunFirst(ThreadsTest &tt) {
     if (!tt.eventSem.Wait()) {
         printf("\n\nCan not wait in a Sem\n");
     }
-    //int32 var = 0;
-    //var++;
     if (!tt.mutexSem.Lock()) {
         printf("\n\nCan not lock\n");
     }
-    /*
-     printf("\nthe thread with the priority class %d and priority level %d\n blocks the code", Threads::GetPriorityClass(threadId),Threads::GetPriorityLevel(threadId));
-     */
     //Decrement counter in order to know when all the threads finish to run this part of code
     tt.incrementCounter--;
     j--;
@@ -219,26 +208,27 @@ void PriorityClassRunFirst(ThreadsTest &tt) {
 }
 
 bool ThreadsTest::PrioritiesPropagationStartFirst() {
-    int32 k = 0; //count the numbe of threat created.
+    int32 k = 0; //count the number of threads created.
     incrementCounter = 0;
     ThreadsTest::nOfThreads1 = 40;
     eventSem.Reset();
-    while (k < ThreadsTest::nOfThreads1) {
+    while (k < (int32) ThreadsTest::nOfThreads1) {
         Threads::BeginThread((ThreadFunctionType) PriorityClassRunFirst, this);
         k++;
     }
-    //Wait for all the threats to be inicialized and waitting
+    //Wait for all the threads to be initialized and waiting
     while (ThreadsTest::incrementCounter < ThreadsTest::nOfThreads1) {
         SleepMSec(1);
     }
-    //Ensure that the last threat are also waitting
+    //Ensure that the last thread are also waiting
     SleepMSec(100);
     //Allow all threads to start
     eventSem.Post();
-    //Wait all the threats to finish
-    while (ThreadsTest::incrementCounter > 0)
-        ;
-    //Ensure that every threat has finished to work.
+    //Wait all the threads to finish
+    while (ThreadsTest::incrementCounter > 0) {
+        SleepMSec(1);
+    }
+    //Ensure that every thread has finished to work.
     SleepMSec(50);
     return callbackTestSuccessful;
 }
@@ -264,13 +254,12 @@ bool ThreadsTest::ThreadIdTest() {
         Threads::BeginThread((ThreadFunctionType) CheckIdDifferentTo0, this);
         SleepMSec(100);
         if (!eventSem.Wait()) {
-            printf("Impossible to wait inicialization CheckIdDifferentTo0");
+            printf("Impossible to wait initialization CheckIdDifferentTo0");
         }
-
         eventSem.Reset();
         incrementCounter++;
     }
-    //Wait for all the threats to be inicialized and waitting
+    //Wait for all the threats to be initialized and waiting
     callbackTestSuccessful = callbackTestSuccessful
             && (ThreadsTest::nOfThreads1 == incrementCounter);
     return callbackTestSuccessful;
@@ -279,7 +268,7 @@ bool ThreadsTest::ThreadIdTest() {
 void AutoKillThread(ThreadsTest &tt) {
     //Obtain the Id of the Thread AutoKill
     tt.threadIdTarget = Threads::Id();
-    // The thread is inicialized and the main can continue.
+    // The thread is initialized and the main can continue.
     tt.eventSem.Post();
     //kill yourself
     tt.callbackTestSuccessful = ThreadsKill(tt.threadIdTarget);
@@ -290,19 +279,17 @@ void AutoKillThread(ThreadsTest &tt) {
 }
 
 void InfiniteLoop(ThreadsTest &tt) {
-
     //The mutex protects this region of code
     if (!tt.mutexSem.Lock()) {
         printf("Fatal error lock");
     }
     tt.threadIdTarget = ThreadsId();
-    //Inicialization is done
+    //Initialization is done
     tt.eventSem.Post();
     if (!tt.mutexSem.UnLock()) {
         printf("Fatal error unlock");
     }
-
-    //infinite bucle
+    //infinite loop
     while (1) {
         SleepMSec(100);
     }
@@ -314,25 +301,24 @@ void ThreadManagement(ThreadsTest &tt) {
     bool ok = false;
     char const *PointerToString = "NULL";
     int32 i = 0;
-    //Check if the thredTarget(INFINITE) is alive. Shoud be true
+    //Check if the thredTarget(INFINITE) is alive. Should be true
     ok = ThreadsIsAlive(tt.threadIdTarget);
     tt.callbackTestSuccessful = ok;
     //kill the Thread target
     ok = ThreadsKill(tt.threadIdTarget);
     //SleepMSec(1);
     tt.callbackTestSuccessful = tt.callbackTestSuccessful && ok;
-    //To kill a thread it is required some time. A time out is implemented--> if in 5 cycles the ThreadsIsAlive is true the thread never will die...
+    //To kill a thread it is required some time. A time out is implemented--> if in 5 cycles the ThreadsIsAlive is true then the thread never will die...
     while (ThreadsIsAlive(tt.threadIdTarget) && i < 5) {
         SleepMSec(1);
         i++;
     }
-    //check if the Thread target is alived. Expected value false.
+    //Check if the Thread target is alived. Expected value false.
     ok = ThreadsIsAlive(tt.threadIdTarget);
     tt.callbackTestSuccessful = tt.callbackTestSuccessful && !ok;
     //Try to kill the Thread again. Expected value false
     ok = ThreadsKill(tt.threadIdTarget);
     tt.callbackTestSuccessful = tt.callbackTestSuccessful && !ok;
-    //SleepMSec(1);
     //Start again the  Thread target
     Threads::BeginThread((ThreadFunctionType) InfiniteLoop, &tt,
     THREADS_DEFAULT_STACKSIZE,
@@ -340,7 +326,7 @@ void ThreadManagement(ThreadsTest &tt) {
     if (!tt.eventSem.Wait()) {
         printf("Impossible to wait the thread in THREAD_MANAGENT");
     }
-    //reset eventSem in order to use in the future
+    //Reset eventSem in order to use in the future
     tt.eventSem.Reset();
     PointerToString = ThreadsName(tt.threadIdTarget);
     ok = (0 == strcmp(PointerToString, tt.nameThreadTest));
@@ -348,7 +334,6 @@ void ThreadManagement(ThreadsTest &tt) {
     SleepMSec(1);
     //ThreadsKill(tt.falseId);
     //ThreadsIsAlive(tt.falseId);
-
     //reset eventSem in order to use in the future
     tt.eventSem.Reset();
     //EndThread
@@ -362,29 +347,29 @@ bool ThreadsTest::ThreadKillTest() {
     Threads::BeginThread((ThreadFunctionType) AutoKillThread, this,
     THREADS_DEFAULT_STACKSIZE,
                          "AUTOKILL");
-    //waiting to inicialize the thread
+    //Waiting to initialize the thread
     if (!eventSem.Wait()) {
-        printf("Impossible to wait inicialization AUTOKILL");
+        printf("Impossible to wait initialization AUTOKILL");
     }
-    //reset eventSem in order to use again
+    //Reset eventSem in order to use again
     eventSem.Reset();
-    //waiting to kill the thread
+    //Waiting to kill the thread
     while (ThreadsIsAlive(threadIdTarget)) {
         SleepMSec(1);
     }
     Threads::BeginThread((ThreadFunctionType) InfiniteLoop, this,
     THREADS_DEFAULT_STACKSIZE,
                          "INFINITE");
-    //Waiting the inicialization of the thread INFINITE
+    //Waiting the initialization of the thread INFINITE
     if (!eventSem.Wait()) {
-        printf("Impossible to wait inicialization INFINITE");
+        printf("Impossible to wait initialization INFINITE");
     }
-    //reset eventSem in order to use again
+    //Reset eventSem in order to use again
     eventSem.Reset();
     Threads::BeginThread((ThreadFunctionType) ThreadManagement, this,
     THREADS_DEFAULT_STACKSIZE,
                          "THREAD_MANAGEMETN");
-    //Waiting to the thread management to run its on code
+    //Waiting thread management to run its on code
     if (!eventSemEndManagement.Wait()) {
         printf("Impossible to wait end THREAD_MANAGEMETN");
     }
@@ -408,28 +393,25 @@ bool ThreadsTest::ThreadNameTest() {
             == strcmp(ThreadsName(threadIdTarget), nameThreadTest));
     //Check if with a false Id the ThreadsName returns null.
     // if ThreadsName(falseId) is NULL the strcmp command doesn't work for this reason first is checked if ThreadsName(falseId) is false
-    if (ThreadsName(falseId) == 0) {
-        callbackTestSuccessful = callbackTestSuccessful
-                && (0 == strcmp(NULL, NULL));
+    if (ThreadsName(falseId) == 0) {    //expected case
+        callbackTestSuccessful = callbackTestSuccessful && true;
     }
-    else {
-        callbackTestSuccessful = callbackTestSuccessful
-                && (0 == strcmp(ThreadsName(falseId), NULL));
+    else {    //unexpected case (returns false
+        callbackTestSuccessful = callbackTestSuccessful && false;
     }
-    //callbackTestSuccessful = callbackTestSuccessful && (0 == strcmp(ThreadsName(falseId), "NULL"));
     SleepMSec(1);
     return callbackTestSuccessful;
 }
 
 void EndTarget(ThreadsTest &tt) {
     tt.threadIdTarget = Threads::Id();
-    //The main can continue
+    //Main can continue
     tt.eventSem.Post();
     //Waiting THREAD_MANAGEMETN_END
     while (tt.incrementCounter < 1) {
         SleepMSec(10);
     }
-    // the THREAD_MANAGEMETN_END can continue
+    //THREAD_MANAGEMETN_END can continue
     tt.eventSem.Post();
     ThreadsEndThread();
     SleepSec(1.0);
@@ -447,11 +429,11 @@ void ThreadManagementEnd(ThreadsTest &tt) {
     // Says to the EndTarget that can continue
     tt.incrementCounter++;
     if (!tt.eventSem.Wait()) {
-        printf("\nThreadManagmentEnd cant not wait\n");
+        printf("\nThreadManagmentEnd cannot not wait\n");
     }
     //Wait EndTarget ends
     SleepSec(1.1);
-    // Reset sem to use in the future
+    //Reset sem to use in the future
     tt.eventSem.Reset();
     ok = ThreadsIsAlive(tt.threadIdTarget);
     tt.callbackTestSuccessful = tt.callbackTestSuccessful && !ok;
@@ -466,11 +448,11 @@ bool ThreadsTest::ThreadEndTest() {
     Threads::BeginThread((ThreadFunctionType) EndTarget, this,
     THREADS_DEFAULT_STACKSIZE,
                          "\EndTarget\n");
-    //Waiting the inicialization of the thread INFINITE
+    //Waiting the initialization of the thread INFINITE
     if (!eventSem.Wait()) {
-        printf("\nImpossible to wait inicialization EndTarget\n");
+        printf("\nImpossible to wait initialization EndTarget\n");
     }
-    //reset eventSem in order to use again
+    //Reset eventSem in order to use again
     eventSem.Reset();
     Threads::BeginThread((ThreadFunctionType) ThreadManagementEnd, this,
     THREADS_DEFAULT_STACKSIZE,
@@ -485,11 +467,8 @@ bool ThreadsTest::ThreadEndTest() {
 }
 
 void CheckCpuRun(ThreadsTest &tt) {
-
     tt.callbackTestSuccessful = tt.callbackTestSuccessful
             && (tt.incrementCounter == ThreadsGetCPUs(Threads::Id()));
-
-    //printf("\n cpu mask %d",ThreadsGetCPUs(Threads::Id()));
     tt.incrementCounter++;
     tt.eventSem.Post();
     return;
@@ -501,10 +480,10 @@ bool ThreadsTest::CpuRunTest() {
     incrementCounter = 1;
     eventSem.Reset();
     while (incrementCounter < nOfThreads1) {
-        Threads::BeginThread((ThreadFunctionType) CheckCpuRun, this,
+        ThreadsBeginThread((ThreadFunctionType) CheckCpuRun, this,
         THREADS_DEFAULT_STACKSIZE,
-                             "NO_NAME", ExceptionHandler::NotHandled,
-                             incrementCounter);
+                           "NO_NAME", ExceptionHandler::NotHandled,
+                           incrementCounter);
         if (!eventSem.Wait()) {
             printf("can not wait");
         }

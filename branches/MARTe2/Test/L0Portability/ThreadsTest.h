@@ -43,7 +43,7 @@ public:
         eventSem.Create();
         eventSemEndManagement.Create();
         nOfThreads1 = 0;
-        threadIdTarget;
+        threadIdTarget = 0;
         falseId = 1;
         mutexSem.Create(False);
         nameThreadTest = "F4EThread";
@@ -51,12 +51,12 @@ public:
     /**
      * Variable incremented by the call back function ThreadsTestIncrementCounter
      */
-    uint32 incrementCounter;
+    int32 incrementCounter;
 
     /**
      * Indicates how many threads will be created
      */
-    uint32 nOfThreads1;
+    int32 nOfThreads1;
 
     /**
      * Variable mutexSem to protect parts of the code
@@ -103,8 +103,7 @@ public:
     bool BeginThread(uint32 nOfThreads);
 
     /**
-     * @brief Tests the change of priority levels and classes.
-     *
+     * @brief Test changes of priority levels and classes.
      * This a very basic test and does not check if (and how) the priority request is actually propagated to
      * the operating system
      * @return True if the priority level and class are changed consistently with
@@ -113,10 +112,8 @@ public:
     bool Priorities();
 
     /**
-     *@brief Test if the OS respect the priorities given to different threats. ATTENTION root is required to change priorities
-     *
+     *@brief Test if the OS respect the priorities given to different threads. ATTENTION root is required to change priorities
      *Initialize threats with different priorities and stop them in a semaphore. When all the threats are inicialized set the semaphore "green" and check which threat goes first
-     *
      *@return true when the threads with more priority go first than the threads with less priority.
      */
     bool PrioritiesPropagationStartFirst();
@@ -129,7 +126,6 @@ public:
 
     /**
      *@brief Test if a thread can kill itself and if one threat can kill another thread.
-     *
      *First part of the test is autokill. Second part of the test, target thread and a management thread are created. Thread MANAGEMENT tries to kill the thread target and then checks if the target is alived. Moreover additional cases are tested. For instant the MANAGEMENT tries to kill the target twice, the second kill fails as expectect but the program shouldn't crash. Nevertheless with a invalid Id the ThreadsKill crash...
      *@return true when all the threads are kill succesfully and the return of the function ThreadsIsAlive() is what is expected.
      */
@@ -138,18 +134,21 @@ public:
     /**
      *@brief Test if TheadsGetsName gets the correct name
      * Also is check the case of a non valid Id. The expected name is NULL.
-     *@param no input parameters
      *@return true when the name is the expected name
      */
     bool ThreadNameTest();
 
     /**
-     *@brief Test if Threads:EndThread ends the thread
-     *@param no input parameters
+     *@brief Test if @see Threads::EndThread ends the thread
      *@return true when the target thread is alive at the beginning and dead at the end
      */
     bool ThreadEndTest();
 
+    /**
+     *@brief Checks if @see Threads::GetCPUs returns the expected CPU mask
+     * 254 threads are created assigning a different runCPU, then is checked if the ThreadsGetCPUs returns the expected value
+     *@return true when ThreadsGetCPUs returns the expected value.
+     */
     bool CpuRunTest();
 };
 
