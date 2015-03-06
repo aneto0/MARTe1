@@ -27,11 +27,8 @@ TARGET=linux
 
 include Makefile.inc
 
-CPPFLAGS+= -fprofile-arcs -ftest-coverage -coverage
-
-LIBRARIES   += ../../../Build/$(TARGET)/$(TESTING_LIBRARY)/$(TESTING_LIBRARY)$(LIBEXT) 
-LIBRARIES   += ../../../Build/$(TARGET)/$(TESTING_LIBRARY)/Test/$(TESTING_LIBRARY)Test$(LIBEXT)
-LIBRARIES   += ../../../Lib/gtest-1.7.0/libgtest.a ../../../Lib/gtest-1.7.0/libgtest_main.a -lgcov
+LIBRARIES   += ../../Build/$(TARGET)/$(TESTING_LIBRARY)/L0Portability$(LIBEXT)
+LIBRARIES   += ../../Build/$(TARGET)/$(TESTING_LIBRARY)/$(TESTING_LIBRARY)$(LIBEXT)
 
 
 OPTIM=-finline-functions
