@@ -116,7 +116,12 @@ private:
     /**
      * Number of bytes being written for the last second (statistics only)
      */
-    int32 bytesPerSecond;
+    float bandwidthToDisk;
+
+    /**
+     * Current number of free buffers
+     */
+    int32 numberOfFreeBuffers;
 
     /**
      * The writer thread is stopped by the message
@@ -140,7 +145,8 @@ public:
         cpuMask = 1;
         threadID = 0;
         threadPriority = 0;
-        bytesPerSecond = 0;
+        bandwidthToDisk = 0;
+        numberOfFreeBuffers = 0;
     }
 
     virtual ~FileWriterDrv(){
@@ -192,12 +198,11 @@ public:
     bool ProcessHttpMessage(HttpStream &hStream);
 
     /** 
-     * NOOP
+     * Writes the statistics of shared buffer.
+     * First channel is the number of free buffer and second the channel
+     * the bandwidth to disk.
      */
-    int32 GetData(uint32 usecTime, int32 *buffer, int32 bufferNumber = 0){
-        AssertErrorCondition(FatalError, "%s: GetData not supported", Name());
-        return -1;
-    }
+    int32 GetData(uint32 usecTime, int32 *buffer, int32 bufferNumber = 0);
 
     /**
      * Load and configure object parameters
