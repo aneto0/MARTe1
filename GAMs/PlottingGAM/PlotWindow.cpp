@@ -78,6 +78,7 @@ bool PlotWindow::Initialise(ConfigurationDataBase &cdbData) {
     } else {
         yAxisScaleMask = YSCALE_LINEAR;
     }
+    cdb.ReadFloat(yAxisScaleFactor, "YAxisScaleFactor", 1.0);
 
     // Read number of buffers to plot
     if(!cdb.ReadInt32(numberOfBuffers2Plot, "PlotLastNBuffers", 50)) {
@@ -219,32 +220,32 @@ bool PlotWindow::AppendJsDataString(FString &jsDataString) {
 	for(int j = 0 ; j < signals[i].buffer2PlotTotalNumberOfSamples-1 ; j++) {
 	    if(signals[i].signalTypeMask == TYPE_FLOAT) {
 		if(yAxisScaleMask == YSCALE_LINEAR) {
-		    jsDataString.Printf("%f,", (float)(*((float *)(signals[i].buffer2plot)+j)));
+		    jsDataString.Printf("%f,", (float)(yAxisScaleFactor * *((float *)(signals[i].buffer2plot)+j)));
 		} else if(yAxisScaleMask == YSCALE_LOG10) {
 #if (defined (_VXWORKS))
-		    jsDataString.Printf("%f,", log10((double)(*((float *)(signals[i].buffer2plot)+j))));
+		    jsDataString.Printf("%f,", log10((double)(yAxisScaleFactor * *((float *)(signals[i].buffer2plot)+j))));
 #else
-		    jsDataString.Printf("%f,", log10f((float)(*((float *)(signals[i].buffer2plot)+j))));
+		    jsDataString.Printf("%f,", log10f((float)(yAxisScaleFactor * *((float *)(signals[i].buffer2plot)+j))));
 #endif
 		}
 	    } else if(signals[i].signalTypeMask == TYPE_INT32) {
 		if(yAxisScaleMask == YSCALE_LINEAR) {
-		    jsDataString.Printf("%d,", (int32)(*((int32 *)(signals[i].buffer2plot)+j)));
+		    jsDataString.Printf("%d,", (int32)(yAxisScaleFactor * *((int32 *)(signals[i].buffer2plot)+j)));
 		} else if(yAxisScaleMask == YSCALE_LOG10) {
 #if (defined (_VXWORKS))
-		    jsDataString.Printf("%f,", log10((double)(*((int32 *)(signals[i].buffer2plot)+j))));
+		    jsDataString.Printf("%f,", log10(yAxisScaleFactor * (double)(*((int32 *)(signals[i].buffer2plot)+j))));
 #else
-		    jsDataString.Printf("%f,", log10f((float)(*((int32 *)(signals[i].buffer2plot)+j))));
+		    jsDataString.Printf("%f,", log10f(yAxisScaleFactor * (float)(*((int32 *)(signals[i].buffer2plot)+j))));
 #endif
 		}
 	    } else if(signals[i].signalTypeMask == TYPE_UINT32) {
 		if(yAxisScaleMask == YSCALE_LINEAR) {
-		    jsDataString.Printf("%d,", (uint32)(*((uint32 *)(signals[i].buffer2plot)+j)));
+		    jsDataString.Printf("%d,", (uint32)(yAxisScaleFactor * *((uint32 *)(signals[i].buffer2plot)+j)));
 		} else if(yAxisScaleMask == YSCALE_LOG10) {
 #if (defined (_VXWORKS))
-		    jsDataString.Printf("%f,", log10((double)(*((uint32 *)(signals[i].buffer2plot)+j))));
+		    jsDataString.Printf("%f,", log10(yAxisScaleFactor * (double)(*((uint32 *)(signals[i].buffer2plot)+j))));
 #else
-		    jsDataString.Printf("%f,", log10f((float)(*((uint32 *)(signals[i].buffer2plot)+j))));
+		    jsDataString.Printf("%f,", log10f(yAxisScaleFactor * (float)(*((uint32 *)(signals[i].buffer2plot)+j))));
 #endif
 		}
 	    } else {
@@ -253,32 +254,32 @@ bool PlotWindow::AppendJsDataString(FString &jsDataString) {
 	}
 	if(signals[i].signalTypeMask == TYPE_FLOAT) {
 	    if(yAxisScaleMask == YSCALE_LINEAR) {
-		jsDataString.Printf("%f];\n", (float)(*((float *)(signals[i].buffer2plot)+signals[i].buffer2PlotTotalNumberOfSamples-1)));
+		jsDataString.Printf("%f];\n", (float)(yAxisScaleFactor * *((float *)(signals[i].buffer2plot)+signals[i].buffer2PlotTotalNumberOfSamples-1)));
 	    } else if(yAxisScaleMask == YSCALE_LOG10) {
 #if (defined (_VXWORKS))
-		jsDataString.Printf("%f];\n", log10((double)(*((float *)(signals[i].buffer2plot)+signals[i].buffer2PlotTotalNumberOfSamples-1))));
+		jsDataString.Printf("%f];\n", log10(yAxisScaleFactor * (double)(*((float *)(signals[i].buffer2plot)+signals[i].buffer2PlotTotalNumberOfSamples-1))));
 #else
 		jsDataString.Printf("%f];\n", log10f((float)(*((float *)(signals[i].buffer2plot)+signals[i].buffer2PlotTotalNumberOfSamples-1))));
 #endif
 	    }
 	} else if(signals[i].signalTypeMask == TYPE_INT32) {
 	    if(yAxisScaleMask == YSCALE_LINEAR) {
-		jsDataString.Printf("%d];\n", (int32)(*((int32 *)(signals[i].buffer2plot)+signals[i].buffer2PlotTotalNumberOfSamples-1)));
+		jsDataString.Printf("%d];\n", (int32)(yAxisScaleFactor * *((int32 *)(signals[i].buffer2plot)+signals[i].buffer2PlotTotalNumberOfSamples-1)));
 	    } else if(yAxisScaleMask == YSCALE_LOG10) {
 #if (defined (_VXWORKS))
-		jsDataString.Printf("%f];\n", log10((double)(*((int32 *)(signals[i].buffer2plot)+signals[i].buffer2PlotTotalNumberOfSamples-1))));
+		jsDataString.Printf("%f];\n", log10((double)(yAxisScaleFactor * *((int32 *)(signals[i].buffer2plot)+signals[i].buffer2PlotTotalNumberOfSamples-1))));
 #else
-		jsDataString.Printf("%f];\n", log10f((float)(*((int32 *)(signals[i].buffer2plot)+signals[i].buffer2PlotTotalNumberOfSamples-1))));
+		jsDataString.Printf("%f];\n", log10f((float)(yAxisScaleFactor * *((int32 *)(signals[i].buffer2plot)+signals[i].buffer2PlotTotalNumberOfSamples-1))));
 #endif
 	    }
 	} else if(signals[i].signalTypeMask == TYPE_UINT32) {
 	    if(yAxisScaleMask == YSCALE_LINEAR) {
-		jsDataString.Printf("%d];\n", (uint32)(*((uint32 *)(signals[i].buffer2plot)+signals[i].buffer2PlotTotalNumberOfSamples-1)));
+		jsDataString.Printf("%d];\n", (uint32)(yAxisScaleFactor * *((uint32 *)(signals[i].buffer2plot)+signals[i].buffer2PlotTotalNumberOfSamples-1)));
 	    } else if(yAxisScaleMask == YSCALE_LOG10) {
 #if (defined (_VXWORKS))
-		jsDataString.Printf("%f];\n", log10((double)(*((uint32 *)(signals[i].buffer2plot)+signals[i].buffer2PlotTotalNumberOfSamples-1))));
+		jsDataString.Printf("%f];\n", log10(yAxisScaleFactor * (double)(*((uint32 *)(signals[i].buffer2plot)+signals[i].buffer2PlotTotalNumberOfSamples-1))));
 #else
-		jsDataString.Printf("%f];\n", log10f((float)(*((uint32 *)(signals[i].buffer2plot)+signals[i].buffer2PlotTotalNumberOfSamples-1))));
+		jsDataString.Printf("%f];\n", log10f(yAxisScaleFactor * (float)(*((uint32 *)(signals[i].buffer2plot)+signals[i].buffer2PlotTotalNumberOfSamples-1))));
 #endif
 	    }
 	} else {
