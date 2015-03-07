@@ -42,23 +42,20 @@ void FileWriterDrv::WriteDataToDisk(){
     uint32 size  = 0;
     bool ok = False;
     running = True;
-    int64 start = HRT::HRTCounter();
+    int64 lastWriteCounter = HRT::HRTCounter();
+    int64 ellapsedWriteCounter = lastWriteCounter;
+    int64 lastWriteSize = 0;
     while(running){
         //Wait for the next buffer to be free
         sharedBufferMux.FastLock();
         sharedBufferSem.Reset();
         sharedBufferMux.FastUnLock();
         sharedBufferSem.Wait();
-	int64 ellapsed = HRT::HRTCounter() - start;
-	if(ellapsed * HRT::HRTPeriod() > 10.0){
-	    start = HRT::HRTCounter();
-	    bytesPerSecond = 0;
-	}
         while(sharedBuffer[i][0] == 1){
             //Write to disk
             for(j=0; j<numberOfOutputFiles; j++){
                 size = numberOfBytesPerSignal;
-		bytesPerSecond += size;
+                lastWriteSize += size;
                 ok = outputFiles[j].Write(&sharedBuffer[i][1] + j * numberOfWordsPerSignal, size);
                 if(!ok){
                     AssertErrorCondition(FatalError,"FileWriterDrv::WriteDataToDisk: %s Could not write data for file: %s",Name(),outputFilenames[j].Buffer());
@@ -69,7 +66,12 @@ void FileWriterDrv::WriteDataToDisk(){
             }
             sharedBufferMux.FastLock();
             sharedBuffer[i][0] = 0;
+            numberOfFreeBuffers++;
             sharedBufferMux.FastUnLock();
+            ellapsedWriteCounter = HRT::HRTCounter() - lastWriteCounter;
+            bandwidthToDisk = lastWriteSize / (ellapsedWriteCounter * HRT::HRTPeriod());
+            lastWriteCounter = HRT::HRTCounter();
+            lastWriteSize = 0;
             //Look for the next buffer
             i++;
             if(i == numberOfBuffers){
@@ -92,6 +94,11 @@ bool FileWriterDrv::ObjectLoadSetup(ConfigurationDataBase &info,StreamInterface 
     CDBExtended cdb(info);
     if(!GenericAcqModule::ObjectLoadSetup(info,err)){
         AssertErrorCondition(InitialisationError,"FileWriterDrv::ObjectLoadSetup: %s GenericAcqModule::ObjectLoadSetup Failed",Name());
+        return False;
+    }
+
+    if(numberOfInputChannels != 2) {
+        AssertErrorCondition(InitialisationError,"FileWriterDrv::ObjectLoadSetup: %s GenericAcqModule::ObjectLoadSetup Failed. Please set NumberOfInputs=2 to account for the statistics channels",Name());
         return False;
     }
 
@@ -132,6 +139,7 @@ bool FileWriterDrv::ObjectLoadSetup(ConfigurationDataBase &info,StreamInterface 
         AssertErrorCondition(InitialisationError,"FileWriterDrv::ObjectLoadSetup: %s at least one buffer must be specified. NumberOfBuffers = %d",Name(), numberOfBuffers);
         return False;
     }
+    numberOfFreeBuffers = numberOfBuffers;
     numberOfBytesPerSignal = numberOfOutputChannels / numberOfOutputFiles * sizeof(int32);
     numberOfWordsPerSignal = numberOfBytesPerSignal / sizeof(int32);
     //Allocate the shared memory
@@ -267,6 +275,7 @@ bool FileWriterDrv::WriteData(uint32 usecTime, const int32 *ibuffer){
     memcpy(&sharedBuffer[lastWriteIdx][1], ibuffer, numberOfBytesPerSignal * numberOfOutputFiles);
     sharedBufferMux.FastLock();
     sharedBuffer[lastWriteIdx][0] = 1;
+    numberOfFreeBuffers--;
     sharedBufferSem.Post();
     sharedBufferMux.FastUnLock();
 
@@ -296,12 +305,13 @@ bool FileWriterDrv::ProcessHttpMessage(HttpStream &hStream) {
     hStream.Printf("<body>\n");
 
     hStream.Printf("<h1>Shared buffer status</h1>\n");
-    hStream.Printf("Bytes written last second = %d\n<br>\n", bytesPerSecond);
+    hStream.Printf("Bandwidth to disk (MB/s) = %f\n<br>\n", bandwidthToDisk/1e6);
+    hStream.Printf("Number of free buffers = %d\n<br>\n", numberOfFreeBuffers);
     /* Data table */
     hStream.Printf("<table border=\"1\" align=\"left\">\n");
     int32 i=0;
     for(i=0; i<numberOfBuffers; i++){
-        if(i % 20 == 0){
+        if(i % 40 == 0){
             if(i != 0){
                 hStream.Printf("</tr>\n");
             }
@@ -318,6 +328,12 @@ bool FileWriterDrv::ProcessHttpMessage(HttpStream &hStream) {
     hStream.Printf("</table>\n");
     hStream.Printf("</body></html>\n");
 
+}
+
+int32 FileWriterDrv::GetData(uint32 usecTime, int32 *buffer, int32 bufferNumber) {
+    memcpy(buffer, &numberOfFreeBuffers, sizeof(int32));
+    memcpy(buffer+1, &bandwidthToDisk, sizeof(float));
+    return 0;
 }
 
 OBJECTLOADREGISTER(FileWriterDrv,"$Id: FileWriterDrv.cpp 3 2012-01-15 16:26:07Z aneto $")
