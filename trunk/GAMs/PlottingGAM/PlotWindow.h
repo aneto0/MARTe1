@@ -89,6 +89,8 @@ private:
     uint32              xAxisSignalTypeMask;
 
     float               xAxisScaleFactor;
+    
+    float               yAxisScaleFactor;
 
     uint32              yAxisScaleMask;
 
@@ -128,6 +130,7 @@ public:
 	xAxisArray = NULL;
 	xAxisSignalTypeMask = TYPE_NONE;
 	xAxisScaleFactor = 1.0;
+	yAxisScaleFactor = 1.0;
 	yAxisScaleMask = YSCALE_LINEAR;
 	totalNumberOfSignals = 0;
 	numberOfBuffers2Plot = 1;
