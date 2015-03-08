@@ -44,19 +44,25 @@ bool TypeConvertGAM::Initialise(ConfigurationDataBase &cdbData) {
         AssertErrorCondition(InitialisationError,"TypeConvertGAM::Initialise: %s did not specify InputSignals entry",Name());
         return False;
     }
-    numberOfSignals = cdb->NumberOfChildren();
     if(!input->ObjectLoadSetup(cdb,NULL)){
         AssertErrorCondition(InitialisationError,"TypeConvertGAM::Initialise: %s ObjectLoadSetup Failed DDBInterface %s ",Name(),input->InterfaceName());
         return False;
     }
 
-    FString *inputTypes = new FString[input->NumberOfEntries()];
+    //To also support arrays...
+    const DDBSignalDescriptor *inSignalDescriptor = input->SignalsList();
+    while( inSignalDescriptor != NULL ){
+        numberOfSignalsWithArrays += inSignalDescriptor->SignalSize();
+        inSignalDescriptor = inSignalDescriptor->Next();
+    }
+    FString *inputTypes = new FString[numberOfSignalsWithArrays];
     if(inputTypes == NULL){
         AssertErrorCondition(InitialisationError,"TypeConvertGAM::Initialise: %s ObjectLoadSetup could not allocate inputTypes ",Name());
         return False;
     }
 
-    const DDBSignalDescriptor *inSignalDescriptor = input->SignalsList();
+    inSignalDescriptor = input->SignalsList();
+    int32 s = 0;
     for(int entry = 0; entry < input->NumberOfEntries(); entry++){
         cdb->MoveToChildren(entry);
         FString signalType;
@@ -65,7 +71,11 @@ bool TypeConvertGAM::Initialise(ConfigurationDataBase &cdbData) {
             delete[] inputTypes;
             return False;
         }
-        inputTypes[entry] = signalType;
+        //If it is an array go inside the array...
+        int32 j=0;
+        for(j=0; j<inSignalDescriptor->SignalSize(); j++){
+            inputTypes[s++] = signalType;
+        }
         inSignalDescriptor->Next();
         cdb->MoveToFather();
     }
@@ -81,22 +91,30 @@ bool TypeConvertGAM::Initialise(ConfigurationDataBase &cdbData) {
         delete[] inputTypes;
         return False;
     }
-    if(cdb->NumberOfChildren() != numberOfSignals){
-        AssertErrorCondition(InitialisationError,"TypeConvertGAM::Initialise: %s ObjectLoadSetup the number of input signals [%d] is different from the number of output signals [%d]", Name(), numberOfSignals, cdb->NumberOfChildren());
+
+    int32 numberOfOutputSignalsWithArrays = 0;
+    const DDBSignalDescriptor *signalDescriptor = output->SignalsList();
+    while( signalDescriptor != NULL ){
+        numberOfOutputSignalsWithArrays += signalDescriptor->SignalSize();
+        signalDescriptor = signalDescriptor->Next();
+    }
+    if(numberOfSignalsWithArrays != numberOfOutputSignalsWithArrays){
+        AssertErrorCondition(InitialisationError,"TypeConvertGAM::Initialise: %s ObjectLoadSetup the number of input signals with arrays [%d] is different from the number of output signals with arrays [%d]", Name(), numberOfSignalsWithArrays, numberOfOutputSignalsWithArrays);
         delete[] inputTypes;
         return False;
     }
-
+    
     if(convertType != NULL) delete[] convertType;
-    convertType = new ConvertType[numberOfSignals];
+    convertType = new ConvertType[numberOfSignalsWithArrays];
     if(convertType == NULL){
         AssertErrorCondition(InitialisationError,"TypeConvertGAM::Initialise: %s ObjectLoadSetup Failed to create convertType array ", Name());
         delete[] inputTypes;
         return False;
     }
 
+    signalDescriptor = output->SignalsList();
     //Read all convert types
-    const DDBSignalDescriptor *signalDescriptor = output->SignalsList();
+    s = 0;
     for(int entry = 0; entry < output->NumberOfEntries(); entry++){
         cdb->MoveToChildren(entry);
         FString signalType;
@@ -106,19 +124,24 @@ bool TypeConvertGAM::Initialise(ConfigurationDataBase &cdbData) {
             return False;
         }
 
-        convertType[entry] = TranslateConvertType(inputTypes[entry], signalType);
-        if(convertType[entry] == Unknown){
-            AssertErrorCondition(InitialisationError,"TypeConvertGAM::Initialise: %s ObjectLoadSetup Convert from %s to %s for signal %s is not supported", Name(), inputTypes[entry].Buffer(), signalType.Buffer(), signalDescriptor->SignalName());
-            delete[] inputTypes;
-            return False;
-        }
+        //If it is an array go inside the array...
+        int32 j=0;
+        for(j=0; j<inSignalDescriptor->SignalSize(); j++){
+            convertType[s] = TranslateConvertType(inputTypes[s], signalType);
+            if(convertType[s] == Unknown){
+                AssertErrorCondition(InitialisationError,"TypeConvertGAM::Initialise: %s ObjectLoadSetup Convert from %s to %s for signal %s is not supported", Name(), inputTypes[s].Buffer(), signalType.Buffer(), signalDescriptor->SignalName());
+                delete[] inputTypes;
+                return False;
+            }
+            s++;
+        }            
         signalDescriptor->Next();
         cdb->MoveToFather();
     }
 
     cdb->MoveToFather();
 
-    delete[] inputTypes;
+        delete[] inputTypes;
     return True;
 }
 
@@ -136,79 +159,79 @@ bool TypeConvertGAM::Execute(GAM_FunctionNumbers execFlag) {
             int signal    = 0;
             int inPtrPos  = 0;
             int outPtrPos = 0;
-            for(signal=0; signal<numberOfSignals; signal++){
+            for(signal=0; signal<numberOfSignalsWithArrays; signal++){
                 inputBuffer  += inPtrPos;
                 outputBuffer += outPtrPos;
                 switch(convertType[signal]){
                     case Int32ToInt32:
                         *(int32 *)outputBuffer = *(int32 *)inputBuffer;
-                        inPtrPos  += sizeof(int32);
-                        outPtrPos += sizeof(int32);
+                        inPtrPos  = sizeof(int32);
+                        outPtrPos = sizeof(int32);
                         break;
                     case Int32ToUint32:
                         *(uint32 *)outputBuffer = *(int32 *)inputBuffer;
-                        inPtrPos  += sizeof(int32);
-                        outPtrPos += sizeof(uint32);
+                        inPtrPos  = sizeof(int32);
+                        outPtrPos = sizeof(uint32);
                         break;
                     case Int32ToFloat:
                         *(float *)outputBuffer = *(int32 *)inputBuffer;
-                        inPtrPos  += sizeof(int32);
-                        outPtrPos += sizeof(float);
+                        inPtrPos  = sizeof(int32);
+                        outPtrPos = sizeof(float);
                         break;
                     case FloatToInt32:
                         *(int32 *)outputBuffer = (int32)(*(float *)inputBuffer);
-                        inPtrPos  += sizeof(float);
-                        outPtrPos += sizeof(int32);
+                        inPtrPos  = sizeof(float);
+                        outPtrPos = sizeof(int32);
                         break;
                     case Int32ToInt64:
                         *(int64 *)outputBuffer = *(int32 *)inputBuffer;
-                        inPtrPos  += sizeof(int32);
-                        outPtrPos += sizeof(int64);
+                        inPtrPos  = sizeof(int32);
+                        outPtrPos = sizeof(int64);
                         break;
                     case Int64ToInt32:
                         *(int32 *)outputBuffer = *(int64 *)inputBuffer;
-                        inPtrPos  += sizeof(int64);
-                        outPtrPos += sizeof(int32);
+                        inPtrPos  = sizeof(int64);
+                        outPtrPos = sizeof(int32);
                         break;
                     case FloatToInt64:
                         *(int64 *)outputBuffer = *(float *)inputBuffer;
-                        inPtrPos  += sizeof(float);
-                        outPtrPos += sizeof(int64);
+                        inPtrPos  = sizeof(float);
+                        outPtrPos = sizeof(int64);
                         break;
                     case Int64ToFloat:
                         *(float *)outputBuffer = *(int64 *)inputBuffer;
-                        inPtrPos  += sizeof(int64);
-                        outPtrPos += sizeof(float);
+                        inPtrPos  = sizeof(int64);
+                        outPtrPos = sizeof(float);
                         break;
                     case Int32ToDouble:
                         *(double *)outputBuffer = *(int32 *)inputBuffer;
-                        inPtrPos  += sizeof(int32);
-                        outPtrPos += sizeof(double);
+                        inPtrPos  = sizeof(int32);
+                        outPtrPos = sizeof(double);
                         break;
                     case DoubleToInt32:
                         *(int32 *)outputBuffer = (int32)(*(double *)inputBuffer);
-                        inPtrPos  += sizeof(double);
-                        outPtrPos += sizeof(int32);
+                        inPtrPos  = sizeof(double);
+                        outPtrPos = sizeof(int32);
                         break;
                     case Int64ToDouble:
                         *(double *)outputBuffer = *(int64 *)inputBuffer;
-                        inPtrPos  += sizeof(int64);
-                        outPtrPos += sizeof(double);
+                        inPtrPos  = sizeof(int64);
+                        outPtrPos = sizeof(double);
                         break;
                     case DoubleToInt64:
                         *(int64 *)outputBuffer = (int64)(*(double *)inputBuffer);
-                        inPtrPos  += sizeof(double);
-                        outPtrPos += sizeof(int64);
+                        inPtrPos  = sizeof(double);
+                        outPtrPos = sizeof(int64);
                         break;
                     case DoubleToFloat:
                         *(float *)outputBuffer = *(double *)inputBuffer;
-                        inPtrPos  += sizeof(double);
-                        outPtrPos += sizeof(float);
+                        inPtrPos  = sizeof(double);
+                        outPtrPos = sizeof(float);
                         break;
                     case FloatToDouble:
                         *(double *)outputBuffer = *(float *)inputBuffer;
-                        inPtrPos  += sizeof(float);
-                        outPtrPos += sizeof(double);
+                        inPtrPos  = sizeof(float);
+                        outPtrPos = sizeof(double);
                         break;
                 }
             }

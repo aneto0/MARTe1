@@ -150,7 +150,14 @@ bool SSM::Initialise(ConfigurationDataBase& cdbData){
 
         cdb->MoveToFather();
 
-        if( !inputData.Allocate(inputSignalDDB->NumberOfEntries()) ){
+        //To support arrays as well
+        int32 numberOfSignalsWithArrays = 0;
+        const DDBSignalDescriptor *inSignalDescriptor = inputSignalDDB->SignalsList();
+        while( inSignalDescriptor != NULL ){
+            numberOfSignalsWithArrays += inSignalDescriptor->SignalSize();
+            inSignalDescriptor = inSignalDescriptor->Next();
+        }
+        if( !inputData.Allocate(numberOfSignalsWithArrays) ){
             AssertErrorCondition(InitialisationError,"SSM::Initialize error allocating %i memory input",inputData.nData);
             return False;
         }
@@ -192,7 +199,13 @@ bool SSM::Initialise(ConfigurationDataBase& cdbData){
 
         cdb->MoveToFather();
 
-        if( !outputData.Allocate(outputSignalDDB->NumberOfEntries()) ){
+        int32 numberOfSignalsWithArrays = 0;
+        const DDBSignalDescriptor *outSignalDescriptor = outputSignalDDB->SignalsList();
+        while( outSignalDescriptor != NULL ){
+            numberOfSignalsWithArrays += outSignalDescriptor->SignalSize();
+            outSignalDescriptor = outSignalDescriptor->Next();
+        }
+        if( !outputData.Allocate(numberOfSignalsWithArrays) ){
             AssertErrorCondition(InitialisationError,"SSM::Initialize error allocating %i memory output",outputData.nData);
             return False;
         }
@@ -255,7 +268,7 @@ bool SSM::Execute(GAM_FunctionNumbers functionNumber){
             counterModel = 0;
         }break;
 
-
+        case GAMOffline:
         case GAMOnline:{
 
             timeInput->Read();
@@ -306,7 +319,6 @@ bool SSM::Execute(GAM_FunctionNumbers functionNumber){
 
         }break;
 
-        case GAMOffline:
         case GAMSafety:{
             return True;
         }
