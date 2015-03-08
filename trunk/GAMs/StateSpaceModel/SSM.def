@@ -1,0 +1,6 @@
+LIBRARY    SSM
+DESCRIPTION "The SSM"
+EXPORTS
+
+Get_private_SSMInfo 		@1
+Get_private_SSMGenericModelInfo @2
