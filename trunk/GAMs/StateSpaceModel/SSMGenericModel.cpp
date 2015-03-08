@@ -122,7 +122,7 @@ bool SSMGenericModel::LoadModel(ConfigurationDataBase &cdb, GAM &gam, int inputD
         }
         if( stateDim == 0 ) stateDim = stateFromInput.NRows();
         if( (stateFromInput.NRows() != stateDim) || (stateFromInput.NColumns() != inputDim) ){
-            CStaticAssertErrorCondition(InitialisationError,"SSMGenericModel::LoadModel incompatibility in State-Input dimensions");
+            CStaticAssertErrorCondition(InitialisationError,"SSMGenericModel::LoadModel incompatibility in State-Input dimensions (%d!=%d) (%d!=%d)",stateFromInput.NRows(),stateDim,stateFromInput.NColumns(),inputDim);
             return False;
         }
     }

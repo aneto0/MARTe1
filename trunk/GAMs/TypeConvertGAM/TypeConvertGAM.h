@@ -58,8 +58,8 @@ private:
     DDBOutputInterface *output;
     /** Stores all the types to convert*/
     ConvertType        *convertType;
-    /** Number of signals to be converted*/
-    int32               numberOfSignals;
+    /** Number of signals to be converted, including elements inside arrays*/
+    int32               numberOfSignalsWithArrays;
 
     /**Translates a convert type from the cdb to an enum type*/
     ConvertType TranslateConvertType(FString &input, FString &output){
@@ -91,10 +91,10 @@ private:
 public:
 
     TypeConvertGAM(){
-        input           = NULL;
-        output          = NULL;
-        convertType     = NULL;
-        numberOfSignals = 0;
+        input                     = NULL;
+        output                    = NULL;
+        convertType               = NULL;
+        numberOfSignalsWithArrays = 0;
     }
 
     virtual ~TypeConvertGAM(){
