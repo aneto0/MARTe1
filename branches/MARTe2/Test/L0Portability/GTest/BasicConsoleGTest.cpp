@@ -27,7 +27,7 @@ TEST_F(BasicConsoleGTest,TestOpen) {
 
 TEST_F(BasicConsoleGTest,TestWrite) {
     BasicConsoleTest console;
-    ASSERT_TRUE(console.TestWrite("Hello\nWorld\n", 3));
+    ASSERT_TRUE(console.TestWrite((char*)"Hello\nWorld\n", 3));
 }
 
 //This tests need user intervent. Do not uncomment for automatic tests.
