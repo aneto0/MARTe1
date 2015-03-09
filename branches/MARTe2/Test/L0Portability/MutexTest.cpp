@@ -24,7 +24,7 @@
 
 #include "GeneralDefinitions.h"
 #include "MutexTest.h"
-#include "ThreadsDatabase.h"
+
 
 //It's used to implement Lock() or FastLock() functions depending by the boolean usingFast
 bool MutexLock(MutexTest &mutexTest, int32 index) {
@@ -62,7 +62,7 @@ void Increment(MutexTest &mutexTest) {
     //if free is True, the thread try to unlock the locked mutex
     if (mutexTest.free) {
         if (!mutexTest.mutexSem[1].FastTryLock()) {
-            if (!MutexUnLock(mutexTest, 1)) {
+            if (!MutexUnLock(mutexTest, 2)) {
                 mutexTest.exitCondition++;
                 return;
             }
@@ -162,7 +162,7 @@ void TimeoutFunction(MutexTest &mutexTest) {
 }
 
 //It's used to test the behavior of system when a thread is killed with a mutex active.
-void InfiniteLoop(MutexTest &mutexTest) {
+void WaitLoop(MutexTest &mutexTest) {
 
     //activate mutex.
     if (!MutexLock(mutexTest, 1)) {
@@ -320,8 +320,8 @@ bool MutexTest::DeadLock() {
 }
 
 //The main process launchs a thread which locks a mutex and, after it launchs another thread which wait on mutex. Then the main process kill the first thread. If the shared variable is 11 it means that the
-//thread murder triggers a fail or an unlock of the mutex allows the operations of the second thread. 
-bool MutexTest::KillerTest() {
+//thread murder triggers a fail or an unlock of the mutex allowing operations of the second thread. 
+bool MutexTest::KillWithLock() {
 
     sharedVariable = 0;
     exitCondition = 0;
@@ -330,8 +330,11 @@ bool MutexTest::KillerTest() {
     expired = False;
     free = False;
     deadlock = False;
-    TID tid1 = Threads::BeginThread((ThreadFunctionType) InfiniteLoop, this);
+    TID tid1 = Threads::BeginThread((ThreadFunctionType) WaitLoop, this);
+    int32 j = 0;
     while (exitCondition < 1) {
+        if (j++ > 2000)
+            return False;
         SleepSec(1e-3);
     }
     //Lock Fail
@@ -343,8 +346,7 @@ bool MutexTest::KillerTest() {
 
     //kill the first thread
     Threads::Kill(tid1);
-    int32 j = 0;
-
+    j=0;
     //wait that the second thread finish its job (or about two second max)
     while (exitCondition < 2) {
         if (j++ > 2000)

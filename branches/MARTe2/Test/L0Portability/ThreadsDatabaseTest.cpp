@@ -36,6 +36,7 @@ int32 nDatabasedThreads() {
 //Infinite loop
 void DoNothing(ThreadsDatabaseTest &threadDatabaseTest) {
     threadDatabaseTest.exitCondition++;
+    SleepSec(1e-3);
     while (1) {
         SleepSec(1e-3);
     }
