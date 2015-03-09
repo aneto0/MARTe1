@@ -91,7 +91,7 @@ void Increment(MutexTest &mutexTest) {
     }
     //Increment shared variable of ten, sleep at each loop and returns if the variable is not consistent (it means that the lock does not work)
     while (i < 10) {
-        if (mutexTest.sharedVariable != state + i) {
+        if (mutexTest.sharedVariable != (state + i)) {
             mutexTest.exitCondition++;
             return;
         }
@@ -222,7 +222,7 @@ bool MutexTest::TestSyncTimeout(TimeoutType timeout, int32 nOfThreads) {
     for (int32 i = 0; i < nOfThreads; i++) {
         Threads::BeginThread((ThreadFunctionType) TimeoutFunction, this);
     }
-    int32 j=0;
+    uint32 j=0;
     while (exitCondition < nOfThreads) {
         if(j++>10*timeout.msecTimeout){
             return False;
@@ -266,7 +266,7 @@ bool MutexTest::TestSyncTimeoutFast(TimeoutType timeout, int32 nOfThreads) {
     for (int32 i = 0; i < nOfThreads; i++) {
         Threads::BeginThread((ThreadFunctionType) TimeoutFunction, this);
     }
-    int32 j=0;
+    uint32 j=0;
     while (exitCondition < nOfThreads) {
         if(j++>10*timeout.msecTimeout){
             return False;

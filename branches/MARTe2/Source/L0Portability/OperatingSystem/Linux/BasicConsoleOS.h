@@ -90,7 +90,7 @@ bool BasicConsoleOSWrite(BasicConsole &con, const void* buffer, uint32 &size) {
     char nextRow = '\n';
     int32 n = 0;
     uint32 index = 0, sizeT = 0, start = 0;
-    int32 columnLimit = con.numberOfColumns;
+    uint32 columnLimit = (uint32) con.numberOfColumns;
     while (1) {
         while (sizeT < columnLimit && index < size) {
             if (buffString[index] == '\0' || buffString[index] == '\n')

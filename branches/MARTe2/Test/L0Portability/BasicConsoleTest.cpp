@@ -26,8 +26,8 @@
 #include "BasicConsoleTest.h"
 
 //Returns the size of the string.
-int32 sizeOfString(char* string) {
-    int32 i = 0;
+uint32 sizeOfString(char* string) {
+    uint32 i = 0;
     if (string == NULL) {
         return -1;
     }
@@ -90,7 +90,7 @@ bool BasicConsoleTest::TestWrite(char* string, int32 padding) {
             return False;
         }
     }
-    int32 stringSize;
+    uint32 stringSize;
 
     //calculate the size of the string
     if ((stringSize = sizeOfString(string)) < 0) {
@@ -130,15 +130,15 @@ bool BasicConsoleTest::TestRead(char* stringArg, int32 sizeArg) {
     char string[N_COLUMNS];
     char result[N_COLUMNS + 20];
     uint32 size = N_COLUMNS;
-    int32 stringSize;
+    uint32 stringSize;
 
     //calculate the size of the string
     if ((stringSize = sizeOfString(stringArg)) < 0) {
         return False;
     }
-
+    const char* prefix="\nPut";
     //define the request to print
-    stringAppend("\nPut: ", stringArg, result);
+    stringAppend((char*)prefix, stringArg, result);
 
     //print the request: the user must insert the string passed by argument
     TestWrite(result, 0);
@@ -151,7 +151,7 @@ bool BasicConsoleTest::TestRead(char* stringArg, int32 sizeArg) {
 
     //return true if the read string is equal to the argument
     if (sizeArg != 0) {
-        return condition1 && condition2 && (size == sizeArg);
+        return condition1 && condition2 && (size == ((uint32)sizeArg));
     }
     else {
         string[size] = '\n';
@@ -198,7 +198,8 @@ bool BasicConsoleTest::TestPerfChar() {
         return False;
     }
 
+    const char* request="press any key\n";
     //return true if the size of the read string is one as aspected.
-    return TestRead("press any key\n", 0);
+    return TestRead((char*)request, 0);
 }
 

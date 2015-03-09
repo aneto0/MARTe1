@@ -57,7 +57,7 @@ void GetInfo(ThreadsDatabaseTest &threadDatabaseTest) {
     threadDatabaseTest.returnValue = threadDatabaseTest.returnValue
             && (threadDatabaseTest.threadInfo->threadId == Threads::Id());
     threadDatabaseTest.exitCondition++;
-    if (threadDatabaseTest.exitCondition != state + 1) {
+    if (threadDatabaseTest.exitCondition != (state + 1)) {
         threadDatabaseTest.returnValue = False; 
     }
     ThreadsDatabase::UnLock();
@@ -155,6 +155,7 @@ bool ThreadsDatabaseTest::TestRemoveEntry(int32 nOfThreads) {
             for (int32 i = 0; i < tidsDim; i++) {
                 Threads::Kill(tids[i]);
             }
+        return False;
         } 
         SleepSec(10e-3);
     }
@@ -274,7 +275,7 @@ bool ThreadsDatabaseTest::TestTimeoutLock(TimeoutType time) {
 
     //launching a thread which locks with timeout and then increment the exitCondition variable
     TID tid2 = Threads::BeginThread((ThreadFunctionType) DoNothings, this);
-    int32 j = 0;
+    uint32 j = 0;
 
     //wait until the second thread increments exitCondition or too much time is elapsed
     while (exitCondition < 4) {
