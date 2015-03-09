@@ -52,10 +52,10 @@ void *LoadableLibraryFunction(LoadableLibrary &ll, const char *name);
 class LoadableLibrary {
 public:
     HANDLE module;
-private:
-    bool LoadableLibraryOpen(LoadableLibrary &ll, const char *dllName);
-    void LoadableLibraryClose(LoadableLibrary &ll);
-    void *LoadableLibraryFunction(LoadableLibrary &ll, const char *name);
+
+    friend bool LoadableLibraryOpen(LoadableLibrary &ll, const char *dllName);
+    friend void LoadableLibraryClose(LoadableLibrary &ll);
+    friend void *LoadableLibraryFunction(LoadableLibrary &ll, const char *name);
 
 public:
     /** */
