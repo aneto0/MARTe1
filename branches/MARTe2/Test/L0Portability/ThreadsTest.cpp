@@ -331,6 +331,7 @@ void ThreadManagement(ThreadsTest &tt) {
     PointerToString = ThreadsName(tt.threadIdTarget);
     ok = (0 == strcmp(PointerToString, tt.nameThreadTest));
     tt.callbackTestSuccessful = tt.callbackTestSuccessful && ok;
+    ThreadsKill(tt.threadIdTarget);
     SleepMSec(1);
     //ThreadsKill(tt.falseId);
     //ThreadsIsAlive(tt.falseId);
@@ -399,6 +400,8 @@ bool ThreadsTest::ThreadNameTest() {
     else {    //unexpected case (returns false
         callbackTestSuccessful = callbackTestSuccessful && false;
     }
+    SleepMSec(1);
+    ThreadsKill(threadIdTarget);
     SleepMSec(1);
     return callbackTestSuccessful;
 }
@@ -473,11 +476,21 @@ void CheckCpuRun(ThreadsTest &tt) {
     tt.eventSem.Post();
     return;
 }
+void GetNumberCPU(ThreadsTest &tt){
+    tt.nOfThreads1= ThreadsGetCPUs(Threads::Id());
+    tt.eventSem.Post();
+}
 
 bool ThreadsTest::CpuRunTest() {
     callbackTestSuccessful = true;
-    nOfThreads1 = 255;
+    //nOfThreads1 = 255;
     incrementCounter = 1;
+    eventSem.Reset();
+
+    ThreadsBeginThread((ThreadFunctionType) GetNumberCPU, this,
+            THREADS_DEFAULT_STACKSIZE,
+                               "NO_NAME", ExceptionHandler::NotHandled);
+    eventSem.Wait();
     eventSem.Reset();
     while (incrementCounter < nOfThreads1) {
         ThreadsBeginThread((ThreadFunctionType) CheckCpuRun, this,
