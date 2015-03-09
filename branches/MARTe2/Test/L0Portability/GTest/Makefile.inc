@@ -36,8 +36,10 @@ OBJSX=  EndianityGTest.x \
 		MutexGTest.x \
 		BasicConsoleGTest.x \
 		HighResolutionTimerGTest.x \
-		ThreadsDatabaseGTest.x
-	
+		ThreadsDatabaseGTest.x \
+		LoadableLibraryGTest.x \
+		MemoryGTest.x \
+		FastPollingMutexGTest.x	
 MAKEDEFAULTDIR=../../../MakeDefaults
 
 include $(MAKEDEFAULTDIR)/MakeStdLibDefs.$(TARGET)
