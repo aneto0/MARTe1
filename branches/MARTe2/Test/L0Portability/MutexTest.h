@@ -120,7 +120,7 @@ public:
     /**
      * Check what happen when a thread were killed while it lock a mutex. 
      * @return true if the tread is killed after the unlock, because otherwise we can obtain a program crash. **/
-    bool KillerTest();
+    bool KillWithLock();
 
 };
 

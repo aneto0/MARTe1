@@ -20,10 +20,7 @@ protected:
     }
 };
 
-TEST_F(MutexGTest,TestSync) {
-    MutexTest mutextest;
-    ASSERT_TRUE(mutextest.TestSync(10));
-}
+
 
 TEST_F(MutexGTest,TestSyncTimeout) {
     MutexTest mutextest;
@@ -50,7 +47,12 @@ TEST_F(MutexGTest,DeadLock) {
     ASSERT_TRUE(mutextest.DeadLock());
 }
 
-TEST_F(MutexGTest,KillerTest) {
+TEST_F(MutexGTest,KillWithLock) {
     MutexTest mutextest;
-    ASSERT_TRUE(mutextest.KillerTest());
+    ASSERT_TRUE(mutextest.KillWithLock());
+}
+
+TEST_F(MutexGTest,TestSync) {
+    MutexTest mutextest;
+    ASSERT_TRUE(mutextest.TestSync(10));
 }
