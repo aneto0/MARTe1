@@ -46,7 +46,11 @@ include $(MAKEDEFAULTDIR)/MakeStdLibDefs.$(TARGET)
 
 TESTING_LIBRARY=L0Portability
 
-BUILD_DIR=../../../Build/$(TARGET)/$(TESTING_LIBRARY)/$(lastword $(subst /,\ ,$(CURDIR)))
+ifeq ($(TARGET),gco)
+	BUILD_DIR=gco
+else
+	BUILD_DIR=../../../Build/$(TARGET)/$(TESTING_LIBRARY)/$(lastword $(subst /,\ ,$(CURDIR)))
+endif
 CFLAGS+= -I../ -I../../../Source/$(TESTING_LIBRARY) 
 CFLAGS+= -I../../../Lib/gtest-1.7.0/include
 

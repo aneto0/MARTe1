@@ -1,8 +1,7 @@
 #############################################################
 #
-# Copyright 2015 F4E | European Joint Undertaking for ITER 
-#  and the Development of Fusion Energy ('Fusion for Energy')
-# 
+# Copyright 2011 EFDA | European Fusion Development Agreement
+#
 # Licensed under the EUPL, Version 1.1 or - as soon they 
 # will be approved by the European Commission - subsequent  
 # versions of the EUPL (the "Licence"); 
@@ -20,33 +19,21 @@
 # See the Licence for the specific language governing 
 # permissions and limitations under the Licence. 
 #
-# $Id: Makefile.inc 3 2012-01-15 16:26:07Z aneto $
+# $Id: Makefile.linux 3 2012-01-15 16:26:07Z aneto $
 #
 #############################################################
 
-OBJSX=  LinkedListableTest.x         	
-		
+TARGET=gco
 
-MAKEDEFAULTDIR=../../MakeDefaults
+include Makefile.inc
 
-include $(MAKEDEFAULTDIR)/MakeStdLibDefs.$(TARGET)
+CPPFLAGS+= -fprofile-arcs -ftest-coverage -coverage
 
-TESTING_LIBRARY=L1CLib
+LIBRARIES   += ../../../Source/L0Portability/$(TARGET)/L0Portability$(LIBEXT) 
+LIBRARIES   += ../../../Source/$(TESTING_LIBRARY)/$(TARGET)/$(TESTING_LIBRARY)$(LIBEXT)
+LIBRARIES   += ../$(TARGET)/$(TESTING_LIBRARY)Test$(LIBEXT)
+LIBRARIES   += ../../../Lib/gtest-1.7.0/libgtest.a ../../../Lib/gtest-1.7.0/libgtest_main.a 
 
-ifeq ($(TARGET),gco)
-	BUILD_DIR=gco
-else
-	BUILD_DIR=../../Build/$(TARGET)/$(TESTING_LIBRARY)/Test
-endif
 
-CFLAGS+= -I../../Source/L0Portability
-CFLAGS+= -I../../Source/$(TESTING_LIBRARY)
-
-all: $(OBJS) \
-                $(BUILD_DIR)/$(TESTING_LIBRARY)Test$(LIBEXT)                 
-	echo  $(OBJS)
-
-include depends.$(TARGET)
-
-include $(MAKEDEFAULTDIR)/MakeStdLibRules.$(TARGET)
+OPTIM=-finline-functions
 

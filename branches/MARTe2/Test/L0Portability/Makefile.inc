@@ -46,7 +46,11 @@ include $(MAKEDEFAULTDIR)/MakeStdLibDefs.$(TARGET)
 
 TESTING_LIBRARY=L0Portability
 
-BUILD_DIR=../../Build/$(TARGET)/$(TESTING_LIBRARY)/Test
+ifeq ($(TARGET),gco)
+	BUILD_DIR=gco
+else
+	BUILD_DIR=../../Build/$(TARGET)/$(TESTING_LIBRARY)/Test
+endif
 CFLAGS+= -I../../Source/$(TESTING_LIBRARY)
 
 all: $(OBJS) \
