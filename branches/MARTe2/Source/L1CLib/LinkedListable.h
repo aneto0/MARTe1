@@ -164,7 +164,7 @@ public:
         }
         LinkedListable *list = this;
         while ((p != NULL) &&(list->next != NULL)){
-            if (sorter->Compare(list->next,p)<0){
+            if (sorter->Compare(list->next,p)>0){
                 LinkedListable *item = p;
                 p = p->next;
                 item->next = list->next;
@@ -189,7 +189,7 @@ public:
         }
         LinkedListable *list = this;
         while ((p != NULL) &&(list->next != NULL)){
-            if (sorter(list->next,p)<0){
+            if (sorter(list->next,p)>0){
                 LinkedListable *item = p;
                 p = p->next;
                 item->next = list->next;
