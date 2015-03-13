@@ -24,7 +24,10 @@
 #
 #############################################################
 
-OBJSX=  LinkedListableTest.x         	
+OBJSX=  LinkedListableTest.x \
+	BStringTest.x \
+	LinkedListHolderTest.x \
+	CStreamTest.x          	
 		
 
 MAKEDEFAULTDIR=../../MakeDefaults
