@@ -23,19 +23,18 @@
  *
  **/
 /**
- * @class LinkedListableTest
- * @brief Tests the LinkListable and Iterators associated functions.
+ * @class LinkedListHolderTest
+ * @brief Tests the LinkListHolder and Iterators associated functions.
  *
- * The test consists in adding, remove and sort elements in a list specified by LinkedListable class.
+ * The test consists in adding, remove and sort elements in a list specified by LinkedListHolder class.
  */
 
 #ifndef LINKEDLISTABLETEST_H_
 #define LINKEDLISTABLETEST_H_
 
-#include "LinkedListable.h"
+#include "LinkedListHolder.h"
 #include "Iterators.h"
-#include "Memory.h"
-
+#include "LinkedListableTest.h"
 
 /** Create a list of integers**/
 class IntegerList: public LinkedListable {
@@ -50,7 +49,6 @@ public:
 
     }
 };
-
 
 /** Create a sorter which sorts integers in a decrescent order. **/
 class SortDecrescent: public SortFilter {
@@ -86,28 +84,45 @@ public:
     }
 };
 
+/** Create a searcher to find integers in the list. **/
+class SearchGreatInteger: public SearchFilter {
+private:
+    uint32 searchIntNumber;
 
-/** Class used for tests. **/
-class LinkedListableTest {
 public:
 
- 
-
-    LinkedListableTest() {
- 
+    SearchGreatInteger(uint32 intNum) {
+        searchIntNumber = intNum;
     }
-    virtual ~LinkedListableTest() {
+
+    void ChangeSearchNumber(uint32 intNum) {
+        searchIntNumber = intNum;
+    }
+
+    bool Test(LinkedListable *data) {
+        return ((IntegerList*) (data))->intNumber > searchIntNumber;
+    }
+};
+
+/** Class used for tests. **/
+class LinkedListHolderTest {
+public:
+
+    LinkedListHolderTest() {
+
+    }
+    virtual ~LinkedListHolderTest() {
 
     }
 
     /**
-     * Inserts integers and sorts them in decrescent order. Then another list is created and it is merged with the first list with the sorted insert. 
+     * Inserts integers and lists of integers in different ways and sorts the final list in a decrescent order. 
      * @return true if all operations works correctly and the final list is sorted. **/
     bool TestInsertAndSorting();
 
-    /** Tests the add, extract and peek functions. 
-      * @return true if all operations works correctly. **/
-    bool TestAddAndRemove();
+    /** Tests the add, extract, peek and delete functions. 
+     * @return true if all operations works correctly. **/
+    bool TestAddRemoveAndSearch();
 };
 
 #endif /* LINKEDLISTABLETEST_H_ */
