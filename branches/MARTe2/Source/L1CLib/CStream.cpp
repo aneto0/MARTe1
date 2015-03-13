@@ -148,11 +148,11 @@ bool CPrintInt32(CStream *cs, int32 n, uint32 desiredSize, char desiredPadding,
     }
 
     if ((mode == 'i') || (mode == 'd')) {
-        int divid = 1000000000;
+        int divid = 1000000000;//////////////////////////////////////////
         // # of characters
         uint32 ccount = 10;
 
-        int na = n;
+        int na = n;//////////////////////////////////////////////////////
 
         if (n < 0) {
             na = -n;
@@ -198,7 +198,7 @@ bool CPrintInt32(CStream *cs, int32 n, uint32 desiredSize, char desiredPadding,
         // # of characters
         uint32 ccount = 10;
         uint32 na = n;
-        if (n != 0) {
+	if (n != 0) {
             while (divid > na) {
                 divid /= 10;
                 ccount--;
@@ -1014,8 +1014,8 @@ bool CGetStringToken(CStream *csIn, CStream *csOut, const char *terminator,
     if (found != NULL) {
         uint32 size = found - csIn->bufferPtr;
         CWrite(csOut, csIn->bufferPtr, size);
-        csIn->bufferPtr = found + strlen(found);
-        csIn->sizeLeft -= size + strlen(terminator);
+        csIn->bufferPtr = found + strlen(terminator);
+        csIn->sizeLeft -= (size + strlen(terminator));
         return True;
     }
     else if (csIn->sizeLeft > 0 && (csIn->sizeLeft != totalSize)) {
