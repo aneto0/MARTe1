@@ -22,6 +22,7 @@
 # $Id$
 #
 #############################################################
+
 ctags : %.cpp %.c %.h
 	ctags -R
 
@@ -60,13 +61,13 @@ $(BUILD_DIR)/%.exe : $(BUILD_DIR)/%.o
 $(BUILD_DIR)/%.ex : $(BUILD_DIR)/%.o $(OBJS)
 	$(COMPILER) $(LFLAGS) $(BUILD_DIR)/$*.o $(OBJS) $(LIBRARIES)  -o $(BUILD_DIR)/$*.ex
 
-depends.linux: dependsRaw.linux 
+depends.cov: dependsRaw.cov
 	@echo "/\.o:/s/^/$(subst /,\/,$(BUILD_DIR))\//" > CreateLinuxDepends.sed
-	sed -f CreateLinuxDepends.sed dependsRaw.linux >depends.linux
+	sed -f CreateLinuxDepends.sed dependsRaw.cov >depends.cov
 	rm -f CreateLinuxDepends.sed 
 
-dependsRaw.linux: 
-	$(COMPILER) $(INCLUDE) $(CPPFLAGS) $(CFLAGS) $(CFLAGSPEC) $(DEBUG) $(OPTIM) -MM -I. *.c* > dependsRaw.linux
+dependsRaw.cov: 
+	$(COMPILER) $(INCLUDE) $(CFLAGS) $(CFLAGSPEC) $(DEBUG) $(OPTIM) -MM -I. *.c* > dependsRaw.cov
 	@mkdir -p temp
 	@mkdir -p $(BUILD_DIR)
 
@@ -77,10 +78,12 @@ $(BUILD_DIR)/%.drv : $(BUILD_DIR)/%.o $(OBJS)
 	$(COMPILER) $(LFLAGS) -shared -fPIC $(OBJS) $(LIBRARIES) $(BUILD_DIR)/$*.o -o $@
 
 %.spb : 
-	$(MAKE) -C $* -f Makefile.$(TARGET) 
+	$(MAKE) -C $* -f Makefile.$(TARGET)
+
 
 %.spc : 
 	$(MAKE) -C $* -f Makefile.$(TARGET) clean
+
 
 clean:  $(SUBPROJC)
 	@rm -f depends*

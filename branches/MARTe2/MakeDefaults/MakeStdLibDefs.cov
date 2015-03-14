@@ -23,7 +23,7 @@
 #
 #############################################################
 
-BUILD_DIR=$(ROOT_DIR)/Build/$(TARGET)/$(PACKAGE)/$(lastword $(subst /,\ ,$(CURDIR)))
+BUILD_DIR=cov
 
 EXEEXT=.ex
 DLLEXT=.so
@@ -34,7 +34,6 @@ DRVEXT=.drv
 GAMEXT=.gam
 GCNOEXT=.gcno
 GCDAEXT=.gcda
-GCOVEXT=.gcov
 
 OBJS=   $(OBJSX:%.x=$(BUILD_DIR)/%.o) 
 OBJS2=  $(OBJSX2:%.x=$(BUILD_DIR)/%.o) 
@@ -52,11 +51,10 @@ MAKE     = make
 #-maltivec -mabi=altivec
 DEBUG = -g -ggdb
 OPTIM = 
-INCLUDE =
 LFLAGS = -Wl,--no-as-needed  
-CFLAGS = -fPIC -Wall
-CPPFLAGS = -fPIC -frtti -Wall
+CFLAGS = -fPIC -Wall -fprofile-arcs -ftest-coverage 
+CPPFLAGS = -fPIC -frtti -fprofile-arcs -ftest-coverage 
 CFLAGSPEC= -DARCHITECTURE=x86_gcc -DOPERATING_SYSTEM=Linux -DUSE_PTHREAD -pthread
-LIBRARIES =  -lm -lnsl -lpthread -lrt -lncurses -ldl
+LIBRARIES =  -lm -lnsl -lpthread -lrt -lncurses -ldl -lgcov
 .SUFFIXES:   .c  .cpp  .o .a .exe .ex .ex_ .so .gam
 

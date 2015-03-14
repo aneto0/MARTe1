@@ -2,7 +2,7 @@
 #
 # Copyright 2015 F4E | European Joint Undertaking for ITER 
 #  and the Development of Fusion Energy ('Fusion for Energy')
-#
+# 
 # Licensed under the EUPL, Version 1.1 or - as soon they 
 # will be approved by the European Commission - subsequent  
 # versions of the EUPL (the "Licence"); 
@@ -23,18 +23,23 @@
 # $Id: Makefile.inc 3 2012-01-15 16:26:07Z aneto $
 #
 #############################################################
-OBJSX=
-SPB    = Source/Core/L0Portability.x Source/Core/L1CLib.x\
-Test/Core/L0Portability.x Test/Core/L1CLib.x  \
-Test/GTest.x
- 
-MAKEDEFAULTDIR=MakeDefaults
 
-ROOT_DIR=.
+OBJSX=  BString.x \
+        CStream.x 
+
+PACKAGE=Core
+ROOT_DIR=../../..
+MAKEDEFAULTDIR=$(ROOT_DIR)/MakeDefaults
 include $(MAKEDEFAULTDIR)/MakeStdLibDefs.$(TARGET)
 
-all: $(OBJS) $(SUBPROJ)
+INCLUDE += -I.
+INCLUDE += -I../L0Portability
+
+all: $(OBJS)    \
+                $(BUILD_DIR)/L1CLib$(LIBEXT) 
 	echo  $(OBJS)
+
+include depends.$(TARGET)
 
 include $(MAKEDEFAULTDIR)/MakeStdLibRules.$(TARGET)
 
