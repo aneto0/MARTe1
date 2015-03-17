@@ -33,54 +33,60 @@
 
 // Iterators support
 /** A class that can handle a Queue of QueueAbles (FIFO). */
-class  QueueHolder: protected StackHolder {
+class QueueHolder: protected StackHolder {
 protected:
     /** */
     Queueable *insertionPoint;
 
 public:
     /** */
-    QueueHolder(){
+    QueueHolder() {
         insertionPoint = &llhRoot;
     }
 
     /** Return the oldest inserted element. */
-    Queueable *Oldest(){
+    Queueable *Oldest() {
         return List();
     }
 
     /** Return the first element. */
-    uint32 QueueSize(){
+    uint32 QueueSize() {
         return llhSize;
     }
 
     /** Insert an element or a list on the queue. */
-    void QueueAdd(Queueable *p){
+    void QueueAdd(Queueable *p) {
+        if (p == NULL) {
+            return;
+        }
         llhSize += p->Size();
         insertionPoint->Insert(p);
-        while(p->next != NULL) p = p->next;
+        while (p->next != NULL)
+            p = p->next;
         insertionPoint = p;
     }
 
     /** Insert an element or a list on the queue. */
-    void QueueInsert(Queueable *p){
+    void QueueInsert(Queueable *p) {
         ListInsert(p);
-        if (insertionPoint == &llhRoot) insertionPoint = p;
+        if (insertionPoint == &llhRoot && p != NULL)
+            insertionPoint = p;
     }
 
     /** Removes the oldest elemnt from the queue. */
-    Queueable *QueueExtract(){
+    Queueable *QueueExtract() {
         Queueable *p = StackPop();
-        if (llhRoot.next == NULL) insertionPoint = &llhRoot;
+        if (llhRoot.next == NULL)
+            insertionPoint = &llhRoot;
         return p;
     }
 
     /** Removes from the middle. */
-    bool QueueExtract(Queueable *p){
+    bool QueueExtract(Queueable *p) {
         bool ret = ListExtract(p);
         if (p == insertionPoint) {
             insertionPoint = &llhRoot;
-            while(insertionPoint->next != NULL){
+            while (insertionPoint->next != NULL) {
                 insertionPoint = insertionPoint->next;
             }
         }
@@ -88,23 +94,23 @@ public:
     }
 
     /** Looks into the queue. */
-    Queueable *QueuePeek(uint32 index){
+    Queueable *QueuePeek(uint32 index) {
         return ListPeek(llhSize - index - 1);
     }
 
     /** Looks into the queue to the last element inserted. */
-    Queueable *QueuePeekLast(){
+    Queueable *QueuePeekLast() {
         return insertionPoint;
     }
 
     /** Reset the queue. */
-    void Reset(){
+    void Reset() {
         LinkedListHolder::Reset();
         insertionPoint = &llhRoot;
     }
 
     /** Insert in the first location the element p. */
-    inline void FastQueueInsertSingle(LinkedListable &p){
+    inline void FastQueueInsertSingle(LinkedListable &p) {
         llhSize++;
         insertionPoint->next = &p;
         insertionPoint = &p;
