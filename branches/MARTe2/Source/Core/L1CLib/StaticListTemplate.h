@@ -36,7 +36,7 @@ class StaticListTemplate:protected StaticListHolder {
 
 public:
 
-    /** the constructor sets aitomatically the object size */
+    /** the constructor sets automatically the object size */
                         StaticListTemplate(TimeoutType  msecTimeout = TTInfiniteWait){
         this->elementSize = sizeof(T)/sizeof(intptr);
         this->msecTimeout = msecTimeout;
@@ -73,7 +73,7 @@ public:
     }
 
     /** Add a the top */
-    inline void         ListInsert(const T &element){
+    inline bool         ListInsert(const T &element){
         return StaticListHolder::ListAdd((const intptr *)&element,SLH_StartOfList);
     }
 
