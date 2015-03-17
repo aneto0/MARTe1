@@ -27,6 +27,10 @@
 OBJSX=  LinkedListableTest.x \
 	BStringTest.x \
 	LinkedListHolderTest.x \
+	StaticListHolderTest.x \
+	StaticListTemplateTest.x \
+	StaticQueueHolderTest.x \
+	StaticStackHolderTest.x \
 	CStreamTest.x          	
 		
 PACKAGE=Core
