@@ -43,6 +43,10 @@ OBJSX=  EndianityGTest.x \
 	LinkedListableGTest.x \
 	BStringGTest.x \
 	LinkedListHolderGTest.x \
+	StaticListHolderGTest.x \
+	StaticListTemplateGTest.x \
+	StaticQueueHolderGTest.x \
+	StaticStackHolderGTest.x \
 	CStreamGTest.x 		
 
 PACKAGE=
