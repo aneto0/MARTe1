@@ -13,7 +13,7 @@
    basic types also include exotic definitions like 23 bit integers
    see BasicTypeEnumerated for more information
 */
-typedef struct {
+typedef struct TypeDescriptor {
 
     /** 
 	    if True then the data is a structure or class and its definition 
@@ -47,6 +47,15 @@ typedef struct {
         unsigned int structuredDataIdCode:14;
 		
     };
+
+    bool operator==(const TypeDescriptor &typeDescriptor) const {
+        if(isStructuredData){
+            return structuredDataIdCode == typeDescriptor.structuredDataIdCode;
+        }
+        bool sameType = (type == typeDescriptor.type);
+        bool sameSize = (size == typeDescriptor.size);
+        return (sameType && sameType);
+    }
 } TypeDescriptor;
 
 /// describes int8

@@ -1,14 +1,13 @@
 #if !defined (TYPED_CONVERSION)
 #define TYPED_CONVERSION
 
-#include "TypedPointer.h"
+#include "AnyType.h"
 #include "FormatDescriptor.h"
+#include "CStream.h"
 
-class CStream{
-};
 /** 
 */
-bool TypeConvert(const TypedPointer &destination, const TypedPointer& source, const FormatDescriptor &conversionFormat ){
+bool TypeConvert(const AnyType &destination, const AnyType& source, const FormatDescriptor &conversionFormat ){
 
     return false;
 }
@@ -16,14 +15,13 @@ bool TypeConvert(const TypedPointer &destination, const TypedPointer& source, co
 
 /** 
 */
-bool TypePrint(CStream &output, const char *format, const TypedPointer& par1){
-    printf(format, *((char *)par1.dataPointer));
+bool TypePrint(CStream &output, const char *format, const AnyType& par1){
     return false;
 }
 
 /** 
 */
-bool TypePrint(CStream &output, const char *format, const TypedPointer& par1, const TypedPointer& par2 ){
+bool TypePrint(CStream &output, const char *format, const AnyType& par1, const AnyType& par2 ){
 
     return false;
 }

@@ -8,7 +8,7 @@
    a pointer and a type descriptor
    used to process data on the basis of its type
 */
-class TypedPointer{
+class AnyType{
 public:
 	
     /// data may be RW or RO
@@ -22,30 +22,30 @@ public:
 	
 public:
 	/// constructor from an integer 8 bit
-    TypedPointer(const int8 &i){
+    AnyType(const int8 &i){
 		dataPointer = (void *) &i; 
 		dataDescriptor = TDConstSignedInteger8Bit;
 	}   	
 
 	/// constructor from an integer 8 bit
-    TypedPointer(int8 &i){
+    AnyType(int8 &i){
 		dataPointer = &i;
 		dataDescriptor = TDSignedInteger8Bit;
 	}   	
 
 	/// constructor from an integer 8 bit
-    TypedPointer(uint8 &i){
+    AnyType(uint8 &i){
 		dataPointer = &i;
 		dataDescriptor = TDUnsignedInteger8Bit;
 	}   	
 	/// constructor from an integer 8 bit
-    TypedPointer(int16 &i){
+    AnyType(int16 &i){
 		dataPointer = &i;
 		dataDescriptor = TDSignedInteger16Bit;
 	}   	
 
 	/// constructor from an integer 8 bit
-    TypedPointer(uint16 &i){
+    AnyType(uint16 &i){
 		dataPointer = &i;
 		dataDescriptor = TDUnsignedInteger16Bit;
 	}   	
