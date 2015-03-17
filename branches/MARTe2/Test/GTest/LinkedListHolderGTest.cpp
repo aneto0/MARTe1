@@ -31,3 +31,8 @@ TEST_F(LinkedListHolderGTest,TestAddRemoveAndSearch) {
     LinkedListHolderTest linkedlistholdertest;
     ASSERT_TRUE(linkedlistholdertest.TestAddRemoveAndSearch());
 }
+
+TEST_F(LinkedListHolderGTest,TestNULLConditions) {
+    LinkedListHolderTest linkedlistholdertest;
+    ASSERT_TRUE(linkedlistholdertest.TestNULLConditions());
+}

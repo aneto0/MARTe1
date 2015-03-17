@@ -29,12 +29,11 @@
  * The test consists in adding, remove and sort elements in a list specified by LinkedListHolder class.
  */
 
-#ifndef LINKEDLISTABLETEST_H_
-#define LINKEDLISTABLETEST_H_
+#ifndef LINKEDLISTHOLDERTEST_H_
+#define LINKEDLISTHOLDERTEST_H_
 
 #include "LinkedListHolder.h"
 #include "Iterators.h"
-#include "LinkedListableTest.h"
 
 /** Create a list of integers**/
 class IntegerList: public LinkedListable {
@@ -47,6 +46,21 @@ public:
 
     ~IntegerList() {
 
+    }
+};
+
+class SumIterator: public Iterator {
+private:
+    int32 toSum;
+
+public:
+
+    SumIterator(int32 number) {
+        toSum = number;
+    }
+    void Do(LinkedListable *data) {
+        IntegerList* dataInt = (IntegerList*) data;
+        dataInt->intNumber += toSum;
     }
 };
 
@@ -120,10 +134,16 @@ public:
      * @return true if all operations works correctly and the final list is sorted. **/
     bool TestInsertAndSorting();
 
-    /** Tests the add, extract, peek and delete functions. 
+    /** 
+     * Tests the add, extract, peek and delete functions. 
      * @return true if all operations works correctly. **/
     bool TestAddRemoveAndSearch();
+
+    /** 
+     * Tests the behavior of many functions with NULL passed by argument.
+     * @return true if all functions returns as expected (and without segmentation faults). **/
+    bool TestNULLConditions();
 };
 
-#endif /* LINKEDLISTABLETEST_H_ */
+#endif 
 

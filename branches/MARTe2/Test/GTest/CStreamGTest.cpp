@@ -1,5 +1,5 @@
 /*
- *  ThreadsDatabaseGTest.cpp
+ *  CStreamGTest.cpp
  *
  *  Created on: Mar 10, 2015
  */

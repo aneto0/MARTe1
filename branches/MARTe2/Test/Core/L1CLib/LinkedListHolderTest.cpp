@@ -25,17 +25,12 @@
 
 #include "LinkedListHolderTest.h"
 
-
 bool LinkedListHolderTest::TestInsertAndSorting() {
 
     IntegerList myRoot;
-    myRoot.intNumber = 0;
-    IntegerList* current;
+    IntegerList* current = &myRoot;
+    ;
     IntegerList* another;
-    current = &myRoot;
-    IntegerList* myInt1;
-    IntegerList* myInt2;
-    IntegerList* myInt3;
 
     //Create three lists.
     LinkedListHolder* listOne = new LinkedListHolder();
@@ -54,11 +49,11 @@ bool LinkedListHolderTest::TestInsertAndSorting() {
 
     //Insert integers in lists in different ways. In the list1 they are added in the queue, in the list2 and list3 on the top.
     for (uint32 i = 0; i < 11; i++) {
-        myInt1 = new IntegerList();
+        IntegerList* myInt1 = new IntegerList();
         myInt1->intNumber = i;
-        myInt2 = new IntegerList();
+        IntegerList* myInt2 = new IntegerList();
         myInt2->intNumber = i;
-        myInt3 = new IntegerList();
+        IntegerList* myInt3 = new IntegerList();
         myInt3->intNumber = i;
         myRoot.Insert(myInt2);
         //Insert an element at the end (the position is > of the size).
@@ -75,6 +70,9 @@ bool LinkedListHolderTest::TestInsertAndSorting() {
     lSizeThree = listThree->ListSize();
 
     if (lSizeOne != 11 || lSizeTwo != 11 || lSizeThree != 11) {
+        delete listOne;
+        delete listTwo;
+        delete listThree;
         return False;
     }
 
@@ -82,18 +80,26 @@ bool LinkedListHolderTest::TestInsertAndSorting() {
     for (uint32 i = 0; i < lSizeOne; i++) {
         current = (IntegerList*) (listOne->ListPeek(i));
         if (current->intNumber != i) {
+            delete listOne;
+            delete listTwo;
+            delete listThree;
             return False;
         }
         current = (IntegerList*) (listTwo->ListPeek(lSizeOne - i - 1));
         if (current->intNumber != i) {
+            delete listOne;
+            delete listTwo;
+            delete listThree;
             return False;
         }
         current = (IntegerList*) (listThree->ListPeek(lSizeOne - i - 1));
         if (current->intNumber != i) {
+            delete listOne;
+            delete listTwo;
+            delete listThree;
             return False;
         }
     }
-
 
     //Insert the list2 on the top of list1. 
     listOne->ListInsertL(listTwo);
@@ -101,6 +107,7 @@ bool LinkedListHolderTest::TestInsertAndSorting() {
 
     //Check if the size is correct.
     if (lSizeOne != 2 * lSizeTwo) {
+        delete listOne;
         return False;
     }
 
@@ -110,6 +117,7 @@ bool LinkedListHolderTest::TestInsertAndSorting() {
         another = (IntegerList*) (listOne->ListPeek(lSizeOne - i - 1));
         uint32 tmp = current->intNumber;
         if (tmp != another->intNumber || tmp != (lSizeTwo - i - 1)) {
+            delete listOne;
             return False;
         }
     }
@@ -127,9 +135,9 @@ bool LinkedListHolderTest::TestInsertAndSorting() {
     lSizeOne++;
     if (current->intNumber != newElement->intNumber
             || lSizeOne != listOne->ListSize()) {
+        delete listOne;
         return False;
     }
-
 
     //Insert the number 11 in the position 19. The insert function take a linkedlistholder by argument 
     aPosition = 19;
@@ -145,6 +153,7 @@ bool LinkedListHolderTest::TestInsertAndSorting() {
     lSizeOne++;
     if (current->intNumber != newElement->intNumber
             || lSizeOne != listOne->ListSize()) {
+        delete listOne;
         return False;
     }
 
@@ -156,10 +165,12 @@ bool LinkedListHolderTest::TestInsertAndSorting() {
     for (uint32 i = 0; i < (lSizeOne - 1); i++) {
         current = (IntegerList*) (listOne->ListPeek(i));
         another = (IntegerList*) (listOne->ListPeek(i + 1));
-        if (current == NULL || another == NULL)
+        if (current == NULL || another == NULL) {
             return False;
-
+            delete listOne;
+        }
         if (another->intNumber > current->intNumber) {
+            delete listOne;
             return False;
         }
     }
@@ -172,13 +183,17 @@ bool LinkedListHolderTest::TestInsertAndSorting() {
     for (uint32 i = 0; i < (lSizeOne - 1); i++) {
         current = (IntegerList*) (listOne->ListPeek(i));
         another = (IntegerList*) (listOne->ListPeek(i + 1));
-        if (current == NULL || another == NULL)
+        if (current == NULL || another == NULL) {
+            delete listOne;
             return False;
-
+        }
         if (another->intNumber > current->intNumber) {
+            delete listOne;
             return False;
         }
     }
+
+    delete listOne;
     return True;
 
 }
@@ -187,19 +202,15 @@ bool LinkedListHolderTest::TestAddRemoveAndSearch() {
 
     //Create a new listlinkholder.
     IntegerList myRoot;
-    myRoot.intNumber = 0;
-    IntegerList* current;
-    current = &myRoot;
-    IntegerList* myInt1;
-    IntegerList* myInt2;
+    IntegerList* current = &myRoot;
 
     LinkedListHolder* listOne = new LinkedListHolder();
     uint32 initialSize = 10;
 
     //Add elements on by one on the queue of the listlinkable and of the linklistholder. 
     for (uint32 i = 1; i < (initialSize + 1); i++) {
-        myInt1 = new IntegerList();
-        myInt2 = new IntegerList();
+        IntegerList* myInt1 = new IntegerList();
+        IntegerList* myInt2 = new IntegerList();
         myInt1->intNumber = initialSize + i;
         myInt2->intNumber = i;
         listOne->ListAdd(myInt2);
@@ -210,6 +221,7 @@ bool LinkedListHolderTest::TestAddRemoveAndSearch() {
     uint32 lSizeOne = listOne->ListSize();
 
     if (lSizeOne != initialSize) {
+        delete listOne;
         return False;
     }
 
@@ -219,6 +231,7 @@ bool LinkedListHolderTest::TestAddRemoveAndSearch() {
     //Check again if the dimension is correct
     lSizeOne = listOne->ListSize();
     if (lSizeOne != (2 * initialSize)) {
+        delete listOne;
         return False;
     }
 
@@ -226,22 +239,25 @@ bool LinkedListHolderTest::TestAddRemoveAndSearch() {
     for (uint32 i = 0; i < lSizeOne; i++) {
         current = (IntegerList*) (listOne->ListPeek(i));
         if (current->intNumber != (i + 1)) {
+            delete listOne;
             return False;
         }
     }
-
 
     //Peek the fifth element from the list and test the function search which should return true.
     uint32 aNumber = 5;
     current = (IntegerList*) listOne->ListPeek(aNumber);
     if (!listOne->ListSearch(current)) {
+        delete listOne;
         return False;
     }
 
-    //Create a new element without inserting its in the list and test the search function on this element. It should return false.
+    //Create a new element without inserting it in the list and test the search function on this element. It should return false.
     current = new IntegerList();
     current->intNumber = aNumber;
     if (listOne->ListSearch(current)) {
+        delete current;
+        delete listOne;
         return False;
     }
 
@@ -250,22 +266,31 @@ bool LinkedListHolderTest::TestAddRemoveAndSearch() {
     //Initialize a searcher for the integer 5.
     aNumber = 5;
     SearchInteger mySearcher(aNumber);
-    
+
     //Extract the integer 5 from the list. This tests the extract function with a sorter passed by argument.
-    listOne->ListExtract(&mySearcher);
+    current = (IntegerList*) (listOne->ListExtract(&mySearcher));
 
     //Since there are not other 5 in the list, the search must return NULL.
-    if (listOne->ListSearch(&mySearcher)!= NULL) {
+    if (listOne->ListSearch(&mySearcher) != NULL) {
+        delete current;
+        delete listOne;
         return False;
     }
 
-    //Test the extract function with the position in the list passed by argument. The integer 4 should be in the position 3 of the list (position begin from 0)
+    delete current;
+
+    //Test the extract function with the position in the list passed by argument. The integer 4 should be 
+    //in the position 3 of the list (position begin from 0)
     mySearcher.ChangeSearchNumber(aNumber - 1);
     current = (IntegerList*) (listOne->ListExtract(aNumber - 2));
 
-    if (listOne->ListSearch(&mySearcher)!= NULL) {
+    if (listOne->ListSearch(&mySearcher) != NULL) {
+        delete current;
+        delete listOne;
         return False;
     }
+
+    delete current;
 
     //Test the delete function with the pointer of the element passed by argument. Delete the integer 10 from the list.
     aNumber = 10;
@@ -273,30 +298,33 @@ bool LinkedListHolderTest::TestAddRemoveAndSearch() {
     current = (IntegerList*) (listOne->ListSearch(&mySearcher));
 
     if (current == NULL) {
+        delete listOne;
         return False;
     }
 
     listOne->ListDelete(current);
     if (listOne->ListSearch(&mySearcher) != NULL) {
+        delete listOne;
         return False;
     }
 
-    //Test the delete function with a searcher in the argument. Delete all integers greater than 15.
+    //Test the delete function with a searcher in the argument. Delete all integers greater than aNumber.
     aNumber = 15;
     SearchGreatInteger myDeleterSearcher(aNumber);
 
     listOne->ListDelete(&myDeleterSearcher);
     lSizeOne = listOne->ListSize();
 
-    //Check that all integers int the list are minor or equal to 15.
+    //Check that all integers int the list are minor or equal to aNumber.
     for (uint32 i = 0; i < lSizeOne; i++) {
         current = (IntegerList*) (listOne->ListPeek(i));
         if ((current->intNumber) > aNumber) {
+            delete listOne;
             return False;
         }
     }
 
-    //Test the ListSafeDelete function deleting all integers greater than 9 from the list.
+    //Test the ListSafeDelete function deleting all integers greater than aNumber from the list.
     aNumber = 9;
     myDeleterSearcher.ChangeSearchNumber(aNumber);
 
@@ -306,10 +334,104 @@ bool LinkedListHolderTest::TestAddRemoveAndSearch() {
     for (uint32 i = 0; i < lSizeOne; i++) {
         current = (IntegerList*) (listOne->ListPeek(i));
         if ((current->intNumber) > aNumber) {
+            delete listOne;
             return False;
         }
     }
 
+    //Test the Iterate function with an iterator that sums aNumber to each element of the list.
+    SumIterator mySumIterator(aNumber);
+
+    listOne->ListIterate(&mySumIterator);
+
+    //Test that all elements are greater or equal to aNumber.
+    for (uint32 i = 0; i < lSizeOne; i++) {
+        current = (IntegerList*) (listOne->ListPeek(i));
+        if ((current->intNumber) < aNumber) {
+            delete listOne;
+            return False;
+        }
+    }
+
+    delete listOne;
     return True;
 }
 
+bool LinkedListHolderTest::TestNULLConditions() {
+    LinkedListHolder* listOne = new LinkedListHolder;
+
+    if (listOne->ListSize() != 0) {
+        return False;
+    }
+
+    //Test Add and Insert functions with NULL as argument.
+    listOne->ListInsert(NULL);
+    listOne->ListInsertL(NULL);
+    listOne->ListAdd(NULL);
+    listOne->ListAddL(NULL);
+    listOne->ListInsertL(NULL, (SortFilter *) NULL);
+    listOne->ListInsertL(NULL, (SortFilterFn *) NULL);
+
+    //Check if the size remains zero.
+    if (listOne->ListSize() != 0) {
+        return False;
+    }
+
+    //Add ten elements to the List.
+    for (uint32 i = 0; i < 10; i++) {
+        IntegerList* myInt = new IntegerList();
+        myInt->intNumber = i;
+        listOne->ListAdd(myInt);
+    }
+
+    //Test Extract functions with index out of bounds and with NULL as argument.
+    if (listOne->ListExtract(11) != NULL) {
+        delete listOne;
+        return False;
+    }
+
+    if (listOne->ListExtract((LinkedListable*) NULL)) {
+        return False;
+    }
+
+    if (listOne->ListExtract((SearchFilter*) NULL) != NULL) {
+        delete listOne;
+        return False;
+    }
+
+    //Test Peek function with index out of bounds.
+    if (listOne->ListPeek(11) != NULL) {
+        delete listOne;
+        return False;
+    }
+
+    //Test Delete functions with NULL as argument.
+    if (listOne->ListDelete((LinkedListable*) NULL)) {
+        delete listOne;
+        return False;
+    }
+
+    if (listOne->ListDelete((SearchFilter*) NULL)) {
+        return False;
+    }
+
+    if (listOne->ListSafeDelete(NULL)) {
+        delete listOne;
+        return False;
+    }
+
+    //Test Search function with NULL as argument.
+    if (listOne->ListSearch((SearchFilter*) NULL) != NULL) {
+        delete listOne;
+        return False;
+    }
+
+    //Check if the dimension of the list remains 10.
+    if (listOne->ListSize() != 10) {
+        return False;
+    }
+
+    delete listOne;
+    return True;
+
+}

@@ -20,6 +20,11 @@ protected:
     }
 };
 
+TEST_F(BStringGTest,TestFSReadAndFSWrite) {
+    BStringTest bstringtest;
+    ASSERT_TRUE(bstringtest.TestFSReadAndFSWrite());
+}
+
 TEST_F(BStringGTest,TestStringOperators) {
     BStringTest bstringtest;
     ASSERT_TRUE(bstringtest.TestStringOperators("Hello","World"));

@@ -114,7 +114,7 @@ void FreeAll(CStream* p){
 bool CStreamTest::TestCPut(char c){
 	myContext.buffGranularity=4;
 
-	//Allocate space.ù
+	//Allocate space.
 	myCStream.NewBuffer(&myCStream);
 	char* begin=myCStream.bufferPtr;
 
@@ -492,7 +492,6 @@ bool CStreamTest::TestCPrintf(){
 
 	//print a double on stream. The default numbers after the point are 6
 	string="Double number: 199.900000";
-	myCStream.NewBuffer(&myCStream);
 	begin=myCStream.bufferPtr;
 	CPrintf(&myCStream, "Double number: %f", 199.9);
 	CPut(&myCStream,'\0');	
@@ -585,17 +584,14 @@ bool CStreamTest::TokenTest(){
 	CGetCStringToken((const char*&)input, buffer, ":.", size);
 
 	if(!stringComp((char*)buffer,(char*) "Nome")){
-		FreeAll(&myCStream);
 		return False;
 	}
 	CGetCStringToken((const char*&)input, buffer, ":.", size);
 	if(!stringComp((char*)buffer,(char*) " Giuseppe")){
-		FreeAll(&myCStream);
 		return False;
 	}
 	CGetCStringToken((const char*&)input, buffer, ":.", size);
 	if(!stringComp((char*)buffer,(char*) " Cognome")){
-		FreeAll(&myCStream);
 		return False;
 	}
 	char saveTerminator;
@@ -605,14 +601,12 @@ bool CStreamTest::TokenTest(){
 	input=begin;
 	char* p=CDestructiveGetCStringToken((char *&)input, ":.", &saveTerminator,":");
 	if(!stringComp((char*)p,(char*) "Nome") || saveTerminator!=':'){
-		FreeAll(&myCStream);
 		return False;
 	}	
 
 	//Restore the terminator char in the string
 	input--;
 	if(*input!=0){
-		FreeAll(&myCStream);
 		return False;
 	}
 	*input=saveTerminator;
@@ -624,7 +618,6 @@ bool CStreamTest::TokenTest(){
 	//Impose null skip. The function skips consecutive terminators automatically
 	p=CDestructiveGetCStringToken((char *&)input, ":.", &saveTerminator,NULL);
 	if(!stringComp((char*)p,(char*) " Giuseppe") || saveTerminator!='.'){
-		FreeAll(&myCStream);
 		return False;
 	}
 	input--;
@@ -635,7 +628,6 @@ bool CStreamTest::TokenTest(){
 	input=newBegin;	
 	p=CDestructiveGetCStringToken((char *&)input, ":.", &saveTerminator,":");
 	if(!stringComp((char*)p,(char*) " Giuseppe") || saveTerminator!='.'){
-		FreeAll(&myCStream);
 		return False;
 	}
 
@@ -646,7 +638,6 @@ bool CStreamTest::TokenTest(){
 	input=newBegin;	
 	p=CDestructiveGetCStringToken((char *&)input, ":.", &saveTerminator,".");
 	if(!stringComp((char*)p,(char*) "")){
-		FreeAll(&myCStream);
 		return False;
 	}
 
@@ -658,14 +649,13 @@ bool CStreamTest::TokenTest(){
 		p=CDestructiveGetCStringToken((char *&)newBegin, ":.", &saveTerminator,NULL);
 	}
 	if(!stringComp((char*)p,(char*) ")")){
-		FreeAll(&myCStream);
 		return False;
 	}
 
 
 
-	
 	//TESTS ON TOKEN FUNCTIONS BETWEEN A CSTREAM AND A STRING
+	myCStream.NewBuffer=FakeNewBuffer;
 	myCStream.NewBuffer(&myCStream);
 	myCStream.bufferPtr=(char*)"Nome:: Giuseppe. Cognome: Ferrò:)";
 	
@@ -763,7 +753,7 @@ bool CStreamTest::TokenTest(){
 	CGetStringToken(&inputCStream, &outputCStream, ":: ", totalSize);
 	CPut(&outputCStream,'\0');
 	if(!stringComp((char*)output,(char*) "Nome")){
-		FreeAll(&myCStream);
+		FreeAll(&outputCStream);
 		return False;
 	}
 
@@ -771,7 +761,7 @@ bool CStreamTest::TokenTest(){
 	CGetStringToken(&inputCStream, &outputCStream, ":: ", totalSize);
 	CPut(&outputCStream,'\0');
 	if(!stringComp((char*)output,(char*) "Giuseppe. Cognome")){
-		FreeAll(&myCStream);
+		FreeAll(&outputCStream);
 		return False;
 	}
 
@@ -784,7 +774,7 @@ bool CStreamTest::TokenTest(){
 	CGetStringToken(&inputCStream, &outputCStream, ":: ", totalSize);
 	CPut(&outputCStream,'\0');
 	if(!stringComp((char*)output,(char*) "Fer")){
-		FreeAll(&myCStream);
+		FreeAll(&outputCStream);
 		return False;
 	}
 
@@ -795,7 +785,7 @@ bool CStreamTest::TokenTest(){
 	CGetCSToken(&inputCStream, &outputCStream, ":.", &saveTerminator, ":"); 
 	CPut(&outputCStream,'\0');
 	if(!stringComp((char*)output,(char*) "Nome")){
-		FreeAll(&myCStream);
+		FreeAll(&outputCStream);
 		return False;
 	}
 	
@@ -804,7 +794,7 @@ bool CStreamTest::TokenTest(){
 	CGetCSToken(&inputCStream, &outputCStream, ":.", &saveTerminator, ":"); 
 	CPut(&outputCStream,'\0');
 	if(!stringComp((char*)output,(char*) " Giuseppe")){
-		FreeAll(&myCStream);
+		FreeAll(&outputCStream);
 		return False;
 	}
 	CGetCSToken(&inputCStream, &outputCStream, ":", &saveTerminator, NULL); 
@@ -814,7 +804,7 @@ bool CStreamTest::TokenTest(){
 	CGetCSToken(&inputCStream, &outputCStream, ":.", &saveTerminator, "."); 
 	CPut(&outputCStream,'\0');
 	if(!stringComp((char*)output,(char*) "")){
-		FreeAll(&myCStream);
+		FreeAll(&outputCStream);
 		return False;
 	}
 
@@ -823,7 +813,7 @@ bool CStreamTest::TokenTest(){
 	CGetCSToken(&inputCStream, &outputCStream, "", &saveTerminator, NULL); 
 	CPut(&outputCStream,'\0');
 	if(!stringComp((char*)output,(char*) " Ferrò:)")){
-		FreeAll(&myCStream);
+		FreeAll(&outputCStream);
 		return False;
 	}
 
@@ -835,11 +825,10 @@ bool CStreamTest::TokenTest(){
 	CGetCSToken(&inputCStream, &outputCStream, ")", &saveTerminator, NULL); 
 	CPut(&outputCStream,'\0');
 	if(!stringComp((char*)output,(char*) ": Ferrò:")){
-		FreeAll(&myCStream);
+		FreeAll(&outputCStream);
 		return False;
 	}
-	
-	FreeAll(&myCStream);
+	FreeAll(&outputCStream);
 	return True;
 }
 

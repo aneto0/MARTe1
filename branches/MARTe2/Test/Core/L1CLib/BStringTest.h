@@ -42,6 +42,11 @@ public:
 
     BStringTest() {
     }
+     
+    /**
+     * Tests FSRead() and FSWrite() functions copying a char buffer on the BString and the contrary.
+     * @return true if the functions works as expected. **/
+    bool TestFSReadAndFSWrite();
 
     /**
      * Tests the operators and the functions between const char* and BStrings.

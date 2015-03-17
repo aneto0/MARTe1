@@ -24,7 +24,96 @@
 
 #include "GeneralDefinitions.h"
 #include "BStringTest.h"
-#include "StringTestHelper.h"
+
+//Returns the size of the string.
+uint32 sizeOfString(char* string) {
+    uint32 i = 0;
+    if (string == NULL) {
+        return -1;
+    }
+
+    while (string[i] != '\0') {
+        i++;
+    }
+    return i;
+}
+
+//Returns true if the strings are equal, false otherwise
+bool stringCompare(char* string1, char* string2) {
+    int32 i = 0;
+    while (1) {
+        if (string1[i] != string2[i]) {
+            return False;
+        }
+        if (string1[i] == '\0' && string2[i] == '\0') {
+            return True;
+        }
+        if (string1[i] == '\0' || string2[i] == '\0') {
+            return False;
+        }
+        i++;
+    }
+}
+
+//Concatenate two strings
+bool stringAppend(char* string1, char* string2, char* result) {
+    int32 i = 0;
+    int32 j = 0;
+    while (1) {
+        result[i] = string1[i];
+        if (string1[i] == '\0') {
+            break;
+        }
+        i++;
+    }
+    while (1) {
+        result[i] = string2[j];
+        if (string2[j] == '\0') {
+            return True;
+        }
+        i++;
+        j++;
+    }
+}
+
+bool BStringTest::TestFSReadAndFSWrite() {
+
+    //Tests the copy of a BString on a char[] buffer with correct size.
+    BString myBString = "Hello";
+    char buffer[32];
+    uint32 size = 6;
+    FSRead(myBString, buffer, size);
+    if (!stringCompare((char*) myBString.Buffer(), (char*) buffer)) {
+        return False;
+    }
+
+    //Checks if the copy works correctly with a minor size.
+    size = 4;
+    FSRead(myBString, buffer, size);
+    buffer[4] = '\0';
+    if (!stringCompare((char*) "Hell", (char*) buffer)) {
+        return False;
+    }
+
+    //Tests the copy froma a char* string to a BString with the correct size (the terminated char is added by FSWrite)
+    BString newString;
+    const char* toCopy = "World";
+    size = 5;
+    FSWrite(newString, toCopy, size);
+    if (!stringCompare((char*) toCopy, (char*) (newString.Buffer()))) {
+        return False;
+    }
+
+    //Tests FSWrite with a minor size. Since the position of the BString is at the end, the new string is appended
+    //to the previous.
+    size = 3;
+    FSWrite(newString, toCopy, size);
+    if (!stringCompare((char*) "WorldWor", (char*) (newString.Buffer()))) {
+        return False;
+    }
+
+    return True;
+}
 
 bool BStringTest::TestStringOperators(const char* string1,
                                       const char* string2) {
@@ -34,8 +123,8 @@ bool BStringTest::TestStringOperators(const char* string1,
     BString stringTwo(string2);
 
     //Check if BString were initialized correctly
-    if (!(StringTestHelper::Compare((char*) stringOne.Buffer(), (char*) string1))
-            || !(StringTestHelper::Compare((char*) stringTwo.Buffer(), (char*) string2))) {
+    if (!(stringCompare((char*) stringOne.Buffer(), (char*) string1))
+            || !(stringCompare((char*) stringTwo.Buffer(), (char*) string2))) {
         return False;
     }
 
@@ -52,15 +141,15 @@ bool BStringTest::TestStringOperators(const char* string1,
     uint32 size2 = stringTwo.Size();
 
     //Check if the size of the BString is correct
-    if (size1 != StringTestHelper::Size((char*) string1)
-            || size2 != StringTestHelper::Size((char*) string2)) {
+    if (size1 != sizeOfString((char*) string1)
+            || size2 != sizeOfString((char*) string2)) {
         return False;
     }
 
     uint32 sizeConcatenate = size1 + size2;
 
     char result[sizeConcatenate + 2];
-    StringTestHelper::Append((char*) string1, (char*) string2, result);
+    stringAppend((char*) string1, (char*) string2, result);
 
     //Concatenate operator between BStrings
     BString Bresult;
@@ -68,7 +157,7 @@ bool BStringTest::TestStringOperators(const char* string1,
     Bresult += stringTwo;
 
     //Test if the concatenate operator works correctly
-    if (!(StringTestHelper::Compare(result, (char*) Bresult.Buffer()))) {
+    if (!(stringCompare(result, (char*) Bresult.Buffer()))) {
         return False;
     }
 
@@ -77,7 +166,7 @@ bool BStringTest::TestStringOperators(const char* string1,
     Bresult += string1;
     Bresult += string2;
 
-    if (!(StringTestHelper::Compare(result, (char*) Bresult.Buffer()))) {
+    if (!(stringCompare(result, (char*) Bresult.Buffer()))) {
         return False;
     }
 
@@ -113,12 +202,12 @@ bool BStringTest::TestStringOperators(const char* string1,
     }
 
     //Otherwise if the new size is bigger than before, the size be increased. The terminate character remains, then a printf of the previous and final BStrings
-    //give the same result (and also the insider function StringTestHelper::Compare which terminate the comparison at the first terminate character), but the equality operator
+    //give the same result (and also the insider function stringCompare which terminate the comparison at the first terminate character), but the equality operator
     //observes also the size of the BStrings then it returns that the two BStrings are different.
     Bresult = newBString;
     newBString.SetSize(10);
     if (newBString == Bresult
-            || !StringTestHelper::Compare((char*) Bresult.Buffer(),
+            || !stringCompare((char*) Bresult.Buffer(),
                               (char*) newBString.Buffer())) {
         return False;
     }
@@ -146,8 +235,8 @@ bool BStringTest::TestCharOperators(char char1, char char2) {
     char string2[] = { char2, '\0' };
 
     //Compare them with the BString Buffers
-    if (!(StringTestHelper::Compare((char*) stringOne.Buffer(), (char*) string1))
-            || !(StringTestHelper::Compare((char*) stringTwo.Buffer(), (char*) string2))) {
+    if (!(stringCompare((char*) stringOne.Buffer(), (char*) string1))
+            || !(stringCompare((char*) stringTwo.Buffer(), (char*) string2))) {
         return False;
     }
 
@@ -162,14 +251,14 @@ bool BStringTest::TestCharOperators(char char1, char char2) {
     int32 sizeConcatenate = size1 + size2;
 
     char result[sizeConcatenate + 2];
-    StringTestHelper::Append((char*) string1, (char*) string2, result);
+    stringAppend((char*) string1, (char*) string2, result);
 
     //Test the concatenate operator between BStrings 
     BString Bresult;
     Bresult += stringOne;
     Bresult += stringTwo;
 
-    if (!(StringTestHelper::Compare(result, (char*) Bresult.Buffer()))) {
+    if (!(stringCompare(result, (char*) Bresult.Buffer()))) {
         return False;
     }
     //Test the concatenate operator between BStrings and characters
@@ -177,7 +266,7 @@ bool BStringTest::TestCharOperators(char char1, char char2) {
     Bresult += char1;
     Bresult += char2;
 
-    if (!(StringTestHelper::Compare(result, (char*) Bresult.Buffer()))) {
+    if (!(stringCompare(result, (char*) Bresult.Buffer()))) {
         return False;
     }
 
