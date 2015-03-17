@@ -31,7 +31,10 @@ OBJSX=  LinkedListableTest.x \
 	StaticListTemplateTest.x \
 	StaticQueueHolderTest.x \
 	StaticStackHolderTest.x \
-	CStreamTest.x          	
+	CStreamTest.x \
+	ComplexTest.x \
+	StackHolderTest.x \
+	QueueHolderTest.x          	
 		
 PACKAGE=Core
 ROOT_DIR=../../..

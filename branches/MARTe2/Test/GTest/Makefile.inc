@@ -47,7 +47,10 @@ OBJSX=  EndianityGTest.x \
 	StaticListTemplateGTest.x \
 	StaticQueueHolderGTest.x \
 	StaticStackHolderGTest.x \
-	CStreamGTest.x 		
+	CStreamGTest.x \
+	ComplexGTest.x \
+	StackHolderGTest.x \
+	QueueHolderGTest.x 		
 
 PACKAGE=
 ROOT_DIR=../..
