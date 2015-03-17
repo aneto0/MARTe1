@@ -30,6 +30,8 @@
 #ifndef COMPLEX_H_
 #define COMPLEX_H_
 
+#include <math.h>
+
 class Complex {
 
     /** */
@@ -81,8 +83,14 @@ public:
      * @param r the real and complex value 
      */
     inline Complex(double r[2]) {
-        real = r[0];
-        imaginary = r[1];
+        if (r != NULL && (r + 1) != NULL) {
+            real = r[0];
+            imaginary = r[1];
+        }
+        else {
+            real = 0;
+            imaginary = 0;
+        }
     }
 
     /**
@@ -319,23 +327,23 @@ public:
         if (real > 0) {
             return arg;
         }
-        else if (imaginary > 0) {
-            return -3.1415 + arg;
+        else if (imaginary >= 0) {
+            return 3.1415 + arg;
         }
         else {
-            return 3.1415 + arg;
+            return -3.1415 + arg;
         }
 
     }
 
     inline friend const Complex sin(const Complex &x) {
-        return -1
-                * (cos(x.real) * sinh(x.imaginary)
-                        + sin(x.real) * cosh(x.imaginary));
+        return Complex(sin(x.real) * cosh(x.imaginary),
+                       cos(x.real) * sinh(x.imaginary));
     }
 
     inline friend const Complex cos(const Complex &x) {
-        return sin(x.real) * sinh(x.imaginary) - cos(x.real) * cosh(x.imaginary);
+        return Complex(cos(x.real) * cosh(x.imaginary),
+                       -sin(x.real) * sinh(x.imaginary));
     }
 
     inline friend const Complex exp(const Complex &x) {
@@ -364,7 +372,7 @@ public:
     inline friend const Complex Csqrt(double x) {
         if (x > 0)
             return Complex(sqrt(x), 0);
-        return Complex(0, sqrt(-x));
+        return Complex(0, -sqrt(x));
     }
 
     inline friend const Complex sqr(const Complex &x) {
