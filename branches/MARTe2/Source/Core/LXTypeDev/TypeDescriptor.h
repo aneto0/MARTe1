@@ -1,9 +1,34 @@
-#if !defined (TYPE_DESCRIPTOR)
+/*
+ * Copyright 2015 F4E | European Joint Undertaking for 
+ * ITER and the Development of Fusion Energy ('Fusion for Energy')
+ *
+ * Licensed under the EUPL, Version 1.1 or - as soon they 
+ will be approved by the European Commission - subsequent  
+ versions of the EUPL (the "Licence"); 
+ * You may not use this work except in compliance with the 
+ Licence. 
+ * You may obtain a copy of the Licence at: 
+ *  
+ * http://ec.europa.eu/idabc/eupl
+ *
+ * Unless required by applicable law or agreed to in 
+ writing, software distributed under the Licence is 
+ distributed on an "AS IS" basis, 
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
+ express or implied. 
+ * See the Licence  
+ permissions and limitations under the Licence. 
+ *
+ * $Id: $
+ *
+ **/
+/**
+ * @file
+ */
+#ifndef TYPE_DESCRIPTOR
 #define TYPE_DESCRIPTOR
 
-
-#include "BasicTypeEnumerated.h"
-
+#include "BasicType.h"
 
 /** 
    Used to describe the type pointed to by a pointer
@@ -11,7 +36,7 @@
    or the remaining bit can be used to identify a specific basic type
    basic types are ints 8-64 bit floats doubles char *
    basic types also include exotic definitions like 23 bit integers
-   see BasicTypeEnumerated for more information
+   see BasicType for more information
 */
 typedef struct TypeDescriptor {
 
@@ -34,7 +59,7 @@ typedef struct TypeDescriptor {
             /** 
 		the actual type of data
             */
-            BasicTypeEnumerated type:4;
+            BasicType::Enum type:4;
           
             /** 
 		the size in bytes or bits (bitset types)
@@ -54,36 +79,36 @@ typedef struct TypeDescriptor {
         }
         bool sameType = (type == typeDescriptor.type);
         bool sameSize = (size == typeDescriptor.size);
-        return (sameType && sameType);
+        return (sameType && sameSize);
     }
 } TypeDescriptor;
 
 /// describes int8
-const TypeDescriptor TDSignedInteger8Bit          = {  false, false, {{ BTDSignedInteger , 1}} };
+const TypeDescriptor SignedInteger8Bit          = {  False, False, {{ BasicType::SignedInteger , 1}} };
 
 /// describes uint8
-const TypeDescriptor TDUnsignedInteger8Bit        = { false, false, {{ BTDUnsignedInteger , 1}} };
+const TypeDescriptor UnsignedInteger8Bit        = { False, False, {{ BasicType::UnsignedInteger , 1}} };
 
 /// describes int16
-const TypeDescriptor TDSignedInteger16Bit         = { false, false, {{ BTDSignedInteger , 2}} };
+const TypeDescriptor SignedInteger16Bit         = { False, False, {{ BasicType::SignedInteger , 2}} };
 
 /// describes uint16
-const TypeDescriptor TDUnsignedInteger16Bit       = { false, false, {{ BTDUnsignedInteger , 2}} };
+const TypeDescriptor UnsignedInteger16Bit       = { False, False, {{ BasicType::UnsignedInteger , 2}} };
 
 /// describes int32
-const TypeDescriptor TDSignedInteger32Bit         = { false, false, {{ BTDSignedInteger , 4}} };
+const TypeDescriptor SignedInteger32Bit         = { False, False, {{ BasicType::SignedInteger , 4}} };
 
 /// describes uint32
-const TypeDescriptor TDUnsignedInteger32Bit       = { false, false, {{ BTDUnsignedInteger , 4}} };
+const TypeDescriptor UnsignedInteger32Bit       = { False, False, {{ BasicType::UnsignedInteger , 4}} };
 
 /// describes int64
-const TypeDescriptor TDSignedInteger64Bit         = { false, false, {{ BTDSignedInteger , 8}} };
+const TypeDescriptor SignedInteger64Bit         = { False, False, {{ BasicType::SignedInteger , 8}} };
 
 /// describes uint64
-const TypeDescriptor TDUnsignedInteger64Bit       = { false, false, {{ BTDUnsignedInteger , 8}} };
+const TypeDescriptor UnsignedInteger64Bit       = { False, False, {{ BasicType::UnsignedInteger , 8}} };
 
 /// describes const int8
-const TypeDescriptor TDConstSignedInteger8Bit     = { false, true , {{ BTDSignedInteger , 1}} };
+const TypeDescriptor ConstSignedInteger8Bit     = { False, True , {{ BasicType::SignedInteger , 1}} };
 
 #endif
 

@@ -1,64 +1,88 @@
-#if !defined (FORMAT_DESCRIPTOR)
-#define FORMAT_DESCRIPTOR 
-
+/*
+ * Copyright 2015 F4E | European Joint Undertaking for 
+ * ITER and the Development of Fusion Energy ('Fusion for Energy')
+ *
+ * Licensed under the EUPL, Version 1.1 or - as soon they 
+ will be approved by the European Commission - subsequent  
+ versions of the EUPL (the "Licence"); 
+ * You may not use this work except in compliance with the 
+ Licence. 
+ * You may obtain a copy of the Licence at: 
+ *  
+ * http://ec.europa.eu/idabc/eupl
+ *
+ * Unless required by applicable law or agreed to in 
+ writing, software distributed under the Licence is 
+ distributed on an "AS IS" basis, 
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
+ express or implied. 
+ * See the Licence  
+ permissions and limitations under the Licence. 
+ *
+ * $Id: $
+ *
+ **/
+/**
+ * @file
+ */
+#ifndef FORMAT_DESCRIPTOR_H
+#define FORMAT_DESCRIPTOR_H
 
 /** 
     Used to choose the float representtaion mode
 */
-enum FloatNotationEnumerated{
+struct FloatNotation{
+    enum Enum{
+        /** 
+          0.99  3.5 35000.2 etc...
+        */
+        FixedPointNotation  =   0,
 
+        /** 
+          9.9E-1 3.5E0 3.5E4 etc....
+        */
+        ExponentNotation    =   1,
 
-    /** 
-      0.99  3.5 35000.2 etc...
-    */
-    FMEFixedPointNotation  =   0,
+        /** 
+          990E-3 3.5E0 35E3 etc....
+        */
+        EngineeringNotation =   2,
 
-    /** 
-      9.9E-1 3.5E0 3.5E4 etc....
-    */
-    FMEExponentNotation    =   1,
-
-    /** 
-      990E-3 3.5E0 35E3 etc....
-    */
-    FMEEngineeringNotation =   2,
-
-    /** 
-      Most meaningful notation fitting within constraints
-      Choice among FixedPoint, Exponent Notation and Engineering notation with size symbols
-      3000 -> 3K  3.6E12  3.6T
-    */
-    FMESmartNotation       =   3
-
+        /** 
+          Most meaningful notation fitting within constraints
+          Choice among FixedPoint, Exponent Notation and Engineering notation with size symbols
+          3000 -> 3K  3.6E12  3.6T
+        */
+        SmartNotation       =   3
+    };
 };
 
+struct BinaryNotation{
+    enum Enum {
 
-enum BinaryNotationEnumerated{
+        /** 
+          print in the native format (integer base 10, float as ieee or whatever ....)
+        */
+        NormalNotation      =   0,
 
-    /** 
-      print in the native format (integer base 10, float as ieee or whatever ....)
-    */
-    BNENormalNotation      =   0,
+        /** 
+          print in hexadecimal -> the data pointed to by the pointer is treated as a char *
+          each character is printed as two hexes (0-F)
+        */
+        HexNotation         =   1,
 
-    /** 
-      print in hexadecimal -> the data pointed to by the pointer is treated as a char *
-      each character is printed as two hexes (0-F)
-    */
-    BNEHexNotation         =   1,
+        /** 
+          print in binary -> the data pointed to by the pointer is treated as a char *
+          each character is printed as 8 bits (0-1)
+        */
+        BitNotation         =   2,
 
-    /** 
-      print in binary -> the data pointed to by the pointer is treated as a char *
-      each character is printed as 8 bits (0-1)
-    */
-    BNEBitNotation         =   2,
-
-    /** 
-      print in octal -> the data pointed to by the pointer is treated as a uint24 *
-      each character is printed as three octals (0-7)
-    */
-    BNEOctalNotation       =   3
-
-
+        /** 
+          print in octal -> the data pointed to by the pointer is treated as a uint24 *
+          each character is printed as three octals (0-7)
+        */
+        OctalNotation       =   3
+    };
 };
 
 
@@ -81,10 +105,10 @@ typedef struct {
     bool                     leftAlign:1; 
 
     /// in case of a float, this field is used to determine how to print it
-    FloatNotationEnumerated  floatNotation:2;
+    FloatNotation::Enum      floatNotation:2;
 
     /// used for ints, floats, pointers, char * etc...
-    BinaryNotationEnumerated binaryNotation:2;
+    BinaryNotation::Enum     binaryNotation:2;
 
     /** in case of binaryNotation not 0 prepend the appropriate
         sequence of chars to indicate hex/binary or octal */
