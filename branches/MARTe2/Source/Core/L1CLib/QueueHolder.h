@@ -69,8 +69,12 @@ public:
     /** Insert an element or a list on the queue. */
     void QueueInsert(Queueable *p) {
         ListInsert(p);
-        if (insertionPoint == &llhRoot && p != NULL)
+        if (insertionPoint == &llhRoot && p != NULL) {
+            while (p->next != NULL) {
+                p = p->next;
+            }
             insertionPoint = p;
+        }
     }
 
     /** Removes the oldest elemnt from the queue. */
