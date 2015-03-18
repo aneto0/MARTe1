@@ -138,6 +138,11 @@ typedef struct {
 	*/
     bool                     fullNotation:1;
 
+    //       
+    int                      spareBits:10;
+    
+public:    
+
 	/** takes a printf like string already pointing at the character after % (see below format)
 	    and parses it recovering all the useful information, discarding all redundant ones,
 		and fills up the fields in this structure.
@@ -163,7 +168,7 @@ typedef struct {
 		[Width] specifies the MAXIMUM or EXACT number of characters to output, depending on the padding [flags] being set on or not 
 		NOTE that in a normal printf this would be the MINIMUM or EXACT number of characters... 
         [Precision] 
-		This is the minimum number of meanigful digits used to represent a number 
+		This is the minimum number of meaningful digits used to represent a number 
 		Differently from printf this includes numbers before .
 		if the exact representation of the number uses less digits [precision] is not considered
 		if [width] is such that a numeric representation with the given precision cannot be fully represented than the number is replaced with a ?
@@ -177,9 +182,8 @@ typedef struct {
 		a,x,p --> activate exadecimal display
         o --> activate octal display
         b --> activate binary display
-
 	*/
-	bool InitialiseFromString(const char *&string){
+    bool InitialiseFromString(const char *&string){
 	    return false;
 	}
 	/** 
@@ -190,7 +194,25 @@ typedef struct {
 		uint32 * p = (uint32 * )this;
 		*p = x;
 	}
-	
+    
+	/**
+        Copy operator 
+    */
+    void operator=(const FormatDescriptor &src){
+        uint32 *d = (uint32 *)this;
+        const uint32 *s = (const uint32 *)&src;
+        *d = *s;
+    }
+
+	/**
+        or bits operator
+    */
+    void operator |=(const FormatDescriptor &src){
+        uint32 *d = (uint32 *)this;
+        const uint32 *s = (const uint32 *)&src;
+        *d |= *s;
+    }
+    
 	/** 
 		constructor from unsigned integer
 		Just copy bit by bit
@@ -203,31 +225,149 @@ typedef struct {
 	}
 } FormatDescriptor;
 
-// lists all flags 
-static const char *flagsLookup = " -#0";
-
-// lists all the types
-static const char *typesLookup = "diuscfegaxpob";
-
-// what flags at what type
-static const FormatDescriptor typesFlags[] = {
-	FormatDescriptor(0),  //d	
-	FormatDescriptor(0),  //i
-	FormatDescriptor(0),  //u
-	FormatDescriptor(0),  //s
-	FormatDescriptor(0),  //c
-	FormatDescriptor(0,0,false,false,Notation::FixedPointNotation, Notation::NormalNotation,false,false),  //f
-	FormatDescriptor(0,0,false,false,Notation::ExponentNotation  , Notation::NormalNotation,false,false),  //e
-	FormatDescriptor(0,0,false,false,Notation::SmartPointNotation, Notation::NormalNotation,false,false),  //g
-	FormatDescriptor(0,0,false,false,Notation::FixedPointNotation, Notation::HexNotation   ,false,false),  //a
-	FormatDescriptor(0,0,false,false,Notation::FixedPointNotation, Notation::HexNotation   ,false,false),  //x
-	FormatDescriptor(0,0,false,false,Notation::FixedPointNotation, Notation::HexNotation   ,false,false),  //p
-	FormatDescriptor(0,0,false,false,Notation::FixedPointNotation, Notation::OctalNotation ,false,false),  //o
-	FormatDescriptor(0,0,false,false,Notation::FixedPointNotation, Notation::BitNotation   ,false,false)   //b
-}    
 
 
-bool InitialiseFromString(const char *&string){
+/**
+
+START .CPP FILE
+
+DATA TABLES FIRST
+
+*/
+
+/** to implement a look-up table between characters in the 
+    printf format encoding and the set of bits to be set in 
+    the FormatDescriptor 
+*/
+struct FDLookup{
+    // the set of flags
+    FormatDescriptor format;
+    // the character in the printf format
+    char character;
+};
+
+/// 0 terminated vector of FDLookups 
+static const FDLookup flagsLookup[] = {
+    { ' ', 	FormatDescriptor(0,0,true ,false,Notation::FixedPointNotation, Notation::NormalNotation,false,false) },  // ' '	
+	{ '-', 	FormatDescriptor(0,0,true ,true ,Notation::FixedPointNotation, Notation::NormalNotation,false,false) },  // '-'
+    { '0', 	FormatDescriptor(0,0,false,false,Notation::FixedPointNotation, Notation::NormalNotation,true ,false) },  // '0'
+    { '#', 	FormatDescriptor(0,0,false,false,Notation::FixedPointNotation, Notation::NormalNotation,false,true)  },  // '#'
+    { 0  ,  FormatDescriptor(0)}
+};
+
+/// 0 terminated vector of FDLookups 
+static const FDLookup typesLookup[] = {
+    { 'd', 	FormatDescriptor(0) },   //d	
+    { 'i', 	FormatDescriptor(0) },  //i
+    { 'u', 	FormatDescriptor(0) },  //u
+    { 's', 	FormatDescriptor(0) },  //s
+    { 'c', 	FormatDescriptor(0) },  //c
+    { 'f', 	FormatDescriptor(0,0,false,false,Notation::FixedPointNotation, Notation::NormalNotation,false,false) },  //f
+    { 'e', 	FormatDescriptor(0,0,false,false,Notation::ExponentNotation  , Notation::NormalNotation,false,false) },  //e
+    { 'g', 	FormatDescriptor(0,0,false,false,Notation::SmartPointNotation, Notation::NormalNotation,false,false) },  //g
+    { 'a', 	FormatDescriptor(0,0,false,false,Notation::FixedPointNotation, Notation::HexNotation   ,false,false) },  //a
+    { 'x', 	FormatDescriptor(0,0,false,false,Notation::FixedPointNotation, Notation::HexNotation   ,false,false) },  //x
+    { 'p', 	FormatDescriptor(0,0,false,false,Notation::FixedPointNotation, Notation::HexNotation   ,false,false) },  //p
+    { 'o', 	FormatDescriptor(0,0,false,false,Notation::FixedPointNotation, Notation::OctalNotation ,false,false) },  //o
+    { 'b', 	FormatDescriptor(0,0,false,false,Notation::FixedPointNotation, Notation::BitNotation   ,false,false) },  //b
+    { 0  ,  FormatDescriptor(0)}
+};
+
+/**
+
+FUNCTIONS BELOW
+
+*/
+
+
+/// strchr equivalent
+static inline const FDLookup *LookupCharacter(char c, const FDLookup *lookupTable){
+    if (lookupTable == NULL) return NULL;
+    while(lookupTable->character != 0){
+        if (lookupTable->character == c){
+            return lookupTable;
+        }
+        lookupTable++;
+    }
+    return NULL;
+}
+
+
+/// add to format the identified flag
+static bool ParseCharacter(char c, FormatDescriptor &format,const FDLookup *lookupTable){
+    
+    // find the position of c in flagsLookup
+     const FDLookup *found = LookupCharacter(c, lookupTable)
+    
+    // not found!
+    if (found == NULL ) return false;
+    
+    // add the missing bits
+    format |= found->format;   
+    
+    return true;
+}
+
+/**
+    0-9 if it is a digit 
+    otherwise negative
+*/
+static inline int GetDigit(char c){
+    int digit = c - '0';
+    if (digit > 9) return -1;
+    return digit;
+}
+
+/** 
+    parses a number out of string 
+    returns 0 if no number is encountered
+*/
+static inline unsigned int GetIntegerNumber(const char *&string){
+    if (string == NULL) return false;
+    
+    unsigned int number = 0;
+    unsigned int digit = 0;
+    // 
+    while ((digit = getDigit(string[0]]))>0){
+        number *=10;
+        number += digit;
+        string++;
+    }
+    
+    return number;
+}
+
+bool FormatDescriptor::InitialiseFromString(const char *&string){
+    
+    // prepare clean FormatDescriptor
+    // copy to this only if parsing successful
+    FormatDescriptor temporaryFormat(0);
+    
+    /// check pointer
+    if (string == NULL) return false;
+    
+    // expect at least a character
+    if (string[0] == 0) return false;
+    
+    //parse options
+    while (ParseCharacter(string[0],temporaryFormat,&flagsLookup[0])) string++;
+    
+    // get any integer number from string if any
+    temporaryFormat.length = GetIntegerNumber(string);
+    
+    // after a dot look for the precision field
+    if (string[0] == '.') {        
+        string++;
+        // get any integer number from string if any
+        temporaryFormat.precision = GetIntegerNumber(string);        
+    }
+    
+    // the next must be the code!
+    if (ParseCharacter(string[0],temporaryFormat,&typesLookup[0])){
+        *this = temporaryFormat;
+        return true;
+    }
+           
 	return false;
 }
 
