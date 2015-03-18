@@ -148,12 +148,11 @@ bool CPrintInt32(CStream *cs, int32 n, uint32 desiredSize, char desiredPadding,
     }
 
     if ((mode == 'i') || (mode == 'd')) {
-        int divid = 1000000000;//////////////////////////////////////////
+        int divid = 1000000000;
         // # of characters
         uint32 ccount = 10;
 
-        int na = n;//////////////////////////////////////////////////////
-
+        int na = n;
         if (n < 0) {
             na = -n;
             ccount++;
@@ -198,7 +197,7 @@ bool CPrintInt32(CStream *cs, int32 n, uint32 desiredSize, char desiredPadding,
         // # of characters
         uint32 ccount = 10;
         uint32 na = n;
-	if (n != 0) {
+        if (n != 0) {
             while (divid > na) {
                 divid /= 10;
                 ccount--;
@@ -704,6 +703,7 @@ bool VCPrintf(CStream *cs, const char *format, va_list argList) {
                 subFieldSize = 0;
                 subFieldStatus = 0;
                 longMode = 0;
+                rightJustify = True;
                 optionBufferPtr = optionBuffer;
                 *optionBufferPtr++ = '%';
             }
@@ -795,7 +795,7 @@ bool VCPrintf(CStream *cs, const char *format, va_list argList) {
                 if (subFieldSize == 0)
                     subFieldSize = 6;
                 CPrintDouble(cs, va_arg(argList, double), desiredSize,
-                             subFieldSize, desiredPadding, 'f');
+                        subFieldSize, desiredPadding, 'f');
                 status = 0;
             }
                 break;
@@ -803,7 +803,7 @@ bool VCPrintf(CStream *cs, const char *format, va_list argList) {
                 if (subFieldSize == 0)
                     subFieldSize = 6;
                 CPrintDouble(cs, va_arg(argList, double), desiredSize,
-                             subFieldSize, desiredPadding, 'e');
+                        subFieldSize, desiredPadding, 'e');
                 status = 0;
             }
                 break;
@@ -841,7 +841,7 @@ bool VCPrintf(CStream *cs, const char *format, va_list argList) {
                 break;
             case 's': {
                 CPrintString(cs, va_arg(argList, char *), desiredSize,
-                             desiredPadding, rightJustify);
+                        desiredPadding, rightJustify);
                 status = 0;
             }
                 break;
