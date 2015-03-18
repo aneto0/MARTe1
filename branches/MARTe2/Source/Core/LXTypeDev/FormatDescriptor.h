@@ -29,10 +29,10 @@
 #define FORMAT_DESCRIPTOR_H
 
 /** 
-    Used to choose the float representtaion mode
+    Used to choose the float and binary representation modes
 */
-struct FloatNotation{
-    enum Enum{
+struct Notation{
+    enum Float{
         /** 
           0.99  3.5 35000.2 etc...
         */
@@ -55,10 +55,8 @@ struct FloatNotation{
         */
         SmartNotation       =   3
     };
-};
 
-struct BinaryNotation{
-    enum Enum {
+    enum Binary {
 
         /** 
           print in the native format (integer base 10, float as ieee or whatever ....)
@@ -105,10 +103,10 @@ typedef struct {
     bool                     leftAlign:1; 
 
     /// in case of a float, this field is used to determine how to print it
-    FloatNotation::Enum      floatNotation:2;
+    Notation::Float          floatNotation:2;
 
     /// used for ints, floats, pointers, char * etc...
-    BinaryNotation::Enum     binaryNotation:2;
+    Notation::Binary         binaryNotation:2;
 
     /** in case of binaryNotation not 0 prepend the appropriate
         sequence of chars to indicate hex/binary or octal */

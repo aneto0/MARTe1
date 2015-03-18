@@ -31,7 +31,7 @@
 
 /** the types of data in the field type of BasicTypeDescriptor*/
 struct BasicType{
-    enum Enum{
+    enum Identifier{
         /** An integer   pointer = intxx * */
         SignedInteger         = 0,
 

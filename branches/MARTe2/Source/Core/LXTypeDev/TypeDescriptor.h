@@ -59,7 +59,7 @@ typedef struct TypeDescriptor {
             /** 
 		the actual type of data
             */
-            BasicType::Enum type:4;
+            BasicType::Identifier type:4;
           
             /** 
 		the size in bytes or bits (bitset types)
