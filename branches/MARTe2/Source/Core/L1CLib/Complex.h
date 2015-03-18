@@ -355,13 +355,6 @@ public:
         return Complex(log(x.Norma()), x.Arg());
     }
 
-    inline friend const Complex Clog(double x) {
-        if (x > 0)
-            return Complex(log(x), 0);
-        else
-            return Complex(log(-x), 3.1415);
-    }
-
     inline friend const Complex sqrt(const Complex &x) {
         double norma = sqrt(x.Norma());
         double arg = x.Arg() / 2;
@@ -369,17 +362,26 @@ public:
         return Complex(norma * cos(arg), norma * sin(arg));
     }
 
-    inline friend const Complex Csqrt(double x) {
-        if (x > 0)
-            return Complex(sqrt(x), 0);
-        return Complex(0, -sqrt(x));
-    }
-
     inline friend const Complex sqr(const Complex &x) {
         return Complex(x.real * x.real - x.imaginary * x.imaginary,
                        x.real * x.imaginary + x.real * x.imaginary);
     }
 };
+
+extern "C" {
+inline const Complex Clog(double x) {
+    if (x > 0)
+        return Complex(log(x), 0);
+    else
+        return Complex(log(-x), 3.1415);
+}
+
+inline const Complex Csqrt(double x) {
+    if (x > 0)
+        return Complex(sqrt(x), 0);
+    return Complex(0, sqrt(-x));
+}
+}
 
 #endif
 
