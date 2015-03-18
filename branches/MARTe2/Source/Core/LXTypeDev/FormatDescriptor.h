@@ -174,7 +174,7 @@ typedef struct {
         f --> fixed point numeric format selected
         e --> exponential format
 		g --> smart format (more powerful than printf)
-		a,A,x,p --> activate exadecimal display
+		a,x,p --> activate exadecimal display
         o --> activate octal display
         b --> activate binary display
 
@@ -182,7 +182,56 @@ typedef struct {
 	bool InitialiseFromString(const char *&string){
 	    return false;
 	}
+	/** 
+		constructor from unsigned integer
+		Just copy bit by bit
+	*/
+	FormatDescriptor(uint32 x){
+		uint32 * p = (uint32 * )this;
+		*p = x;
+	}
+	
+	/** 
+		constructor from unsigned integer
+		Just copy bit by bit
+	*/
+	FormatDescriptor(uint8 length, uint8 precision, bool pad, bool leftAlign, 
+                        Notation::Float floatNotation,Notation::Binary binaryNotation, 
+                        bool binaryPadded, bool fullNotation ){}
+		uint32 * p = (uint32 * )this;
+		*p = x;
+	}
 } FormatDescriptor;
+
+// lists all flags 
+static const char *flagsLookup = " -#0";
+
+// lists all the types
+static const char *typesLookup = "diuscfegaxpob";
+
+// what flags at what type
+static const FormatDescriptor typesFlags[] = {
+	FormatDescriptor(0),  //d	
+	FormatDescriptor(0),  //i
+	FormatDescriptor(0),  //u
+	FormatDescriptor(0),  //s
+	FormatDescriptor(0),  //c
+	FormatDescriptor(0,0,false,false,Notation::FixedPointNotation, Notation::NormalNotation,false,false),  //f
+	FormatDescriptor(0,0,false,false,Notation::ExponentNotation  , Notation::NormalNotation,false,false),  //e
+	FormatDescriptor(0,0,false,false,Notation::SmartPointNotation, Notation::NormalNotation,false,false),  //g
+	FormatDescriptor(0,0,false,false,Notation::FixedPointNotation, Notation::HexNotation   ,false,false),  //a
+	FormatDescriptor(0,0,false,false,Notation::FixedPointNotation, Notation::HexNotation   ,false,false),  //x
+	FormatDescriptor(0,0,false,false,Notation::FixedPointNotation, Notation::HexNotation   ,false,false),  //p
+	FormatDescriptor(0,0,false,false,Notation::FixedPointNotation, Notation::OctalNotation ,false,false),  //o
+	FormatDescriptor(0,0,false,false,Notation::FixedPointNotation, Notation::BitNotation   ,false,false)   //b
+}    
+
+
+bool InitialiseFromString(const char *&string){
+	return false;
+}
+
+
 
 #endif
 
