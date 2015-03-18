@@ -81,6 +81,8 @@ struct Notation{
         */
         OctalNotation       =   3
     };
+	
+
 };
 
 
@@ -88,29 +90,53 @@ struct Notation{
 typedef struct {
 
 //*** MAYBE REPLACE with finite set of options ( *' ' *0  *' '0x *' ', ....)
-    /// character used to pad the representation to its full length
-    char                     paddingCharacter:8; 
     /// maximum size of representation  max 255
     unsigned int             length:8;
 
-    /// minimum number of meaningful digits (unless overridden by length)  max 255
-    unsigned int             precision:8;
+    /**
+        minimum (whenever applicable) number of meaningful digits (unless overridden by length)  max 64 
+		differently from printf this includes characters before comma
+		excludes characters used for the exponents or for the sign and the .
+		0.34 has precision 2        -> (precision =8)  0.3400000 
+		234 has precision 3         -> (precision =8)  234.00000 
+		2345678000 has precision 10 -> (precision =8) unchanged still precision 10
+		2.345678E9 has precision 7  -> (precision =8) 2.3456780E9 
+		234 (int) has precision 3   -> (precision =8) unchanged  still precision 3  
+		0x4ABCD has precision 5     -> (precision =8) unchanged  still precision 5  
+		1-64 
+	*/	 
+    unsigned int             precision:6;
 
-    /// true means use the full length and pad with the padding character 
-    bool                     align:1;
+    /**
+		true means produce a number of characters equal to length  
+		fill up using spaces 
+	*/
+    bool                     pad:1;
 
-    /// true means to left align instead of right align;
+    /** 
+		true means to produce pad spaces after printing the object representation
+    */
     bool                     leftAlign:1; 
 
+    
     /// in case of a float, this field is used to determine how to print it
     Notation::Float          floatNotation:2;
 
     /// used for ints, floats, pointers, char * etc...
     Notation::Binary         binaryNotation:2;
 
-    /** in case of binaryNotation not 0 prepend the appropriate
-        sequence of chars to indicate hex/binary or octal */
-    bool                     binaryNotationFull;
+	/** 
+		only meaningful for numbers in Hex/octal/binary
+		Fills the number on the left with 0s up to the full representation 
+		Number of 0s depends on the size of the number (hex 64 bit ==> numbers+trailing zero = 16)
+	*/
+    bool                     binaryPadded:1;
+
+    /** 
+		only meaningful for numbers
+		Add the missing + or 0x 0B or 0o
+	*/
+    bool                     fullNotation:1;
 
 	/** takes a printf like string already pointing at the character after % (see below format)
 	    and parses it recovering all the useful information, discarding all redundant ones,
@@ -118,28 +144,40 @@ typedef struct {
 	    At the end the pointer string is moved to the next character after the parsed block
 		
 		The overall printf-like format supported is the following:
-		%[flags][width][.precision][length]type
+		%[flags][width][.precision]type
 		Note that the full printf would be this:
 		%[parameter][flags][width][.precision][length]type
-		which is not supported
+		!which is not supported!
 			
-		[flags]:
-		-  	Left-align the output of this place-holder (the default is to right-align the output).
-		+   Prepends a plus for positive signed-numeric types. positive = '+', negative = '-'. (the default doesn't prepend anything in front of positive numbers).
-		' ' Prepends a space for positive signed-numeric types. positive = ' ', negative = '-'. This flag is ignored if the '+' flag exists. (the default doesn't prepend anything in front of positive numbers).
-        0  	Prepends zeros for numbers when the width option is specified. (the default prepends spaces). Example: printf("%2d", 3) produces " 3", while printf("%02d", 3) produces in "03".
-        #   Alternate form. For 'g' and 'G', trailing zeros are not removed. For 'f', 'F', 'e', 'E', 'g', 'G', the output always contains a decimal point. For 'o', 'x', 'X', or '0', '0x', '0X', respectively, is prepended to non-zero numbers.
+		[flags]: // slightly different from standard printf notation
+		' ' Activates padding:
+			fills up to width using spaces
+		-  	Left-align : put padding spaces after printing the object
+		#   Activate fullNotation:
+			+ in front of integers
+			0x/0b/0o in front of Hex/octal/binary
+        0  	Prepends zeros for Hex Octal and Binary notations (binaryPadded activated)
+			Number of zeros depends on number precision and chosen notation (64 bit int and binary notation = up to 64 zeros)
 		
 		[width][.precision]  two numbers 
-		Width specifies the MAXIMUM or EXACT number of characters to output, depending on the padding [flags] being set on or not 
+		[Width] specifies the MAXIMUM or EXACT number of characters to output, depending on the padding [flags] being set on or not 
 		NOTE that in a normal printf this would be the MINIMUM or EXACT number of characters... 
-        
-		Precision usually specifies a maximum limit on the output, depending on the particular formatting type. 
-		For floating point numeric types, it specifies the number of digits to the right of the decimal point that the output should be rounded. 
-		For the string type, it limits the number of characters that should be output, after which the string is truncated.
+        [Precision] 
+		This is the minimum number of meanigful digits used to represent a number 
+		Differently from printf this includes numbers before .
+		if the exact representation of the number uses less digits [precision] is not considered
+		if [width] is such that a numeric representation with the given precision cannot be fully represented than the number is replaced with a ?
+		type
+		This is one character among the following
 		
-		[length]type
-		This is read and parsed only to set special display formats like %x %b etc... as the actual data type comes with the data
+		d,i,u,s,c --> no effect (format depends on actual data type not the letter here!)
+        f --> fixed point numeric format selected
+        e --> exponential format
+		g --> smart format (more powerful than printf)
+		a,A,x,p --> activate exadecimal display
+        o --> activate octal display
+        b --> activate binary display
+
 	*/
 	bool InitialiseFromString(const char *&string){
 	    return false;
