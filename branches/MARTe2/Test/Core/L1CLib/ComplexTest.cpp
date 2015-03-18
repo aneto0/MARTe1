@@ -31,7 +31,6 @@ bool equalDouble(double a, double b, double tolerance) {
     return (a - b) < tolerance && (a - b) > (-tolerance);
 }
 
-
 bool ComplexTest::TestConstructors() {
 
     //Test empty constructor (real and imaginary parts equal to zero).
@@ -64,7 +63,7 @@ bool ComplexTest::TestConstructors() {
 
     //Test the constructor with an array of two elements passed by argument.
     //If we pass NULL as argument it initialize real and imaginary to zero.
-    Complex myFailComplex((double*)NULL);
+    Complex myFailComplex((double*) NULL);
 
     if (myFailComplex.Real() != 0 || myFailComplex.Imaginary() != 0) {
         return False;
@@ -107,7 +106,7 @@ bool ComplexTest::TestAddAndDifferenceOperators() {
     //Create two equal complexes.
     Complex myComplex1(1, 1);
     Complex myComplex2 = myComplex1;
-   
+
     //Test the equality operator between two complexes.
     if (!(myComplex1 == myComplex2)) {
         return False;
@@ -182,7 +181,6 @@ bool ComplexTest::TestAddAndDifferenceOperators() {
     return True;
 }
 
-
 bool ComplexTest::TestProductOperators() {
     double rePart = 3.3;
     double imPart = 4.4;
@@ -240,7 +238,6 @@ bool ComplexTest::TestProductOperators() {
 
     return True;
 }
-
 
 bool ComplexTest::TestNormAndDivision() {
     double rePart = 3.3;
@@ -310,7 +307,6 @@ bool ComplexTest::TestNormAndDivision() {
         return False;
     }
 
-
     //Tests the < and > operators which can give a sorting of complexes by their norma.
     if (myComplex1 > newComplex) {
         if (myComplex1.Norma2() < newComplex.Norma2()) {
@@ -355,8 +351,10 @@ bool ComplexTest::TestNormAndDivision() {
     while (imPartUp > 0 && rePartUp > -1) {
         Complex testArgComplexUp(rePartUp, imPartUp);
         Complex testArgComplexDown(rePartDown, imPartDown);
-        if ((testArgComplexUp.Arg() < (pi / 2 - 1e-3) && testArgComplexUp.Arg() > (pi + 1e-3))
-                || (testArgComplexDown.Arg() > (-pi / 2 + 1e-3) && testArgComplexDown.Arg() < (-pi - 1e-3))) {
+        if ((testArgComplexUp.Arg() < (pi / 2 - 1e-3)
+                && testArgComplexUp.Arg() > (pi + 1e-3))
+                || (testArgComplexDown.Arg() > (-pi / 2 + 1e-3)
+                        && testArgComplexDown.Arg() < (-pi - 1e-3))) {
             return False;
         }
         rePartUp -= step;
@@ -433,6 +431,44 @@ bool ComplexTest::TestMathOperations() {
     expectedIm = rePart * imPart * 2;
     result = sqr(testComplex);
     if (!equalDouble(result.Real(), expectedRe, 1e-4)
+            || !equalDouble(result.Imaginary(), expectedIm, 1e-4)) {
+        return False;
+    }
+
+    //Test the logarithm of a negative number.
+    double negativeNumber = -(e * e * e);
+    expectedRe = 3.0;
+    expectedIm = pi;
+    result = Clog(negativeNumber);
+    if (!equalDouble(result.Real(), expectedRe, 1e-4)
+            || !equalDouble(result.Imaginary(), expectedIm, 1e-4)) {
+        return False;
+    }
+
+    //Test if it works also for positive numbers.
+    double positiveNumber = -negativeNumber;
+    expectedRe = 3.0;
+    expectedIm = 0;
+    result = Clog(positiveNumber);
+    if (!equalDouble(result.Real(), expectedRe, 1e-4)
+            || !equalDouble(result.Imaginary(), expectedIm, 1e-4)) {
+        return False;
+    }
+
+    //Test the square root of a negative number.
+    expectedRe = 0;
+    result = Csqrt(negativeNumber);
+
+    if (!equalDouble(result.Imaginary() * result.Imaginary(), -negativeNumber,
+                     1e-4) || !equalDouble(result.Real(), expectedRe, 1e-4)) {
+        return False;
+    }
+
+    //Test if it works also for positive numbers.
+    expectedIm = 0;
+    result = Csqrt(positiveNumber);
+
+    if (!equalDouble(result.Real() * result.Real(), positiveNumber, 1e-4)
             || !equalDouble(result.Imaginary(), expectedIm, 1e-4)) {
         return False;
     }

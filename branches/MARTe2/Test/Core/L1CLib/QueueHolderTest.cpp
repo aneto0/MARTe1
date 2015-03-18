@@ -26,19 +26,31 @@
 #include "QueueHolderTest.h"
 
 bool QueueHolderTest::TestAll() {
+
+    //Peek from the new to the old element, Extract at the beginning And add on the queue. Insert on the beginning (as a stack).
+
     IntegerLinkedListable* myRoot = new IntegerLinkedListable();
-    myRoot->intNumber = 0;
-    IntegerLinkedListable* myInt;
     QueueHolder* myQueue = new QueueHolder();
+
+    //Add a List in the queue using insert function.
+    for (int32 i = 0; i < 5; i++) {
+        IntegerLinkedListable* myInt = new IntegerLinkedListable();
+        myInt->intNumber = i;
+        myRoot->Add(myInt);
+    }
+    myQueue->QueueInsert(myRoot->Next());
 
     //Add a single element in the queue.
     IntegerLinkedListable* myNewInt = new IntegerLinkedListable();
-    myNewInt->intNumber = 0;
+    myNewInt->intNumber = 5;
     myQueue->FastQueueInsertSingle(*myNewInt);
 
-    //Add a List in the queue.
-    for (int32 i = 1; i < 11; i++) {
-        myInt = new IntegerLinkedListable();
+    delete myRoot;
+    myRoot = new IntegerLinkedListable();
+
+    //Add a List in the queue using add function.
+    for (int32 i = 6; i < 11; i++) {
+        IntegerLinkedListable* myInt = new IntegerLinkedListable();
         myInt->intNumber = i;
         myRoot->Add(myInt);
     }
@@ -52,7 +64,8 @@ bool QueueHolderTest::TestAll() {
     }
 
     for (int32 i = 0; i < 11; i++) {
-        int32 num = ((IntegerLinkedListable*) (myQueue->QueuePeek(i)))->intNumber;
+        int32 num =
+                ((IntegerLinkedListable*) (myQueue->QueuePeek(i)))->intNumber;
         if (num != (10 - i)) {
             delete myQueue;
             return False;
@@ -60,29 +73,49 @@ bool QueueHolderTest::TestAll() {
     }
 
     //Extract the oldest number (FIFO) and check that it's correct.
-    IntegerLinkedListable* oldest = (IntegerLinkedListable*) (myQueue->QueueExtract());
+    IntegerLinkedListable* oldest =
+            (IntegerLinkedListable*) (myQueue->QueueExtract());
     if (oldest->intNumber != 0 || myQueue->QueueSize() != 10) {
-        delete oldest;   
+        delete oldest;
         delete myQueue;
         return False;
     }
 
-    delete oldest;   
+    delete oldest;
 
-    //Extract the newest number and check that it's correct.
-    IntegerLinkedListable* last = (IntegerLinkedListable*) (myQueue->QueuePeekLast());
-    IntegerLinkedListable* newOldest = (IntegerLinkedListable*) (myQueue->Oldest());
-    if (last->intNumber != 10 || newOldest->intNumber != 1
-            || myQueue->QueueSize() != 10) {
+    //Extract the newest number (FIFO) and check that it's correct.
+    IntegerLinkedListable* last =
+            (IntegerLinkedListable*) (myQueue->QueuePeekLast());
+    if (!myQueue->QueueExtract(last)) {
+        delete myQueue;
+        return False;
+    }
+    if (last->intNumber != 10 || myQueue->QueueSize() != 9) {
+        delete last;
+        delete myQueue;
+        return False;
+    }
+
+    delete last;
+
+    //Extract the newest and the oldest numbers and check that are correct.
+    last = (IntegerLinkedListable*) (myQueue->QueuePeekLast());
+    IntegerLinkedListable* newOldest =
+            (IntegerLinkedListable*) (myQueue->Oldest());
+    if (last->intNumber != 9 || newOldest->intNumber != 1
+            || myQueue->QueueSize() != 9) {
         delete myQueue;
         return False;
     }
 
     //Tests the peek and the extract functions for an element of the list.
-    uint32 aPosition=5;
-    IntegerLinkedListable* fifthElement = (IntegerLinkedListable*) (myQueue->QueuePeek(aPosition));
+    //Since the stack now is 9-8-...-1 the i element has 9-i value (the index begin from 0).
+    uint32 aPosition = 5;
+    IntegerLinkedListable* fifthElement =
+            (IntegerLinkedListable*) (myQueue->QueuePeek(aPosition));
     myQueue->QueueExtract(fifthElement);
-    if (fifthElement->intNumber != aPosition || myQueue->QueueSize() != 9) {
+    if (fifthElement->intNumber != (9 - aPosition)
+            || myQueue->QueueSize() != 8) {
         delete fifthElement;
         delete myQueue;
         return False;
@@ -91,12 +124,10 @@ bool QueueHolderTest::TestAll() {
     delete fifthElement;
 
     delete myQueue;
-    
+
     return True;
 
 }
-
-
 
 bool QueueHolderTest::TestNULLConditions() {
     QueueHolder* myQueue = new QueueHolder();
@@ -118,9 +149,9 @@ bool QueueHolderTest::TestNULLConditions() {
     //Add ten elements to the queue.
     for (uint32 i = 0; i < 10; i++) {
         IntegerLinkedListable* myInt = new IntegerLinkedListable();
-	if(myInt==NULL){
-		return False;
-	}
+        if (myInt == NULL) {
+            return False;
+        }
         myInt->intNumber = i;
         myQueue->FastQueueInsertSingle(*myInt);
     }

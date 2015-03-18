@@ -35,46 +35,42 @@
 #include "CStream.h"
 #include "Memory.h"
 
-
-
 /** A struct used from CStream to create a new buffer memory. **/
-struct CStreamContext{
-	int32 counter;
-	int32 buffGranularity;
-	char* begin;	
+struct CStreamContext {
+    int32 counter;
+    int32 buffGranularity;
+    char* begin;
 };
-
 
 /** A function to create a new buffer of memory **/
 void CreateNewBuffer(CStream* p);
-
 
 class CStreamTest {
 
 private:
 
 public:
-	struct CStreamContext myContext;
-	struct CStream myCStream;
+    struct CStreamContext myContext;
+    struct CStream myCStream;
 
     CStreamTest() {
         /** Initialize the context struct. **/
-	myContext.counter=0;
-	myContext.buffGranularity=250;
-	myContext.begin=NULL;
-       
+        myContext.counter = 0;
+        myContext.buffGranularity = 350;
+        myContext.begin = NULL;
+
         /** Initialize the CStream struct. **/
-	myCStream.context=(void*)(&myContext);
-	myCStream.bufferPtr=NULL;
-	myCStream.NewBuffer=CreateNewBuffer;
-	myCStream.sizeLeft=0;
+        myCStream.context = (void*) (&myContext);
+        myCStream.bufferPtr = NULL;
+        myCStream.NewBuffer = CreateNewBuffer;
+        myCStream.sizeLeft = 0;
     }
 
     /** 
      * Tests the CPut() function writing a char on the CStream.
      * @param c is the character to write on the CStream.
      * @return true if the char written on the stream is equal to the char passed by argument. **/
-    bool TestCPut(char c);	
+    bool TestCPut(char c);
 
     /**
      * Tests the CGet() function reading a char from the CStream.
@@ -85,7 +81,7 @@ public:
     /**
      * Tests if a string is correctly read from the CStream. The CStream contains the string passed by argument, then it is read by the CRead() function on a buffer.
      * @param string is the string on the CStream.
-     * @return true if the read string is equal to the string passed by argument. **/    
+     * @return true if the read string is equal to the string passed by argument. **/
     bool TestCRead(const char* string);
 
     /**
@@ -93,7 +89,7 @@ public:
      * @param string is the string to write on the CStream.
      * @return true if the string written on the CStream is equal to the string passed by argument. **/
     bool TestCWrite(const char* string);
- 
+
     /**
      * Tests the write on the CStream of a int32 number in different formats.
      * @param sDec is the signed integer.
@@ -102,7 +98,8 @@ public:
      * @param oct is the integer in octal base.
      * @param number is the number to print on the CStream.
      * @return true if the strings written on CStream for different formats are equal to the strings passed by argument. **/
-    bool TestPrintInt32(const char* sDec, const char* uDec, const char* hex, const char* oct, int32 number);
+    bool TestPrintInt32(const char* sDec, const char* uDec, const char* hex,
+                        const char* oct, int32 number);
 
     /**
      * Tests the write on the CStream of a int64 number in different formats.
@@ -111,7 +108,8 @@ public:
      * @param oct is the integer in octal base.
      * @param number is the number to print on the CStream.
      * @return true if the strings written on CStream for different formats are equal to the strings passed by argument. **/
-    bool TestPrintInt64(const char* sDec, const char* hex, const char* oct, int64 number);
+    bool TestPrintInt64(const char* sDec, const char* hex, const char* oct,
+                        int64 number);
 
     /**
      * Tests the write on a CStream of a double number with different numbers after the point and approximations.
