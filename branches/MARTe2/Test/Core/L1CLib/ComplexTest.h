@@ -34,6 +34,7 @@
 
 /** Definition of the PI constant **/
 #define pi 3.1415
+#define e 2.71828 
 
 #include "Complex.h"
 
