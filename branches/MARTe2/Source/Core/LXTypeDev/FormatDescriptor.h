@@ -28,6 +28,7 @@
 #ifndef FORMAT_DESCRIPTOR_H
 #define FORMAT_DESCRIPTOR_H
 
+#include "GeneralDefinitions.h"
 /** 
     Used to choose the float and binary representation modes
 */
@@ -81,20 +82,18 @@ struct Notation{
         */
         OctalNotation       =   3
     };
-	
-
 };
 
 
 /** Describes how a basic type shall be printed (transformed into a string) */
-typedef struct {
-
+class FormatDescriptor{
+public:
 //*** MAYBE REPLACE with finite set of options ( *' ' *0  *' '0x *' ', ....)
     /// maximum size of representation  max 255
-    unsigned int             length:8;
+    uint32                   width:8;
 
     /**
-        minimum (whenever applicable) number of meaningful digits (unless overridden by length)  max 64 
+        minimum (whenever applicable) number of meaningful digits (unless overridden by width)  max 64 
 		differently from printf this includes characters before comma
 		excludes characters used for the exponents or for the sign and the .
 		0.34 has precision 2        -> (precision =8)  0.3400000 
@@ -105,16 +104,16 @@ typedef struct {
 		0x4ABCD has precision 5     -> (precision =8) unchanged  still precision 5  
 		1-64 
 	*/	 
-    unsigned int             precision:6;
+    uint32                   precision:8;
 
     /**
-		true means produce a number of characters equal to length  
+		True means produce a number of characters equal to width 
 		fill up using spaces 
 	*/
     bool                     pad:1;
 
     /** 
-		true means to produce pad spaces after printing the object representation
+		True means to produce pad spaces after printing the object representation
     */
     bool                     leftAlign:1; 
 
@@ -139,10 +138,8 @@ typedef struct {
     bool                     fullNotation:1;
 
     //       
-    int                      spareBits:10;
+    int32                    spareBits:8;
     
-public:    
-
 	/** takes a printf like string already pointing at the character after % (see below format)
 	    and parses it recovering all the useful information, discarding all redundant ones,
 		and fills up the fields in this structure.
@@ -165,7 +162,7 @@ public:
 			Number of zeros depends on number precision and chosen notation (64 bit int and binary notation = up to 64 zeros)
 		
 		[width][.precision]  two numbers 
-		[Width] specifies the MAXIMUM or EXACT number of characters to output, depending on the padding [flags] being set on or not 
+		[width] specifies the MAXIMUM or EXACT number of characters to output, depending on the padding [flags] being set on or not 
 		NOTE that in a normal printf this would be the MINIMUM or EXACT number of characters... 
         [Precision] 
 		This is the minimum number of meaningful digits used to represent a number 
@@ -183,15 +180,20 @@ public:
         o --> activate octal display
         b --> activate binary display
 	*/
-    bool InitialiseFromString(const char *&string){
-	    return false;
-	}
+    bool InitialiseFromString(const char *&string);
+
+    /**
+     * Format descriptor is not initialised
+     */
+	FormatDescriptor(){
+    }
+
 	/** 
 		constructor from unsigned integer
 		Just copy bit by bit
 	*/
 	FormatDescriptor(uint32 x){
-		uint32 * p = (uint32 * )this;
+		uint32 *p = (uint32 * )this;
 		*p = x;
 	}
     
@@ -213,17 +215,43 @@ public:
         *d |= *s;
     }
     
+    /**
+        Two FormatDescriptors are equal if every field is equal
+    */
+    bool operator ==(const FormatDescriptor &src){
+        uint32 *p = (uint32 * )this;
+        uint32 *s = (uint32 * )&src;
+		return *p == *s;
+    }
+
+    /**
+        Two FormatDescriptors are different if one of the fields is different 
+    */
+    bool operator !=(const FormatDescriptor &src){
+        uint32 *p = (uint32 * )this;
+        uint32 *s = (uint32 * )&src;
+		return *p != *s;
+    }
+
 	/** 
 		constructor from unsigned integer
 		Just copy bit by bit
 	*/
-	FormatDescriptor(uint8 length, uint8 precision, bool pad, bool leftAlign, 
+    FormatDescriptor(uint8 width, uint8 precision, bool pad, bool leftAlign, 
                         Notation::Float floatNotation,Notation::Binary binaryNotation, 
-                        bool binaryPadded, bool fullNotation ){}
-		uint32 * p = (uint32 * )this;
-		*p = x;
+                        bool binaryPadded, bool fullNotation ){
+
+		this->width = width;
+		this->precision = precision;
+		this->pad = pad;
+		this->leftAlign = leftAlign;
+		this->floatNotation = floatNotation;
+		this->binaryNotation = binaryNotation;
+		this->binaryPadded = binaryPadded;
+		this->fullNotation = fullNotation;
+        this->spareBits = 0;
 	}
-} FormatDescriptor;
+};
 
 
 
@@ -240,18 +268,18 @@ DATA TABLES FIRST
     the FormatDescriptor 
 */
 struct FDLookup{
-    // the set of flags
-    FormatDescriptor format;
     // the character in the printf format
     char character;
+    // the set of flags
+    FormatDescriptor format;
 };
 
 /// 0 terminated vector of FDLookups 
 static const FDLookup flagsLookup[] = {
-    { ' ', 	FormatDescriptor(0,0,true ,false,Notation::FixedPointNotation, Notation::NormalNotation,false,false) },  // ' '	
-	{ '-', 	FormatDescriptor(0,0,true ,true ,Notation::FixedPointNotation, Notation::NormalNotation,false,false) },  // '-'
-    { '0', 	FormatDescriptor(0,0,false,false,Notation::FixedPointNotation, Notation::NormalNotation,true ,false) },  // '0'
-    { '#', 	FormatDescriptor(0,0,false,false,Notation::FixedPointNotation, Notation::NormalNotation,false,true)  },  // '#'
+    { ' ', 	FormatDescriptor(0,0,True ,False,Notation::FixedPointNotation, Notation::NormalNotation,False,False) },  // ' '	
+	{ '-', 	FormatDescriptor(0,0,True ,True ,Notation::FixedPointNotation, Notation::NormalNotation,False,False) },  // '-'
+    { '0', 	FormatDescriptor(0,0,False,False,Notation::FixedPointNotation, Notation::NormalNotation,True ,False) },  // '0'
+    { '#', 	FormatDescriptor(0,0,False,False,Notation::FixedPointNotation, Notation::NormalNotation,False,True)  },  // '#'
     { 0  ,  FormatDescriptor(0)}
 };
 
@@ -262,14 +290,14 @@ static const FDLookup typesLookup[] = {
     { 'u', 	FormatDescriptor(0) },  //u
     { 's', 	FormatDescriptor(0) },  //s
     { 'c', 	FormatDescriptor(0) },  //c
-    { 'f', 	FormatDescriptor(0,0,false,false,Notation::FixedPointNotation, Notation::NormalNotation,false,false) },  //f
-    { 'e', 	FormatDescriptor(0,0,false,false,Notation::ExponentNotation  , Notation::NormalNotation,false,false) },  //e
-    { 'g', 	FormatDescriptor(0,0,false,false,Notation::SmartPointNotation, Notation::NormalNotation,false,false) },  //g
-    { 'a', 	FormatDescriptor(0,0,false,false,Notation::FixedPointNotation, Notation::HexNotation   ,false,false) },  //a
-    { 'x', 	FormatDescriptor(0,0,false,false,Notation::FixedPointNotation, Notation::HexNotation   ,false,false) },  //x
-    { 'p', 	FormatDescriptor(0,0,false,false,Notation::FixedPointNotation, Notation::HexNotation   ,false,false) },  //p
-    { 'o', 	FormatDescriptor(0,0,false,false,Notation::FixedPointNotation, Notation::OctalNotation ,false,false) },  //o
-    { 'b', 	FormatDescriptor(0,0,false,false,Notation::FixedPointNotation, Notation::BitNotation   ,false,false) },  //b
+    { 'f', 	FormatDescriptor(0,0,False,False,Notation::FixedPointNotation, Notation::NormalNotation,False,False) },  //f
+    { 'e', 	FormatDescriptor(0,0,False,False,Notation::ExponentNotation  , Notation::NormalNotation,False,False) },  //e
+    { 'g', 	FormatDescriptor(0,0,False,False,Notation::SmartNotation     , Notation::NormalNotation,False,False) },  //g
+    { 'a', 	FormatDescriptor(0,0,False,False,Notation::FixedPointNotation, Notation::HexNotation   ,False,False) },  //a
+    { 'x', 	FormatDescriptor(0,0,False,False,Notation::FixedPointNotation, Notation::HexNotation   ,False,False) },  //x
+    { 'p', 	FormatDescriptor(0,0,False,False,Notation::FixedPointNotation, Notation::HexNotation   ,False,False) },  //p
+    { 'o', 	FormatDescriptor(0,0,False,False,Notation::FixedPointNotation, Notation::OctalNotation ,False,False) },  //o
+    { 'b', 	FormatDescriptor(0,0,False,False,Notation::FixedPointNotation, Notation::BitNotation   ,False,False) },  //b
     { 0  ,  FormatDescriptor(0)}
 };
 
@@ -282,7 +310,9 @@ FUNCTIONS BELOW
 
 /// strchr equivalent
 static inline const FDLookup *LookupCharacter(char c, const FDLookup *lookupTable){
-    if (lookupTable == NULL) return NULL;
+    if (lookupTable == NULL) {
+        return NULL;
+    }
     while(lookupTable->character != 0){
         if (lookupTable->character == c){
             return lookupTable;
@@ -297,24 +327,28 @@ static inline const FDLookup *LookupCharacter(char c, const FDLookup *lookupTabl
 static bool ParseCharacter(char c, FormatDescriptor &format,const FDLookup *lookupTable){
     
     // find the position of c in flagsLookup
-     const FDLookup *found = LookupCharacter(c, lookupTable)
+     const FDLookup *found = LookupCharacter(c, lookupTable);
     
     // not found!
-    if (found == NULL ) return false;
+    if (found == NULL ) {
+        return False;
+    }
     
     // add the missing bits
     format |= found->format;   
     
-    return true;
+    return True;
 }
 
 /**
     0-9 if it is a digit 
     otherwise negative
 */
-static inline int GetDigit(char c){
-    int digit = c - '0';
-    if (digit > 9) return -1;
+static inline int32 GetDigit(char c){
+    int32 digit = c - '0';
+    if (digit > 9) {
+        return -1;
+    }
     return digit;
 }
 
@@ -322,14 +356,14 @@ static inline int GetDigit(char c){
     parses a number out of string 
     returns 0 if no number is encountered
 */
-static inline unsigned int GetIntegerNumber(const char *&string){
-    if (string == NULL) return false;
+static inline uint32 GetIntegerNumber(const char *&string){
+    if (string == NULL) return False;
     
-    unsigned int number = 0;
-    unsigned int digit = 0;
+    uint32 number = 0;
+    int32 digit = 0;
     // 
-    while ((digit = getDigit(string[0]]))>0){
-        number *=10;
+    while ((digit = GetDigit(string[0]))>0){
+        number *= 10;
         number += digit;
         string++;
     }
@@ -344,16 +378,22 @@ bool FormatDescriptor::InitialiseFromString(const char *&string){
     FormatDescriptor temporaryFormat(0);
     
     /// check pointer
-    if (string == NULL) return false;
+    if (string == NULL) {
+        return False;
+    }
     
     // expect at least a character
-    if (string[0] == 0) return false;
+    if (string[0] == 0) {
+        return False;
+    }
     
     //parse options
-    while (ParseCharacter(string[0],temporaryFormat,&flagsLookup[0])) string++;
+    while (ParseCharacter(string[0],temporaryFormat,&flagsLookup[0])) {
+        string++;
+    }
     
     // get any integer number from string if any
-    temporaryFormat.length = GetIntegerNumber(string);
+    temporaryFormat.width = GetIntegerNumber(string);
     
     // after a dot look for the precision field
     if (string[0] == '.') {        
@@ -365,10 +405,10 @@ bool FormatDescriptor::InitialiseFromString(const char *&string){
     // the next must be the code!
     if (ParseCharacter(string[0],temporaryFormat,&typesLookup[0])){
         *this = temporaryFormat;
-        return true;
+        return True;
     }
            
-	return false;
+	return False;
 }
 
 
