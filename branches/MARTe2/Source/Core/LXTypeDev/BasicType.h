@@ -70,16 +70,16 @@ struct BasicType{
         the parts will be separated using the
         character specified in the format field  */
 
-    //MAYBE OBSOLETE 
-        FString               = 7,
+    //OBSOLETE 
+    ///    FString               = 7,  --> dealt via Streamable Interface
 
     /** BString class, size field is meaningless
         void * is BString *
         it is an array of BStrings matching the
         input size  */
 
-    //MAYBE OBSOLETE 
-        STBStringArray        = 8,
+    // OBSOLETE 
+///        STBStringArray        = 8,
 
     /** FString class, size field is meaningless
         void * is FString *
@@ -87,12 +87,12 @@ struct BasicType{
         input size  */
 
     //MAYBE OBSOLETE 
-        FStringArray          = 9,
+//        FStringArray          = 9,
 
     /** StreamInterface class, size field is meaningless */
         Stream                = 10,
 
-        /** Pointers */
+        /** Pointers  */
         Pointer               = 11,
 
         /** A signed integer of size in bits   pointer = intxx * */
