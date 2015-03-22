@@ -25,7 +25,9 @@
 
 /**
  * @file
- * Multi-thread support
+ * @brief Multi-thread support
+ *
+ * Framework threading definition.
  */
 #ifndef THREADS_H
 #define THREADS_H
@@ -35,33 +37,39 @@
 #include "ExceptionHandler.h"
 #include "ProcessorType.h"
 
-/** Defines the default stack size for a thread. */
+/**
+ * Defines the default stack size for a thread.
+ */
 #ifndef THREADS_DEFAULT_STACKSIZE
 #define THREADS_DEFAULT_STACKSIZE 32768
 #endif
 
-/** Assign default initialisation. */
+/**
+ * Assign default initialisation. When a new thread is created, before calling the user callback entry function
+ * this function is called. This allows to keep track of how many threads are running in the application at any
+ * given time and to do house keeping (see also ThreadsDatabase).
+ */
 extern ThreadInformationConstructorType threadInitialisationInterfaceConstructor;
 
 extern "C" {
-/** @see Threads::BeginThread*/
-TID ThreadsBeginThread(ThreadFunctionType function, void *parameters = NULL,
+/** @brief See Threads::BeginThread */
+TID ThreadsBeginThread(ThreadFunctionType function,
+                       void *parameters = NULL,
                        uint32 stacksize = THREADS_DEFAULT_STACKSIZE,
                        const char *name = NULL,
-                       uint32 exceptionHandlerBehaviour =
-                               ExceptionHandler::NotHandled,
+                       uint32 exceptionHandlerBehaviour = ExceptionHandler::NotHandled,
                        ProcessorType runOnCPUs = PTUndefinedCPUs);
 
-/** @see Threads::EndThread*/
+/** @brief See Threads::EndThread */
 void ThreadsEndThread();
 
-/** @see Threads::Id*/
+/** @brief See Threads::Id */
 TID ThreadsId();
 
-/** @see Threads::Kill*/
+/** @brief See Threads::Kill */
 bool ThreadsKill(TID tid);
 
-/** @see Threads::IsAlive*/
+/** @brief See Threads::IsAlive */
 bool ThreadsIsAlive(TID tid);
 
 /** @see Threads::Name*/
@@ -86,12 +94,10 @@ void ThreadsSetPriorityLevel(TID tid, uint32 level);
 void ThreadsSetPriorityClass(TID tid, uint32 priotityClass);
 
 /** Allows to set the thread initialisation method */
-void ThreadsSetInitialisationInterfaceConstructor(
-        ThreadInformationConstructorType threadInitialisationInterfaceConstructor);
+void ThreadsSetInitialisationInterfaceConstructor(ThreadInformationConstructorType threadInitialisationInterfaceConstructor);
 
 /** This function allows to call a subroutine within an exception handler protection */
-bool ThreadProtectedExecute(ThreadFunctionType userFunction, void *userData,
-                            ExceptionHandler *eh);
+bool ThreadProtectedExecute(ThreadFunctionType userFunction, void *userData, ExceptionHandler *eh);
 }
 
 // Forward declaration.
@@ -101,9 +107,8 @@ bool ThreadProtectedExecute(ThreadFunctionType userFunction, void *userData,
  @param threadName The thread name.
  @param exceptionHandlerBehaviour Describes the behaviour of threads when an exception occurr.
  */
-ThreadInformation * DefaultThreadInformationConstructor(
-        ThreadFunctionType userThreadFunction, void *userData,
-        const char *threadName, uint32 exceptionHandlerBehaviour);
+ThreadInformation * DefaultThreadInformationConstructor(ThreadFunctionType userThreadFunction, void *userData, const char *threadName,
+                                                        uint32 exceptionHandlerBehaviour);
 
 /**
  * This class provides a common layer among different OS for using threads.
@@ -111,13 +116,10 @@ ThreadInformation * DefaultThreadInformationConstructor(
 class Threads {
 public:
 
-    friend void ThreadsSetInitialisationInterfaceConstructor(
-            ThreadInformationConstructorType tiic);
+    friend void ThreadsSetInitialisationInterfaceConstructor(ThreadInformationConstructorType tiic);
     friend void ThreadsSetPriorityLevel(TID tid, uint32 level);
     friend void ThreadsSetPriorityClass(TID tid, uint32 priotityClass);
-    friend TID ThreadsBeginThread(ThreadFunctionType function, void *parameters,
-                                  uint32 stacksize, const char *name,
-                                  uint32 exceptionHandlerBehaviour,
+    friend TID ThreadsBeginThread(ThreadFunctionType function, void *parameters, uint32 stacksize, const char *name, uint32 exceptionHandlerBehaviour,
                                   ProcessorType runOnCPUs);
     friend TID ThreadsId();
     friend void ThreadsEndThread();
@@ -173,8 +175,7 @@ public:
      or the parameter passed to this function by the BeginThread method.
      @param tiic A pointer to the function to be used in the BeginThread method.
      */
-    static void SetThreadInformationConstructor(
-            ThreadInformationConstructorType tiic) {
+    static void SetThreadInformationConstructor(ThreadInformationConstructorType tiic) {
         ThreadsSetInitialisationInterfaceConstructor(tiic);
     }
 
@@ -194,27 +195,27 @@ public:
     }
 
     /**
-     A call to this function will start a thred.
-     @param function The function main for the thread.
-     @param parameters A pointer passed to the thread main function.
-     @param stacksize The size of the stack.
-     @param name The name of the thread.
-     @param exceptionAction The action to perform when an exception occurs.
-     @return The thread identification number.
-
-     This function will dynamically allocate an object of type
-     ThreadInformation using the function hook ThreadInformationConstructor.
-     This allows the programmer to choose which constructor has to be used in the case
-     a ThreadInformation derived class had been used.
+     * @brief Starts a new thread.
+     *
+     * This will start a new thread and callback the function set by the user.
+     * This function will dynamically allocate an object of type ThreadInformation using the function hook
+     * ThreadInformationConstructor. If the DefaultThreadInformationConstructor is used the thread will automatically
+     * be registered in the ThreadDatabase and the user function called afterwards.
+     *
+     * @param function The function main for the thread.
+     * @param parameters A pointer passed to the thread main function.
+     * @param stacksize The size of the stack.
+     * @param name The name of the thread.
+     * @param exceptionAction The action to perform when an exception occurs.
+     * @return The thread identification number.
      */
-    static TID BeginThread(ThreadFunctionType function, void *parameters = NULL,
+    static TID BeginThread(ThreadFunctionType function,
+                           void *parameters = NULL,
                            uint32 stacksize = THREADS_DEFAULT_STACKSIZE,
                            const char *name = NULL,
-                           uint32 exceptionHandlerBehaviour =
-                                   ExceptionHandler::NotHandled,
+                           uint32 exceptionHandlerBehaviour = ExceptionHandler::NotHandled,
                            ProcessorType runOnCPUs = PTUndefinedCPUs) {
-        return ThreadsBeginThread(function, parameters, stacksize, name,
-                                  exceptionHandlerBehaviour, runOnCPUs);
+        return ThreadsBeginThread(function, parameters, stacksize, name, exceptionHandlerBehaviour, runOnCPUs);
     }
 
     /** Gets the current thread id; */

@@ -23,21 +23,34 @@
  *
  **/
 /**
- * @class EndianityTest
- * @brief Tests all the Endianity class functions.
- * This class is designed to test all the Endianity functions,
- * for all the supported MARTe types.
- *
+ * @file 
+ * @see EndianityTest
  */
 #ifndef ENDIANITY_TEST_H
 #define ENDIANITY_TEST_H
 
 #include "Endianity.h"
 
+/**
+ * @class EndianityTest
+ * @brief Tests all the Endianity class functions.
+ *
+ * This class is designed to test all the Endianity functions,
+ * for all the supported MARTe types. It forces the conversion
+ * from (to) the tartet architecture endianity (i.e. the endianity of 
+ * machine where the code is being executed), to (from) the 
+ * complementary endianity.
+ */
 template<class T>
 class EndianityTest {
 private:
+    /** 
+     * The test class is designed to support any basic type
+     */
     T testValue;
+    /** 
+     * A static array to test operations that include arrays
+     */ 
     T testArray[3];
 
 public:
@@ -53,15 +66,18 @@ public:
     }
 
     /**
-     * @brief Converts the testValue to little endian and to big endian.
+     * @brief Converts the testValue to little endian and to big endian from the
+     * target architecture endianity.
      *
      * If the target architecture is little endian:
-     * - the test value and the little endian value must be the same
-     * - the test value and the big endian value must be different
+     *  - the test value and the little endian value must be the same;
+     *  - the test value and the big endian value must be different.
+     *
      * If the target architecture is big endian:
-     * - the test value and the little endian value must be different 
-     * - the test value and the big endian value must the same
-     * @return True if the test is successful
+     *  - the test value and the little endian value must be different;
+     *  - the test value and the big endian value must the same.
+     *
+     * @return True if the conditions above are verified.
      */
     bool ToEndian() {
         T valueLittleEndian = testValue;
@@ -81,14 +97,18 @@ public:
     }
 
     /**
-     * Converts the testValue from little endian and from big endian
+     * @brief Converts the testValue from little endian and from big endian to
+     * the target architecture.
+     *
      * If the target architecture is little endian:
-     * - the test value and the little endian value must be the same
-     * - the test value and the big endian value must be different
+     *  - the test value and the little endian value must be the same;
+     *  - the test value and the big endian value must be different.
+     *
      * If the target architecture is big endian:
-     * - the test value and the little endian value must be different 
-     * - the test value and the big endian value must the same
-     * @return True if the test is successful
+     * - the test value and the little endian value must be different;
+     * - the test value and the big endian value must the same.
+     *
+     * @return True if the conditions above are verified.
      */
     bool FromEndian() {
         T valueLittleEndian = testValue;
@@ -108,14 +128,18 @@ public:
     }
 
     /**
-     * Converts the testArray to little endian and to big endian
+     * @brief Converts the testArray to little endian and to big endian from the target
+     * architecture endianity.
+     *
      * If the target architecture is little endian:
-     * - each element of the test array and the little endian array must be the same
-     * - each element of the test array and the big endian array must be different same
+     *  - each element of the test array and the little endian array must be the same;
+     *  - each element of the test array and the big endian array must be different same.
+     *
      * If the target architecture is big endian:
-     * - each element of the test array and the little endian array must be different 
-     * - each element of the test array and the big endian array must be the same
-     * @return True if the test is successful
+     *  - each element of the test array and the little endian array must be different;
+     *  - each element of the test array and the big endian array must be the same.
+     *
+     * @return True if the conditions above are verified.
      */
     bool MemCopyToEndian() {
         T arrayLittleEndian[3];
@@ -143,14 +167,18 @@ public:
     }
 
     /**
-     * Converts the testArray from little endian and from big endian
+     * @brief Converts the testArray from little endian and from big endian to the 
+     * target architecture endianity.
+     *
      * If the target architecture is little endian:
-     * - each element of the test array and the little endian array must be the same
-     * - each element of the test array and the big endian array must be different same
+     *  - each element of the test array and the little endian array must be the same;
+     *  - each element of the test array and the big endian array must be different same.
+     *
      * If the target architecture is big endian:
-     * - each element of the test array and the little endian array must be different 
-     * - each element of the test array and the big endian array must be the same
-     * @return True if the test is successful
+     *  - each element of the test array and the little endian array must be different;
+     *  - each element of the test array and the big endian array must be the same.
+     *
+     * @return True if the conditions above are verified.
      */
     bool MemCopyFromEndian() {
         T arrayLittleEndian[3];
@@ -179,10 +207,15 @@ public:
     }
 
     /**
+     * @brief Verifies that going to a different endianity and returning to the 
+     * target architecture endianity does not change the value.
+     *
      * Converts the testValue to little endian and to big endian and then back
-     * from little and big endian. The values should return to the original test
-     * value
-     * @return True if the test is successful
+     * from little and from big endian. The values should return to the original test
+     * value.
+     *
+     * @return True if the test value is not changed after returning to the original 
+     * endianity.
      */
     bool ToFromEndian() {
         T valueLittleEndian = testValue;
@@ -197,10 +230,10 @@ public:
     }
 
     /**
-     * Converts the testArray to little endian and to big endian and then back
-     * from little and big endian. All the array values should return to the original test
-     * value
-     * @return True if the test is successful
+     * @brief The same logic as ToFromEndian but for arrays.
+     *
+     * @see EndianityTest::ToFromEndian but using the 
+     * Endianity::MemCopyToFromEndian and Endianity::MemCopyFromLittleEndian functions.
      */
     bool MemCopyToFromEndian() {
         T arrayLittleEndian[3];
@@ -226,7 +259,9 @@ public:
     }
 
     /**
-     * Executes all the tests
+     * @brief Executes all the tests.
+     *
+     * @return True if all the tests are successful.
      */
     bool All() {
         bool ok = ToEndian();
