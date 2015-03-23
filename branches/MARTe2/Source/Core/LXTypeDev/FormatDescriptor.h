@@ -408,7 +408,7 @@ bool FormatDescriptor::InitialiseFromString(const char *&string){
         return True;
     }
            
-	return False;
+    return False;
 }
 
 
