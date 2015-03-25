@@ -40,19 +40,10 @@ class BasicString;
 
 extern "C" {
 
-/** Exported function to write the content of buffer into the BString.
+
+/** Exported function to read the content of BString from a buffer.
  @param  s The BString class
  @param  buffer The pointer to the buffer where to read the data from
- @param  position where to read from
- @param  size   The number of bytes to read
-NOT used by BSTtring actually but by FString
- @return True if successful. False otherwise.
- */
-bool BSRead(BasicString &s, void* buffer, uint32 position, uint32 &size);
-
-/** Exported function to write the content of BString into a buffer.
- @param  s The BString class
- @param  buffer The pointer to the buffer where to write the data to
  @param  position where to write from
  @param  size   The number of bytes to write
  @return True if successful. False otherwise.
@@ -75,7 +66,6 @@ bool BSWrite(BasicString &s, const void* buffer, uint32 position, uint32 &size);
 */
 class BasicString: public CharBuffer {
 
-    friend bool BSRead (BasicString &s, void* buffer, uint32 position, uint32 &size);
     friend bool BSWrite(BasicString &s, const void* buffer, uint32 position, uint32 &size);
 
 protected:
@@ -130,7 +120,7 @@ protected:
      @param  s The BString to be copied
      @return True if successful. False otherwise.
      */
-    bool Copy(const BString &s) {
+    bool Copy(const BasicString &s) {
         uint32 wsize = s.size;
         size = 0;
         bool ret = BSWrite(*this, s.Buffer(), 0, wsize);
@@ -140,14 +130,14 @@ protected:
 public:
 
     /** Creates an empty string */
-    inline BString() {
+    inline BasicString() {
         InitMembers();
     }
 
     /** Creates a BString as a copy of a BString.
      @param x The BString to use for initialisation
      */
-    inline BString(const BString &x) {
+    inline BasicString(const BString &x) {
         InitMembers();
         Copy(x);
     }
@@ -155,13 +145,13 @@ public:
     /** Creates a BString as a copy of string
      @param x The pointer to the string to use for initialisation
      */
-    inline BString(const char *x) {
+    inline BasicString(const char *x) {
         InitMembers();
         Copy(x);
     }
 
     /** Destructor */
-    virtual ~BString() {
+    virtual ~BasicasicString() {
         FinishMembers();
     }
 

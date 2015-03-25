@@ -97,7 +97,7 @@ class CharBuffer {
 public:
 
     /** Creates a buffer of a given size */
-    inline CharBuffer(uint32 desiredSize) {
+    inline CharBuffer(uint32 desiredSize=0) {
         InitMembers();
         SetBufferSize(desiredSize);
     }

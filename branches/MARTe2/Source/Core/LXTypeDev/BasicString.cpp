@@ -26,6 +26,7 @@
 #include "BasicString.h"
 #include "GeneralDefinitions.h"
 
+#if 0 // not needed for BasicString
 
 bool BSRead(BasicString &s, char* buffer, uint32 position, uint32 &size) {
     // adjust position
@@ -43,6 +44,8 @@ bool BSRead(BasicString &s, char* buffer, uint32 position, uint32 &size) {
 //    position += size;
     return True;
 }
+
+#endif
 
 bool BSWrite(BString &s, const char* buffer, uint32 position, uint32 &copySize) {
     // adjust position
