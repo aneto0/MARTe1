@@ -21,7 +21,7 @@
 // $Id$
 //
 //
-function putRGraphLabelLine(canvasId) {
+function putRGraphLabelBar(canvasId) {
     var canv  = document.getElementById(canvasId);
     var context = canv.getContext("2d");
     context.textBaseline = "top";
@@ -30,7 +30,7 @@ function putRGraphLabelLine(canvasId) {
     context.fillText('Powered by RGraph', 0, 0);
 }
 
-function putTitleLine(canvasId, title, color) {
+function putTitleBar(canvasId, title, color) {
     var canvas  = document.getElementById(canvasId);
     var context = canvas.getContext("2d");
     context.textBaseline = "top";
@@ -47,28 +47,28 @@ function putTitleLine(canvasId, title, color) {
 }
 
 
-function getMaxOfArrayLine(numArray) {
+function getMaxOfArrayBar(numArray) {
 	    return Math.max.apply(null, numArray);
 	}
 
 
 
 
-function getMinOfArrayLine(numArray) {
+function getMinOfArrayBar(numArray) {
     return Math.min.apply(null, numArray);
 }
 
 
 
-function ArrayToStringLineExp(dataMatrix, length){
+function ArrayToStringExpBar(dataMatrix, resolution){
 	var dataString = new Array(dataMatrix.length);
 	for(var i = 0 ; i < dataMatrix.length ; i++) {
-		dataString[i] = (dataMatrix[i].toExponential(3)).toString(10);
+		dataString[i] = (dataMatrix[i].toExponential(resolution)).toString(10);
 	}
 	return dataString;
 }
 
-function ArrayToStringLine(dataMatrix, length){
+function ArrayToStringBar(dataMatrix, length){
 	var dataString = new Array(dataMatrix.length);
 	for(var i = 0 ; i < dataMatrix.length ; i++) {
 		dataMatrix[i] = Math.round(dataMatrix[i]*length)/length;
@@ -78,41 +78,32 @@ function ArrayToStringLine(dataMatrix, length){
 }
 
 
-function plotLine(canvasId, dataMatrix, xLimits, title, xlabel, ylabel, bottomXAxisPos, zoom) {
+function plotBar(canvasId, dataMatrix, xLimits, title, xlabel, ylabel, bottomXAxisPos, zoom) {
+
     //Clear the plot every time.
     RGraph.Clear(document.getElementById(canvasId));
-
     var colorSequence = ['blue','red','black','green','aqua','purple','olive','fuchsia','teal','maroon','navy','lime','gray','yellow','silver'];
-
-    //Calculate yMax and yMin from the data array.
-    var yMaxArr = new Array(dataMatrix.length);
-    var yMinArr = new Array(dataMatrix.length);
-
-    for(var i = 0 ; i < dataMatrix.length ; i++) {
-	yMaxArr[i]=getMaxOfArrayLine(dataMatrix[i]);
-	yMinArr[i]=getMinOfArrayLine(dataMatrix[i]);
-    }
-
-    var yMax=getMaxOfArrayLine(yMaxArr);
-    var yMin=getMinOfArrayLine(yMinArr);
-
-    //Adjust bounds with the zoom.
-    yMax*=(1+zoom);
-    yMin*=(1-zoom);
-
+    
     //Define x and y ticks.
     var NUM_OF_XTICKS = 10;
     var NUM_OF_YTICKS = 10;
+
+    //Calculate values for each tick
     if(xLimits.length == 2) {
-	var xLabelArray = new Array(NUM_OF_XTICKS+1);
+	var xLabelArray = new Array(dataMatrix.length*(NUM_OF_XTICKS+1));
 	var deltaX = (xLimits[1]-xLimits[0])/NUM_OF_XTICKS;
-	for(var i = 0 ; i <= NUM_OF_XTICKS ; i++) {
-	    xLabelArray[i] = xLimits[0] + i*deltaX;
+	var cnt=0;
+	for(var j =0; j < dataMatrix.length; j++){
+	    for(var i = 0 ; i <= NUM_OF_XTICKS ; i++) {
+	        xLabelArray[cnt] = xLimits[0] + i*deltaX;
+		    cnt++;
+	    }
 	}
     } else {
 	xLabelArray = [];
     }
 
+    var xLabelArrayStr;
     //Convert the x-label to a string array rounding at 2 decimal numbers, otherwise use the scientific mode.
     if(xLimits[1] < 0.01){
 	var xLabelArrayStr = ArrayToStringExpBar(xLabelArray,2);
@@ -120,7 +111,24 @@ function plotLine(canvasId, dataMatrix, xLimits, title, xlabel, ylabel, bottomXA
     else{
 	var xLabelArrayStr = ArrayToStringBar(xLabelArray, 100);
     }
- 
+
+
+    //Calculate yMax and yMin from the data array.
+    var yMaxArr = new Array(dataMatrix.length);
+    var yMinArr = new Array(dataMatrix.length);
+
+    for(var i = 0 ; i < dataMatrix.length ; i++) {
+        yMaxArr[i]=getMaxOfArrayBar(dataMatrix[i]);
+	yMinArr[i]=getMinOfArrayBar(dataMatrix[i]);
+    }
+
+    var yMax=getMaxOfArrayBar(yMaxArr);
+    var yMin=getMinOfArrayBar(yMinArr);
+
+    //Adjust bounds with the zoom.
+    yMax*=(1+zoom);
+    yMin*=(1-zoom);
+
     //Calculate a string array in scientific mode for y label.
     var yLabelArray= new Array(NUM_OF_YTICKS);
     var element=yMax;
@@ -130,48 +138,32 @@ function plotLine(canvasId, dataMatrix, xLimits, title, xlabel, ylabel, bottomXA
 	element-=(yMax-yMin)/(NUM_OF_YTICKS-1);
 	k++;
     }
-    var dataString=ArrayToStringLineExp(yLabelArray);
+    var dataString=ArrayToStringExpBar(yLabelArray,3);
 
-
-    //Draw the line plot.
-    var line = new RGraph.Line({
+    //Draw the bar plot.
+    var bar = new RGraph.Bar({
                 id: canvasId,
                 data: dataMatrix,
                 options: {
-		    colors: colorSequence,
-		    gutter: {
+		gutter: {
 			left: 100,
                         bottom: 50
                     },
+                    //labels: xLabelArray,
+                    colors: {
+			self: ['yellow'],
+			//sequential: false
+		    },
 		    ylabels: {
                         specific: dataString
 		    },
-		    background: {
-		    	grid: {
-				autofit: {
-					self: true,
-					numhlines: 10,
-					numvlines:20
-				}
-			    }
-		    },
-		    text: {
-			size: 8,
-	            },
-		    title: {
-			xaxis: xlabel,
-			yaxis: ylabel,
-		    },
-		    xticks: NUM_OF_XTICKS,
-		    yticks: NUM_OF_YTICKS,
-                    ymax: yMax,
+		    labels: xLabelArrayStr,
+                    hmargin: 15,
+                    //bevel: true,
+ 		    ymax: yMax,
                     ymin: yMin,
-		    tickmarks: 'circle',
-		    labels: xLabelArray
-                    //spline: true
-                }
+                    strokestyle: 'black'
+                }                
             }).draw()
-
     putTitleLine(canvasId+"title", title, colorSequence);
-
 }
