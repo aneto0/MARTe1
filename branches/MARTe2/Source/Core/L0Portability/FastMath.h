@@ -19,7 +19,7 @@
  * See the Licence  
  permissions and limitations under the Licence. 
  *
- * $Id: Endianity.h 3 2012-01-15 16:26:07Z aneto $
+ * $Id:  $
  *
  **/
 /**

@@ -33,6 +33,17 @@
 #include "ThreadInformation.h"
 #include "TimeoutType.h"
 
+/** @brief A database of pointers to threadInformation objects.
+  * 
+  * These methods allows to store and remove pointers to threadInformation objects. A new entry is automatically
+  * add to the database when a thread begin its execution and it's removed from database automatically when the
+  * thread terminate. A spinlock mutex it's implemented here to make consistent all operations on database between
+  * threads. The database allow to threads the access to other threads informations.
+  *
+  * The database is fundamental for all operations between threads. Without it, threads could not know nothing about 
+  * other threads.
+  */ 
+
 extern "C" {
 
 /** @see ThreadsDatabase::DatabaseNewEntry */
@@ -94,48 +105,59 @@ public:
                                        TID tid);
 
 public:
-    /** create new TDB entry associated to the ti */
+    /** @brief Add a new thread to the database.
+      * The database memory is allocated dinamically truth malloc and realloc functions.
+      * @param ti is a pointer to the thread information.
+      * @return true if ti is added to the database, false if something wrong happened with memory allocation. */
     static bool NewEntry(ThreadInformation *ti) {
         return ThreadsDatabaseNewEntry(ti);
     }
 
-    /** destroy TDB entry  */
+    /** @brief Remove the entry from database searching by tid.
+      * @param tid is the id of the threads which must be removed from database.
+      * @return true if the thread with tid as id is in the database and if it is removed without errors. */
     static ThreadInformation *RemoveEntry(TID tid) {
         return ThreadsDatabaseRemoveEntry(tid);
     }
 
-    /** access private thread information
-     on timeout returns NULL
-     tid = 0 --> current TID */
+    /** @brief Get thread informations.
+      * @param tid is the id of the requested thread.
+      * @return the ThreadInformation object related to the thread with tid as id. */
     static ThreadInformation *GetThreadInformation(TID tid) {
         return ThreadsDatabaseGetThreadInformation(tid);
     }
 
-    /** must be locked before accessing TDB information */
+    /** @brief Lock a spinlock mutex to allow exclusive access to the database.
+        With timeout it wait until it's expired, then return false.
+      * @param tt is the timeout. 
+      * @return false if the lock fails because the timeout. */
     static bool Lock(TimeoutType tt = TTInfiniteWait) {
         return ThreadsDatabaseLock(tt);
     }
 
-    /** must be unlocked after accessing TDB information */
+    /** @brief Unlock a spinlock mutex.
+      * @return true. */
     static bool UnLock() {
         return ThreadsDatabaseUnLock();
     }
 
-    /** how many threads are registered
-     value meaningful only between Lock/UnLock*/
+    /** @brief Return the number of threads registered.
+      * @return the number of threads currently saved in database. */
     static int32 NumberOfThreads() {
         return ThreadsDatabaseNumberOfThreads();
     }
 
-    /** the TID of thread #n
-     value meaningful only between Lock/UnLock*/
+    /** @brief Get the thread id of the n-th thread saved in database.
+      * @param n is the index of the requested thread.
+      * @return the tid of the requested thread. */
     static TID GetThreadID(int32 n) {
         return ThreadsDatabaseGetThreadID(n);
     }
 
-    /** retrieves information about a thread identified either by name or TID or index
-     tid = 0 ==> current tid
-     to be called between Lock/UnLock*/
+    /** @brief Get the informations searching a thread by index or by id.
+      * @param n is the index of the requested thread.
+      * @param tid is the tid of the requested thread.
+      * @return true if the requested thread is in the database. */
     static bool GetInfo(ThreadInformation &tiCopy, int32 n = -1,
                         TID tid = (TID) - 1) {
         return ThreadsDatabaseGetInfo(tiCopy, n, tid);

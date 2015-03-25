@@ -19,7 +19,7 @@
  * See the Licence  
  permissions and limitations under the Licence. 
  *
- * $Id: Endianity.h 3 2012-01-15 16:26:07Z aneto $
+ * $Id: $
  *
  **/
 /**
@@ -31,14 +31,27 @@
 
 #include "GeneralDefinitions.h"
 
+/**
+ * @brief Functions to get the main processor informations.
+ * 
+ * These functions allows to get cpu informatios like family,
+ * id, model and number of avaiable processors.
+ *
+ * Most of the implementation is delegated to ProcessorA.h and ProcessorOS.h.
+ */
+
 extern "C" {
 
+/** @see Processor::Family(). */
 uint32 ProcessorFamily();
 
+/** @see Processor::VendorId(). */
 const char *ProcessorVendorId();
 
+/** @see Processor::ProcessorsAvaiable(). */
 uint32 ProcessorsAvailable();
 
+/** @see Processor::Model(). */
 uint32 ProcessorModel();
 }
 
@@ -46,22 +59,26 @@ uint32 ProcessorModel();
 class Processor {
 public:
 
-    /** The processor type. */
+    /** @brief Returns the processor type.
+      * @return a string which contains the processor type. */
     static inline const char *VendorId() {
         return ProcessorVendorId();
     }
 
-    /** The processor family */
+    /** @brief Returns the processor family. 
+      * @return processor family. */
     static inline uint32 Family() {
         return ProcessorFamily();
     }
 
-    /** The processor family */
+    /** @brief Returns the processor model.
+      * @return processor model. */
     static inline uint32 Model() {
         return ProcessorModel();
     }
 
-    /** The number of cpus avaible */
+    /** @brief Returns the number of avaible cpus. 
+      * @returns the number of avaible cpus. */
     static inline uint32 Available() {
         return ProcessorsAvailable();
     }

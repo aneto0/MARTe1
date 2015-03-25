@@ -31,38 +31,42 @@
 
 #include "GeneralDefinitions.h"
 /**
- This class provides basic facilities to use semaphores.
+ @brief This class provides basic facilities to use semaphores.
  */
 class SemCore {
 protected:
-    /** A number associated to te semaphore. */
+    /** A number associated to the semaphore. */
     HANDLE semH;
 public:
-    /** Set the semaphore handle to 0. */
+    /** @brief Set the semaphore handle to 0. */
     void Init() {
         semH = (HANDLE) 0;
     }
-    /** Set the semaphore. */
+    /** @brief Set the semaphore.
+      * @param s is the desired initial value for the semaphore. */
     void Init(HANDLE s) {
         semH = s;
     }
 
-    /** Calls Init(s). */
+    /** @brief Constructor.
+      * @param s is the desired initial value for the semaphore. */
     SemCore(HANDLE s) {
         Init(s);
     }
 
-    /** Calls Init(). */
+    /** @brief Constructor. */
     SemCore() {
         Init();
     }
 
-    /** */
+    /** @brief Assign operator.
+      * @param s is another SemCore object and its value will be copied in this.*/
     void operator=(SemCore &s) {
         semH = s.semH;
     }
 
-    /** the operating system handle */
+    /** @brief return number associated to the semaphore.
+      * @return the current value associated to the semaphore. */
     inline HANDLE Handle() {
         return semH;
     }

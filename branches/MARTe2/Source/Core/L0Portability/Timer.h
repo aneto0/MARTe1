@@ -32,16 +32,45 @@
 #include "Threads.h"
 #include "Sleep.h"
 
+
+/**
+ * @brief Functions for timer management.
+ * 
+ * These methods allows to call a subroutine function when a timer is elapsed. Here are implemented functions to
+ * configure the desired period of the timer, to start and terminate the timer.
+ *
+ * Most of the implementation is delegated to TimerOS.h which provides system level functions for timer management.
+ *  
+ */
+
+
+
 class Timer;
 
 extern "C" {
+
+/** @see Timer::ConfigTimer(). */
 bool TimerConfigTimer(Timer &t, int32 usec, int32 cpuMask);
+
+/** @see Timer::ConfigAndStartTimer(). */
 bool TimerConfigAndStartTimer(Timer &t, int32 usec, int32 cpuMask);
+
+/** @see Timer::GetTimerUsecPeriod(). */
 int64 TimerGetTimerUsecPeriod(Timer &t);
+
+/** @see Timer::ResetTimer(). */
 bool TimerResetTimer(Timer &t);
+
+/** @see Timer::Init(). */
 void TimerInit(Timer &t);
+
+/** @see Timer::StartTimer(). */
 bool TimerStartTimer(Timer &t);
+
+/** @see Timer::StopTimer(). */
 bool TimerStopTimer(Timer &t);
+
+/** @see Timer::TimerServiceRoutine(). */
 void TimerCServiceRoutine(Timer &t);
 }
 
@@ -75,7 +104,8 @@ public:
 
 public:
 
-    /** Constructor - creates, configures and starts the timer with period usec */
+    /** @brief Constructor.
+      * Creates, configures and starts the timer with usec as period (in microseconds). */
     Timer(int32 usec) {
         Init();
         if (!ConfigAndStartTimer(usec)) {
@@ -83,24 +113,25 @@ public:
         }
     }
 
-    /** Constructor - creates the timer */
+    /** @brief Constructor.
+      * Creates the timer. */
     Timer() {
         Init();
     }
 
-    /** Initialise timer parameters */
+    /** @brief Initialise timer parameters. */
     void Init() {
         TimerInit(*this);
     }
 
-    /** Initialise statistics parameters */
+    /** @brief Initialise statistics parameters. */
     void InitStats() {
         timerCounter = 0;
         currentHRTTick = 0;
         oldHRTTick = 0;
     }
 
-    /** Destructor */
+    /** @brief Destructor. */
     virtual ~Timer() {
         if (timerStatus == RUNNING) {
             if (!StopTimer()) {
@@ -109,54 +140,68 @@ public:
         }
     }
 
-    /** Configure the timer - this method can be called anytime as long as the object exists */
+    /** @brief Configure the timer
+      * This method can be called anytime as long as the object exists.
+      * @param usec is the desired period of the timer (in microseconds).
+      * @param cpumask is the mask of the cpu.
+      * @return true if the system level function return without errors.  */
     bool ConfigTimer(int32 usec, int32 cpuMask = 0xff) {
         return TimerConfigTimer(*this, usec, cpuMask);
     }
 
-    /** Configure and start the timer - this method can be called anytime as long as the object exists and even if a timer is already running */
+    /** @brief Configure and start the timer.
+      * This method can be called anytime as long as the object exists and even if a timer is already running.
+      * @param usec is the desired period of the timer (in microseconds).
+      * @param cpumask is the mask of cpu.
+      * @return true if configuration return true and if the state of timer was not already in RUNNING.*/
     bool ConfigAndStartTimer(int32 usec, int32 cpuMask = 0xff) {
         return TimerConfigAndStartTimer(*this, usec, cpuMask);
     }
 
-    /** Starts a timer that has already been configured */
+    /** @brief Starts a timer that has already been configured.
+      * @return false if the timer is not in CONFIGURED status. */
     bool StartTimer() {
         return TimerStartTimer(*this);
     }
 
-    /** Get current timer period in microseconds */
+    /** @brief Get current timer period in microseconds.
+      * @return the timer period in microseconds. */
     int64 GetTimerUsecPeriod() {
         return TimerGetTimerUsecPeriod(*this);
     }
 
-    /** Get value for internal timer counter */
+    /** @brief Get value for internal timer counter (how many times a timer started).
+      * @return the timer counter. */
     int64 GetTimerCounter() {
         return timerCounter;
     }
 
-    /** Stop timer */
+    /** @brief Stop timer.
+      * @return true if the system level function returns without errors. */
     bool StopTimer() {
         return TimerStopTimer(*this);
     }
 
-    /** Reset timer internal counter and statistics */
+    /** @brief Reset timer internal counter and statistics. 
+      * It works only if the timer is not in RUNNING mode.
+      * @return false if the timer is in RUNNING mode, true otherwise. */
     bool ResetTimer() {
         return TimerResetTimer(*this);
     }
 
-    /**
-     * @return the Timer status
-     */
+    /** @brief Get the timer status.
+     *  @return the timer status. */
     int32 TimerStatus() {
         return timerStatus;
     }
 
-    /** Collects statistical info and calls the user's timer service routine */
+    /** @brief Collects statistical info and calls the user's timer service routine. */
     void TimerServiceRoutine() {
         TimerCServiceRoutine(*this);
     }
 
-    /** User's timer service routine - is called once every period usec */
+    /** @brief User's timer service routine.
+      * This function is called once every period usec. */
     virtual void UserTimerServiceRoutine() {
     }
 };

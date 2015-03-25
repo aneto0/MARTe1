@@ -19,13 +19,11 @@
  * See the Licence  
  permissions and limitations under the Licence. 
  *
- * $Id: Endianity.h 3 2012-01-15 16:26:07Z aneto $
+ * $Id: $
  *
  **/
-/**
- *  @file 
- *  Mutex semafore
- */
+
+
 #ifndef MUTEX_SEM
 #define MUTEX_SEM
 
@@ -33,55 +31,75 @@
 #include INCLUDE_FILE_OPERATING_SYSTEM(OPERATING_SYSTEM,MutexSemOS.h)
 #include "SemCore.h"
 
+
+/**
+ * @brief Mutex Semaphore with functions to allows creation, destruction and lock-unlock of the semaphore.
+ * 
+ * This type of semaphore is very useful for thread syncronization due to protect critical sections of code
+ * like for example multiple accesses to the same shared memory location avoiding race conditions or not consistent datas.
+ *
+ * Most of the implementation is delegated to MutexSemOS.h which provides system level functions for mutex semaphores.
+ *
+ * Mutex semaphores are generally used in multithreading applications to guarantee exclusive access in critical code sections
+ * shared by different threads.
+ */
+
+
 /** a mutual exclusion semaphore */
 class MutexSem : public SemCore {
 
 public:
-    /** constructor */
+    /** @brief Constructor. */
     MutexSem(HANDLE h) {
         Init(h);
     }
 
-    /** default constructor */
+    /** @brief Default constructor. */
     MutexSem() {
     }
 
-    /** destructor */
+    /** @brief Destructor. */
     ~MutexSem() {
         Close();
     }
 
-    /** open the semafore with a given initial state */
+    /** @brief Open the semafore with a given initial state.
+      * @param locked is the desired initial state: true = locked, false = unlocked.
+      * @return false if something in the system level mutex initialization goes wrong. */
     bool Create(bool locked=False) {
         return MutexSemOSCreate(semH, locked);
     }
 
-    /** close the semafore handle */
+    /** @brief Close the semafore handle. 
+      * @return true. */
     bool Close() {
         return MutexSemOSClose(semH);
     }
 
-    /** grab the semafore */
+    /** @brief Lock the semafore.
+      * @return false if something in the lock system level function goes wrong. */
     bool Lock(TimeoutType msecTimeout = TTInfiniteWait) {
         return MutexSemOSLock(semH, msecTimeout);
     }
 
-    /** returns the ownership */
+    /** @brief Unlock the semaphore.
+      * @return true if the unlock system level function return true. */
     bool UnLock() {
         return MutexSemOSUnLock(semH);
     }
 
-    /** locks without wasting time */
+    /** @see Lock() */
     inline bool FastLock(TimeoutType msecTimeout = TTInfiniteWait) {
         return MutexSemOSFastLock(semH, msecTimeout);
     }
 
-    /** unlock semafore fast */
+    /** @see UnLock() */
     inline bool FastUnLock() {
         return MutexSemOSFastUnLock(semH);
     }
 
-    /** just try to lock it returning immediately */
+    /** @brief Try to lock the semaphore and if it is already locked returning immediately.
+      * @return true if the semaphore was unlocked and the function locks it, false if it was already locked. */
     inline bool FastTryLock() {
         return MutexSemOSFastTryLock(semH);
     }

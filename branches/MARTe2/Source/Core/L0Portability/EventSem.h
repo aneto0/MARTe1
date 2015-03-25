@@ -19,25 +19,33 @@
  * See the Licence  
  permissions and limitations under the Licence. 
  *
- * $Id: Endianity.h 3 2012-01-15 16:26:07Z aneto $
+ * $Id:  $
  *
  **/
 
 /**
  * @file 
- * A semaphore used to synchronise several tasks.
- *
- * After being Reset the semaphore is ready to Wait.
- * Once waiting, until a Post arrives all the tasks will wait on 
- * the semaphore. After the post all tasks are allowed to proceed.
- * A Reset is then required to use the semaphore again.
+ * @brief A semaphore used to synchronise several tasks.
  */
+
 #ifndef EVENT_SEM_H
 #define EVENT_SEM_H
 
 #include "GeneralDefinitions.h"
 #include "SemCore.h"
 #include INCLUDE_FILE_OPERATING_SYSTEM(OPERATING_SYSTEM,EventSemOS.h)
+/** 
+ * @brief This semaphore is used mostly for thread syncronization.
+ * After being Reset the semaphore is ready to Wait.
+ * Once waiting, until a Post arrives all the threads will wait on 
+ * the semaphore. After the post all tasks are allowed to proceed.
+ * A Reset is then required to use the semaphore again.
+ *
+ * Most of the implementation is delegated to the EventSemOS.h file
+ * which is different for each operating system and provides non-portable
+ * functions to implement this kind of semaphore.  
+ */
+
 
 /** Definition of an event shemaphore. */
 class EventSem: public SemCore {
@@ -51,7 +59,7 @@ public:
         Init(h);
     }
 
-    /** copies semaphore and special infos as well. */
+    /** @brief Copies semaphore and special infos as well. */
     void operator=(EventSem &s) {
         *this = s;
     }
@@ -61,32 +69,38 @@ public:
         Close();
     }
 
-    /** Creates the semafore */
+    /** @brief Creates the semafore.
+        @return true if the initialization of the semH handle goes fine (pthread initialization). */
     bool Create() {
         return EventSemCreate(semH);
     }
 
-    /** closes the semafore */
+    /** @brief Closes the semafore.
+        @return true if the system level function returns without errors. */
     bool Close(void) {
         return EventSemClose(semH);
     }
 
-    /** wait for an event */
+    /** @brief Wait for an event.
+      * @return true if the system level function returns without errors. */
     bool Wait(TimeoutType msecTimeout = TTInfiniteWait) {
         return EventSemWait(semH, msecTimeout);
     }
 
-    /** resets the semafore and then waits*/
+    /** @brief Resets the semafore and then waits.
+      * @return true if both system level Reset and Wait functions return true.*/
     bool ResetWait(TimeoutType msecTimeout = TTInfiniteWait) {
         return EventSemResetWait(semH, msecTimeout);
     }
 
-    /** Send an event to semafore */
+    /** @brief Send an event to semafore, unlocking it.
+        @return true if the system level function returns without errors. */
     bool Post() {
         return EventSemPost(semH);
     }
 
-    /** reset the semafore to its unposted state */
+    /** @brief Reset the semafore to its unposted state.
+      * @return true if the semaphore state is resetted correctly. */
     bool Reset() {
         return EventSemReset(semH);
     }

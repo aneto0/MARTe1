@@ -19,7 +19,7 @@
  * See the Licence  
  permissions and limitations under the Licence. 
  *
- * $Id: Endianity.h 3 2012-01-15 16:26:07Z aneto $
+ * $Id:  $
  *
  **/
 /** 
@@ -32,6 +32,17 @@
 #include "GeneralDefinitions.h"
 #include "HighResolutionTimer.h"
 
+/**
+ * @brief Functions for timeout definition.
+ * 
+ * These methods define the timeout object which is simply an integer which represent a time in milliseconds.
+ * Futhermore here are defined flags for different types of timeout.
+ *  
+ * This class is used to implement semaphores based on spinlocks with timed locks and in applications which needs
+ * timeouts.
+ */
+
+
 /** max value for the delay that is treated  */
 const uint32 TTMaxDelay = 0xFFFF0000;
 
@@ -41,17 +52,20 @@ public:
     /** how many msecs to wait */
     uint32 msecTimeout;
 public:
-    /** constructor from integer*/
+    /** @brief Constructor from integer.
+      * @param msecs is the time in milliseconds. */
     TimeoutType(uint32 msecs = (uint32) 0xFFFFFFFF) {
         msecTimeout = msecs;
     }
 
-    /** constructor from float */
+    /** @brief Set timeout from float.
+      * @param secs is the time in seconds. */
     void SetTimeOutSec(double secs) {
         msecTimeout = (uint32) (secs * 1000.0);
     }
 
-    /** constructor from HRT ticks */
+    /** @brief Set timeout from HRT ticks.
+      * @param ticks are the number of cpu ticks. */
     void SetTimeOutHighResolutionTimerTicks(int64 ticks) {
         if (ticks < 0)
             ticks = 0;
@@ -59,7 +73,8 @@ public:
         msecTimeout = (uint32) msDT;
     }
 
-    /** Timeout in HighResolutionTimer Ticks*/
+    /** @brief Get the timeout in HighResolutionTimer Ticks
+      * @return the number of ticks related to the timeout. */
     int64 HighResolutionTimerTicks() const {
         double dT = msecTimeout;
         dT = dT * 1e-3;
@@ -69,7 +84,8 @@ public:
         return ticks;
     }
 
-    /** bounded reduction */
+    /** @brief Subtract n to the timeout.
+      * @param n is the value which must be subtracted to the timeout (milliseconds). */
     void operator-=(uint32 n) {
         if (msecTimeout > n)
             msecTimeout -= n;
@@ -77,22 +93,28 @@ public:
             msecTimeout = 0;
     }
 
-    /** comparison */
+    /** @brief Compare two timeout times.
+      * @param tt is another timeout object.
+      * @return true of msecTimeout attributes of both timeout object are equal. */
     bool operator==(const TimeoutType tt) {
         return msecTimeout == tt.msecTimeout;
     }
 
-    /** comparison */
+    /** @brief Check if two timeout are different.
+      * @param tt is another timeout.
+      * @return true if msecTimeout attributes of both timeout object are different. */
     bool operator!=(const TimeoutType tt) {
         return msecTimeout != tt.msecTimeout;
     }
 
-    /** copy */
+    /** @brief Assignment operator.
+      * @param tt is the timout to copy in this. */
     void operator=(const TimeoutType tt) {
         msecTimeout = tt.msecTimeout;
     }
 
-    /** A finite timeout is not infinite not unprotected */
+    /** @brief Check if the timeout is finite.
+      * @return true if the timeout is less than the max timeout accettable. */
     bool IsFinite() {
         return (msecTimeout < (uint32) 0xFFFFFFFE);
     }

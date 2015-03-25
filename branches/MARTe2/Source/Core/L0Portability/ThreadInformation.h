@@ -34,8 +34,20 @@
 #include "Memory.h"
 #include "ExceptionHandler.h"
 
-/** The type of a function that can be used for a thread.
- */
+/** @brief A class which contains all threads informations (name, function, argument, id, priority info).
+  * 
+  * This class is useful to the ThreadsDatabase implementation (@see ThreadsDatabase.h) and allow the access
+  * to the main thread information.
+  *
+  * Generally this methods and attributes are used for the comunication and syncronization between threads,
+  * allowing for example to a thread to understand if another thread is still alive or also to kill and terminate
+  * other threads.
+  */ 
+
+
+
+
+/** The type of a function that can be used for a thread. */
 typedef void (*ThreadFunctionType)(void *parameters);
 
 /** This class is an interface used to implement a common thread initialisation procedure.
@@ -55,8 +67,7 @@ protected:
     const char *name;
 
     /** enables the operating system to perform some housekeeping 
-     * before releasing the thread to the user code
-     */
+     * before releasing the thread to the user code. */
     EventSem startThreadSynchSem;
 
 public:
@@ -69,7 +80,7 @@ public:
     /** The thread priority level */
     uint32 priorityLevel;
 
-    /** */
+    /** @brief Default constructor. */
     ThreadInformation() {
         userThreadFunction = NULL;
         userData = NULL;
@@ -81,7 +92,8 @@ public:
         startThreadSynchSem.Reset();
     }
 
-    /** */
+    /** @brief Constructor. 
+      * @param threadInfo contains informations to initialize this object. */
     ThreadInformation(ThreadInformation &threadInfo) {
         userThreadFunction = threadInfo.userThreadFunction;
         userData = threadInfo.userData;
@@ -91,7 +103,8 @@ public:
         priorityLevel = threadInfo.priorityLevel;
     }
 
-    /** */
+    /** @brief Equal operator to copy a thread info in this. 
+      * @param threadInfo contains informations to initialize this object. */
     void operator=(ThreadInformation &threadInfo) {
         userThreadFunction = threadInfo.userThreadFunction;
         userData = threadInfo.userData;
@@ -102,9 +115,9 @@ public:
     }
 
     /** Constructor.
-     @param userThreadFunction Actually the thread that has to be executed.
-     @param userData A pointer to a structure containing thread data.
-     @param name The name of the thread.        */
+      * @param userThreadFunction Actually the thread that has to be executed.
+      * @param userData A pointer to a structure containing thread data.
+      * @param name The name of the thread. */
     ThreadInformation(ThreadFunctionType userThreadFunction, void *userData,
                       const char *name) {
         this->userThreadFunction = userThreadFunction;
@@ -122,55 +135,51 @@ public:
         startThreadSynchSem.Reset();
     }
 
-    /** Normal class destructor. It just frees the memory allocated for the name string. */
+    /** @brief Destructor. 
+      * It just frees the memory allocated for the name string. */
     virtual ~ThreadInformation() {
         MemoryFree((void *&) name);
         startThreadSynchSem.Close();
     }
     ;
 
-    /** The function representing the thread. This is the most basic implementation */
+    /** @brief Launch the function of the thread.
+      * The function representing the thread. This is the most basic implementation. */
     virtual void UserThreadFunction() {
         if (userThreadFunction != NULL)
             userThreadFunction(userData);
     }
 
-    /** Function to get the name of the thread.
-     @return A reference to the dynamically allocated string representing the name of the thread.
-     An internal structure that can potentially be referenced after the destruction of the object. */
+    /** @brief Get the name of the thread.
+      * @return A reference to the dynamically allocated string representing the name of the thread.
+      * An internal structure that can potentially be referenced after the destruction of the object. */
     virtual const char *ThreadName() {
         return name;
     }
 
-    /** This function allows to call a subroutine within an exception handler protection.
-     This implementation is a dummy one.
-     */
+    /** @brief Call the thread function with an exception handler protection. */
     bool ExceptionProtectedExecute(ThreadFunctionType userFunction,
                                    void *userData, ExceptionHandler *eh) {
         userFunction(userData);
         return True;
     }
 
-    /**
-     * Locks the thread until all OS housekeeping is terminated
-     */
+    /** @brief The thread wait a post condition. */
     inline void ThreadWait() {
         startThreadSynchSem.Wait();
     }
 
-    /**
-     * Releases the thread as soon as any OS housekeeping is terminated
-     */
+    /** @brief If the thread was in waiting now it can proceed its execution. */
     inline void ThreadPost() {
         startThreadSynchSem.Post();
     }
 };
 
-/** The type of function that can be used to instantiate a thread initialisation interface object.
- @param userFunction The thread entry point.
- @param userData A pointer to data that can be passed to the thread.
- @param threadName The thread name.
- @param exceptionHandlerAction Describes the behaviour of threads when an exception occurr. @see ExceptionHandler
+/** The type of function that can be used to instantiate a thread initialization interface object.
+ * @param userFunction The thread entry point.
+ * @param userData A pointer to data that can be passed to the thread.
+ * @param threadName The thread name.
+ * @param exceptionHandlerAction Describes the behaviour of threads when an exception occurr. @see ExceptionHandler
  */
 typedef ThreadInformation *(*ThreadInformationConstructorType)(
         ThreadFunctionType userFunction, void *userData, const char *threadName,

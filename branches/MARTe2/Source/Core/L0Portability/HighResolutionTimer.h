@@ -19,64 +19,79 @@
  * See the Licence  
  permissions and limitations under the Licence. 
  *
- * $Id: Endianity.h 3 2012-01-15 16:26:07Z aneto $
+ * $Id:  $
  *
  **/
 
 /**
  * @file
- * Access to the high resolution counters. These routines enable
+ * @brief Access to the high resolution counters. These routines enable
  * the calculation of high resolution timings.
- *
- * The time ellapsed can be calculated using:
- * int64 t1 = HRT::HRTCounter();
- * SOME CODE
- * double totalTime = (HRT::HRTCounter() - t1) * HRT::HRTPeriod();
  */
+ 
 #ifndef HIGH_RESOLUTION_TIMER_H
 #define HIGH_RESOLUTION_TIMER_H
 
 #include "GeneralDefinitions.h"
 #include INCLUDE_FILE_ARCHITECTURE(ARCHITECTURE,HighResolutionTimerA.h)
+/** 
+  * @brief This class implements useful functions for timing. These functions are used a lot in each
+  * functions that need timeouts implementation like for examples semaphores. 
+  * Most of the implementation is delegated to HighResolutionTimerA.h which use very low level code (assembly)
+  * for the Counter functions, while the Frequency and Period functions are delegated to HighResolutionTimerCalibratorOs.h
+  * reading on a system file that returns the current cpu frequency. */
+
 
 extern "C"
 {
-    /** the frequency of the HRT Clock. */
+    /** @brief The frequency of the HighResolutionTimer Clock.
+      * @return the clock frequency of the cpu. */
     int64 HighResolutionTimerFrequency();
 
-    /** the HRT Clock period in seconds */
+    /** @brief the HighResolutionTimer Clock period in seconds.
+      * @return the cpu clock period in seconds (it must be the inverse of the frequency). */
     double HighResolutionTimerPeriod();
 
-    /** how many ticks in a msec for the HRT */
+    /** @brief How many ticks in a msec for the HRT.
+      * @return the number of the cpu ticks during a millisecond. */
     uint32 HighResolutionTimerMSecTics();
 }
 
-/** Access to a calibrated high frequency counter. Uses the CPU internal register */
+
 class HighResolutionTimer {
 
 public:
 
-    /** an high resolution time counter. Only valid on pentiums CPUs and above */
+    /** @brief An high resolution time counter. Only valid on pentiums CPUs and above.
+      * Reads the cpu ticks on an 64 bits integer. */
     static inline int64 Counter() {
         return HighResolutionTimerRead64();
     }
 
-    /** an high resolution time counter. Only valid on pentiums CPUs and above */
+    /** @brief An high resolution time counter. Only valid on pentiums CPUs and above 
+      * Reads the cpu ticks on an 32 bits integer. */
     static inline uint32 Counter32() {
         return HighResolutionTimerRead32();
     }
 
-    /** to interpret the value returned by HRTCounter. Also the CPU clock!! */
+    /** @brief To interpret the value returned by HRTCounter.
+      * @see HighResolutionTimerFrequency(). 
+      * @return the current frequency of the cpu. */
     static inline int64 Frequency() {
         return HighResolutionTimerFrequency();
     }
 
-    /** The length of a clock period in seconds */
+    /** @brief The length of a clock period in seconds.
+      * @see HighResolutionTimerPeriod().
+      * @return the current period of the cpu. */
     static inline double Period() {
         return HighResolutionTimerPeriod();
     }
 
-    /** converts HRT ticks to time */
+    /** @brief Converts HRT ticks to time.
+      * @param tStop is the final ticks number.
+      * @param tStart is the initial ticks number.
+      * @return the time elapsed in TStop-TStart ticks in seconds */
     static inline double TicksToTime(int64 tStop, int64 tStart = 0) {
         int64 dT = tStop - tStart;
         return dT * Period();
