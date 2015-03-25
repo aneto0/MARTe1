@@ -103,26 +103,23 @@ void MemorySharedFree(void *address) {
     MemoryOSSharedFree(address);
 }
 
-bool MemoryCopy(void* destination, void* source, uint32 size){
-	return MemoryOsCopy(destination, source, size);
+bool MemoryCopy(void* destination, void* source, uint32 size) {
+    return MemoryOsCopy(destination, source, size);
 }
 
-int32 MemoryCompare(const void* mem1, const void* mem2, uint32 size){
-	return MemoryOsCompare(mem1, mem2, size);
+int32 MemoryCompare(const void* mem1, const void* mem2, uint32 size) {
+    return MemoryOsCompare(mem1, mem2, size);
 }
 
-void *MemorySearch(void* mem, char c, uint32 size){
-	return MemoryOsSearch(mem, c, size);
+void *MemorySearch(void* mem, char c, uint32 size) {
+    return MemoryOsSearch(mem, c, size);
 }
 
-bool MemoryMove(void* destination, const void* source, uint32 size){
-	return MemoryOsMove(destination, source, size);
+bool MemoryMove(void* destination, const void* source, uint32 size) {
+    return MemoryOsMove(destination, source, size);
 }
 
-bool MemorySet(void* mem, char c, uint32 size){
-	return MemoryOsSet(mem, c, size);
+bool MemorySet(void* mem, char c, uint32 size) {
+    return MemoryOsSet(mem, c, size);
 }
-
-
-
 
