@@ -100,5 +100,56 @@ bool MemoryOSCheck(void *address, MemoryTestAccessMode accessMode,
     return True;
 }
 
+//Copy source to destination.
+bool MemoryOsCopy(void* destination, void* source, uint32 size){
+	if(source==NULL || destination==NULL){
+		return False;
+	}
+	
+	return memcpy(destination, source, size) != NULL;
+}
+
+// <0 -> mem1 < mem2      >0 -> mem1 > mem2       =0 -> mem1 = mem2
+int32 MemoryOsCompare(const void* mem1, const void* mem2, uint32 size){
+	if(mem1 == NULL || mem2 == NULL){
+		return -1;
+	}
+	int32 ret=memcmp(mem1,mem2,size);	
+	if(ret<0){
+		return 1; // 1 if mem1<mem2
+	}
+	if(ret>0){
+		return 2;// 2 if mem1>mem2
+	}
+	return ret; //0 if mem1=mem2
+	
+}
+
+//Return a pointer to the first occurence of c in mem
+void* MemoryOsSearch(void* mem, int32 c, uint32 size){
+	if(mem == NULL){
+		return NULL;
+	}
+	return memchr(mem, c, size);
+}
+
+//Move size bytes from source to destination
+bool MemoryOsMove(void* destination, const void* source, uint32 size){
+	if(source == NULL || destination == NULL){
+		return False;
+	}
+	return memmove(destination, source, size) != NULL;
+	
+}
+
+
+//Copy c in the first size locations pointed by mem
+bool MemoryOsSet(void* mem, int32 c, uint32 size){
+	if(mem == NULL){
+		return False;
+	}	
+	return memset(mem, c, size) != NULL;
+}
+
 #endif
 
