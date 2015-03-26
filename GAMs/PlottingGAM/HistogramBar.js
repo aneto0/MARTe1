@@ -78,7 +78,7 @@ function ArrayToStringBar(dataMatrix, length){
 }
 
 
-function plotBar(canvasId, dataMatrix, xLimits, title, xlabel, ylabel, bottomXAxisPos, zoom) {
+function plotBar(canvasId, dataMatrix, xLimits, title, xlabel, ylabel, zoom) {
 
     //Clear the plot every time.
     RGraph.Clear(document.getElementById(canvasId));
