@@ -78,11 +78,11 @@ function ArrayToStringLine(dataMatrix, length){
 }
 
 
-function plotLine(canvasId, dataMatrix, xLimits, title, xlabel, ylabel, onlyPositiveYValues, zoom) {
+function plotLine(canvasId, dataMatrix, xLimits, title, xlabel, ylabel, zoom) {
     //Clear the plot every time.
     RGraph.Clear(document.getElementById(canvasId));
 
-    var colorSequence = ['blue','red','black','green','aqua','purple','olive','fuchsia','teal','maroon','navy','lime','gray','yellow','silver'];
+    var colorSequence = ['black','blue','red','green','aqua','purple','olive','fuchsia','teal','maroon','navy','lime','gray','yellow','silver'];
 
     //Calculate yMax and yMin from the data array.
     var yMaxArr = new Array(dataMatrix.length);
@@ -132,21 +132,40 @@ function plotLine(canvasId, dataMatrix, xLimits, title, xlabel, ylabel, onlyPosi
     }
     var dataString=ArrayToStringLineExp(yLabelArray);
 
-    var xAxisPosString = 'center';
-    if(onlyPositiveYValues){
-        xAxisPosString = 'bottom';
+    //var xAxisPosString = 'center';
+
+   var dataNewMatrix=new Array(dataMatrix.length+1);
+    
+
+
+    for(var i=0; i<(dataMatrix.length); i++){
+	dataNewMatrix[i+1]=dataMatrix[i];
     }
 
+    if(yMin < 0){
+	var dataXTicks=new Array(NUM_OF_XTICKS+1);
+	for(var i=0; i<=NUM_OF_XTICKS; i++){
+		dataXTicks[i]=0;
+	}
+	dataNewMatrix[0]=dataXTicks;
+    }
+    else{
+	dataNewMatrix[0]=[];
+    }   
+
+
+//alert(yLabelArray);
     //Draw the line plot.
     var line = new RGraph.Line({
                 id: canvasId,
-                data: dataMatrix,
+                data: dataNewMatrix,
                 options: {
                     colors: colorSequence,
                     gutter: {
                         left: 100,
                         bottom: 50
                     },
+		   // xaxispos: xAxisPosString,
                     ylabels: {
                         specific: dataString
                     },
@@ -170,9 +189,9 @@ function plotLine(canvasId, dataMatrix, xLimits, title, xlabel, ylabel, onlyPosi
                     yticks: NUM_OF_YTICKS,
                     ymax: yMax,
                     ymin: yMin,
-                    tickmarks: 'circle',
+                    tickmarks: ['tick','circle'],
                     labels: xLabelArray,
-                    xaxispos: xAxisPosString
+                 
                     //spline: true
                 }
             }).draw()
