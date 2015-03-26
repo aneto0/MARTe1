@@ -253,7 +253,7 @@ bool PlotWindow::Initialise(ConfigurationDataBase &cdbData) {
     }
 
     //Reset to zero all signals at the beginning.
-        if (statistic == 1 && execFlag == GAMPrepulse) {
+    if (statistic == 1) {
         for (int32 i = 0; i < totalNumberOfSignals; i++) {
             for (int32 n = 0; n < signals[i].numberOfBuffers; n++) {
 
