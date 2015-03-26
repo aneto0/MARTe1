@@ -253,12 +253,26 @@ bool PlotWindow::Initialise(ConfigurationDataBase &cdbData) {
     }
 
     //Reset to zero all signals at the beginning.
-    if (statistic == 1) {
+        if (statistic == 1 && execFlag == GAMPrepulse) {
         for (int32 i = 0; i < totalNumberOfSignals; i++) {
             for (int32 n = 0; n < signals[i].numberOfBuffers; n++) {
-                int32* incrementDataPtr = (int32*) (signals[i].buffer2plot
-                        + n * signals[i].numberOfBytesPerBuffer);
-                (*incrementDataPtr) = 0;
+
+                if (signals[i].signalTypeMask == TYPE_INT32) {
+                    int32* incrementDataPtr = (int32*) (signals[i].buffer2plot
+                            + n * signals[i].numberOfBytesPerBuffer);
+                    (*incrementDataPtr)=0;
+                }
+                if (signals[i].signalTypeMask == TYPE_FLOAT) {
+                    float* incrementDataPtr = (float*) (signals[i].buffer2plot
+                            + n * signals[i].numberOfBytesPerBuffer);
+                    (*incrementDataPtr)=0;
+                }
+                if (signals[i].signalTypeMask == TYPE_UINT32) {
+                    uint32* incrementDataPtr = (uint32*) (signals[i].buffer2plot
+                            + n * signals[i].numberOfBytesPerBuffer);
+                    (*incrementDataPtr)=0;
+                }
+
             }
         }
     }
@@ -273,9 +287,23 @@ bool PlotWindow::Execute(GAM_FunctionNumbers execFlag) {
     if (statistic == 1 && execFlag == GAMPrepulse) {
         for (int32 i = 0; i < totalNumberOfSignals; i++) {
             for (int32 n = 0; n < signals[i].numberOfBuffers; n++) {
-                int32* incrementDataPtr = (int32*) (signals[i].buffer2plot
-                        + n * signals[i].numberOfBytesPerBuffer);
-                (*incrementDataPtr) = 0;
+
+                if (signals[i].signalTypeMask == TYPE_INT32) {
+                    int32* incrementDataPtr = (int32*) (signals[i].buffer2plot
+                            + n * signals[i].numberOfBytesPerBuffer);
+                    (*incrementDataPtr)=0;
+                }
+                if (signals[i].signalTypeMask == TYPE_FLOAT) {
+                    float* incrementDataPtr = (float*) (signals[i].buffer2plot
+                            + n * signals[i].numberOfBytesPerBuffer);
+                    (*incrementDataPtr)=0;
+                }
+                if (signals[i].signalTypeMask == TYPE_UINT32) {
+                    uint32* incrementDataPtr = (uint32*) (signals[i].buffer2plot
+                            + n * signals[i].numberOfBytesPerBuffer);
+                    (*incrementDataPtr)=0;
+                }
+
             }
         }
     }
