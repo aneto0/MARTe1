@@ -141,7 +141,6 @@ public:
 
     FString yLabel;
 
-    bool onlyPositiveYBool;
 
     /** Statistic flag (0 = time, 1 = statistic). **/
     int32 statistic;

@@ -163,14 +163,14 @@ bool PlottingGAM::ProcessHttpMessage(HttpStream &hStream) {
         //plot in line mode for each object initialized in line mode.
 	if (gcrtpw[i]->plotType == "Line"){
         	hStream.Printf(
-        	        "plotLine('canvas%d', data[%d], xAxisLimits[%d], titles[%d], xLabels[%d], yLabels[%d], %d, %f);\n",
-        	        i, i, i, i, i, i, gcrtpw[i]->onlyPositiveYBool, gcrtpw[i]->zoom);
+        	        "plotLine('canvas%d', data[%d], xAxisLimits[%d], titles[%d], xLabels[%d], yLabels[%d], %f);\n",
+        	        i, i, i, i, i, i, gcrtpw[i]->zoom);
 	}
 	//plot in bar mode for each object initialized in bar mode.
 	if (gcrtpw[i]->plotType == "Bar"){
 		  hStream.Printf(
-        	        "plotBar('canvas%d', data[%d], xAxisLimits[%d], titles[%d], xLabels[%d], yLabels[%d], %d, %f);\n",
-        	        i, i, i, i, i, i, gcrtpw[i]->onlyPositiveYBool, gcrtpw[i]->zoom);
+        	        "plotBar('canvas%d', data[%d], xAxisLimits[%d], titles[%d], xLabels[%d], yLabels[%d], %f);\n",
+        	        i, i, i, i, i, i, gcrtpw[i]->zoom);
 	}
     }
     hStream.Printf("}\n");

@@ -29,17 +29,6 @@
 bool PlotWindow::Initialise(ConfigurationDataBase &cdbData) {
 
     CDBExtended cdb(cdbData);
-
-    FString onlyPositiveY;
-    cdb.ReadFString(onlyPositiveY, "OnlyPositiveY", "No");
-    if (onlyPositiveY == "Yes" || onlyPositiveY == "yes"
-            || onlyPositiveY == "YES") {
-        onlyPositiveYBool = True;
-    }
-    else {
-        onlyPositiveYBool = False;
-    }
-
     cdb.ReadInt32(plotPixelWidth, "PlotPixelWidth", 1250);
     cdb.ReadInt32(plotPixelHeight, "PlotPixelHeight", 350);
 
