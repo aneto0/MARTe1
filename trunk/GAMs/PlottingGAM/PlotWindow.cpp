@@ -430,14 +430,20 @@ bool PlotWindow::AppendJsDataString(FString &jsDataString) {
                     float value = (float) (yAxisScaleFactor
                             * *((float *) (signals[i].buffer2plot) + j));
 
-
-                    if (value != 0) {
-			value=log10f(value);
+		    if(value < -1) {
+                        value=-log10f(-value);
                         jsDataString.Printf("%f", value);
-                    }
+		    }
+		    else {
+                        if (value > 1) {
+			    value=log10f(value);
+                            jsDataString.Printf("%f", value);
+                        }	    
                     //In case of log10 y-axis, if y=0 the y-value remains to zero (also if it should be -inf)
-                    else {
-                        jsDataString.Printf("%f", value);
+                        else {
+                            value = 0.0;
+                            jsDataString.Printf("%f", value);
+                        }
                     }
 #endif
                 }
@@ -457,11 +463,23 @@ bool PlotWindow::AppendJsDataString(FString &jsDataString) {
 
                     int32 value = (int32) (yAxisScaleFactor
                             * *((int32 *) (signals[i].buffer2plot) + j));
-                    if (value != 0) {
-                        jsDataString.Printf("%f", log10f(value));
-                    }
-                    else {
-                        jsDataString.Printf("%f", value);
+			
+		    float retValue;
+
+                    if(value < -1) {
+                        retValue=-log10f(-value);
+                        jsDataString.Printf("%f", retValue);
+		    }
+		    else {
+                        if (value > 1) {
+			    retValue=log10f(value);
+                            jsDataString.Printf("%f", retValue);
+                        }	    
+                    //In case of log10 y-axis, if y=0 the y-value remains to zero (also if it should be -inf)
+                        else {
+                            retValue = 0.0;
+                            jsDataString.Printf("%f", retValue);
+                        }
                     }
 
 #endif
@@ -481,11 +499,22 @@ bool PlotWindow::AppendJsDataString(FString &jsDataString) {
 #else
                     uint32 value = (uint32) (yAxisScaleFactor
                             * *((uint32 *) (signals[i].buffer2plot) + j));
-                    if (value != 0) {
-                        jsDataString.Printf("%f", log10f(value));
-                    }
-                    else {
-                        jsDataString.Printf("%f", value);
+                    
+                    float retValue;
+                    if(value < -1) {
+                        retValue=-log10f(-value);
+                        jsDataString.Printf("%f", retValue);
+		    }
+		    else {
+                        if (value > 1) {
+			    retValue=log10f(value);
+                            jsDataString.Printf("%f", retValue);
+                        }	    
+                    //In case of log10 y-axis, if y=0 the y-value remains to zero (also if it should be -inf)
+                        else {
+                            retValue = 0.0;
+                            jsDataString.Printf("%f", retValue);
+                        }
                     }
 #endif
                 }
