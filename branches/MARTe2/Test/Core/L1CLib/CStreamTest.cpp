@@ -25,6 +25,7 @@
 #include "GeneralDefinitions.h"
 #include "CStreamTest.h"
 
+
 //Returns the size of the string.
 uint32 sizeOfStr(char* string) {
     uint32 i = 0;
@@ -688,15 +689,15 @@ bool CStreamTest::TestCPrintf() {
     }
 
     string = "print this string?    y";	//18
-    //Test the sprintf function with size passed by argument
+    //Test the sprintf function with size passed by argument (incluse the terminated char)
     char myBuffer[32];
-    bl2_snprintf(myBuffer, 24, "%-21s %9c", origin, c);
-    if (!stringComp(myBuffer, (char*) string)) {
+    bl2_snprintf(myBuffer, 18, "%-21s %9c", origin, c);
+    if (!stringComp(myBuffer, (char*) "print this string")) {
         FreeAll(&myCStream);
         return False;
     }
 
-    //Test the sprintf function with 2000000000 as the maximum size.
+    //Test the sprintf function without size.
     bl2_sprintf(myBuffer, "%-21s %9c", origin, c);
     if (!stringComp(myBuffer, (char*) string)) {
         FreeAll(&myCStream);

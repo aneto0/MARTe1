@@ -167,11 +167,9 @@ bool ComplexTest::TestAddAndDifferenceOperators() {
     myComplex4 = sumOnRe2 - myComplex2;
 
     //Tests the -= operator between complex and double and the conjugate operator.
-    //myComplex3 must be equal to myComplex1, while myComplex2 needs to be multiplicated for -1 and
-    //conjugated to be equal to myComplex4.
     myComplex1 -= sumOnRe1;
     myComplex2 -= sumOnRe2;
-    myComplex2 = ~(-myComplex2);
+    myComplex2 = -myComplex2;
 
     //Check if the operations with these operators give the same result.
     if (!(myComplex1 == myComplex3) || !(myComplex2 == myComplex4)) {

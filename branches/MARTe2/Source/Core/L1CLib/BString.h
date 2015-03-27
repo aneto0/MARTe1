@@ -34,31 +34,44 @@
 #include "Memory.h"
 #include <string.h>
 
+/**
+ * @brief A class to implement basic string operations by operators. 
+ *
+ * This class contains a char* attribute which represent the string and allows
+ * to modify it managing dinamically the memory associated to it. Futhermore the
+ * overloading of operators here defined allows to simplify the string operations:
+ * assignment, concatenation, comparation ecc. */
+
+
+
+
+
+
+
+
+
 /** Predefinition of the class */
 class BString;
 
 extern "C" {
-/** Exported function to allocate memory for BString.
- @param  s The BString class
- @param  allocSize The size of the memory to allocate
- @return True if successful. False otherwise.
- */
+/** @brief Exported function to allocate memory for BString.
+  * @param  s The BString class
+  * @param  allocSize The size of the memory to allocate
+  * @return True if successful. False otherwise. */
 bool FSAlloc(BString &s, int32 allocSize);
 
-/** Exported function to write the content of buffer into the BString.
- @param  s The BString class
- @param  buffer The pointer to the buffer where to read the data from
- @param  size   The number of bytes to read
- @return True if successful. False otherwise.
- */
+/** @brief Exported function to write the content of buffer into the BString.
+  * @param  s The BString class
+  * @param  buffer The pointer to the buffer where to read the data from
+  * @param  size   The number of bytes to read
+  * @return True if successful. False otherwise. */
 bool FSRead(BString &s, void* buffer, uint32 &size);
 
-/** Exported function to write the content of BString into a buffer.
- @param  s The BString class
- @param  buffer The pointer to the buffer where to write the data to
- @param  size   The number of bytes to write
- @return True if successful. False otherwise.
- */
+/** @brief Exported function to write the content of BString into a buffer.
+  * @param  s The BString class
+  * @param  buffer The pointer to the buffer where to write the data to
+  * @param  size   The number of bytes to write
+  * @return True if successful. False otherwise. */
 bool FSWrite(BString &s, const void* buffer, uint32 &size);
 
 }
@@ -83,7 +96,7 @@ protected:
     /**  the seek position */
     uint32 position;
 
-    /** used for constructors */
+    /** @brief Used for constructors */
     void InitMembers() {
         size = 0;
         allocatedSize = 0;
@@ -92,7 +105,7 @@ protected:
         FSAlloc(*this, 0);
     }
 
-    /** used for destructors */
+    /** @brief Used for destructors */
     void FinishMembers() {
         if (buffer != NULL)
             MemoryFree((void *&) buffer);
@@ -102,10 +115,9 @@ protected:
         position = 0;
     }
 
-    /** Copy a character into the BString buffer.
-     @param  c the character to be copied
-     @return True if successful. False otherwise.
-     */
+    /** @brief Copy a character into the BString buffer.
+      * @param  c the character to be copied
+      * @return True if successful. False otherwise. */
     bool Copy(char c) {
         uint32 wsize = 1;
         size = 0;
@@ -115,10 +127,9 @@ protected:
         return ret;
     }
 
-    /** Copy a string into the BString buffer.
-     @param  s The pointer to the string to be copied
-     @return True if successful. False otherwise.
-     */
+    /** @brief Copy a string into the BString buffer.
+      * @param  s The pointer to the string to be copied
+      * @return True if successful. False otherwise. */
     bool Copy(const char *s) {
         if (s == NULL)
             return False;
@@ -130,11 +141,9 @@ protected:
         return ret;
     }
 
-    /** Copy a BString into a BString.
-     @param  s The BString to be copied
-     @return True if successful. False otherwise.
-     */
-
+    /** @brief Copy a BString into a BString.
+      * @param  s The BString to be copied
+      * @return True if successful. False otherwise. */
     bool Copy(const BString &s) {
         uint32 wsize = s.size;
         size = 0;
@@ -146,57 +155,51 @@ protected:
 
 public:
 
-    /** Creates an empty string */
+    /** @brief Creates an empty string. */
     inline BString() {
         InitMembers();
     }
 
-    /** Creates a BString as a copy of a BString.
-     @param x The BString to use for initialisation
-     */
+    /** @brief Creates a BString as a copy of a BString.
+      * @param x The BString to use for initialization. */
     inline BString(const BString &x) {
         InitMembers();
         Copy(x);
     }
 
-    /** Creates a BString as a copy of string
-     @param x The pointer to the string to use for initialisation
-     */
+    /** @brief Creates a BString as a copy of string.
+      * @param x The pointer to the string to use for initialization. */
     inline BString(const char *x) {
         InitMembers();
         Copy(x);
     }
 
-    /** Destructor */
+    /** @brief Destructor. */
     virtual ~BString() {
         FinishMembers();
     }
 
-    /** The size of the string.
-     @return The size of the buffer contained in BString
-     */
+    /** @brief Get the size of the BString.
+      * @return The size of the buffer contained in BString. */
     inline uint32 Size() const {
         return size;
     }
 
-    /** Read Only access to the internal buffer
-     @return The pointer to the buffer
-     */
+    /** @brief Read Only access to the internal buffer.
+      * @return The pointer to the buffer. */
     inline const char *Buffer() const {
         return buffer;
     }
 
-    /** Read Write access top the internal buffer
-     @return The pointer to the buffer
-     */
+    /** @brief Read Write access top the internal buffer.
+      * @return The pointer to the buffer. */
     inline char *BufferReference() const {
         return buffer;
     }
 
-    /** Clip the string size to a specified point
-     @param  size The size of the buffer.
-     @return True if successful. False otherwise.
-     */
+    /** @brief Clip the string size to a specified point.
+      * @param  size The size of the buffer.
+      * @return True if successful. False otherwise. */
     inline bool SetSize(uint32 size) {
         if (FSAlloc(*this, size) == False)
             return False;
@@ -207,42 +210,37 @@ public:
         return True;
     }
 
-    /** Returns a pointer to the tail of the buffer.
-     @param  ix the offset from the end of buffer
-     @return pointer to the tail of the buffer
-     */
+    /** @brief Returns a pointer to the tail of the buffer.
+      * @param  ix the offset from the end of buffer.
+      * @return pointer to the tail of the buffer. */
     inline const char *Tail(int32 ix) const {
         return buffer + size - ix - 1;
     }
 
-    /** Sets BString to be a copy of the input parameter.
-     @param c The character to copy
-     @return True if successful. False otherwise.
-     */
+    /** @brief Sets BString to be a copy of the input parameter.
+      * @param c The character to copy.
+      * @return True if successful. False otherwise. */
     inline bool operator=(char c) {
         return Copy(c);
     }
 
-    /** Sets BString to be a copy of the input parameter.
-     @param s The string to copy
-     @return True if successful. False otherwise.
-     */
+    /** @brief Sets BString to be a copy of the input parameter.
+      * @param s The string to copy.
+      * @return True if successful. False otherwise. */
     inline bool operator=(const char *s) {
         return Copy(s);
     }
 
-    /** Sets BString to be a copy of the input parameter.
-     @param s The BString to copy
-     @return True if successful. False otherwise.
-     */
+    /** @brief Sets BString to be a copy of the input parameter.
+      * @param s The BString to copy
+      * @return True if successful. False otherwise. */
     inline bool operator=(const BString &s) {
         return Copy(s);
     }
 
-    /** Concatenate the character to the string contained in the buffer
-     @param  c The character to concatenate
-     @return True if successful. False otherwise.
-     */
+    /** @brief Concatenate the character to the string contained in the buffer.
+      * @param  c The character to concatenate.
+      * @return True if successful. False otherwise. */
     inline bool operator+=(const char c) {
         position = size;
         uint32 wsize = 1;
@@ -250,10 +248,9 @@ public:
         return FSWrite(*this, &temp, wsize);
     }
 
-    /** Concatenate the string to the string contained in the buffer
-     @param  s The string to concatenate
-     @return True if successful. False otherwise.
-     */
+    /** @brief Concatenate the string to the string contained in the buffer.
+      * @param  s The string to concatenate.
+      * @return True if successful. False otherwise. */
     inline bool operator+=(const char *s) {
         if (s == NULL)
             return False;
@@ -262,20 +259,18 @@ public:
         return FSWrite(*this, s, wsize);
     }
 
-    /** Concatenate the BString to the string contained in the buffer
-     @param  s The BString to concatenate
-     @return True if successful. False otherwise.
-     */
+    /** @brief Concatenate the BString to the string contained in the buffer.
+      * @param  s The BString to concatenate.
+      * @return True if successful. False otherwise. */
     inline bool operator+=(BString &s) {
         position = size;
         uint32 wsize = s.Size();
         return FSWrite(*this, s.Buffer(), wsize);
     }
 
-    /** Compare the buffer content with the input content
-     @param s The buffer to be compared with
-     @return True if the two buffers are the same. False otherwise.
-     */
+    /** @brief Compare the buffer content with the input content.
+      * @param s The buffer to be compared with.
+      * @return True if the two buffers are the same. False otherwise. */
     inline bool operator==(BString &s) const {
         if (size != s.size)
             return False;
@@ -284,10 +279,9 @@ public:
         return True;
     }
 
-    /** Compare the buffer content with the input content
-     @param s The buffer to be compared with
-     @return True if the two buffers are the same. False otherwise.
-     */
+    /** @brief Compare the buffer content with the input content.
+      * @param s The buffer to be compared with.
+      * @return True if the two buffers are the same. False otherwise. */
     inline bool operator==(const char *s) const {
         if (s == NULL)
             return False;
@@ -296,28 +290,32 @@ public:
         return True;
     }
 
+    /** @brief Compare the buffer content with the input content.
+      * @param s The buffer to be compared with.
+      * @return True if the two buffers are different. False otherwise. */
     inline bool operator!=(BString &s) const {
         return !((*this) == s);
     }
 
+    /** @brief Compare the buffer content with the input content.
+      * @param s The buffer to be compared with.
+      * @return True if the two buffers are different. False otherwise. */
     inline bool operator!=(const char *s) const {
         return !((*this) == s);
     }
 
-    /** Allows access to character within the buffer
-     @param  pos The position in the buffer to be accessed.
-     @return 0 if the position is outside the buffer limits. The character at position pos otherwise.
-     */
+    /** @brief Allows access to character within the buffer.
+      * @param  pos The position in the buffer to be accessed.
+      * @return 0 if the position is outside the buffer limits. The character at position pos otherwise. */
     inline char operator[](uint32 pos) {
         if (pos >= size)
             return 0; // was -1 ?? Anton ??
         return buffer[pos];
     }
 
-    /** Checks if a char is in the string
-     @param c The character to look for.
-     @return True if found. False otherwise.
-     */
+    /** @brief Checks if a char is in the string.
+      * @param c The character to look for.
+      * @return True if found. False otherwise. */
     inline bool In(char c) const {
         for (uint32 i = 0; i < size; i++)
             if (buffer[i] == c)
@@ -326,9 +324,8 @@ public:
     }
 
     /** Checks if a string is contained in the string.
-     @param x The string to look for.
-     @return True if the string is found. False otherwise.
-     */
+      * @param x The string to look for.
+      * @return True if the string is found. False otherwise. */
     inline bool In(BString &x) const {
         if (x.Size() == 0)
             return False;
