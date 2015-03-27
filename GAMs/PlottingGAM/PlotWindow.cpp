@@ -25,6 +25,7 @@
 #include "PlotWindow.h"
 #include "CDBExtended.h"
 
+
 /// This method runs at initialisation
 bool PlotWindow::Initialise(ConfigurationDataBase &cdbData) {
 
@@ -428,12 +429,15 @@ bool PlotWindow::AppendJsDataString(FString &jsDataString) {
 #else
                     float value = (float) (yAxisScaleFactor
                             * *((float *) (signals[i].buffer2plot) + j));
+
+
                     if (value != 0) {
-                        jsDataString.Printf("%f", log10f(value));
+			value=log10f(value);
+                        jsDataString.Printf("%f", value);
                     }
-                    //In case of log10 y-axis, if y=0 the y-value remains to zero (also if it should be -infty)
+                    //In case of log10 y-axis, if y=0 the y-value remains to zero (also if it should be -inf)
                     else {
-                        jsDataString.Printf("%f", 0);
+                        jsDataString.Printf("%f", value);
                     }
 #endif
                 }
@@ -457,7 +461,7 @@ bool PlotWindow::AppendJsDataString(FString &jsDataString) {
                         jsDataString.Printf("%f", log10f(value));
                     }
                     else {
-                        jsDataString.Printf("%f", 0);
+                        jsDataString.Printf("%f", value);
                     }
 
 #endif
@@ -481,7 +485,7 @@ bool PlotWindow::AppendJsDataString(FString &jsDataString) {
                         jsDataString.Printf("%f", log10f(value));
                     }
                     else {
-                        jsDataString.Printf("%f", 0);
+                        jsDataString.Printf("%f", value);
                     }
 #endif
                 }
