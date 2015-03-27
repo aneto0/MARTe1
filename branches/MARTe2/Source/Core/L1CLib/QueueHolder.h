@@ -31,30 +31,42 @@
 
 #include "StackHolder.h"
 
-// Iterators support
-/** A class that can handle a Queue of QueueAbles (FIFO). */
+/** This is a particular case of the LinkedListHolder class.
+  *
+  * These functions implements the FIFO rules to add and remove elements
+  * basically using only some functions already defined for list implementation.
+  * 
+  * Elements are added on the last position and extracted from the first position. */
+
+
+
+
+/** @brief A class that can handle a Queue of QueueAbles (FIFO). */
 class QueueHolder: protected StackHolder {
 protected:
-    /** */
+    /** pointer to the end of the list */
     Queueable *insertionPoint;
 
 public:
-    /** */
+    /** @brief Constructor. */
     QueueHolder() {
         insertionPoint = &llhRoot;
     }
 
-    /** Return the oldest inserted element. */
+    /** @brief Return the oldest inserted element (the root namely the first position).
+      * @return a pointer to the oldest element. */
     Queueable *Oldest() {
         return List();
     }
 
-    /** Return the first element. */
+    /** @brief Return the number of elements in the queue.
+      * @return the size of the queue. */
     uint32 QueueSize() {
         return llhSize;
     }
 
-    /** Insert an element or a list on the queue. */
+    /** @brief Insert an element or a list at the end of the list.
+      * @param p is a pointer to the LinkedListable to add on the queue. */
     void QueueAdd(Queueable *p) {
         if (p == NULL) {
             return;
@@ -66,7 +78,8 @@ public:
         insertionPoint = p;
     }
 
-    /** Insert an element or a list on the queue. */
+    /** @brief Insert an element or a list at the beginning of the list.
+      * @param p is a pointer to the LinkedListable to add on the top. */
     void QueueInsert(Queueable *p) {
         ListInsert(p);
         if (insertionPoint == &llhRoot && p != NULL) {
@@ -77,7 +90,8 @@ public:
         }
     }
 
-    /** Removes the oldest elemnt from the queue. */
+    /** @brief Removes the oldest element from the queue.
+      * @return a pointer to the oldest element of the list (the first). */
     Queueable *QueueExtract() {
         Queueable *p = StackPop();
         if (llhRoot.next == NULL)
@@ -85,7 +99,9 @@ public:
         return p;
     }
 
-    /** Removes from the middle. */
+    /** @brief Removes a specific element.
+      * @param p is a pointer to the element which must be removed.
+      * @return true if the element is the list, false otherwise. */
     bool QueueExtract(Queueable *p) {
         bool ret = ListExtract(p);
         if (p == insertionPoint) {
@@ -97,23 +113,28 @@ public:
         return ret;
     }
 
-    /** Looks into the queue. */
+    /** @brief Looks into the queue.
+      * @param index defines the position of the requested element.
+      * @return the pointer to the element if it is found, NULL otherwise. 
+      * Index=0 is the element at the end of the list. */
     Queueable *QueuePeek(uint32 index) {
         return ListPeek(llhSize - index - 1);
     }
 
-    /** Looks into the queue to the last element inserted. */
+    /** @brief Looks into the queue to the last element inserted.
+      * @return the element at the end of the list. */
     Queueable *QueuePeekLast() {
         return insertionPoint;
     }
 
-    /** Reset the queue. */
+    /** @brief Reset the queue. */
     void Reset() {
         LinkedListHolder::Reset();
         insertionPoint = &llhRoot;
     }
 
-    /** Insert in the first location the element p. */
+    /** @brief Insert in the first location the element p.
+      * @param p is the element to insert on the queue. */
     inline void FastQueueInsertSingle(LinkedListable &p) {
         llhSize++;
         insertionPoint->next = &p;

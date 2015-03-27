@@ -31,6 +31,14 @@
 #ifndef ITERATORS_H
 #define ITERATORS_H
 
+/** @brief Here there are prototipes for Iterator, SearchFilter and SortFilter objects.
+  *
+  * All member functions are virtual to allow to the user to implement the desired actions.
+  *
+  * These objects are very useful in for LinkedListableList objects (@see LinkedListableList.h)
+  * where passing them to the list functions it's possible sort, search and manipulate
+  * elements. */ 
+
 #include "GeneralDefinitions.h"
 
 /** the return codes when a Test2 is called in a SearchFilterT or
@@ -62,47 +70,53 @@ enum SFTestType {
 
 class LinkedListable;
 
-/** A class template to build an iterator filter. */
+/** @brief A class template to build an iterator filter. */
 class Iterator {
 public:
-    /** The function performing the action linked to the iterator. */
+    /** @brief The function performing the action linked to the iterator.
+      * @param data is a pointer to a LinkedListable object. */
     virtual void Do(LinkedListable *data)=0;
 };
 
-/** A class template to build an iterator filter. */
+/** @brief A class template to build an iterator filter. */
 template<typename T>
 class IteratorT {
 public:
-    /** The function performing the action linked to the iterator. */
+    /** @brief The function performing the action linked to the iterator.
+      * @param data is a generic template. */
     virtual void Do(T data)=0;
 
-    /** A more specialised form of the Do function to be used on certain
-     applications. */
+    /** @brief A more specialised form of the Do function to be used on certain applications.
+      * @param data is a generic template.
+      * @param mode is a flag for special operatios. */
     virtual void Do2(T data, SFTestType mode = SFTTNull) {
         Do(data);
     }
 };
 
-/** The type of a function to be iterated on a set.
- @param data */
+/** @brief The type of a function to be iterated on a set.
+  * @param data is a LinkedListable object pointer. */
 typedef void (IteratorFn)(LinkedListable *data);
 
-/**  A class template to build search filters. */
+/** @brief A class template to build search filters. */
 class SearchFilter {
 public:
-    /** the function that performs the search on a set of data */
+    /** @brief The function that performs the search on a set of data.
+      * @param is a LinkedListable object pointer. */
     virtual bool Test(LinkedListable *data)=0;
 };
 
-/** A class template to build an iterator filter. */
+/** @brief A class template to build an iterator filter. */
 template<typename T>
 class SearchFilterT {
 public:
-    /** The function performing the action linked to the iterator. */
+    /** @brief The function performing the action linked to the iterator. 
+      * @param data is a generic template. */
     virtual bool Test(T data)=0;
 
-    /** A more specialised form of the Test function to be used on certain
-     applications. */
+    /** @brief A more specialised form of the Test function to be used on certain applications.
+      * @param data is a generic template.
+      * @param mode is a flag for special operations. */
     virtual SFTestType Test2(T data, SFTestType mode = SFTTNull) {
         if (Test(data))
             return SFTTFound;
@@ -110,23 +124,26 @@ public:
     }
 };
 
-/** The type of a function to be used to search on a set.
- @param data */
+/** @brief The type of a function to be used to search on a set.
+  * @param data is a LinkedListable object pointer. */
 typedef bool (SearchFilterFn)(LinkedListable *data);
 
-/**  A class template to build search filters. */
+/**  @brief A class template to build search filters. */
 class SortFilter {
 public:
     virtual ~SortFilter(){
 
     }
-    /** A function that can be used to compare two object. */
+    /** @brief A function that can be used to compare two object.
+      * @param data1 is the first LinkedListable object.
+      * @param data2 is the second LinkedListable object.
+      * @return a positive value if data1 is not ordered with data2, negative otherwise. */
     virtual int32 Compare(LinkedListable *data1, LinkedListable *data2)=0;
 };
 
 /** The type of a function to be used to sort a set.
- @param data1
- @param data2
+ @param data1 is the first LinkedListable object pointer.
+ @param data2 is the second LinkedListable object pointer.
  */
 typedef int32 (SortFilterFn)(LinkedListable *data1, LinkedListable *data2);
 
