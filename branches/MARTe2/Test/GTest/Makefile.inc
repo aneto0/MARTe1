@@ -40,6 +40,7 @@ OBJSX=  EndianityGTest.x \
 	LoadableLibraryGTest.x \
 	MemoryGTest.x \
 	FastPollingMutexGTest.x	\
+	StringPortableGTest.x \
 	LinkedListableGTest.x \
 	BStringGTest.x \
 	LinkedListHolderGTest.x \
