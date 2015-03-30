@@ -52,7 +52,7 @@ bool StringPortableAppend(char* string1, const char* string2, char* result);
 //Concatenate two strings giving result in another string
 /** @see StringPortable:AppendN() */
 bool StringPortableAppendN(char* string1, const char* string2, char* result,
-                   int32 &size);
+                           int32 &size);
 
 //Concatenate the second string to the first
 /** @see StringPortable:Cat() */
@@ -85,164 +85,167 @@ const char* StringPortableSearchLastChar(const char* string, char c);
 
 //Return a pointer to the first occurrence of substring in string.
 /** @see StringPortable:SearchSubstr() */
-const char* StringPortableSearchSubstr(const char* string, const char* substring);
+const char* StringPortableSearchSubstr(const char* string,
+                                       const char* substring);
 
 /** @see StringPortable:TokenizeByChars() */
-char* StringPortableTokenizeByChars(char* string, const char* delimiter, char* result);
+char* StringPortableTokenizeByChars(char* string, const char* delimiter,
+                                    char* result);
 
 /** @see StringPortable:TokenizeByString() */
-const char* StringPortableTokenizeByString(const char* string, const char* terminator, char* result);
+const char* StringPortableTokenizeByString(const char* string,
+                                           const char* terminator,
+                                           char* result);
 
 /** @see StringPortable:Substr() */
-bool StringPortableSubstr(int32 begin, int32 end, const char* string, char* result);
+bool StringPortableSubstr(int32 begin, int32 end, const char* string,
+                          char* result);
 
 }
 
+class StringPortable {
 
-class StringPortable{
-	
 public:
-	/** @brief Returns the length of a string.
-	  * @param string.
-	  * @return the size of the string in the argument. */
-	static int32 Length(const char* string){
-		return StringPortableLength(string);
-	}
+    /** @brief Returns the length of a string.
+     * @param string.
+     * @return the size of the string in the argument. */
+    static int32 Length(const char* string) {
+        return StringPortableLength(string);
+    }
 
-	/** @brief Returns true if the strings are equal, false otherwise.
-          * @param string1 is the first string.
-          * @param string2 is the second string.
-          * @return true if the two strings are equals. */
-	static bool Equal(const char* string1, const char* string2){
-		return StringPortableEqual(string1, string2);
-	}
+    /** @brief Returns true if the strings are equal, false otherwise.
+     * @param string1 is the first string.
+     * @param string2 is the second string.
+     * @return true if the two strings are equals. */
+    static bool Equal(const char* string1, const char* string2) {
+        return StringPortableEqual(string1, string2);
+    }
 
-	/** @brief Compare two strings until 'size' characters.
-          * @param string1 is the first string.
-          * @param string2 is the second string.
-          * @size is the max number of bytes to compare.
-          * @return true if strings are equal for 'size' characters. */
-	static bool EqualN(const char* string1, const char* string2, int32 size){
-		return StringPortableEqualN(string1, string2, size);
-	}
+    /** @brief Compare two strings until 'size' characters.
+     * @param string1 is the first string.
+     * @param string2 is the second string.
+     * @size is the max number of bytes to compare.
+     * @return true if strings are equal for 'size' characters. */
+    static bool EqualN(const char* string1, const char* string2, int32 size) {
+        return StringPortableEqualN(string1, string2, size);
+    }
 
-	/** @brief Concatenate two strings giving result in another string.
-          * @param string1 is the string at the beginning.
-          * @param string2 is the string to append.
-          * @param result is the concatenate string.
-          * @return true if strings are not NULL. */
-	static bool Append(char* string1, const char* string2, char* result){
-		return StringPortableAppend(string1, string2, result);
-	}
+    /** @brief Concatenate two strings giving result in another string.
+     * @param string1 is the string at the beginning.
+     * @param string2 is the string to append.
+     * @param result is the concatenate string.
+     * @return true if strings are not NULL. */
+    static bool Append(char* string1, const char* string2, char* result) {
+        return StringPortableAppend(string1, string2, result);
+    }
 
-	/** @brief Append max 'size' characters of string2 to string1.
-          * @param string1 is the string at the beginning.
-          * @param string2 is the string to append.
-          * @param result is the concatenate string.
-          * @return true if strings are not NULL. */ 
-	static bool AppendN(char* string1, const char* string2, char* result,
-                   int32 &size){
-		return StringPortableAppendN(string1, string2, result, size);
-	}
+    /** @brief Append max 'size' characters of string2 to string1.
+     * @param string1 is the string at the beginning.
+     * @param string2 is the string to append.
+     * @param result is the concatenate string.
+     * @return true if strings are not NULL. */
+    static bool AppendN(char* string1, const char* string2, char* result,
+                        int32 &size) {
+        return StringPortableAppendN(string1, string2, result, size);
+    }
 
-	//Concatenate the second string to the first
-	static bool Cat(char* string1, const char* string2){
-		return StringPortableCat(string1, string2);
-	}
+    //Concatenate the second string to the first
+    static bool Cat(char* string1, const char* string2) {
+        return StringPortableCat(string1, string2);
+    }
 
-	//Concatenate the second string to the first
-	static bool CatN(char* string1, const char* string2, int32 &size){
-		return StringPortableCatN(string1, string2, size);
-	}
+    //Concatenate the second string to the first
+    static bool CatN(char* string1, const char* string2, int32 &size) {
+        return StringPortableCatN(string1, string2, size);
+    }
 
-        /** @brief Get the pointer to the first occurrence of c in string.
-          * @param string is the string.
-          * @param c is the character which must be searched in string.
-          * @return the pointer to the first occurrence of c in string, NULL if c is not found. */
-	static const char* SearchChar(const char* string, char c){
-		return StringPortableSearchChar(string, c);
-	}
- 
-	/** @brief Copy operation.
-          * @param destination is the destination string.
-          * @param source is the source string.
-          * @return true of strings are not NULL. */
-	static bool Copy(char* destination, const char* source){
-		return StringPortableCopy(destination, source);
-	}
+    /** @brief Get the pointer to the first occurrence of c in string.
+     * @param string is the string.
+     * @param c is the character which must be searched in string.
+     * @return the pointer to the first occurrence of c in string, NULL if c is not found. */
+    static const char* SearchChar(const char* string, char c) {
+        return StringPortableSearchChar(string, c);
+    }
 
-        /** @brief Copy operation with 'size' as the max number of characters to copy.
-          * @param destination is the destination string, 
-          * @param source is the source string.
-          * @size is the max number of bytes to copy.
-          * @return true if strings are not NULL. */
-	static bool CopyN(char* destination, const char* source, int32 &size){
-		return StringPortableCopyN(destination, source, size);
-	}
+    /** @brief Copy operation.
+     * @param destination is the destination string.
+     * @param source is the source string.
+     * @return true of strings are not NULL. */
+    static bool Copy(char* destination, const char* source) {
+        return StringPortableCopy(destination, source);
+    }
 
-	/** @brief Return the index of the first occurrence in string1 of a char in string2.
-          * @param string1 is the string where to search.
-          * @param string2 contains characters which must be searched in string1.
-          * @return the index of the first occurrence in string1 of a char in string2, length of string1 if c is not found. */
-	static int32 SearchIndex(const char* string1, const char* string2){
-		return StringPortableSearchIndex(string1, string2);
-	}
+    /** @brief Copy operation with 'size' as the max number of characters to copy.
+     * @param destination is the destination string, 
+     * @param source is the source string.
+     * @size is the max number of bytes to copy.
+     * @return true if strings are not NULL. */
+    static bool CopyN(char* destination, const char* source, int32 &size) {
+        return StringPortableCopyN(destination, source, size);
+    }
 
-	/** @brief Get the pointer of the first occurrence in string1 of a char in string2.
-          * @param string1 is the string where to search.
-          * @param string2 contains characters which must be searched in string1.
-          * @return the pointer to the first occurrence in string1 of a char in string2, NULL if c is not found. */
-	static const char* SearchChars(const char* string1, const char* string2){
-		return StringPortableSearchChars(string1, string2);
-	}
+    /** @brief Return the index of the first occurrence in string1 of a char in string2.
+     * @param string1 is the string where to search.
+     * @param string2 contains characters which must be searched in string1.
+     * @return the index of the first occurrence in string1 of a char in string2, length of string1 if c is not found. */
+    static int32 SearchIndex(const char* string1, const char* string2) {
+        return StringPortableSearchIndex(string1, string2);
+    }
 
-	/** @brief Return a pointer at the last char c founded in string.
-          * @param string is the string where to search c.
-          * @param c is the character which must be searched in string.
-          * @return the pointer to the last occurrence of c in string, NULL if c is not found. */
-	static const char* SearchLastChar(const char* string, char c){
-		return StringPortableSearchLastChar(string, c);
-	}
+    /** @brief Get the pointer of the first occurrence in string1 of a char in string2.
+     * @param string1 is the string where to search.
+     * @param string2 contains characters which must be searched in string1.
+     * @return the pointer to the first occurrence in string1 of a char in string2, NULL if c is not found. */
+    static const char* SearchChars(const char* string1, const char* string2) {
+        return StringPortableSearchChars(string1, string2);
+    }
 
-	/** @brief Search a substring.
-          * @param string is the string where to search substring.
-          * @param substring is the string which must be searched in string.
-          * @return a pointer to the first occurrence of substring in string, NULL if substring is not found. */
-	static const char* SearchSubstr(const char* string, const char* substring){
-		return StringPortableSearchSubstr(string, substring);
-	}
+    /** @brief Return a pointer at the last char c founded in string.
+     * @param string is the string where to search c.
+     * @param c is the character which must be searched in string.
+     * @return the pointer to the last occurrence of c in string, NULL if c is not found. */
+    static const char* SearchLastChar(const char* string, char c) {
+        return StringPortableSearchLastChar(string, c);
+    }
 
-	/** @brief Get the token using chars as delimiters.
-          * @param string is the string to tokenize.
-          * @param delimiter contains char delimiters.
-          * @param result is the substring between delimiters.
-          * @return a pointer to the next position after the delimiter for a successive tokenize operation.
-          * If result is NULL this function put a terminated char in string at the delimiter. */
-	static char* TokenizeByChars(char* string, const char* delimiter, char* result){
-		return StringPortableTokenizeByChars(string, delimiter, result);
-	}
+    /** @brief Search a substring.
+     * @param string is the string where to search substring.
+     * @param substring is the string which must be searched in string.
+     * @return a pointer to the first occurrence of substring in string, NULL if substring is not found. */
+    static const char* SearchSubstr(const char* string, const char* substring) {
+        return StringPortableSearchSubstr(string, substring);
+    }
 
-        /** @brief Get the token using a string as delimiter.
-          * @param string is the string to tokenize.
-          * @param terminator is the string delimiter.
-          * @result is the next position for a successive operation (NULL if terminator is not found or in case of errors).*/
-	static const char* TokenizeByString(const char* string, const char* terminator, char* result){
-		return StringPortableTokenizeByString(string, terminator, result);
-	}
+    /** @brief Get the token using chars as delimiters.
+     * @param string is the string to tokenize.
+     * @param delimiter contains char delimiters.
+     * @param result is the substring between delimiters.
+     * @return a pointer to the next position after the delimiter for a successive tokenize operation.
+     * If result is NULL this function put a terminated char in string at the delimiter. */
+    static char* TokenizeByChars(char* string, const char* delimiter,
+                                 char* result) {
+        return StringPortableTokenizeByChars(string, delimiter, result);
+    }
 
-        /** @brief Get the substring between two indexes.
-          * @param begin is the first index.
-          * @param end is the second index.
-          * @param result is the substring.
-          * @return true if indexes are correct and the strings are not NULL. */ 
-	static bool Substr(int32 begin, int32 end, const char* string, char* result){
-		return StringPortableSubstr(begin, end, string, result);
-	}
+    /** @brief Get the token using a string as delimiter.
+     * @param string is the string to tokenize.
+     * @param terminator is the string delimiter.
+     * @result is the next position for a successive operation (NULL if terminator is not found or in case of errors).*/
+    static const char* TokenizeByString(const char* string,
+                                        const char* terminator, char* result) {
+        return StringPortableTokenizeByString(string, terminator, result);
+    }
+
+    /** @brief Get the substring between two indexes.
+     * @param begin is the first index.
+     * @param end is the second index.
+     * @param result is the substring.
+     * @return true if indexes are correct and the strings are not NULL. */
+    static bool Substr(int32 begin, int32 end, const char* string,
+                       char* result) {
+        return StringPortableSubstr(begin, end, string, result);
+    }
 
 };
-
-
-
-
 
 #endif

@@ -27,7 +27,6 @@
  * String basic management in portable version
  */
 
-
 #include "StringPortable.h"
 
 //Returns the size of the string.
@@ -70,7 +69,8 @@ bool StringPortableEqual(const char* string1, const char* string2) {
 }
 
 //Returns true if the strings are equal, false otherwise
-bool StringPortableEqualN(const char* string1, const char* string2, int32 size) {
+bool StringPortableEqualN(const char* string1, const char* string2,
+                          int32 size) {
 
     int32 i = 0;
     while (i < size) {
@@ -127,7 +127,8 @@ bool StringPortableAppend(char* string1, const char* string2, char* result) {
 }
 
 //Concatenate two strings giving result in another string
-bool StringPortableAppendN(char* string1, const char* string2, char* result, int32 &size) {
+bool StringPortableAppendN(char* string1, const char* string2, char* result,
+                           int32 &size) {
 
     if (result == NULL) {
         result = string1;
@@ -293,7 +294,8 @@ int32 StringPortableSearchIndex(const char* string1, const char* string2) {
 }
 
 //return the pointer of the first occurrence in string1 of a char in string2
-const char* StringPortableSearchChars(const char* string1, const char* string2) {
+const char* StringPortableSearchChars(const char* string1,
+                                      const char* string2) {
 
     int32 i = 0;
     int32 j = 0;
@@ -340,7 +342,8 @@ const char* StringPortableSearchLastChar(const char* string, char c) {
 }
 
 //Return a pointer to the first occurrence of substring in string.
-const char* StringPortableSearchSubstr(const char* string, const char* substring) {
+const char* StringPortableSearchSubstr(const char* string,
+                                       const char* substring) {
 
     if (string == NULL || substring == NULL) {
         return NULL;
@@ -365,7 +368,8 @@ const char* StringPortableSearchSubstr(const char* string, const char* substring
     return NULL;
 }
 
-char* StringPortableTokenizeByChars(char* string, const char* delimiter, char* result) {
+char* StringPortableTokenizeByChars(char* string, const char* delimiter,
+                                    char* result) {
 
     int32 i = 0;
     int32 j = 0;
@@ -384,8 +388,8 @@ char* StringPortableTokenizeByChars(char* string, const char* delimiter, char* r
                 return string + i + 1;
             }
 
-	    if(delimiter[j] == '\0') {
-		break;
+            if (delimiter[j] == '\0') {
+                break;
             }
             j++;
         }
@@ -402,8 +406,9 @@ char* StringPortableTokenizeByChars(char* string, const char* delimiter, char* r
     return NULL;
 }
 
-const char* StringPortableTokenizeByString(const char* string, const char* terminator, char* result) {
-
+const char* StringPortableTokenizeByString(const char* string,
+                                           const char* terminator,
+                                           char* result) {
 
     int32 size1 = StringPortableLength(string);
     int32 size2 = StringPortableLength(terminator);
@@ -418,18 +423,19 @@ const char* StringPortableTokenizeByString(const char* string, const char* termi
             result[i] = '\0';
             return string + i + size2;
         }
-	if((result + i) == NULL || (string + i) == NULL){
-		return NULL;
-	}
+        if ((result + i) == NULL || (string + i) == NULL) {
+            return NULL;
+        }
         result[i] = string[i];
         i++;
     }
-    
+
     StringPortableCopy(result + i, string + i);
     return NULL;
 }
 
-bool StringPortableSubstr(int32 begin, int32 end, const char* string, char* result) {
+bool StringPortableSubstr(int32 begin, int32 end, const char* string,
+                          char* result) {
 
     int32 i = 0;
 
@@ -444,7 +450,7 @@ bool StringPortableSubstr(int32 begin, int32 end, const char* string, char* resu
         i++;
     }
 
-    result[i]='\0';
+    result[i] = '\0';
     return True;
 
 }
