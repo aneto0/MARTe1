@@ -26,6 +26,7 @@
  * @file 
  * A list of pointers that can grow and shrink
  */
+
 #ifndef STATIC_LIST_HOLDER_H
 #define STATIC_LIST_HOLDER_H
 
@@ -33,15 +34,25 @@
 #include "Memory.h"
 #include "TimeoutType.h"
 #include "FastPollingMutexSem.h"
-//#include "ErrorManagement.h"
 
-/** the list will grow at the pace of 64 elements */
+/** @brief This class is foundamental an array where pieces of SLH_Granularity size of memory were dynamically allocated
+ * due to add new elements in the list. 
+ *
+ * For each element, the add function makes a copy and stores it in the list. Then there are many functions to perform
+ * the main important features of a list: extract, peek, find, ecc.
+ *
+ * It's important highlight that elements must have a dimension multiple of (intptr*) size which is a pointer to a long
+ * long integer. This size depends from the system (32 or 64 bits). 
+ */
+
+//#include "ErrorManagement.h"
+/** @brief The list will grow at the pace of 64 elements */
 static const int SLH_Granularity = 64;
 
-/** use this to insert at beginning of list */
+/** @brief Use this to insert at beginning of list */
 static const int SLH_StartOfList = 0;
 
-/** use this to add at the end of list */
+/** @brief Use this to add at the end of list */
 static const int SLH_EndOfList = -1;
 
 ///** use this to specify not to use the semaphore */
@@ -53,8 +64,10 @@ static const int SLH_EndOfList = -1;
 ///** use this to specify not to use the semaphore */
 //static const int SLHT_WaitForEver = SEM_INDEFINITE_WAIT;
 
-/** a container of pointers that can grow or shrink. It allows inserting and removing of elements.
- It uses realloc. It also offers the possibility to control the data access via a sempahore */
+/** @brief Yhis object is a container of pointers that can grow or shrink. 
+ * It allows inserting and removing of elements.
+ * It uses realloc. It also offers the possibility to control the data access via a sempahore */
+
 class StaticListHolder {
 protected:
     /** the vector of elements */
@@ -72,7 +85,9 @@ protected:
     /** how much to wait for a resource in milliseconds */
     TimeoutType msecTimeout;
 
-    /** increases the list size by 1. Manages the reallocation of memory when necessary */
+    /** @brief Increases the list size by 1. Manages the reallocation of memory when necessary.
+     * @return false if the memory (re)allocation fails, true otherwise.
+     * If the number of elements is multiple than granularity a new space for 'granularity' elements is added. */
     bool IncreaseListSize() {
         if ((numberOfElements % SLH_Granularity) == 0) {
             int newSize = numberOfElements + SLH_Granularity;
@@ -95,20 +110,25 @@ protected:
         return True;
     }
 
-    /** decreases the list size by 1. Reallocation of memory is not performed */
+    /** @brief Decreases the list size by 1. Reallocation of memory is not performed. */
     bool DecreaseListSize() {
         numberOfElements--;
         return True;
     }
 
-    /** copies data from a buffer to the position */
+    /** @brief Copies data from a buffer to the position.
+     * @param destination is the destination pointer.
+     * @param source is the pointer to the memory which must be copied.  */
     inline void Copy(intptr *destination, const intptr *source) {
         for (int j = 0; j < elementSize; j++) {
             destination[j] = source[j];
         }
     }
 
-    /** compares data between source and destination. True means equal */
+    /** @brief Compares data between source and destination. 
+     * @param destination is a pointer to the first value.
+     * @param source is a pointer to the second value.
+     * @return true if the values are equal. */
     inline bool Compare(const intptr *destination, const intptr *source) {
         for (int j = 0; j < elementSize; j++) {
             if (destination[j] != source[j])
@@ -117,7 +137,9 @@ protected:
         return True;
     }
 
-    /** finds data in list. -1 means not found */
+    /** @brief Finds data in list.
+     * @param data is a pointer to the data to find.
+     * @return the index of the data found in the list, -1 if it is not found. */
     inline int Find(const intptr *data) {
         int index = 0;
         while (!Compare(GetPointer(index), data) && (index < numberOfElements))
@@ -127,19 +149,23 @@ protected:
         return index;
     }
 
-    /** retrieves address of data element */
+    /** @brief Get the address of data element.
+     * @param position is the index of the element in the list.
+     * @return a pointer to the element in 'position'. */
     inline intptr* GetPointer(int position) {
         return &elements[position * elementSize];
     }
 
-    /** moves all the pointers from position to the right. Assumes that the last position is empty */
+    /** @brief Moves all the pointers from position to the right. Assumes that the last position is empty.
+     * @param position is the minor index. */
     inline void RightShiftListFrom(int position) {
         for (int i = (numberOfElements - 1); i > position; i--) {
             Copy(GetPointer(i), GetPointer(i - 1));
         }
     }
 
-    /** removes the element in position and shifts all the elements at the right of it to the left */
+    /** @brief Removes the element in position and shifts all the elements at the right of it to the left.
+     * @param position is the minor index. */
     inline void LeftShiftListTo(int position) {
         for (int i = position; i < (numberOfElements - 1); i++) {
             Copy(GetPointer(i), GetPointer(i + 1));
@@ -147,7 +173,8 @@ protected:
     }
 
 public:
-    /** creates a List with the given elelent size as multiple of 32 bits! */
+    /** @brief Create a List with the given element size is multiple of sizeof(intptr*).
+     * @param elementSize is the factor sizeof(element)/sizeof(intptr*).  */
     StaticListHolder(int elementSize = 1) {
         elements = NULL;
         numberOfElements = 0;
@@ -156,25 +183,28 @@ public:
         mux.Create();
     }
 
-    /** a virtual destructor . This means that all descendants will be virtual */
+    /** @brief Virtual destructor . This means that all descendants will be virtual. */
     virtual ~StaticListHolder() {
         if (elements != NULL)
             MemoryFree((void *&) elements);
         numberOfElements = 0;
     }
 
-    /** set access control policies */
+    /** @brief Set access timeout. */
     void SetAccessTimeout(TimeoutType msecTimeout = TTInfiniteWait) {
         this->msecTimeout = msecTimeout;
     }
 
-    /** how many elements currently in the list */
+    /** @brief Get the number of elements in the list.
+     * @return the number of elements in the list. */
     uint32 ListSize() const {
         return numberOfElements;
     }
 
-    /** Add an element at any position. 0 = add on top, -1 = add at the end
-     @param element is a pointer to a buffer of data. The data will be copied into the list    */
+    /** @brief Add an element at any position. 
+     * @param element is a pointer to a buffer of data. The data will be copied into the list.
+     * @param position could be 0 = add on top, -1 = add at the end.
+     * @return false if the semaphore lock fails or if something fails in the memory (re)allocation, true otherwise. */
     bool ListAdd(const intptr *element, int position = SLH_EndOfList) {
         if (msecTimeout != TTUnProtected) {
             if (!mux.FastLock(msecTimeout)) {
@@ -210,8 +240,10 @@ public:
         return True;
     }
 
-    /** Removes an element from any position. 0 = removes from the top, -1 = removes from the end
-     @param element is a pointer to a buffer of data. The data will be copied into the list */
+    /** @brief Removes an element by its position. 
+     * @param element is a pointer to the data to get. 
+     * @param position is the position of the requested element (0 = removes from the top, -1 = removes from the end).
+     * @return false if semaphore lock fails or if the element is not in the list, true otherwise. */
     bool ListExtract(intptr *element = NULL, int position = SLH_EndOfList) {
         if (msecTimeout != TTUnProtected) {
             if (!mux.FastLock(msecTimeout)) {
@@ -244,8 +276,10 @@ public:
         return ret;
     }
 
-    /** reads a value without affecting the list
-     @param element is a pointer to a buffer of data. The data will be copied into the list */
+    /** @brief Reads a value without affecting the list.
+     * @param element is a pointer to the data to read.
+     * @param position is the position of the requested element.
+     * @return false if semaphore lock fails or if the position is out of bounds, true otherwise. */
     bool ListPeek(intptr *element = NULL, int position = SLH_EndOfList) {
         if (msecTimeout != TTUnProtected) {
             if (!mux.FastLock(msecTimeout)) {
@@ -272,8 +306,9 @@ public:
         return ret;
     }
 
-    /** removes an element from the list using a copy of the element as a search key
-     @param element is a pointer to a buffer of data. The data will just be read */
+    /** @brief Removes an element from the list using a copy of the element as a search key.
+     * @param element is a pointer to a buffer of data with the same value of the element to delete.
+     * @return false if semaphore lock fails or if the element is not in the list, true otherwise. */
     bool ListDelete(const intptr *element) {
         if (msecTimeout != TTUnProtected) {
             if (!mux.FastLock(msecTimeout)) {
@@ -300,8 +335,9 @@ public:
         return ret;
     }
 
-    /** finds at what index the specified data is located. -1 means not found
-     @param element is a pointer to a buffer of data. The data will just be read */
+    /** @brief Finds at what index the specified data is located. 
+     * @param element is a pointer to an element with the same value of the element to search.
+     * @return the position of the requested element or -1 in case of it is not found or the semaphore lock fails. */
     int ListFind(const intptr *element) {
         if (msecTimeout != TTUnProtected) {
             if (!mux.FastLock(msecTimeout)) {
@@ -317,12 +353,14 @@ public:
         return position;
     }
 
-    /** Add a the top */
+    /** @brief Add a the top of the list. */
     inline void ListInsert(intptr *element) {
         ListAdd(element, 0);
     }
 
-    /** removes at the specified position */
+    /** @brief Removes at the specified position.
+     * @param position is the index of the element to be removed.
+     * @return false if semaphore lock fails or if the position is out of bounds, true otherwise. */
     inline bool ListDelete(int position) {
         return (ListExtract(NULL, position));
     }

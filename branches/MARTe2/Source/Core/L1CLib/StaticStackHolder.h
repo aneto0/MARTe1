@@ -33,34 +33,57 @@
 #include "GeneralDefinitions.h"
 #include "StaticListHolder.h"
 
-class  StaticStackHolder: protected StaticListHolder {
+/** @brief This class implements a stack using the StaticListHolder functions (@see StaticListHolder.h).
+ *
+ * These are functions for the stack manipulation like push, pop, peek.
+ */
+
+/** @brief Implementation of a Stack derived from StaticListHolder (LIFO)*/
+class StaticStackHolder: protected StaticListHolder {
 
 public:
 
-    /** creates a Stack with the given element size
-        note that the size is in 32 bit multiples
-    */
-                    StaticStackHolder(int elementSize = 1){
+    /** @brief Constructor. Creates a Stack with the given element size.
+     @param elementSize is the factor sizeof(element)/sizeof(intptr*). */
+    StaticStackHolder(int elementSize = 1) {
         this->elementSize = elementSize;
-    };
+    }
+    ;
 
-    /**  Insert on top a single element. When the space is finished the bottom is discarded */
-    inline void     StackPush(const intptr *element){ ListAdd(element); }
+    /** @brief Insert on top a single element. 
+     * @param element is a pointer to the element to copy in the stack. */
+    inline void StackPush(const intptr *element) {
+        ListAdd(element);
+    }
 
-    /** Get from Top */
-    inline bool     StackPop(intptr *element){ return ListExtract(element); }
+    /** @brief Get from Top.
+     * @param element is a pointer to the element in return.
+     * @return false in case of semaphore errors or if the stack is empty, true otherwise. */
+    inline bool StackPop(intptr *element) {
+        return ListExtract(element);
+    }
 
-    /** The depth of the stack */
-    inline uint32   StackDepth(){ return ListSize(); }
+    /** @brief Get the depth of the stack.
+     * @return the number of elements in the stack. */
+    inline uint32 StackDepth() {
+        return ListSize();
+    }
 
-    /** looks into the stack: index = 0 is the top */
-    inline bool     StackPeek(intptr *element,int position){ return ListPeek(element,ListSize()-1-position); }
+    /** @brief Looks into the stack.
+     * @param element is a pointer to the element in return.
+     * @param position is the index of the requested element (0 is the top).
+     * @return true if the position is correct and the semaphore lock does not fail. */
+    inline bool StackPeek(intptr *element, int position) {
+        return ListPeek(element, ListSize() - 1 - position);
+    }
 
-    /** show the top of stack */
-    inline bool     StackTop(intptr *element){ return ListPeek(element); }
-
+    /** @brief Show the top of stack.
+     * @param element is the pointer of the element in return.
+     * @return true if the stack is not empty and the semaphore lock does not fail.*/
+    inline bool StackTop(intptr *element) {
+        return ListPeek(element);
+    }
 
 };
-
 
 #endif

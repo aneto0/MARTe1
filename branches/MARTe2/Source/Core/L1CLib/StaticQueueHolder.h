@@ -32,38 +32,66 @@
 
 #include "StaticStackHolder.h"
 
-class  StaticQueueHolder: protected StaticStackHolder {
+/** @brief A queue implementation derived from StaticListHolder (@see StaticListHolder.h)
+ * 
+ * These functions implement the most important features of a queue, the insert and the 
+ * extract of the oldest element in the list. */
+
+/** A class for the implementation of a static queue (FIFO). */
+class StaticQueueHolder: protected StaticStackHolder {
 protected:
 
 public:
 
-    /** creates a Queue with the given elelent size */
-                    StaticQueueHolder(int elementSize32bit = 1){
+    /** @brief Constructor. Creates a queue with the given element size.
+     * @param element size is sizeof(element)/sizeof(intptr*). */
+    StaticQueueHolder(int elementSize32bit = 1) {
         this->elementSize = elementSize;
-    };
+    }
+    ;
 
-    /** return the last inserted element */
-    inline bool     Last(intptr *element){  return StackTop(element);  };
+    /** @brief Return the last inserted element.
+     * @param element is the pointer to the element in return. */
+    inline bool Last(intptr *element) {
+        return StackTop(element);
+    }
+    ;
 
-    /** return the n of element on the Q */
-    inline uint32   QueueSize(){  return StackDepth();   };
+    /** @brief Return the number of elements in the queue.
+     * @return the number of elements in the queue. */
+    inline uint32 QueueSize() {
+        return StackDepth();
+    }
+    ;
 
-    /** insert an element on the queue */
-    inline void     QueueAdd(const intptr *element){ StackPush(element); }
+    /** @brief Insert an element on the queue.
+     * @param element is a pointer to the element to copy in the queue. */
+    inline void QueueAdd(const intptr *element) {
+        StackPush(element);
+    }
 
-    /** removes the oldest elemnt from the queue */
-    inline bool     QueueExtract(intptr *element){ return ListExtract(element,SLH_StartOfList);}
+    /** @brief Removes the oldest element from the queue.
+     * @param is a pointer to the element in return.
+     * @return true if the element is in the list and the semaphore lock does not fail. */
+    inline bool QueueExtract(intptr *element) {
+        return ListExtract(element, SLH_StartOfList);
+    }
 
-    /** looks into the queue: index = 0 is the most recent added */
-    inline bool     QueuePeek(intptr *element, uint32 index){ return StackPeek(element,index); }
+    /** @brief Looks into the queue.
+     * @param element is a pointer to the element in return.
+     * @param index is the index of the requested element (index = 0 is the most recent added).
+     * @return true if the index is correct and the semaphore lock does not fail. */
+    inline bool QueuePeek(intptr *element, uint32 index) {
+        return StackPeek(element, index);
+    }
 
-    /** looks into the queue to the last element inserted */
-    inline bool     QueuePeekLast(intptr *element ){ return QueuePeek(element,0);  }
-
+    /** @brief Looks into the queue to the last element inserted.
+     * @param element is a pointer to the element in return.
+     * @return true if the queue is not empty and the semaphore lock does not fail. */
+    inline bool QueuePeekLast(intptr *element) {
+        return QueuePeek(element, 0);
+    }
 
 };
-
-
-
 
 #endif
