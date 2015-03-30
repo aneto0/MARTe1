@@ -33,19 +33,19 @@
 #ifndef BASIC_CONSOLE_TEST_H
 #define BASIC_CONSOLE_TEST_H
 
-#include "StringPortable.h"
+#include "StringHelper.h"
 
-class StringPortableTest {
+class StringHelperTest {
 
 private:
 
 public:
 
-    StringPortableTest() {
+    StringHelperTest() {
     }
 
-    /** @brief Tests the Length() function.
-     * @param string.
+    /** @brief Tests the Length() function 
+     .     * @param string.
      * @return true if the length of the string is correct. */
     bool TestLength(const char* string);
 
@@ -53,7 +53,7 @@ public:
      * @param string is the first string.
      * @param stringEqual is the second string.
      * @return true if the results of Equal(), EqualN() functions are correct. */
-    bool TestEqual(const char* string, const char* stringEqual);
+    bool TestCompare(const char* string, const char* stringEqual);
 
     /** @brief Tests the Copy() function.
      * @param string is the string to copy.
@@ -64,7 +64,7 @@ public:
      * @param string1 is the first string.
      * @param string2 is the string to concatenate to string1.
      * @return true if the concatenate string is correct. */
-    bool TestAppend(const char* string1, const char* string2);
+    bool TestConcatenate();
 
     /** @brief Tests the different search functions (by char, by string).
      * @return true if the operations return the expected result. */

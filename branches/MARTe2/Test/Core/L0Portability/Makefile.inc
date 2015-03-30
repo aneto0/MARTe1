@@ -40,7 +40,8 @@ OBJSX=  EndianityTest.x \
 		LoadableLibraryTest.x \
 		MemoryTest.x \
 		FastPollingMutexTest.x \
-		StringPortableTest.x
+		StringPortableTest.x \
+		StringHelperTest.x
 
 PACKAGE=Core
 ROOT_DIR=../../..

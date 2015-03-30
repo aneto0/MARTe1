@@ -46,8 +46,6 @@ bool StringPortableTest::TestLength(const char* string) {
     return True;
 }
 
-
-
 bool StringPortableTest::TestEqual(const char* string,
                                    const char* stringEqual) {
 
@@ -245,7 +243,6 @@ bool StringPortableTest::TestSearch() {
     if (!StringTestHelper::Compare(retPointer, "ld")) {
         return False;
     }
-    return True;
 
     //Test the search with a list of chars as argument and index as return (return index to the first occurrence).
     const char* charsToSearch = "dow";
@@ -261,7 +258,6 @@ bool StringPortableTest::TestSearch() {
             != StringPortable::Length(buffer)) {
         return False;
     }
-
 
     //This substring is not in the buffer.
     const char* substring = "lloW";
@@ -282,6 +278,7 @@ bool StringPortableTest::TestSearch() {
         return False;
     }
 
+    return True;
 }
 
 bool StringPortableTest::TestToken() {
@@ -340,16 +337,15 @@ bool StringPortableTest::TestToken() {
     }
 
     //Test the tokenize function with string as delimiter.
-    buffer1 = "Hello:World,I am...Giuseppe";
+    buffer1 = (char*) "Hello:World,I am...Giuseppe";
     const char* stringDelimiter = "...";
     const char* retPointerConst;
 
     //This substring is not in the buffer.
-    if ((retPointerConst = StringPortable::TokenizeByString(buffer1,
-                                                            "....",
+    if ((retPointerConst = StringPortable::TokenizeByString(buffer1, "....",
                                                             result)) != NULL) {
         return False;
-    }  	
+    }
 
     //Check if the result is correct.
     if ((retPointerConst = StringPortable::TokenizeByString(buffer1,
