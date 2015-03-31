@@ -143,13 +143,13 @@ void MemorySharedFree(void *address);
  * @param destination is the pointer to the destination memory location.
  * @param source is the pointer to the source memory location.
  * @return true if source, destination and destination after copy are != NULL. */
-bool MemoryCopy(void *destination, void *source, uint32 size);
+bool MemoryCopy(void *destination, const void *source, uint32 size);
 
 /** @brief Compare mem1 and mem2 until size bytes.
  * @param mem1 is the pointer to the first memory location.
  * @param mem2 is the pointer to the second memory location.
  * @return (0 if mem1 = mem2), (1 if mem1 < mem2), (2 if mem1 > mem2). */
-int32 MemoryCompare(void *mem1, void *mem2, uint32 size);
+int32 MemoryCompare(const void *mem1, const void *mem2, uint32 size);
 
 /** @brief Search c in mem and return the pointer to the first occurrence.
  * @param mem is the memory location.

@@ -50,25 +50,32 @@ public:
     }
 
     /**
-     * Tests the correct behavior of the malloc function.
+     * @brief Tests the correct behavior of the malloc function.
      * @param size is the number of integers to allocate.
      * @return true if the pointers to the allocated memory are valid. **/
     bool TestMallocAndFree(int32 size);
 
-    /** Tests the correct behavior of the realloc function.
+    /** 
+     * @brief Tests the correct behavior of the realloc function.
      * @param size1 is the number of integers to allocate with initial malloc.
      * @param size2 is the additional memory which must be allocated.
      * @return true if the pointers are valid and the realloc does not corrupt the initial memory. **/
     bool TestRealloc(int32 size1, int32 size2);
 
-    /** Tests the correct behavior of the string duplicate.
+    /** 
+     * @brief Tests the correct behavior of the string duplicate.
      * @param s is the string to duplicate.
      * @return true if the string result of the function is equal to s.**/
     bool TestMemoryStringDup(const char *s);
 
-    /** Tests the shared memory between two different threads and the main process.
+    /** 
+     * @brief Tests the shared memory between two different threads and the main process.
      * @return true if the shared int and the shared bool are consistent with the operations done by threads. **/
     bool TestSharedMemory();
+
+    bool TestCopyAndMove();
+
+    bool TestSetAndSearch();
 };
 
 #endif

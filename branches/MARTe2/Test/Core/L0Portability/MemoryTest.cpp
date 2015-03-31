@@ -129,3 +129,110 @@ bool MemoryTest::TestSharedMemory() {
     //else return false
     return returnValue;
 }
+
+bool MemoryTest::TestCopyAndMove() {
+    int32 myIntArray[5];
+    float myFloatArray[5];
+
+    for (int32 i = 0; i < 5; i++) {
+        myIntArray[i] = i;
+    }
+
+    //Copy the int array in the float array.
+    uint32 sizeToCopy = 5 * sizeof(int32);
+    if (!MemoryCopy(myFloatArray, (const void*) myIntArray, sizeToCopy)) {
+        return False;
+    }
+
+    //Check that bytes are equal indipendently from type.
+    if (MemoryCompare((const void*) myFloatArray, (const void*) myIntArray,
+                      sizeToCopy) != 0) {
+        return False;
+    }
+
+    const char* source = "Hello World";
+    const char* test = "Hello W0000";
+    char* buffer[32];
+
+    sizeToCopy = 11;
+
+    //Another way to copy memory.
+    if (!MemoryMove(buffer, source, sizeToCopy)) {
+        return False;
+    }
+
+    //Source must be greater than test.
+    if (MemoryCompare(source, test, sizeToCopy) != 2) {
+        return False;
+    }
+
+    //Test must be less than source.
+    if (MemoryCompare(test, source, sizeToCopy) != 1) {
+        return False;
+    }
+
+    //Test the result in case of NULL argument.
+    if (MemoryCompare(NULL, source, sizeToCopy) != -1) {
+        return False;
+    }
+
+    return True;
+
+}
+
+bool MemoryTest::TestSetAndSearch() {
+
+    uint32 size = 10;
+    char* buffPointer = (char*) MemoryMalloc(size);
+
+    if (buffPointer == NULL) {
+        return False;
+    }
+
+    //Set first 5 bytes to 'o'.
+    char myFavouriteChar = 'o';
+    uint32 charSize = 5;
+    if (!MemorySet(buffPointer, myFavouriteChar, size)) {
+        MemoryFree((void*&) buffPointer);
+        return False;
+    }
+
+    char* newBuffPointer = buffPointer + charSize;
+
+    //Set last 5 bytes to 'u'.
+    myFavouriteChar = 'u';
+
+    if (!MemorySet(newBuffPointer, myFavouriteChar, size - charSize)) {
+        MemoryFree((void*&) buffPointer);
+        return False;
+    }
+
+    char test[] = "ooooouuuuu";
+
+    //Check that the Set result is correct.
+    if(MemoryCompare(test, buffPointer, size) != 0){
+        MemoryFree((void*&) buffPointer);
+        return False;
+    }
+    
+
+    //Test the Search function.
+    if (MemorySearch(buffPointer, myFavouriteChar, size) != newBuffPointer) {
+        MemoryFree((void*&) buffPointer);
+        return False;
+    }
+
+    //Test the result of Search when the character is not found.
+    char imNotInBuffer = 'a';
+    if (MemorySearch(buffPointer, imNotInBuffer, size) != NULL) {
+        MemoryFree((void*&) buffPointer);
+        return False;
+    }
+
+
+    MemoryFree((void*&) buffPointer);
+
+    return True;
+
+}
+

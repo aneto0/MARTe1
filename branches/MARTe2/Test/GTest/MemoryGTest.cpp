@@ -20,8 +20,6 @@ protected:
     }
 };
 
-
-
 TEST_F(MemoryGTest,TestMallocAndFree) {
     MemoryTest memorytest;
     ASSERT_TRUE(memorytest.TestMallocAndFree(100));
@@ -29,7 +27,7 @@ TEST_F(MemoryGTest,TestMallocAndFree) {
 
 TEST_F(MemoryGTest,TestRealloc) {
     MemoryTest memorytest;
-    ASSERT_TRUE(memorytest.TestRealloc(100,10));
+    ASSERT_TRUE(memorytest.TestRealloc(100, 10));
 }
 
 TEST_F(MemoryGTest,TestMemoryStringDup) {
@@ -40,4 +38,14 @@ TEST_F(MemoryGTest,TestMemoryStringDup) {
 TEST_F(MemoryGTest,TestSharedMemory) {
     MemoryTest memorytest;
     ASSERT_TRUE(memorytest.TestSharedMemory());
+}
+
+TEST_F(MemoryGTest,TestCopyAndMove) {
+    MemoryTest memorytest;
+    ASSERT_TRUE(memorytest.TestCopyAndMove());
+}
+
+TEST_F(MemoryGTest,TestSetAndSearch) {
+    MemoryTest memorytest;
+    ASSERT_TRUE(memorytest.TestSetAndSearch());
 }

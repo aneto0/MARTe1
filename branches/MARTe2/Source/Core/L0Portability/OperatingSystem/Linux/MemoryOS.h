@@ -126,7 +126,7 @@ bool MemoryOSCheck(void *address, MemoryTestAccessMode accessMode,
   * @param source is a pointer to the source memory.
   * @param is the number of bytes to copy.
   * @return true if source, destination and destination after the copy are not NULL. */
-bool MemoryOsCopy(void* destination, void* source, uint32 size) {
+bool MemoryOsCopy(void* destination, const void* source, uint32 size) {
     if (source == NULL || destination == NULL) {
         return False;
     }

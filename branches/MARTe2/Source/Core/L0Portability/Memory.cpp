@@ -103,7 +103,7 @@ void MemorySharedFree(void *address) {
     MemoryOSSharedFree(address);
 }
 
-bool MemoryCopy(void* destination, void* source, uint32 size) {
+bool MemoryCopy(void* destination, const void* source, uint32 size) {
     return MemoryOsCopy(destination, source, size);
 }
 
