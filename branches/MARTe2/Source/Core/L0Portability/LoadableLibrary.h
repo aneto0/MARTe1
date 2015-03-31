@@ -56,7 +56,7 @@ void *LoadableLibraryFunction(LoadableLibrary &ll, const char *name);
 
 
 /** 
- * @brief This functions allows to load dimanically a library and its functions.
+ * @brief This functions allows to load dinamically a library and its functions.
  *
  * Most of the implementation is delegated to LoadableLibraryOS.h which is different
  * for each operating systems and contains the non portable system calls to load libraries.
