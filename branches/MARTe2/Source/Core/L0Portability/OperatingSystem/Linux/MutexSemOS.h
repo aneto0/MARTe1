@@ -35,7 +35,7 @@
 #include <math.h>
 #include <sys/timeb.h>
 
-/** @brief Private event semaphore class used for Solaris and Linux when using pThread. */
+/** @brief Private mutex semaphore class used for Solaris and Linux when using pThread. */
 class PrivateMutexSemStruct {
     /**  Mutex Handle */
     pthread_mutex_t mutexHandle;
