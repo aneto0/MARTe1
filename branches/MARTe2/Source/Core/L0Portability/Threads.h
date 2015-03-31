@@ -187,13 +187,17 @@ public:
         ThreadsSetInitialisationInterfaceConstructor(tiic);
     }
 
-    /** @brief Change thread priority. 
+    /** @brief Change thread priority.
+      * @param tid is the thread identifier.
+      * @param level is the level to assign to the thread. 
       * Applies only to current thread 0-31 (on windows it is actually/4) */
     static void SetPriorityLevel(TID tid, uint32 level) {
         ThreadsSetPriorityLevel(tid, level);
     }
 
-    /** @brief Change thread priority class. */
+    /** @brief Change thread priority class.
+      * @param tid is the thread identifier.
+      * @param priorityClass is the class to assign to the thread. */
     static void SetPriorityClass(TID tid, uint32 priorityClass) {
         ThreadsSetPriorityClass(tid, priorityClass);
     }

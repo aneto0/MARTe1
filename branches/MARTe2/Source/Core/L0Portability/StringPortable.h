@@ -112,7 +112,7 @@ class StringPortable {
 
 public:
     /** @brief Returns the length of a string.
-     * @param string.
+     * @param string is the string argument.
      * @return the size of the string in the argument. */
     static int32 Length(const char* string) {
         return StringPortableLength(string);
