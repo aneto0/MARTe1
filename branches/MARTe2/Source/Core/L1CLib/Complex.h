@@ -298,14 +298,14 @@ public:
 
     /**
      * @brief Performs the product operation between complexes.
-     * @param b is the complex number to multiply to this. */
+     * @param a is the complex number to multiply to this. */
     inline void operator *=(const Complex &a) {
         *this = *this * a;
     }
 
     /**
      * @brief Performs the product operation between a complex and a real.
-     * @param b is the real number to multiply to this. */
+     * @param a is the real number to multiply to this. */
     inline void operator *=(double a) {
         real *= a;
         imaginary *= a;
