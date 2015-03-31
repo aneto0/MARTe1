@@ -24,7 +24,7 @@
  **/
 /**
  * @file
- * Basic memory management
+ * @brief Basic memory management in Windows
  */
 #ifndef MEMORY_OS_H
 #define MEMORY_OS_H
@@ -32,7 +32,7 @@
 #include <stdlib.h>
 
 /**
- * @see Memory::MemoryMalloc
+ * @see MemoryMalloc
  */
 void *MemoryOSMalloc(uint32 size, MemoryAllocationFlags allocFlags) {
     if (size <= 0) {
@@ -42,7 +42,7 @@ void *MemoryOSMalloc(uint32 size, MemoryAllocationFlags allocFlags) {
 }
 
 /** 
- * @see Memory::MemoreFree
+ * @see MemoryFree
  */
 void MemoryOSFree(void *&data) {
     if (data != NULL) {
@@ -52,35 +52,35 @@ void MemoryOSFree(void *&data) {
 }
 
 /** 
- * @see Memory::Realloc
+ * @see MemoryRealloc
  */
 void *MemoryOSRealloc(void *&data, uint32 newSize) {
     return realloc(data, newSize);
 }
 
 /** 
- * @see Memory::Strdup
+ * @see MemoryStringDup
  */
 char *MemoryOSStringDup(const char *s) {
     return strdup(s);
 }
 
 /** 
- * @see Memory::SharedAlloc
+ * @see MemorySharedAlloc
  */
 void *MemoryOSSharedAlloc(uint32 key, uint32 size, uint32 permMask) {
     return NULL;
 }
 
 /** 
- * @see Memory::SharedFree
+ * @see MemorySharedFree
  */
 void MemoryOSSharedFree(void *address) {
     /* Do nothing */
 }
 
 /**
- * @see Memory::MemoryCheck
+ * @see MemoryMemoryCheck
  */
 bool MemoryOSCheck(void *address, MemoryTestAccessMode accessMode,
                    uint32 size) {

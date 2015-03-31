@@ -24,7 +24,7 @@
  **/
 /**
  * @file
- * Implentation of task sleeping 
+ * @brief Implentation of task sleeping. 
  */
 #ifndef SLEEP_H
 #define SLEEP_H
@@ -50,6 +50,7 @@ extern "C" {
 };
 
 /** @brief Sleeps for the time requested or more.
+  *
   * This function uses HighResolutionTimer functions.
   * @param sec is the time in seconds to sleep (at least). */
 static inline void SleepAtLeast(double sec) {
@@ -57,6 +58,7 @@ static inline void SleepAtLeast(double sec) {
 }
 
 /** @brief Sleeps no more than the time requested.
+  *
   * This function uses HighResolutionTimer functions.
   * @param sec is the time in seconds to sleep (no more). */
 static inline void SleepNoMore(double sec) {
@@ -82,6 +84,7 @@ static inline void SleepMSec(int32 msec) {
 }
 
 /** @brief Sleep without yield cpu.
+  *
   * This function uses HighResolutionTimer functions.
   * @param sec is the seconds to sleep. */
 static inline void SleepBusy(double sec) {

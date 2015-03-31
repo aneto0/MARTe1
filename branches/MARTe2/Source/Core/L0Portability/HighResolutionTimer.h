@@ -25,7 +25,9 @@
 
 /**
  * @file
- * @brief Access to the high resolution counters. These routines enable
+ * @brief Access to the high resolution counters. 
+ *
+ * These routines enable
  * the calculation of high resolution timings.
  */
  
@@ -34,13 +36,6 @@
 
 #include "GeneralDefinitions.h"
 #include INCLUDE_FILE_ARCHITECTURE(ARCHITECTURE,HighResolutionTimerA.h)
-/** 
-  * @brief This class implements useful functions for timing. These functions are used a lot in each
-  * functions that need timeouts implementation like for examples semaphores. 
-  * Most of the implementation is delegated to HighResolutionTimerA.h which use very low level code (assembly)
-  * for the Counter functions, while the Frequency and Period functions are delegated to HighResolutionTimerCalibratorOs.h
-  * reading on a system file that returns the current cpu frequency. */
-
 
 extern "C"
 {
@@ -57,6 +52,13 @@ extern "C"
     uint32 HighResolutionTimerMSecTics();
 }
 
+/** 
+  * @brief This class implements useful functions for high resolution timing using the cpu clock. 
+  *
+  * These functions are used a lot in each functions that need timeouts implementation like for examples semaphores. 
+  * Most of the implementation is delegated to HighResolutionTimerA.h which use very low level code (assembly)
+  * for the Counter functions, while the Frequency and Period functions are delegated to HighResolutionTimerCalibratorOs.h
+  * reading on a system file that returns the current cpu frequency. */
 
 class HighResolutionTimer {
 

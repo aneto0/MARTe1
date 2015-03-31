@@ -25,14 +25,14 @@
 
 /** 
  * @file
- * A class that can handle a Queue of any type. The maximum length is fixed.
+ * @brief A class that can handle a Queue of any type.
  */
 #ifndef STATIC_QUEUE_HOLDER_H
 #define STATIC_QUEUE_HOLDER_H
 
 #include "StaticStackHolder.h"
 
-/** @brief A queue implementation derived from StaticListHolder (@see StaticListHolder.h)
+/** @brief This class implements a queue (FIFO) using the StaticListHolder functions.
  * 
  * These functions implement the most important features of a queue, the insert and the 
  * extract of the oldest element in the list. */
@@ -44,9 +44,9 @@ protected:
 public:
 
     /** @brief Constructor. Creates a queue with the given element size.
-     * @param element size is sizeof(element)/sizeof(intptr*). */
+     * @param elementSize32bit is sizeof(element)/sizeof(intptr*). */
     StaticQueueHolder(int elementSize32bit = 1) {
-        this->elementSize = elementSize;
+        this->elementSize = elementSize32bit;
     }
     ;
 
@@ -71,7 +71,7 @@ public:
     }
 
     /** @brief Removes the oldest element from the queue.
-     * @param is a pointer to the element in return.
+     * @param element is a pointer to the element in return.
      * @return true if the element is in the list and the semaphore lock does not fail. */
     inline bool QueueExtract(intptr *element) {
         return ListExtract(element, SLH_StartOfList);

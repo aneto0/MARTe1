@@ -24,7 +24,7 @@
  **/
 /**
  * @file
- * Access processor's information
+ * @brief Access to processor's information
  */
 #ifndef HIGH_RESOLUTION_TIMER_CALIBRATOR_OS_H
 #define HIGH_RESOLUTION_TIMER_CALIBRATOR_OS_H
@@ -35,13 +35,21 @@
 
 #define LINUX_CPUINFO_BUFFER_SIZE 1023
 
+/** @brief A class to get the period and the frequency of the cpu clock. */
+
 class HighResolutionTimerCalibratorOS {
 
 public:
+    /** Number of cpu ticks in a millisecond */
     uint32 HRTmSecTics;
+
+    /** Number of cpu ticks in a second */
     uint64 HRTFrequency;
+ 
+    /** Time between a tick and the other in seconds */
     double HRTPeriod;
 
+    /** @brief Calculate the period and the frequency of the cpu clock. */
     HighResolutionTimerCalibratorOS() {
         HRTFrequency = 0;
         HRTPeriod = 0;

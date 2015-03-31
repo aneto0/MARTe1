@@ -24,7 +24,7 @@
  **/
 /**
  * @file
- * Access processor's information
+ * @brief Access processor's information
  */
 #ifndef PROCESSOR_OS_H
 #define PROCESSOR_OS_H

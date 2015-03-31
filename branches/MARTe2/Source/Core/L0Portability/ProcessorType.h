@@ -25,7 +25,8 @@
 
 /** 
  * @file
- * Defines the processors where a particular task should run
+ * @brief Defines the processors where a particular task should run
+ *
  * e.g., if a task is to run on cpu 2 and 3 the mask is: 0x06 (00000110)
  */
 #ifndef PROCESSOR_TYPE_H
@@ -37,6 +38,10 @@ extern "C" {
 uint32 ProcessorTypeGetDefaultCPUs();
 void ProcessorTypeSetDefaultCPUs(uint32 defaultMask);
 }
+
+/** @brief Defines the processors where a particular task should run.
+  *
+  * cpus are setted by a mask of bits (32 bits max = 32 processors max). */
 
 class ProcessorType {
 public:
@@ -52,6 +57,7 @@ public:
 
 #if !defined (_CINT)
     /** @brief Constructor from integer.
+     *
      *  The default is to run the tasks all CPUs but the first.
      *  @param cpuMask is the cpu mask. */
     ProcessorType(const uint32 cpuMask = 0xFE) {

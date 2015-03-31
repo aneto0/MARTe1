@@ -22,10 +22,7 @@
  * $Id: $
  *
  **/
-/**
- * @file
- * Basic memory management
- */
+
 
 #ifndef MEMORY_H
 #define MEMORY_H
@@ -33,7 +30,8 @@
 #include "GeneralDefinitions.h"
 
 /**
- * @brief Allows functions to manage memory locations dinamically.  
+ * @file
+ * @brief Memory management.  
  * 
  * Here are defined functions to allocate, reallocate and deallocate memory dinamically, 
  * other functions for the shared memory management which allows allocation of a memory  

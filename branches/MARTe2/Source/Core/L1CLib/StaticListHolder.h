@@ -24,7 +24,7 @@
  **/
 /** 
  * @file 
- * A list of pointers that can grow and shrink
+ * @brief A list of elements that can grow and shrink
  */
 
 #ifndef STATIC_LIST_HOLDER_H
@@ -34,16 +34,6 @@
 #include "Memory.h"
 #include "TimeoutType.h"
 #include "FastPollingMutexSem.h"
-
-/** @brief This class is foundamental an array where pieces of SLH_Granularity size of memory were dynamically allocated
- * due to add new elements in the list. 
- *
- * For each element, the add function makes a copy and stores it in the list. Then there are many functions to perform
- * the main important features of a list: extract, peek, find, ecc.
- *
- * It's important highlight that elements must have a dimension multiple of (intptr*) size which is a pointer to a long
- * long integer. This size depends from the system (32 or 64 bits). 
- */
 
 //#include "ErrorManagement.h"
 /** @brief The list will grow at the pace of 64 elements */
@@ -64,9 +54,19 @@ static const int SLH_EndOfList = -1;
 ///** use this to specify not to use the semaphore */
 //static const int SLHT_WaitForEver = SEM_INDEFINITE_WAIT;
 
-/** @brief Yhis object is a container of pointers that can grow or shrink. 
- * It allows inserting and removing of elements.
- * It uses realloc. It also offers the possibility to control the data access via a sempahore */
+/** @brief This object is a container of pointers that can grow or shrink.
+ *
+ * This class is foundamental an array where pieces of SLH_Granularity size of memory were dynamically allocated
+ * due to add new elements in the list. 
+ *
+ * For each element, the add function makes a copy and stores it in the list. Then there are many functions to perform
+ * the main important features of a list: extract, peek, find, ecc.
+ *
+ * It's important highlight that elements must have a dimension multiple of (intptr*) size which is a pointer to a long
+ * long integer. This size depends from the system (32 or 64 bits). 
+ */
+
+
 
 class StaticListHolder {
 protected:

@@ -22,10 +22,6 @@
  * $Id:  $
  *
  **/
-/**
- * @file
- * String basic management in portable version
- */
 
 #include "StringPortable.h"
 

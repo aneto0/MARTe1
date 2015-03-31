@@ -25,24 +25,13 @@
 
 /**
  * @file
- * Threads database, which can be queried to know the number of threads running in the application
+ * @brief Threads database, which can be queried to know the number of threads running in the application
  */
 #if !defined (THREADS_DATABASE_H)
 #define THREADS_DATABASE_H
 
 #include "ThreadInformation.h"
 #include "TimeoutType.h"
-
-/** @brief A database of pointers to threadInformation objects.
-  * 
-  * These methods allows to store and remove pointers to threadInformation objects. A new entry is automatically
-  * add to the database when a thread begin its execution and it's removed from database automatically when the
-  * thread terminate. A spinlock mutex it's implemented here to make consistent all operations on database between
-  * threads. The database allow to threads the access to other threads informations.
-  *
-  * The database is fundamental for all operations between threads. Without it, threads could not know nothing about 
-  * other threads.
-  */ 
 
 extern "C" {
 
@@ -71,6 +60,19 @@ TID ThreadsDatabaseGetThreadID(int32 n);
 bool ThreadsDatabaseGetInfo(ThreadInformation &tiCopy, int32 n, TID tid);
 
 }
+
+
+/** @brief A database of pointers to threadInformation objects.
+  * 
+  * These methods allows to store and remove pointers to threadInformation objects. A new entry is automatically
+  * add to the database when a thread begin its execution and it's removed from database automatically when the
+  * thread terminate. A spinlock mutex it's implemented here to make consistent all operations on database between
+  * threads. The database allow to threads the access to other threads informations.
+  *
+  * The database is fundamental for all operations between threads. Without it, threads could not know nothing about 
+  * other threads.
+  */ 
+
 
 class ThreadsDatabase {
 private:

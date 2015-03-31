@@ -25,7 +25,7 @@
 
 /**
  * @file
- * Information to be stored associated with a specific thread
+ * @brief Information to be stored associated with a specific thread
  */
 #ifndef THREAD_INITIALISATION_H
 #define THREAD_INITIALISATION_H
@@ -33,16 +33,6 @@
 #include "EventSem.h"
 #include "Memory.h"
 #include "ExceptionHandler.h"
-
-/** @brief A class which contains all threads informations (name, function, argument, id, priority info).
-  * 
-  * This class is useful to the ThreadsDatabase implementation (@see ThreadsDatabase.h) and allow the access
-  * to the main thread information.
-  *
-  * Generally this methods and attributes are used for the comunication and syncronization between threads,
-  * allowing for example to a thread to understand if another thread is still alive or also to kill and terminate
-  * other threads.
-  */ 
 
 
 
@@ -55,6 +45,18 @@ typedef void (*ThreadFunctionType)(void *parameters);
  *  functionalities. For this reason has not been made pure virtual and can
  *  be istantiated.
  */
+
+
+/** @brief A class which contains all threads informations (name, function, argument, id, priority info).
+  * 
+  * This class is useful to the ThreadsDatabase implementation and allow the access
+  * to the main thread information.
+  *
+  * Generally this methods and attributes are used for the comunication and syncronization between threads,
+  * allowing for example to a thread to understand if another thread is still alive or also to kill and terminate
+  * other threads.
+  */ 
+
 class ThreadInformation {
 protected:
     /** The user thread entry point. */

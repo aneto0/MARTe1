@@ -24,7 +24,7 @@
  **/
 /**
  * @file
- * A class that can handle a stack of Stackables
+ * @brief Stack of StackAbles
  */
 #ifndef STACK_HOLDER_H
 #define STACK_HOLDER_H
@@ -102,14 +102,14 @@ public:
     }
 
     /** @brief Removes and gets the n-th element of stack.
-      * @index is the position of the requested element.
+      * @param index is the position of the requested element.
       * @return a pointer to the element at index position. */
     Stackable *StackExtract(uint32 index){
         return ListExtract(index);
     }
 
     /** @brief Inserts a list as the n-th element of stack (if possible, otherwise as bottom).
-        @param p is the pointer to LinkedListable list to insert.
+        @param q is the pointer to LinkedListable list to insert.
         @param index is the position. */
     void StackInsert(Stackable *q,uint32 index){
         ListInsert(q,index);

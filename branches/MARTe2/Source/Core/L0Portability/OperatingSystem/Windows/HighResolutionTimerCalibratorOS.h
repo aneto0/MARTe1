@@ -24,7 +24,7 @@
  **/
 /**
  * @file
- * Access processor's information
+ * @brief Access processor's information
  */
 #ifndef HIGH_RESOLUTION_TIMER_CALIBRATOR_OS_H
 #define HIGH_RESOLUTION_TIMER_CALIBRATOR_OS_H
@@ -32,13 +32,21 @@
 #include "../../HighResolutionTimer.h"
 #include <windows.h>
 
+
+/** @brief A class to get the period and the frequency of the clock. */
 class HighResolutionTimerCalibratorOS {
 
 public:
+    /** Number of cpu ticks in a milliseconsd. */
     uint32 HRTmSecTics;
+   
+    /** Number of cpu ticks in a second. */
     uint64 HRTFrequency;
+ 
+    /** Time between a tick and the other in seconds. */
     double HRTPeriod;
-
+    
+    /** @brief Get the frequency and the period of the cpu clock. */
     HighResolutionTimerCalibratorOS() {
         uint64 tt0, tt1, tt2, tt3, tt4, tt5, dTa, dTb;
         dTa = 0;

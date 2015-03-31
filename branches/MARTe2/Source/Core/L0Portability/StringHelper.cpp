@@ -22,11 +22,6 @@
  * $Id: $
  *
  **/
-/**
- * @file
- * String basic management
- */
-
 #include "StringHelper.h"
 #include INCLUDE_FILE_OPERATING_SYSTEM(OPERATING_SYSTEM,StringHelperOS.h)
 

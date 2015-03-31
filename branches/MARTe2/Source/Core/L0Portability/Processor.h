@@ -24,21 +24,12 @@
  **/
 /**
  * @file
- * Access processor's information
+ * @brief Access to processor's information.
  */
 #ifndef PROCESSOR_H
 #define PROCESSOR_H
 
 #include "GeneralDefinitions.h"
-
-/**
- * @brief Functions to get the main processor informations.
- * 
- * These functions allows to get cpu informatios like family,
- * id, model and number of avaiable processors.
- *
- * Most of the implementation is delegated to ProcessorA.h and ProcessorOS.h.
- */
 
 extern "C" {
 
@@ -55,7 +46,16 @@ uint32 ProcessorsAvailable();
 uint32 ProcessorModel();
 }
 
-/** Defines some methods to get information about the processor. */
+/**
+ * @brief Functions to get the main processor informations.
+ * 
+ * These functions allows to get cpu informatios like family,
+ * id, model and number of avaiable processors.
+ *
+ * Most of the implementation is delegated to ProcessorA.h and ProcessorOS.h.
+ */
+
+
 class Processor {
 public:
 

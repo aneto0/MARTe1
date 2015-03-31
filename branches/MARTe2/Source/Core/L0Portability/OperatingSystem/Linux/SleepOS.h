@@ -24,7 +24,7 @@
  **/
 /**
  * @file
- * Implentation of task sleeping in Linux
+ * @brief Implentation of task sleeping in Linux
  */
 #ifndef SLEEP_OS_H
 #define SLEEP_OS_H
@@ -40,6 +40,8 @@
 
 /**
  * @see Sleep.h SleepAtLeast
+ * @brief Sleep more than sec in argument.
+ * @param sec defines the minimum number of seconds to sleep.
  */
 static inline void SleepOSAtLeast(double sec) {
     int64 hrtCounter;
@@ -72,6 +74,8 @@ static inline void SleepOSAtLeast(double sec) {
 
 /** 
  * @see Sleep.h SleepNoMore
+ * @brief Sleep maximum sec in the argument.
+ * @param sec defines the maximum number of seconds to sleep.
  */
 static inline void SleepOSNoMore(double sec) {
     int64 secCounts = (int64) (sec * HighResolutionTimer::Frequency());
@@ -97,6 +101,8 @@ static inline void SleepOSNoMore(double sec) {
 
 /** 
  * @see Sleep.h SleepSec
+ * @brief Sleep sec seconds.
+ * @param sec is the number to seconds to sleep.
  */
 static inline void SleepOSSecDouble(double sec) {
     struct timespec timesValues;
@@ -114,6 +120,8 @@ static inline void SleepOSSecDouble(double sec) {
 
 /** 
  * @see Sleep.h SleepSec
+ * @brief Sleep sec seconds.
+ * @param sec is the number of seconds to sleep.
  */
 static inline void SleepOSSecFloat(float sec) {
     SleepOSSecDouble(sec);
@@ -121,6 +129,8 @@ static inline void SleepOSSecFloat(float sec) {
 
 /** 
  * @see Sleep.h SleepOSSec
+ * @brief Sleep for msec milliseconds.
+ * @param msec is the number of milliseconds to sleep.
  */
 static inline void SleepOSMSec(int32 msec) {
     int32 sec = 0;
@@ -147,6 +157,9 @@ static inline void SleepOSMSec(int32 msec) {
 
 /** 
  * @see Sleep.h SleepSemiBusy
+ * @brief Sleep totalSleepSec seconds yielding cpu only for nonBusySleepSec seconds.
+ * @param totalSleepSec is the number of seconds to sleep.
+ * @param nonBusySleepSec is the number of seconds to sleep yielding cpu.
  */
 static inline void SleepOSSemiBusy(double totalSleepSec,
                                    double nonBusySleepSec) {
@@ -170,6 +183,8 @@ static inline void SleepOSSemiBusy(double totalSleepSec,
         ;
 }
 
+/** @brief Get the number of seconds elapsed from 1 Jan 1970.
+  * @return the number of seconds elapsed from 1 Jan 1970. */
 static int32 SleepOSGetDateSeconds() {
     return (int32) time((time_t *) NULL);
 }

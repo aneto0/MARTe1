@@ -24,7 +24,7 @@
  **/
 /**
  * @file
- * String basic management in portable version
+ * @brief Basic portable of char* string management.
  */
 
 #ifndef STRING_PORTABLE_H
@@ -103,6 +103,11 @@ bool StringPortableSubstr(int32 begin, int32 end, const char* string,
 
 }
 
+/** @brief This class provides static portable functions for strings management.
+  *
+  * All functions are developed without use extern library functions so could be
+  * used everywhere. */
+
 class StringPortable {
 
 public:
@@ -124,7 +129,7 @@ public:
     /** @brief Compare two strings until 'size' characters.
      * @param string1 is the first string.
      * @param string2 is the second string.
-     * @size is the max number of bytes to compare.
+     * @param size is the max number of bytes to compare.
      * @return true if strings are equal for 'size' characters. */
     static bool EqualN(const char* string1, const char* string2, int32 size) {
         return StringPortableEqualN(string1, string2, size);
@@ -143,18 +148,26 @@ public:
      * @param string1 is the string at the beginning.
      * @param string2 is the string to append.
      * @param result is the concatenate string.
+     * @param size is the maximum number of characters to append.
      * @return true if strings are not NULL. */
     static bool AppendN(char* string1, const char* string2, char* result,
                         int32 &size) {
         return StringPortableAppendN(string1, string2, result, size);
     }
 
-    //Concatenate the second string to the first
+    /** @brief Concatenate the second string to the first.
+      * @param string1 is the string at the beginning (and the result).
+      * @param string2 is the string to append.
+      * @return true if strings are not NULL. */
     static bool Cat(char* string1, const char* string2) {
         return StringPortableCat(string1, string2);
     }
 
-    //Concatenate the second string to the first
+    /** @brief Concatenate the second string to the first untile size characters.
+      * @param string1 is the string at the beginning (and the result).
+      * @param string2 is the string to append.
+      * @param size is the maximum number of characters to append.
+      * @return true if strings are not NULL. */   
     static bool CatN(char* string1, const char* string2, int32 &size) {
         return StringPortableCatN(string1, string2, size);
     }
@@ -178,7 +191,7 @@ public:
     /** @brief Copy operation with 'size' as the max number of characters to copy.
      * @param destination is the destination string, 
      * @param source is the source string.
-     * @size is the max number of bytes to copy.
+     * @param size is the max number of bytes to copy.
      * @return true if strings are not NULL. */
     static bool CopyN(char* destination, const char* source, int32 &size) {
         return StringPortableCopyN(destination, source, size);
@@ -221,6 +234,7 @@ public:
      * @param delimiter contains char delimiters.
      * @param result is the substring between delimiters.
      * @return a pointer to the next position after the delimiter for a successive tokenize operation.
+     *
      * If result is NULL this function put a terminated char in string at the delimiter. */
     static char* TokenizeByChars(char* string, const char* delimiter,
                                  char* result) {

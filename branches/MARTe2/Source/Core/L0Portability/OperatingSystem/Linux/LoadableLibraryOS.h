@@ -24,7 +24,7 @@
  **/
 /**
  * @file
- * Loadable library implementation in Linux
+ * @brief Loadable library implementation in Linux
  */
 #ifndef LOADABLE_LIBRARY_OS_H
 #define LOADABLE_LIBRARY_OS_H
@@ -33,6 +33,8 @@
 
 /**
  * @see LoadableLibrary::Close
+ * @brief Close a library previously opened dinamically.
+ * @param ll is the library to close.
  */
 void LoadableLibraryOSClose(LoadableLibrary &ll) {
     if (ll.module != 0) {
@@ -42,6 +44,10 @@ void LoadableLibraryOSClose(LoadableLibrary &ll) {
 
 /**
  * @see LoadableLibrary::Open
+ * @brief Open a library dinamically.
+ * @param ll is the library in return.
+ * @param dllName is the name of the library.
+ * @return true if the requested library is found and opened.
  */
 bool LoadableLibraryOSOpen(LoadableLibrary &ll, const char *dllName) {
     if (ll.module != 0) {
@@ -57,6 +63,10 @@ bool LoadableLibraryOSOpen(LoadableLibrary &ll, const char *dllName) {
 
 /**
  * @see LoadableLibrary::Function.
+ * @brief Load a function of a library dinamically.
+ * @param ll is the library where the requested function is.
+ * @param name is the name of the function.
+ * @return a pointer to the requested function.
  */
 void *LoadableLibraryOSFunction(LoadableLibrary &ll, const char *name) {
     if ((ll.module == NULL) || (name == NULL)) {

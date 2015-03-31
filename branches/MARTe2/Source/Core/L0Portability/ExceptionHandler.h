@@ -24,12 +24,12 @@
  **/
 /**
  * @file
- * Exception handling interface. Place holder for future implementations
+ * @brief Exception handling interface. Place holder for future implementations.
  */
 #ifndef EXCEPTION_HANDLER
 #define EXCEPTION_HANDLER
 
-/** Exception handler plugin interface. */
+/** @brief Exception handler plugin interface. */
 class ExceptionHandler {
 private:
     /** What to do in case of exception. */
@@ -51,7 +51,7 @@ public:
     static const uint32 NoReport = 0x10000;
 
 public:
-    /** Default handler. */
+    /** @brief Default handler. */
     ExceptionHandler(uint32 action = NotHandled) {
         this->action = action;
     }

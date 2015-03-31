@@ -22,11 +22,16 @@
  *
  **/
 
+/** @file
+  * @brief Functions to obtain the cpu informations.*/
+
+
+
 #ifndef PROCESSOR_P_H
 #define PROCESSOR_P_H
 
 /**
- * Implementation of the cpuid function for x86 and gcc
+ * @brief Implementation of the cpuid function for x86 and gcc
  * @param info drives the type of request being asked, e.g. 0 for Vendor, 1 for Family and Model, ...
  * @param eax the CPU EAX register
  * @param ebx the CPU EBX register
@@ -45,6 +50,8 @@ static inline void ProcessorCPUID(uint32 info, uint32 &eax, uint32 &ebx,
 
 /** 
  * @see Processor::Family()
+ * @brief Get the cpu family.
+ * @return the cpu family.
  */
 uint32 ProcessorFamily() {
     uint32 eax = 0;
@@ -61,6 +68,8 @@ uint32 ProcessorFamily() {
 
 /** 
  * @see Processor::Model()
+ * @brief Get the cpu model.
+ * @return the cpu model.
  */
 uint32 ProcessorModel() {
     uint32 eax = 0;
@@ -72,12 +81,14 @@ uint32 ProcessorModel() {
 }
 
 /**
- * Stores the processor vendor
+ * @brief Stores the processor vendor
  */
 static char processorVendorId[13];
 
 /** 
  * @see Processor::VendorId()
+ * @brief Get the identifier of the cpu.
+ * @return the cpu id.
  */
 const char *ProcessorVendorId() {
 

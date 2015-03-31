@@ -24,16 +24,16 @@
  **/
 /** 
  * @file
- * A template to customise a StaticListHolder for a specific struct or class
+ * @brief A template to customise a StaticListHolder for a specific struct or class
  */
 #ifndef STATIC_LIST_TEMPLATE_H
 #define STATIC_LIST_TEMPLATE_H
 
 #include "StaticListHolder.h"
 
-/** @brief This class derived from StaticListHolder (@see StaticListHolder.h) and implements a generic template list.
+/** @brief This class implements a generic template list.
  *
- * The main difference is that user should not insert manually sizeof(element)/sizeof(intptr*) because it is automatically
+ * The main difference with StaticListHolder is that user should not insert manually sizeof(element)/sizeof(intptr*) because it is automatically
  * calculated by the size of the template object.  
  *
  * For each element, the add function makes a copy and stores it in the list. Then there are many functions to perform
@@ -77,6 +77,7 @@ public:
 
     /** @brief Reads a value without affecting the list.
      * @param element is the data in return.
+     * @param position is the index of the requested element.
      * @return false if the semaphore lock fails, or if the position is out of bounds, true otherwise.   */
     inline bool ListPeek(T &element, int position = SLH_EndOfList) {
         return StaticListHolder::ListPeek((intptr *) &element, position);

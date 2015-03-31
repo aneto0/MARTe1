@@ -24,7 +24,7 @@
  **/
 /**
  * @file
- * A class that can handle one or more linked list
+ * @brief A class that can handle one or more linked list
  */
 
 #ifndef LINKED_LIST_HOLDER_H
@@ -43,10 +43,10 @@
 /** @brief The LinkedListHolder class. */
 class LinkedListHolder {
 protected:
-    /** */
+    /** List root */
     LinkedListable llhRoot;
 
-    /** */
+    /** List size */
     uint32 llhSize;
 
 public:

@@ -23,6 +23,10 @@
  *
  **/
 
+/**
+ * @file
+ * @brief Mutex semaphore implementation.
+ */
 
 #ifndef MUTEX_SEM
 #define MUTEX_SEM
@@ -49,7 +53,8 @@
 class MutexSem : public SemCore {
 
 public:
-    /** @brief Constructor. */
+    /** @brief Constructor.
+      * @param h is a pointer to the semaphore structure. */
     MutexSem(HANDLE h) {
         Init(h);
     }

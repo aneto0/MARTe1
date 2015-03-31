@@ -35,12 +35,18 @@
 #include "TimeoutType.h"
 #include "Sleep.h"
 
-/** @brief This type of semaphore uses just a single spinlock instruction: Atomic::TestAndSet. The Timeout is calculated using the HighResolutionTimer class. 
+/** @brief A semaphore based on spin locks.
+  *
+  * This type of semaphore uses just a single spinlock instruction: Atomic::TestAndSet. The Timeout is calculated using the HighResolutionTimer class. 
+  *
   * With this type of semaphores we have a different implementation of the lock with timeout, where a thread tries to lock until the timeout is expired without 
   * the failure of the mutex (thing that happens using pthread_mutex functions).
+  *
   * Furthermore a thread can unlocks a semaphore locked by another thread. */
 class FastPollingMutexSem {
 protected:
+    
+    /** Atomic variable */
     volatile int32 flag;
 public:
     /** @brief Constructor. */

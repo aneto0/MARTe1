@@ -22,8 +22,9 @@
 
 /**
  * @file
- * Access to the high resolution counters. These routines enable
- * the calculation of high resolution timings.
+ * @brief Access to the high resolution counters. 
+ *
+ * These routines enable the calculation of high resolution timings.
  *
  * The time ellapsed can be calculated using:
  * int64 t1 = HRT::HRTCounter();
@@ -33,7 +34,8 @@
 #ifndef _HIGH_RESOLUTION_TIMER_P_H_
 #define _HIGH_RESOLUTION_TIMER_P_H_
 
-/** Reads the High Resolution Timer as 32 bit.Fast inline assembler. */
+/** @brief Reads the High Resolution Timer as 32 bit. Fast inline assembler.
+  * @return number of cpu ticks in a 32 bit integer. */
 static inline uint32 HighResolutionTimerRead32() {
 __asm {
     _emit 0x0F
@@ -41,7 +43,8 @@ __asm {
 }
 }
 
-/** Reads the High Resolution Timer as 64 bit int. Fast inline */
+/** @brief Reads the High Resolution Timer as 64 bit int. Fast inline assembler.
+  * @return number of cpu ticks in a 64 bit integer. */
 static inline int64 HighResolutionTimerRead64() {
 __asm {
 _emit 0x0F

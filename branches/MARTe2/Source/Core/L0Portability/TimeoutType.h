@@ -24,13 +24,19 @@
  **/
 /** 
  * @file
- * Defines the timeout
+ * @brief Defines the timeout
  */
 #ifndef TIMEOUT_TYPE_H
 #define TIMEOUT_TYPE_H
 
 #include "GeneralDefinitions.h"
 #include "HighResolutionTimer.h"
+
+
+/** max value for the delay that is treated  */
+const uint32 TTMaxDelay = 0xFFFF0000;
+
+/** type to indicate specific wait in the timeout parameters */
 
 /**
  * @brief Functions for timeout definition.
@@ -42,11 +48,6 @@
  * timeouts.
  */
 
-
-/** max value for the delay that is treated  */
-const uint32 TTMaxDelay = 0xFFFF0000;
-
-/** type to indicate specific wait in the timeout parameters */
 class TimeoutType {
 public:
     /** how many msecs to wait */

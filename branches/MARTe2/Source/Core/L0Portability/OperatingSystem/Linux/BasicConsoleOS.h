@@ -24,7 +24,7 @@
  **/
 /**
  * @file
- * Basic console implementation in linux
+ * @brief Basic console implementation in linux
  */
 
 #ifndef BASIC_CONSOLE_OS_H
@@ -45,7 +45,12 @@
 #define BASIC_CONSOLE_LINUX_CLEAR_ROWS 40
 
 /**
- * @see Console::Open
+ * @see BasicConsoleOpen
+ * @brief Open a console.
+ * @param con is the console.
+ * @param numberOfColumns is the desired number of columns.
+ * @param numberOfRows is the desired number of rows.
+ * @return true if the console is opened correctly.
  */
 bool BasicConsoleOSOpen(BasicConsole &con, int32 numberOfColumns,
                         int32 numberOfRows) {
@@ -66,7 +71,10 @@ bool BasicConsoleOSOpen(BasicConsole &con, int32 numberOfColumns,
 }
 
 /**
- * @see Console::Close
+ * @see BasicConsoleClose
+ * @brief Close a console.
+ * @param con is the console to close.
+ * @return true if the console is closed correctly.
  */
 bool BasicConsoleOSClose(BasicConsole &con) {
     if (con.openingMode & PerformCharacterInput) {
@@ -76,14 +84,22 @@ bool BasicConsoleOSClose(BasicConsole &con) {
 }
 
 /**
- * @see Console::Show
+ * @see BasicConsole::Show
+ * @brief Not Implemented.
+ * @param con is the console.
+ * @return true.
  */
 bool BasicConsoleOSShow(BasicConsole &con) {
     return True;
 }
 
 /**
- * @see Console::Write
+ * @see BasicConsole::Write
+ * @brief Write on the console.
+ * @param con is the console.
+ * @param buffer is a pointer to the memory to write.
+ * @param size is the number of bytes to write on the console.
+ * @return true if at least one byte is written.
  */
 bool BasicConsoleOSWrite(BasicConsole &con, const void* buffer, uint32 &size) {
     char* buffString = (char*) buffer;
@@ -122,7 +138,12 @@ bool BasicConsoleOSWrite(BasicConsole &con, const void* buffer, uint32 &size) {
 }
 
 /**
- * @see Console::Read
+ * @see BasicConsole::Read.
+ * @brief Read from the console.
+ * @param con is the console.
+ * @param buffer is the location of memory where store read bytes.
+ * @param size is the number of bytes to read.
+ * @return true if at least one byte is read.
  */
 bool BasicConsoleOSRead(BasicConsole &con, void* buffer, uint32 &size,
                         TimeoutType msecTimeout) {
@@ -144,14 +165,22 @@ bool BasicConsoleOSRead(BasicConsole &con, void* buffer, uint32 &size,
 }
 
 /**
- * Not implemented
+ * @brief Not implemented.
+ * @param con is the console.
+ * @param title is the title.
+ * @return false.
  */
 bool BasicConsoleOSSetTitleBar(BasicConsole &con, const char *title) {
     return False;
 }
 
 /**
- * Not implemented
+ * @see BasicConsole::SetWindowSize.
+ * @brief Set the number of rows and columns.
+ * @param con is the console.
+ * @param numberOfColumns is the desired number of columns.
+ * @param numberOfRows is the desired number of rows.
+ * @return true.  
  */
 bool BasicConsoleOSSetWindowSize(BasicConsole &con, int numberOfColumns,
                                  int numberOfRows) {
@@ -161,7 +190,12 @@ bool BasicConsoleOSSetWindowSize(BasicConsole &con, int numberOfColumns,
 }
 
 /**
- * Not implemented
+ * @see BasicConsole::GetWindowSize.
+ * @brief Get the number of columns and rows.
+ * @param con is the console.
+ * @param numberOfColumns is the numberOfColumns in return.
+ * @param numberOfRows is the numberOfRows in return.
+ * @return true.
  */
 bool BasicConsoleOSGetWindowSize(BasicConsole &con, int &numberOfColumns,
                                  int &numberOfRows) {
@@ -171,7 +205,7 @@ bool BasicConsoleOSGetWindowSize(BasicConsole &con, int &numberOfColumns,
 }
 
 /**
- * Not implemented
+ * @see BasicConsoleOSSetWindowSize BasicConsole::SetWindowSize
  */
 bool BasicConsoleOSSetSize(BasicConsole &con, int numberOfColumns,
                            int numberOfRows) {
@@ -181,7 +215,7 @@ bool BasicConsoleOSSetSize(BasicConsole &con, int numberOfColumns,
 }
 
 /**
- * Not implemented
+ * @see BasicConsoleOSGetWindowSize BasicConsole::GetWindowSize
  */
 bool BasicConsoleOSGetSize(BasicConsole &con, int &numberOfColumns,
                            int &numberOfRows) {
@@ -191,21 +225,33 @@ bool BasicConsoleOSGetSize(BasicConsole &con, int &numberOfColumns,
 }
 
 /**
- * Not implemented
+ * @brief Not implemented.
+ * @param con is the console.
+ * @param column is the desired x position.
+ * @param row is the desired y position.
+ * @return false.
  */
 bool BasicConsoleOSSetCursorPosition(BasicConsole &con, int column, int row) {
     return False;
 }
 
 /**
- * Not implemented
+ * @brief Not implemented.
+ * @param con is the console.
+ * @param column is the cursor x position.
+ * @param row is the cursor y position.
+ * @return false.
  */
 bool BasicConsoleOSGetCursorPosition(BasicConsole &con, int &column, int &row) {
     return False;
 }
 
 /**
- * Not implemented
+ * @brief Not implemented.
+ * @param con is the console.
+ * @param foreGroundColour is the desired foreground color.
+ * @param backGroundColour is the desired background color.
+ * @return false.
  */
 bool BasicConsoleOSSetColour(BasicConsole &con, Colours foreGroundColour,
                              Colours backGroundColour) {
@@ -214,6 +260,9 @@ bool BasicConsoleOSSetColour(BasicConsole &con, Colours foreGroundColour,
 
 /**
  * @see BasicConsole::Clear
+ * @brief Clean the console.
+ * @param con is the console.
+ * @return true.
  */
 bool BasicConsoleOSClear(BasicConsole &con) {
     for (int32 i = 0; i < BASIC_CONSOLE_LINUX_CLEAR_ROWS; i++) {
@@ -223,7 +272,14 @@ bool BasicConsoleOSClear(BasicConsole &con) {
 }
 
 /**
- * Not implemented
+ * @brief Not implemented.
+ * @param con is the console.
+ * @param c is the char to write.
+ * @param foreGroundColour is the desired foreground color.
+ * @param backGroundColour is the desired background color.
+ * @param column is the desired x position.
+ * @param row is the desired y position.
+ * @return false.
  */
 bool BasicConsoleOSPlotChar(BasicConsole &con, char c, Colours foreGroundColour,
                             Colours backGroundColour, int column, int row) {

@@ -24,7 +24,7 @@
  **/
 /**
  * @file
- * Multi-platform generic timer implementation
+ * @brief Multi-platform generic timer implementation
  */
 #ifndef TIMER_H
 #define TIMER_H
@@ -32,16 +32,6 @@
 #include "Threads.h"
 #include "Sleep.h"
 
-
-/**
- * @brief Functions for timer management.
- * 
- * These methods allows to call a subroutine function when a timer is elapsed. Here are implemented functions to
- * configure the desired period of the timer, to start and terminate the timer.
- *
- * Most of the implementation is delegated to TimerOS.h which provides system level functions for timer management.
- *  
- */
 
 
 
@@ -73,6 +63,16 @@ bool TimerStopTimer(Timer &t);
 /** @see Timer::TimerServiceRoutine(). */
 void TimerCServiceRoutine(Timer &t);
 }
+
+/**
+ * @brief Functions for timer management.
+ * 
+ * These methods allows to call a subroutine function when a timer is elapsed. Here are implemented functions to
+ * configure the desired period of the timer, to start and terminate the timer.
+ *
+ * Most of the implementation is delegated to TimerOS.h which provides system level functions for timer management.
+ *  
+ */
 
 class Timer {
 private:
@@ -143,7 +143,7 @@ public:
     /** @brief Configure the timer
       * This method can be called anytime as long as the object exists.
       * @param usec is the desired period of the timer (in microseconds).
-      * @param cpumask is the mask of the cpu.
+      * @param cpuMask is the mask of the cpu.
       * @return true if the system level function return without errors.  */
     bool ConfigTimer(int32 usec, int32 cpuMask = 0xff) {
         return TimerConfigTimer(*this, usec, cpuMask);
@@ -152,7 +152,7 @@ public:
     /** @brief Configure and start the timer.
       * This method can be called anytime as long as the object exists and even if a timer is already running.
       * @param usec is the desired period of the timer (in microseconds).
-      * @param cpumask is the mask of cpu.
+      * @param cpuMask is the mask of cpu.
       * @return true if configuration return true and if the state of timer was not already in RUNNING.*/
     bool ConfigAndStartTimer(int32 usec, int32 cpuMask = 0xff) {
         return TimerConfigAndStartTimer(*this, usec, cpuMask);

@@ -25,7 +25,7 @@
 
 /**
  * @file
- * Definition of iterator/filters classes
+ * @brief Definition of iterator/filters classes
  */
 
 #ifndef ITERATORS_H
@@ -70,7 +70,7 @@ enum SFTestType {
 
 class LinkedListable;
 
-/** @brief A class template to build an iterator filter. */
+/** @brief A class to build an iterator filter. */
 class Iterator {
 public:
     /** @brief The function performing the action linked to the iterator.
@@ -98,11 +98,11 @@ public:
   * @param data is a LinkedListable object pointer. */
 typedef void (IteratorFn)(LinkedListable *data);
 
-/** @brief A class template to build search filters. */
+/** @brief A class to build search filters. */
 class SearchFilter {
 public:
     /** @brief The function that performs the search on a set of data.
-      * @param is a LinkedListable object pointer. */
+      * @param data is a LinkedListable object pointer. */
     virtual bool Test(LinkedListable *data)=0;
 };
 
@@ -128,7 +128,7 @@ public:
   * @param data is a LinkedListable object pointer. */
 typedef bool (SearchFilterFn)(LinkedListable *data);
 
-/**  @brief A class template to build search filters. */
+/**  @brief A class to build search filters. */
 class SortFilter {
 public:
     virtual ~SortFilter(){

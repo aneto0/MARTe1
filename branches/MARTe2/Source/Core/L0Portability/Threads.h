@@ -26,8 +26,6 @@
 /**
  * @file
  * @brief Multi-thread support
- *
- * Framework threading definition.
  */
 #ifndef THREADS_H
 #define THREADS_H
@@ -37,89 +35,99 @@
 #include "ExceptionHandler.h"
 #include "ProcessorType.h"
 
-/**
- * Defines the default stack size for a thread.
- */
+
+
+/** Defines the default stack size for a thread. */
 #ifndef THREADS_DEFAULT_STACKSIZE
 #define THREADS_DEFAULT_STACKSIZE 32768
 #endif
 
-/**
- * Assign default initialisation. When a new thread is created, before calling the user callback entry function
- * this function is called. This allows to keep track of how many threads are running in the application at any
- * given time and to do house keeping (see also ThreadsDatabase).
- */
+/** Assign default initialisation. */
 extern ThreadInformationConstructorType threadInitialisationInterfaceConstructor;
 
 extern "C" {
-/** @brief See Threads::BeginThread */
-TID ThreadsBeginThread(ThreadFunctionType function,
-                       void *parameters = NULL,
+/** @see Threads::BeginThread. */
+TID ThreadsBeginThread(ThreadFunctionType function, void *parameters = NULL,
                        uint32 stacksize = THREADS_DEFAULT_STACKSIZE,
                        const char *name = NULL,
-                       uint32 exceptionHandlerBehaviour = ExceptionHandler::NotHandled,
+                       uint32 exceptionHandlerBehaviour =
+                               ExceptionHandler::NotHandled,
                        ProcessorType runOnCPUs = PTUndefinedCPUs);
 
-/** @brief See Threads::EndThread */
+/** @see Threads::EndThread. */
 void ThreadsEndThread();
 
-/** @brief See Threads::Id */
+/** @see Threads::Id. */
 TID ThreadsId();
 
-/** @brief See Threads::Kill */
+/** @see Threads::Kill. */
 bool ThreadsKill(TID tid);
 
-/** @brief See Threads::IsAlive */
+/** @see Threads::IsAlive. */
 bool ThreadsIsAlive(TID tid);
 
-/** @see Threads::Name*/
+/** @see Threads::Name. */
 const char *ThreadsName(TID tid);
 
-/** @see Threads::GetCPUs*/
+/** @see Threads::GetCPUs. */
 int32 ThreadsGetCPUs(TID tid);
 
-/** @see Threads::GetState*/
+/** @see Threads::GetState. */
 uint32 ThreadsGetState(TID tid);
 
-/** @see Threads::GetPriorityLevel*/
+/** @see Threads::GetPriorityLevel. */
 uint32 ThreadsGetPriorityLevel(TID tid);
 
-/** @see Threads::GetPriorityClass*/
+/** @see Threads::GetPriorityClass. */
 uint32 ThreadsGetPriorityClass(TID tid);
 
-/** @see Threads::SetPriorityLevel*/
+/** @see Threads::SetPriorityLevel. */
 void ThreadsSetPriorityLevel(TID tid, uint32 level);
 
-/** @see Threads::SetPriorityClass*/
+/** @see Threads::SetPriorityClass. */
 void ThreadsSetPriorityClass(TID tid, uint32 priotityClass);
 
-/** Allows to set the thread initialisation method */
-void ThreadsSetInitialisationInterfaceConstructor(ThreadInformationConstructorType threadInitialisationInterfaceConstructor);
+/** Allows to set the thread initialisation method. */
+void ThreadsSetInitialisationInterfaceConstructor(
+        ThreadInformationConstructorType threadInitialisationInterfaceConstructor);
 
-/** This function allows to call a subroutine within an exception handler protection */
-bool ThreadProtectedExecute(ThreadFunctionType userFunction, void *userData, ExceptionHandler *eh);
+/** This function allows to call a subroutine within an exception handler protection. */
+bool ThreadProtectedExecute(ThreadFunctionType userFunction, void *userData,
+                            ExceptionHandler *eh);
 }
 
-// Forward declaration.
-/** This is the default TII object instantiator eventually used in the BeginThread method.
- @param userThreadFunction The thread entry point.
- @param userData A pointer to data that can be passed to the thread.
- @param threadName The thread name.
- @param exceptionHandlerBehaviour Describes the behaviour of threads when an exception occurr.
- */
-ThreadInformation * DefaultThreadInformationConstructor(ThreadFunctionType userThreadFunction, void *userData, const char *threadName,
-                                                        uint32 exceptionHandlerBehaviour);
+
+/** @brief This is the default ThreadInformation object instantiator eventually used in the BeginThread method.
+  * @param userThreadFunction The thread entry point.
+  * @param userData A pointer to data that can be passed to the thread.
+  * @param threadName The thread name.
+  * @param exceptionHandlerBehaviour Describes the behaviour of threads when an exception occurr. */
+ThreadInformation * DefaultThreadInformationConstructor(
+        ThreadFunctionType userThreadFunction, void *userData,
+        const char *threadName, uint32 exceptionHandlerBehaviour);
 
 /**
- * This class provides a common layer among different OS for using threads.
+ * @brief Functions for threads management.
+ * 
+ * These methods allows to begin and end threads holding all information in a general thread database (@see ThreadsDatabase.h),
+ * other functions allows to a thread to kill, check the life, get informations of other threads by their identifier. 
+ *
+ * Most of the implementation is delegated to ThreadsOS.h which provides system level functions for threads management.
+ *
+ * These are the basic functions to use threads.  
  */
+
+
 class Threads {
 public:
 
-    friend void ThreadsSetInitialisationInterfaceConstructor(ThreadInformationConstructorType tiic);
+    friend void ThreadsSetInitialisationInterfaceConstructor(
+            ThreadInformationConstructorType tiic);
     friend void ThreadsSetPriorityLevel(TID tid, uint32 level);
     friend void ThreadsSetPriorityClass(TID tid, uint32 priotityClass);
-    friend TID ThreadsBeginThread(ThreadFunctionType function, void *parameters, uint32 stacksize, const char *name, uint32 exceptionHandlerBehaviour,
+    friend TID ThreadsBeginThread(ThreadFunctionType function, void *parameters,
+                                  uint32 stacksize, const char *name,
+                                  uint32 exceptionHandlerBehaviour,
                                   ProcessorType runOnCPUs);
     friend TID ThreadsId();
     friend void ThreadsEndThread();
@@ -131,9 +139,8 @@ public:
     friend void ThreadsSetHighClass();
 
 public:
-//Thread states
-//The three main states are: READY, PENDING and SUSPENDED 
-//All the other states are substates of these and may or not be available depending on the OS
+/** The three main states are: READY, PENDING and SUSPENDED 
+  * All the other states are substates of these and may or not be available depending on the OS */
 
     static const uint32 STATE_UNKNOWN = -1;
     static const uint32 STATE_READY = 1024;
@@ -170,91 +177,109 @@ public:
     static const uint32 PRIORITY_HIGHEST = 6;
     static const uint32 PRIORITY_TIME_CRITICAL = 7;
 
-    /** Sets the function used to build the thread initialisation interface.
-     An initialisation interface object is created using either the default value
-     or the parameter passed to this function by the BeginThread method.
-     @param tiic A pointer to the function to be used in the BeginThread method.
-     */
-    static void SetThreadInformationConstructor(ThreadInformationConstructorType tiic) {
+    /** @brief Sets the function used to build the thread initialization interface.
+      *
+      * An initialisation interface object is created using either the default value
+      * or the parameter passed to this function by the BeginThread method.
+      * @param tiic A pointer to the function to be used in the BeginThread method. */
+    static void SetThreadInformationConstructor(
+            ThreadInformationConstructorType tiic) {
         ThreadsSetInitialisationInterfaceConstructor(tiic);
     }
 
-    /** Change thread priority. Applies only to current thread 0-31 (on windows it is actually/4) */
+    /** @brief Change thread priority. 
+      * Applies only to current thread 0-31 (on windows it is actually/4) */
     static void SetPriorityLevel(TID tid, uint32 level) {
         ThreadsSetPriorityLevel(tid, level);
     }
 
-    /** Change thread priority class. */
+    /** @brief Change thread priority class. */
     static void SetPriorityClass(TID tid, uint32 priorityClass) {
         ThreadsSetPriorityClass(tid, priorityClass);
     }
 
-    /** Called implicitly at the end of the main thread function. Calling this leaves some allocated memory unfreed */
+    /** @brief Called implicitly at the end of the main thread function. 
+      * Calling this leaves some allocated memory unfreed */
     static void EndThread() {
         ThreadsEndThread();
     }
 
     /**
-     * @brief Starts a new thread.
-     *
-     * This will start a new thread and callback the function set by the user.
-     * This function will dynamically allocate an object of type ThreadInformation using the function hook
-     * ThreadInformationConstructor. If the DefaultThreadInformationConstructor is used the thread will automatically
-     * be registered in the ThreadDatabase and the user function called afterwards.
-     *
+     * @brief A call to this function will start a thred.
      * @param function The function main for the thread.
      * @param parameters A pointer passed to the thread main function.
      * @param stacksize The size of the stack.
      * @param name The name of the thread.
-     * @param exceptionAction The action to perform when an exception occurs.
+     * @param exceptionHandlerBehaviour The action to perform when an exception occurs.
+     * @param runOnCPUs The cpu mask where the thread can be executed.
      * @return The thread identification number.
+     * 
+     * This function will dynamically allocate an object of type
+     * ThreadInformation using the function hook ThreadInformationConstructor.
+     * This allows the programmer to choose which constructor has to be used in the case
+     * a ThreadInformation derived class had been used.
      */
-    static TID BeginThread(ThreadFunctionType function,
-                           void *parameters = NULL,
+    static TID BeginThread(ThreadFunctionType function, void *parameters = NULL,
                            uint32 stacksize = THREADS_DEFAULT_STACKSIZE,
                            const char *name = NULL,
-                           uint32 exceptionHandlerBehaviour = ExceptionHandler::NotHandled,
+                           uint32 exceptionHandlerBehaviour =
+                                   ExceptionHandler::NotHandled,
                            ProcessorType runOnCPUs = PTUndefinedCPUs) {
-        return ThreadsBeginThread(function, parameters, stacksize, name, exceptionHandlerBehaviour, runOnCPUs);
+        return ThreadsBeginThread(function, parameters, stacksize, name,
+                                  exceptionHandlerBehaviour, runOnCPUs);
     }
 
-    /** Gets the current thread id; */
+    /** @brief Gets the current thread id; 
+      * @return the current thread id. */
     static TID Id() {
         return ThreadsId();
     }
 
-    /** Asynchronous thread kill */
+    /** @brief Asynchronous thread kill.
+      *
+      * A thread cannot be killed while locks a mutex semaphore in Linux.
+      * @param tid is the id of the thread to kill.
+      * @return true if system level kill function returns without errors. */
     static bool Kill(TID tid) {
         return ThreadsKill(tid);
     }
 
-    /** Check whether thread still alive */
+    /** @brief Check if thread is still alive.
+      * @param tid is the id of the thread which must be checked.
+      * @return true if thread is alive (checking before that it is in the database), false otherwise. */
     static bool IsAlive(TID tid) {
         return ThreadsIsAlive(tid);
     }
 
-    /** Retrieve thread name */
+    /** @brief Get thread name.
+      * @param tid is the id of the requested thread,
+      * @return the name of the thread with tid as id. */
     static const char *Name(TID tid) {
         return ThreadsName(tid);
     }
 
-    /**
-     * Returns the task state. This can be a masked combination of any of the
+    
+   /** @brief Returns the task state.
+     * 
+     * This can be a masked combination of any of the
      * defined THREAD_STATE. So for instance a value of "6" means:
-     * THREAD_STATE_BLOCKED + THREAD_STATE_SEM
-     * @param tid the thread identifier
-     * @return the thread state(s)
-     */
+     * THREAD_STATE_BLOCKED + THREAD_STATE_SEM.
+     * @param tid is the id of the requested thread.
+     * @return the thread state(s). */
     static uint32 GetState(TID tid) {
         return ThreadsGetState(tid);
     }
 
-    /** @return the thread priority level*/
+    /** @brief Get the priority level of a thread.
+      * @param tid is the id of the requested thread.
+      * @return the thread priority level. */
     static int32 GetPriorityLevel(TID tid) {
         return ThreadsGetPriorityLevel(tid);
     }
 
-    /** @return the thread priority class*/
+    /** @brief Get the priority class of a thread.
+      * @param tid is the id of the requested thread.
+      * @return the thread priority class. */
     static int32 GetPriorityClass(TID tid) {
         return ThreadsGetPriorityClass(tid);
     }

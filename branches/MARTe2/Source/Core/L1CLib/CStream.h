@@ -24,7 +24,7 @@
  **/
 /** 
  * @file 
- * A portable C stream mechanism. */
+ * @brief A portable C stream mechanism. */
 #if !defined (CSTREAM_H)
 #define CSTREAM_H
 
@@ -33,11 +33,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
-/** @brief  A portable C stream mechanism.
-  *
-  * It provides the base infrastructure for the most advanced streaming classes
-  * (e.g. File, Socket and FString) to do printf like operations. */
-
 
 
 
@@ -46,6 +41,11 @@ struct CStream;
 
 /** Define the function called by NewBuffer */
 typedef void (*CStreamNewBufferFN)(CStream *p);
+
+/** @brief  A portable C stream mechanism.
+  *
+  * It provides the base infrastructure for the most advanced streaming classes
+  * (e.g. File, Socket and FString) to do printf like operations. */
 
 struct CStream {
 

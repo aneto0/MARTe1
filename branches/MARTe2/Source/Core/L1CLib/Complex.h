@@ -25,7 +25,7 @@
 
 /** 
  * @file
- * an implementation of the complex numerical type as 2 doubles
+ * @brief An implementation of the complex numerical type as 2 doubles
  */
 #ifndef COMPLEX_H_
 #define COMPLEX_H_

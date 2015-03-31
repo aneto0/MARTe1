@@ -23,12 +23,19 @@
  *
  **/
 
+/** @file
+  * @brief Implementation of Assembly instructions for fast math operations.
+  */
+
+
 #ifndef FAST_MATH_A_H
 #define FAST_MATH_A_H
 
 /**
  * @see FastMath::Sin
- */
+ * @brief Calculate the sine of an angle.
+ * @param angle is the angle parameter in radiants.
+ * @return the value of the sine of angle. */
 static inline float FastMathSin(float angle) {
     volatile float output;
     __asm__ __volatile__(
@@ -40,6 +47,9 @@ static inline float FastMathSin(float angle) {
 
 /**
  * @see FastMath::Cos
+ * @brief Calculate the cosine of an angle.
+ * @param angle is the angle parameter in radiants.
+ * @return the value of the cosine of angle.
  */
 static inline float FastMathCos(float angle) {
     volatile float output;
@@ -52,7 +62,9 @@ static inline float FastMathCos(float angle) {
 
 /** 
  * @see FastMath::FloatToInt 
- */
+ * @brief Fast conversion to int by float.
+ * @param input is the float number to convert.
+ * @return the floor of input (32 bits integer). */
 static inline int32 FastMathFloatToInt(float input) {
     volatile int32 output;
     __asm__ __volatile__(

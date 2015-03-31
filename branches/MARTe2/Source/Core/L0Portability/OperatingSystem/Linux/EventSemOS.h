@@ -25,7 +25,7 @@
 
 /**
  * @file 
- * Linux implementation of the EventSem
+ * @brief Linux implementation of the event semaphore
  */
 #ifndef EVENT_SEM_OS_H
 #define EVENT_SEM_OS_H
@@ -35,29 +35,35 @@
 #include <math.h>
 #include <sys/timeb.h>
 
-/** Private structure used for solaris adn linux when using pThread. */
+/** @brief Private event semaphore class used for Solaris and Linux when using pThread.
+ *  
+ *  The event semaphore is impemented using pthread_cond functions, but this class
+ *  use also a pthread_mutex to assure consistency of critical operations on the event semaphore
+ *  shared by threads. */
 class PrivateEventSemStruct {
-    // Mutex Handle
+    /** Mutex Handle */
     pthread_mutex_t mutexHandle;
 
-    // Mutex Attributes
+    /** Mutex Attributes */
     pthread_mutexattr_t mutexAttributes;
 
-    // Conditional Variable
+    /** Conditional Variable */
     pthread_cond_t eventVariable;
 
-    // boolean semaphore
+    /** boolean semaphore */
     bool stop;
 
 public:
-    //
+    /** @brief Constructor. */
     PrivateEventSemStruct() {
         stop = True;
     }
-    //
+    /** @brief Destructor. */
     ~PrivateEventSemStruct() {
     }
 
+    /** @brief Initialize the semaphore with the right attributes.
+      * @return false if something wrong with pthread_mutex and pthread_cond initializations. */
     bool Init() {
         stop = True;
         if (pthread_mutexattr_init(&mutexAttributes) != 0) {
@@ -72,6 +78,9 @@ public:
         return True;
     }
 
+
+    /** @brief Destroy the semaphore.
+      * @return false if something wrong in pthread_mutex and pthread_cond destructions. */
     bool Close() {
         Post();
         if (!pthread_mutexattr_destroy(&mutexAttributes)) {
@@ -86,6 +95,10 @@ public:
         return True;
     }
 
+
+    /** @brief Wait until a post condition or until the timeout expire.
+      * @param msecTimeout is the desired timeout.
+      * @return false if lock or wait functions fail or if the timeout causes the wait fail. */
     bool Wait(TimeoutType msecTimeout = TTInfiniteWait) {
         if (msecTimeout == TTInfiniteWait) {
             if (pthread_mutex_lock(&mutexHandle) != 0) {
@@ -130,6 +143,9 @@ public:
         return True;
     }
 
+
+    /** @brief Post condition. Free all threads stopped in a wait condition.
+      * @return true if the eventVariable is set to zero. */
     bool Post() {
         if (pthread_mutex_lock(&mutexHandle) != 0) {
             return False;
@@ -141,6 +157,8 @@ public:
         return (pthread_cond_broadcast(&eventVariable) == 0);
     }
 
+    /** @brief Reset the semaphore for a new possible wait condition.
+      * @return false if the mutex lock fails. */
     bool Reset() {
         if (pthread_mutex_lock(&mutexHandle) != 0) {
             return False;
@@ -155,6 +173,9 @@ public:
 
 /** 
  * @see EventSem::Create
+ * @brief Create a new PrivateEventSemStruct. 
+ * @param semH is a pointer to the new PrivateEventSemStruct in return.
+ * @return false if the new or the Init functions fail, true otherwise.
  */
 static bool EventSemCreate(HANDLE &semH) {
     if (semH != (HANDLE) NULL) {
@@ -175,7 +196,10 @@ static bool EventSemCreate(HANDLE &semH) {
 }
 
 /**
- * @see EventSem::Close
+ * @see EventSem::Close.
+ * @brief Destroy the event semaphore.
+ * @param semH is the pointer to the semaphore.
+ * @return true if the Close function has success, false otherwise.
  */
 static bool EventSemClose(HANDLE &semH) {
     if (semH == (HANDLE) NULL) {
@@ -189,6 +213,10 @@ static bool EventSemClose(HANDLE &semH) {
 
 /** 
  * @see EventSem::Wait
+ * @brief Wait condition.
+ * @param semH is a pointer to the event semaphore.
+ * @param msecTimeout is the desired timeout.
+ * @return the result of PrivateEventSemStruct::Wait.
  */
 static inline bool EventSemWait(HANDLE &semH, TimeoutType msecTimeout) {
     if (semH == (HANDLE) NULL) {
@@ -198,7 +226,10 @@ static inline bool EventSemWait(HANDLE &semH, TimeoutType msecTimeout) {
 }
 
 /**
- * @see EventSem::Post
+ * @see EventSem::Post   
+ * @brief Post condition.
+ * @param semH is a pointer to the event semaphore.
+ * @return the result of PrivateEventSemStruct::Post.
  */
 static inline bool EventSemPost(HANDLE &semH) {
     if (semH == (HANDLE) NULL) {
@@ -208,7 +239,10 @@ static inline bool EventSemPost(HANDLE &semH) {
 }
 
 /** 
- * @see EventSem::Reset
+ * @see EventSem::Reset 
+ * @brief Reset the semaphore for a new wait condition.
+ * @param semH is a pointer to the event semaphore.
+ * @return the result of PrivateEventSemStruct::Reset.
  */
 static inline bool EventSemReset(HANDLE &semH) {
     if (semH == (HANDLE) NULL) {
@@ -219,6 +253,10 @@ static inline bool EventSemReset(HANDLE &semH) {
 
 /** 
  * @see EventSem::ResetWait
+ * @brief Reset and then perform a wait condition of the event semaphore.
+ * @param semH is a pointer to the event semaphore.
+ * @param msecTimeout is the desired timeout.
+ * @return the result of PrivateEventSemStruct::Wait.
  */
 static inline bool EventSemResetWait(HANDLE &semH, TimeoutType msecTimeout) {
     EventSemReset(semH);

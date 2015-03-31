@@ -24,7 +24,7 @@
  **/
 /**
  * @file
- * Basic memory management
+ * @brief Basic memory management in Linux
  */
 #ifndef MEMORY_OS_H
 #define MEMORY_OS_H
@@ -35,7 +35,11 @@
 #include <string.h>
 
 /**
- * @see Memory::MemoryMalloc
+ * @see MemoryMalloc
+ * @brief Allocate dinamically a portion of memory.
+ * @param size is the number of bytes to allocate.
+ * @param allocFlags 
+ * @return a pointer to the allocated memory.
  */
 void *MemoryOSMalloc(uint32 size, MemoryAllocationFlags allocFlags) {
     if (size <= 0) {
@@ -45,7 +49,9 @@ void *MemoryOSMalloc(uint32 size, MemoryAllocationFlags allocFlags) {
 }
 
 /** 
- * @see Memory::MemoreFree
+ * @see MemoryFree
+ * @brief Free a portion of memory previously dinamically allocated.
+ * @param data is the pointer to the memory to be freed.
  */
 void MemoryOSFree(void *&data) {
     if (data != NULL) {
@@ -55,21 +61,32 @@ void MemoryOSFree(void *&data) {
 }
 
 /** 
- * @see Memory::Realloc
+ * @see MemoryRealloc
+ * @brief Reallocate the memory.
+ * @param data is the pointer to the memory which must be reallocated.
+ * @param newSize is the desired new size for the memory portion.
  */
 void *MemoryOSRealloc(void *&data, uint32 newSize) {
     return realloc(data, newSize);
 }
 
 /** 
- * @see Memory::Strdup
+ * @see MemoryStringDup
+ * @brief Duplicate a string.
+ * @param s is the string to duplicate.
+ * @return a pointer to the string copy.
  */
 char *MemoryOSStringDup(const char *s) {
     return strdup(s);
 }
 
 /** 
- * @see Memory::SharedAlloc
+ * @see MemorySharedAlloc
+ * @brief Allocate a shared memory.
+ * @param key is the identifier of the shared memory.
+ * @param size is the desired size of the shared memory.
+ * @param permMask define the process permissions.
+ * @return a pointer to the shared memory created.
  */
 void *MemoryOSSharedAlloc(uint32 key, uint32 size, uint32 permMask) {
     key_t keyid = (key_t) key;
@@ -85,22 +102,30 @@ void *MemoryOSSharedAlloc(uint32 key, uint32 size, uint32 permMask) {
 }
 
 /** 
- * @see Memory::SharedFree
+ * @see MemorySharedFree
+ * @brief Free a shared memory portion.
+ * @param address is a pointer to the shared memory.
  */
 void MemoryOSSharedFree(void *address) {
     shmdt(address);
 }
 
 /**
- * Currently not implemented in Linux
- * @see Memory::MemoryCheck
+ * @see MemoryMemoryCheck
+ * @brief Currently not implemented in Linux
+ * @return true.
  */
 bool MemoryOSCheck(void *address, MemoryTestAccessMode accessMode,
                    uint32 size) {
     return True;
 }
 
-//Copy source to destination.
+/** @see MemoryCopy. 
+  * @brief Copy source to destination.
+  * @param destination is a pointer to the destination memory.
+  * @param source is a pointer to the source memory.
+  * @param is the number of bytes to copy.
+  * @return true if source, destination and destination after the copy are not NULL. */
 bool MemoryOsCopy(void* destination, void* source, uint32 size) {
     if (source == NULL || destination == NULL) {
         return False;
@@ -109,7 +134,12 @@ bool MemoryOsCopy(void* destination, void* source, uint32 size) {
     return memcpy(destination, source, size) != NULL;
 }
 
-// <0 -> mem1 < mem2      >0 -> mem1 > mem2       =0 -> mem1 = mem2
+/** @see MemoryCompare.
+  * @brief Compare two memory portions.
+  * @param mem1 is a pointer to the first memory.
+  * @param mem2 is a pointer to the second memory.
+  * @param size is the size to compare.
+  * @return (0 if mem1 < mem2), (1 if mem1 < mem2), (2 if mem1 > mem2), (-1 if one of memory arguments is NULL). */
 int32 MemoryOsCompare(const void* mem1, const void* mem2, uint32 size) {
     if (mem1 == NULL || mem2 == NULL) {
         return -1;
@@ -125,7 +155,12 @@ int32 MemoryOsCompare(const void* mem1, const void* mem2, uint32 size) {
 
 }
 
-//Return a pointer to the first occurence of c in mem
+/** @see MemorySearch.
+  * @brief Search a byte in the memory.
+  * @param mem is the memory.
+  * @param c is the element to search.
+  * @param size is the number of bytes to check.
+  * @return a pointer to the first occurence of c in mem, NULL if is not found or in case of mem=NULL.  */
 void* MemoryOsSearch(void* mem, int32 c, uint32 size) {
     if (mem == NULL) {
         return NULL;
@@ -133,7 +168,12 @@ void* MemoryOsSearch(void* mem, int32 c, uint32 size) {
     return memchr(mem, c, size);
 }
 
-//Move size bytes from source to destination
+/** @see MemoryMove.
+  * @brief Copy size bytes from source to destination.
+  * @param destination is a pointer to the destination memory.
+  * @param source is a pointer to source memory.
+  * @param size is the number of bytes to copy.
+  * @return true if source, destination and destination after the copy are not NULL. */
 bool MemoryOsMove(void* destination, const void* source, uint32 size) {
     if (source == NULL || destination == NULL) {
         return False;
@@ -142,7 +182,12 @@ bool MemoryOsMove(void* destination, const void* source, uint32 size) {
 
 }
 
-//Copy c in the first size locations pointed by mem
+/** @see MemorySet.
+  * @brief Copy c in the first bytes of a memory.
+  * @param mem is a pointer to the memory.
+  * @param c is the byte to copy.
+  * @param size is the number of bytes to set to c.
+  * @return true if mem before and after the operation id not NULL. */
 bool MemoryOsSet(void* mem, int32 c, uint32 size) {
     if (mem == NULL) {
         return False;

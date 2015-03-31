@@ -24,7 +24,7 @@
  **/
 /**
  * @file
- * Basic memory management
+ * @brief Thread functions implementation in Linux using pthread library and signals. 
  */
 #ifndef THREADS_OS_H
 #define THREADS_OS_H 
@@ -34,7 +34,7 @@
 
 #define __thread_decl 
 /**
- * Callback thread function as defined in Linux
+ * @brief Callback thread function as defined in Linux
  */
 typedef void *(*StandardThreadFunction)(void *args);
 
@@ -43,12 +43,16 @@ void ThreadsOSEndThread() {
 }
 
 /**
- * Not implemented in Linux
+ * @brief Not implemented in Linux
+ * @param threadid is the thread identifier.
+ * @return the thread state.
  */
 uint32 ThreadsOSGetState(TID threadId) {
     return Threads::STATE_UNKNOWN;
 }
 
+
+/** @see Threads::GetCPUs */
 int32 ThreadsOSGetCPUs(TID threadId) {
     int32 cpus = -1;
     cpu_set_t cpuset;
@@ -71,6 +75,8 @@ TID ThreadsOSId() {
 }
 
 /**
+ * @see Threads::SetPriorityLevel.
+ *
  * In linux the priority will vary between 33, i.e. priorityClass = IDLE_PRIORITY_CLASS
  * and priorityLevel = PRIORITY_IDLE and 99, i.e. priorityClass = REAL_TIME_PRIORITY_CLASS
  * and priorityLevel = PRIORITY_TIME_CRITICAL
@@ -86,6 +92,9 @@ void ThreadsOSSetPriorityLevel(TID threadId, uint32 priorityClass,
     pthread_setschedparam(ThreadsOSId(), policy, &param);
 }
 
+/** @see Threads::Kill
+  *
+  * A thread cannot be deleted if it locks a mutex semaphore. */
 bool ThreadsOSKill(TID threadId) {
     if (threadId == 0) {
         return True;
@@ -98,6 +107,9 @@ bool ThreadsOSKill(TID threadId) {
     return False;
 }
 
+/** @see Threads::IsAlive
+  * 
+  * A signal is used to know if the other thread is alive.  */
 bool ThreadsOSIsAlive(TID threadId) {
     if (threadId == 0) {
         return False;
@@ -105,6 +117,7 @@ bool ThreadsOSIsAlive(TID threadId) {
     return (pthread_kill(threadId, 0) == 0);
 }
 
+/** @see Threads::BeginThread */
 TID ThreadsOSBeginThread(StandardThreadFunction function,
                          ThreadInformation *threadInfo, uint32 stacksize,
                          ProcessorType runOnCPUs) {

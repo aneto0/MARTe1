@@ -19,12 +19,12 @@
  * See the Licence  
  permissions and limitations under the Licence. 
  *
- * $Id: Endianity.h 3 2012-01-15 16:26:07Z aneto $
+ * $Id: $
  *
  **/
 /**
  * @file
- * Access processor's information
+ * @brief Access processor's information
  */
 #ifndef PROCESSOR_OS_H
 #define PROCESSOR_OS_H
@@ -33,6 +33,7 @@
 
 /**
  * @see Processors::Available()
+ * @return a mask of the avaiable processors.
  */
 uint32 ProcessorsAvailable() {
     return (uint32) sysconf(_SC_NPROCESSORS_ONLN);

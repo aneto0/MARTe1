@@ -24,8 +24,7 @@
  **/
 /**
  * @file
- * Basic memory management
- */
+ * @brief Thread functions implementation in Window using process library. */
 #ifndef THREADS_OS_H
 #define THREADS_OS_H 
 
@@ -34,7 +33,7 @@
 
 #define __thread_decl
 /**
- * Callback thread function
+ * @brief Callback thread function
  */
 typedef void *(*StandardThreadFunction)(void *args);
 
@@ -43,20 +42,27 @@ void ThreadsOSEndThread() {
 }
 
 /**
- * Not implemented in Windows
+ * @brief Not implemented in Windows
+ * @param threadid is the thread identifier.
+ * @return the state of the thread.
  */
 uint32 ThreadsOSGetState(TID threadId) {
     return Threads::STATE_UNKNOWN;
 }
 
+/** @brief Not implemented in Windows.
+  * @see Threads::GetCPUs */
 int32 ThreadsOSGetCPUs(TID threadId) {
     return -1;
 }
 
+/** @see Threads::Id */
 TID ThreadsOSId() {
     return (TID) GetCurrentThreadId();
 }
 
+
+/** @see Threads::SetPriorityLevel */
 void ThreadsOSSetPriorityLevel(TID threadId, uint32 priorityClass,
                                uint32 priorityLevel) {
     priorityLevel /= 5;
@@ -101,12 +107,14 @@ void ThreadsOSSetPriorityLevel(TID threadId, uint32 priorityClass,
     }
 }
 
+/** @see Threads::Kill */
 bool ThreadsOSKill(TID threadId) {
     if (TerminateThread((HANDLE) threadId, 0) == FALSE)
         return False;
     return True;
 }
 
+/** @see Threads::IsAlive */
 bool ThreadsOSIsAlive(TID threadId) {
     return (GetThreadPriority((HANDLE) threadId) != THREAD_PRIORITY_ERROR_RETURN);
 }

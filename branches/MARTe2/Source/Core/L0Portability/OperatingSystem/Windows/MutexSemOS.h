@@ -24,7 +24,7 @@
  **/
 /**
  *  @file 
- *  Mutex semafore
+ *  @brief Windows implementation of the utex semafore
  */
 
 #ifndef MUTEX_SEM_OS_H
@@ -32,13 +32,13 @@
 
 #include "../../TimeoutType.h"
 
-/** open the semafore with a given initial state */
+/** @see MutexSem::Create */
 bool MutexSemOSCreate(HANDLE semH, bool locked) {
     semH = CreateMutex(NULL, (locked == True), NULL);
     return (semH != NULL);
 }
 
-/** close the semafore handle */
+/** @see MutexSem::Close */
 bool MutexSemOSClose(HANDLE semH) {
     if (semH == (HANDLE) NULL)
         return True;
@@ -49,7 +49,7 @@ bool MutexSemOSClose(HANDLE semH) {
     return True;
 }
 
-/** grab the semafore */
+/** @see MutexSem::Lock */
 bool MutexSemOSLock(HANDLE semH, TimeoutType msecTimeout) {
     DWORD ret = WaitForSingleObject(semH, msecTimeout.msecTimeout);
     if (ret == WAIT_FAILED) {
@@ -60,7 +60,7 @@ bool MutexSemOSLock(HANDLE semH, TimeoutType msecTimeout) {
     return True;
 }
 
-/** returns the ownership */
+/** @see MutexSem::UnLock */
 bool MutexSemOSUnLock(HANDLE semH) {
     if (ReleaseMutex(semH) == FALSE) {
         return False;
@@ -68,18 +68,18 @@ bool MutexSemOSUnLock(HANDLE semH) {
     return True;
 }
 
-/** locks without wasting time */
+/** @see MutexSem::FastLock */
 inline bool MutexSemOSFastLock(HANDLE semH, TimeoutType msecTimeout) {
     int ret = WaitForSingleObject(semH, msecTimeout.msecTimeout);
     return ((ret != (int) WAIT_FAILED) && (ret != (int) WAIT_TIMEOUT));
 }
 
-/** unlock semafore fast */
+/** @see MutexSem::UnLock */
 inline bool MutexSemOSFastUnLock(HANDLE semH) {
     return (ReleaseMutex(semH) == TRUE);
 }
 
-/** just try to lock it returning immediately */
+/** @see MutexSem::FastTryLock */
 inline bool MutexSemOSFastTryLock(HANDLE semH) {
     int ret = WaitForSingleObject(semH, 0);
     return ((ret != (int) WAIT_FAILED) && (ret != (int) WAIT_TIMEOUT));

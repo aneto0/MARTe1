@@ -24,7 +24,7 @@
  **/
 /**
  * @file 
- * Common functionalities shared by all semaphore types
+ * @brief Common functionalities shared by all semaphore types
  */
 #ifndef SEM_CORE_H
 #define SEM_CORE_H
@@ -43,13 +43,13 @@ public:
         semH = (HANDLE) 0;
     }
     /** @brief Set the semaphore.
-      * @param s is the desired initial value for the semaphore. */
+      * @param s is a pointer to the semaphore structure. */
     void Init(HANDLE s) {
         semH = s;
     }
 
     /** @brief Constructor.
-      * @param s is the desired initial value for the semaphore. */
+      * @param s is a pointer to the semaphore structure. */
     SemCore(HANDLE s) {
         Init(s);
     }

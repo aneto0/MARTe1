@@ -25,7 +25,7 @@
 
 /** 
  * @file
- * Basic implementation of strings 
+ * @brief Basic implementation of strings 
  */
 #ifndef BASIC_STRING_H
 #define BASIC_STRING_H
@@ -33,21 +33,6 @@
 #include "GeneralDefinitions.h"
 #include "Memory.h"
 #include <string.h>
-
-/**
- * @brief A class to implement basic string operations by operators. 
- *
- * This class contains a char* attribute which represent the string and allows
- * to modify it managing dinamically the memory associated to it. Futhermore the
- * overloading of operators here defined allows to simplify the string operations:
- * assignment, concatenation, comparation ecc. */
-
-
-
-
-
-
-
 
 
 /** Predefinition of the class */
@@ -75,6 +60,15 @@ bool FSRead(BString &s, void* buffer, uint32 &size);
 bool FSWrite(BString &s, const void* buffer, uint32 &size);
 
 }
+
+
+/**
+ * @brief A class to implement basic string operations by operators. 
+ *
+ * This class contains a char* attribute which represent the string and allows
+ * to modify it managing dinamically the memory associated to it. Futhermore the
+ * overloading of operators here defined allows to simplify the string operations:
+ * assignment, concatenation, comparation ecc. */
 
 class BString {
 

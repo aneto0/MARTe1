@@ -24,7 +24,7 @@
  **/
 /**
  *  @file 
- *  Mutex semafore Linux implementation
+ *  @brief Linux implementation of the mutex semaphore.
  */
 
 #ifndef MUTEX_SEM_OS_H
@@ -35,22 +35,22 @@
 #include <math.h>
 #include <sys/timeb.h>
 
-/** Auxiliary class needed to implement the MutexSem class under
- Solaris and Linux. */
+/** @brief Private event semaphore class used for Solaris and Linux when using pThread. */
 class PrivateMutexSemStruct {
     /**  Mutex Handle */
     pthread_mutex_t mutexHandle;
     /** Mutex Attributes */
     pthread_mutexattr_t mutexAttributes;
 public:
-    /** */
+    /** @brief Constructor. */
     PrivateMutexSemStruct() {
     }
-    /** */
+    /** @brief Destructor. */
     ~PrivateMutexSemStruct() {
     }
 
-    /** */
+    /** @brief Initialize the semaphore with the right attributes.
+      * @return false if something wrong with pthread_mutex initialization. */
     bool Init() {
         if (pthread_mutexattr_init(&mutexAttributes) != 0)
             return False;
@@ -67,7 +67,8 @@ public:
         return True;
     }
 
-    /** */
+    /** @brief Destroy the semaphore.
+      * @return false if something wrong in pthread_mutex destruction. */
     bool Close() {
         if (!pthread_mutexattr_destroy(&mutexAttributes))
             return False;
@@ -76,7 +77,10 @@ public:
         return True;
     }
 
-    /** */
+    /** @brief Lock the semaphore until an unlock or the timeout expire.
+      * @param msecTimeout is the desired timeout.
+      * @return false if lock fails also because the expire of the timeout, true otherwise.
+      * The thread that locks a semaphore cannot be killed. */
     bool Lock(TimeoutType msecTimeout = TTInfiniteWait) {
         if (msecTimeout == TTInfiniteWait) {
             if (pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL) != 0)
@@ -103,21 +107,28 @@ public:
         return True;
     }
 
-    /** */
+    /** @brief Unlock the semaphore.
+      * @return true if the unlock has success.
+      * Enable the possibility to kill the thread after the unlock. */
     bool UnLock() {
         bool condition = (pthread_mutex_unlock(&mutexHandle) == 0);
         return condition
                 && pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL) == 0;
     }
 
-    /** */
+    /** @brief Fast return in case of locked semaphore.
+      * @return true if the semaphore was unlocked and locks it, otherwise return false.*/
     bool TryLock() {
         return (pthread_mutex_trylock(&mutexHandle) == 0);
     }
 
 };
 
-/** open the semafore with a given initial state */
+/** @see MutexSem::Create.
+  * @brief Create a mutex semafore with a given initial state 
+  * @param semH is a pointer to the new PrivateMutexSemStruct object.
+  * @param locked defines the initial state (true = locked, false = unlocked).
+  * @return false if the new or Init (or Lock if locked = true) fails, true otherwise */
 static bool MutexSemOSCreate(HANDLE &semH, bool locked) {
     if (semH != (HANDLE) NULL) {
         delete (PrivateMutexSemStruct *) semH;
@@ -141,7 +152,10 @@ static bool MutexSemOSCreate(HANDLE &semH, bool locked) {
     return True;
 }
 
-/** close the semafore handle */
+/** @see MutexSem::Close
+  * @brief Close the semafore handle.
+  * @param semH is a pointer to the mutex semaphore.
+  * @return true. */
 static inline bool MutexSemOSClose(HANDLE &semH) {
     if (semH == (HANDLE) NULL) {
         return True;
@@ -150,7 +164,11 @@ static inline bool MutexSemOSClose(HANDLE &semH) {
     return True;
 }
 
-/** grab the semafore */
+/** @see MutexSem::Lock
+  * @brief Lock the semafore.
+  * @param semH is a pointer to the mutex semaphore.
+  * @param msecTimeout is the desired timeout.
+  * @return the result of PrivateMutexSemStruct::Lock */
 static inline bool MutexSemOSLock(HANDLE &semH, TimeoutType msecTimeout) {
     if (semH == (HANDLE) NULL) {
         return False;
@@ -158,7 +176,10 @@ static inline bool MutexSemOSLock(HANDLE &semH, TimeoutType msecTimeout) {
     return ((PrivateMutexSemStruct *) semH)->Lock(msecTimeout);
 }
 
-/** returns the ownership */
+/** @see MutexSem::UnLock
+  * @brief Unlock the semaphore.
+  * @param semH is a pointer to the mutex semaphore.
+  * @return the return of PrivateMutexSemStruct::UnLock. */
 static inline bool MutexSemOSUnLock(HANDLE &semH) {
     if (semH == (HANDLE) NULL) {
         return False;
@@ -166,7 +187,7 @@ static inline bool MutexSemOSUnLock(HANDLE &semH) {
     return ((PrivateMutexSemStruct *) semH)->UnLock();
 }
 
-/** locks without wasting time */
+/** @see MutexSem::Lock MutexSemOSLock. */
 static inline bool MutexSemOSFastLock(HANDLE &semH, TimeoutType msecTimeout) {
     if (semH == (HANDLE) NULL) {
         return False;
@@ -174,7 +195,7 @@ static inline bool MutexSemOSFastLock(HANDLE &semH, TimeoutType msecTimeout) {
     return ((PrivateMutexSemStruct *) semH)->Lock(msecTimeout);
 }
 
-/** unlock semafore fast */
+/** @see MutexSem::UnLock MutexSemOSUnLock. */
 static inline bool MutexSemOSFastUnLock(HANDLE &semH) {
     if (semH == (HANDLE) NULL) {
         return False;
@@ -182,7 +203,11 @@ static inline bool MutexSemOSFastUnLock(HANDLE &semH) {
     return ((PrivateMutexSemStruct *) semH)->UnLock();
 }
 
-/** just try to lock it returning immediately */
+/** @see MutexSem::FastTryLock. 
+  * @brief Fast return in case of locked semaphore.
+  * @param semH is a pointer to the mutex semaphore.
+  * @param msecTimeout is the desired timeout.
+  * @return the result of PrivateMutexSemStruct::FastLock. */
 static inline bool MutexSemOSFastTryLock(HANDLE &semH) {
     if (semH == (HANDLE) NULL) {
         return False;

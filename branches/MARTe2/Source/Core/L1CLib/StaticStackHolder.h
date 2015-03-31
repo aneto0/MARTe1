@@ -24,8 +24,7 @@
  **/
 /** 
  * @file
- * A class that can handle a stack of any type but has a fixed size
- * It is based on a vector of pointers
+ * @brief A class that can handle a stack of any type.
  */
 #ifndef STATIC_STACK_HOLDER_H
 #define STATIC_STACK_HOLDER_H
@@ -33,7 +32,7 @@
 #include "GeneralDefinitions.h"
 #include "StaticListHolder.h"
 
-/** @brief This class implements a stack using the StaticListHolder functions (@see StaticListHolder.h).
+/** @brief This class implements a stack (LIFO) using the StaticListHolder functions.
  *
  * These are functions for the stack manipulation like push, pop, peek.
  */

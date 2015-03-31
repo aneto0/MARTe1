@@ -24,22 +24,31 @@
  **/
 /**
  * @file
- * Linux timer implementation based on signals.
+ * @brief Linux timer implementation based on signals.
  */
 #include <sys/time.h>
 #include <signal.h>
 
+
+
 static Timer *timerThisPtr = NULL;
+
+/** @brief Define the routine to be executed at the end of each timer expire.
+  * @param sig is the signal caughted (SIGALRM must be handled). */
 void TimerOSTimerServiceRoutine(int sig) {
     if (sig == SIGALRM) {
         timerThisPtr->TimerServiceRoutine();
     }
 }
 
+/** @see Timer::Init */
 void TimerOSInit(Timer &t) {
     timerThisPtr = &t;
 }
 
+/** @see Timer::ConfigTimer.
+  * 
+  * Uses sigaction function to caught SIGALRM signal and launch the desired service routine. */
 bool TimerOSConfigTimer(Timer &t, int32 usec, int32 cpuMask) {
     struct sigaction sact;
     /* Setup Signal Handler */
@@ -54,6 +63,9 @@ bool TimerOSConfigTimer(Timer &t, int32 usec, int32 cpuMask) {
     return True;
 }
 
+/** @see Timer::StartTimer
+  *
+  * A sigalarm signal is generated when the timer is expired. */
 bool TimerOSStartTimer(Timer &t) {
     struct itimerval timeVals;
     /* Configure Timer Values */
@@ -71,6 +83,7 @@ bool TimerOSStartTimer(Timer &t) {
     return True;
 }
 
+/** @see Timer::StopTimer */
 bool TimerOSStopTimer(Timer &t) {
     if (!t.ConfigAndStartTimer(0)) {
         //CStaticAssertErrorCondition(InitialisationError, "Timer::StopTimer() -> ConfigAndStartTimer() failed");

@@ -24,7 +24,7 @@
  **/
 /**
  * @file
- * Linked list implementation
+ * @brief Linked list implementation
  */
 #ifndef LINKED_LISTABLE_H
 #define LINKED_LISTABLE_H
@@ -42,10 +42,8 @@
 
 
 
-/**
-  * @brief A linked member. 
-  * Can be used as root of a linked list
-  * a specific linked list member can be derived from this class. */
+
+
 class LinkedListable {
 friend class MultiLinkedListHolder;
 friend class LinkedListHolder;

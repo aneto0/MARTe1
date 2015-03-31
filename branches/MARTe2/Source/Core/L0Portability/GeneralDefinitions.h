@@ -25,7 +25,7 @@
 
 /** 
  * @file
- * Definition of the basic properties and types.
+ * @brief Definition of the basic properties and types.
  */
 
 #ifndef GENERAL_DEFINITIONS_H

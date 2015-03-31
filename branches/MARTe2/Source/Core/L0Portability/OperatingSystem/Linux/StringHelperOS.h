@@ -24,7 +24,7 @@
  **/
 /**
  * @file
- * String basic management
+ * @brief char* string basic management
  */
 
 #ifndef STRING_HELPER_OS_H
@@ -32,7 +32,10 @@
 
 #include <string.h>
 
-//Concatenate 2 strings.
+/** @brief Concatenate two strings.
+  * @param destination is the first (and final) string.
+  * @param source is the string to append to destination.
+  * @return destination or NULL if arguments are NULL. */
 char* StringOsConcatenate(char* destination, const char* source) {
     if (source == NULL || destination == NULL) {
         return NULL;
@@ -40,7 +43,10 @@ char* StringOsConcatenate(char* destination, const char* source) {
     return strcat(destination, source);
 }
 
-//Concatenate 2 strings until size chars.
+/** @brief Concatenate 2 strings until size characters.
+  * @param destination is the first (and final) string.
+  * @source is the string to append to destination.
+  * @size is the maximum number of characters to append. */
 char* StringOsConcatenateN(char* destination, const char* source, uint32 size) {
     if (destination == NULL || source == NULL) {
         return NULL;
@@ -48,7 +54,10 @@ char* StringOsConcatenateN(char* destination, const char* source, uint32 size) {
     return strncat(destination, source, size);
 }
 
-//Returns a pointer to the first occurrence of c in string.
+/** @brief Search a character in a string.
+  * @param string is the string.
+  * @param c is the character to search.
+  * @return a pointer to the first occurrence of c in string. */
 char* StringOsSearchChar(char* string, char c) {
     if (string == NULL) {
         return NULL;
@@ -56,7 +65,10 @@ char* StringOsSearchChar(char* string, char c) {
     return strchr(string, c);
 }
 
-//Compare two strings.
+/** @brief Compare two strings.
+  * @param string1 is the first string.
+  * @param string2 is the second string.
+  * @return (0 if string1 = string2), (1 if string1 < string2), (2 if string1 > string2), -1 if arguments are NULL. */
 int32 StringOsCompare(const char* string1, const char* string2) {
     if (string1 == NULL || string2 == NULL) {
         return -1;
@@ -72,7 +84,11 @@ int32 StringOsCompare(const char* string1, const char* string2) {
     return ret; //0 if string1=string2
 }
 
-//Compare two strings until size chars.
+/** @brief Compare two strings until size characters.
+  * @param string1 is the first string.
+  * @param string2 is the second string.
+  * @param size is the maximum number of characters to compare.
+  * @return (0 if string1 = string2), (1 if string1 < string2), (2 if string1 > string2), -1 if arguments are NULL. */
 int32 StringOsCompareN(const char* string1, const char* string2, uint32 size) {
     if (string1 == NULL || string2 == NULL) {
         return -1;
@@ -88,7 +104,10 @@ int32 StringOsCompareN(const char* string1, const char* string2, uint32 size) {
     return ret; //0 if string1=string2
 }
 
-//Copy source in destination.
+/** @brief Copy source in destination.
+  * @param destination is the destination string.
+  * @param source is the source string.
+  * @return true if source, destination and destination after the copy are not NULL. */
 bool StringOsCopy(char* destination, const char* source) {
     if (source == NULL || destination == NULL) {
         return False;
@@ -96,7 +115,11 @@ bool StringOsCopy(char* destination, const char* source) {
     return strcpy(destination, source) != NULL;
 }
 
-//Copy source in destination until size chars.
+/** @brief Copy source in destination until size characters.
+  * @param destination is the destination string.
+  * @param source is the source string.
+  * @param size is the maximum number of characters to copy.
+  * @return true if source, destination and destination after the copy are not NULL. */
 bool StringOsCopyN(char* destination, const char* source, uint32 size) {
     if (source == NULL || destination == NULL) {
         return False;
@@ -104,7 +127,7 @@ bool StringOsCopyN(char* destination, const char* source, uint32 size) {
     return strncpy(destination, source, size) != NULL;
 }
 
-//Return the index position of the first char in string2 founded in string1 -> "abcde" "12d" returns 3.
+/** @see StringHelper::SearchIndex */
 int32 StringOsSearchIndex(const char* string1, const char* string2) {
     if (string1 == NULL || string2 == NULL) {
         return -1;
@@ -112,7 +135,7 @@ int32 StringOsSearchIndex(const char* string1, const char* string2) {
     return (int32) (strcspn(string1, string2));
 }
 
-//Return the length of a string.
+/** @see StringHelper::Length */
 int32 StringOsLength(const char* string) {
     if (string == NULL) {
         return -1;
@@ -120,7 +143,7 @@ int32 StringOsLength(const char* string) {
     return (int32) (strlen(string));
 }
 
-//Return the pointer of the first char in string1 matched with one of chars in string2.
+/** @see StringHelper::SearchChars. */
 char* StringOsSearchChars(char* string1, const char* string2) {
     if (string1 == NULL || string2 == NULL) {
         return NULL;
@@ -128,7 +151,7 @@ char* StringOsSearchChars(char* string1, const char* string2) {
     return strpbrk(string1, string2);
 }
 
-//Return a pointer at the last char c founded in string
+/** @see StringHelper::SearchLastChar */
 char* StringOsSearchLastChar(char* string, char c) {
     if (string == NULL) {
         return NULL;
@@ -136,7 +159,7 @@ char* StringOsSearchLastChar(char* string, char c) {
     return strrchr(string, c);
 }
 
-//Return a pointer to the first occurrence of substring in string.
+/** @see StringHelper::SearchString */
 char* StringOsSearchString(char* string, const char* substring) {
     if (string == NULL || substring == NULL) {
         return NULL;
@@ -144,7 +167,7 @@ char* StringOsSearchString(char* string, const char* substring) {
     return strstr(string, substring);
 }
 
-//if string is NULL the function tokenize from the pointer of the previous success strtok function.
+/** @see StringHelper::Tokenizer */
 char* StringOsTokenizer(char* string, const char* delimiter) {
     return strtok(string, delimiter);
 }

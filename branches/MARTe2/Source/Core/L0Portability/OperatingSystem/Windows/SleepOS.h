@@ -24,7 +24,7 @@
  **/
 /**
  * @file
- * Implementation of task sleeping in Windows
+ * @brief Implementation of task sleeping in Windows
  */
 #ifndef SLEEP_OS_H
 #define SLEEP_OS_H

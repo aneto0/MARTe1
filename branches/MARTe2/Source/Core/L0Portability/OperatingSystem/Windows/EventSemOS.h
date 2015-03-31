@@ -19,13 +19,13 @@
  * See the Licence  
  permissions and limitations under the Licence. 
  *
- * $Id: Endianity.h 3 2012-01-15 16:26:07Z aneto $
+ * $Id:  $
  *
  **/
 
 /**
  * @file 
- * Linux implementation of the EventSem
+ * Windows implementation of the EventSem
  */
 #ifndef EVENT_SEM_OS_H
 #define EVENT_SEM_OS_H

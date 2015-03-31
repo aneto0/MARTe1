@@ -34,6 +34,7 @@
 #include INCLUDE_FILE_ARCHITECTURE(ARCHITECTURE,AtomicA.h)
 
 /** @brief A collector of functions that are executed atomically even on multiprocessor machines. 
+ *
  * The target architecture is the one of the machine where the code is being executed. 
  * Most of the implementation is therefore delegated to the AtomicA.h implementation, 
  * which will be specific for each type of supported architecture. 

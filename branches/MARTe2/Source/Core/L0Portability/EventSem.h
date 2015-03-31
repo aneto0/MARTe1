@@ -36,6 +36,7 @@
 #include INCLUDE_FILE_OPERATING_SYSTEM(OPERATING_SYSTEM,EventSemOS.h)
 /** 
  * @brief This semaphore is used mostly for thread syncronization.
+ *
  * After being Reset the semaphore is ready to Wait.
  * Once waiting, until a Post arrives all the threads will wait on 
  * the semaphore. After the post all tasks are allowed to proceed.
@@ -47,14 +48,14 @@
  */
 
 
-/** Definition of an event shemaphore. */
 class EventSem: public SemCore {
 public:
-    /** */
+    /** @brief Constructor. */
     EventSem() {
     }
 
-    /** */
+    /** @brief Constructor by semaphore pointer. 
+      * @param h is a pointer to the sempahore structure. */
     EventSem(HANDLE h) {
         Init(h);
     }
@@ -64,7 +65,7 @@ public:
         *this = s;
     }
 
-    /** */
+    /** @brief Destructor */
     ~EventSem() {
         Close();
     }

@@ -24,6 +24,7 @@
  **/
 /**
  * @file
+ * @brief General definitions for Windows functions.
  */
 #ifndef GENERAL_DEFINITIONS_OS_H
 #define GENERAL_DEFINITIONS_OS_H

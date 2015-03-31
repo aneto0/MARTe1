@@ -31,16 +31,6 @@
 
 #include "GeneralDefinitions.h"
 #include "TimeoutType.h"
-/**
- * @brief Development of read and write operation on a console.
- * Most of the implementation is therefore delegated in BasicConsoleOS.h implementation 
- * which is different for each operating system due to implement portable functions.
- * 
- * These methods are particularly useful to obtain a first basic portable human interface,
- * where the user can interact with the system truth read and write operations allowing 
- * for example commands, debugging ecc.  
- */
-
 
 class BasicConsole;
 
@@ -122,12 +112,12 @@ bool BasicConsoleWrite(BasicConsole &con, const void* buffer, uint32 &size,
                        TimeoutType msecTimeout);
 
 /** @brief Read operation on the console con.
-  * Reads 'size' bytes from the console and puts them on the buffer passed by argument.
+  * Reads size bytes from the console and puts them on the buffer passed by argument.
   * If PerformCharacterInput mode is enabled, returns after one character read.
   * @param con is the console.
   * @param buffer is the buffer where the read bytes are written.
-  * @size is the number of bytes to read.
-  * @msecTimeout is the timeout (not implemented in linux).
+  * @param size is the number of bytes to read.
+  * @param msecTimeout is the timeout (not implemented in linux).
   * @return true if at least one byte it is read.*/
 bool BasicConsoleRead(BasicConsole &con, void* buffer, uint32 &size,
                       TimeoutType msecTimeout);
@@ -137,16 +127,16 @@ bool BasicConsoleSetTitleBar(const char *title);
 
 /** @brief Set the size of the console con.
   * @param con is the console.
-  * @numberOfColumns is the number of columns to set in the console.
-  * @numberOfRows is the number of rows to set in the console.
+  * @param numberOfColumns is the number of columns to set in the console.
+  * @param numberOfRows is the number of rows to set in the console.
   * @return true. */
 bool BasicConsoleSetSize(BasicConsole &con, int numberOfColumns,
                          int numberOfRows);
 
 /** @brief Get the size of the console con.
   * @param con is the console.
-  * @numberOfColumns is the number of columns to set in the console.
-  * @numberOfRows is the number of rows to set in the console.
+  * @param numberOfColumns is the number of columns to set in the console.
+  * @param numberOfRows is the number of rows to set in the console.
   * @return true. */
 bool BasicConsoleGetSize(BasicConsole &con, int &numberOfColumns,
                          int &numberOfRows);
@@ -184,7 +174,18 @@ bool BasicConsolePlotChar(BasicConsole &con, char c, Colours foreGroundColour,
 
 }
 
-/** Implements a stream interface to the console. */
+/**
+ * @brief Development of read and write operation on a console.
+ *
+ * Most of the implementation is therefore delegated in BasicConsoleOS.h implementation 
+ * which is different for each operating system due to implement portable functions.
+ * 
+ * These methods are particularly useful to obtain a first basic portable human interface,
+ * where the user can interact with the system truth read and write operations allowing 
+ * for example commands, debugging ecc.  
+ */
+
+
 class BasicConsole {
     /** how many lines since last paging. */
     int32 lineCount;

@@ -24,7 +24,7 @@
  **/
 /**
  * @file
- * Macro definition of some mathematical constanst and some 
+ * @brief Macro definition of some mathematical constanst and some 
  * optimised mathematical operations.
  */
 #ifndef FAST_MATH_H
@@ -33,6 +33,8 @@
 #include "GeneralDefinitions.h"
 #include INCLUDE_FILE_ARCHITECTURE(ARCHITECTURE,FastMathA.h)
 
+
+/** @brief Performs mathematical operations using fast processor instructions. */
 class FastMath {
 public:
 
@@ -65,7 +67,7 @@ public:
     static const double SQRT1_2;
 
     /**     
-     * Converts a float to an integer using a processor instruction. 
+     * @brief Converts a float to an integer using a processor instruction. 
      * @param input the value to convert
      * @return the input as an integer
      */
@@ -74,8 +76,8 @@ public:
     }
 
     /**     
-     * Computes the cosine of an angle using a processor instruction. 
-     * @param param the angle to compute 
+     * @brief Computes the cosine of an angle using a processor instruction. 
+     * @param angle the angle to compute 
      * @return the cos(angle)
      */
     static inline float Cos(float angle) {
@@ -83,8 +85,8 @@ public:
     }
 
     /**     
-     * Computes the sine of an angle using a processor instruction. 
-     * @param param the angle to compute 
+     * @brief Computes the sine of an angle using a processor instruction. 
+     * @param angle the angle to compute 
      * @return the sin(angle)
      */
     static inline float Sin(float angle) {
