@@ -24,58 +24,9 @@
 
 #include "GeneralDefinitions.h"
 #include "CStreamTest.h"
+#include "StringTestHelper.h"
 
 
-//Returns the size of the string.
-uint32 sizeOfStr(char* string) {
-    uint32 i = 0;
-    if (string == NULL) {
-        return -1;
-    }
-
-    while (string[i] != '\0') {
-        i++;
-    }
-    return i;
-}
-
-//Returns true if the strings are equal, false otherwise
-bool stringComp(char* string1, char* string2) {
-    int32 i = 0;
-    while (1) {
-        if (string1[i] != string2[i]) {
-            return False;
-        }
-        if (string1[i] == '\0' && string2[i] == '\0') {
-            return True;
-        }
-        if (string1[i] == '\0' || string2[i] == '\0') {
-            return False;
-        }
-        i++;
-    }
-}
-
-//Concatenate two strings
-bool stringApp(char* string1, char* string2, char* result) {
-    int32 i = 0;
-    int32 j = 0;
-    while (1) {
-        result[i] = string1[i];
-        if (string1[i] == '\0') {
-            break;
-        }
-        i++;
-    }
-    while (1) {
-        result[i] = string2[j];
-        if (string2[j] == '\0') {
-            return True;
-        }
-        i++;
-        j++;
-    }
-}
 
 //This function allocate memory for the stream.
 void CreateNewBuffer(CStream* p) {
@@ -147,7 +98,7 @@ bool CStreamTest::TestCRead(const char* string) {
 
     //Allocate space (not necessary because bufferPtr point to the string argument but increase the sizeLeft value)
     myCStream.NewBuffer(&myCStream);
-    uint32 size = sizeOfStr((char*) string);
+    uint32 size = StringTestHelper::Size((char*) string);
     myCStream.bufferPtr = (char*) string;
     size++;
 
@@ -160,7 +111,7 @@ bool CStreamTest::TestCRead(const char* string) {
     }
 
     //Check if the read string is correct.
-    bool cond = stringComp(begin, (char*) result);
+    bool cond = StringTestHelper::Compare(begin, (char*) result);
     FreeAll(&myCStream);
     return cond;
 }
@@ -171,7 +122,7 @@ bool CStreamTest::TestCWrite(const char* string) {
     //Allocate memory for the stream
     myContext.buffGranularity = 4;
     myCStream.NewBuffer(&myCStream);
-    uint32 size = sizeOfStr((char*) string);
+    uint32 size = StringTestHelper::Size((char*) string);
     size++;
     char* begin = myCStream.bufferPtr;
     //Write the string argument on the stream
@@ -181,7 +132,7 @@ bool CStreamTest::TestCWrite(const char* string) {
     }
 
     //Check if the string on stream is correct
-    bool cond = stringComp(begin, (char*) string);
+    bool cond = StringTestHelper::Compare(begin, (char*) string);
     FreeAll(&myCStream);
     return cond;
 }
@@ -200,7 +151,7 @@ bool CStreamTest::TestPrintInt32(const char* sDec, const char* uDec,
     //The '-' going before the space requested for the desired size
     CPrintInt32(&myCStream, -2147483648, 12, 0, 'd');
     CPut(&myCStream, '\0');
-    if (!stringComp(begin, (char*) "- 2147483648")) {
+    if (!StringTestHelper::Compare(begin, (char*) "- 2147483648")) {
         FreeAll(&myCStream);
         return False;
     }
@@ -209,7 +160,7 @@ bool CStreamTest::TestPrintInt32(const char* sDec, const char* uDec,
     begin = myCStream.bufferPtr;
     CPrintInt32(&myCStream, -2147483648, 9, 0, 'x');
     CPut(&myCStream, '\0');
-    if (!stringComp(begin, (char*) " 80000000")) {
+    if (!StringTestHelper::Compare(begin, (char*) " 80000000")) {
         FreeAll(&myCStream);
         return False;
     }
@@ -218,7 +169,7 @@ bool CStreamTest::TestPrintInt32(const char* sDec, const char* uDec,
     begin = myCStream.bufferPtr;
     CPrintInt32(&myCStream, -2147483648, 13, 0, 'o');
     CPut(&myCStream, '\0');
-    if (!stringComp(begin, (char*) "  20000000000")) {
+    if (!StringTestHelper::Compare(begin, (char*) "  20000000000")) {
         FreeAll(&myCStream);
         return False;
     }
@@ -227,7 +178,7 @@ bool CStreamTest::TestPrintInt32(const char* sDec, const char* uDec,
     begin = myCStream.bufferPtr;
     CPrintInt32(&myCStream, -2147483648, 12, '*', 'd');
     CPut(&myCStream, '\0');
-    if (!stringComp(begin, (char*) "-*2147483648")) {
+    if (!StringTestHelper::Compare(begin, (char*) "-*2147483648")) {
         FreeAll(&myCStream);
         return False;
     }
@@ -236,7 +187,7 @@ bool CStreamTest::TestPrintInt32(const char* sDec, const char* uDec,
     begin = myCStream.bufferPtr;
     CPrintInt32(&myCStream, -2147483648, 9, 'x', 'x');
     CPut(&myCStream, '\0');
-    if (!stringComp(begin, (char*) "x80000000")) {
+    if (!StringTestHelper::Compare(begin, (char*) "x80000000")) {
         FreeAll(&myCStream);
         return False;
     }
@@ -245,7 +196,7 @@ bool CStreamTest::TestPrintInt32(const char* sDec, const char* uDec,
     begin = myCStream.bufferPtr;
     CPrintInt32(&myCStream, -2147483648, 12, 'x', 'o');
     CPut(&myCStream, '\0');
-    if (!stringComp(begin, (char*) "x20000000000")) {
+    if (!StringTestHelper::Compare(begin, (char*) "x20000000000")) {
         FreeAll(&myCStream);
         return False;
     }
@@ -254,7 +205,7 @@ bool CStreamTest::TestPrintInt32(const char* sDec, const char* uDec,
     begin = myCStream.bufferPtr;
     CPrintInt32(&myCStream, number, 0, ' ', 'd');
     CPut(&myCStream, '\0');
-    if (!stringComp(begin, (char*) sDec)) {
+    if (!StringTestHelper::Compare(begin, (char*) sDec)) {
         FreeAll(&myCStream);
         return False;
     }
@@ -263,7 +214,7 @@ bool CStreamTest::TestPrintInt32(const char* sDec, const char* uDec,
     begin = myCStream.bufferPtr;
     CPrintInt32(&myCStream, number, 0, ' ', 'u');
     CPut(&myCStream, '\0');
-    if (!stringComp(begin, (char*) uDec)) {
+    if (!StringTestHelper::Compare(begin, (char*) uDec)) {
         FreeAll(&myCStream);
         return False;
     }
@@ -272,7 +223,7 @@ bool CStreamTest::TestPrintInt32(const char* sDec, const char* uDec,
     begin = myCStream.bufferPtr;
     CPrintInt32(&myCStream, number, 0, ' ', 'X');
     CPut(&myCStream, '\0');
-    if (!stringComp(begin, (char*) hex)) {
+    if (!StringTestHelper::Compare(begin, (char*) hex)) {
         FreeAll(&myCStream);
         return False;
     }
@@ -281,7 +232,7 @@ bool CStreamTest::TestPrintInt32(const char* sDec, const char* uDec,
     begin = myCStream.bufferPtr;
     CPrintInt32(&myCStream, number, 0, ' ', 'o');
     CPut(&myCStream, '\0');
-    if (!stringComp(begin, (char*) oct)) {
+    if (!StringTestHelper::Compare(begin, (char*) oct)) {
         FreeAll(&myCStream);
         return False;
     }
@@ -318,28 +269,28 @@ bool CStreamTest::TestPrintInt32(const char* sDec, const char* uDec,
     begin = myCStream.bufferPtr;
     CPrintInt32(&myCStream, number, desiredSize, '*', 'd');
     CPut(&myCStream, '\0');
-    if (sizeOfStr(begin) != desiredSize) {
+    if (StringTestHelper::Size(begin) != desiredSize) {
         FreeAll(&myCStream);
         return False;
     }
     begin = myCStream.bufferPtr;
     CPrintInt32(&myCStream, number, desiredSize, '*', 'u');
     CPut(&myCStream, '\0');
-    if (sizeOfStr(begin) != desiredSize) {
+    if (StringTestHelper::Size(begin) != desiredSize) {
         FreeAll(&myCStream);
         return False;
     }
     begin = myCStream.bufferPtr;
     CPrintInt32(&myCStream, number, desiredSize, '*', 'X');
     CPut(&myCStream, '\0');
-    if (sizeOfStr(begin) != desiredSize) {
+    if (StringTestHelper::Size(begin) != desiredSize) {
         FreeAll(&myCStream);
         return False;
     }
     begin = myCStream.bufferPtr;
     CPrintInt32(&myCStream, number, desiredSize, '*', 'o');
     CPut(&myCStream, '\0');
-    if (sizeOfStr(begin) != desiredSize) {
+    if (StringTestHelper::Size(begin) != desiredSize) {
         FreeAll(&myCStream);
         return False;
     }
@@ -357,7 +308,7 @@ bool CStreamTest::TestPrintInt64(const char* sDec, const char* hex,
     char* begin = myCStream.bufferPtr;
     CPrintInt64(&myCStream, number, 0, ' ', 'd');
     CPut(&myCStream, '\0');
-    if (!stringComp(begin, (char*) sDec)) {
+    if (!StringTestHelper::Compare(begin, (char*) sDec)) {
         FreeAll(&myCStream);
         return False;
     }
@@ -366,7 +317,7 @@ bool CStreamTest::TestPrintInt64(const char* sDec, const char* hex,
     begin = myCStream.bufferPtr;
     CPrintInt64(&myCStream, number, 0, ' ', 'X');
     CPut(&myCStream, '\0');
-    if (!stringComp(begin, (char*) hex)) {
+    if (!StringTestHelper::Compare(begin, (char*) hex)) {
         FreeAll(&myCStream);
         return False;
     }
@@ -375,7 +326,7 @@ bool CStreamTest::TestPrintInt64(const char* sDec, const char* hex,
     begin = myCStream.bufferPtr;
     CPrintInt64(&myCStream, number, 0, 0, 'o');
     CPut(&myCStream, '\0');
-    if (!stringComp(begin, (char*) oct)) {
+    if (!StringTestHelper::Compare(begin, (char*) oct)) {
         FreeAll(&myCStream);
         return False;
     }
@@ -407,20 +358,20 @@ bool CStreamTest::TestPrintInt64(const char* sDec, const char* hex,
     begin = myCStream.bufferPtr;
     CPrintInt64(&myCStream, number, desiredSize, '*', 'd');
     CPut(&myCStream, '\0');
-    if (sizeOfStr(begin) != desiredSize) {
+    if (StringTestHelper::Size(begin) != desiredSize) {
         FreeAll(&myCStream);
         return False;
     }
     CPrintInt64(&myCStream, number, desiredSize, '*', 'X');
     CPut(&myCStream, '\0');
-    if (sizeOfStr(begin) != desiredSize) {
+    if (StringTestHelper::Size(begin) != desiredSize) {
         FreeAll(&myCStream);
         return False;
     }
     begin = myCStream.bufferPtr;
     CPrintInt64(&myCStream, number, desiredSize, '*', 'o');
     CPut(&myCStream, '\0');
-    if (sizeOfStr(begin) != desiredSize) {
+    if (StringTestHelper::Size(begin) != desiredSize) {
         FreeAll(&myCStream);
         return False;
     }
@@ -440,7 +391,7 @@ bool CStreamTest::TestPrintDouble() {
     char* begin = myCStream.bufferPtr;
     CPrintDouble(&myCStream, myDouble, 0, 1, 0, 'e');
     CPut(&myCStream, '\0');
-    if (!stringComp(begin, (char*) string)) {
+    if (!StringTestHelper::Compare(begin, (char*) string)) {
         FreeAll(&myCStream);
         return False;
     }
@@ -451,7 +402,7 @@ bool CStreamTest::TestPrintDouble() {
     begin = myCStream.bufferPtr;
     CPrintDouble(&myCStream, myDouble, 0, 1, 0, 'e');
     CPut(&myCStream, '\0');
-    if (!stringComp(begin, (char*) string)) {
+    if (!StringTestHelper::Compare(begin, (char*) string)) {
         FreeAll(&myCStream);
         return False;
     }
@@ -465,7 +416,7 @@ bool CStreamTest::TestPrintDouble() {
     begin = myCStream.bufferPtr;
     CPrintDouble(&myCStream, myBigDouble, 19, 7, '*', 'e');
     CPut(&myCStream, '\0');
-    if (!stringComp(begin, (char*) string)) {
+    if (!StringTestHelper::Compare(begin, (char*) string)) {
         FreeAll(&myCStream);
         return False;
     }
@@ -476,7 +427,7 @@ bool CStreamTest::TestPrintDouble() {
     begin = myCStream.bufferPtr;
     CPrintDouble(&myCStream, myLittleDouble, 10, 1, '*', 'e');
     CPut(&myCStream, '\0');
-    if (!stringComp(begin, (char*) string)) {
+    if (!StringTestHelper::Compare(begin, (char*) string)) {
         FreeAll(&myCStream);
         return False;
     }
@@ -488,7 +439,7 @@ bool CStreamTest::TestPrintDouble() {
     begin = myCStream.bufferPtr;
     CPrintDouble(&myCStream, inf, 5, 7, '*', 'e');
     CPut(&myCStream, '\0');
-    if (!stringComp(begin, (char*) "+Inf ")) {
+    if (!StringTestHelper::Compare(begin, (char*) "+Inf ")) {
         FreeAll(&myCStream);
         return False;
     }
@@ -499,7 +450,7 @@ bool CStreamTest::TestPrintDouble() {
     begin = myCStream.bufferPtr;
     CPrintDouble(&myCStream, inf, 6, 7, '*', 'e');
     CPut(&myCStream, '\0');
-    if (!stringComp(begin, (char*) "-Inf  ")) {
+    if (!StringTestHelper::Compare(begin, (char*) "-Inf  ")) {
         FreeAll(&myCStream);
         return False;
     }
@@ -511,7 +462,7 @@ bool CStreamTest::TestPrintDouble() {
     begin = myCStream.bufferPtr;
     CPrintDouble(&myCStream, nan, 5, 7, '*', 'f');
     CPut(&myCStream, '\0');
-    if (!stringComp(begin, (char*) "NaN  ")) {
+    if (!StringTestHelper::Compare(begin, (char*) "NaN  ")) {
         FreeAll(&myCStream);
         return False;
     }
@@ -531,38 +482,38 @@ bool CStreamTest::TestPrintString(const char* string) {
     //Write string on stream with right and left justify but no padding. It must be the same
     CPrintString(&myCStream, string, 0, 0, True);
     CPut(&myCStream, '\0');
-    if (!stringComp(begin, (char*) string)) {
+    if (!StringTestHelper::Compare(begin, (char*) string)) {
         FreeAll(&myCStream);
         return False;
     }
     begin = myCStream.bufferPtr;
     CPrintString(&myCStream, string, 0, 0, False);
     CPut(&myCStream, '\0');
-    if (!stringComp(begin, (char*) string)) {
+    if (!StringTestHelper::Compare(begin, (char*) string)) {
         FreeAll(&myCStream);
         return False;
     }
 
     //Add three stars as padding and test right and left justify
-    uint32 size = sizeOfStr((char*) string);
+    uint32 size = StringTestHelper::Size((char*) string);
 
     uint32 desiredSize = size + 3;
     char result[32];
-    stringApp((char*) string, (char*) "***", result);
+    StringTestHelper::Append((char*) string, (char*) "***", result);
 
     begin = myCStream.bufferPtr;
     CPrintString(&myCStream, string, desiredSize, '*', False);
     CPut(&myCStream, '\0');
-    if (!stringComp(begin, (char*) result)) {
+    if (!StringTestHelper::Compare(begin, (char*) result)) {
         FreeAll(&myCStream);
         return False;
     }
-    stringApp((char*) "***", (char*) string, result);
+    StringTestHelper::Append((char*) "***", (char*) string, result);
 
     begin = myCStream.bufferPtr;
     CPrintString(&myCStream, string, desiredSize, '*', True);
     CPut(&myCStream, '\0');
-    if (!stringComp(begin, (char*) result)) {
+    if (!StringTestHelper::Compare(begin, (char*) result)) {
         FreeAll(&myCStream);
         return False;
     }
@@ -579,7 +530,7 @@ bool CStreamTest::TestCPrintf() {
     const char* string = "Int32 number:   13    d   15";
     CPrintf(&myCStream, "Int32 number: %4i %4x %4o", 13, 13, 13);
     CPut(&myCStream, '\0');
-    if (!stringComp(begin, (char*) string)) {
+    if (!StringTestHelper::Compare(begin, (char*) string)) {
         FreeAll(&myCStream);
         return False;
     }
@@ -590,7 +541,7 @@ bool CStreamTest::TestCPrintf() {
     CPrintf(&myCStream, "Int64 number: %lli %6Lx %3lo", 1099500000000,
             1099500000000, 1099500000000);
     CPut(&myCStream, '\0');
-    if (!stringComp(begin, (char*) string)) {
+    if (!StringTestHelper::Compare(begin, (char*) string)) {
         FreeAll(&myCStream);
         return False;
     }
@@ -600,7 +551,7 @@ bool CStreamTest::TestCPrintf() {
     begin = myCStream.bufferPtr;
     CPrintf(&myCStream, "Double number: %f", 199.9);
     CPut(&myCStream, '\0');
-    if (!stringComp(begin, (char*) string)) {
+    if (!StringTestHelper::Compare(begin, (char*) string)) {
         FreeAll(&myCStream);
         return False;
     }
@@ -610,7 +561,7 @@ bool CStreamTest::TestCPrintf() {
     begin = myCStream.bufferPtr;
     CPrintf(&myCStream, "Double number: %.1f", 199.9989);
     CPut(&myCStream, '\0');
-    if (!stringComp(begin, (char*) string)) {
+    if (!StringTestHelper::Compare(begin, (char*) string)) {
         FreeAll(&myCStream);
         return False;
     }
@@ -621,7 +572,7 @@ bool CStreamTest::TestCPrintf() {
     begin = myCStream.bufferPtr;
     CPrintf(&myCStream, "Double number: %10f %%", 199.9);
     CPut(&myCStream, '\0');
-    if (!stringComp(begin, (char*) string)) {
+    if (!StringTestHelper::Compare(begin, (char*) string)) {
         FreeAll(&myCStream);
         return False;
     }
@@ -631,7 +582,7 @@ bool CStreamTest::TestCPrintf() {
     begin = myCStream.bufferPtr;
     CPrintf(&myCStream, "Double number: %@15.2f %e", 199.9, 199.9);
     CPut(&myCStream, '\0');
-    if (!stringComp(begin, (char*) string)) {
+    if (!StringTestHelper::Compare(begin, (char*) string)) {
         FreeAll(&myCStream);
         return False;
     }
@@ -643,7 +594,7 @@ bool CStreamTest::TestCPrintf() {
     string = "   print this string? y";
     CPrintf(&myCStream, "%21s %9c", origin, c);
     CPut(&myCStream, '\0');
-    if (!stringComp(begin, (char*) string)) {
+    if (!StringTestHelper::Compare(begin, (char*) string)) {
         FreeAll(&myCStream);
         return False;
     }
@@ -653,7 +604,7 @@ bool CStreamTest::TestCPrintf() {
     string = "***print this string? y";	//18
     CPrintf(&myCStream, "%*21s %9c", origin, c);
     CPut(&myCStream, '\0');
-    if (!stringComp(begin, (char*) string)) {
+    if (!StringTestHelper::Compare(begin, (char*) string)) {
         FreeAll(&myCStream);
         return False;
     }
@@ -663,7 +614,7 @@ bool CStreamTest::TestCPrintf() {
     string = "print this string?    y";	//18
     CPrintf(&myCStream, "%-21s %9c", origin, c);
     CPut(&myCStream, '\0');
-    if (!stringComp(begin, (char*) string)) {
+    if (!StringTestHelper::Compare(begin, (char*) string)) {
         FreeAll(&myCStream);
         return False;
     }
@@ -673,7 +624,7 @@ bool CStreamTest::TestCPrintf() {
     string = "print this string?--- y";	//18
     CPrintf(&myCStream, "%--21s %9c", origin, c);
     CPut(&myCStream, '\0');
-    if (!stringComp(begin, (char*) string)) {
+    if (!StringTestHelper::Compare(begin, (char*) string)) {
         FreeAll(&myCStream);
         return False;
     }
@@ -683,7 +634,7 @@ bool CStreamTest::TestCPrintf() {
     string = "%--- print this string?***     r y";	//18
     CPrintf(&myCStream, "%--- %*-21s %5s %9c", origin, "r", c);
     CPut(&myCStream, '\0');
-    if (!stringComp(begin, (char*) string)) {
+    if (!StringTestHelper::Compare(begin, (char*) string)) {
         FreeAll(&myCStream);
         return False;
     }
@@ -692,14 +643,14 @@ bool CStreamTest::TestCPrintf() {
     //Test the sprintf function with size passed by argument (incluse the terminated char)
     char myBuffer[32];
     bl2_snprintf(myBuffer, 18, "%-21s %9c", origin, c);
-    if (!stringComp(myBuffer, (char*) "print this string")) {
+    if (!StringTestHelper::Compare(myBuffer, (char*) "print this string")) {
         FreeAll(&myCStream);
         return False;
     }
 
     //Test the sprintf function without size.
     bl2_sprintf(myBuffer, "%-21s %9c", origin, c);
-    if (!stringComp(myBuffer, (char*) string)) {
+    if (!StringTestHelper::Compare(myBuffer, (char*) string)) {
         FreeAll(&myCStream);
         return False;
     }
@@ -722,15 +673,15 @@ bool CStreamTest::TokenTest() {
     //This function returns the token using as terminators chars passed in the argument (the terminator is a char)
     CGetCStringToken((const char*&) input, buffer, ":.", size);
 
-    if (!stringComp((char*) buffer, (char*) "Nome")) {
+    if (!StringTestHelper::Compare((char*) buffer, (char*) "Nome")) {
         return False;
     }
     CGetCStringToken((const char*&) input, buffer, ":.", size);
-    if (!stringComp((char*) buffer, (char*) " Giuseppe")) {
+    if (!StringTestHelper::Compare((char*) buffer, (char*) " Giuseppe")) {
         return False;
     }
     CGetCStringToken((const char*&) input, buffer, ":.", size);
-    if (!stringComp((char*) buffer, (char*) " Cognome")) {
+    if (!StringTestHelper::Compare((char*) buffer, (char*) " Cognome")) {
         return False;
     }
     char saveTerminator;
@@ -739,7 +690,7 @@ bool CStreamTest::TokenTest() {
     input = begin;
     char* p = CDestructiveGetCStringToken((char *&) input, ":.",
                                           &saveTerminator, ":");
-    if (!stringComp((char*) p, (char*) "Nome") || saveTerminator != ':') {
+    if (!StringTestHelper::Compare((char*) p, (char*) "Nome") || saveTerminator != ':') {
         return False;
     }
 
@@ -757,7 +708,7 @@ bool CStreamTest::TokenTest() {
     //Impose null skip. The function skips consecutive terminators automatically
     p = CDestructiveGetCStringToken((char *&) input, ":.", &saveTerminator,
                                     NULL);
-    if (!stringComp((char*) p, (char*) " Giuseppe") || saveTerminator != '.') {
+    if (!StringTestHelper::Compare((char*) p, (char*) " Giuseppe") || saveTerminator != '.') {
         return False;
     }
     input--;
@@ -768,7 +719,7 @@ bool CStreamTest::TokenTest() {
     input = newBegin;
     p = CDestructiveGetCStringToken((char *&) input, ":.", &saveTerminator,
                                     ":");
-    if (!stringComp((char*) p, (char*) " Giuseppe") || saveTerminator != '.') {
+    if (!StringTestHelper::Compare((char*) p, (char*) " Giuseppe") || saveTerminator != '.') {
         return False;
     }
 
@@ -779,7 +730,7 @@ bool CStreamTest::TokenTest() {
     input = newBegin;
     p = CDestructiveGetCStringToken((char *&) input, ":.", &saveTerminator,
                                     ".");
-    if (!stringComp((char*) p, (char*) "")) {
+    if (!StringTestHelper::Compare((char*) p, (char*) "")) {
         return False;
     }
 
@@ -791,7 +742,7 @@ bool CStreamTest::TokenTest() {
         p = CDestructiveGetCStringToken((char *&) newBegin, ":.",
                                         &saveTerminator, NULL);
     }
-    if (!stringComp((char*) p, (char*) ")")) {
+    if (!StringTestHelper::Compare((char*) p, (char*) ")")) {
         return False;
     }
 
@@ -802,7 +753,7 @@ bool CStreamTest::TokenTest() {
 
     begin = myCStream.bufferPtr;
     CGetToken(&myCStream, (char*) buffer, ".:", size, &saveTerminator, NULL);
-    if (!stringComp((char*) buffer, (char*) "Nome") || saveTerminator != ':') {
+    if (!StringTestHelper::Compare((char*) buffer, (char*) "Nome") || saveTerminator != ':') {
         FreeAll(&myCStream);
         return False;
     }
@@ -811,7 +762,7 @@ bool CStreamTest::TokenTest() {
     newBegin = myCStream.bufferPtr;
 
     CGetToken(&myCStream, (char*) buffer, ".:", size, &saveTerminator, NULL);
-    if (!stringComp((char*) buffer, (char*) " Giuseppe")
+    if (!StringTestHelper::Compare((char*) buffer, (char*) " Giuseppe")
             || saveTerminator != '.') {
         FreeAll(&myCStream);
         return False;
@@ -820,7 +771,7 @@ bool CStreamTest::TokenTest() {
 
     //The function skips correctly the second ":"
     CGetToken(&myCStream, (char*) buffer, ".:", size, &saveTerminator, ":");
-    if (!stringComp((char*) buffer, (char*) " Giuseppe")
+    if (!StringTestHelper::Compare((char*) buffer, (char*) " Giuseppe")
             || saveTerminator != '.') {
         FreeAll(&myCStream);
         return False;
@@ -830,7 +781,7 @@ bool CStreamTest::TokenTest() {
     myCStream.bufferPtr = newBegin;
 
     CGetToken(&myCStream, (char*) buffer, ".:", size, &saveTerminator, ".");
-    if (!stringComp((char*) buffer, (char*) "") || saveTerminator != ':') {
+    if (!StringTestHelper::Compare((char*) buffer, (char*) "") || saveTerminator != ':') {
         FreeAll(&myCStream);
         return False;
     }
@@ -839,7 +790,7 @@ bool CStreamTest::TokenTest() {
     myCStream.bufferPtr = newBegin;
     size = 4;
     CGetToken(&myCStream, (char*) buffer, ".:", size, &saveTerminator, ":");
-    if (!stringComp((char*) buffer, (char*) " Gi") || saveTerminator != 'i') {
+    if (!StringTestHelper::Compare((char*) buffer, (char*) " Gi") || saveTerminator != 'i') {
         FreeAll(&myCStream);
         return False;
     }
@@ -851,7 +802,7 @@ bool CStreamTest::TokenTest() {
     for (uint32 i = 0; i < 3; i++) {
         CGetToken(&myCStream, (char*) buffer, ".:", size, &saveTerminator, ":");
     }
-    if (!stringComp((char*) buffer, (char*) ")")) {
+    if (!StringTestHelper::Compare((char*) buffer, (char*) ")")) {
         FreeAll(&myCStream);
         return False;
     }
@@ -894,7 +845,7 @@ bool CStreamTest::TokenTest() {
     //Use a string as a terminator  with this function
     CGetStringToken(&inputCStream, &outputCStream, ":: ", totalSize);
     CPut(&outputCStream, '\0');
-    if (!stringComp((char*) output, (char*) "Nome")) {
+    if (!StringTestHelper::Compare((char*) output, (char*) "Nome")) {
         FreeAll(&outputCStream);
         return False;
     }
@@ -902,7 +853,7 @@ bool CStreamTest::TokenTest() {
     output = outputCStream.bufferPtr;
     CGetStringToken(&inputCStream, &outputCStream, ":: ", totalSize);
     CPut(&outputCStream, '\0');
-    if (!stringComp((char*) output, (char*) "Giuseppe. Cognome")) {
+    if (!StringTestHelper::Compare((char*) output, (char*) "Giuseppe. Cognome")) {
         FreeAll(&outputCStream);
         return False;
     }
@@ -915,7 +866,7 @@ bool CStreamTest::TokenTest() {
     totalSize = 5;
     CGetStringToken(&inputCStream, &outputCStream, ":: ", totalSize);
     CPut(&outputCStream, '\0');
-    if (!stringComp((char*) output, (char*) "Fer")) {
+    if (!StringTestHelper::Compare((char*) output, (char*) "Fer")) {
         FreeAll(&outputCStream);
         return False;
     }
@@ -925,7 +876,7 @@ bool CStreamTest::TokenTest() {
     output = outputCStream.bufferPtr;
     CGetCSToken(&inputCStream, &outputCStream, ":.", &saveTerminator, ":");
     CPut(&outputCStream, '\0');
-    if (!stringComp((char*) output, (char*) "Nome")) {
+    if (!StringTestHelper::Compare((char*) output, (char*) "Nome")) {
         FreeAll(&outputCStream);
         return False;
     }
@@ -934,7 +885,7 @@ bool CStreamTest::TokenTest() {
     output = outputCStream.bufferPtr;
     CGetCSToken(&inputCStream, &outputCStream, ":.", &saveTerminator, ":");
     CPut(&outputCStream, '\0');
-    if (!stringComp((char*) output, (char*) " Giuseppe")) {
+    if (!StringTestHelper::Compare((char*) output, (char*) " Giuseppe")) {
         FreeAll(&outputCStream);
         return False;
     }
@@ -944,7 +895,7 @@ bool CStreamTest::TokenTest() {
     output = outputCStream.bufferPtr;
     CGetCSToken(&inputCStream, &outputCStream, ":.", &saveTerminator, ".");
     CPut(&outputCStream, '\0');
-    if (!stringComp((char*) output, (char*) "")) {
+    if (!StringTestHelper::Compare((char*) output, (char*) "")) {
         FreeAll(&outputCStream);
         return False;
     }
@@ -953,7 +904,7 @@ bool CStreamTest::TokenTest() {
     output = outputCStream.bufferPtr;
     CGetCSToken(&inputCStream, &outputCStream, "", &saveTerminator, NULL);
     CPut(&outputCStream, '\0');
-    if (!stringComp((char*) output, (char*) " Ferrò:)")) {
+    if (!StringTestHelper::Compare((char*) output, (char*) " Ferrò:)")) {
         FreeAll(&outputCStream);
         return False;
     }
@@ -964,7 +915,7 @@ bool CStreamTest::TokenTest() {
     output = outputCStream.bufferPtr;
     CGetCSToken(&inputCStream, &outputCStream, ")", &saveTerminator, NULL);
     CPut(&outputCStream, '\0');
-    if (!stringComp((char*) output, (char*) ": Ferrò:")) {
+    if (!StringTestHelper::Compare((char*) output, (char*) ": Ferrò:")) {
         FreeAll(&outputCStream);
         return False;
     }
