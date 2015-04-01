@@ -13,7 +13,7 @@
 #include "ObjectRegistryDataBase.h"
 #include "MessageHandler.h"
 #include "GlobalObjectDataBase.h"
-
+#include "File.h"
 #include <string.h>
 #include <iostream>
 #define DEBUG
@@ -29,7 +29,6 @@ static EventSem sharedEvent;
 //Static MDSInterface class field
 std::vector<MDSInterface::DeviceHandler *> MDSInterface::deviceHandlers;
 MDSInterface::TreeWriter *MDSInterface::treeWriter;
-int MDSInterface::segmentSize;
 MDSInterface::SignalBufferQueue *MDSInterface::signalBufferQueue;
 
 MDSInterface::~MDSInterface()
@@ -290,36 +289,85 @@ void MDSInterface::loadSubtree(CDBExtended &cdbx)
 
 //printf("LOAD SUBTREE found MDS Id = %d\n", mdsId);
 
-	//Found the field for this subtree. This means that this is a MARTe component (GAM or IOGAM or even Service) using MDSplus parameters
-	std::vector<char *> parNames = getParameterNames(mdsId);
-	std::vector<MDSplus::Data *> parValues = getParameterValues(mdsId);
-	for(int i = 0; i < parNames.size(); i++)
-	{
-	    char *parName = parNames[i];
-//printf("PAR NAME: %s\n", parName);
-	    if(!cdbx->Exists((const char *)parName))
-	    {
-//printf("Added\n");
-	    	cdbx->AddChildAndMove(parName);
-	    	cdbx->MoveToFather();
-	    }
-	    MDSplus::Data *currValue = parValues[i];
-	    char *decompiled = currValue->decompile();
-//printf("PAR Value: %s\n", decompiled);
-	    cdbx.WriteString(decompiled, parName);
-	    delete []decompiled;
+		//Found the field for this subtree. This means that this is a MARTe component (GAM or IOGAM or even Service) using MDSplus parameters
+		std::vector<char *> parNames = getParameterNames(mdsId);
+		std::vector<MDSplus::Data *> parValues = getParameterValues(mdsId);
+		for(int i = 0; i < parNames.size(); i++)
+		{
+			char *parName = parNames[i];
+			if(!cdbx->Exists((const char *)parName))
+			{
+				cdbx->AddChildAndMove(parName);
+				cdbx->MoveToFather();
+			}
+			MDSplus::Data *currValue = parValues[i];
+			char clazz, dtype, nDims;
+			short length;
+			int *dims;
+			void *ptr;
+			currValue->getInfo(&clazz, &dtype, &length, &nDims, &dims, &ptr);
+			if(clazz == CLASS_S) //Scalar
+			{
+				if(dtype == DTYPE_FLOAT || dtype ==  DTYPE_DOUBLE)
+					cdbx.WriteFloat(currValue->getFloat(), parName);
+				else if(dtype == DTYPE_T)
+				{
+					char *str = currValue->getString();
+					cdbx.WriteString(str, parName);
+					delete [] str;
+				}
+				else
+					cdbx.WriteInt32(currValue->getInt(), parName);
+			} 
+			else //Array
+			{
+				int size[1], numDims = 1;
+				if(dtype == DTYPE_FLOAT || dtype ==  DTYPE_DOUBLE)
+				{
+				
+					float *arr = currValue->getFloatArray(size);
+					cdbx.WriteFloatArray(arr, size, numDims, parName);
+					delete [] arr;
+				}
+				else if(dtype == DTYPE_T)
+				{
+					char **strArr = currValue->getStringArray(size);
+					FString *fStrArr = new FString[size[0]];
+					for(int i = 0; i < size[0]; i++)
+					{
+						fStrArr[i] = strArr[i];
+						delete [] strArr[i];
+					}
+					delete [] strArr;
+					cdbx.WriteFStringArray(fStrArr, size, numDims, parName);
+					delete [] fStrArr;
+				}
+				else
+				{
+				
+					int *arr = currValue->getIntArray(size);
+					cdbx.WriteInt32Array(arr, size, numDims, parName);
+					delete [] arr;
+				}
+			} 
+	//	    cdbx.WriteString(convertedDecompiled, parName);
+		} 
 	}
-    } 
-    else //Not a component holding MDSplus parameters, BUT whise descensdants may contain MDSplus parameters
+    else //Not a component holding MDSplus parameters, BUT whose descensdants may contain MDSplus parameters
     {
-	for(int i=0; i < cdbx->NumberOfChildren(); i++)
-	{
-	    cdbx->MoveToChildren(i);
-	    loadSubtree(cdbx);
-	    //cdbx->moveToFather();
-	    cdbx->MoveToFather();
-	}
+		for(int i=0; i < cdbx->NumberOfChildren(); i++)
+		{
+	    	cdbx->MoveToChildren(i);
+	    	loadSubtree(cdbx);
+	    	//cdbx->moveToFather();
+	    	cdbx->MoveToFather();
+		}
     }
+	File f;
+	f.OpenWrite("CACCONA.cfg");
+	cdbx->WriteToStream(f);
+	f.Close();
+
 }
 	
 	
@@ -434,7 +482,7 @@ void  MDSInterface::resetSignals(int deviceIdx)
 /** Declare a new signal to be stored in MDSplus database. The first argument specifies the MDSplus device which will receive the 
   signal data. Signals are stored under the SIGNALS.USER subtree of the corresponding device tree. The method will return an internal
   integer id which will be used in real-time to report signal samples.   */ 
-int  MDSInterface::declareSignal(int deviceIdx, char const * name, char const * description)
+int  MDSInterface::declareSignal(int deviceIdx, char const * name, char const * description, int segmentSize)
 {
     for(int i = 0; i < deviceHandlers.size(); i++)
     {
@@ -973,6 +1021,7 @@ bool MDSInterface::DeviceHandler::reportSignal(int userIdx, float val, float tim
     {
 	    return true;
     }
+//printf("ReportSignal %d %f %f\n", userIdx, val, time);
     if(userIdx < 0 || userIdx >= signalBuffers.size())
 	    return false;
     SignalBuffer *currBuffer, *nextBuffer;

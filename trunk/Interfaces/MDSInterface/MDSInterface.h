@@ -90,7 +90,6 @@ private:
     static const char *css;
     int getEventCode(char *name, int size);
 
-    static int segmentSize ;
     int runOnCpu;
     static bool initializing;
 
@@ -100,7 +99,6 @@ public:
 ///////////////////////////////////////////////////////////////////////////////    
     MDSInterface()
     {
-	segmentSize = DEFAULT_SEGMENT_SIZE;
 	treeWriter = 0;
 	signalBufferQueue = new SignalBufferQueue();
     initializing = false;
@@ -128,15 +126,18 @@ public:
 /** Dynamic configuration load recursive method */
     void loadSubtree(CDBExtended &cdbx);
 
+
 /** get parameter lists for selected device */
     std::vector<char *> getParameterNames(int deviceIdx);
     std::vector<MDSplus::Data *> getParameterValues(int deviceIdx);
+
+
 
 //Static methods used by MDSplus-aware GAMS
 /** Declare a new signal to be stored in MDSplus database. The first argument specifies the MDSplus device which will receive the 
   signal data. Signals are stored under the SIGNALS.USER subtree of the corresponding device tree. The method will return an internal
   integer id which will be used in real-time to report signal samples.   */ 
-  static int declareSignal(int deviceIdx, char const * name, char const * description);
+  static int declareSignal(int deviceIdx, char const * name, char const * description, int segmentSize = DEFAULT_SEGMENT_SIZE);
 /** Methods for reporting signal samples in real-time, based on the id returned by declareSignal() method */
   static bool reportSignal(int deviceIdx, int userIdx, float val, float time);
 /** Reset all out signal information */
@@ -152,7 +153,7 @@ public:
   static bool getFloatParameter(int deviceIdx, char *name, float &retVal);
 /** Get the specified parameter. Memory for data and dims is allocated by the caller. If the parameter is Scalar return nDims = 0; 
     return NULL if parameter not found */ 
-  static int *getIntArrayParameter(int deviceIdx, char *name, int &nElements);
+  static int *getIntArrayParameter(int deviceIdx,  char *name, int &nElements);
   static double *getDoubleArrayParameter(int deviceIdx, char *name, int &nElements);
   static float *getFloatArrayParameter(int deviceIdx, char *name, int &nElements);
 
