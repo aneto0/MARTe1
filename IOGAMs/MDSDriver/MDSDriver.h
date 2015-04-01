@@ -17,6 +17,7 @@ class MDSDriver: public GenericAcqModule
 private:
     int deviceIdx;
     int prevTime;
+	int segmentSize;
 // Reference Waveform settings
     char **refWaveformNames;
     int numRefWaveforms;

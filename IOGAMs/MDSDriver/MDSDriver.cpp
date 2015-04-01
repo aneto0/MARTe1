@@ -55,7 +55,6 @@ static char *css = "table.bltable {"
         		"MDSDriver::ObjectLoadSetup: %s GenericAcqModule wrong or missing info", Name() );
             return False;
     	}
-
 	//Output signals: time(32 bits), trigger(32 bits), signals (integer, 32 bits) 
 	numRefWaveforms = NumberOfInputs();
 	if(numRefWaveforms > 0)
@@ -123,21 +122,24 @@ static char *css = "table.bltable {"
     			"MDSDriver::ObjectLoadSetup: %s the number %d of OutSignalDescriptions is different from the number %d of input signals", Name(), retNumOuts, numOutSignals );
     	    	    return False;
 	    	}
-		for(int i = 0; i < numOutSignals; i++)
-		{
-		    char *currName = (char *)outSignalDescs[i].Buffer();
-		    outSignalDescriptions[i] = new char[strlen(currName) + 1];
-		    strcpy(outSignalDescriptions[i], currName);
-		    printf("%s\n", currName);
-		}
+			for(int i = 0; i < numOutSignals; i++)
+			{
+		    	char *currName = (char *)outSignalDescs[i].Buffer();
+		    	outSignalDescriptions[i] = new char[strlen(currName) + 1];
+		    	strcpy(outSignalDescriptions[i], currName);
+		    	printf("%s\n", currName);
+			}
 	    }
 	    else
 	    {
-		for(int i = 0; i < numOutSignals; i++)
+			for(int i = 0; i < numOutSignals; i++)
 		    outSignalDescriptions[i] = 0;
 	    }
+		if(!cdb.ReadInt32(segmentSize, "SegmentSize"))
+			segmentSize = DEFAULT_SEGMENT_SIZE;
+		printf("SEGMENT SIZE: %d\n", segmentSize);
 	}
-        if( !cdb.ReadInt32(deviceIdx, "MdsId") ) 
+    if( !cdb.ReadInt32(deviceIdx, "MdsId") ) 
 	{
     	    AssertErrorCondition(FatalError,
     			"MDSDriver::ObjectLoadSetup: %s MdsId is not declared", Name() );
@@ -160,7 +162,7 @@ static char *css = "table.bltable {"
 	MDSInterface::resetSignals(deviceIdx);
  	for(int i = 0; i < numOutSignals; i++)
 	{
-         if((outSignalIdxs[i] = MDSInterface::declareSignal(deviceIdx, outSignalNames[i], outSignalDescriptions[i])) == -1)
+         if((outSignalIdxs[i] = MDSInterface::declareSignal(deviceIdx, outSignalNames[i], outSignalDescriptions[i], segmentSize)) == -1)
  	    {
     	    	AssertErrorCondition(FatalError,
     			"MDSDriver::PulseStart: %s Error declaring out signal %s for device idx %d", Name(),  outSignalNames[i], deviceIdx);
@@ -173,10 +175,10 @@ static char *css = "table.bltable {"
   
     bool MDSDriver::WriteData(uint32 usecTime, const int32 *buffer)
     {
+//	printf("WRITE SIGNALS: %d %d\n", usecTime, numOutSignals);
         if(usecTime == prevTime) return True;
         prevTime = usecTime;
 	    float time = usecTime * 1E-6;
-//	printf("WRITE SIGNALS: %d %d", usecTime, numOutSignals);
 	    for(int i = 0; i < numOutSignals; i++)
 	    {
 	        currOutputs[i] = ((float *)buffer)[i];
