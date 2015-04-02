@@ -35,16 +35,14 @@
 
 /** A more abstract version of Streamable. It is used to allow referring to streams at lower levels */
 class StreamInterface{
-public:
-    /** the destructor */
-    virtual             ~StreamInterface(){};
 
+protected:
     // PURE STREAMING
     /** Reads data into buffer. As much as size byte are written, actual size
         is returned in size. msecTimeout is how much the operation should last.
         timeout behaviour is class specific. I.E. sockets with blocking activated wait forever
         when noWait is used .... */
-    virtual bool        Read(
+    virtual bool        PrivateRead(
                             void*               buffer,
                             uint32 &            size,
                             TimeoutType         msecTimeout     = TTDefault)=0;
@@ -53,57 +51,158 @@ public:
         is returned in size. msecTimeout is how much the operation should last.
         timeout behaviour is class specific. I.E. sockets with blocking activated wait forever
         when noWait is used .... */
-    virtual bool        Write(
+    virtual bool        PrivateWrite(
                             const void*         buffer,
                             uint32 &            size,
                             TimeoutType         msecTimeout     = TTDefault)=0;
 
     /** whether it can be written into */
-    virtual bool        CanWrite()=0;
+    virtual bool        PrivateCanWrite()=0;
 
     /** whether it can be  read */
-    virtual bool        CanRead()=0;
+    virtual bool        PrivateCanRead()=0;
 
     // RANDOM ACCESS INTERFACE
 
     /** The size of the stream */
-    virtual int64       Size()=0;
+    virtual int64       PrivateSize()=0;
 
     /** Moves within the file to an absolute location */
-    virtual bool        Seek(int64 pos)=0;
+    virtual bool        PrivateSeek(int64 pos)=0;
 
     /** Returns current position */
-    virtual int64       Position(void)=0;
+    virtual int64       PrivatePosition(void)=0;
 
     /** Clip the stream size to a specified point */
-    virtual bool        SetSize(int64 size)=0;
+    virtual bool        PrivateSetSize(int64 size)=0;
 
     /** can you move the pointer */
-    virtual bool        CanSeek()=0;
+    virtual bool        PrivateCanSeek()=0;
 
     // Extended Attributes or Multiple Streams INTERFACE
 
     /** how many streams are available */
-    virtual uint32      NOfStreams()=0;
+    virtual uint32      PrivateNOfStreams()=0;
 
     /** select the stream to read from. Switching may reset the stream to the start. */
-    virtual bool        Switch(uint32 n)=0;
+    virtual bool        PrivateSwitch(uint32 n)=0;
 
     /** select the stream to read from. Switching may reset the stream to the start. */
-    virtual bool        Switch(const char *name)=0;
+    virtual bool        PrivateSwitch(const char *name)=0;
 
     /** how many streams are available */
-    virtual uint32      SelectedStream()=0;
+    virtual uint32      PrivateSelectedStream()=0;
 
     /** the name of the stream we are using */
-    virtual bool        StreamName(uint32 n,char *name,int nameSize)=0;
+    virtual bool        PrivateStreamName(uint32 n,char *name,int nameSize)=0;
 
     /**  add a new stream to write to. */
-    virtual bool        AddStream(const char *name)=0;
+    virtual bool        PrivateAddStream(const char *name)=0;
 
     /**  remove an existing stream . */
-    virtual bool        RemoveStream(const char *name)=0;
+    virtual bool        PrivateRemoveStream(const char *name)=0;
 
+public:
+    /** the destructor */
+    virtual             ~StreamInterface(){};
+
+public: 
+
+    // PURE UNBUFFERED STREAMING
+
+    /** Reads data into buffer. As much as size byte are written, actual size
+        is returned in size. msecTimeout is how much the operation should last.
+        timeout behaviour is class specific. I.E. sockets with blocking activated wait forever
+        when noWait is used .... */
+    inline bool         Read(
+                            void*               buffer,
+                            uint32 &            size,
+                            TimeoutType         msecTimeout     = TTDefault)
+    {
+        return PrivateRead(buffer,size,msecTimeout);
+    }
+
+    /** Write data from a buffer to the stream. As much as size byte are written, actual size
+        is returned in size. msecTimeout is how much the operation should last.
+        timeout behaviour is class specific. I.E. sockets with blocking activated wait forever
+        when noWait is used .... */
+    inline bool         Write(
+                            const void*         buffer,
+                            uint32 &            size,
+                            TimeoutType         msecTimeout     = TTDefault)
+    {
+        return PrivateWite(buffer,size,msecTimeout);
+    }
+
+    /** whether it can be written into */
+    inline bool         CanWrite(){ return PrivateCanWrite(); }
+
+    /** whether it can be  read */
+    inline bool         CanRead() { return PrivateCanRead(); }
+
+    // RANDOM ACCESS INTERFACE
+
+    /** The size of the stream */
+    inline int64        Size()    { return PrivateSize(); }
+
+    /** Moves within the file to an absolute location */
+    inline bool         Seek(int64 pos)
+    {
+        return PrivateSeek(pos);
+    }
+
+    /** Returns current position */
+    inline int64        Position() { return PrivatePosition(); }
+
+    /** Clip the stream size to a specified point */
+    inline bool         SetSize(int64 size)
+    {
+        return PrivateSetSize(size);
+    }
+
+    /** can you move the pointer */
+    inline bool         CanSeek()  { return PrivateCanSeek(); }
+
+    // Extended Attributes or Multiple Streams INTERFACE
+
+    /** how many streams are available */
+    inline uint32       NOfStreams(){return PrivateNOfStreams(); }
+
+    /** select the stream to read from. Switching may reset the stream to the start. */
+    virtual bool        Switch(uint32 n)
+    {
+        return PrivateSwitch(n);
+    }
+
+    /** select the stream to read from. Switching may reset the stream to the start. */
+    virtual bool        Switch(const char *name)
+    {
+        return PrivateSwitch(name);
+    }
+
+    /** how many streams are available */
+    virtual uint32      SelectedStream()
+    {
+        return PrivateSelectedStream();
+    }  
+
+    /** the name of the stream we are using */
+    virtual bool        StreamName(uint32 n,char *name,int nameSize)
+    {
+        return PrivateStreamName(n,name,nameSize);
+    }
+
+    /**  add a new stream to write to. */
+    virtual bool        AddStream(const char *name)
+    {
+        return PrivateAddStream(name);
+    }
+
+    /**  remove an existing stream . */
+    virtual bool        RemoveStream(const char *name)
+    {
+        return PrivateRemoveStream(name);
+    }
 
 };
 
