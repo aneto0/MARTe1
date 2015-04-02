@@ -32,37 +32,42 @@ void MessageTriggerFn(MessageTriggeringTimeService &mtts){
     mtts.MessageTrigger();
 }
 
+void MessageTriggeringTimeService::MessageTriggered(){
+    int32 i    = 0;
+    int32 j    = 0;
+    int64 data = 0;
+
+    //Get data from driver
+    driver->GetData((int32)usecTime, (int32 *)dataBuffer);
+    for(i=0; i<nMaskObjs; i++){
+        if(numberOfBytesPerChannel == 4)
+            data = *((int32 *)(dataBuffer + maskList[i]->channelNumber * numberOfBytesPerChannel));
+        else if(numberOfBytesPerChannel == 8)
+            data = *((int64 *)(dataBuffer + maskList[i]->channelNumber * numberOfBytesPerChannel));
+        else if(numberOfBytesPerChannel == 2)
+            data = *((int16 *)(dataBuffer + maskList[i]->channelNumber * numberOfBytesPerChannel));
+        else if(numberOfBytesPerChannel == 1)
+            data = *(dataBuffer + maskList[i]->channelNumber * numberOfBytesPerChannel);
+        //If data is valid
+        if(maskList[i]->AssertMask(data)){
+            //Send all associated messages
+            for(j=0; j<maskList[i]->Size(); j++){
+                GMDSendMessageDeliveryRequest(maskList[i]->Find(j), TTInfiniteWait ,False);
+            }
+        }
+    }
+}
+
 void MessageTriggeringTimeService::MessageTrigger(){
     Threads::SetRealTimeClass();
     Threads::SetPriorityLevel(messageTriggerPriority);
     //To synch with Start()
     alive      = True;
 
-    int32 i    = 0;
-    int32 j    = 0;
-    int64 data = 0;
     while(alive){
         //New cycle
         messageTriggerSem.ResetWait();
-        //Get data from driver
-        driver->GetData((int32)usecTime, (int32 *)dataBuffer);
-        for(i=0; i<nMaskObjs; i++){
-            if(numberOfBytesPerChannel == 4)
-                data = *((int32 *)(dataBuffer + maskList[i]->channelNumber * numberOfBytesPerChannel));
-            else if(numberOfBytesPerChannel == 8)
-                data = *((int64 *)(dataBuffer + maskList[i]->channelNumber * numberOfBytesPerChannel));
-            else if(numberOfBytesPerChannel == 2)
-                data = *((int16 *)(dataBuffer + maskList[i]->channelNumber * numberOfBytesPerChannel));
-            else if(numberOfBytesPerChannel == 1)
-                data = *(dataBuffer + maskList[i]->channelNumber * numberOfBytesPerChannel);
-            //If data is valid
-            if(maskList[i]->AssertMask(data)){
-                //Send all associated messages
-                for(j=0; j<maskList[i]->Size(); j++){
-                    GMDSendMessageDeliveryRequest(maskList[i]->Find(j), TTInfiniteWait ,False);
-                }
-            }
-        }
+        MessageTriggered();    
     }
     //To synch with Stop()
     alive = True;
@@ -83,10 +88,12 @@ bool MessageTriggeringTimeService::Start(){
         return False;
     }
 
-    alive             = False;
-    messageTriggerTID = Threads::BeginThread((void (__thread_decl *)(void *))&MessageTriggerFn,this, THREADS_DEFAULT_STACKSIZE, Name(), XH_NotHandled, cpuMask);
-    while(!alive){
-        SleepMsec(10);
+    if(useThread){
+        alive             = False;
+        messageTriggerTID = Threads::BeginThread((void (__thread_decl *)(void *))&MessageTriggerFn,this, THREADS_DEFAULT_STACKSIZE, Name(), XH_NotHandled, cpuMask);
+        while(!alive){
+            SleepMsec(10);
+        }
     }
     return True;
 }
@@ -96,20 +103,23 @@ bool MessageTriggeringTimeService::Stop(){
         return True;
     }
     alive = False;
-    messageTriggerSem.Post();
-    int32 exitCounter = 0;
-    while(!alive){
-        exitCounter++;
-        SleepMsec(10);
-        if(exitCounter > 100){
-            AssertErrorCondition(FatalError, "%s::Stop(): failed to stop the message sending thread. Waited for 1 second.", Name());
-            break;
+    if(useThread){
+        messageTriggerSem.Post();
+        int32 exitCounter = 0;
+        while(!alive){
+            exitCounter++;
+            SleepMsec(10);
+            if(exitCounter > 100){
+                AssertErrorCondition(FatalError, "%s::Stop(): failed to stop the message sending thread. Waited for 1 second.", Name());
+                break;
+            }
         }
+        if(exitCounter > 100){
+            Threads::Kill(messageTriggerTID);
+        }
+        messageTriggerTID = 0;
     }
-    if(exitCounter > 100){
-        Threads::Kill(messageTriggerTID);
-    }
-    messageTriggerTID = 0;
+
     if(dataBuffer != NULL){
         free((void *&)dataBuffer);
     }
@@ -118,7 +128,12 @@ bool MessageTriggeringTimeService::Stop(){
 
 bool MessageTriggeringTimeService::Trigger(int64 time){
     usecTime = time;
-    messageTriggerSem.fastPost();
+    if(useThread){
+        messageTriggerSem.fastPost();
+    }
+    else{
+        MessageTriggered();
+    }
     return True;
 }
 
@@ -144,6 +159,16 @@ bool MessageTriggeringTimeService::ObjectLoadSetup(ConfigurationDataBase &info,S
     if(!cdb.ReadInt32(cpuMask, "CPUMask")){
         AssertErrorCondition(InitialisationError, "MessageTriggeringTimeService::ObjectLoadSetup: %s: CPUMask was not specified", Name());
         return False;
+    }
+
+    //If to start an independent thread
+    FString useThreadStr;
+    cdb.ReadFString(useThreadStr, "UseThread");
+    if((useThreadStr == "False") || (useThreadStr == "false") || (useThreadStr == "FALSE") || (useThreadStr == "no") || (useThreadStr == "No") || (useThreadStr == "NO")){
+        useThread = False;
+    }
+    else{
+        useThread = True;
     }
 
     driver = GetGlobalObjectDataBase()->Find(driverLoc.Buffer());

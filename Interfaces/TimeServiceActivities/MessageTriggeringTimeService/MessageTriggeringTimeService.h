@@ -104,14 +104,26 @@ private:
     bool alive;
     
     /**
-     * Implements the message sending mechanism
+     * Callback function of the thread
      */ 
     void MessageTrigger();
+
+    /**
+     * Analyses the input data and send the messages if any of the masks
+     * is valid
+     */ 
+    void MessageTriggered();
 
     /**
      * The last value of time when Trigger was called
      */
     int64 usecTime;
+
+    /**
+     * True if the mask and message sending should be handled in
+     * a different thread
+     */
+    bool useThread;
 
 public:
 
@@ -125,6 +137,7 @@ public:
         maskList                = NULL;
         dataBuffer              = NULL;
         alive                   = False;
+        useThread               = True;
 
         messageTriggerSem.Create();
     }
