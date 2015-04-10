@@ -135,8 +135,8 @@ int64 FileSize(BasicFile &f){
 #elif defined(_WIN32)
     return GetFileSize(f.file,NULL);
 #elif defined(_VXWORKS)
-    int save = lseek(f.file,0,SEEK_CUR);
-    int sz = lseek(f.file,0,SEEK_END);
+    int64 save = lseek(f.file,0,SEEK_CUR);
+    int64 sz = lseek(f.file,0,SEEK_END);
     lseek(f.file,save,SEEK_SET);
     if (sz==ERROR)  {
         f.action = OSError;
@@ -148,8 +148,8 @@ int64 FileSize(BasicFile &f){
 
 bool FileSeek(BasicFile &f,int64 pos){
 
-    uint32 position = pos;
-    uint32 newpos;
+    int64 position = pos;
+    int64 newpos;
 #if defined(_OS2)
     DosSetFilePtr(f.file,position,FILE_BEGIN,&newpos);
 #elif defined(_WIN32)
@@ -183,14 +183,14 @@ int64 FilePosition(BasicFile &f){
 #elif defined(_WIN32)
     return SetFilePointer(f.file, 0,NULL,FILE_CURRENT);
 #elif defined(_VXWORKS)
-    int sz = lseek(f.file,0,SEEK_CUR);
+    int64 sz = lseek(f.file,0,SEEK_CUR);
     if (sz==ERROR){
         f.action = OSError;
         CStaticAssertPlatformErrorCondition(OSError,"FilePosition");
     }
     return sz;
 #elif (defined(_RTAI)|| defined(_LINUX)  || defined(_SOLARIS) || defined(_MACOSX))
-    int sz = lseek(f.file,0,SEEK_CUR);
+    int64 sz = lseek(f.file,0,SEEK_CUR);
     if (sz<0) {
         f.action = OSError;
         CStaticAssertPlatformErrorCondition(OSError,"FilePosition");
@@ -234,14 +234,14 @@ bool  FileRelativeSeek(BasicFile &f,int64 pos){
     unsigned long newpos;
     newpos = SetFilePointer(f.file, position,NULL,FILE_CURRENT);
 #elif defined(_VXWORKS)
-    int newpos = lseek(f.file,position,SEEK_CUR);
+    int64 newpos = lseek(f.file,position,SEEK_CUR);
     if (newpos==ERROR){
         f.action = OSError;
         CStaticAssertPlatformErrorCondition(OSError,"BasicFile::RelativeSeek");
     }
     return True;
 #elif (defined(_RTAI)|| defined(_LINUX)  || defined(_SOLARIS) || defined(_MACOSX))
-    int newpos = lseek(f.file, position,SEEK_CUR);
+    int64 newpos = lseek(f.file, position,SEEK_CUR);
     if (newpos<0) {
         f.action = OSError;
         CStaticAssertPlatformErrorCondition(OSError,"BasicFile::RelativeSeek");
@@ -282,8 +282,8 @@ bool  FilePositionSeek(BasicFile &f,int64 &pos){
     pos = pp;
     return True;
 #elif (defined(_RTAI)|| defined(_LINUX) || defined(_SOLARIS) || defined(_MACOSX))
-    int p = pos;
-    int pp = lseek(f.file,p,SEEK_SET);
+    int64 p = pos;
+    int64 pp = lseek(f.file,p,SEEK_SET);
     if (pp<0)  {
         f.action = OSError;
         CStaticAssertPlatformErrorCondition(OSError,"BasicFile::PositionSeek");
