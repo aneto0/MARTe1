@@ -5,6 +5,9 @@
 #include "TypeDescriptor.h"
 #include "AnyType.h"
 #include "CStream.h"
+#include "CharBuffer.h"
+#include "BasicStreamBuffer.h"
+#include "StreamInterface.h"
 
 struct TestPattern{
     // the character in the printf format

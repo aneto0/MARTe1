@@ -29,7 +29,6 @@
 #ifndef STREAM_INTERFACE_H
 #define STREAM_INTERFACE_H
 
-#include "System.h"
 #include "TimeoutType.h"
 
 
@@ -47,7 +46,7 @@ protected:
         I.E. sockets with blocking activated wait forever when noWait is used .... 
     */
     virtual bool        UnBufferedRead(
-                            void*               buffer,
+                            char*               buffer,
                             uint32 &            size,
                             TimeoutType         msecTimeout     = TTDefault,
                             bool                complete        = false)=0;
@@ -61,7 +60,7 @@ protected:
         I.E. sockets with blocking activated wait forever when noWait is used .... 
     */
     virtual bool        UnBufferedWrite(
-                            const void*         buffer,
+                            const char*         buffer,
                             uint32 &            size,
                             TimeoutType         msecTimeout     = TTDefault,
                             bool                complete        = false)=0;
@@ -76,7 +75,7 @@ protected:
     virtual bool        UnBufferedSeek(int64 pos)=0;
 
     /** Returns current position */
-    virtual int64       UnBufferedPosition(void)=0;
+    virtual int64       UnBufferedPosition()=0;
 
     /** Clip the stream size to a specified point */
     virtual bool        UnBufferedSetSize(int64 size)=0;
@@ -88,6 +87,8 @@ protected:
 
     /** select the stream to read from. Switching may reset the stream to the start. */
     virtual bool        UnBufferedSwitch(const char *name)=0;
+    
+    virtual bool        UnBufferedRemoveStream(const char *name)=0;
 
 
 public:
@@ -106,7 +107,7 @@ public:
         timeout behaviour depends on class characteristics and sync mode.
     */
     virtual bool        Read(
-                            void*               buffer,
+                            char*               buffer,
                             uint32 &            size,
                             TimeoutType         msecTimeout     = TTDefault,
                             bool                complete        = false)
@@ -122,7 +123,7 @@ public:
         timeout behaviour depends on class characteristics and sync mode. 
     */
     virtual bool        Write(
-                            const void*         buffer,
+                            const char*         buffer,
                             uint32 &            size,
                             TimeoutType         msecTimeout     = TTDefault,
                             bool                complete        = false)

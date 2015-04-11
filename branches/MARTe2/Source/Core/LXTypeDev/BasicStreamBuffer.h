@@ -1,7 +1,30 @@
-#if !defined BASIC_STREAM_BUFFER
-#define BASIC_STREAM_BUFFER
+/*
+ * Copyright 2015 F4E | European Joint Undertaking for
+ * ITER and the Development of Fusion Energy ('Fusion for Energy')
+ *
+ * Licensed under the EUPL, Version 1.1 or - as soon they
+ will be approved by the European Commission - subsequent
+ versions of the EUPL (the "Licence");
+ * You may not use this work except in compliance with the
+ Licence.
+ * You may obtain a copy of the Licence at:
+ *
+ * http://ec.europa.eu/idabc/eupl
+ *
+ * Unless required by applicable law or agreed to in
+ writing, software distributed under the Licence is
+ distributed on an "AS IS" basis,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ express or implied.
+ * See the Licence
+ permissions and limitations under the Licence.
+ *
+ * $Id: $
+ *
+ **/
 
-/**
+/** 
+ * @file
     Replaces CStream and BufferedStream of BL1
     Inherits from pure virtual StreamInterface and does not resolve all pure virtual functions
    
@@ -69,13 +92,19 @@
     6a) same as 1a 
 
 */
+#if !defined BASIC_STREAM_BUFFER
+#define BASIC_STREAM_BUFFER
+
+#include "StreamInterface.h"
+#include "CharBuffer.h"
+
 class BasicStreamBuffer: public StreamInterface {
  
     /**
        Defines the operation mode and statsu of a basic stream
        one only can be set of the first 4.
     */
-    struct OperatingModes{
+    struct OperatingMode{
 
 
         /** writeBuffer is the active one.
@@ -98,14 +127,16 @@ class BasicStreamBuffer: public StreamInterface {
              Flush is executed in between changes
         */
         bool MutexBuffering(){
-            return (mutexReadBufferActive || mutexWriteBufferActive) 
+            return (mutexReadBufferActive || mutexWriteBufferActive);
         }
     };
 
     
     /// set automatically on initialisation by calling of the Canxxx functions 
-    OperatingMode           operatingModes;
-    
+    OperatingMode           operatingMode;
+
+    uint32 writeAccessPosition;
+    uint32 readAccessPosition;    
     
 protected: // read buffer and statuses
 
@@ -123,7 +154,7 @@ protected: // read buffer and statuses
     /**
         for read mode is how much data was filled in the buffer
     */
-    uint32                  readBufferFillAmount
+    uint32                  readBufferFillAmount;
 
 protected: // read buffer protected methods
     /**  
@@ -221,8 +252,8 @@ protected: // mode methods
     inline bool SwitchToWriteMode(){
         if (!ResyncReadBuffer()) return false;
  
-        mutexWriteBufferActive = true;
-        mutexReadBufferActive = false;
+        operatingMode.mutexWriteBufferActive = true;
+        operatingMode.mutexReadBufferActive = false;
     }
     
     /** 
@@ -233,13 +264,13 @@ protected: // mode methods
     bool SwitchToReadMode(){
         // adjust seek position
         if (!FlushWriteBuffer()) return false;
-        mutexWriteBufferActive = false;
-        mutexReadBufferActive = true; 
+        operatingMode.mutexWriteBufferActive = false;
+        operatingMode.mutexReadBufferActive = true; 
     }
 
 public:
     /**
-        sets appropriate buffer sizes and adjusts operatingModes
+        sets appropriate buffer sizes and adjusts operatingMode
     */
     bool SetBufferSize(uint32 readBufferSize=0, uint32 writeBufferSize=0){
         if (!CanRead())  readBufferSize = 0;   
@@ -252,13 +283,13 @@ public:
         ResyncReadBuffer();
 
         // assume separate buffers
-        operatingModes.mutexReadBufferActive = false;
-        operatingModes.mutexWriteBufferActive = false;
+        operatingMode.mutexReadBufferActive = false;
+        operatingMode.mutexWriteBufferActive = false;
 
         // possibly mutex buffering mode ?
         if (CanSeek() && CanWrite() && CanRead() && 
             (readBufferSize>0) && (writeBufferSize>0)){
-            operatingModes.mutexWriteBufferActive = true;
+            operatingMode.mutexWriteBufferActive = true;
         }
         
         // adjust readBufferSize
@@ -266,7 +297,8 @@ public:
 
         // adjust writeBufferSize
         writeBuffer.SetBufferSize(writeBufferSize);
-        
+    
+        return true;    
     } 
     
     /// default constructor
@@ -274,6 +306,8 @@ public:
         readBufferAccessPosition    = 0;
         writeBufferAccessPosition   = 0;
         readBufferFillAmount        = 0;
+        readAccessPosition          = 0;
+        writeAccessPosition         = 0;
         SetBufferSize(readBufferSize,writeBufferSize);
     }
 
@@ -295,11 +329,11 @@ public:  // special methods for buffering
     }
 
 
-    /// simply write to buffer if space exist and if operatingModes allows
+    /// simply write to buffer if space exist and if operatingMode allows
     inline bool         PutC(char c)
     {
         // if in mutex mode switch to write mode
-        if (operatingModes.mutexReadBufferActive) {
+        if (operatingMode.mutexReadBufferActive) {
            if (!SwitchToWriteMode()) return false;
         }
         
@@ -322,10 +356,10 @@ public:  // special methods for buffering
     }    
 
     /// simply read from buffer 
-    inline bool         GetC(char &c)
+    inline bool         GetC(char &c) {
 
         // if in mutex mode switch to write mode
-        if (operatingModes.mutexWriteBufferActive) {
+        if (operatingMode.mutexWriteBufferActive) {
            if (!SwitchToReadMode()) return false;
         }
 
@@ -363,7 +397,7 @@ public:  // replaced StreamInterface methods
     {
         // check for mutually exclusive buffering and 
         // whether one needs to switch to ReadMode
-        if (operatingModes.mutexWriteBufferActive) {
+        if (operatingMode.mutexWriteBufferActive) {
            if (!SwitchToReadMode()) return false;
         }
  
@@ -394,6 +428,7 @@ public:  // replaced StreamInterface methods
         			
         		}
         	}
+       }
         	
        // if needed read directly from stream
        return UnBufferedRead(buffer,size,msecTimeout);
@@ -404,7 +439,7 @@ public:  // replaced StreamInterface methods
         timeout behaviour is class specific. I.E. sockets with blocking activated wait forever
         when noWait is used .... */
     virtual bool         Write(
-                            const void*         buffer,
+                            const char*         buffer,
                             uint32 &            size,
                             TimeoutType         msecTimeout     = TTDefault,
                             bool                completeWrite   = false)
@@ -412,7 +447,7 @@ public:  // replaced StreamInterface methods
 
         // check for mutually exclusive buffering and 
         // whether one needs to switch to WriteMode
-        if (operatingModes.mutexReadBufferActive) {
+        if (operatingMode.mutexReadBufferActive) {
            if (!SwitchToWriteMode()) return false;
         }
         
@@ -452,7 +487,7 @@ public:  // replaced StreamInterface methods
         }
         return UnBufferedWrite(buffer,size,msecTimeout);
 
-    } 
+    }
 
     // RANDOM ACCESS INTERFACE
 
