@@ -1,30 +1,17 @@
-/*
- * Copyright 2015 F4E | European Joint Undertaking for
- * ITER and the Development of Fusion Energy ('Fusion for Energy')
- *
- * Licensed under the EUPL, Version 1.1 or - as soon they
- will be approved by the European Commission - subsequent
- versions of the EUPL (the "Licence");
- * You may not use this work except in compliance with the
- Licence.
- * You may obtain a copy of the Licence at:
- *
- * http://ec.europa.eu/idabc/eupl
- *
- * Unless required by applicable law or agreed to in
- writing, software distributed under the Licence is
- distributed on an "AS IS" basis,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
- express or implied.
- * See the Licence
- permissions and limitations under the Licence.
- *
- * $Id: $
- *
- **/
+#if !defined BASIC_STREAM_BUFFER
+#define BASIC_STREAM_BUFFER
 
-/** 
- * @file
+extern "C"{
+
+	bool BSB_SetBufferSize(
+            BasicStreamBuffer & bsb,  
+            uint32 				readBufferSize, 
+            uint32 				writeBufferSize);
+
+}
+
+
+/**
     Replaces CStream and BufferedStream of BL1
     Inherits from pure virtual StreamInterface and does not resolve all pure virtual functions
    
@@ -66,8 +53,8 @@
         CanRead CanWrite CanSeek
         readBuffer.Buffer()!=NULL  && writeBuffer.Buffer()!=NULL && 
         operatingMode.mutexBuffering() = True   
-        operatingMode.mutexWriteBufferActive and
-        operatingMode.mutexReadBufferActive  determines whether the read 
+        operatingMode.mutexWriteMode and
+        operatingMode.mutexReadMode  determines whether the read 
         or write buffering is active
         Get and Put toggle the two flags
         everytime the flags are changed a proper Flush operation is 
@@ -92,51 +79,38 @@
     6a) same as 1a 
 
 */
-#if !defined BASIC_STREAM_BUFFER
-#define BASIC_STREAM_BUFFER
-
-#include "StreamInterface.h"
-#include "CharBuffer.h"
-
 class BasicStreamBuffer: public StreamInterface {
  
     /**
        Defines the operation mode and statsu of a basic stream
        one only can be set of the first 4.
     */
-    struct OperatingMode{
+    struct OperatingModes{
 
+    	/** cache of canSeek() used in all the buffering functions 
+    	for accelleration sake
+    	*/
+    	bool canSeek:1;
 
         /** writeBuffer is the active one.
         */
-        bool mutexReadBufferActive:1;
+        bool mutexReadMode:1;
 
         /** writeBuffer is the active one.
         */
-        bool mutexWriteBufferActive:1;
-
+        bool mutexWriteMode:1;
+    	
         /** append 0 
             always only used for SingleBuffering
         */
         bool stringMode:1;
 
-        /**  
-             mutually exclusive buffering 
-             active when CanSeek is set and both CanRead and CanWrite
-             only one buffer can be used at a time
-             Flush is executed in between changes
-        */
-        bool MutexBuffering(){
-            return (mutexReadBufferActive || mutexWriteBufferActive);
-        }
     };
 
     
     /// set automatically on initialisation by calling of the Canxxx functions 
-    OperatingMode           operatingMode;
-
-    uint32 writeAccessPosition;
-    uint32 readAccessPosition;    
+    OperatingMode           operatingModes;
+    
     
 protected: // read buffer and statuses
 
@@ -156,33 +130,33 @@ protected: // read buffer and statuses
     */
     uint32                  readBufferFillAmount;
 
-protected: // read buffer protected methods
-    /**  
-        refill readBuffer
-        assumes that the read position is now at the end of buffer
-        no check will be performed here on that
+protected: // mode methods
+    
+    /** 
+        sets the readBufferFillAmount to 0
+        adjust the seek position
+        sets the mutexWriteMode
+        does not check for mutexBuffering to be active
     */
-    inline bool RefillReadBuffer(){
-
-        // load next batch of data
-        readBufferAccessPosition = 0;
-        readBufferFillAmount = readBuffer.BufferAllocatedSize();
-        return UnBufferedRead(readBuffer.BufferReference(),readBufferFillAmount);  
+    inline bool SwitchToWriteMode(){
+        if (!ResyncReadBuffer()) return false;
+        mutexWriteMode = true;
+        mutexReadMode = false;
+    }
+    
+    /** 
+        Flushes output buffer
+        resets mutexWriteMode
+        does not refill the buffer nor check the mutexBuffering is active
+    */
+    bool SwitchToReadMode(){
+        // adjust seek position
+        if (!FlushWriteBuffer()) return false;
+        mutexWriteMode = false;
+        mutexReadMode = true; 
     }
 
-    /// copies to buffer size bytes from the end of readBuffer
-    inline void BufferRead(char *buffer, uint32 &size){
-
-        uint32 spaceLeft = readBufferFillAmount - readBufferAccessPosition;
-
-        // clip to available space
-        if (size > spaceLeft) size = spaceLeft;
-  	
-  	    // fill the buffer with the remainder 
-  	    MemoryCopy(buffer, readBuffer.Buffer()+readBufferAccessPosition,size);
-        readBufferAccessPosition+=size;
-
-    }    
+protected: // read buffer protected methods
 
     /**
         sets the readBufferFillAmount to 0
@@ -196,7 +170,26 @@ protected: // read buffer protected methods
         if (!UnBufferedSeek (UnBufferedPosition()-readBufferFillAmount+readBufferAccessPosition)) return false;
         readBufferFillAmount = 0;
         readBufferAccessPosition = 0;
+        return true;
     } 
+    
+    /**  
+        refill readBuffer
+        assumes that the read position is now at the end of buffer
+    */
+    inline bool RefillReadBuffer(){
+    	if (readBuffer.Buffer() == NULL) return false;
+        // load next batch of data
+        readBufferAccessPosition = 0;
+        readBufferFillAmount = readBuffer.BufferAllocatedSize();
+        return UnBufferedRead(readBuffer.BufferReference(),readBufferFillAmount);  
+    }
+
+private:    
+    /// copies to buffer size bytes from the end of readBuffer
+    void BufferRead(char *buffer, uint32 &size);
+    // NOTE used privately by Read 
+
 
 protected: // write buffer and statuses
 
@@ -219,121 +212,87 @@ protected: // write buffer methods
         only called internally when no more space available 
     */
     inline bool FlushWriteBuffer(TimeoutType         msecTimeout     = TTDefault){
+    	// no buffering!
+    	if (writeBuffer.Buffer()== NULL) return true;
+    	// how much was written?
         uint32 writeSize = writeBufferAccessPosition;
-        if (!UnBufferedWrite(readBuffer.Buffer(),writeSize,msecTimeout,true)) return False;
+        // write
+        if (!UnBufferedWrite(writeBuffer.Buffer(),writeSize,msecTimeout,true)) return False;
 
         writeBufferAccessPosition = 0;
         
         return True;  
     }
-
+private:
     /// copies buffer of size size at the end of writeBuffer
-    inline void BufferWrite(const char *buffer, uint32 &size){
-
-        // recalculate how much we can write
-        uint32 spaceLeft = writeBuffer.BufferAllocatedSize() - writeBufferAccessPosition;
-
-        // clip to spaceLeft
-        if (size > spaceLeft) size = spaceLeft;
-  	
-  	    // fill the buffer with the remainder 
-  	    MemoryCopy(writeBuffer.BufferReference()+writeBufferAccessPosition,buffer,size);
-        writeBufferAccessPosition+=size;
-    }
-
-protected: // mode methods
-    
-    /** 
-        sets the readBufferFillAmount to 0
-        adjust the seek position
-        sets the mutexWriteBufferActive
-        does not check for mutexBuffering to be active
-    */
-    inline bool SwitchToWriteMode(){
-        if (!ResyncReadBuffer()) return false;
- 
-        operatingMode.mutexWriteBufferActive = true;
-        operatingMode.mutexReadBufferActive = false;
-    }
-    
-    /** 
-        Flushes output buffer
-        resets mutexWriteBufferActive
-        does not refill the buffer nor check the mutexBuffering is active
-    */
-    bool SwitchToReadMode(){
-        // adjust seek position
-        if (!FlushWriteBuffer()) return false;
-        operatingMode.mutexWriteBufferActive = false;
-        operatingMode.mutexReadBufferActive = true; 
-    }
+    void BufferWrite(const char *buffer, uint32 &size);
+    // NOTE used privately by Read 
 
 public:
+
+    //
+    friend bool BSB_SetBufferSize(
+	            BasicStreamBuffer & bsb,  
+	            uint32 				readBufferSize, 
+	            uint32 				writeBufferSize);
+
     /**
-        sets appropriate buffer sizes and adjusts operatingMode
+        sets appropriate buffer sizes and adjusts operatingModes
     */
     bool SetBufferSize(uint32 readBufferSize=0, uint32 writeBufferSize=0){
-        if (!CanRead())  readBufferSize = 0;   
-        if (!CanWrite()) writeBufferSize = 0;   
-
-        // dump any data in the write Queue
-        Flush();
-
-        // adjust seek position if needed
-        ResyncReadBuffer();
-
-        // assume separate buffers
-        operatingMode.mutexReadBufferActive = false;
-        operatingMode.mutexWriteBufferActive = false;
-
-        // possibly mutex buffering mode ?
-        if (CanSeek() && CanWrite() && CanRead() && 
-            (readBufferSize>0) && (writeBufferSize>0)){
-            operatingMode.mutexWriteBufferActive = true;
-        }
-        
-        // adjust readBufferSize
-        readBuffer.SetBufferSize(readBufferSize);
-
-        // adjust writeBufferSize
-        writeBuffer.SetBufferSize(writeBufferSize);
-    
-        return true;    
-    } 
+    	return BSB_SetBufferSize(*this, readBufferSize, writeBufferSize);
+    }   
     
     /// default constructor
     BasicStreamBuffer(uint32 readBufferSize=0, uint32 writeBufferSize=0){
         readBufferAccessPosition    = 0;
         writeBufferAccessPosition   = 0;
         readBufferFillAmount        = 0;
-        readAccessPosition          = 0;
-        writeAccessPosition         = 0;
+    	operatingModes.canSeek      = false;
+    	operatingModes.mutexReadMode = false;
+    	operatingModes.mutexWriteMode = false;
+    	operatingModes.stringMode = false;
+        operatingModes.canSeek = bsb.CanSeek(); 
+    	
+        // mutex mode is enabled if CanSeek and both can Read and Write
+    	// in that case the stream is single and bidirectional
+        if (CanSeek() && CanWrite() && CanRead()) {
+        	bsb.operatingModes.mutexWriteMode = true;
+        }    	
+        
         SetBufferSize(readBufferSize,writeBufferSize);
+       
     }
 
     /// default destructor
     virtual ~BasicStreamBuffer(){
+    	Flush();
     }
 
 
 public:  // special methods for buffering
     
     /** 
-         saves any pending write operations 
+         on dual separate buffering (CanSeek=False) just Flush output 
+     
+         on joint buffering (CanSeek= True) depending on read/write mode 
+         either Resync or Flush
     */
-    bool Flush(TimeoutType         msecTimeout     = TTDefault){
-        // no data
-        if (writeAccessPosition == 0) return true;
- 
-        return FlushWriteBuffer(msecTimeout);
+    inline bool Flush(TimeoutType         msecTimeout     = TTDefault){
+    	// mutexReadMode --> can seek so makes sense to resync
+    	if (operatingModes.mutexReadMode){
+    		return ResyncReadBuffer();
+    	} 
+         	
+   		return FlushWriteBuffer();
     }
 
 
-    /// simply write to buffer if space exist and if operatingMode allows
+    /// simply write to buffer if space exist and if operatingModes allows
     inline bool         PutC(char c)
     {
         // if in mutex mode switch to write mode
-        if (operatingMode.mutexReadBufferActive) {
+        if (operatingModes.mutexReadMode) {
            if (!SwitchToWriteMode()) return false;
         }
         
@@ -350,16 +309,15 @@ public:  // special methods for buffering
             return True;
         }
 
-
         uint32 size = 1;
         return (UnBufferedWrite(&c, size) && (size == 1));
     }    
 
     /// simply read from buffer 
-    inline bool         GetC(char &c) {
+    inline bool         GetC(char &c)
 
         // if in mutex mode switch to write mode
-        if (operatingMode.mutexWriteBufferActive) {
+        if (operatingModes.mutexWriteMode) {
            if (!SwitchToReadMode()) return false;
         }
 
@@ -393,129 +351,49 @@ public:  // replaced StreamInterface methods
                             char *              buffer,
                             uint32 &            size,
                             TimeoutType         msecTimeout     = TTDefault,
-                            bool                completeRead    = false)
-    {
-        // check for mutually exclusive buffering and 
-        // whether one needs to switch to ReadMode
-        if (operatingMode.mutexWriteBufferActive) {
-           if (!SwitchToReadMode()) return false;
-        }
- 
-        if (readBuffer.Buffer()!=NULL){ 
-
-            // read from buffer first
-            uint32 toRead = size;
-        	
-        	BufferRead(buffer, size);
-        	
-        	if (size != toRead ){
-        		
-        		toRead -= size;
-        		
-        		if ((toRead*4) < readBuffer.BufferAllocatedSize()){
-        			if (!RefillReadBuffer()) return false;
-        			
-        			BufferRead(buffer+size, toRead);
-        			size+= toRead;
-        			
-        			// should have completed
-        			return true;
-        			
-        		} else {
-                    // if needed read directly from stream
-                    if (!UnBufferedRead(buffer+size,toRead,msecTimeout)) return false;
-                    size += toRead;
-        			
-        		}
-        	}
-       }
-        	
-       // if needed read directly from stream
-       return UnBufferedRead(buffer,size,msecTimeout);
-    }
+                            bool                completeRead    = false);
+    // NOTE: Implemented in .cpp but no need to have c- mangling functions as function will be normally acceessed via VT 
+    
 
     /** Write data from a buffer to the stream. As much as size byte are written, actual size
         is returned in size. msecTimeout is how much the operation should last.
         timeout behaviour is class specific. I.E. sockets with blocking activated wait forever
         when noWait is used .... */
     virtual bool         Write(
-                            const char*         buffer,
+                            const void*         buffer,
                             uint32 &            size,
                             TimeoutType         msecTimeout     = TTDefault,
-                            bool                completeWrite   = false)
-    {
+                            bool                completeWrite   = false);
 
-        // check for mutually exclusive buffering and 
-        // whether one needs to switch to WriteMode
-        if (operatingMode.mutexReadBufferActive) {
-           if (!SwitchToWriteMode()) return false;
-        }
-        
-        // buffering active?
-        if (writeBuffer.Buffer() != NULL){
-        	// separate input and output size
-        	uint32 toWrite = size;
-        	// check available buffer size versus write size 
-            // if size is comparable to buffer size there 
-            // is no reason to use the buffering mechanism
-            if (writeBuffer.BufferAllocatedSize() > (4 *size)){
-            	// try writing the buffer
-            	BufferWrite(buffer, size);
-            	
-            	// all done! space available! 
-            	if (size == toWrite) return true;
-            	
-            	// make space
-            	if (!Flush()) return false;
+    // NOTE: Implemented in .cpp but no need to have c- mangling functions as function will be normally acceessed via VT 
 
-            	toWrite -= size;
-            	uint32 leftToWrite = toWrite;
-            	
-            	// try writing the buffer
-            	BufferWrite(buffer+size, leftToWrite);
-
-            	size+= leftToWrite;
-            	
-            	// should have been able to fill in it!!!
-            	if (leftToWrite != toWrite) return false;
-            	return true;               
-            } else {
-            	// write the buffer so far
-            	if (!Flush()) return false;
-            }
-            
-        }
-        return UnBufferedWrite(buffer,size,msecTimeout);
-
-    }
 
     // RANDOM ACCESS INTERFACE
 
     /** The size of the stream */
-    virtual int64       Size()    { 
+    virtual int64       Size()    {
+    	// just commit all pending changes if any
+    	// so stream size will be updated     	
     	Flush();
+    	// then call Size from unbuffered stream 
     	return UnBufferedSize(); 
     }
 
     /** Moves within the file to an absolute location */
-    virtual bool        Seek(int64 pos)
-    {
-        Flush();
-    	return UnBufferedSeek(pos);
-    }
+    virtual bool        Seek(int64 pos);
+    // NOTE: Implemented in .cpp but no need to have c- mangling functions as function will be normally acceessed via VT 
 
+    /** Moves within the file relative to current location */
+    virtual bool        RelativeSeek(int32 deltaPos);
+    // NOTE: Implemented in .cpp but no need to have c- mangling functions as function will be normally acceessed via VT 
+    
     /** Returns current position */
-    virtual int64       Position() {
-    	
-    	
-    	return UnBufferedPosition(); 
-    }
+    virtual int64       Position() ;
+    // NOTE: Implemented in .cpp but no need to have c- mangling functions as function will be normally acceessed via VT 
 
     /** Clip the stream size to a specified point */
-    virtual bool        SetSize(int64 size)
-    {
-        return UnBufferedSetSize(size);
-    }
+    virtual bool        SetSize(int64 size);
+    // NOTE: Implemented in .cpp but no need to have c- mangling functions as function will be normally acceessed via VT 
 
     // Extended Attributes or Multiple Streams INTERFACE
 
@@ -533,14 +411,105 @@ public:  // replaced StreamInterface methods
         return UnBufferedSwitch(name);
     }
 
-    /**  remove an existing stream . */
+    /**  remove an existing stream .
+        current stream cannot be removed 
+    */
     virtual bool        RemoveStream(const char *name)
     {
     	Flush();
         return UnBufferedRemoveStream(name);
     }
 
+public:  // auxiliary functions based on buffering
+    
+    /** extract a token from the stream into a string data until a terminator or 0 is found.
+        Skips all skip characters and those that are also terminators at the beginning
+        returns true if some data was read before any error or file termination. False only on error and no data available
+        The terminator (just the first encountered) is consumed in the process and saved in saveTerminator if provided
+        skipCharacters=NULL is equivalent to skipCharacters = terminator
+        {BUFFERED}    */
+    virtual bool        GetToken(
+                            char *              outputBuffer,
+                            const char *        terminator,
+                            uint32              outputBufferSize,
+                            char *              saveTerminator,
+                            const char *        skipCharacters);
 
+    /** extract a token from the stream into a string data until a terminator or 0 is found.
+        Skips all skip characters and those that are also terminators at the beginning
+        returns true if some data was read before any error or file termination. False only on error and no data available
+        The terminator (just the first encountered) is consumed in the process and saved in saveTerminator if provided
+        skipCharacters=NULL is equivalent to skipCharacters = terminator
+        {BUFFERED}
+        A character can be found in the terminator or in the skipCharacters list  in both or in none
+        0) none                 the character is copied
+        1) terminator           the character is not copied the string is terminated
+        2) skip                 the character is not copied
+        3) skip + terminator    the character is not copied, the string is terminated if not empty
+    */
+    virtual bool        GetToken(
+    		                BasicStreamBuffer &  output,
+                            const char *        terminator,
+                            char *              saveTerminator=NULL,
+                            const char *        skipCharacters=NULL);
+
+    /** to skip a series of tokens delimited by terminators or 0
+        {BUFFERED}    */
+    virtual bool        SkipTokens(
+                            uint32              count,
+                            const char *        terminator);
+
+    
+    /** Extract a line */
+    inline bool 		GetLine(
+    						char *				outputBuffer,
+    						uint32 				outputBufferSize,
+    						bool 				skipTerminators=True){
+        const char *skipCharacters = "\r";
+#if defined (_WIN32)
+        if (!skipTerminators) skipCharacters = "\r";
+#else
+        if (!skipTerminators) skipCharacters = "";
+#endif
+        return GetToken(outputBuffer,"\n",outputBufferSize,NULL,skipCharacters);
+    }
+
+    /** @param skipTerminators will skip an empty line or any part of a line termination */
+    inline bool 		GetLine(
+    						BasicStreamBuffer &	output,
+    						bool 				skipTerminators=True){
+        const char *skipCharacters = "\r";
+#if defined (_WIN32)
+        if (!skipTerminators) skipCharacters = "\r";
+#else
+        if (!skipTerminators) skipCharacters = "";
+#endif
+        return GetToken(output,"\n",NULL,skipCharacters);
+    }
+
+    /** 
+    */
+    inline bool Print(const AnyType& par){
+        return False;
+    }
+
+    /** 
+    */
+    inline bool PrintFormatted(const char *format, const AnyType& par1){
+        return False;
+    }
+    
+    /** 
+    */
+    inline bool PrintFormatted(const char *format, const AnyType& par1, const AnyType& par2){
+        return False;
+    }
+
+    /** 
+    */
+    inline bool PrintFormatted(const char *format, const AnyType& par1, const AnyType& par2, const AnyType& par3){
+        return False;
+    }
 
 };
 
