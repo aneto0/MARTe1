@@ -35,7 +35,8 @@
 /** A more abstract version of Streamable. It is used to allow referring to streams at lower levels */
 class StreamInterface{
 
-protected:
+protected:  // TO BE IMPLEMENTED IN FINAL CLASS 
+	
     // PURE STREAMING
     /** 
         Reads data into buffer. 
@@ -140,7 +141,16 @@ public:
     // SYNCHRONISATION INTERFACE
 
     /** 
-       whether it can wait to complete operation - msecTimeout is used to limit the blocking time
+       whether it can wait to complete operation 
+       or in absence of data or buffer space the 
+       operation terminates immediately       
+       msecTimeout is used to limit the blocking time 
+       when blocking is active. It is not used otherwise - unless
+       complete is set in which case the operation is tried multiple 
+       times each after fixed interval (set as timeout/10 or 1ms min) 
+       This implies that class implementations of Read and Write 
+       might have to involve a select call or something similar
+       for classes light String blocking has no meaning.        
     */
     virtual bool        CanBlock()=0;
     
@@ -150,7 +160,9 @@ public:
     // RANDOM ACCESS INTERFACE
 
     /** The size of the stream */
-    virtual int64       Size()    { return UnBufferedSize(); }
+    virtual int64       Size()    { 
+    	return UnBufferedSize(); 
+    }
 
     /** Moves within the file to an absolute location */
     virtual bool        Seek(int64 pos)
@@ -158,8 +170,15 @@ public:
         return UnBufferedSeek(pos);
     }
 
+    /** Moves within the file relative to current location */
+    virtual bool        RelativeSeek(int32 deltaPos){
+    	return UnBufferedSeek( UnBufferedPosition() + deltaPos);
+    }       
+    
     /** Returns current position */
-    virtual int64       Position() { return UnBufferedPosition(); }
+    virtual int64       Position() { 
+    	return UnBufferedPosition(); 
+    }
 
     /** Clip the stream size to a specified point */
     virtual bool        SetSize(int64 size)

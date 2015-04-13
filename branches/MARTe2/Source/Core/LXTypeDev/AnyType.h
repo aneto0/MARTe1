@@ -39,11 +39,11 @@ class AnyType{
 public:
 	
     /// data may be RW or RO
-    void * 				dataPointer;
+	void * 				dataPointer;
 
 	/// what type is the data 
-	TypeDescriptor		dataDescriptor;
-
+    TypeDescriptor      dataDescriptor;
+ 
 	/// used only for bit range types
     unsigned int        bitAddress:3;	
 	
@@ -75,6 +75,12 @@ public:
     AnyType(uint16 &i){
 		dataPointer = &i;
 		dataDescriptor = UnsignedInteger16Bit;
+	}   	
+
+	/// constructor from an integer 8 bit
+    AnyType(uint32 &i){
+		dataPointer = &i;
+		dataDescriptor = UnsignedInteger32Bit;
 	}   	
 };
 #endif

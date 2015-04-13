@@ -30,7 +30,6 @@
 
 #include "AnyType.h"
 #include "FormatDescriptor.h"
-#include "CStream.h"
 
 /** 
 */
