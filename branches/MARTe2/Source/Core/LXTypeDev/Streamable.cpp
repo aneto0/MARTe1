@@ -1,23 +1,23 @@
-#include "BasicStreamBuffer.h"
+#include "Streamable.h"
 
 
-bool BSB_SetBufferSize(BasicStreamBuffer & bsb,uint32 readBufferSize, uint32 writeBufferSize){
-        if (!bsb.CanRead())  bsb.readBufferSize = 0;   
-        if (!bsb.CanWrite()) bsb.writeBufferSize = 0;   
+bool StreamableSetBufferSize(Streamable & bsb,uint32 readBufferSize, uint32 writeBufferSize){
+        if (!stream.CanRead())  stream.readBufferSize = 0;   
+        if (!stream.CanWrite()) stream.writeBufferSize = 0;   
 
         // dump any data in the write Queue
-        bsb.Flush();
+        stream.Flush();
         
         // adjust readBufferSize
-        bsb.readBuffer.SetBufferSize(bsb.readBufferSize);
+        stream.readBuffer.SetBufferSize(stream.readBufferSize);
 
         // adjust writeBufferSize
-        bsb.writeBuffer.SetBufferSize(bsb.writeBufferSize);
+        stream.writeBuffer.SetBufferSize(stream.writeBufferSize);
         
     } 
 
 /// copies to buffer size bytes from the end of readBuffer
-void BasicStreamBuffer::BufferRead(char *buffer, uint32 &size){
+void Streamable::BufferRead(char *buffer, uint32 &size){
 
     uint32 spaceLeft = readBufferFillAmount - readBufferAccessPosition;
     
@@ -25,13 +25,13 @@ void BasicStreamBuffer::BufferRead(char *buffer, uint32 &size){
     if (size > spaceLeft) size = spaceLeft;
 	
 	    // fill the buffer with the remainder 
-	    if (size > 0) MemoryCopy(buffer, readBuffer.Buffer()+readBufferAccessPosition,size);
+	if (size > 0) MemoryCopy(buffer, readBuffer.Buffer()+readBufferAccessPosition,size);
     readBufferAccessPosition+=size;
 
 }
 
 
-bool BasicStreamBuffer::Read(
+bool Streamable::Read(
                         char *              buffer,
                         uint32 &            size,
                         TimeoutType         msecTimeout     = TTDefault,
@@ -77,7 +77,7 @@ bool BasicStreamBuffer::Read(
     
 
 /// copies buffer of size size at the end of writeBuffer
-void BasicStreamBuffer::BufferWrite(const char *buffer, uint32 &size){
+void Streamable::BufferWrite(const char *buffer, uint32 &size){
 
 	// recalculate how much we can write
 	uint32 spaceLeft = writeBuffer.BufferAllocatedSize() - writeBufferAccessPosition;
@@ -95,7 +95,7 @@ void BasicStreamBuffer::BufferWrite(const char *buffer, uint32 &size){
     is returned in size. msecTimeout is how much the operation should last.
     timeout behaviour is class specific. I.E. sockets with blocking activated wait forever
     when noWait is used .... */
-bool BasicStreamBuffer::Write(
+bool Streamable::Write(
                         const void*         buffer,
                         uint32 &            size,
                         TimeoutType         msecTimeout     = TTDefault,
@@ -147,7 +147,7 @@ bool BasicStreamBuffer::Write(
 } 
 
 /** Moves within the file to an absolute location */
-bool BasicStreamBuffer::Seek(int64 pos)
+bool Streamable::Seek(int64 pos)
 {
     if (!operatingModes.canSeek) return false;
     
@@ -176,7 +176,7 @@ bool BasicStreamBuffer::Seek(int64 pos)
 }
 
 /** Moves within the file relative to current location */
-bool  BasicStreamBuffer::RelativeSeek(int32 deltaPos){
+bool  Streamable::RelativeSeek(int32 deltaPos){
     if (!operatingModes.canSeek) return false;
     
     // if write mode on then just flush out data
@@ -203,7 +203,7 @@ bool  BasicStreamBuffer::RelativeSeek(int32 deltaPos){
 }    
 
 /** Returns current position */
-int64 BasicStreamBuffer::Position() {
+int64 Streamable::Position() {
     if (!operatingModes.canSeek) return false;
     
     // if write mode on then just flush out data
@@ -215,7 +215,7 @@ int64 BasicStreamBuffer::Position() {
 }
 
 /** Clip the stream size to a specified point */
-bool BasicStreamBuffer::SetSize(int64 size)
+bool Streamable::SetSize(int64 size)
 {
     if (!operatingModes.canSeek) return false;
     
@@ -236,7 +236,7 @@ bool BasicStreamBuffer::SetSize(int64 size)
     The terminator (just the first encountered) is consumed in the process and saved in saveTerminator if provided
     skipCharacters=NULL is equivalent to skipCharacters = terminator
     {BUFFERED}    */
-bool BasicStreamBuffer::GetToken(
+bool Streamable::GetToken(
                             char *              outputBuffer,
                             const char *        terminator,
                             uint32              outputBufferSize,
@@ -306,8 +306,8 @@ bool BasicStreamBuffer::GetToken(
     2) skip                 the character is not copied
     3) skip + terminator    the character is not copied, the string is terminated if not empty
 */
-virtual bool BasicStreamBuffer::GetToken(
-		                    BasicStreamBuffer &  output,
+virtual bool Streamable::GetToken(
+		                    Streamable &  output,
                             const char *        terminator,
                             char *              saveTerminator=NULL,
                             const char *        skipCharacters=NULL){
@@ -348,7 +348,7 @@ virtual bool BasicStreamBuffer::GetToken(
 
 /** to skip a series of tokens delimited by terminators or 0
     {BUFFERED}    */
-bool BasicStreamBuffer::SkipTokens(
+bool Streamable::SkipTokens(
                             uint32              count,
                             const char *        terminator){
 
@@ -374,90 +374,4 @@ bool BasicStreamBuffer::SkipTokens(
 
     return True;
 }
-
-bool CPrintf(CStream *cs,const char *format,...){
-    if (format==NULL) return False;
-
-    va_list argList;
-    va_start(argList,format);
-    bool ret = VCPrintf(cs,format,argList);
-    va_end(argList);
-
-    return ret;
-};
-
-
-static const int bl2_vsprintfDummySize  = 1;
-
-static void bl2_vsprintfReadFN(CStream *p){
-    p->bufferPtr = (char *)p->context;
-    p->sizeLeft = bl2_vsprintfDummySize;
-}
-
-int bl2_vsprintf(char *buffer,const char *format,va_list argList){
-
-    char temp[bl2_vsprintfDummySize];
-    int max = 2000000000;
-
-    CStream cs;
-    cs.context   = &temp[0];
-    cs.bufferPtr = buffer;
-    cs.sizeLeft  = max;
-    cs.NewBuffer = bl2_vsprintfReadFN;
-
-    VCPrintf(&cs,format,argList);
-    *cs.bufferPtr++ = 0;
-
-    return  max - cs.sizeLeft;
-
-}
-
-int bl2_sprintf(char *buffer,const char *format,...){
-    if (format==NULL) return 0;
-
-    va_list argList;
-    va_start(argList,format);
-    bool ret = bl2_vsprintf(buffer,format,argList);
-    va_end(argList);
-
-    return ret;
-};
-
-int bl2_vsnprintf(char *buffer,size_t size,const char *format,va_list argList){
-
-    char temp[bl2_vsprintfDummySize];
-
-    CStream cs;
-    cs.context   = &temp[0];
-    cs.bufferPtr = buffer;
-    cs.sizeLeft  = size - 1;
-    cs.NewBuffer = bl2_vsprintfReadFN;
-
-    VCPrintf(&cs,format,argList);
-
-    int amount = cs.bufferPtr - buffer;
-
-    if ((amount >= 0) && (amount < size)){
-        *cs.bufferPtr++ = 0;
-        return amount + 1;
-    }
-
-    buffer[size-1] = 0;
-    return size;
-
-}
-
-int bl2_snprintf(char *buffer,size_t size,const char *format,...){
-    if (format==NULL) return 0;
-
-    va_list argList;
-    va_start(argList,format);
-    bool ret = bl2_vsnprintf(buffer,size,format,argList);
-    va_end(argList);
-
-    return ret;
-};
-
-
-
 

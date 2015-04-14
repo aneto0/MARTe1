@@ -28,8 +28,6 @@
 #ifndef TYPE_DESCRIPTOR
 #define TYPE_DESCRIPTOR
 
-#include "BasicType.h"
-
 /** 
    Used to describe the type pointed to by a pointer
    Depending on the first bit isStructuredData it may contain a code identifying a structure
@@ -38,8 +36,60 @@
    basic types also include exotic definitions like 23 bit integers
    see BasicType for more information
 */
-typedef struct TypeDescriptor {
+struct TypeDescriptor {
+    /// The basic types that can be used 
+    enum BasicType{
+        /** An integer   pointer = intxx * 
+            size is in bytes */
+        SignedInteger         = 0,
 
+        /** An integer   pointer = uintxx * 
+            size is in bytes */
+        UnsignedInteger       = 1,
+
+        /** standard float   pointer = float32 or float64 * 
+            size is in bytes */
+        Float                 = 2,
+
+        /** Pointers  
+            size is of that of the native pointer
+            size field is not used
+         */
+        Pointer               = 3,
+
+        /** pointer to a zero terminated string   pointer = const char *
+            size field is not used
+        */
+        CCString              = 8,
+
+        /** pointer to a pointer to a zero terminated string that has been allocated using malloc 
+            pointer = char ** 
+            BTConvert will free and re allocate memory 
+            size field is not used
+        */
+        PCString              = 9,
+
+        /** pointer to an array of characters of size specified in size field 
+            pointer = char[size] 
+            string will be 0 terminated and (size-1) truncated
+            size field is in bytes
+        */
+        CArray                = 10,
+
+        /** BString class, 
+            pointer = BasicString *
+            it is a pointer to a single BString
+            size field is not used
+        */
+        BasicString           = 11,
+
+        /** StreamAble class, 
+            size field is meaningless 
+     	 */
+        StreamAble            = 12
+
+    };	
+	
     /** 
 	    if True then the data is a structure or class and its definition 
         has to be found in the ObjectRegistryDatabase
@@ -51,7 +101,7 @@ typedef struct TypeDescriptor {
 	*/
     bool isConstant:1;
 
-    union {
+    union {  // 14 bit unnamed union
 
         /** used to describe basic types */
         struct  {
@@ -59,12 +109,12 @@ typedef struct TypeDescriptor {
             /** 
 		the actual type of data
             */
-            BasicType::Identifier type:4;
+            BasicType 		type:4;
           
             /** 
 		the size in bytes or bits (bitset types)
             */
-            unsigned int size:10;
+            unsigned int 	size:10;
 
         };
 		
@@ -73,6 +123,7 @@ typedef struct TypeDescriptor {
 		
     };
 
+    /** Compare types */
     bool operator==(const TypeDescriptor &typeDescriptor) const {
         if(isStructuredData){
             return structuredDataIdCode == typeDescriptor.structuredDataIdCode;
@@ -84,31 +135,31 @@ typedef struct TypeDescriptor {
 } TypeDescriptor;
 
 /// describes int8
-const TypeDescriptor SignedInteger8Bit          = {  False, False, {{ BasicType::SignedInteger , 1}} };
+const TypeDescriptor SignedInteger8Bit          = {  False, False, {{ SignedInteger , 1}} };
 
 /// describes uint8
-const TypeDescriptor UnsignedInteger8Bit        = { False, False, {{ BasicType::UnsignedInteger , 1}} };
+const TypeDescriptor UnsignedInteger8Bit        = { False, False, {{ UnsignedInteger , 1}} };
 
 /// describes int16
-const TypeDescriptor SignedInteger16Bit         = { False, False, {{ BasicType::SignedInteger , 2}} };
+const TypeDescriptor SignedInteger16Bit         = { False, False, {{ SignedInteger , 2}} };
 
 /// describes uint16
-const TypeDescriptor UnsignedInteger16Bit       = { False, False, {{ BasicType::UnsignedInteger , 2}} };
+const TypeDescriptor UnsignedInteger16Bit       = { False, False, {{ UnsignedInteger , 2}} };
 
 /// describes int32
-const TypeDescriptor SignedInteger32Bit         = { False, False, {{ BasicType::SignedInteger , 4}} };
+const TypeDescriptor SignedInteger32Bit         = { False, False, {{ SignedInteger , 4}} };
 
 /// describes uint32
-const TypeDescriptor UnsignedInteger32Bit       = { False, False, {{ BasicType::UnsignedInteger , 4}} };
+const TypeDescriptor UnsignedInteger32Bit       = { False, False, {{ UnsignedInteger , 4}} };
 
 /// describes int64
-const TypeDescriptor SignedInteger64Bit         = { False, False, {{ BasicType::SignedInteger , 8}} };
+const TypeDescriptor SignedInteger64Bit         = { False, False, {{ SignedInteger , 8}} };
 
 /// describes uint64
-const TypeDescriptor UnsignedInteger64Bit       = { False, False, {{ BasicType::UnsignedInteger , 8}} };
+const TypeDescriptor UnsignedInteger64Bit       = { False, False, {{ UnsignedInteger , 8}} };
 
 /// describes const int8
-const TypeDescriptor ConstSignedInteger8Bit     = { False, True , {{ BasicType::SignedInteger , 1}} };
+const TypeDescriptor ConstSignedInteger8Bit     = { False, True , {{ SignedInteger , 1}} };
 
 #endif
 

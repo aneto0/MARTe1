@@ -1,13 +1,12 @@
-#if !defined BASIC_STREAM_BUFFER
-#define BASIC_STREAM_BUFFER
+#if !defined STREAMABLE
+#define STREAMABLE
 
 extern "C"{
 
-	bool BSB_SetBufferSize(
-            BasicStreamBuffer & bsb,  
+	bool StreamableSetBufferSize(
+            Streamable & stream,  
             uint32 				readBufferSize, 
             uint32 				writeBufferSize);
-
 }
 
 
@@ -79,7 +78,7 @@ extern "C"{
     6a) same as 1a 
 
 */
-class BasicStreamBuffer: public StreamInterface {
+class Streamable: public StreamInterface {
  
     /**
        Defines the operation mode and statsu of a basic stream
@@ -231,8 +230,8 @@ private:
 public:
 
     //
-    friend bool BSB_SetBufferSize(
-	            BasicStreamBuffer & bsb,  
+    friend bool StreamableSetBufferSize(
+	            Streamable & 		stream,  
 	            uint32 				readBufferSize, 
 	            uint32 				writeBufferSize);
 
@@ -240,11 +239,14 @@ public:
         sets appropriate buffer sizes and adjusts operatingModes
     */
     bool SetBufferSize(uint32 readBufferSize=0, uint32 writeBufferSize=0){
-    	return BSB_SetBufferSize(*this, readBufferSize, writeBufferSize);
+    	return StreamableSetBufferSize(*this, readBufferSize, writeBufferSize);
     }   
     
     /// default constructor
-    BasicStreamBuffer(uint32 readBufferSize=0, uint32 writeBufferSize=0){
+    Streamable(
+    			uint32 readBufferSize=0, 
+    			uint32 writeBufferSize=0)
+    {
         readBufferAccessPosition    = 0;
         writeBufferAccessPosition   = 0;
         readBufferFillAmount        = 0;
@@ -265,7 +267,7 @@ public:
     }
 
     /// default destructor
-    virtual ~BasicStreamBuffer(){
+    virtual ~Streamable(){
     	Flush();
     }
 
@@ -448,7 +450,7 @@ public:  // auxiliary functions based on buffering
         3) skip + terminator    the character is not copied, the string is terminated if not empty
     */
     virtual bool        GetToken(
-    		                BasicStreamBuffer &  output,
+    		                Streamable &  output,
                             const char *        terminator,
                             char *              saveTerminator=NULL,
                             const char *        skipCharacters=NULL);
@@ -476,7 +478,7 @@ public:  // auxiliary functions based on buffering
 
     /** @param skipTerminators will skip an empty line or any part of a line termination */
     inline bool 		GetLine(
-    						BasicStreamBuffer &	output,
+    						Streamable &	output,
     						bool 				skipTerminators=True){
         const char *skipCharacters = "\r";
 #if defined (_WIN32)
