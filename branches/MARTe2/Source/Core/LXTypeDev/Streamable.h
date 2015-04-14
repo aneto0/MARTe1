@@ -498,21 +498,67 @@ public:  // auxiliary functions based on buffering
     }
 
     /** 
+         pars is a vector terminated by voidAnyType value
+         format follows the TypeDescriptor::InitialiseFromString
+         prints all data pointed to by pars
+    */
+    inline bool PrintFormatted(const char *format, const AnyType pars[]){
+    	// indicates active parameter
+    	int parsIndex = 0;
+    	// checks silly parameter
+    	if (format == NULL) return false;
+    	
+    	// loops through parameters
+    	while(1){
+    		// scans for % and in the meantime prints what it encounters
+    		while ((*format !=0) && (*format != '%')) {
+    			if (!PutC(*format)) return false;
+    			format++;
+    		}
+    		// end of format
+    		if (*format == 0) return true;
+    		
+    		// if not end then %
+    		// keep on parsing format to build a FormatDescriptor
+    		FormatDescriptor fd;
+    		if (!fd.InitialiseFromString(format)) return false;
+    		
+    		// if void simply skip and continue
+    		if (!pars[parIndex].IsVoid()){
+    		    // use it to process parameters
+    		    if (!TypeConvert(*this, pars[parsIndex++], fd) return false
+    		}
+    	}
+        // never comes here!
+    	return false;
+    }
+
+    /** 
     */
     inline bool PrintFormatted(const char *format, const AnyType& par1){
-        return False;
+    	AnyType pars[2] = { par1,voidAnyType};
+    	return PrintFormatted(format, const AnyType[] pars);
     }
-    
+
     /** 
     */
     inline bool PrintFormatted(const char *format, const AnyType& par1, const AnyType& par2){
-        return False;
+    	AnyType pars[3] = { par1,par2,voidAnyType}; 
+    	return PrintFormatted(format, const AnyType[] pars);
     }
 
     /** 
     */
     inline bool PrintFormatted(const char *format, const AnyType& par1, const AnyType& par2, const AnyType& par3){
-        return False;
+    	AnyType pars[4] = { par1,par2,par3,voidAnyType}; 
+    	return PrintFormatted(format, const AnyType[] pars);
+    }
+
+    /** 
+    */
+    inline bool PrintFormatted(const char *format, const AnyType& par1, const AnyType& par2, const AnyType& par3, const AnyType& par4){
+    	AnyType pars[5] = { par1,par2,par3,par4,voidAnyType}; 
+    	return PrintFormatted(format, const AnyType[] pars);
     }
 
 };

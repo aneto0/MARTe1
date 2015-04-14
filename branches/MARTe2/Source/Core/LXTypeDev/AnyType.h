@@ -49,6 +49,17 @@ public:
 	
 public:
 	/// constructor from an integer 8 bit
+    AnyType(void){
+		dataPointer = NULL; 
+		dataDescriptor = VoidType;
+	}   	
+    
+    /// check for void type
+    bool IsVoid(){
+    	return (dataDescriptor == VoidType);
+    }
+
+    /// constructor from an integer 8 bit
     AnyType(const int8 &i){
 		dataPointer = (void *) &i; 
 		dataDescriptor = ConstSignedInteger8Bit;
@@ -83,5 +94,9 @@ public:
 		dataDescriptor = UnsignedInteger32Bit;
 	}   	
 };
+
+// void data marker
+static const voidAnyType;
+
 #endif
 

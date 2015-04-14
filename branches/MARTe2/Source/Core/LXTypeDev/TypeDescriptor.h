@@ -134,6 +134,9 @@ struct TypeDescriptor {
     }
 } TypeDescriptor;
 
+/// describes int0
+const TypeDescriptor VoidType                   = {  False, False, {{ SignedInteger , 0}} };
+
 /// describes int8
 const TypeDescriptor SignedInteger8Bit          = {  False, False, {{ SignedInteger , 1}} };
 
