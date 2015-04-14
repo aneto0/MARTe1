@@ -25,8 +25,8 @@
 /**
  * @file
  */
-#ifndef TYPED_CONVERSION_H
-#define TYPED_CONVERSION_H
+#ifndef TYPE_CONVERSION_H
+#define TYPE_CONVERSION_H
 
 #include "AnyType.h"
 #include "FormatDescriptor.h"
@@ -38,17 +38,6 @@ bool TypeConvert(const AnyType &destination, const AnyType& source, const Format
 }
 
 
-/** 
-*/
-bool TypePrint(CStream &output, const char *format, const AnyType& par1){
-    return False;
-}
-
-/** 
-*/
-bool TypePrint(CStream &output, const char *format, const AnyType& par1, const AnyType& par2 ){
-    return False;
-}
 
 
 #endif
