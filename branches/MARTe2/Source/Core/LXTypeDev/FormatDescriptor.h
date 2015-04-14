@@ -84,13 +84,19 @@ struct Notation{
     };
 };
 
+class FormatDescriptor;
+
+extern "C"  bool FDInitialiseFromString(FormatDescriptor &fd,const char *&string);
 
 /** Describes how a basic type shall be printed (transformed into a string) */
 class FormatDescriptor{
 public:
 //*** MAYBE REPLACE with finite set of options ( *' ' *0  *' '0x *' ', ....)
-    /// maximum size of representation  max 255
-    uint32                   width:8;
+	
+    /** maximum size of representation  max 255
+        0 means unlimited
+    */
+    unsigned int            width:8;
 
     /**
         minimum (whenever applicable) number of meaningful digits (unless overridden by width)  max 64 
@@ -104,41 +110,41 @@ public:
 		0x4ABCD has precision 5     -> (precision =8) unchanged  still precision 5  
 		1-64 
 	*/	 
-    uint32                   precision:8;
+    unsigned int 			precision:8;
 
     /**
 		True means produce a number of characters equal to width 
 		fill up using spaces 
 	*/
-    bool                     pad:1;
+    bool                    pad:1;
 
     /** 
 		True means to produce pad spaces after printing the object representation
     */
-    bool                     leftAlign:1; 
+    bool                    leftAlign:1; 
 
     
     /// in case of a float, this field is used to determine how to print it
-    Notation::Float          floatNotation:2;
+    Notation::Float         floatNotation:2;
 
     /// used for ints, floats, pointers, char * etc...
-    Notation::Binary         binaryNotation:2;
+    Notation::Binary        binaryNotation:2;
 
 	/** 
 		only meaningful for numbers in Hex/octal/binary
 		Fills the number on the left with 0s up to the full representation 
 		Number of 0s depends on the size of the number (hex 64 bit ==> numbers+trailing zero = 16)
 	*/
-    bool                     binaryPadded:1;
+    bool                    binaryPadded:1;
 
     /** 
 		only meaningful for numbers
 		Add the missing + or 0x 0B or 0o
 	*/
-    bool                     fullNotation:1;
+    bool                    fullNotation:1;
 
     //       
-    int32                    spareBits:8;
+    int                     spareBits:8;
     
 	/** takes a printf like string already pointing at the character after % (see below format)
 	    and parses it recovering all the useful information, discarding all redundant ones,
@@ -180,7 +186,9 @@ public:
         o --> activate octal display
         b --> activate binary display
 	*/
-    bool InitialiseFromString(const char *&string);
+    inline bool InitialiseFromString(const char *&string){
+    	return FDInitialiseFromString(*this,string);
+    }
 
     /**
      * Format descriptor is not initialised
@@ -253,164 +261,10 @@ public:
 	}
 };
 
-
-
-/**
-
-START .CPP FILE
-
-DATA TABLES FIRST
-
-*/
-
-/** to implement a look-up table between characters in the 
-    printf format encoding and the set of bits to be set in 
-    the FormatDescriptor 
-*/
-struct FDLookup{
-    // the character in the printf format
-    char character;
-    // the set of flags
-    FormatDescriptor format;
-};
-
-/// 0 terminated vector of FDLookups 
-static const FDLookup flagsLookup[] = {
-    { ' ', 	FormatDescriptor(0,0,True ,False,Notation::FixedPointNotation, Notation::NormalNotation,False,False) },  // ' '	
-	{ '-', 	FormatDescriptor(0,0,True ,True ,Notation::FixedPointNotation, Notation::NormalNotation,False,False) },  // '-'
-    { '0', 	FormatDescriptor(0,0,False,False,Notation::FixedPointNotation, Notation::NormalNotation,True ,False) },  // '0'
-    { '#', 	FormatDescriptor(0,0,False,False,Notation::FixedPointNotation, Notation::NormalNotation,False,True)  },  // '#'
-    { 0  ,  FormatDescriptor(0)}
-};
-
-/// 0 terminated vector of FDLookups 
-static const FDLookup typesLookup[] = {
-    { 'd', 	FormatDescriptor(0) },   //d	
-    { 'i', 	FormatDescriptor(0) },  //i
-    { 'u', 	FormatDescriptor(0) },  //u
-    { 's', 	FormatDescriptor(0) },  //s
-    { 'c', 	FormatDescriptor(0) },  //c
-    { 'f', 	FormatDescriptor(0,0,False,False,Notation::FixedPointNotation, Notation::NormalNotation,False,False) },  //f
-    { 'e', 	FormatDescriptor(0,0,False,False,Notation::ExponentNotation  , Notation::NormalNotation,False,False) },  //e
-    { 'g', 	FormatDescriptor(0,0,False,False,Notation::SmartNotation     , Notation::NormalNotation,False,False) },  //g
-    { 'a', 	FormatDescriptor(0,0,False,False,Notation::FixedPointNotation, Notation::HexNotation   ,False,False) },  //a
-    { 'x', 	FormatDescriptor(0,0,False,False,Notation::FixedPointNotation, Notation::HexNotation   ,False,False) },  //x
-    { 'p', 	FormatDescriptor(0,0,False,False,Notation::FixedPointNotation, Notation::HexNotation   ,False,False) },  //p
-    { 'o', 	FormatDescriptor(0,0,False,False,Notation::FixedPointNotation, Notation::OctalNotation ,False,False) },  //o
-    { 'b', 	FormatDescriptor(0,0,False,False,Notation::FixedPointNotation, Notation::BitNotation   ,False,False) },  //b
-    { 0  ,  FormatDescriptor(0)}
-};
-
-/**
-
-FUNCTIONS BELOW
-
-*/
-
-
-/// strchr equivalent
-static inline const FDLookup *LookupCharacter(char c, const FDLookup *lookupTable){
-    if (lookupTable == NULL) {
-        return NULL;
-    }
-    while(lookupTable->character != 0){
-        if (lookupTable->character == c){
-            return lookupTable;
-        }
-        lookupTable++;
-    }
-    return NULL;
-}
-
-
-/// add to format the identified flag
-static bool ParseCharacter(char c, FormatDescriptor &format,const FDLookup *lookupTable){
-    
-    // find the position of c in flagsLookup
-     const FDLookup *found = LookupCharacter(c, lookupTable);
-    
-    // not found!
-    if (found == NULL ) {
-        return False;
-    }
-    
-    // add the missing bits
-    format |= found->format;   
-    
-    return True;
-}
-
-/**
-    0-9 if it is a digit 
-    otherwise negative
-*/
-static inline int32 GetDigit(char c){
-    int32 digit = c - '0';
-    if (digit > 9) {
-        return -1;
-    }
-    return digit;
-}
-
 /** 
-    parses a number out of string 
-    returns 0 if no number is encountered
+   default printf notation %i or %f or %s etc... 
 */
-static inline uint32 GetIntegerNumber(const char *&string){
-    if (string == NULL) return False;
-    
-    uint32 number = 0;
-    int32 digit = 0;
-    // 
-    while ((digit = GetDigit(string[0]))>0){
-        number *= 10;
-        number += digit;
-        string++;
-    }
-    
-    return number;
-}
-
-bool FormatDescriptor::InitialiseFromString(const char *&string){
-    
-    // prepare clean FormatDescriptor
-    // copy to this only if parsing successful
-    FormatDescriptor temporaryFormat(0);
-    
-    /// check pointer
-    if (string == NULL) {
-        return False;
-    }
-    
-    // expect at least a character
-    if (string[0] == 0) {
-        return False;
-    }
-    
-    //parse options
-    while (ParseCharacter(string[0],temporaryFormat,&flagsLookup[0])) {
-        string++;
-    }
-    
-    // get any integer number from string if any
-    temporaryFormat.width = GetIntegerNumber(string);
-    
-    // after a dot look for the precision field
-    if (string[0] == '.') {        
-        string++;
-        // get any integer number from string if any
-        temporaryFormat.precision = GetIntegerNumber(string);        
-    }
-    
-    // the next must be the code!
-    if (ParseCharacter(string[0],temporaryFormat,&typesLookup[0])){
-        *this = temporaryFormat;
-        return True;
-    }
-           
-    return False;
-}
-
+static const FormatDescriptor  standardFormatDescriptor(0,0,false,false,Notation::FixedPointNotation,Notation::NormalNotation,False,False);
 
 
 #endif

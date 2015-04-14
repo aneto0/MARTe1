@@ -1,6 +1,8 @@
 #if !defined STREAMABLE
 #define STREAMABLE
 
+#include "TypeConversion.h"
+
 extern "C"{
 
 	bool StreamableSetBufferSize(
@@ -106,7 +108,7 @@ class Streamable: public StreamInterface {
 
     };
 
-    
+private:    
     /// set automatically on initialisation by calling of the Canxxx functions 
     OperatingMode           operatingModes;
     
@@ -129,7 +131,7 @@ protected: // read buffer and statuses
     */
     uint32                  readBufferFillAmount;
 
-protected: // mode methods
+protected: // mode switch methods
     
     /** 
         sets the readBufferFillAmount to 0
@@ -148,7 +150,7 @@ protected: // mode methods
         resets mutexWriteMode
         does not refill the buffer nor check the mutexBuffering is active
     */
-    bool SwitchToReadMode(){
+    inline bool SwitchToReadMode(){
         // adjust seek position
         if (!FlushWriteBuffer()) return false;
         mutexWriteMode = false;
@@ -492,7 +494,7 @@ public:  // auxiliary functions based on buffering
     /** 
     */
     inline bool Print(const AnyType& par){
-        return False;
+    	return TypeConvert(*this, par, standardFormatDescriptor);
     }
 
     /** 
