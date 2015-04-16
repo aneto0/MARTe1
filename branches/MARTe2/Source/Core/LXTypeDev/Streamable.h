@@ -491,11 +491,10 @@ public:  // auxiliary functions based on buffering
         return GetToken(output,"\n",NULL,skipCharacters);
     }
 
-    /** 
+    /**
+     * Very powerful function to handle data conversion into a stream of chars
     */
-    inline bool Print(const AnyType& par){
-    	return TypeConvert(*this, par, standardFormatDescriptor);
-    }
+    virtual bool Print(const AnyType& par,FormatDescriptor fd=standardFormatDescriptor);
 
     /** 
          pars is a vector terminated by voidAnyType value
@@ -526,7 +525,7 @@ public:  // auxiliary functions based on buffering
     		// if void simply skip and continue
     		if (!pars[parIndex].IsVoid()){
     		    // use it to process parameters
-    		    if (!TypeConvert(*this, pars[parsIndex++], fd) return false
+    		    if (!Print(pars[parsIndex++], fd) return false
     		}
     	}
         // never comes here!
