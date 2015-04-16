@@ -57,7 +57,6 @@ extern "C" {
  */
 class ErrorManagement{
 
-public:
 	
 public:
 	/** values to be used in ErrorManagementFunction */
@@ -129,21 +128,51 @@ public:
 	 	 to disambiguate among possible sources 
 	 */
 	struct ErrorInformation{
-		///
-		ErrorType 	errorType;
 		
-		/// seconds from start of calendar (type TBD)
-		int     	time;
+		/// first to be transmitted is the header;
+		struct {
+			///
+			ErrorType 	errorType:8;
+
+			///
+			uint16      lineNumber;
+
+			///
+			bool        isObject:1;
+
+			///
+			bool        hasProcessId:1;
+
+			///
+			bool        hasObjectPointer:1;
+
+			///
+			bool        hasClassName:1;
+
+		} header;
+
+		/// msecs from start of time -  
+		uint64     	msecTime;
+
+		///
+		char *      fileName;
 		
 		/// thread ID
 		TID		    threadId;
 		
 		///
-		void *      classPtr;
+		PID         processId;
 		
 		///
-		bool        isObject;
+		void *      objectPointer;
+
+		///
+		char *      className;
 		
+		/// 
+		ErrorInformation(){
+			
+		}
 	
 	};
 	
@@ -182,68 +211,5 @@ public:
 
 };
 
-#if 0
-
-/** the type of an user provided ErrorProcessing function */
-typedef void (*AssembleErrorMessageFunctionType)(const char *errorDescription,va_list argList,const char *errorHeader,...);
-
-extern "C" {
-
-    /**
-        Sets the error status and depending on setup does appropriate action
-        This call is to be called from static members
-    */
-    void VCAssertErrorCondition(EMFErrorType errorCode,const void *object,const char *className,const char *errorDescription,va_list argList);
-
-    /** Sets the error status and depending on setup does appropriate action
-        This call is to be called from Interrupt Service Routines
-    */
-    void VCISRAssertErrorCondition(EMFErrorType errorCode,const void *object,const char *className,const char *errorDescription,va_list argList);
-
-    /** Sets the error status and depending on setup does appropriate action
-        This call is to be called from Interrupt Service Routines
-    */
-    void CISRStaticAssertErrorCondition(EMFErrorType errorCode,const char *errorDescription,...);
-
-    #if defined(_OS2)
-    /** Sets the error status and depending on setup does appropriate action */
-    void VCAssertPlatformErrorCondition(EMFErrorType errorCode,const void *object,const char *className,int32 os2ErrorCode,const char *errorDescription,va_list argList);
-    #else
-    /** Sets the error status and depending on setup does appropriate action */
-    void VCAssertPlatformErrorCondition(EMFErrorType errorCode,const void *object,const char *className,const char *errorDescription,va_list argList);
-    #endif
-
-    /** Sets the error status and depending on setup does appropriate action */
-    void VCAssertSocketErrorCondition(EMFErrorType errorCode,const void *object,const char *className,const char *errorDescription,va_list argList);
-
-    /** Sets the error status and depending on setup does appropriate action
-        This call is to be called from static members
-    */
-    void VCStaticAssertErrorCondition(EMFErrorType errorCode,const char *errorDescription,va_list argList);
-
-    /** Sets the error status and depending on setup does appropriate action
-        This call is to be called from static members
-    */
-    void CStaticAssertErrorCondition(EMFErrorType errorCode,const char *errorDescription,...);
-
-    #if defined(_OS2)
-    /** Sets the error status and depending on setup does appropriate action */
-    void CStaticAssertPlatformErrorCondition(EMFErrorType errorCode,int32 os2ErrorCode,const char *errorDescription,...);
-    #else
-    /** Sets the error status and depending on setup does appropriate action */
-    void CStaticAssertPlatformErrorCondition(EMFErrorType errorCode,const char *errorDescription,...);
-    #endif
-
-    /** set the handler for error messages */
-    void LSSetUserAssembleErrorMessageFunction(AssembleErrorMessageFunctionType userFun=NULL);
-
-    /** get the handler for error messages */
-    void LSGetUserAssembleErrorMessageFunction(AssembleErrorMessageFunctionType &userFun);
-
-    /** sets the handler for error messages coming from interrupts */
-    void LSSetUserAssembleISRErrorMessageFunction(AssembleErrorMessageFunctionType userFun);
-
-}
-#endif
 
 #endif
