@@ -389,12 +389,34 @@ bool Print(const AnyType& par,FormatDescriptor fd=standardFormatDescriptor){
 		return false;
 	}
 	
-	bool isSigned = false;
 	switch (par.dataDescriptor.type){
 	 
-	case SignedInteger: 
-		isSigned = true 
-	case UnsignedInteger:
+	case UnsignedInteger: 
+    {
+        switch (par.dataDescriptor.size){
+            case 8:{
+                uint8 *data = (uint8 *)par.dataPointer;
+                Print(*data,fd);
+            } break;
+            case 16:{
+                uint16 *data = (uint16 *)par.dataPointer;
+                Print(*data,fd);
+            } break;
+            case 32:{
+                uint32 *data = (uint32 *)par.dataPointer;
+                Print(*data,fd);
+            } break;
+            case 64:{
+                uint64 *data = (uint64 *)par.dataPointer;
+                Print(*data,fd);
+            } break;
+            default:{
+                uint64 number = ExpandToInt64(par.dataPointer, par.dataDescriptor.size);
+                Print(number,fd);
+            }
+        }
+    } break;
+	case SignedInteger:
 	{
 		int64 number = ExpandToInt64(par.dataPointer, par.dataDescriptor.size);
 		PrintInt64(number);
@@ -406,7 +428,7 @@ bool Print(const AnyType& par,FormatDescriptor fd=standardFormatDescriptor){
 	        UnsignedInteger       = 1,
 		
 	
-	}
+	} break;
 	
 	
 }
