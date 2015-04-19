@@ -376,61 +376,128 @@ bool Streamable::SkipTokens(
 }
 
 
-bool PrintAnyInteger()
+#include "NumberToString.h"
+
+
+template <typename T> bool PrintInteger(T number,FormatDescriptor fd=standardFormatDescriptor){
+	char buffer[67];
+	int size = sizeof (buffer);
+	const char *convertedNumber;
+
+	switch (fd.binaryNotation){
+	case NormalNotation:{
+		convertedNumber= NumberToDecimal(buffer,size,number);
+	}break;
+	case HexNotation{
+		convertedNumber= NumberToHexadecimal(buffer,size,number,fd.binaryPadded);
+	}break;
+	case OctalNotation{
+		convertedNumber= NumberToOctal(buffer,size,number,fd.binaryPadded);
+	}break;
+	case BitNotation{
+		convertedNumber= NumberToBinary(buffer,size,number,fd.binaryPadded);
+	}break;
+
+	}
+
+	// if it does not fit than produce a  ?
+    if (size > fd.width) {
+    	size = 1;
+    	convertedNumber = '?';
+    }
+
+    // check padding style
+    if ((fd.pad) && (!fd.leftAlign)){
+		int i;
+		for (i=size;i< fd.width;i++) {
+			if (!PutC(' ')) return false;
+		}
+    }
+
+	// first write
+	if (!Write(convertedNumber,size,TTDefault,true)) return false;
+
+    // check padding style
+    if ((fd.pad) && (fd.leftAlign)){
+		int i;
+		for (i=size;i< fd.width;i++) {
+			if (!PutC(' ')) return false;
+		}
+    }
+
+    return true;
+
+}
 
 
 bool Print(const AnyType& par,FormatDescriptor fd=standardFormatDescriptor){
-	
+
 	/// empty - an error?
 	if (par.dataPointer == NULL) return false;
-	
+
 	if (par.isStructuredData ){
 		Errormanagement::ReportError(UnsupportedError, "Streamable::Print StructuredData not supported");
 		return false;
 	}
-	
+
 	switch (par.dataDescriptor.type){
-	 
+
 	case UnsignedInteger: 
-    {
-        switch (par.dataDescriptor.size){
-            case 8:{
-                uint8 *data = (uint8 *)par.dataPointer;
-                Print(*data,fd);
-            } break;
-            case 16:{
-                uint16 *data = (uint16 *)par.dataPointer;
-                Print(*data,fd);
-            } break;
-            case 32:{
-                uint32 *data = (uint32 *)par.dataPointer;
-                Print(*data,fd);
-            } break;
-            case 64:{
-                uint64 *data = (uint64 *)par.dataPointer;
-                Print(*data,fd);
-            } break;
-            default:{
-                uint64 number = ExpandToInt64(par.dataPointer, par.dataDescriptor.size);
-                Print(number,fd);
-            }
-        }
-    } break;
+	{
+		switch (par.dataDescriptor.size){
+		case 8:{
+			uint8 *data = (uint8 *)par.dataPointer;
+			return PrintInteger(*data,fd);
+		} break;
+		case 16:{
+			uint16 *data = (uint16 *)par.dataPointer;
+			return PrintInteger(*data,fd);
+		} break;
+		case 32:{
+			uint32 *data = (uint32 *)par.dataPointer;
+			return PrintInteger(*data,fd);
+		} break;
+		case 64:{
+			uint64 *data = (uint64 *)par.dataPointer;
+			return PrintInteger(*data,fd);
+		} break;
+		default:{
+			uint64 number = ExpandToUint64(par.dataPointer, par.dataDescriptor.size);
+			return PrintInteger(number,fd);
+		}
+		}
+	} break;
 	case SignedInteger:
 	{
-		int64 number = ExpandToInt64(par.dataPointer, par.dataDescriptor.size);
-		PrintInt64(number);
+		switch (par.dataDescriptor.size){
+		case 8:{
+			int8 *data = (int8 *)par.dataPointer;
+			return PrintInteger(*data,fd);
+		} break;
+		case 16:{
+			int16 *data = (int16 *)par.dataPointer;
+			return PrintInteger(*data,fd);
+		} break;
+		case 32:{
+			int32 *data = (int32 *)par.dataPointer;
+			return PrintInteger(*data,fd);
+		} break;
+		case 64:{
+			int64 *data = (int64 *)par.dataPointer;
+			return PrintInteger(*data,fd);
+		} break;
+		default:{
+			int64 number = ExpandToInt64(par.dataPointer, par.dataDescriptor.size);
+			return PrintInteger(number,fd);
+		}
+		}
 	}break;
+	default:{
 		
-		
-	        /** An integer   pointer = uintxx * 
-	            size is in bytes */
-	        UnsignedInteger       = 1,
-		
-	
-	} break;
-	
-	
+	}
+	}
+
+
 }
 
 

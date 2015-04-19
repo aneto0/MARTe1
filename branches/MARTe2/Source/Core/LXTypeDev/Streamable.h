@@ -491,6 +491,21 @@ public:  // auxiliary functions based on buffering
         return GetToken(output,"\n",NULL,skipCharacters);
     }
 
+    
+/**
+ *  Methods to convert and print numbers and other objects 
+ */    
+    
+private:
+    
+    /**
+     * Simple Print of an integer
+     */
+    template <typename T> bool PrintInteger(const T &number,FormatDescriptor fd=standardFormatDescriptor);    
+
+public:
+    
+    
     /**
      * Very powerful function to handle data conversion into a stream of chars
     */

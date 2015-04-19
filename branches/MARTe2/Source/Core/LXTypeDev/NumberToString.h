@@ -25,71 +25,269 @@
 #if !defined NUMBER_TO_STRING
 #define NUMBER_TO_STRING
 
-template <typename T> void NtoStringPriv(char *buffer,int &ix,T number){       
+template <typename T> void NtoDecimalPrivate(char *buffer,int &nextFree,T number){       
 	while (number > 0){
-        if (ix <= 0) return ;
-		ix--;
 		unsigned short  digit = number % 10;
 		number                = number / 10;
-		buffer[ix] = '0' + digit;
+		buffer[nextFree--] = '0' + digit;
 	}
 }
 
-
-template <typename T> const char *NtoString(char *buffer,int &size,T number){       
-    if (size <= 0) {
-        return "";
+/**
+ * Converts any integer type, signed and unsigned to string 
+ * writes to a buffer up to the length of the buffer
+ * if it does not fit returns "?" 
+ * size contains the size of the buffer (including space for terminator 0)
+ * size returns the size of the string excluding the trailing 0
+ * if there is enough space a pointer is returned to the start of the number in buffer.
+ * buffer is filled from the end backwards
+ */
+template <typename T> const char *NumberToDecimal(char *buffer,int &size,T number){
+	// 5/4,7/6,12/11,22/21 depending on the byte size of number - include 0 and eventual sign
+	int neededSize = (sizeof(number)*5 +3)/2;	
+	if (number<0)neededSize++; 
+	
+	// there must be space for the number in the worst case
+    if (size < neededSize)   {
+    	size = 1;
+    	return "?";
     }
-	buffer[size--] = 0;
-	int ix = size;
+
+	// size is now the avilable size for the number
+	// nextFree is an index within the buffer for the next free space
+	int nextFree = size-1;
+    
+    // terminate string and then fill backwards
+	buffer[nextFree--] = 0;
+	
+	// always output a 0 at least
+	// space is guaranteed by the first check against 2
 	if (number == 0){
-        if (ix <= 0) return "";
-        ix--;
-	    buffer[ix] = '0';
-	}
+	    buffer[nextFree--] = '0';
+	} else
+		
+	// deal with negative by removing the sign and outputting it separately
     if (number < 0) {
         number = -number;
 
-        NtoStringPriv(buffer,ix,number);       
+        // convert each digit
+        NtoDecimalPrivate(buffer,nextFree,number);
 
-        if (ix <= 0) return "";
-        ix--;
-        buffer[ix] = '-';
+        // put the -
+        buffer[nextFree--] = '-';
     } else {
 
-        NtoStringPriv(buffer,ix,number);       
+        // convert each digit
+        NtoDecimalPrivate(buffer,nextFree,number);
     }
     
-    size -= ix;
-	return buffer + ix;
+	// nextFree is the next location to be used in the buffer going backwards
+	// firstUsed is the first location used in the buffer 
+	int firstUsed = nextFree+1; 
+	
+	// size is the space available for the number in the buffer including terminator 0
+	// size = 10 and first used = 0 ==> 9 characters
+    size -= firstUsed;
+    size --;
+    //
+	return buffer + firstUsed;
 }
 
+/**
+ * Converts any integer type, signed and unsigned to string in hexadecimal notation 
+ * writes to a buffer up to the length of the buffer
+ * if it does not fit returns "?" 
+ * size contains the size of the buffer (including space for terminator 0)
+ * size returns the size of the string excluding the trailing 0
+ * if there is enough space a pointer is returned to the start of the number in buffer.
+ * buffer is filled from the end backwards
+ */
+template <typename T> const char *NumberToHexadecimal(char *buffer,int &size,T number, bool putTrailingZeros){       
+	int totalNumberSize = sizeof(number) * 2;
+	// Even if trailing zeroes are skipped
+	// we need this buffer size to process number
+	// from now on we do need to check for buffer size anymore!
+	if (size < (totalNumberSize+3)) {
+    	size = 1;
+    	return "?";
+    }
+	// size is now the avilable size for the number
+	// nextFree is an index within the buffer for the next free space
+	int nextFree = size-1;
+    
+    // terminate string and then fill backwards
+	buffer[nextFree--] = 0;
 
-char toHex(uint8_t nibble){
-	if (nibble < 9) return '0'+nibble;
-	if (nibble > 15) return '?';
-	return 'A'+nibble-10;
-}
-
-static const char PROGMEM hexLabel[] = "0x";
-
-template <typename T> const char *NtoHex(char *buffer,int &size,T number){       
-    int n = sizeof(number);   
-    if (size <= (2*n+1)) return "??";
-    buffer[size-1] = 0;
-    int ix = size-1;
-
-    for (int i = 0;i < 2*n; i++ ){
+    for (int i = 0;i < totalNumberSize  i++ ){
         unsigned short digit = number & 0xF;
-        ix--;
-        if (digit < 10)   buffer[ix] = '0' + digit;
-        else              buffer[ix] = 'A' + digit - 10;
+        if (digit < 10)   buffer[nextFree--] = '0' + digit;
+        else              buffer[nextFree--] = 'A' + digit - 10;
+        
+        // maybe better /=16??? check with signed numbers!
         number >>=4;
+        
+        // this code is alternative to the one commented below 
+        if ((number == 0) && !putTrailingZeros) break; 
+    }
+
+    // now use a pointer to the first digit
+	int firstUsed = nextFree+1; 
+
+	// alternative option
+//    if (!putTrailingZeros){
+    	// if firstUsed is not the first digit and is 0 then skip it
+//    	while ((firstUsed < (size-1)) && (buffer[firstUsed]=='0')) firstUsed++;    			
+//    }
+
+    // the space is guaranteed by the check at the beginning!
+    buffer[firstUsed-1] = 'x';
+    buffer[firstUsed-2] = '0';
+    
+    size -= firstUsed;
+    size--;
+    return buffer + firstUsed-2;
+}
+
+/**
+ * Converts any integer type, signed and unsigned to string in octal notation 
+ * writes to a buffer up to the length of the buffer
+ * if it does not fit returns "?" 
+ * size contains the size of the buffer (including space for terminator 0)
+ * size returns the size of the string excluding the trailing 0
+ * if there is enough space a pointer is returned to the start of the number in buffer.
+ * buffer is filled from the end backwards
+ */
+template <typename T> const char *NumberToOctal(char *buffer,int &size,T number, bool putTrailingZeros){       
+	int totalNumberSize = (sizeof(number) * 8 + 2 ) / 3;
+	// Even if trailing zeroes are skipped
+	// we need this buffer size to process number
+	// from now on we do need to check for buffer size anymore!
+	if (size < (totalNumberSize+3)) {
+    	size = 1;
+    	return "?";
+    }
+	// size is now the avilable size for the number
+	// nextFree is an index within the buffer for the next free space
+	int nextFree = size-1;
+    
+    // terminate string and then fill backwards
+	buffer[nextFree--] = 0;
+
+    for (int i = 0;i < totalNumberSize  i++ ){
+        unsigned short digit = number & 0x7;
+        buffer[nextFree--] = '0' + digit;
+
+        // maybe better /=8??? check with signed numbers!
+        number >>=3;
+        
+        // this code is alternative to the one commented below 
+        if ((number == 0) && !putTrailingZeros) break; 
+    
+    }
+
+    // now use a pointer to the first digit
+	int firstUsed = nextFree+1; 
+
+//    if (!putTrailingZeros){
+    	// if firstUsed is not the first digit and is 0 then skip it
+//    	while ((firstUsed < (size-1)) && (buffer[firstUsed]=='0')) firstUsed++;    			
+//    }
+
+    // the space is guaranteed by the check at the beginning!
+    buffer[firstUsed-1] = 'o';
+    buffer[firstUsed-2] = '0';
+    
+    size -= firstUsed;
+    size--;
+    return buffer + firstUsed-2;
+}
+
+/**
+ * Converts any integer type, signed and unsigned to string in binary notation 
+ * writes to a buffer up to the length of the buffer
+ * if it does not fit returns "?" 
+ * size contains the size of the buffer (including space for terminator 0)
+ * size returns the size of the string excluding the trailing 0
+ * if there is enough space a pointer is returned to the start of the number in buffer.
+ * buffer is filled from the end backwards
+ */
+template <typename T> const char *NumberToBinary(char *buffer,int &size,T number, bool putTrailingZeros){       
+	int totalNumberSize = sizeof(number) * 8;
+	// Even if trailing zeroes are skipped
+	// we need this buffer size to process number
+	// from now on we do need to check for buffer size anymore!
+	if (size < (totalNumberSize+3)) {
+    	size = 1;
+    	return "?";
+    }
+	// size is now the avilable size for the number
+	// nextFree is an index within the buffer for the next free space
+	int nextFree = size-1;
+    
+    // terminate string and then fill backwards
+	buffer[nextFree--] = 0;
+
+    for (int i = 0;i < totalNumberSize  i++ ){
+        unsigned short digit = number & 0x1;
+        buffer[nextFree--] = '0' + digit;
+        // maybe better /=2??? check with signed numbers!
+        number >>=1;
+        
+        // this code is alternative to the one commented below 
+        if ((number == 0) && !putTrailingZeros) break; 
+        
+    }
+
+    // now use a pointer to the first digit
+	int firstUsed = nextFree+1; 
+
+//    if (!putTrailingZeros){
+    	// if firstUsed is not the first digit and is 0 then skip it
+//    	while ((firstUsed < (size-1)) && (buffer[firstUsed]=='0')) firstUsed++;    			
+//    }
+
+    // the space is guaranteed by the check at the beginning!
+    buffer[firstUsed-1] = 'o';
+    buffer[firstUsed-2] = '0';
+    
+    size -= firstUsed;
+    size--;
+    return buffer + firstUsed-2;
+}
+
+
+template <typename T> const char *NumberToFormat(char *buffer, int &size,T number,Notation::Binary binaryNotation= Notation::NormalNotation){
+	const char *convertedNumber;
+	
+	switch (fd.binaryNotation){
+	case NormalNotation:{
+		convertedNumber= NumberToDecimal(buffer,size,number);
+	}break;
+	case HexNotation{
+		convertedNumber= NumberToHexadecimal(buffer,size,number,fd.binaryPadded);
+	}break;
+	case OctalNotation{
+		convertedNumber= NumberToOctal(buffer,size,number,fd.binaryPadded);
+	}break;
+	case BitNotation{
+		convertedNumber= NumberToBinary(buffer,size,number,fd.binaryPadded);
+	}break;
+	}
+
+	// if it does not fit than produce a  ?
+    if (size > fd.width) {
+    	size = 1;
+    	convertedNumber = '?';
     }
     
-    size =2*n;
-    return buffer + ix;
+    // check padding style
+    if (fd.pad){
+    	if (fd.leftAlign)    	
+    }
+    
+	
 }
+
 
 
 
@@ -103,208 +301,6 @@ template <typename T> const char *NtoHex(char *buffer,int &size,T number){
 
 
 
-uint8_t Putn_s(Print &stream,const char *s, uint8_t size){
-	while (*s!= 0){
-		if (size==0) return size;
-		stream.print(s[0]);
-		s++;
-		size--;
-	}
-	return size;
-}
-
-// progmem string
-uint8_t Putn_ps(Print &stream,const prog_char *s, uint8_t size){
-	if (s == NULL) return size;
-	char c = pgm_read_byte(s);
-	while (c != 0){
-		if (size==0) return size;
-		stream.print(c);
-		s++;
-		size--;
-		c = pgm_read_byte(s);
-	}
-	return size;
-}
-
-/// move labels to match data and return how far it had to move - should be = data 
-uint8_t enumFind(uint8_t data,const prog_char *&labels){
-	uint8_t index = 0;
-	char c = pgm_read_byte(labels);
-	while ((index < data) && (c != 0)){
-		if (c == ';') index++;
-		labels++;
-		c = pgm_read_byte(labels);
-	}
-	return index;
-}
-
-///
-uint8_t Putn_enum(Print &stream,uint8_t data,const prog_char *labels,uint8_t maxPrint){ 
-	if (labels == NULL) return maxPrint;
-	if (maxPrint == 0) return maxPrint;
-
-	// move labels to match data and return how far it had to move - should be = data 
-	uint8_t index = enumFind(data,labels); 
-
-	if (index == data) {
-		uint16_t labelSize = 0;
-		char c = pgm_read_byte(labels+labelSize);	
-		while ((c != 0) && (c != ';')){
-			labelSize++;
-			c = pgm_read_byte(labels+labelSize);
-		}
-
-		if (labelSize <= maxPrint){
-			Putn_ps(stream, labels,labelSize);
-			return maxPrint - labelSize;
-		}
-	}
-	
-	stream.print('?');
-	return maxPrint -1;
-
-}
-
-// up to size or ?
-uint8_t Putn_u32(Print &stream,uint32_t number,uint8_t maxPrint){
-	char buffer[11];
-	char *ptr = toBuffer_u32(buffer,number);
-	int8_t neededSize = (&buffer[10] - ptr);
-	if (neededSize > maxPrint){
-		if (maxPrint > 0){
-			stream.print('!');
-			maxPrint--;
-		}
-    	return maxPrint;
-	}
-	return Putn_s(stream,ptr,maxPrint);
-}
-
-/// up to size or ?
-uint8_t Putn_u16(Print &stream,uint16_t number,uint8_t maxPrint){
-	char buffer[6];
-	char *ptr = toBuffer_u16(buffer,number);
-	int8_t neededSize = (&buffer[5] - ptr);
-	if (neededSize > maxPrint){
-		if (maxPrint > 0){
-			stream.print('!');
-			maxPrint--;
-		}
-    	return maxPrint;
-	}
-	return Putn_s(stream,ptr,maxPrint);
-
-}
-
-// up to size or ?
-uint8_t Putn_u8(Print &stream,uint8_t number,uint8_t maxPrint){
-	char buffer[4];
-	char *ptr = toBuffer_u8(buffer,number);
-	int8_t neededSize = (&buffer[3] - ptr);
-	if (neededSize > maxPrint){
-		if (maxPrint > 0){
-			stream.print('!');
-			maxPrint--;
-		}
-    	return maxPrint;
-	}
-	return Putn_s(stream,ptr,maxPrint);
-
-}
-
-char toHex(uint8_t nibble){
-	if (nibble < 9) return '0'+nibble;
-	if (nibble > 15) return '?';
-	return 'A'+nibble-10;
-}
-
-static const char PROGMEM hexLabel[] = "0x";
-
-// up to size or ?
-uint8_t Putn_u8x(Print &stream,uint8_t number,uint8_t maxPrint){
-	if (maxPrint == 0) return maxPrint;
-	if (maxPrint< 4) {
-		stream.print('!');
-		maxPrint--;
-	} else {
-		stream.print((const __FlashStringHelper *)(hexLabel));
-		stream.print(toHex(number >> 4) );
-		stream.print(toHex(number & 0xF));
-		maxPrint-=4;
-	}
-	return maxPrint;
-}
-
-// up to size or ?
-uint8_t Putn_u16x(Print &stream,uint16_t number,uint8_t maxPrint){
-	if (maxPrint == 0) return maxPrint;
-	if (maxPrint < 6) {
-		stream.print('!');
-		maxPrint--;
-	} else {
-		stream.print((const __FlashStringHelper *)(hexLabel));
-		stream.print(toHex( number >> 12)      );
-		stream.print(toHex((number >>  8)& 0xF));
-		stream.print(toHex((number >>  4)& 0xF));
-		stream.print(toHex( number       & 0xF));
-		maxPrint-=6;
-	}
-	return maxPrint;
-}
-
-// up to size or ?
-uint8_t Putn_u32x(Print &stream,uint32_t number,uint8_t maxPrint){
-	if (maxPrint == 0) return maxPrint;
-	if (maxPrint < 10) {
-		stream.print('!');
-		maxPrint--;
-	} else {
-		stream.print((const __FlashStringHelper *)(hexLabel));
-		stream.print(toHex( number >> 28)      );
-		stream.print(toHex((number >> 24)& 0xF));
-		stream.print(toHex((number >> 20)& 0xF));
-		stream.print(toHex((number >> 16)& 0xF));
-		stream.print(toHex((number >> 12)& 0xF));
-		stream.print(toHex((number >>  8)& 0xF));
-		stream.print(toHex((number >>  4)& 0xF));
-		stream.print(toHex( number       & 0xF));
-		maxPrint-=10;
-	}
-	return maxPrint;
-}
-
-// up to size or ?
-uint8_t Putn_i32(Print &stream,int32_t number,uint8_t maxPrint){
-	if (maxPrint == 0) return 0;
-	if (number < 0){
-		stream.print('-');
-		maxPrint--;
-		number = -number;
-	}
-	return Putn_u32(stream,number,maxPrint);
-}
-
-// up to size or ?
-uint8_t Putn_i16(Print &stream,int16_t number,uint8_t maxPrint){
-	if (maxPrint== 0) return 0;
-	if (number < 0){
-		stream.print('-');
-		maxPrint--;
-		number = -number;
-	}
-	return Putn_u16(stream,number,maxPrint);
-}
-// up to size or ?
-uint8_t Putn_i8(Print &stream,int8_t number,uint8_t maxPrint){
-	if (maxPrint == 0) return 0;
-	if (number < 0){
-		stream.print('-');
-		maxPrint--;
-		number = -number;
-	}
-	return Putn_u8(stream,number,maxPrint);
-}
 
 // for internal use only - number must be normalised fabs(number)<10 - exponent is carried separately
 static uint8_t Putn_fixed(Print &stream,float number,uint8_t maxPrint,uint8_t numberOfSignificantFigures,int16_t exponent){
