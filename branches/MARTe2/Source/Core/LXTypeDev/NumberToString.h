@@ -370,9 +370,9 @@ template <typename T> void FPToFixed(char *&pBuffer,int16 &sizeLeft,T normalized
 		}
 		
 		// get a digit and shift the number
-		uint8 digit = (uint8)(number * 1.000000000001);
-		number -= digit;
-		number *= 10.0;
+		uint8 digit = (uint8)(normalizedNumber * 1.000000000001);
+		normalizedNumber -= digit;
+		normalizedNumber *= 10.0;
 
 		if (sizeLeft--) *pBuffer++ = '0'+ digit;
 
@@ -391,7 +391,7 @@ void ExpToDecimal(char *&pBuffer,int16 &sizeLeft,int16 exponent){
 		if (sizeLeft--) *pBuffer++ = 'E';
         char buffer2[7];
         uint16 stringSize;
-        char *expNumber = NumberToDecimal(stringSize,buffer2,sizeof(buffer2),exponent,true);
+        const char *expNumber = NumberToDecimal(stringSize,buffer2,sizeof(buffer2),exponent,true);
         while (*expNumber != 0){
             *pBuffer++ = *expNumber++;
         }
@@ -421,7 +421,7 @@ template <typename T> bool BasicFloatConversion(uint16 &stringSize,char *&pBuffe
 	if (precision == 0) precision = 1;
 
 	// not space even for "0"!
-	if (bufferSize <= 2) {
+	if (sizeLeft < 1) {
 		stringSize = 1;
 		pBuffer = "?"; 
         return false;
@@ -457,7 +457,7 @@ template <typename T> const char *FloatToFixed(uint16 &stringSize,char *buffer,u
 	char *pBuffer = buffer;
 
     // deals with nan, 0 etc
-    if (!BasicFloatConversion(stringSize,pBuffer,sizeLeft,number, precision)){}
+    if (!BasicFloatConversion(stringSize,pBuffer,sizeLeft,number, precision)){
         return pBuffer;
     }
 
@@ -498,7 +498,7 @@ template <typename T> const char *FloatToExponential(uint16 &stringSize,char *bu
 	char *pBuffer = buffer;
 
     // deals with nan, 0 etc
-    if (!BasicFloatConversion(stringSize,pBuffer,sizeLeft,number, precision)){}
+    if (!BasicFloatConversion(stringSize,pBuffer,sizeLeft,number, precision)){
         return pBuffer;
     }
 
@@ -543,7 +543,7 @@ template <typename T> const char *FloatToEngineering(uint16 &stringSize,char *bu
 	char *pBuffer = buffer;
 
     // deals with nan, 0 etc
-    if (!BasicFloatConversion(stringSize,pBuffer,sizeLeft,number, precision)){}
+    if (!BasicFloatConversion(stringSize,pBuffer,sizeLeft,number, precision)){
         return pBuffer;
     }
 
@@ -560,8 +560,16 @@ template <typename T> const char *FloatToEngineering(uint16 &stringSize,char *bu
     // does all the work of conversion but for the sign and special cases
     FPToFixed(pBuffer,sizeLeft,number, exponent,precision);
     
-    // writes exponent
-    ExpToDecimal(pBuffer,sizeLeft, engineeringExponent);
+    // output exponent if exists
+    if (exponent != 0){
+		if (sizeLeft--) *pBuffer++ = 'E';
+        char buffer2[7];
+        uint16 stringSize;
+        const char *expNumber = NumberToDecimal(stringSize,buffer2,sizeof(buffer2),exponent,true);
+        while (*expNumber != 0){
+            *pBuffer++ = *expNumber++;
+        }
+    }
 
     	// no space to complete number exit
 	if (sizeLeft < 0) {
@@ -576,7 +584,7 @@ template <typename T> const char *FloatToEngineering(uint16 &stringSize,char *bu
 	return buffer;
 }
 	
-**
+/**
  * converts a float/double (or any other equivalent) to a string using engineering format
  * bufferSize is the buffer size and includes the space for the 0 terminator
  * buffer is a writable area of memory of at least bufferSize
@@ -593,7 +601,7 @@ template <typename T> const char *FloatToSmart(uint16 &stringSize,char *buffer,u
 	char *pBuffer = buffer;
 
     // deals with nan, 0 etc
-    if (!BasicFloatConversion(stringSize,pBuffer,sizeLeft,number, precision)){}
+    if (!BasicFloatConversion(stringSize,pBuffer,sizeLeft,number, precision)){
         return pBuffer;
     }
 
@@ -613,7 +621,7 @@ template <typename T> const char *FloatToSmart(uint16 &stringSize,char *buffer,u
     if ((engineeringExponent != 0) && (engineeringExponent<=12) && (engineeringExponent>=-12)){
         static const char *symbols = "pnum kMGT";
 		if (sizeLeft--) *pBuffer++ = symbols[engineeringExponent/3];        
-    } else 
+    } else {
         // writes exponent
         ExpToDecimal(pBuffer,sizeLeft, engineeringExponent);
     }
