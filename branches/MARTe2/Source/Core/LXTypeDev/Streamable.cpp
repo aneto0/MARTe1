@@ -381,21 +381,21 @@ bool Streamable::SkipTokens(
 
 template <typename T> bool PrintInteger(T number,FormatDescriptor fd=standardFormatDescriptor){
 	char buffer[67];
-	int size = sizeof (buffer);
+	int size = 0;
 	const char *convertedNumber;
 
 	switch (fd.binaryNotation){
 	case NormalNotation:{
-		convertedNumber= NumberToDecimal(buffer,size,number);
+		convertedNumber= NumberToDecimal(size,buffer,sizeof (buffer),number,fd.fullNotation);
 	}break;
 	case HexNotation{
-		convertedNumber= NumberToHexadecimal(buffer,size,number,fd.binaryPadded);
+		convertedNumber= NumberToHexadecimal(size,buffer,sizeof (buffer),number,fd.binaryPadded,fd.fullNotation);
 	}break;
 	case OctalNotation{
-		convertedNumber= NumberToOctal(buffer,size,number,fd.binaryPadded);
+		convertedNumber= NumberToOctal(size,buffer,sizeof (buffer),number,fd.binaryPadded,fd.fullNotation);
 	}break;
 	case BitNotation{
-		convertedNumber= NumberToBinary(buffer,size,number,fd.binaryPadded);
+		convertedNumber= NumberToBinary(size,buffer,sizeof (buffer),number,fd.binaryPadded,fd.fullNotation);
 	}break;
 
 	}

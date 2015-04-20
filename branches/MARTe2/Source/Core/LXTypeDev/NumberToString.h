@@ -37,25 +37,27 @@ template <typename T> void NtoDecimalPrivate(char *buffer,int &nextFree,T number
  * Converts any integer type, signed and unsigned to string 
  * writes to a buffer up to the length of the buffer
  * if it does not fit returns "?" 
- * size contains the size of the buffer (including space for terminator 0)
- * size returns the size of the string excluding the trailing 0
+ * bufferSize contains the size of the buffer (including space for terminator 0)
+ * stringSize returns the size of the string excluding the trailing 0
  * if there is enough space a pointer is returned to the start of the number in buffer.
  * buffer is filled from the end backwards
  */
-template <typename T> const char *NumberToDecimal(char *buffer,int &size,T number){
+template <typename T> const char *NumberToDecimal(uint16 &stringSize,char *buffer,uint16 bufferSize,T number,bool addPositiveSign=false){
 	// 5/4,7/6,12/11,22/21 depending on the byte size of number - include 0 and eventual sign
 	int neededSize = (sizeof(number)*5 +3)/2;	
 	if (number<0)neededSize++; 
 	
 	// there must be space for the number in the worst case
-    if (size < neededSize)   {
-    	size = 1;
+    if (bufferSize < neededSize)   {
+    	stringSize = 1;
     	return "?";
     }
 
+    stringSize = 0;
+
 	// size is now the avilable size for the number
 	// nextFree is an index within the buffer for the next free space
-	int nextFree = size-1;
+	int nextFree = bufferSize-1;
     
     // terminate string and then fill backwards
 	buffer[nextFree--] = 0;
@@ -79,6 +81,9 @@ template <typename T> const char *NumberToDecimal(char *buffer,int &size,T numbe
 
         // convert each digit
         NtoDecimalPrivate(buffer,nextFree,number);
+        
+        // put the +
+        if (addPositiveSign) buffer[nextFree--] = '+';
     }
     
 	// nextFree is the next location to be used in the buffer going backwards
@@ -87,8 +92,8 @@ template <typename T> const char *NumberToDecimal(char *buffer,int &size,T numbe
 	
 	// size is the space available for the number in the buffer including terminator 0
 	// size = 10 and first used = 0 ==> 9 characters
-    size -= firstUsed;
-    size --;
+	stringSize - bufferSize - firstUsed;
+	stringSize -= 1;
     //
 	return buffer + firstUsed;
 }
@@ -102,18 +107,25 @@ template <typename T> const char *NumberToDecimal(char *buffer,int &size,T numbe
  * if there is enough space a pointer is returned to the start of the number in buffer.
  * buffer is filled from the end backwards
  */
-template <typename T> const char *NumberToHexadecimal(char *buffer,int &size,T number, bool putTrailingZeros){       
+template <typename T> const char *NumberToHexadecimal(uint16 &stringSize,char *buffer,uint16 bufferSize,T number, bool putTrailingZeros,bool addHeader=false){       
+	// sizeof(number) * 8 = totalBits
+	// divided by 4 = number of digits
 	int totalNumberSize = sizeof(number) * 2;
+	
+	// consider terminator 0 and header
+	int totalBufferSize = totalNumberSize+1;
+	if (addHeader) totalBufferSize +=2;
+	
 	// Even if trailing zeroes are skipped
 	// we need this buffer size to process number
 	// from now on we do need to check for buffer size anymore!
-	if (size < (totalNumberSize+3)) {
-    	size = 1;
+	if (bufferSize < totalBufferSize) {
+		stringSize = 1;
     	return "?";
     }
 	// size is now the avilable size for the number
 	// nextFree is an index within the buffer for the next free space
-	int nextFree = size-1;
+	int nextFree = totalBufferSize-1;
     
     // terminate string and then fill backwards
 	buffer[nextFree--] = 0;
@@ -130,22 +142,20 @@ template <typename T> const char *NumberToHexadecimal(char *buffer,int &size,T n
         if ((number == 0) && !putTrailingZeros) break; 
     }
 
+	if (addHeader) {
+		// the space is guaranteed by the check at the beginning!
+		buffer[nextFree--] = 'x';
+		buffer[nextFree--] = '0';
+	}
+
     // now use a pointer to the first digit
 	int firstUsed = nextFree+1; 
-
-	// alternative option
-//    if (!putTrailingZeros){
-    	// if firstUsed is not the first digit and is 0 then skip it
-//    	while ((firstUsed < (size-1)) && (buffer[firstUsed]=='0')) firstUsed++;    			
-//    }
-
-    // the space is guaranteed by the check at the beginning!
-    buffer[firstUsed-1] = 'x';
-    buffer[firstUsed-2] = '0';
-    
-    size -= firstUsed;
-    size--;
-    return buffer + firstUsed-2;
+	
+	stringSize - bufferSize - firstUsed;
+	stringSize -= 1;
+    //
+	return buffer + firstUsed;
+	
 }
 
 /**
@@ -157,18 +167,25 @@ template <typename T> const char *NumberToHexadecimal(char *buffer,int &size,T n
  * if there is enough space a pointer is returned to the start of the number in buffer.
  * buffer is filled from the end backwards
  */
-template <typename T> const char *NumberToOctal(char *buffer,int &size,T number, bool putTrailingZeros){       
+template <typename T> const char *NumberToOctal(uint16 &stringSize,char *buffer,uint16 bufferSize,T number, bool putTrailingZeros,bool addHeader=false){       
+	// sizeof(number) * 8 = totalBits
+	// divided by 3 and rounded up = number of digits
 	int totalNumberSize = (sizeof(number) * 8 + 2 ) / 3;
+
+	// consider terminator 0 and header
+	int totalBufferSize = totalNumberSize+1;
+	if (addHeader) totalBufferSize +=2;
+	
 	// Even if trailing zeroes are skipped
 	// we need this buffer size to process number
 	// from now on we do need to check for buffer size anymore!
-	if (size < (totalNumberSize+3)) {
-    	size = 1;
+	if (bufferSize < totalBufferSize) {
+		stringSize = 1;
     	return "?";
     }
 	// size is now the avilable size for the number
 	// nextFree is an index within the buffer for the next free space
-	int nextFree = size-1;
+	int nextFree = totalBufferSize-1;
     
     // terminate string and then fill backwards
 	buffer[nextFree--] = 0;
@@ -185,21 +202,19 @@ template <typename T> const char *NumberToOctal(char *buffer,int &size,T number,
     
     }
 
+	if (addHeader) {
+		// the space is guaranteed by the check at the beginning!
+		buffer[nextFree--] = 'o';
+		buffer[nextFree--] = '0';
+	}
+
     // now use a pointer to the first digit
 	int firstUsed = nextFree+1; 
 
-//    if (!putTrailingZeros){
-    	// if firstUsed is not the first digit and is 0 then skip it
-//    	while ((firstUsed < (size-1)) && (buffer[firstUsed]=='0')) firstUsed++;    			
-//    }
+	stringSize - bufferSize - firstUsed;
+	stringSize -= 1;
 
-    // the space is guaranteed by the check at the beginning!
-    buffer[firstUsed-1] = 'o';
-    buffer[firstUsed-2] = '0';
-    
-    size -= firstUsed;
-    size--;
-    return buffer + firstUsed-2;
+	return buffer + firstUsed-2;
 }
 
 /**
@@ -211,13 +226,20 @@ template <typename T> const char *NumberToOctal(char *buffer,int &size,T number,
  * if there is enough space a pointer is returned to the start of the number in buffer.
  * buffer is filled from the end backwards
  */
-template <typename T> const char *NumberToBinary(char *buffer,int &size,T number, bool putTrailingZeros){       
+template <typename T> const char *NumberToBinary(uint16 &stringSize,char *buffer,uint16 bufferSize,T number, bool putTrailingZeros,bool addHeader=false){       
+
+	// sizeof(number) * 8 = totalBits
 	int totalNumberSize = sizeof(number) * 8;
+	
+	// consider terminator 0 and header
+	int totalBufferSize = totalNumberSize+1;
+	if (addHeader) totalBufferSize +=2;
+	
 	// Even if trailing zeroes are skipped
 	// we need this buffer size to process number
 	// from now on we do need to check for buffer size anymore!
-	if (size < (totalNumberSize+3)) {
-    	size = 1;
+	if (bufferSize < totalBufferSize) {
+		stringSize = 1;
     	return "?";
     }
 	// size is now the avilable size for the number
@@ -233,62 +255,293 @@ template <typename T> const char *NumberToBinary(char *buffer,int &size,T number
         // maybe better /=2??? check with signed numbers!
         number >>=1;
         
-        // this code is alternative to the one commented below 
+        // skip excessing zeros 
         if ((number == 0) && !putTrailingZeros) break; 
         
     }
 
+	if (addHeader){
+		// the space is guaranteed by the check at the beginning!
+		buffer[nextFree--] = 'b';
+		buffer[nextFree--] = '0';
+	}
+
     // now use a pointer to the first digit
 	int firstUsed = nextFree+1; 
-
-//    if (!putTrailingZeros){
-    	// if firstUsed is not the first digit and is 0 then skip it
-//    	while ((firstUsed < (size-1)) && (buffer[firstUsed]=='0')) firstUsed++;    			
-//    }
-
-    // the space is guaranteed by the check at the beginning!
-    buffer[firstUsed-1] = 'o';
-    buffer[firstUsed-2] = '0';
-    
-    size -= firstUsed;
-    size--;
+	
+	stringSize - bufferSize - firstUsed;
+	stringSize -= 1;
+	
     return buffer + firstUsed-2;
 }
 
+/// This function allows determining rapidly the minimum number of digits 
+/// necessary to describe a number
+/// it takes the exponent in base2 and multiplies it by log10(2)
+/// this is the minimum log of the number
+/// the maximum is this value + log10(2)
+/// all of this unless the float is subnormal...
+static inline template <typename T> unsigned short FastLog10(T x){
+unsigned short exponent;
+if (sizeof(x) == 4){
+    unsigned long  &px = (unsigned long &)x;
+    exponent = ((px & 0x7F800000) >> 23)-127;   
+}
+if (sizeof(x) == 8){
+    unsigned long long &px = (unsigned long long &)x;
+    exponent = ((px & 0x7FFC000000000000) >> 52)-1023;
+}
+    return (0.30102996 * exponent );
+}
 
-template <typename T> const char *NumberToFormat(char *buffer, int &size,T number,Notation::Binary binaryNotation= Notation::NormalNotation){
-	const char *convertedNumber;
-	
-	switch (fd.binaryNotation){
-	case NormalNotation:{
-		convertedNumber= NumberToDecimal(buffer,size,number);
-	}break;
-	case HexNotation{
-		convertedNumber= NumberToHexadecimal(buffer,size,number,fd.binaryPadded);
-	}break;
-	case OctalNotation{
-		convertedNumber= NumberToOctal(buffer,size,number,fd.binaryPadded);
-	}break;
-	case BitNotation{
-		convertedNumber= NumberToBinary(buffer,size,number,fd.binaryPadded);
-	}break;
+#define CHECK_AND_REDUCE(number,step,exponent)\
+if (number >= 1E ## step){ \
+	exponent+=step; \
+	number *= 1E- ## step; \
+} 
+#define CHECK_AND_INCREASE(number,step,exponent)\
+if (number <= 1E- ## step){ \
+	exponent-=(step+1); \
+	number *= 10E ## step; \
+} 
+
+// exponent is increased or decreased,not set
+template <typename T> static inline T NormalizeNumber(T &positiveNumber, int16 &exponent){
+	// used internally 
+	if (positiveNumber <= 0.0) return ;
+
+	if (positiveNumber >= 1.0){
+        CHECK_AND_REDUCE(positiveNumber,256,exponent)
+        CHECK_AND_REDUCE(positiveNumber,128,exponent)
+        CHECK_AND_REDUCE(positiveNumber,64,exponent)
+        CHECK_AND_REDUCE(positiveNumber,32,exponent)
+        CHECK_AND_REDUCE(positiveNumber,16,exponent)
+        CHECK_AND_REDUCE(positiveNumber,8,exponent)
+        CHECK_AND_REDUCE(positiveNumber,4,exponent)
+        CHECK_AND_REDUCE(positiveNumber,2,exponent)
+        CHECK_AND_REDUCE(positiveNumber,1,exponent)
+	} else {
+        CHECK_AND_INCREASE(positiveNumber,256,exponent)
+        CHECK_AND_INCREASE(positiveNumber,128,exponent)
+        CHECK_AND_INCREASE(positiveNumber,64,exponent)
+        CHECK_AND_INCREASE(positiveNumber,32,exponent)
+        CHECK_AND_INCREASE(positiveNumber,16,exponent)
+        CHECK_AND_INCREASE(positiveNumber,8,exponent)
+        CHECK_AND_INCREASE(positiveNumber,4,exponent)
+        CHECK_AND_INCREASE(positiveNumber,2,exponent)
+        CHECK_AND_INCREASE(positiveNumber,1,exponent)	
+        CHECK_AND_INCREASE(positiveNumber,0,exponent)	
+	}
+}
+
+/**
+ * converts a float/double (or any other equivalent) to a string using fixed format
+ * bufferSize is the buffer size and includes the space for the 0 terminator
+ * buffer is a writable area of memory of at least bufferSize
+ * returns pointer to the string either within the buffer or (in case of errors or inf/nan to a const char)
+ * returns stringSize with the actual length of the string
+ * precision determines the number of significative digits
+ */
+template <typename T> const char *FloatToFixed(uint16 &stringSize,char *buffer,uint16 bufferSize,T number, uint8 precision){
+	if (isnan(number)) {
+		stringSize = 3;
+		return "NaN";	
 	}
 
-	// if it does not fit than produce a  ?
-    if (size > fd.width) {
-    	size = 1;
-    	convertedNumber = '?';
-    }
-    
-    // check padding style
-    if (fd.pad){
-    	if (fd.leftAlign)    	
-    }
-    
+	if (isinf(number)) {
+		stringSize = 3;
+		return "Inf";		
+	}
+
+	if (number == 0) {
+		stringSize = 1;
+		return "0";		
+	}
+
+	// 0 not allowed
+	if (precision == 0) precision = 1;
+
+	// not space even for "0"!
+	if (bufferSize <= 2) {
+		stringSize = 1;
+		return "?"; 
+	}
+	// stringSize is also an index within the buffer for the next free space
+	stringSize = 0;
+	// we will use sizeLeft to control use of buffer
+	// 16 bit and signed so that we can count negatively 
+	// (max exponent is -310 and max precision is 255 so the sum of the two is the max number of digits) 
+	int16 sizeLeft = bufferSize-1;
+	// we will also use pBuffer to mark the current active location in the buffer
+	char *pBuffer = buffer;
+
+	// flip sign if necessary;
+	if (number < 0){
+		number = -number;
+		if (sizeLeft--) *pBuffer++ = '-';
+	}
+
+	// normalize number
+	uint16 &exponent = 0;
+	NormalizeNumber(number,exponent);
+
+	// numbers below 1.0
+	if (exponent < 0){
+
+		if (sizeLeft--) *pBuffer++ = '0';
+		if (sizeLeft--) *pBuffer++ = '.';
+		
+		// loop and add zeros
+		int i;
+		for (i = 0; i < -(exponent+1); i++){
+			if (sizeLeft--) *pBuffer++ = '0';
+		}
+		// exponent has only the job of marking where to put the '.'
+		// here is lowered by 1 to avoid adding a second '.' in the following code
+		exponent--;
+	} 
 	
+	// loop to fulfil precision 
+	// also must reach the end of the integer part thus exponent is checked
+	while ((exponent > 0) && (precision > 0) ){
+		// before outputting the fractional part add a '.'
+		if (exponent == -1){
+			if (sizeLeft--) *pBuffer++ = '.';
+		}
+		
+		// get a digit and shift the number
+		uint8 digit = (uint8)number;
+		number -= digit;
+		number *= 10.0;
+
+		buffer[nextFree++] = '0'+ digit;		
+		if (sizeLeft--) *pBuffer++ = '0'+ digit;
+
+		// update precision and exponent
+		if (precision > 0) precision--;
+		exponent--;
+	}
+
+	// no space to complete number exit
+	if (sizeLeft < 0) {
+		stringSize = 1;
+		return "?";
+	}
+	
+	// terminate string - space is guaranteed by check above  
+	*pBuffer = 0;
+	stringSize = (pBuffer - buffer);	
+
+	return buffer;
 }
 
 
+	
+	
+// up to size or ?
+uint8_t Putn_float(Print &stream,float number,uint8_t numberOfSignificantFigures,uint8_t maxPrint){
+	if (isnan(number)){
+		if (maxPrint > 3) {
+			maxPrint-=3;
+			stream.print(F("NaN"));
+		} else {
+			if (maxPrint > 0) {
+				maxPrint--;
+				stream.print('!');
+			}
+		}
+		return maxPrint;
+	}
+	if (isinf(number)){
+		if (maxPrint > 3) {
+			maxPrint-=3;
+			stream.print(F("Inf"));
+		} else {
+			if (maxPrint > 0) {
+				maxPrint--;
+				stream.print('!');
+			}
+		}
+		return maxPrint;
+	}
+	
+	if (maxPrint == 0) return 0;
+	if (number < 0){
+		maxPrint--;
+		stream.print('-');
+		number = -number;
+	}
+	if (maxPrint == 0) return 0;
+
+	
+	int16_t nDigits = normalizeNumber(number);
+
+	// workout the size of exponent
+	// the size of exponent is 2+expNDigits+1 
+	int16_t expNDigits = 0;
+	uint16_t absNDigits = abs (nDigits);
+	while (absNDigits > 10){
+		expNDigits++;
+		absNDigits /= 10;
+	}
+	
+	//	scientific notation number size 3= .E+
+	uint8_t expNotationSize = numberOfSignificantFigures+3+expNDigits+1;
+
+	// fractional notation just number . number
+	uint8_t fractNotationSize = numberOfSignificantFigures+1;
+	// add zeroes if number below 1.0
+	if (nDigits < 0)fractNotationSize-=nDigits;
+	if ((nDigits+1) > numberOfSignificantFigures)fractNotationSize=nDigits+1;
+	
+	// choose fractional if enough space and if it is shorter then integer
+	if ((maxPrint >= fractNotationSize)&&(fractNotationSize < expNotationSize)) {
+		
+		maxPrint = Putn_fixed(stream,number,maxPrint,numberOfSignificantFigures,nDigits);
+	} else
+    // choose exp notation if enough space 
+    if (maxPrint >= expNotationSize) {
+    	
+    	maxPrint = Putn_scientific(stream,number,maxPrint,numberOfSignificantFigures,nDigits,expNDigits);    
+    } else
+	// choose super compact notation if enough space and if exponent within range (p,n,u,m,k,M,G,T)
+  	if ((maxPrint >= (2+nDigits % 3)) && (nDigits <= 12) && (nDigits >= -12)){
+  		int8_t symbolIndex = (nDigits + 12)/3;
+  		if (symbolIndex == 4){
+  			maxPrint = Putn_fixed(stream,number,maxPrint,numberOfSignificantFigures,nDigits);
+  		} else {
+  			nDigits = (nDigits + 12)%3;
+  			static const char *symbols = "pnum kMGT";
+  			if (maxPrint > 0){
+  				maxPrint--;
+  				maxPrint = Putn_fixed(stream,number,maxPrint,numberOfSignificantFigures,nDigits);
+  				stream.print(symbols[symbolIndex]);
+  			}
+  		}
+  	} else 
+    // choose compact exp notation if enough space 
+    if (maxPrint >= (3+expNDigits)) {
+    	
+    	maxPrint = Putn_scientific(stream,number,maxPrint,numberOfSignificantFigures,nDigits,expNDigits);
+  	} else {
+  		stream.print('!');
+  		maxPrint--;
+  	}
+
+	return maxPrint;
+}
+
+
+
+
+template <typename T> const char *FloatToFixed(char *buffer,int &size,T number, bool putTrailingZeros,bool addHeader=false){
+	
+	
+	
+	
+	
+	
+}
 
 
 
