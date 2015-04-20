@@ -370,7 +370,7 @@ template <typename T> void FPToFixed(char *&pBuffer,int16 &sizeLeft,T normalized
 		}
 		
 		// get a digit and shift the number
-		uint8 digit = (uint8)number;
+		uint8 digit = (uint8)(number * 1.000000000001);
 		number -= digit;
 		number *= 10.0;
 
