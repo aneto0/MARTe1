@@ -2,7 +2,10 @@
 #define STREAMABLE
 
 #include "TypeConversion.h"
+#include "TimeoutType.h"
+#include "StreamInterface.h"
 
+class Streamable;
 extern "C"{
 
 	bool StreamableSetBufferSize(
@@ -110,7 +113,7 @@ class Streamable: public StreamInterface {
 
 private:    
     /// set automatically on initialisation by calling of the Canxxx functions 
-    OperatingMode           operatingModes;
+    OperatingModes           operatingModes;
     
     
 protected: // read buffer and statuses
@@ -141,8 +144,8 @@ protected: // mode switch methods
     */
     inline bool SwitchToWriteMode(){
         if (!ResyncReadBuffer()) return false;
-        mutexWriteMode = true;
-        mutexReadMode = false;
+        operatingModes.mutexWriteMode = true;
+        operatingModes.mutexReadMode = false;
     }
     
     /** 
@@ -153,8 +156,8 @@ protected: // mode switch methods
     inline bool SwitchToReadMode(){
         // adjust seek position
         if (!FlushWriteBuffer()) return false;
-        mutexWriteMode = false;
-        mutexReadMode = true; 
+        operatingModes.mutexWriteMode = false;
+        operatingModes.mutexReadMode = true; 
     }
 
 protected: // read buffer protected methods
@@ -244,6 +247,7 @@ public:
     	return StreamableSetBufferSize(*this, readBufferSize, writeBufferSize);
     }   
     
+protected:
     /// default constructor
     Streamable(
     			uint32 readBufferSize=0, 
@@ -256,12 +260,13 @@ public:
     	operatingModes.mutexReadMode = false;
     	operatingModes.mutexWriteMode = false;
     	operatingModes.stringMode = false;
-        operatingModes.canSeek = bsb.CanSeek(); 
+        //FISA change this!
+        operatingModes.canSeek = CanSeek(); 
     	
         // mutex mode is enabled if CanSeek and both can Read and Write
     	// in that case the stream is single and bidirectional
         if (CanSeek() && CanWrite() && CanRead()) {
-        	bsb.operatingModes.mutexWriteMode = true;
+        	operatingModes.mutexWriteMode = true;
         }    	
         
         SetBufferSize(readBufferSize,writeBufferSize);
@@ -308,7 +313,7 @@ public:  // special methods for buffering
                 if (!FlushWriteBuffer()) return false;
             }
             // write data
-            writeBuffer.BufferReference()[writeAccessPosition++] = c;
+            writeBuffer.BufferReference()[writeBufferAccessPosition++] = c;
             
             return True;
         }
@@ -318,7 +323,7 @@ public:  // special methods for buffering
     }    
 
     /// simply read from buffer 
-    inline bool         GetC(char &c)
+    inline bool         GetC(char &c) {
 
         // if in mutex mode switch to write mode
         if (operatingModes.mutexWriteMode) {
@@ -333,7 +338,7 @@ public:  // special methods for buffering
                 if (!RefillReadBuffer()) return false;
             }
 
-            c = readBuffer.BufferReference()[readAccessPosition++];
+            c = readBuffer.BufferReference()[readBufferAccessPosition++];
 
             return True;
         }
@@ -538,9 +543,9 @@ public:
     		if (!fd.InitialiseFromString(format)) return false;
     		
     		// if void simply skip and continue
-    		if (!pars[parIndex].IsVoid()){
+    		if (!pars[parsIndex].IsVoid()){
     		    // use it to process parameters
-    		    if (!Print(pars[parsIndex++], fd) return false
+    		    if (!Print(pars[parsIndex++], fd)) return false;
     		}
     	}
         // never comes here!
@@ -551,36 +556,29 @@ public:
     */
     inline bool PrintFormatted(const char *format, const AnyType& par1){
     	AnyType pars[2] = { par1,voidAnyType};
-    	return PrintFormatted(format, const AnyType[] pars);
+    	return PrintFormatted(format, pars);
     }
 
     /** 
     */
     inline bool PrintFormatted(const char *format, const AnyType& par1, const AnyType& par2){
     	AnyType pars[3] = { par1,par2,voidAnyType}; 
-    	return PrintFormatted(format, const AnyType[] pars);
+    	return PrintFormatted(format, pars);
     }
 
     /** 
     */
     inline bool PrintFormatted(const char *format, const AnyType& par1, const AnyType& par2, const AnyType& par3){
     	AnyType pars[4] = { par1,par2,par3,voidAnyType}; 
-    	return PrintFormatted(format, const AnyType[] pars);
+    	return PrintFormatted(format, pars);
     }
 
     /** 
     */
     inline bool PrintFormatted(const char *format, const AnyType& par1, const AnyType& par2, const AnyType& par3, const AnyType& par4){
     	AnyType pars[5] = { par1,par2,par3,par4,voidAnyType}; 
-    	return PrintFormatted(format, const AnyType[] pars);
+    	return PrintFormatted(format, pars);
     }
 
 };
-
-
-
-
-
-
-
 #endif

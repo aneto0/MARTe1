@@ -25,8 +25,8 @@
 /**
  * @file
  */
-#ifndef TYPED_POINTER_H
-#define TYPED_POINTER_H
+#ifndef ANY_TYPE_H
+#define ANY_TYPE_H
 
 #include "GeneralDefinitions.h"
 #include "TypeDescriptor.h"
@@ -55,7 +55,7 @@ public:
 	}   	
     
     /// check for void type
-    bool IsVoid(){
+    bool IsVoid() const{
     	return (dataDescriptor == VoidType);
     }
 
@@ -96,7 +96,7 @@ public:
 };
 
 // void data marker
-static const voidAnyType;
+static const AnyType voidAnyType;
 
 #endif
 

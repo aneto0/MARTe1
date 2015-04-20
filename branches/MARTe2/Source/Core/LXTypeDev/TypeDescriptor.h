@@ -132,37 +132,37 @@ struct TypeDescriptor {
         bool sameSize = (size == typeDescriptor.size);
         return (sameType && sameSize);
     }
-} TypeDescriptor;
+};
 
 /// describes int0
-const TypeDescriptor VoidType                   = {  False, False, {{ SignedInteger , 0}} };
+const TypeDescriptor VoidType                   = {  False, False, {{ TypeDescriptor::SignedInteger , 0}} };
 
 /// describes int8
-const TypeDescriptor SignedInteger8Bit          = {  False, False, {{ SignedInteger , 1}} };
+const TypeDescriptor SignedInteger8Bit          = {  False, False, {{ TypeDescriptor::SignedInteger , 1}} };
 
 /// describes uint8
-const TypeDescriptor UnsignedInteger8Bit        = { False, False, {{ UnsignedInteger , 1}} };
+const TypeDescriptor UnsignedInteger8Bit        = { False, False, {{ TypeDescriptor::UnsignedInteger , 1}} };
 
 /// describes int16
-const TypeDescriptor SignedInteger16Bit         = { False, False, {{ SignedInteger , 2}} };
+const TypeDescriptor SignedInteger16Bit         = { False, False, {{ TypeDescriptor::SignedInteger , 2}} };
 
 /// describes uint16
-const TypeDescriptor UnsignedInteger16Bit       = { False, False, {{ UnsignedInteger , 2}} };
+const TypeDescriptor UnsignedInteger16Bit       = { False, False, {{ TypeDescriptor::UnsignedInteger , 2}} };
 
 /// describes int32
-const TypeDescriptor SignedInteger32Bit         = { False, False, {{ SignedInteger , 4}} };
+const TypeDescriptor SignedInteger32Bit         = { False, False, {{ TypeDescriptor::SignedInteger , 4}} };
 
 /// describes uint32
-const TypeDescriptor UnsignedInteger32Bit       = { False, False, {{ UnsignedInteger , 4}} };
+const TypeDescriptor UnsignedInteger32Bit       = { False, False, {{ TypeDescriptor::UnsignedInteger , 4}} };
 
 /// describes int64
-const TypeDescriptor SignedInteger64Bit         = { False, False, {{ SignedInteger , 8}} };
+const TypeDescriptor SignedInteger64Bit         = { False, False, {{ TypeDescriptor::SignedInteger , 8}} };
 
 /// describes uint64
-const TypeDescriptor UnsignedInteger64Bit       = { False, False, {{ UnsignedInteger , 8}} };
+const TypeDescriptor UnsignedInteger64Bit       = { False, False, {{ TypeDescriptor::UnsignedInteger , 8}} };
 
 /// describes const int8
-const TypeDescriptor ConstSignedInteger8Bit     = { False, True , {{ SignedInteger , 1}} };
+const TypeDescriptor ConstSignedInteger8Bit     = { False, True , {{ TypeDescriptor::SignedInteger , 1}} };
 
 #endif
 

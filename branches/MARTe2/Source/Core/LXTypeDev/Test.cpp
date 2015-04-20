@@ -1,15 +1,15 @@
 #include <stdio.h>
-#include "BasicType.h"
 #include "FormatDescriptor.h"
 #include "TypeConversion.h"
 #include "TypeDescriptor.h"
 #include "AnyType.h"
 #include "CStream.h"
 #include "CharBuffer.h"
-#include "BasicStreamBuffer.h"
-#include "StreamInterface.h"
+#include "Streamable.h"
+/*#include "StreamInterface.h"*/
+#include "NumberToString.h"
 
-struct TestPattern{
+/*struct TestPattern{
     // the character in the printf format
     const char *format;
     // the set of flags
@@ -94,11 +94,28 @@ void TestAll(){
         }
     }
     
-}
+}*/
 
 
 int main(int argc, char **argv){
-    TestAll();
+    char buffer[100];
+    double d = 1.2345;
+    int32  n = 12345;
+    uint16 size = 0;
+    printf("%s\n", NumberToDecimal(size, buffer, sizeof(buffer), n, false));
+    printf("%s\n", NumberToHexadecimal(size, buffer, sizeof(buffer), n, false));
+    printf("%s\n", NumberToOctal(size, buffer, sizeof(buffer), n, false));
+    printf("%s\n", NumberToBinary(size, buffer, sizeof(buffer), n, false));
+   
+    printf("%s\n", NumberToDecimal(size, buffer, sizeof(buffer), n, false));
+    printf("%s\n", NumberToHexadecimal(size, buffer, sizeof(buffer), n, false, true));
+    printf("%s\n", NumberToOctal(size, buffer, sizeof(buffer), n, false, true));
+    printf("%s\n", NumberToBinary(size, buffer, sizeof(buffer), n, false, true));
+
+    const char *retString = FloatToFixed(size, buffer, sizeof(buffer), d, 8);
+    printf("->%s<-size=%d\n", retString, size);
+
+//    TestAll();
 /*    TestFormatDescriptor("d");
 
     FormatDescriptor expected();

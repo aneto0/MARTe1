@@ -25,6 +25,9 @@
 #if !defined NUMBER_TO_STRING
 #define NUMBER_TO_STRING
 
+#include "GeneralDefinitions.h"
+#include "math.h"
+
 template <typename T> void NtoDecimalPrivate(char *buffer,int &nextFree,T number){       
 	while (number > 0){
 		unsigned short  digit = number % 10;
@@ -92,7 +95,7 @@ template <typename T> const char *NumberToDecimal(uint16 &stringSize,char *buffe
 	
 	// size is the space available for the number in the buffer including terminator 0
 	// size = 10 and first used = 0 ==> 9 characters
-	stringSize - bufferSize - firstUsed;
+	stringSize = bufferSize - firstUsed;
 	stringSize -= 1;
     //
 	return buffer + firstUsed;
@@ -130,7 +133,7 @@ template <typename T> const char *NumberToHexadecimal(uint16 &stringSize,char *b
     // terminate string and then fill backwards
 	buffer[nextFree--] = 0;
 
-    for (int i = 0;i < totalNumberSize  i++ ){
+    for (int i = 0;i < totalNumberSize; i++ ){
         unsigned short digit = number & 0xF;
         if (digit < 10)   buffer[nextFree--] = '0' + digit;
         else              buffer[nextFree--] = 'A' + digit - 10;
@@ -151,7 +154,7 @@ template <typename T> const char *NumberToHexadecimal(uint16 &stringSize,char *b
     // now use a pointer to the first digit
 	int firstUsed = nextFree+1; 
 	
-	stringSize - bufferSize - firstUsed;
+	stringSize = bufferSize - firstUsed;
 	stringSize -= 1;
     //
 	return buffer + firstUsed;
@@ -190,7 +193,7 @@ template <typename T> const char *NumberToOctal(uint16 &stringSize,char *buffer,
     // terminate string and then fill backwards
 	buffer[nextFree--] = 0;
 
-    for (int i = 0;i < totalNumberSize  i++ ){
+    for (int i = 0;i < totalNumberSize;  i++ ){
         unsigned short digit = number & 0x7;
         buffer[nextFree--] = '0' + digit;
 
@@ -211,10 +214,10 @@ template <typename T> const char *NumberToOctal(uint16 &stringSize,char *buffer,
     // now use a pointer to the first digit
 	int firstUsed = nextFree+1; 
 
-	stringSize - bufferSize - firstUsed;
+	stringSize = bufferSize - firstUsed;
 	stringSize -= 1;
 
-	return buffer + firstUsed-2;
+	return buffer + firstUsed;
 }
 
 /**
@@ -244,12 +247,12 @@ template <typename T> const char *NumberToBinary(uint16 &stringSize,char *buffer
     }
 	// size is now the avilable size for the number
 	// nextFree is an index within the buffer for the next free space
-	int nextFree = size-1;
+	int nextFree = bufferSize-1;
     
     // terminate string and then fill backwards
 	buffer[nextFree--] = 0;
 
-    for (int i = 0;i < totalNumberSize  i++ ){
+    for (int i = 0;i < totalNumberSize;  i++ ){
         unsigned short digit = number & 0x1;
         buffer[nextFree--] = '0' + digit;
         // maybe better /=2??? check with signed numbers!
@@ -269,10 +272,10 @@ template <typename T> const char *NumberToBinary(uint16 &stringSize,char *buffer
     // now use a pointer to the first digit
 	int firstUsed = nextFree+1; 
 	
-	stringSize - bufferSize - firstUsed;
+	stringSize = bufferSize - firstUsed;
 	stringSize -= 1;
 	
-    return buffer + firstUsed-2;
+    return buffer + firstUsed;
 }
 
 /// This function allows determining rapidly the minimum number of digits 
@@ -281,7 +284,7 @@ template <typename T> const char *NumberToBinary(uint16 &stringSize,char *buffer
 /// this is the minimum log of the number
 /// the maximum is this value + log10(2)
 /// all of this unless the float is subnormal...
-static inline template <typename T> unsigned short FastLog10(T x){
+/*static inline template <typename T> unsigned short FastLog10(T x){
 unsigned short exponent;
 if (sizeof(x) == 4){
     unsigned long  &px = (unsigned long &)x;
@@ -292,7 +295,7 @@ if (sizeof(x) == 8){
     exponent = ((px & 0x7FFC000000000000) >> 52)-1023;
 }
     return (0.30102996 * exponent );
-}
+}*/
 
 #define CHECK_AND_REDUCE(number,step,exponent)\
 if (number >= 1E ## step){ \
@@ -306,7 +309,7 @@ if (number <= 1E- ## step){ \
 } 
 
 // exponent is increased or decreased,not set
-template <typename T> static inline T NormalizeNumber(T &positiveNumber, int16 &exponent){
+template <typename T> static inline void NormalizeNumber(T &positiveNumber, int16 &exponent){
 	// used internally 
 	if (positiveNumber <= 0.0) return ;
 
@@ -382,7 +385,7 @@ template <typename T> const char *FloatToFixed(uint16 &stringSize,char *buffer,u
 	}
 
 	// normalize number
-	uint16 &exponent = 0;
+	int16 exponent = 0;
 	NormalizeNumber(number,exponent);
 
 	// numbers below 1.0
@@ -403,7 +406,7 @@ template <typename T> const char *FloatToFixed(uint16 &stringSize,char *buffer,u
 	
 	// loop to fulfil precision 
 	// also must reach the end of the integer part thus exponent is checked
-	while ((exponent > 0) && (precision > 0) ){
+	while ((exponent > 0) || (precision > 0) ){
 		// before outputting the fractional part add a '.'
 		if (exponent == -1){
 			if (sizeLeft--) *pBuffer++ = '.';
@@ -414,7 +417,6 @@ template <typename T> const char *FloatToFixed(uint16 &stringSize,char *buffer,u
 		number -= digit;
 		number *= 10.0;
 
-		buffer[nextFree++] = '0'+ digit;		
 		if (sizeLeft--) *pBuffer++ = '0'+ digit;
 
 		// update precision and exponent
@@ -439,7 +441,7 @@ template <typename T> const char *FloatToFixed(uint16 &stringSize,char *buffer,u
 	
 	
 // up to size or ?
-uint8_t Putn_float(Print &stream,float number,uint8_t numberOfSignificantFigures,uint8_t maxPrint){
+/*uint8 Putn_float(Print &stream,float number,uint8_t numberOfSignificantFigures,uint8_t maxPrint){
 	if (isnan(number)){
 		if (maxPrint > 3) {
 			maxPrint-=3;
@@ -529,7 +531,7 @@ uint8_t Putn_float(Print &stream,float number,uint8_t numberOfSignificantFigures
   	}
 
 	return maxPrint;
-}
+}*/
 
 
 
