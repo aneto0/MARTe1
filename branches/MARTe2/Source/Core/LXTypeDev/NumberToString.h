@@ -338,6 +338,52 @@ template <typename T> static inline void NormalizeNumber(T &positiveNumber, int1
 }
 
 /**
+ * converts a couple of normalizedNumber/exponent (or any other equivalent) to a string using fixed format
+ * normalizedNumber is not 0 nor Nan nor Inf and is positive
+ * sizeLeft is the buffer size left
+ * pBuffer is a writable area of memory of at least sizeLeft
+ * precision determines the number of significative digits and is always not 0
+ */
+template <typename T> void FPToFixed(char *&pBuffer,int16 &sizeLeft,T normalizedNumber, int16 exponent,uint8 precision){
+	// numbers below 1.0
+	if (exponent < 0){
+
+		if (sizeLeft--) *pBuffer++ = '0';
+		if (sizeLeft--) *pBuffer++ = '.';
+		
+		// loop and add zeros
+		int i;
+		for (i = 0; i < -(exponent+1); i++){
+			if (sizeLeft--) *pBuffer++ = '0';
+		}
+		// exponent has only the job of marking where to put the '.'
+		// here is lowered by 1 to avoid adding a second '.' in the following code
+		exponent--;
+	} 
+	
+	// loop to fulfil precision 
+	// also must reach the end of the integer part thus exponent is checked
+	while ((exponent > 0) || (precision > 0) ){
+		// before outputting the fractional part add a '.'
+		if (exponent == -1){
+			if (sizeLeft--) *pBuffer++ = '.';
+		}
+		
+		// get a digit and shift the number
+		uint8 digit = (uint8)number;
+		number -= digit;
+		number *= 10.0;
+
+		if (sizeLeft--) *pBuffer++ = '0'+ digit;
+
+		// update precision and exponent
+		if (precision > 0) precision--;
+		exponent--;
+	}
+
+}
+
+/**
  * converts a float/double (or any other equivalent) to a string using fixed format
  * bufferSize is the buffer size and includes the space for the 0 terminator
  * buffer is a writable area of memory of at least bufferSize
@@ -388,41 +434,86 @@ template <typename T> const char *FloatToFixed(uint16 &stringSize,char *buffer,u
 	int16 exponent = 0;
 	NormalizeNumber(number,exponent);
 
-	// numbers below 1.0
-	if (exponent < 0){
+    // does all the work of conversion but for the sign and special cases
+    FPToFixed(pBuffer,sizeLeft,number, exponent,precision);
 
-		if (sizeLeft--) *pBuffer++ = '0';
-		if (sizeLeft--) *pBuffer++ = '.';
-		
-		// loop and add zeros
-		int i;
-		for (i = 0; i < -(exponent+1); i++){
-			if (sizeLeft--) *pBuffer++ = '0';
-		}
-		// exponent has only the job of marking where to put the '.'
-		// here is lowered by 1 to avoid adding a second '.' in the following code
-		exponent--;
-	} 
-	
-	// loop to fulfil precision 
-	// also must reach the end of the integer part thus exponent is checked
-	while ((exponent > 0) || (precision > 0) ){
-		// before outputting the fractional part add a '.'
-		if (exponent == -1){
-			if (sizeLeft--) *pBuffer++ = '.';
-		}
-		
-		// get a digit and shift the number
-		uint8 digit = (uint8)number;
-		number -= digit;
-		number *= 10.0;
-
-		if (sizeLeft--) *pBuffer++ = '0'+ digit;
-
-		// update precision and exponent
-		if (precision > 0) precision--;
-		exponent--;
+	// no space to complete number exit
+	if (sizeLeft < 0) {
+		stringSize = 1;
+		return "?";
 	}
+	
+	// terminate string - space is guaranteed by check above  
+	*pBuffer = 0;
+	stringSize = (pBuffer - buffer);	
+
+	return buffer;
+}
+
+/**
+ * converts a float/double (or any other equivalent) to a string using fixed format
+ * bufferSize is the buffer size and includes the space for the 0 terminator
+ * buffer is a writable area of memory of at least bufferSize
+ * returns pointer to the string either within the buffer or (in case of errors or inf/nan to a const char)
+ * returns stringSize with the actual length of the string
+ * precision determines the number of significative digits
+ */
+template <typename T> const char *FloatToExponent(uint16 &stringSize,char *buffer,uint16 bufferSize,T number, uint8 precision){
+	if (isnan(number)) {
+		stringSize = 3;
+		return "NaN";	
+	}
+
+	if (isinf(number)) {
+		stringSize = 3;
+		return "Inf";		
+	}
+
+	if (number == 0) {
+		stringSize = 1;
+		return "0";		
+	}
+
+	// 0 not allowed
+	if (precision == 0) precision = 1;
+
+	// not space even for "0"!
+	if (bufferSize <= 2) {
+		stringSize = 1;
+		return "?"; 
+	}
+	// stringSize is also an index within the buffer for the next free space
+	stringSize = 0;
+	// we will use sizeLeft to control use of buffer
+	// 16 bit and signed so that we can count negatively 
+	// (max exponent is -310 and max precision is 255 so the sum of the two is the max number of digits) 
+	int16 sizeLeft = bufferSize-1;
+	// we will also use pBuffer to mark the current active location in the buffer
+	char *pBuffer = buffer;
+
+	// flip sign if necessary;
+	if (number < 0){
+		number = -number;
+		if (sizeLeft--) *pBuffer++ = '-';
+	}
+
+	// normalize number
+	int16 exponent = 0;
+	NormalizeNumber(number,exponent);
+
+    // does all the work of conversion but for the sign and special cases
+    FPToFixed(pBuffer,sizeLeft,number, 0,precision);
+    
+    // output exponent if exists
+    if (exponent != 0){
+		if (sizeLeft--) *pBuffer++ = 'E';
+        char buffer2[7];
+        uint16 stringSize;
+        char *expNumber = NumberToDecimal(stringSize,buffer2,sizeof(buffer2),exponent,true);
+        while (*expNumber != 0){
+            *pBuffer++ = *expNumber++;
+        }
+    }
 
 	// no space to complete number exit
 	if (sizeLeft < 0) {
