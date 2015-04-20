@@ -438,7 +438,14 @@ template <typename T> bool BasicFloatConversion(uint16 &stringSize,char *&pBuffe
     return true;
 }
 
+static inline uint8 FixedFormatSize(int16 exponent,uint16 precision){    
 
+	// fixed notation 
+	uint8 fixedNotationSize = precision;
+    if (exponent > (precision-1)) fixedNotationSize = exponent;
+    if (exponent < (precision-1)) fixedNotationSize++;
+    return fixedNotationSize;
+}
 
 /**
  * converts a float/double (or any other equivalent) to a string using fixed format
@@ -479,6 +486,26 @@ template <typename T> const char *FloatToFixed(uint16 &stringSize,char *buffer,u
 	stringSize = (pBuffer - buffer);	
 
 	return buffer;
+}
+
+static inline uint16 NumberOfDigitsOfExponent(int16 exponent){
+	// workout the size of exponent
+	// the size of exponent is 2+expNDigits 
+	int16_t exponentNumberOfDigits = 3;// E+nn
+	uint16 absExponent = abs (exponent);
+	while (absExponent > 10){
+		exponentNumberOfDigits++;
+		absExponent /= 10;
+	}
+    return exponentNumberOfDigits;
+}
+
+static inline uint8 ExponentialFormatSize(int16 exponent,uint16 precision){    
+	//	exponential notation number size
+	uint8 exponentNotationSize = precision+NumberOfDigitsOfExponent(exponent);
+    // add space for .
+    if (1 < precision) exponentNotationSize++;
+    return exponentNotationSize;
 }
 
 /**
@@ -525,6 +552,22 @@ template <typename T> const char *FloatToExponential(uint16 &stringSize,char *bu
 	return buffer;
 }
 
+static inline int16 ExponentToEngineering(int16 &exponent){
+    int16 engineeringExponent = exponent / 3;
+    if (engineeringExponent < 0) engineeringExponent = (exponent-2)/3;
+    engineeringExponent *= 3;
+    exponent -= engineeringExponent;
+    return engineeringExponent;
+}
+
+static inline uint8 EngineeringFormatSize(int16 exponent,uint16 precision){    
+	uint8 engineeringNotationSize = precision;
+    engineeringNotationSize += NumberOfDigitsOfExponent(ExponentToEngineering(exponent));
+        
+    if (exponent > (precision-1)) engineeringNotationSize = exponentCopy;
+    if (exponent < (precision-1)) engineeringNotationSize++;
+    return engineeringNotationSize;
+}
 
 /**
  * converts a float/double (or any other equivalent) to a string using engineering format
@@ -552,10 +595,7 @@ template <typename T> const char *FloatToEngineering(uint16 &stringSize,char *bu
 	NormalizeNumber(number,exponent);
 
     // partitions the exponent between engineering part and residual 
-    int16 engineeringExponent = exponent / 3;
-    if (engineeringExponent < 0) engineeringExponent = (exponent-2)/3;
-    engineeringExponent *= 3;
-    exponent -= engineeringExponent;
+    int16 engineeringExponent = ExponentToEngineering(exponent);
     
     // does all the work of conversion but for the sign and special cases
     FPToFixed(pBuffer,sizeLeft,number, exponent,precision);
@@ -583,7 +623,23 @@ template <typename T> const char *FloatToEngineering(uint16 &stringSize,char *bu
 
 	return buffer;
 }
-	
+
+static inline uint8 SmartFormatSize(int16 exponent,uint16 precision){    
+	uint8 smartNotationSize = precision;
+    int16 exponentCopy = exponent;
+    int16 engineeringExponent = ExponentToEngineering(exponentCopy);
+        
+    if ((engineeringExponent != 0) && (engineeringExponent<=12) && (engineeringExponent>=-12)){
+        engineeringNotationSize++;
+    } else {
+        engineeringNotationSize += NumberOfDigitsOfExponent(engineeringExponent);
+    }
+        
+    if (exponent > (precision-1)) smartNotationSize = exponentCopy;
+    if (exponent < (precision-1)) smartNotationSize++;
+    
+    return smartNotationSize'
+}	
 /**
  * converts a float/double (or any other equivalent) to a string using engineering format
  * bufferSize is the buffer size and includes the space for the 0 terminator
@@ -610,10 +666,7 @@ template <typename T> const char *FloatToSmart(uint16 &stringSize,char *buffer,u
 	NormalizeNumber(number,exponent);
 
     // partitions the exponent between engineering part and residual 
-    int16 engineeringExponent = exponent / 3;
-    if (engineeringExponent < 0) engineeringExponent = (exponent-2)/3;
-    engineeringExponent *= 3;
-    exponent -= engineeringExponent;
+    int16 engineeringExponent = ExponentToEngineering(exponent);
     
     // does all the work of conversion but for the sign and special cases
     FPToFixed(pBuffer,sizeLeft,number, exponent,precision);
@@ -626,6 +679,104 @@ template <typename T> const char *FloatToSmart(uint16 &stringSize,char *buffer,u
         ExpToDecimal(pBuffer,sizeLeft, engineeringExponent);
     }
       
+   	// no space to complete number exit
+	if (sizeLeft < 0) {
+		stringSize = 1;
+		return "?";
+	}
+	
+	// terminate string - space is guaranteed by check above  
+	*pBuffer = 0;
+	stringSize = (pBuffer - buffer);	
+
+	return buffer;
+}
+
+
+/**
+ * converts a float/double (or any other equivalent) to a string using whatever format achieves best compact representation
+ * bufferSize is the buffer size and includes the space for the 0 terminator
+ * buffer is a writable area of memory of at least bufferSize
+ * returns pointer to the string either within the buffer or (in case of errors or inf/nan) to a const char
+ * returns stringSize with the actual length of the string
+ * precision determines the number of significative digits
+ */
+template <typename T> const char *FloatToCompact(uint16 &stringSize,char *buffer,uint16 bufferSize,T number, uint8 precision){
+	// we will use sizeLeft to control use of buffer
+	// 16 bit and signed so that we can count negatively 
+	// (max exponent is -310 and max precision is 255 so the sum of the two is the max number of digits) 
+	int16 sizeLeft = bufferSize-1;
+	// we will also use pBuffer to mark the current active location in the buffer
+	char *pBuffer = buffer;
+
+    // deals with nan, 0 etc
+    if (!BasicFloatConversion(stringSize,pBuffer,sizeLeft,number, precision)){}
+        return pBuffer;
+    }
+
+	// normalize number
+	int16 exponent = 0;
+	NormalizeNumber(number,exponent);
+    
+    uint8 fs[4];
+    fs[0] = FixedFormatSize(exponent,precision);
+    fs[1] = ExponentialFormatSize(exponent,precision);
+    fs[2] = EngineeringFormatSize(exponent,precision);
+    fs[3] = SmartFormatSize(exponent,precision);
+    
+    int chosen = 0;
+    int size = fs[0];
+    for (int i = 1; i < 4;i++){
+        if (((fs[i] <=  sizeLeft) && (fs[i] > fs[chosen])) || ((fs[i] < fs[chosen]) && (fs[chosen] > sizeleft))) chosen = i;
+    }
+    if (fs[chosen] > sizeleft){
+        precision -= (fs[chosen] + sizeleft);
+    }
+    
+    if ( precision < 1) return "?";
+    
+    switch (chosen){
+        case 0:{
+            // does all the work of conversion but for the sign and special cases
+            FPToFixed(pBuffer,sizeLeft,number, exponent,precision);
+            
+        }break;
+        case 1:{
+    
+            // does all the work of conversion but for the sign and special cases
+            FPToFixed(pBuffer,sizeLeft,number, 0,precision);
+
+            // writes exponent
+            ExpToDecimal(pBuffer,sizeLeft, exponent);
+            
+        }break;
+        case 2:{
+            // partitions the exponent between engineering part and residual 
+            int16 engineeringExponent = ExponentToEngineering(exponent); 
+    
+            // does all the work of conversion but for the sign and special cases
+            FPToFixed(pBuffer,sizeLeft,number, exponent,precision);
+
+            // writes exponent
+            ExpToDecimal(pBuffer,sizeLeft, engineeringExponent);
+            
+        }break;
+        case 3:{
+            // partitions the exponent between engineering part and residual 
+            int16 engineeringExponent = ExponentToEngineering(exponent); 
+    
+            // does all the work of conversion but for the sign and special cases
+            FPToFixed(pBuffer,sizeLeft,number, exponent,precision);
+
+            if ((engineeringExponent != 0) && (engineeringExponent<=12) && (engineeringExponent>=-12)){
+                static const char *symbols = "pnum kMGT";
+                if (sizeLeft--) *pBuffer++ = symbols[engineeringExponent/3];        
+                } else {
+                   // writes exponent
+                ExpToDecimal(pBuffer,sizeLeft, engineeringExponent);
+            }            
+        }break;
+    }
 
     	// no space to complete number exit
 	if (sizeLeft < 0) {
@@ -639,6 +790,7 @@ template <typename T> const char *FloatToSmart(uint16 &stringSize,char *buffer,u
 
 	return buffer;
 }
+
 	
 // up to size or ?
 /*uint8 Putn_float(Print &stream,float number,uint8_t numberOfSignificantFigures,uint8_t maxPrint){
