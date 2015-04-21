@@ -36,6 +36,29 @@ template <typename T> void NtoDecimalPrivate(char *buffer,int &nextFree,T number
 	}
 }
 
+template <typename T1,typename T2> void NormalizeInteger(T1 positiveNumber,T2 &tenToExponent){       
+    tenToExponent = 1;
+    T2 temp ;
+    if (sizeof(T1)>=8){ // max 19
+        temp = tenToExponent * 10000000000; // 10 zeros 
+        if (positiveNumber >= temp )  tenToExponent = temp;
+    }
+    if (sizeof(T1)>=4){ // max 9 
+        temp = tenToExponent * 100000; // 5 zeros
+        if (positiveNumber >= temp )  tenToExponent = temp;
+    }
+    if (sizeof(T1)>=2){ // max 4 zeros
+        temp = tenToExponent * 100; // 2 zeros
+        if (positiveNumber >= temp )  tenToExponent = temp;
+    }
+    temp = tenToExponent * 10; // 1 
+    if (positiveNumber >= temp )  tenToExponent = temp;
+    temp = tenToExponent * 10;  // 1
+    if (positiveNumber >= temp )  tenToExponent = temp;
+}
+
+
+
 /**
  * Converts any integer type, signed and unsigned to string 
  * writes to a buffer up to the length of the buffer
@@ -792,305 +815,3 @@ template <typename T> const char *FloatToCompact(uint16 &stringSize,char *buffer
 }
 
 	
-// up to size or ?
-/*uint8 Putn_float(Print &stream,float number,uint8_t numberOfSignificantFigures,uint8_t maxPrint){
-	if (isnan(number)){
-		if (maxPrint > 3) {
-			maxPrint-=3;
-			stream.print(F("NaN"));
-		} else {
-			if (maxPrint > 0) {
-				maxPrint--;
-				stream.print('!');
-			}
-		}
-		return maxPrint;
-	}
-	if (isinf(number)){
-		if (maxPrint > 3) {
-			maxPrint-=3;
-			stream.print(F("Inf"));
-		} else {
-			if (maxPrint > 0) {
-				maxPrint--;
-				stream.print('!');
-			}
-		}
-		return maxPrint;
-	}
-	
-	if (maxPrint == 0) return 0;
-	if (number < 0){
-		maxPrint--;
-		stream.print('-');
-		number = -number;
-	}
-	if (maxPrint == 0) return 0;
-
-	
-	int16_t nDigits = normalizeNumber(number);
-
-	// workout the size of exponent
-	// the size of exponent is 2+expNDigits+1 
-	int16_t expNDigits = 0;
-	uint16_t absNDigits = abs (nDigits);
-	while (absNDigits > 10){
-		expNDigits++;
-		absNDigits /= 10;
-	}
-	
-	//	scientific notation number size 3= .E+
-	uint8_t expNotationSize = numberOfSignificantFigures+3+expNDigits+1;
-
-	// fractional notation just number . number
-	uint8_t fractNotationSize = numberOfSignificantFigures+1;
-	// add zeroes if number below 1.0
-	if (nDigits < 0)fractNotationSize-=nDigits;
-	if ((nDigits+1) > numberOfSignificantFigures)fractNotationSize=nDigits+1;
-	
-	// choose fractional if enough space and if it is shorter then integer
-	if ((maxPrint >= fractNotationSize)&&(fractNotationSize < expNotationSize)) {
-		
-		maxPrint = Putn_fixed(stream,number,maxPrint,numberOfSignificantFigures,nDigits);
-	} else
-    // choose exp notation if enough space 
-    if (maxPrint >= expNotationSize) {
-    	
-    	maxPrint = Putn_scientific(stream,number,maxPrint,numberOfSignificantFigures,nDigits,expNDigits);    
-    } else
-	// choose super compact notation if enough space and if exponent within range (p,n,u,m,k,M,G,T)
-  	if ((maxPrint >= (2+nDigits % 3)) && (nDigits <= 12) && (nDigits >= -12)){
-  		int8_t symbolIndex = (nDigits + 12)/3;
-  		if (symbolIndex == 4){
-  			maxPrint = Putn_fixed(stream,number,maxPrint,numberOfSignificantFigures,nDigits);
-  		} else {
-  			nDigits = (nDigits + 12)%3;
-  			static const char *symbols = "pnum kMGT";
-  			if (maxPrint > 0){
-  				maxPrint--;
-  				maxPrint = Putn_fixed(stream,number,maxPrint,numberOfSignificantFigures,nDigits);
-  				stream.print(symbols[symbolIndex]);
-  			}
-  		}
-  	} else 
-    // choose compact exp notation if enough space 
-    if (maxPrint >= (3+expNDigits)) {
-    	
-    	maxPrint = Putn_scientific(stream,number,maxPrint,numberOfSignificantFigures,nDigits,expNDigits);
-  	} else {
-  		stream.print('!');
-  		maxPrint--;
-  	}
-
-	return maxPrint;
-}*/
-
-
-
-
-template <typename T> const char *FloatToFixed(char *buffer,int &size,T number, bool putTrailingZeros,bool addHeader=false){
-	
-	
-	
-	
-	
-	
-}
-
-
-
-#if 0   /// from arduino dev
-
-#include <stdlib.h>
-#include "StreamAux.h"
-#include <math.h>
-
-
-
-
-
-// for internal use only - number must be normalised fabs(number)<10 - exponent is carried separately
-static uint8_t Putn_fixed(Print &stream,float number,uint8_t maxPrint,uint8_t numberOfSignificantFigures,int16_t exponent){
-	
-	// suffix 0.000 in case of negative exponent
-	if (exponent < 0){
-		if (maxPrint > 0){
-			stream.print('0');
-			maxPrint--;
-		}
-		if (maxPrint > 0){
-			stream.print ('.');
-			maxPrint--;
-		}
-		int i;
-		for (i=exponent;i<-1;i++){
-			if (maxPrint > 0){
-				stream.print('0');
-				maxPrint--;
-			}
-		}
-		exponent--;
-	}
-	
-	// write all the significative figures
-	while ((numberOfSignificantFigures > 0) || (exponent >= 0)){
-	    // at the crossing of 0 exponent put a .
-		if (exponent==-1){
-			if (maxPrint > 0){
-				stream.print('.');
-				maxPrint--;
-			}
-		}
-		uint8_t digit = (uint8_t)number;
-		if (maxPrint > 0){
-			stream.print((char)('0'+digit));
-			maxPrint--;
-		}
-		float digitF = digit;
-		number = number - digitF;
-		number *= 10.0;			
-		exponent--;
-		numberOfSignificantFigures--;
-	}
-    return maxPrint;
-}
-
-// for internal use only - number must be normalised fabs(number)<10 - exponent is carried separately
-static uint8_t Putn_scientific(Print &stream,float number,uint8_t maxPrint,uint8_t numberOfSignificantFigures,int16_t decimalExponent,int16_t expNDigits){
-	if (maxPrint > (expNDigits+3)){
-		maxPrint -= expNDigits+3; // 3 = E+ and at least one digit (expNDigit=0 ==> 1 digit)
-		maxPrint = Putn_fixed(stream,number,maxPrint,numberOfSignificantFigures,0);
-		maxPrint += expNDigits+3;
-		if (maxPrint >0){
-			stream.print('E');
-			maxPrint--;
-		}
-		if (maxPrint >=2)
-			if (decimalExponent >= 0){
-				stream.print('+');
-				maxPrint--;
-				maxPrint = Putn_u16(stream,decimalExponent,maxPrint);
-			}
-			else {
-				stream.print('-');
-				maxPrint--;
-				maxPrint = Putn_u16(stream,-decimalExponent,maxPrint);
-			}
-	}
-	
-	return maxPrint;
-}
-
-// used internally 
-static int16_t normalizeNumber(float &number){
-	if (number == 0.0) return 0;
-	int16_t powerShift = 0;
-	while (number >= 10.0){
-		powerShift++;
-		number *= 0.1;
-	}
-	while (number < 1.0){
-		powerShift--;
-		number *= 10.0;
-	}
-	return powerShift;
-}
-
-// up to size or ?
-uint8_t Putn_float(Print &stream,float number,uint8_t numberOfSignificantFigures,uint8_t maxPrint){
-	if (isnan(number)){
-		if (maxPrint > 3) {
-			maxPrint-=3;
-			stream.print(F("NaN"));
-		} else {
-			if (maxPrint > 0) {
-				maxPrint--;
-				stream.print('!');
-			}
-		}
-		return maxPrint;
-	}
-	if (isinf(number)){
-		if (maxPrint > 3) {
-			maxPrint-=3;
-			stream.print(F("Inf"));
-		} else {
-			if (maxPrint > 0) {
-				maxPrint--;
-				stream.print('!');
-			}
-		}
-		return maxPrint;
-	}
-	
-	if (maxPrint == 0) return 0;
-	if (number < 0){
-		maxPrint--;
-		stream.print('-');
-		number = -number;
-	}
-	if (maxPrint == 0) return 0;
-
-	
-	int16_t nDigits = normalizeNumber(number);
-
-	// workout the size of exponent
-	// the size of exponent is 2+expNDigits+1 
-	int16_t expNDigits = 0;
-	uint16_t absNDigits = abs (nDigits);
-	while (absNDigits > 10){
-		expNDigits++;
-		absNDigits /= 10;
-	}
-	
-	//	scientific notation number size 3= .E+
-	uint8_t expNotationSize = numberOfSignificantFigures+3+expNDigits+1;
-
-	// fractional notation just number . number
-	uint8_t fractNotationSize = numberOfSignificantFigures+1;
-	// add zeroes if number below 1.0
-	if (nDigits < 0)fractNotationSize-=nDigits;
-	if ((nDigits+1) > numberOfSignificantFigures)fractNotationSize=nDigits+1;
-	
-	// choose fractional if enough space and if it is shorter then integer
-	if ((maxPrint >= fractNotationSize)&&(fractNotationSize < expNotationSize)) {
-		
-		maxPrint = Putn_fixed(stream,number,maxPrint,numberOfSignificantFigures,nDigits);
-	} else
-    // choose exp notation if enough space 
-    if (maxPrint >= expNotationSize) {
-    	
-    	maxPrint = Putn_scientific(stream,number,maxPrint,numberOfSignificantFigures,nDigits,expNDigits);    
-    } else
-	// choose super compact notation if enough space and if exponent within range (p,n,u,m,k,M,G,T)
-  	if ((maxPrint >= (2+nDigits % 3)) && (nDigits <= 12) && (nDigits >= -12)){
-  		int8_t symbolIndex = (nDigits + 12)/3;
-  		if (symbolIndex == 4){
-  			maxPrint = Putn_fixed(stream,number,maxPrint,numberOfSignificantFigures,nDigits);
-  		} else {
-  			nDigits = (nDigits + 12)%3;
-  			static const char *symbols = "pnum kMGT";
-  			if (maxPrint > 0){
-  				maxPrint--;
-  				maxPrint = Putn_fixed(stream,number,maxPrint,numberOfSignificantFigures,nDigits);
-  				stream.print(symbols[symbolIndex]);
-  			}
-  		}
-  	} else 
-    // choose compact exp notation if enough space 
-    if (maxPrint >= (3+expNDigits)) {
-    	
-    	maxPrint = Putn_scientific(stream,number,maxPrint,numberOfSignificantFigures,nDigits,expNDigits);
-  	} else {
-  		stream.print('!');
-  		maxPrint--;
-  	}
-
-	return maxPrint;
-}
-
-
-
-#endif
-
-#endif
