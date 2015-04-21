@@ -36,27 +36,65 @@ template <typename T> void NtoDecimalPrivate(char *buffer,int &nextFree,T number
 	}
 }
 
-template <typename T1,typename T2> void NormalizeInteger(T1 positiveNumber,T2 &tenToExponent){       
+
+// returns the exponent
+// tenToExponent becomes 10 ^ exponent
+// positiveNumber is a the abs (number)
+template <typename T> uint8 NormalizeInteger(T positiveNumber,T &tenToExponent){       
     tenToExponent = 1;
-    T2 temp ;
-    if (sizeof(T1)>=8){ // max 19
+    T temp ;
+    uint8 exp = 0;
+    if (sizeof(T)>=8){ // max 19
         temp = tenToExponent * 10000000000; // 10 zeros 
-        if (positiveNumber >= temp )  tenToExponent = temp;
+        if (positiveNumber >= temp )  {
+            tenToExponent = temp;
+            exp += 10;
+        }
     }
-    if (sizeof(T1)>=4){ // max 9 
+    
+    if (sizeof(T)>=4){ // max 9 
         temp = tenToExponent * 100000; // 5 zeros
-        if (positiveNumber >= temp )  tenToExponent = temp;
+        if (positiveNumber >= temp ) {
+            tenToExponent = temp;
+            exp += 5;
+        }
     }
-    if (sizeof(T1)>=2){ // max 4 zeros
+    
+    if (sizeof(T)>=2){ // max 4 zeros
         temp = tenToExponent * 100; // 2 zeros
-        if (positiveNumber >= temp )  tenToExponent = temp;
+        if (positiveNumber >= temp ) {
+            tenToExponent = temp;
+            exp += 2;
+        }
     }
+    
     temp = tenToExponent * 10; // 1 
-    if (positiveNumber >= temp )  tenToExponent = temp;
+    if (positiveNumber >= temp ){
+            tenToExponent = temp;
+            exp ++;
+        }
     temp = tenToExponent * 10;  // 1
-    if (positiveNumber >= temp )  tenToExponent = temp;
+    if (temp > tenToExponent){
+    	if (positiveNumber >= temp ){
+            tenToExponent = temp;
+            exp ++;
+        }
+    }
+    return exp;
 }
 
+
+
+/// buffer must have sufficient size to hold a number of size exponent+1! and the trailing zero  
+template <typename T> void NumberToDecimalPrivate(char *buffer, T positiveNumber,uint8 exponent){
+	char *pCurrent = buffer + exponent + 1;
+	*pCurrent-- = 0;
+	while (pCurrent >= buffer ){
+		unsigned short  digit = positiveNumber % 10;
+		positiveNumber        = positiveNumber / 10;
+		*pCurrent-- = '0' + digit;
+	}
+}
 
 
 /**
