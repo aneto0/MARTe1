@@ -36,7 +36,8 @@ bool HighResolutionTimerTest::TestFrequency() {
     double HRTperiod = HighResolutionTimer::Period();
     double relativePeriod = 1.0 / HRTfrequency;
     int64 relativeFrequency = (int64) (1.0 / HRTperiod);
-    return (HRTperiod == relativePeriod) && (HRTfrequency == relativeFrequency);
+    return (HRTperiod == relativePeriod) && (HRTfrequency == relativeFrequency)
+            && (HighResolutionTimerMSecTics() == (HRTfrequency / 1000.0));
 }
 
 //return true if the measured time is more or less equal to the sleep time.

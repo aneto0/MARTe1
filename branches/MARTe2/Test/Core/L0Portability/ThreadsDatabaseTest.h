@@ -38,6 +38,7 @@
 #include "ThreadsDatabase.h"
 #include "Threads.h"
 #include "Sleep.h"
+#include "EventSem.h"
 
 class ThreadsDatabaseTest {
 
@@ -63,37 +64,41 @@ public:
     /** timeout for the lock with timeout **/
     TimeoutType timeout;
 
+    EventSem eventsem;
+
     ThreadsDatabaseTest() {
         returnValue = True;
         exitCondition = 0;
         threadInfo = NULL;
         tidsDim = 0;
         timeout = TTInfiniteWait;
+        eventsem.Create();
     }
 
     /**
-     * Tests the efficiency of the Lock function of the database and compare the thread information returned by database with the thread's attributes.
+     * @brief Tests the efficiency of the Lock function of the database and compare the thread information returned by database with the thread's attributes.
      * @param nOfThreads number of threads to launch.
      * @return true if the exit condition value remains consistent and all the information received by database are correct. False otherwise. **/
     bool TestGetInfoAndLock(int32 nOfThreads);
 
     /**
-     * Tests the GetId() function of the database. A thread receives the tid of the other threads in database and compare it with the saved tids in the array. Then, it kills the other threads and
+     * @brief Tests the GetId() function of the database. A thread receives the tid of the other threads in database and compare it with the saved tids in the array.
+     * Then, it kills the other threads and
      * check if they are removed from the database.
      * @param nOfThreads number of threads to launch.
      * @return true if the returned tids are correct and after kills all thread's information are removed from database, false otherwise. **/
     bool TestGetId(int32 nOfThreads);
 
     /**
-     * Launchs nOfThreads threads and for each thread the main process control before that its tid is in the database, then remove the entry from the database and check that the informations 
-     * are not in the database anymore.
+     * @brief Launchs nOfThreads threads and for each thread the main process control before that its tid is in the database, then remove the entry from the database 
+     * and check that the informations are not in the database anymore.
      * @param nOfThreads numbero of threads to launch.
      * @return true if the thread information pointer for each thread is in the database before the removing, and it's NULL after, false otherwise. **/
     bool TestRemoveEntry(int32 nOfThreads);
 
     /**
-     * Tests the lock of the database with a provided timeout. A thread lock the database and goes in an infinite loop, then another thread locks the database and it must wait until the timeout
-     * is expired, after that it exit incrementing the exitCondition.
+     * @brief Tests the lock of the database with a provided timeout. A thread lock the database and goes in an infinite loop, 
+     * then another thread locks the database and it must wait until the timeout is expired, after that it exit incrementing the exitCondition.
      * @param the timeout for the lock function.
      * @return true if the second thread exit incrementing exitCondition after the expire of the timeout, false if too much time pass because this means that both thread are locked and the timeout 
      * does not work. **/

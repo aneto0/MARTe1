@@ -150,6 +150,14 @@ bool FastPollingMutexTest::TestSync(int32 nOfThreads) {
     expired = False;
     free = False;
     deadlock = False;
+
+    FastPollingMutexSem myFastMutex;
+    myFastMutex.Create(True);
+    if (!myFastMutex.Locked()) {
+        return False;
+    }
+    myFastMutex.Close();
+
     for (int32 i = 0; i < nOfThreads; i++) {
         Threads::BeginThread((ThreadFunctionType) Increment, this);
     }

@@ -160,6 +160,7 @@ public:
         ok = ok && TestSleepMSec(120);
         ok = ok && TestSleepBusy(0.4);
         ok = ok && TestSemiBusy(0.5, 0.2);
+        GetDateSeconds();
         return ok;
     }
 };

@@ -192,6 +192,23 @@ bool StringHelperTest::TestSearch() {
         return False;
     }
 
+    if ((retPointer = StringHelper::SearchChars(buffer, " e")) == NULL) {
+        return False;
+    }
+
+    if (!StringTestHelper::Compare(retPointer, "ello World")) {
+        return False;
+    }
+
+    if ((retPointer = StringHelper::SearchChars(retPointer + 1, " e"))
+            == NULL) {
+        return False;
+    }
+
+    if (!StringTestHelper::Compare(retPointer, " World")) {
+        return False;
+    }
+
     //Test the search with a list of chars as argument and index as return (return index to the first occurrence).
     const char* charsToSearch = "dow";
 

@@ -44,6 +44,11 @@ TEST_F(TimerGTest,ConfigAndStartTimerTest) {
     ASSERT_TRUE(timerTest.ConfigAndStartTimerTest());
 }
 
+TEST_F(TimerGTest,ResetTimerTest) {
+    TimerTest timerTest;
+    ASSERT_TRUE(timerTest.ResetTimerTest());
+}
+
 TEST_F(TimerGTest,ConfigAndNotStartTimerTest) {
     TimerTest timerTest;
     ASSERT_TRUE(timerTest.ConfigAndNotStartTimerTest());

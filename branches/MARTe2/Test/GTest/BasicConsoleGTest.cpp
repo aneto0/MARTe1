@@ -31,7 +31,7 @@ TEST_F(BasicConsoleGTest,TestWrite) {
 }
 
 //This tests need user intervent. Do not uncomment for automatic tests.
-/*
+
  TEST_F(BasicConsoleGTest,TestRead) {
  BasicConsoleTest console;
  ASSERT_TRUE(console.TestRead("Hello\n", 6));
@@ -41,9 +41,13 @@ TEST_F(BasicConsoleGTest,TestWrite) {
  BasicConsoleTest console;
  ASSERT_TRUE(console.TestPaging(10,5,5));
  }
-
+/*
  TEST_F(BasicConsoleGTest,TestPerfChar) {
  BasicConsoleTest console;
  ASSERT_TRUE(console.TestPerfChar());
+ }*/
+
+ TEST_F(BasicConsoleGTest,TestNotImplemented) {
+ BasicConsoleTest console;
+ ASSERT_TRUE(console.TestNotImplemented());
  }
- */

@@ -44,25 +44,75 @@ void DoNothing(ThreadsDatabaseTest &threadDatabaseTest) {
 
 //return false if at least one thread does not match its tid in the database or if the exitCondition variable change in the locked block (this means that lock function does not work).
 void GetInfo(ThreadsDatabaseTest &threadDatabaseTest) {
+
+    if (!threadDatabaseTest.eventsem.Wait()) {
+        threadDatabaseTest.exitCondition++;
+        threadDatabaseTest.returnValue = False;
+        return;
+    }
+
     ThreadsDatabase::Lock();
     int32 state = threadDatabaseTest.exitCondition;
     threadDatabaseTest.returnValue = threadDatabaseTest.returnValue
             && ((threadDatabaseTest.threadInfo =
                     ThreadsDatabase::GetThreadInformation(Threads::Id()))
                     != NULL);
+
     if (!threadDatabaseTest.returnValue) {
         threadDatabaseTest.exitCondition++;
+        ThreadsDatabase::UnLock();
         return;
     }
+
+    if (threadDatabaseTest.threadInfo->threadId != Threads::Id()) {
+        threadDatabaseTest.returnValue = False;
+        threadDatabaseTest.exitCondition++;
+        ThreadsDatabase::UnLock();
+        return;
+    }
+    ThreadInformation controller;
+
+    if (!ThreadsDatabase::GetInfo(controller, -1, Threads::Id())) {
+        threadDatabaseTest.returnValue = False;
+        threadDatabaseTest.exitCondition++;
+        ThreadsDatabase::UnLock();
+        return;
+    }
+
+    if (controller.threadId != threadDatabaseTest.threadInfo->threadId) {
+        threadDatabaseTest.returnValue = False;
+        threadDatabaseTest.exitCondition++;
+        ThreadsDatabase::UnLock();
+        return;
+    }
+
+    int32 n = ThreadsDatabase::NumberOfThreads();
+
+    if (n > 0) {
+
+        if (!ThreadsDatabase::GetInfo(controller, n - 1, -1)) {
+            threadDatabaseTest.returnValue = False;
+            threadDatabaseTest.exitCondition++;
+            ThreadsDatabase::UnLock();
+            return;
+        }
+
+        if (controller.threadId != ThreadsDatabase::GetThreadID(n - 1)) {
+            threadDatabaseTest.returnValue = False;
+            threadDatabaseTest.exitCondition++;
+            ThreadsDatabase::UnLock();
+            return;
+        }
+    }
+
     SleepSec(1e-3);
-    threadDatabaseTest.returnValue = threadDatabaseTest.returnValue
-            && (threadDatabaseTest.threadInfo->threadId == Threads::Id());
+
     threadDatabaseTest.exitCondition++;
     if (threadDatabaseTest.exitCondition != (state + 1)) {
-        threadDatabaseTest.returnValue = False; 
+        threadDatabaseTest.returnValue = False;
     }
     ThreadsDatabase::UnLock();
-    
+
 }
 
 //The thread that calls this function, gets tids from database and kill the other threads. Then, checks if it remains alone in the database and exit.
@@ -89,17 +139,19 @@ void GetId(ThreadsDatabaseTest &threadDatabaseTest) {
 }
 
 //Only Increment exit condition after the lock. It's used to test the lock with timeout.
-void DoNothings(ThreadsDatabaseTest &threadDatabaseTest) {
+void DoNothings(void *myThreadDatabaseTest) {
+    ThreadsDatabaseTest *threadDatabaseTest =
+            (ThreadsDatabaseTest*) myThreadDatabaseTest;
 
-    while (threadDatabaseTest.exitCondition < 1) {
+    while (threadDatabaseTest->exitCondition < 1) {
         SleepSec(1e-3);
     }
-    threadDatabaseTest.exitCondition++;
-    while (threadDatabaseTest.exitCondition < 3) {
+    threadDatabaseTest->exitCondition++;
+    while (threadDatabaseTest->exitCondition < 3) {
         SleepSec(1e-3);
     }
-    ThreadsDatabase::Lock(threadDatabaseTest.timeout);
-    threadDatabaseTest.exitCondition++;
+    ThreadsDatabase::Lock(threadDatabaseTest->timeout);
+    threadDatabaseTest->exitCondition++;
     ThreadsDatabase::UnLock();
 }
 
@@ -118,21 +170,40 @@ void LockTimeout(ThreadsDatabaseTest &threadDatabaseTest) {
     ThreadsDatabase::UnLock();
 }
 
+void DoNothingsProtected(ThreadsDatabaseTest *threadDatabaseTest) {
+    ThreadProtectedExecute(DoNothings, (void*) threadDatabaseTest, NULL);
+}
+
 //Test the goodness of the informations in the database and the efficiency of lock and unlock functions
 bool ThreadsDatabaseTest::TestGetInfoAndLock(int32 nOfThreads) {
     exitCondition = 0;
     returnValue = True;
+    if (!eventsem.Reset()) {
+        return False;
+    }
     for (int32 i = 0; i < nOfThreads; i++) {
-        Threads::BeginThread((ThreadFunctionType) GetInfo, this);
+        tids[i] = Threads::BeginThread((ThreadFunctionType) GetInfo, this);
     }
-    int32 j=0;
+    SleepSec(10e-3);
+    if (!eventsem.Post()) {
+        for (int32 i = 0; i < nOfThreads; i++) {
+            Threads::Kill(tids[i]);
+        }
+        return False;
+    }
+
+    int32 j = 0;
     while (exitCondition < nOfThreads) {
-        if(j++>10*nOfThreads) {
-            returnValue=False;
+        if (j++ > 10 * nOfThreads) {
+            for (int32 i = 0; i < nOfThreads; i++) {
+                Threads::Kill(tids[i]);
+            }
+            returnValue = False;
             break;
-        } 
-            SleepSec(100e-3);
+        }
+        SleepSec(100e-3);
     }
+
     return returnValue && (nDatabasedThreads() == 0);
 
 }
@@ -148,16 +219,16 @@ bool ThreadsDatabaseTest::TestRemoveEntry(int32 nOfThreads) {
         tidsDim++;
     }
 
-    int32 j=0;   
-  
+    int32 j = 0;
+
     //wait that all threads begin
     while (exitCondition < nOfThreads) {
-        if(j++>10*nOfThreads) {
+        if (j++ > 10 * nOfThreads) {
             for (int32 i = 0; i < tidsDim; i++) {
                 Threads::Kill(tids[i]);
             }
-        return False;
-        } 
+            return False;
+        }
         SleepSec(10e-3);
     }
 
@@ -225,16 +296,16 @@ bool ThreadsDatabaseTest::TestGetId(int32 nOfThreads) {
         tidsDim++;
     }
 
-    int32 j=0;
+    int32 j = 0;
 
     //wait that all threads begin
     while (exitCondition < nOfThreads - 1) {
-        if(j++>10*nOfThreads) {
+        if (j++ > 10 * nOfThreads) {
             for (int32 i = 0; i < tidsDim; i++) {
                 Threads::Kill(tids[i]);
             }
             return False;
-        } 
+        }
         SleepSec(10e-3);
     }
 
@@ -243,11 +314,11 @@ bool ThreadsDatabaseTest::TestGetId(int32 nOfThreads) {
     //launch a thread with GetId function. It obtains tids of the other threads from database and kill them all.
     Threads::BeginThread((ThreadFunctionType) GetId, this);
 
-    j=0;
+    j = 0;
 
     while (exitCondition < nOfThreads) {
-        if(j++>10*nOfThreads) {
-            returnValue=False;
+        if (j++ > 10 * nOfThreads) {
+            returnValue = False;
         }
         SleepSec(10e-3);
     }
@@ -275,7 +346,8 @@ bool ThreadsDatabaseTest::TestTimeoutLock(TimeoutType time) {
     TID tid1 = Threads::BeginThread((ThreadFunctionType) LockTimeout, this);
 
     //launching a thread which locks with timeout and then increment the exitCondition variable
-    TID tid2 = Threads::BeginThread((ThreadFunctionType) DoNothings, this);
+    TID tid2 = Threads::BeginThread((ThreadFunctionType) DoNothingsProtected,
+                                    this);
     uint32 j = 0;
 
     //wait until the second thread increments exitCondition or too much time is elapsed

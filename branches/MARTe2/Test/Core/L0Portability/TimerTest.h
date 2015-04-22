@@ -72,7 +72,33 @@ public:
         if (!StopTimer()) {
             return False;
         }
+
         return True;
+    }
+
+    bool ResetTimerTest() {
+
+        if (!ConfigAndStartTimer(10000, 0xff)) {
+            return False;
+        }
+
+        //The timer is running so the reset should return true
+        if (!ResetTimer()) {
+            return False;
+        }
+
+        if (!StopTimer()) {
+            return False;
+        }
+
+        //The timer is not running so the reset should return false
+        if (ResetTimer()) {
+
+            return False;
+        }
+
+        return True;
+
     }
 
     /**
@@ -100,6 +126,7 @@ public:
         if (!eventSem.Wait(testTimeout)) {
             return True;
         }
+
         return False;
     }
 

@@ -244,6 +244,23 @@ bool StringPortableTest::TestSearch() {
         return False;
     }
 
+    if ((retPointer = StringPortable::SearchChars(buffer, " e")) == NULL) {
+        return False;
+    }
+
+    if (!StringTestHelper::Compare(retPointer, "ello World")) {
+        return False;
+    }
+
+    if ((retPointer = StringPortable::SearchChars(retPointer + 1, " e"))
+            == NULL) {
+        return False;
+    }
+
+    if (!StringTestHelper::Compare(retPointer, " World")) {
+        return False;
+    }
+
     //Test the search with a list of chars as argument and index as return (return index to the first occurrence).
     const char* charsToSearch = "dow";
 
@@ -399,3 +416,81 @@ bool StringPortableTest::TestToken() {
     return True;
 
 }
+
+bool StringPortableTest::TestNull() {
+
+    int32 size = 2;
+
+    if (StringPortable::Length(NULL) != -1) {
+        return False;
+    }
+
+    if (StringPortable::Equal(NULL, "ciao")) {
+        return False;
+    }
+
+    if (StringPortable::EqualN("ciao", NULL, size)) {
+        return False;
+    }
+
+    char buffer[32];
+
+    if (StringPortable::Append((char*) "Hello", NULL, buffer)) {
+        return False;
+    }
+
+    if (StringPortable::AppendN(NULL, "World", NULL, size)) {
+        return False;
+    }
+
+    if (StringPortable::Cat(NULL, "Hello")) {
+        return False;
+    }
+
+    if (StringPortable::CatN(buffer, NULL, size)) {
+        return False;
+    }
+
+    if (StringPortable::SearchChar(NULL, 'H') != NULL) {
+        return False;
+    }
+
+    if (StringPortable::Copy(NULL, "Hello")) {
+        return False;
+    }
+
+    if (StringPortable::CopyN(buffer, NULL, size)) {
+        return False;
+    }
+
+    if (StringPortable::SearchIndex(NULL, "hey") != -1) {
+        return False;
+    }
+
+    if (StringPortable::SearchChars(NULL, "hey") != NULL) {
+        return False;
+    }
+
+    if (StringPortable::SearchLastChar(NULL, 'c') != NULL) {
+        return False;
+    }
+
+    if (StringPortable::SearchSubstr("Hello", NULL) != NULL) {
+        return False;
+    }
+
+    if (StringPortable::TokenizeByChars(NULL, ".,", buffer) != NULL) {
+        return False;
+    }
+
+    if (StringPortable::TokenizeByString("Hello", NULL, buffer) != NULL) {
+        return False;
+    }
+
+    if (StringPortable::Substr(-1, 3, "Hello", buffer)) {
+        return False;
+    }
+
+    return True;
+}
+

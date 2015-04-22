@@ -58,7 +58,9 @@ bool MemoryTest::TestMallocAndFree(int32 size) {
 
     //free the allocated memory
     MemoryFree((void*&) allocated);
-    return allocated == NULL;
+    uint32 nothing = 0;
+    return allocated == NULL
+            && !MemoryAllocationStatistics(nothing, nothing, nothing);
 }
 
 //Tests the realloc function.
@@ -69,6 +71,7 @@ bool MemoryTest::TestRealloc(int32 size1, int32 size2) {
     //check if the pointers to these memory locations are valid
     for (int32 i = 0; i < size1; i++) {
         if ((allocated + i) == NULL) {
+            MemoryFree((void*&) allocated);
             return False;
         }
         allocated[i] = i;
@@ -81,14 +84,45 @@ bool MemoryTest::TestRealloc(int32 size1, int32 size2) {
     //check if pointers of new memory are valid and if the old memory is not corrupted
     for (int32 i = 0; i < size2; i++) {
         if ((allocated + size1 + i) == NULL) {
+            MemoryFree((void*&) allocated);
             return False;
         }
         if (allocated[i] != i) {
+            MemoryFree((void*&) allocated);
             return False;
         }
     }
 
-    return True;
+    MemoryFree((void*&) allocated);
+    //check if it implemens a malloc in case of null pointer in input.
+    allocated = NULL;
+
+    allocated = (int32*) MemoryRealloc((void*&) allocated,
+                                       size1 * sizeof(int32));
+    for (int32 i = 0; i < size1; i++) {
+        if ((allocated + i) == NULL) {
+            MemoryFree((void*&) allocated);
+            return False;
+        }
+    }
+    uint32 size = 0;
+    //check if implements a free if size is 0.
+    allocated = (int32*) MemoryRealloc((void*&) allocated, size);
+    if (allocated != NULL) {
+        MemoryFree((void*&) allocated);
+        return False;
+    }
+
+    //check if it returns NULL in case of NULL input and size equal to zero.
+    allocated = (int32*) MemoryRealloc((void*&) allocated, size);
+
+    if (allocated != NULL) {
+        MemoryFree((void*&) allocated);
+        return False;
+    }
+
+    //this function is not implemented in linux and should return true.
+    return MemoryCheck(NULL, (MemoryTestAccessMode) 0, 0);
 }
 
 //Test if the string s is copied without errors.
@@ -210,11 +244,10 @@ bool MemoryTest::TestSetAndSearch() {
     char test[] = "ooooouuuuu";
 
     //Check that the Set result is correct.
-    if(MemoryCompare(test, buffPointer, size) != 0){
+    if (MemoryCompare(test, buffPointer, size) != 0) {
         MemoryFree((void*&) buffPointer);
         return False;
     }
-    
 
     //Test the Search function.
     if (MemorySearch(buffPointer, myFavouriteChar, size) != newBuffPointer) {
@@ -228,7 +261,6 @@ bool MemoryTest::TestSetAndSearch() {
         MemoryFree((void*&) buffPointer);
         return False;
     }
-
 
     MemoryFree((void*&) buffPointer);
 

@@ -57,7 +57,6 @@ bool BasicConsoleTest::TestWrite(char* string, int32 padding) {
 
     bool condition1 = BasicConsoleWrite(myConsole, string, size,
                                         TTInfiniteWait);
-
     //return true if the size is correct
     return condition1 && (size == stringSize);
 
@@ -86,9 +85,9 @@ bool BasicConsoleTest::TestRead(char* stringArg, int32 sizeArg) {
     if ((stringSize = StringTestHelper::Size(stringArg)) < 0) {
         return False;
     }
-    const char* prefix="\nPut";
+    const char* prefix = "\nPut: ";
     //define the request to print
-    StringTestHelper::Append((char*)prefix, stringArg, result);
+    StringTestHelper::Append((char*) prefix, stringArg, result);
 
     //print the request: the user must insert the string passed by argument
     TestWrite(result, 0);
@@ -101,12 +100,12 @@ bool BasicConsoleTest::TestRead(char* stringArg, int32 sizeArg) {
 
     //return true if the read string is equal to the argument
     if (sizeArg != 0) {
-        return condition1 && condition2 && (size == ((uint32)sizeArg));
+        return condition1 && condition2 && (size == ((uint32) sizeArg));
     }
     else {
         string[size] = '\n';
         string[size + 1] = '\0';
-        return (size == 1) && TestWrite(string, 0);
+        return (size == 1); //&& TestWrite(string, 0);
     }
 
 }
@@ -120,6 +119,16 @@ bool BasicConsoleTest::TestPaging(int32 overflow, int32 rows, int32 columns) {
     }
 
     if (!myConsole.SetSize(rows, columns)) {
+        return False;
+    }
+    int32 retRows = 0;
+    int32 retCols = 0;
+
+    if (!myConsole.GetSize(retRows, retCols)) {
+        return False;
+    }
+
+    if (rows != retRows || columns != retCols) {
         return False;
     }
 
@@ -148,8 +157,56 @@ bool BasicConsoleTest::TestPerfChar() {
         return False;
     }
 
-    const char* request="press any key\n";
+    const char* request = "press any key\n";
     //return true if the size of the read string is one as aspected.
-    return TestRead((char*)request, 0);
+    return TestRead((char*) request, 0);
 }
 
+bool BasicConsoleTest::TestNotImplemented() {
+    int32 rows = 0;
+    int32 cols = 0;
+
+    if (!myConsole.SetWindowSize(5, 5)) {
+        return False;
+    }
+
+    if (!myConsole.GetWindowSize(rows, cols)) {
+        return False;
+    }
+
+    if (rows != 5 || cols != 5) {
+        return False;
+    }
+
+    Colours black;
+
+    if (myConsole.SetColour(black, black)) {
+        return False;
+    }
+
+    if (myConsole.SetCursorPosition(rows, cols)) {
+        return False;
+    }
+
+    if (myConsole.GetCursorPosition(rows, cols)) {
+        return False;
+    }
+
+    if (myConsole.SetTitleBar("Title")) {
+        return False;
+    }
+
+    if (!myConsole.Show()) {
+        return False;
+    }
+
+    if (myConsole.PlotChar('c', black, black, rows, cols)) {
+        return False;
+    }
+
+    if (!myConsole.Clear()) {
+        return False;
+    }
+
+    return True;
+}

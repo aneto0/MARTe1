@@ -52,3 +52,9 @@ TEST_F(StringPortableGTest,TestToken) {
     StringPortableTest mystringportable;
     ASSERT_TRUE(mystringportable.TestToken());
 }
+
+
+TEST_F(StringPortableGTest,TestNull) {
+    StringPortableTest mystringportable;
+    ASSERT_TRUE(mystringportable.TestNull());
+}

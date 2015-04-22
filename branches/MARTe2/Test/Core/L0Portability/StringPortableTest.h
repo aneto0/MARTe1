@@ -74,6 +74,8 @@ public:
      * @return true if the operations return the expected result. */
     bool TestToken();
 
+    bool TestNull();
+
 };
 
 #endif

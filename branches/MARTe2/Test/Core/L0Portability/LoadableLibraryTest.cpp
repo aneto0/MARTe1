@@ -25,7 +25,6 @@
 #include "GeneralDefinitions.h"
 #include "LoadableLibraryTest.h"
 
-
 //Test if the the library in the argument is opened.
 bool LoadableLibraryTest::TestOpenCloseLibrary(const char *dllName) {
     if (myLoadableLibrary.Open(dllName)) {
@@ -41,6 +40,10 @@ bool LoadableLibraryTest::TestOpenCloseLibrary(const char *dllName) {
 bool LoadableLibraryTest::TestLoadFunction(const char *dllName,
                                            const char *dllFunction) {
     if (!myLoadableLibrary.Open(dllName)) {
+        return False;
+    }
+
+    if (myLoadableLibrary.Function(NULL) != NULL) {
         return False;
     }
 
