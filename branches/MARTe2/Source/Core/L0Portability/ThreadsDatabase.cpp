@@ -222,7 +222,7 @@ TID ThreadsDatabaseGetThreadID(int32 n) {
  to be called between Lock/UnLock*/
 bool ThreadsDatabaseGetInfo(ThreadInformation &threadInfoCopy, int32 n,
                             TID threadId) {
-    if (n > 0) {
+    if (n >= 0) {
         TID threadId = ThreadsDatabaseGetThreadID(n);
         ThreadInformation *threadInfo = ThreadsDatabaseGetThreadInformation(
                 threadId);

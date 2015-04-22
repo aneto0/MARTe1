@@ -123,7 +123,7 @@ bool BasicConsoleRead(BasicConsole &con, void* buffer, uint32 &size,
                       TimeoutType msecTimeout);
 
 /** @brief Not implemented.  */
-bool BasicConsoleSetTitleBar(const char *title);
+bool BasicConsoleSetTitleBar(BasicConsole &con, const char *title);
 
 /** @brief Set the size of the console con.
   * @param con is the console.
@@ -159,7 +159,7 @@ bool BasicConsoleGetCursorPosition(BasicConsole &con, int &column, int &row);
   * Go to the next row nOfColumns times.
   * @param con is the console.
   * @return true. */
-bool BasicBasicConsoleClear(BasicConsole &con);
+bool BasicConsoleClear(BasicConsole &con);
 
 /** @brief Not implemented. */
 bool BasicConsoleSetColour(BasicConsole &con, Colours foreGroundColour,
@@ -223,7 +223,7 @@ private:
                                   uint32 &size, TimeoutType msecTimeout);
     friend bool BasicConsoleRead(BasicConsole &con, void* buffer, uint32 &size,
                                  TimeoutType msecTimeout);
-    friend bool BasicConsoleSetTitleBar(const char *title);
+    friend bool BasicConsoleSetTitleBar(BasicConsole &con, const char *title);
     friend bool BasicConsoleSetSize(BasicConsole &con, int32 numberOfColumns,
                                     int32 numberOfRows);
     friend bool BasicConsoleGetSize(BasicConsole &con, int32 &numberOfColumns,
@@ -247,6 +247,7 @@ private:
                                      Colours foreGroundColour,
                                      Colours backGroundColour, int32 column,
                                      int32 row);
+    friend bool BasicConsoleClear(BasicConsole &con);
 
 public:
 
@@ -290,7 +291,7 @@ public:
     /** @brief Set Title Bar text.
       * @see BasicConsoleSetTitleBar(). */
     inline bool SetTitleBar(const char *title) {
-        return BasicConsoleSetTitleBar(title);
+        return BasicConsoleSetTitleBar(*this, title);
     }
 
     /** @brief Sets the size of the buffer.
@@ -339,7 +340,7 @@ public:
       * @see BasicConsoleClear(). */
     inline bool Clear() {
         lineCount = 0;
-        return BasicBasicConsoleClear(*this);
+        return BasicConsoleClear(*this);
     }
 
     /** @brief Enable or Disable the paging mode using the operators.
