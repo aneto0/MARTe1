@@ -25,7 +25,7 @@
 #include "GeneralDefinitions.h"
 #include "StringHelperTest.h"
 #include "StringTestHelper.h"
-#include "stdio.h"
+
 
 bool StringHelperTest::TestLength(const char* string) {
     //Calculate the length of the string.
@@ -256,33 +256,27 @@ bool StringHelperTest::TestToken() {
     //Test the tokenize giving chars as delimiters.
     if ((retPointer = StringHelper::Tokenizer(buffer1, charDelimiters))
             == NULL) {
-        printf("\nesco 1\n");
         return False;
     }
 
     if (!StringTestHelper::Compare(retPointer, "Hello")) {
-        printf("\n1 %s\n", buffer1);
         return False;
     }
 
     //If NULL is the source argument it tokenize from the next pointer.
     if ((retPointer = StringHelper::Tokenizer(NULL, charDelimiters)) == NULL) {
-        printf("\nesco 2\n");
         return False;
     }
 
     if (!StringTestHelper::Compare(retPointer, "World")) {
-        printf("\n2 %s\n", buffer1);
         return False;
     }
 
     if ((retPointer = StringHelper::Tokenizer(NULL, charDelimiters)) == NULL) {
-        printf("\nesco 3\n");
         return False;
     }
 
     if (!StringTestHelper::Compare(retPointer, "I am...Giuseppe")) {
-        printf("\n3 %s\n", buffer1);
         return False;
     }
 

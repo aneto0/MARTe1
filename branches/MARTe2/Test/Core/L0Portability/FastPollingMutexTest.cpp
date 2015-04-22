@@ -24,7 +24,7 @@
 
 #include "GeneralDefinitions.h"
 #include "FastPollingMutexTest.h"
-#include <stdio.h>
+
 
 //It's used to implement FastLock() function
 bool MutexLock(FastPollingMutexTest &fastMutexTest, int32 index) {
