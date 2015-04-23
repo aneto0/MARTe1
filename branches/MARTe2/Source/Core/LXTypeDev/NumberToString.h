@@ -26,14 +26,14 @@
 #define NUMBER_TO_STRING
 
 #include "GeneralDefinitions.h"
-#include "math.h"
+#include <math.h>
 
 
 
 // returns the exponent
 // positiveNumber is the abs (number)
 template <typename T> uint8 GetOrderOfMagnitude(T positiveNumber){       
-    tenToExponent = 1;
+    int32 tenToExponent = 1;
     T temp ;
     uint8 exp = 0;
     if (sizeof(T)>=8){ // max 19
@@ -81,7 +81,7 @@ template <typename T> uint8 GetOrderOfMagnitude(T positiveNumber){
  *  numberFillLength shall be set to 4 
  *  streamer must have a PutC(char) method. It will be used to output the digits
  */   
-template <typename T, class streamer> void NToDecimalStreamPrivate(streamer s, T positiveNumber,int8 numberFillLength=0){
+template <typename T, class streamer> void NToDecimalStreamPrivate(streamer &s, T positiveNumber,int8 numberFillLength=0){
 
 	if (numberFillLength < 0) numberFillLength=0;
 	// calculates the number of obligatory digits for first section by removing the nearest multiple of 4
@@ -161,7 +161,7 @@ template <typename T, class streamer> void NToDecimalStreamPrivate(streamer s, T
  * uses any class with method PutC
  * if it does not fit returns "?" 
  */
-template <typename T, class streamer> bool NumberToDecimalStream(streamer stream, T number,uint8 maximumSize=0,bool padded=false,bool leftAligned=false, bool addPositiveSign=false){
+template <typename T, class streamer> bool NumberToDecimalStream(streamer &stream, T number,uint8 maximumSize=0,bool padded=false,bool leftAligned=false, bool addPositiveSign=false){
 
 	T positiveNumber;
 	uint8 numberSize = 1;
@@ -173,11 +173,13 @@ template <typename T, class streamer> bool NumberToDecimalStream(streamer stream
 		positiveNumber = number;
 	}
 	
-	numberSize += OrderOfMagnitude(positiveNumber);
+	numberSize += GetOrderOfMagnitude(positiveNumber);
 	
+	if(maximumSize==0) maximumSize=numberSize;
+
 	if (addPositiveSign) numberSize++;
 	
-	if ((maximumSize != 0) && (maximumSize < numberSize)){
+	if (maximumSize < numberSize){
 		numberSize = 1; // just the '?'
 		
 		if (padded && !leftAligned){
@@ -187,12 +189,14 @@ template <typename T, class streamer> bool NumberToDecimalStream(streamer stream
 		stream.PutC('?');
 		
 	} else {
-
+		
 		if (padded && !leftAligned){
 			for (int i=0;i < maximumSize-numberSize;i++) stream.PutC(' ');
 		}
+		
+		if(number<0) stream.PutC('-');
+		else if (addPositiveSign) stream.PutC('+');
 
-		if (addPositiveSign) stream.PutC('+');
 		NToDecimalStreamPrivate(stream, positiveNumber);
 	}
 	
@@ -225,18 +229,22 @@ template <typename T> uint8 GetOrderOfMagnitudeHex(T positiveNumber){
  * if there is enough space a pointer is returned to the start of the number in buffer.
  * buffer is filled from the end backwards
  */
-template <typename T> const char *NumberToHexadecimalStream(streamer stream, T number,uint8 maximumSize=0,bool padded=false,bool leftAligned=false, bool putTrailingZeros=false,bool addHeader=false){       
+template <typename T, class streamer> bool NumberToHexadecimalStream(streamer &stream, T number,uint8 maximumSize=0,bool padded=false,bool leftAligned=false, bool putTrailingZeros=false,bool addHeader=false){       
 
 	// sizeof(number) * 8 = totalBits
 	// divided by 4 = number of digits
 	int numberSize = 0;
-	if (putTrailingZeros) numberSize = sizeof (T)*2;
-	else 				  numberSize = GetOrderOfMagnitudeHex(T) + 1;
 	
-	// consider terminator 0 and header
-	if (addHeader) totalBufferSize +=2;
+	if (putTrailingZeros) numberSize = sizeof (T)*2;
+	else  numberSize = GetOrderOfMagnitudeHex(number) + 1;
 
-	if ((maximumSize != 0) && (maximumSize < numberSize)){
+
+	// consider terminator 0 and header
+	if (addHeader) numberSize +=2;
+
+	if(maximumSize==0) maximumSize=numberSize;
+
+	if (maximumSize < numberSize){
 		numberSize = 1; // just the '?'
 		
 		if (padded && !leftAligned){
@@ -253,13 +261,15 @@ template <typename T> const char *NumberToHexadecimalStream(streamer stream, T n
 
 		if (addHeader) stream.PutC('0');
 		if (addHeader) stream.PutC('x');
-		
-		for (int i = (sizeof(T) * 8) - 4 ; i >= 0 ;i-=4){
+	
+			
+	
+		for (int i = (sizeof(T) * 8) - 4; i>=0; i-=4){
 			uint8 digit = (number >> i) & 0xF;			
 			if ((digit != 0) || (putTrailingZeros)){
 				putTrailingZeros = true;
-				if (digit < 10)   buffer[nextFree--] = '0' + digit;
-				else              buffer[nextFree--] = 'A' + digit - 10;
+				if (digit < 10)   stream.PutC('0'+digit);
+				else              stream.PutC('A'+digit-10);
 			} 
 		}
 	}
@@ -737,8 +747,11 @@ template <typename T> const char *FloatToFixed(uint16 &stringSize,char *buffer,u
 static inline uint16 NumberOfDigitsOfExponent(int16 exponent){
 	// workout the size of exponent
 	// the size of exponent is 2+expNDigits 
-	int16_t exponentNumberOfDigits = 3;// E+nn
-	uint16 absExponent = abs (exponent);
+	int16 exponentNumberOfDigits = 3;// E+nn
+	uint16 absExponent = exponent;
+	if(absExponent<0){
+		absExponent*=-1;
+	}
 	while (absExponent > 10){
 		exponentNumberOfDigits++;
 		absExponent /= 10;
@@ -808,7 +821,8 @@ static inline int16 ExponentToEngineering(int16 &exponent){
 
 static inline uint8 EngineeringFormatSize(int16 exponent,uint16 precision){    
 	uint8 engineeringNotationSize = precision;
-    engineeringNotationSize += NumberOfDigitsOfExponent(ExponentToEngineering(exponent));
+	int16 exponentCopy=exponent;
+    engineeringNotationSize += NumberOfDigitsOfExponent(ExponentToEngineering(exponentCopy));
         
     if (exponent > (precision-1)) engineeringNotationSize = exponentCopy;
     if (exponent < (precision-1)) engineeringNotationSize++;
@@ -873,6 +887,7 @@ template <typename T> const char *FloatToEngineering(uint16 &stringSize,char *bu
 static inline uint8 SmartFormatSize(int16 exponent,uint16 precision){    
 	uint8 smartNotationSize = precision;
     int16 exponentCopy = exponent;
+	uint16 engineeringNotationSize=precision;
     int16 engineeringExponent = ExponentToEngineering(exponentCopy);
         
     if ((engineeringExponent != 0) && (engineeringExponent<=12) && (engineeringExponent>=-12)){
@@ -884,7 +899,7 @@ static inline uint8 SmartFormatSize(int16 exponent,uint16 precision){
     if (exponent > (precision-1)) smartNotationSize = exponentCopy;
     if (exponent < (precision-1)) smartNotationSize++;
     
-    return smartNotationSize'
+    return smartNotationSize;
 }	
 /**
  * converts a float/double (or any other equivalent) to a string using engineering format
@@ -956,7 +971,7 @@ template <typename T> const char *FloatToCompact(uint16 &stringSize,char *buffer
 	char *pBuffer = buffer;
 
     // deals with nan, 0 etc
-    if (!BasicFloatConversion(stringSize,pBuffer,sizeLeft,number, precision)){}
+    if (!BasicFloatConversion(stringSize,pBuffer,sizeLeft,number, precision)){
         return pBuffer;
     }
 
@@ -973,10 +988,10 @@ template <typename T> const char *FloatToCompact(uint16 &stringSize,char *buffer
     int chosen = 0;
     int size = fs[0];
     for (int i = 1; i < 4;i++){
-        if (((fs[i] <=  sizeLeft) && (fs[i] > fs[chosen])) || ((fs[i] < fs[chosen]) && (fs[chosen] > sizeleft))) chosen = i;
+        if (((fs[i] <=  sizeLeft) && (fs[i] > fs[chosen])) || ((fs[i] < fs[chosen]) && (fs[chosen] > sizeLeft))) chosen = i;
     }
-    if (fs[chosen] > sizeleft){
-        precision -= (fs[chosen] + sizeleft);
+    if (fs[chosen] > sizeLeft){
+        precision -= (fs[chosen] + sizeLeft);
     }
     
     if ( precision < 1) return "?";
@@ -1036,5 +1051,4 @@ template <typename T> const char *FloatToCompact(uint16 &stringSize,char *buffer
 
 	return buffer;
 }
-
-	
+#endif	
