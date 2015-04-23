@@ -328,7 +328,7 @@ template <typename T, class streamer> bool NumberToOctalStream(streamer &stream,
 	// divided by 4 = number of digits
 	int numberSize = 0;
 	
-	if (putTrailingZeros) numberSize = sizeof (T)*2;
+	if (putTrailingZeros) numberSize = (sizeof(T)*8+2)/3;
 	else  numberSize = GetOrderOfMagnitudeOct(number) + 1;
 
 	if (addHeader) numberSize +=2;
@@ -391,7 +391,7 @@ template <typename T, class streamer> bool NumberToBinaryStream(streamer &stream
 	// divided by 4 = number of digits
 	int numberSize = 0;
 	
-	if (putTrailingZeros) numberSize = sizeof (T)*2;
+	if (putTrailingZeros) numberSize = sizeof (T)*8;
 	else  numberSize = GetOrderOfMagnitudeBin(number) + 1;
 
 
