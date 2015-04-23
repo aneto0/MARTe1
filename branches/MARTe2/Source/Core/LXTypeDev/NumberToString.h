@@ -235,13 +235,14 @@ template <typename T> uint8 GetOrderOfMagnitudeBin(T positiveNumber){
 	uint8 log=bits/factor;
 	uint8 index=log-1;
 	T test=1<<index;
-	while(log>1 && positiveNumber!=test){
+	while(log>1){
 		factor*=2;
 		log=bits/factor;
-		if(positiveNumber>test)
+		if(positiveNumber>=(2*test))
 			index+=log;	
-		else
+		else if(positiveNumber<test)
 			index-=log;
+		else break;
 		test=1<<index;
 	}
 
