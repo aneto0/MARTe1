@@ -29,13 +29,15 @@
 #include <math.h>
 
 
-
 // returns the exponent
 // positiveNumber is the abs (number)
+// operates by comparing with 10**N with converging by bisection to the correct value
+// returns the number of digits after the first or the exponent
 template <typename T> uint8 GetOrderOfMagnitude(T positiveNumber){       
     int32 tenToExponent = 1;
     T temp ;
     uint8 exp = 0;
+    // check whether exponent greater than 10  
     if (sizeof(T)>=8){ // max 19
         temp = tenToExponent * 10000000000; // 10 zeros 
         if (positiveNumber >= temp )  {
@@ -44,6 +46,7 @@ template <typename T> uint8 GetOrderOfMagnitude(T positiveNumber){
         }
     }
     
+    // check whether exponent greater than 5  
     if (sizeof(T)>=4){ // max 9 
         temp = tenToExponent * 100000; // 5 zeros
         if (positiveNumber >= temp ) {
@@ -52,6 +55,7 @@ template <typename T> uint8 GetOrderOfMagnitude(T positiveNumber){
         }
     }
     
+    // check whether exponent greater than 2  
     if (sizeof(T)>=2){ // max 4 zeros
         temp = tenToExponent * 100; // 2 zeros
         if (positiveNumber >= temp ) {
@@ -60,12 +64,16 @@ template <typename T> uint8 GetOrderOfMagnitude(T positiveNumber){
         }
     }
     
+    // check whether exponent greater than 1  
     temp = tenToExponent * 10; // 1 
     if (positiveNumber >= temp ){
             tenToExponent = temp;
             exp ++;
-        }
+    }
+    
+    // check whether exponent greater than 1  
     temp = tenToExponent * 10;  // 1
+    // avoid overflowing in case of signed number
     if (temp > tenToExponent){
     	if (positiveNumber >= temp ){
             tenToExponent = temp;
@@ -161,64 +169,115 @@ template <typename T, class streamer> void NToDecimalStreamPrivate(streamer &s, 
  * uses any class with method PutC
  * if it does not fit returns "?" 
  */
-template <typename T, class streamer> bool NumberToDecimalStream(streamer &stream, T number,uint8 maximumSize=0,bool padded=false,bool leftAligned=false, bool addPositiveSign=false){
+template <typename T, class streamer> 
+bool NumberToDecimalStream(
+			streamer &		stream,                        // must have a GetC(c) function where c is of a type that can be obtained from chars  
+			T 				number,
+			uint8 			maximumSize			= 0,       // 0 means that the number is printed in its entirety
+			bool 			padded				= false,   // if maximumSize!=0 & align towards the right or the left
+			bool 			leftAligned			= false,   // if padded and maximumSize!=0 align towards the left
+			bool 			addPositiveSign		= false)   // prepend with + not just with - for negative numbers
+{
 
+	// put here the unsigned version of the number
 	T positiveNumber;
+	// put here the total space needed for the number
+	// 1 always for the one figure to print
 	uint8 numberSize = 1;
-	
+
+	// add the number of figures beyond the first 
+	numberSize += GetOrderOfMagnitude(positiveNumber);
+
+	// if negative invert it and account for the '-' in the size
 	if (number < 0) {
 		positiveNumber = -number;
 		numberSize++;
 	} else {
+		// if positive copy it and account for the '+' in the size if addPositiveSign set
 		positiveNumber = number;
+		if (addPositiveSign) numberSize++;
 	}
-	
-	numberSize += GetOrderOfMagnitude(positiveNumber);
-	
-	if(maximumSize==0) maximumSize=numberSize;
+	// if no limits set the numberSize as the limit
+	if (maximumSize==0) maximumSize=numberSize;
 
-	if (addPositiveSign) numberSize++;
-	
+    // is there enough space for the number?
 	if (maximumSize < numberSize){
-		numberSize = 1; // just the '?'
-		
+		// if no than we shall print '?' so the size is 1 now
+		numberSize = 1; 
+
+		// fill up to from 1 maximumSize with ' '
 		if (padded && !leftAligned){
-			for (int i=0;i < maximumSize-1;i++) stream.PutC(' ');
+			for (int i=1;i < maximumSize;i++) stream.PutC(' ');
 		}
 		
+		// put the ?
 		stream.PutC('?');
 		
-	} else {
+	} else { // enough space
 		
+		// fill up from numberSize to maximumSize with ' '
 		if (padded && !leftAligned){
-			for (int i=0;i < maximumSize-numberSize;i++) stream.PutC(' ');
+			for (int i=numberSize;i < maximumSize;i++) stream.PutC(' ');
 		}
-		
-		if(number<0) stream.PutC('-');
-		else if (addPositiveSign) stream.PutC('+');
+		// add sign 
+		if (number < 0)      stream.PutC('-');
+		else 
+        if (addPositiveSign) stream.PutC('+');
 
+		// put number
 		NToDecimalStreamPrivate(stream, positiveNumber);
 	}
 	
+	// fill up from numberSize to maximumSize with ' '
 	if (padded && leftAligned){
-		for (int i=0;i < maximumSize-numberSize;i++) stream.PutC(' ');
+		for (inrt i=numberSize;i < maximumSize;i++) stream.PutC(' ');
 	}
     return true;	
 }
 
 
-// returns the exponent
+// returns the number of digits necessary to represent this number -1 
 // positiveNumber is the abs (number)
 template <typename T> uint8 GetOrderOfMagnitudeHex(T positiveNumber){
 	uint8 exp = 0;
-	while (positiveNumber > 0xF){
-		positiveNumber >>= 4;
-		exp++;
+
+	// check if larger than 2**32
+	if (sizeof(T)==8)
+		if  (positiveNumber >= 0x100000000){
+			exp += 8;
+			T >>= 32;
+		}
+
+	// check if larger than 2**16
+	if (sizeof(T)>=4)
+		if  (positiveNumber >= 0x10000){
+			exp += 4;
+			T >>= 16;
+		}
+
+	// check if larger than 2**8
+	if (sizeof(T)>=2)
+		if  (positiveNumber >= 0x100){
+			exp += 2;
+			T >>= 8;
+		}
+
+	// check if larger than 2**4
+	if  (positiveNumber >= 0x10){
+		exp += 1;
+		T >>= 4;
 	}
+
+//	while (positiveNumber > 0xF){
+//		positiveNumber >>= 4;
+//		exp++;
+//	}
 	
     return exp;
 }
 
+// returns the number of digits necessary to represent this number -1 
+// positiveNumber is the abs (number)
 template <typename T> uint8 GetOrderOfMagnitudeOct(T positiveNumber){
 	uint8 exp = 0;
 	while (positiveNumber > 0x7){
@@ -229,6 +288,55 @@ template <typename T> uint8 GetOrderOfMagnitudeOct(T positiveNumber){
     return exp;
 }
 
+
+// returns the number of digits necessary to represent this number -1 
+// positiveNumber is the abs (number)
+template <typename T> uint8 GetOrderOfMagnitudeBin(T positiveNumber){
+	uint8 exp = 0;
+
+	// check if larger than 2**32
+	// if so shift 
+	if (sizeof(T)==8)
+		if  (positiveNumber >= 0x100000000){
+			exp += 32;
+			positiveNumber >>= 32;
+		}
+
+	// check if larger than 2**16
+	if (sizeof(T)>=4)
+		if  (positiveNumber >= 0x10000){
+			exp += 16;
+			positiveNumber >>= 16;
+		}
+
+	// check if larger than 2**8
+	if (sizeof(T)>=2)
+		if  (positiveNumber >= 0x100){
+			exp += 8;
+			positiveNumber >>= 8;
+		}
+	// check if larger than 2**4
+	if  (positiveNumber >= 0x10){
+		exp += 4;
+		positiveNumber >>= 4;
+	}
+
+	// check if larger than 2**2
+	if  (positiveNumber >= 0x4){
+		exp += 2;
+		positiveNumber >>= 2;
+	}
+
+	// check if larger than 2**1
+	if  (positiveNumber >= 0x2){
+		exp += 1;
+		positiveNumber >>= 1;
+	}
+
+    return exp;
+}
+
+/*
 template <typename T> uint8 GetOrderOfMagnitudeBin(T positiveNumber){
 	uint8 factor=2;
 	uint8 bits=sizeof(T)*8;
@@ -254,10 +362,8 @@ template <typename T> uint8 GetOrderOfMagnitudeBin(T positiveNumber){
 	return index;
 }
 	
+*/
 
-
-
-	
 
 /**
  * Converts any integer type, signed and unsigned to string in hexadecimal notation 
@@ -268,39 +374,64 @@ template <typename T> uint8 GetOrderOfMagnitudeBin(T positiveNumber){
  * if there is enough space a pointer is returned to the start of the number in buffer.
  * buffer is filled from the end backwards
  */
-template <typename T, class streamer> bool NumberToHexadecimalStream(streamer &stream, T number,uint8 maximumSize=0,bool padded=false,bool leftAligned=false, bool putTrailingZeros=false,bool addHeader=false){       
+template <typename T, class streamer> 
+bool NumberToHexadecimalStream(
+			streamer &		stream, 
+			T 				number,
+			uint8 			maximumSize			=0,
+			bool 			padded				=false,
+			bool 			leftAligned			=false, 
+			bool 			putTrailingZeros	=false,
+			bool 			addHeader			=false)
+{       
+	// put here size of number
+	uint8 numberSize       = 0;
+	uint8 numberSizePadded = 0;
+	uint8 numberDigits     = 0;
 
-	// sizeof(number) * 8 = totalBits
-	// divided by 4 = number of digits
-	int numberSize = 0;
-	
-	if (putTrailingZeros) numberSize = sizeof (T)*2;
-	else  numberSize = GetOrderOfMagnitudeHex(number) + 1;
-
-
-	// consider terminator 0 and header
+	// adding two chars 0x header
 	if (addHeader) numberSize +=2;
 
-	if(maximumSize==0) maximumSize=numberSize;
+	// if we add the trailing zeroes
+	// sizeof(number) * 8 = totalBits
+	// divided by 4 = number of digits	
+	numberSizePadded = numberSize + sizeof (T) * 2;
 
+	numberDigits = GetOrderOfMagnitudeHex(number) + 1;
+	// minimum requirements size!
+	numberSize += numberDigits;
+
+	// if not limits then use the number size as limt
+	if (maximumSize==0) maximumSize = numberSizePadded;
+
+	// cannot fit the number
 	if (maximumSize < numberSize){
 		numberSize = 1; // just the '?'
 		
+		// pad on the left
 		if (padded && !leftAligned){
-			for (int i=0;i < maximumSize-1;i++) stream.PutC(' ');
+			for (int i=1;i < maximumSize;i++) stream.PutC(' ');
 		}
-		
+		// put the ?
 		stream.PutC('?');
 		
 	} else {
+		// allow adding header
+		if (addHeader) numberSize = numberSizePadded;
 
+		// in case of left alignment
 		if (padded && !leftAligned){
-			for (int i=0;i < maximumSize-numberSize;i++) stream.PutC(' ');
+			for (int i=numberSize;i < maximumSize;i++) stream.PutC(' ');
 		}
 
-		if (addHeader) stream.PutC('0');
-		if (addHeader) stream.PutC('x');
+		// add header
+		if (addHeader) {
+			stream.PutC('0');
+			stream.PutC('x');
+		}
 	
+
+		
 		int bits=(numberSize-1)*4;	
 	
 		for (int i = bits; i>=0; i-=4){
@@ -313,14 +444,13 @@ template <typename T, class streamer> bool NumberToHexadecimalStream(streamer &s
 		}
 	}
 	
+	// in case of right alignment
 	if (padded && leftAligned){
-		for (int i=0;i < maximumSize-numberSize;i++) stream.PutC(' ');
+		for (int i = numberSize;i < maximumSize;i++) stream.PutC(' ');
 	}
     return true;	
 	
 }
-
-
 
 template <typename T, class streamer> bool NumberToOctalStream(streamer &stream, T number,uint8 maximumSize=0,bool padded=false,bool leftAligned=false, bool putTrailingZeros=false, bool addHeader=false){       
 
