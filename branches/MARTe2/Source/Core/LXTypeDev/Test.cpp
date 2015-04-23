@@ -159,12 +159,28 @@ bool TestToDecimalStream(){
 
 bool TestToHexadecimalStream(){
 	myStream thisStream;
-	int32 number=0x8af;
+	uint8 number=0x8f;
 	NumberToHexadecimalStream(thisStream, number);
 	printf("\nT buffer3: %s\n", thisStream.Buffer());
 	return True;
 }
 
+bool TestToOctalStream(){
+	myStream thisStream;
+	uint8 number=0xfd;
+	NumberToOctalStream(thisStream, number);
+	printf("\nT buffer4: %s\n", thisStream.Buffer());
+	return True;
+}
+
+bool TestToBinaryStream(){
+	myStream thisStream;
+	uint8 number=0xa1;
+	uint8 size=GetOrderOfMagnitudeBin(number); 
+	NumberToBinaryStream(thisStream, number);
+	printf("\nT buffer5: %s\n", thisStream.Buffer());
+	return True;
+}
 
 int main(int argc, char **argv){
     char buffer[100];
@@ -176,6 +192,8 @@ int main(int argc, char **argv){
 	TestToDecimalStreamPrivate();
 	TestToDecimalStream();
 	TestToHexadecimalStream();
+	TestToOctalStream();
+	TestToBinaryStream();
 
     printf("%s\n", NumberToDecimal(size, buffer, sizeof(buffer), n, false));
     printf("%s\n", NumberToHexadecimal(size, buffer, sizeof(buffer), n, false));

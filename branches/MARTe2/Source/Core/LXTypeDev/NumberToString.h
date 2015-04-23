@@ -219,6 +219,44 @@ template <typename T> uint8 GetOrderOfMagnitudeHex(T positiveNumber){
     return exp;
 }
 
+template <typename T> uint8 GetOrderOfMagnitudeOct(T positiveNumber){
+	uint8 exp = 0;
+	while (positiveNumber > 0x7){
+		positiveNumber >>= 3;
+		exp++;
+	}
+	
+    return exp;
+}
+
+template <typename T> uint8 GetOrderOfMagnitudeBin(T positiveNumber){
+	uint8 factor=2;
+	uint8 bits=sizeof(T)*8;
+	uint8 log=bits/factor;
+	uint8 index=log-1;
+	T test=1<<index;
+	while(log>1 && positiveNumber!=test){
+		factor*=2;
+		log=bits/factor;
+		if(positiveNumber>test)
+			index+=log;	
+		else
+			index-=log;
+		test=1<<index;
+	}
+
+	if(positiveNumber>=(2*test)){
+		index++;
+	}
+		
+	
+	return index;
+}
+	
+
+
+
+	
 
 /**
  * Converts any integer type, signed and unsigned to string in hexadecimal notation 
@@ -262,9 +300,9 @@ template <typename T, class streamer> bool NumberToHexadecimalStream(streamer &s
 		if (addHeader) stream.PutC('0');
 		if (addHeader) stream.PutC('x');
 	
-			
+		int bits=(numberSize-1)*4;	
 	
-		for (int i = (sizeof(T) * 8) - 4; i>=0; i-=4){
+		for (int i = bits; i>=0; i-=4){
 			uint8 digit = (number >> i) & 0xF;			
 			if ((digit != 0) || (putTrailingZeros)){
 				putTrailingZeros = true;
@@ -280,6 +318,120 @@ template <typename T, class streamer> bool NumberToHexadecimalStream(streamer &s
     return true;	
 	
 }
+
+
+
+template <typename T, class streamer> bool NumberToOctalStream(streamer &stream, T number,uint8 maximumSize=0,bool padded=false,bool leftAligned=false, bool putTrailingZeros=false, bool addHeader=false){       
+
+	// sizeof(number) * 8 = totalBits
+	// divided by 4 = number of digits
+	int numberSize = 0;
+	
+	if (putTrailingZeros) numberSize = sizeof (T)*2;
+	else  numberSize = GetOrderOfMagnitudeOct(number) + 1;
+
+	if (addHeader) numberSize +=2;
+	
+	if(maximumSize==0) maximumSize=numberSize;
+
+	if (maximumSize < numberSize){
+		numberSize = 1; // just the '?'
+		
+		if (padded && !leftAligned){
+			for (int i=0;i < maximumSize-1;i++) stream.PutC(' ');
+		}
+		
+		stream.PutC('?');
+		
+	} else {
+
+		if (padded && !leftAligned){
+			for (int i=0;i < maximumSize-numberSize;i++) stream.PutC(' ');
+		}
+
+		if (addHeader) stream.PutC('0');
+		if (addHeader) stream.PutC('o');
+	
+		int bits=(numberSize-1)*3;
+
+		if((bits+3)>(sizeof(T)*8)){
+			uint8 digit = (number >> bits) & 0x7;
+			bits-=3;			
+			if ((digit != 0) || (putTrailingZeros)){
+				putTrailingZeros=true;
+				stream.PutC('0'+digit);
+			}
+		}	
+
+		for (int i = bits; i>=0; i-=3){
+			uint8 digit = (number >> i) & 0x7;			
+			if ((digit != 0) || (putTrailingZeros)){
+				putTrailingZeros=true;
+				stream.PutC('0'+digit);
+			} 
+		}
+
+		
+	}
+	
+	if (padded && leftAligned){
+		for (int i=0;i < maximumSize-numberSize;i++) stream.PutC(' ');
+	}
+    return true;	
+	
+}
+
+
+
+
+template <typename T, class streamer> bool NumberToBinaryStream(streamer &stream, T number,uint8 maximumSize=0,bool padded=false,bool leftAligned=false, bool putTrailingZeros=false){       
+
+	// sizeof(number) * 8 = totalBits
+	// divided by 4 = number of digits
+	int numberSize = 0;
+	
+	if (putTrailingZeros) numberSize = sizeof (T)*2;
+	else  numberSize = GetOrderOfMagnitudeBin(number) + 1;
+
+
+	if(maximumSize==0) maximumSize=numberSize;
+
+	if (maximumSize < numberSize){
+		numberSize = 1; // just the '?'
+		
+		if (padded && !leftAligned){
+			for (int i=0;i < maximumSize-1;i++) stream.PutC(' ');
+		}
+		
+		stream.PutC('?');
+		
+	} else {
+
+		if (padded && !leftAligned){
+			for (int i=0;i < maximumSize-numberSize;i++) stream.PutC(' ');
+		}
+
+		int bits=numberSize-1;
+
+		for (int i = bits; i>=0; i--){
+			uint8 digit = (number >> i) & 0x1;			
+			if ((digit != 0) || (putTrailingZeros)){
+				putTrailingZeros=true;
+				stream.PutC('0'+digit);
+			} 
+		}
+
+		
+	}
+	
+	if (padded && leftAligned){
+		for (int i=0;i < maximumSize-numberSize;i++) stream.PutC(' ');
+	}
+    return true;	
+	
+}
+
+
 
 
 ///////////////////////////////////////////////////
