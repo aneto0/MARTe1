@@ -28,19 +28,11 @@
 #include "GeneralDefinitions.h"
 #include "math.h"
 
-template <typename T> void NtoDecimalPrivate(char *buffer,int &nextFree,T number){       
-	while (number > 0){
-		unsigned short  digit = number % 10;
-		number                = number / 10;
-		buffer[nextFree--] = '0' + digit;
-	}
-}
 
 
 // returns the exponent
-// tenToExponent becomes 10 ^ exponent
-// positiveNumber is a the abs (number)
-template <typename T> uint8 NormalizeInteger(T positiveNumber,T &tenToExponent){       
+// positiveNumber is the abs (number)
+template <typename T> uint8 GetOrderOfMagnitude(T positiveNumber){       
     tenToExponent = 1;
     T temp ;
     uint8 exp = 0;
@@ -84,18 +76,211 @@ template <typename T> uint8 NormalizeInteger(T positiveNumber,T &tenToExponent){
 }
 
 
+/** implements a 2 step conversion - step1 32/64 to 16bit step2 10bit to decimal
+ *  this way the number of 32/64 bit operations are reduced
+ *  numberFillLength shall be set to 4 
+ *  streamer must have a PutC(char) method. It will be used to output the digits
+ */   
+template <typename T, class streamer> void NToDecimalStreamPrivate(streamer s, T positiveNumber,int8 numberFillLength=0){
 
-/// buffer must have sufficient size to hold a number of size exponent+1! and the trailing zero  
-template <typename T> void NumberToDecimalPrivate(char *buffer, T positiveNumber,uint8 exponent){
-	char *pCurrent = buffer + exponent + 1;
-	*pCurrent-- = 0;
-	while (pCurrent >= buffer ){
-		unsigned short  digit = positiveNumber % 10;
-		positiveNumber        = positiveNumber / 10;
-		*pCurrent-- = '0' + digit;
+	if (numberFillLength < 0) numberFillLength=0;
+	// calculates the number of obligatory digits for first section by removing the nearest multiple of 4
+	if (numberFillLength > 0) numberFillLength &= 0x3;
+	
+	// treat 64 bit numbers dividing them into 5 blocks of max 4 digits
+	if (sizeof(T)==8){  
+		const uint64 tests[4] = {10000000000000000,1000000000000,100000000,10000};
+		// calculates the number of obligatory digits for first section 
+		if (numberFillLength > 0)numberFillLength %=4;
+		int i;
+		for (i=0;i<4;i++){
+			// enter if a big number or if zero padding required
+			if ((positiveNumber > tests[i])|| (numberFillLength>0))  {
+				// call this template with 16 bit number
+				// otherwise infinite recursion!
+				uint16 x = positiveNumber / tests[i];
+				positiveNumber %= tests[i];
+				// process the upper part as uint16
+				// recurse into this function
+				NToDecimalStreamPrivate(s,x,numberFillLength);
+				// next blocks will all be padded to 4 digits 
+				numberFillLength = 4;
+			} 
+		}
+		// call this template with 16 bit number
+		// otherwise infinite recursion!
+		uint16 x = positiveNumber;
+		// recurse into this function
+		NToDecimalStreamPrivate(s,x,numberFillLength);
+		return;
+	}  
+
+	// treat 32 bit numbers dividing them into 3 blocks of max 4 digits
+	if (sizeof(T)==4){  
+		const uint32 tests[2] = {100000000,10000};
+		int i;
+		for (i=0;i<2;i++){
+			if ((positiveNumber > tests[i])|| (numberFillLength>0))  {
+				uint16 x = positiveNumber / tests[i];
+				positiveNumber %= tests[i];
+				// process the upper part as uint32
+				NToDecimalStreamPrivate(s,x,numberFillLength);
+				numberFillLength = 4;
+			} // after this 11 max
+		}
+		uint16 x = positiveNumber;
+		NToDecimalStreamPrivate(s,x,numberFillLength);
+		return;
+	}
+
+	// 16 bit code 
+	if (sizeof(T)<=2){ 
+		// sufficient for  a 16 - 8 bit number NO terminator needed
+		char buffer[5]; 
+
+		uint8 index = sizeof(buffer)-1;
+		// if not zero extract digits backwards
+		while (positiveNumber > 0){
+			uint8 digit    = positiveNumber % 10;
+			positiveNumber = positiveNumber / 10;
+			buffer[index--] = '0' + digit;
+		}
+		
+		// first fill in all necessary zeros 
+		uint8 i= 0;		
+		if (numberFillLength > 0){
+			for (i=(5-numberFillLength);i<=index;i++) s.PutC('0');
+		}
+		// then complete by outputting all digits 
+		for (i=index+1;i<=4;i++) s.PutC(buffer[i]);
 	}
 }
 
+/**
+ * Converts any integer type, signed and unsigned to string 
+ * uses any class with method PutC
+ * if it does not fit returns "?" 
+ */
+template <typename T, class streamer> bool NumberToDecimalStream(streamer stream, T number,uint8 maximumSize=0,bool padded=false,bool leftAligned=false, bool addPositiveSign=false){
+
+	T positiveNumber;
+	uint8 numberSize = 1;
+	
+	if (number < 0) {
+		positiveNumber = -number;
+		numberSize++;
+	} else {
+		positiveNumber = number;
+	}
+	
+	numberSize += OrderOfMagnitude(positiveNumber);
+	
+	if (addPositiveSign) numberSize++;
+	
+	if ((maximumSize != 0) && (maximumSize < numberSize)){
+		numberSize = 1; // just the '?'
+		
+		if (padded && !leftAligned){
+			for (int i=0;i < maximumSize-1;i++) stream.PutC(' ');
+		}
+		
+		stream.PutC('?');
+		
+	} else {
+
+		if (padded && !leftAligned){
+			for (int i=0;i < maximumSize-numberSize;i++) stream.PutC(' ');
+		}
+
+		if (addPositiveSign) stream.PutC('+');
+		NToDecimalStreamPrivate(stream, positiveNumber);
+	}
+	
+	if (padded && leftAligned){
+		for (int i=0;i < maximumSize-numberSize;i++) stream.PutC(' ');
+	}
+    return true;	
+}
+
+
+// returns the exponent
+// positiveNumber is the abs (number)
+template <typename T> uint8 GetOrderOfMagnitudeHex(T positiveNumber){
+	uint8 exp = 0;
+	while (positiveNumber > 0xF){
+		positiveNumber >>= 4;
+		exp++;
+	}
+	
+    return exp;
+}
+
+
+/**
+ * Converts any integer type, signed and unsigned to string in hexadecimal notation 
+ * writes to a buffer up to the length of the buffer
+ * if it does not fit returns "?" 
+ * size contains the size of the buffer (including space for terminator 0)
+ * size returns the size of the string excluding the trailing 0
+ * if there is enough space a pointer is returned to the start of the number in buffer.
+ * buffer is filled from the end backwards
+ */
+template <typename T> const char *NumberToHexadecimalStream(streamer stream, T number,uint8 maximumSize=0,bool padded=false,bool leftAligned=false, bool putTrailingZeros=false,bool addHeader=false){       
+
+	// sizeof(number) * 8 = totalBits
+	// divided by 4 = number of digits
+	int numberSize = 0;
+	if (putTrailingZeros) numberSize = sizeof (T)*2;
+	else 				  numberSize = GetOrderOfMagnitudeHex(T) + 1;
+	
+	// consider terminator 0 and header
+	if (addHeader) totalBufferSize +=2;
+
+	if ((maximumSize != 0) && (maximumSize < numberSize)){
+		numberSize = 1; // just the '?'
+		
+		if (padded && !leftAligned){
+			for (int i=0;i < maximumSize-1;i++) stream.PutC(' ');
+		}
+		
+		stream.PutC('?');
+		
+	} else {
+
+		if (padded && !leftAligned){
+			for (int i=0;i < maximumSize-numberSize;i++) stream.PutC(' ');
+		}
+
+		if (addHeader) stream.PutC('0');
+		if (addHeader) stream.PutC('x');
+		
+		for (int i = (sizeof(T) * 8) - 4 ; i >= 0 ;i-=4){
+			uint8 digit = (number >> i) & 0xF;			
+			if ((digit != 0) || (putTrailingZeros)){
+				putTrailingZeros = true;
+				if (digit < 10)   buffer[nextFree--] = '0' + digit;
+				else              buffer[nextFree--] = 'A' + digit - 10;
+			} 
+		}
+	}
+	
+	if (padded && leftAligned){
+		for (int i=0;i < maximumSize-numberSize;i++) stream.PutC(' ');
+	}
+    return true;	
+	
+}
+
+
+///////////////////////////////////////////////////
+
+template <typename T> void NtoDecimalPrivate(char *buffer,int &nextFree,T number){       
+	while (number > 0){
+		unsigned short  digit = number % 10;
+		number                = number / 10;
+		buffer[nextFree--] = '0' + digit;
+	}
+}
 
 /**
  * Converts any integer type, signed and unsigned to string 
