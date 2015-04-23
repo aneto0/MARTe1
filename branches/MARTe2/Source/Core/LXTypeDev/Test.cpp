@@ -9,6 +9,34 @@
 /*#include "StreamInterface.h"*/
 #include "NumberToString.h"
 
+#define MAX_DIMENSION 64
+
+class myStream{
+private:
+	char buffer[MAX_DIMENSION];
+	int32 size;
+public:
+
+	myStream(){
+		size=0;
+	}
+	
+	void PutC(char c){
+		size%=(MAX_DIMENSION-1);
+			
+		
+		buffer[size]=c;
+		buffer[size+1]=0;
+		size++;		
+	}
+	
+	char* Buffer(){
+		return buffer;
+	}
+};
+
+
+
 /*struct TestPattern{
     // the character in the printf format
     const char *format;
@@ -97,11 +125,58 @@ void TestAll(){
 }*/
 
 
+bool TestMagnitude(){
+	int number=12345;
+	uint8 order=0;
+	
+	if((order=GetOrderOfMagnitude(number))!=4){
+		printf("F order: %c", '0'+order);	
+		return False;
+	}
+	
+	printf("\nT order: %c\n", '0'+order);
+
+}
+
+
+bool TestToDecimalStreamPrivate(){
+	myStream thisStream;
+	int32 number=40;
+	NToDecimalStreamPrivate(thisStream, number);
+	printf("\nT buffer1: %s\n", thisStream.Buffer());
+	return True;
+} 
+	
+
+bool TestToDecimalStream(){
+	myStream thisStream;
+	int32 number=-40;
+	NumberToDecimalStream(thisStream, number);
+	printf("\nT buffer2: %s\n", thisStream.Buffer());
+	return True;
+}
+
+
+bool TestToHexadecimalStream(){
+	myStream thisStream;
+	int32 number=0x8af;
+	NumberToHexadecimalStream(thisStream, number);
+	printf("\nT buffer3: %s\n", thisStream.Buffer());
+	return True;
+}
+
+
 int main(int argc, char **argv){
     char buffer[100];
     double d = 1.2345;
     int32  n = 12345;
     uint16 size = 0;
+	
+	TestMagnitude();
+	TestToDecimalStreamPrivate();
+	TestToDecimalStream();
+	TestToHexadecimalStream();
+
     printf("%s\n", NumberToDecimal(size, buffer, sizeof(buffer), n, false));
     printf("%s\n", NumberToHexadecimal(size, buffer, sizeof(buffer), n, false));
     printf("%s\n", NumberToOctal(size, buffer, sizeof(buffer), n, false));
