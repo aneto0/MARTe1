@@ -96,6 +96,28 @@ bool OutputGAM::Initialise(ConfigurationDataBase& cdbData){
         return False;
     }
 
+    FString enableSignalName;
+    if(!cdb.ReadFString(enableSignalName,"EnableSignalName", "")){
+        AssertErrorCondition(Information, "OutputGAM::Initialise: %s does not specify an EnableSignalName", Name());
+    }
+
+    FString enableSignalType;
+    if(!cdb.ReadFString(enableSignalType,"EnableSignalType","int32")){
+        AssertErrorCondition(Information, "OutputGAM::Initialise: %s does not specify a EnableSignalType. Assuming int32", Name());
+    }
+    
+    if(enableSignalName.Size() > 0){
+        if(!AddInputInterface(enableSignalInterface,"EnableSignalInterface")){
+            AssertErrorCondition(InitialisationError,"OutputGAM::Initialise: %s failed to add input interface EnableSignalInterface",Name());
+            return False;
+        }
+
+        if(!enableSignalInterface->AddSignal(enableSignalName.Buffer(), enableSignalType.Buffer())){
+            AssertErrorCondition(InitialisationError,"OutputGAM::Initialise: %s failed to add input Signal %s to interface EnableSignalInterface",Name(),enableSignalName.Buffer());
+            return False;
+        }
+    }
+
     //////////////////////////////////
     // Add Signal List to Interface //
     //////////////////////////////////
@@ -265,6 +287,15 @@ bool OutputGAM::Execute(GAM_FunctionNumbers functionNumber){
             return True;
         }
     }
+
+    if(enableSignalInterface != NULL){
+        enableSignalInterface->Read();
+        int32 enable = *(int32 *)enableSignalInterface->Buffer();
+        if(enable == 0){
+            return True;
+        }
+    }
+
 
     ///////////////////////////
     // Implement Acquisition //
