@@ -34,7 +34,7 @@
 // operates by comparing with 10**N with converging by bisection to the correct value
 // returns the number of digits after the first or the exponent
 template <typename T> uint8 GetOrderOfMagnitude(T positiveNumber){       
-    int32 tenToExponent = 1;
+    T tenToExponent = 1;
     T temp ;
     uint8 exp = 0;
     // check whether exponent greater than 10  
@@ -185,10 +185,7 @@ bool NumberToDecimalStream(
 	// 1 always for the one figure to print
 	uint8 numberSize = 1;
 
-	// add the number of figures beyond the first 
-	numberSize += GetOrderOfMagnitude(positiveNumber);
-
-	// if negative invert it and account for the '-' in the size
+		// if negative invert it and account for the '-' in the size
 	if (number < 0) {
 		positiveNumber = -number;
 		numberSize++;
@@ -197,6 +194,12 @@ bool NumberToDecimalStream(
 		positiveNumber = number;
 		if (addPositiveSign) numberSize++;
 	}
+
+	// add the number of figures beyond the first 
+	numberSize += GetOrderOfMagnitude(positiveNumber);
+
+
+
 	// if no limits set the numberSize as the limit
 	if (maximumSize==0) maximumSize=numberSize;
 
@@ -281,32 +284,32 @@ template <typename T> uint8 GetOrderOfMagnitudeHex(T positiveNumber){
 template <typename T> uint8 GetOrderOfMagnitudeOct(T positiveNumber){
 	uint8 exp = 0;
 	if (sizeof(T)==8)
-		if  (positiveNumber > 0x800000000000){
+		if  (positiveNumber >= 0x1000000000000){
 			exp += 16;
 			positiveNumber >>= 48;
 		}
 	
 	if (sizeof(T)>=4)
-		if  (positiveNumber > 0x800000){
+		if  (positiveNumber >= 0x1000000){
 			exp += 8;
 			positiveNumber >>= 24;
 		}
 
 	// check if larger than 2**12
 	if (sizeof(T)>=2)
-		if  (positiveNumber > 0x800){
+		if  (positiveNumber >= 0x1000){
 			exp += 4;
 			positiveNumber >>= 12;
 		}
 
 	// check if larger than 2**6
-	if  (positiveNumber > 0x20){
+	if  (positiveNumber >= 0x40){
 		exp += 2;
 		positiveNumber >>= 6;
 	}
 
 	// check if larger than 2**2
-	if  (positiveNumber > 0x4){
+	if  (positiveNumber >= 0x8){
 		exp += 1;
 		positiveNumber >>= 3;
 	}
@@ -428,7 +431,8 @@ bool NumberToHexadecimalStream(
 	// if we add the trailing zeroes
 	// sizeof(number) * 8 = totalBits
 	// divided by 4 = number of digits	
-	numberSizePadded = numberSize + sizeof (T) * 2;
+	uint8 totalDigits= sizeof (T) * 2;
+	numberSizePadded = numberSize +totalDigits;
 
 	numberDigits = GetOrderOfMagnitudeHex(number) + 1;
 	// minimum requirements size!
@@ -449,8 +453,19 @@ bool NumberToHexadecimalStream(
 		stream.PutC('?');
 		
 	} else {
-		// allow adding header
-		if (addHeader) numberSize = numberSizePadded;
+		
+		//In case of trailing zeros the digits are the maximum possible or equal to maximum size (-2 if there is header)
+		if (putTrailingZeros){
+			numberSize-=numberDigits;
+			if(numberSizePadded>maximumSize){
+				numberDigits=totalDigits-(numberSizePadded-maximumSize);
+			}
+			else{	
+				numberDigits=totalDigits;
+			}
+			numberSize+=numberDigits;		
+		}
+	
 
 		// in case of left alignment
 		if (padded && !leftAligned){
@@ -462,10 +477,8 @@ bool NumberToHexadecimalStream(
 			stream.PutC('0');
 			stream.PutC('x');
 		}
-	
-
 		
-		int bits=(numberSize-1)*4;	
+		int bits=(numberDigits-1)*4;	
 	
 		for (int i = bits; i>=0; i-=4){
 			uint8 digit = (number >> i) & 0xF;			
@@ -487,16 +500,27 @@ bool NumberToHexadecimalStream(
 
 template <typename T, class streamer> bool NumberToOctalStream(streamer &stream, T number,uint8 maximumSize=0,bool padded=false,bool leftAligned=false, bool putTrailingZeros=false, bool addHeader=false){       
 
+
+	uint8 numberSize       = 0;
+	uint8 numberSizePadded = 0;
+	uint8 numberDigits     = 0;
+
+	// adding two chars 0x header
+	if (addHeader) numberSize +=2;
+
+	// if we add the trailing zeroes
 	// sizeof(number) * 8 = totalBits
 	// divided by 4 = number of digits
-	int numberSize = 0;
-	
-	if (putTrailingZeros) numberSize = (sizeof(T)*8+2)/3;
-	else  numberSize = GetOrderOfMagnitudeOct(number) + 1;
+	uint8 totalDigits=(sizeof(T)*8+2)/3;
+	numberSizePadded = numberSize + totalDigits;
 
-	if (addHeader) numberSize +=2;
+	numberDigits = GetOrderOfMagnitudeOct(number) + 1;
+	// minimum requirements size!
+	numberSize += numberDigits;
+
+
 	
-	if(maximumSize==0) maximumSize=numberSize;
+	if(maximumSize==0) maximumSize=numberSizePadded;
 
 	if (maximumSize < numberSize){
 		numberSize = 1; // just the '?'
@@ -508,6 +532,18 @@ template <typename T, class streamer> bool NumberToOctalStream(streamer &stream,
 		stream.PutC('?');
 		
 	} else {
+	
+		if (putTrailingZeros){
+			numberSize-=numberDigits;
+			if(numberSizePadded>maximumSize){
+				numberDigits=totalDigits-(numberSizePadded-maximumSize);
+			}
+			else{	
+				numberDigits=totalDigits;
+			}
+			numberSize+=numberDigits;		
+		}
+
 
 		if (padded && !leftAligned){
 			for (int i=0;i < maximumSize-numberSize;i++) stream.PutC(' ');
@@ -515,8 +551,9 @@ template <typename T, class streamer> bool NumberToOctalStream(streamer &stream,
 
 		if (addHeader) stream.PutC('0');
 		if (addHeader) stream.PutC('o');
-	
-		int bits=(numberSize-1)*3;
+
+
+		int bits=(numberDigits-1)*3;
 
 		if((bits+3)>(sizeof(T)*8)){
 			uint8 digit = (number >> bits) & 0x7;
@@ -550,15 +587,18 @@ template <typename T, class streamer> bool NumberToOctalStream(streamer &stream,
 
 template <typename T, class streamer> bool NumberToBinaryStream(streamer &stream, T number,uint8 maximumSize=0,bool padded=false,bool leftAligned=false, bool putTrailingZeros=false){       
 
+	uint8 numberSize       = 0;
+	uint8 numberSizePadded = 0;
+
+	// if we add the trailing zeroes
 	// sizeof(number) * 8 = totalBits
 	// divided by 4 = number of digits
-	int numberSize = 0;
-	
-	if (putTrailingZeros) numberSize = sizeof (T)*8;
-	else  numberSize = GetOrderOfMagnitudeBin(number) + 1;
+	uint8 totalDigits=sizeof(T)*8;
+	numberSizePadded = totalDigits;
 
+	numberSize = GetOrderOfMagnitudeBin(number) + 1;
 
-	if(maximumSize==0) maximumSize=numberSize;
+	if(maximumSize==0) maximumSize=numberSizePadded;
 
 	if (maximumSize < numberSize){
 		numberSize = 1; // just the '?'
@@ -571,6 +611,15 @@ template <typename T, class streamer> bool NumberToBinaryStream(streamer &stream
 		
 	} else {
 
+		if (putTrailingZeros){
+			if(numberSizePadded>maximumSize){
+				numberSize=maximumSize;
+			}
+			else{	
+				numberSize=totalDigits;
+			}
+
+		}
 		if (padded && !leftAligned){
 			for (int i=0;i < maximumSize-numberSize;i++) stream.PutC(' ');
 		}
@@ -957,7 +1006,7 @@ template <typename T> void FPToFixed(char *&pBuffer,int16 &sizeLeft,T normalized
 /**
 Encodes the exponent in the classical form E+nn
  */
-void ExpToDecimal(char *&pBuffer,int16 &sizeLeft,int16 exponent){
+static inline void ExpToDecimal(char *&pBuffer,int16 &sizeLeft,int16 exponent){
     // output exponent if exists
     if (exponent != 0){
 		if (sizeLeft--) *pBuffer++ = 'E';
@@ -1367,4 +1416,6 @@ template <typename T> const char *FloatToCompact(uint16 &stringSize,char *buffer
 
 	return buffer;
 }
+
+
 #endif	
