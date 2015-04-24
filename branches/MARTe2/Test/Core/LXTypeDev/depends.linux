@@ -1,0 +1,6 @@
+../../../Build/linux/Core/LXTypeDev/NumberToStringTest.o: NumberToStringTest.cpp \
+ ../../../Source/Core/L0Portability/GeneralDefinitions.h \
+ ../../../Source/Core/L0Portability/Architecture/x86_gcc/GeneralDefinitionsA.h \
+ ../../../Source/Core/L0Portability/OperatingSystem/Linux/GeneralDefinitionsOS.h \
+ NumberToStringTest.h ../../../Source/Core/LXTypeDev/NumberToString.h \
+ ../L0Portability/StringTestHelper.h
