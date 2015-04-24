@@ -230,7 +230,7 @@ bool NumberToDecimalStream(
 	
 	// fill up from numberSize to maximumSize with ' '
 	if (padded && leftAligned){
-		for (inrt i=numberSize;i < maximumSize;i++) stream.PutC(' ');
+		for (int i=numberSize;i < maximumSize;i++) stream.PutC(' ');
 	}
     return true;	
 }
@@ -245,27 +245,27 @@ template <typename T> uint8 GetOrderOfMagnitudeHex(T positiveNumber){
 	if (sizeof(T)==8)
 		if  (positiveNumber >= 0x100000000){
 			exp += 8;
-			T >>= 32;
+			positiveNumber >>= 32;
 		}
 
 	// check if larger than 2**16
 	if (sizeof(T)>=4)
 		if  (positiveNumber >= 0x10000){
 			exp += 4;
-			T >>= 16;
+			positiveNumber >>= 16;
 		}
 
 	// check if larger than 2**8
 	if (sizeof(T)>=2)
 		if  (positiveNumber >= 0x100){
 			exp += 2;
-			T >>= 8;
+			positiveNumber >>= 8;
 		}
 
 	// check if larger than 2**4
 	if  (positiveNumber >= 0x10){
 		exp += 1;
-		T >>= 4;
+		positiveNumber >>= 4;
 	}
 
 //	while (positiveNumber > 0xF){
@@ -280,10 +280,43 @@ template <typename T> uint8 GetOrderOfMagnitudeHex(T positiveNumber){
 // positiveNumber is the abs (number)
 template <typename T> uint8 GetOrderOfMagnitudeOct(T positiveNumber){
 	uint8 exp = 0;
+	if (sizeof(T)==8)
+		if  (positiveNumber > 0x800000000000){
+			exp += 16;
+			positiveNumber >>= 48;
+		}
+	
+	if (sizeof(T)>=4)
+		if  (positiveNumber > 0x800000){
+			exp += 8;
+			positiveNumber >>= 24;
+		}
+
+	// check if larger than 2**12
+	if (sizeof(T)>=2)
+		if  (positiveNumber > 0x800){
+			exp += 4;
+			positiveNumber >>= 12;
+		}
+
+	// check if larger than 2**6
+	if  (positiveNumber > 0x20){
+		exp += 2;
+		positiveNumber >>= 6;
+	}
+
+	// check if larger than 2**2
+	if  (positiveNumber > 0x4){
+		exp += 1;
+		positiveNumber >>= 3;
+	}
+
+
+/*	uint8 exp = 0;
 	while (positiveNumber > 0x7){
 		positiveNumber >>= 3;
 		exp++;
-	}
+	}*/
 	
     return exp;
 }
