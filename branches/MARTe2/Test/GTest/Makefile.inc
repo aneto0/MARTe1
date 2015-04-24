@@ -52,7 +52,8 @@ OBJSX=  EndianityGTest.x \
 	CStreamGTest.x \
 	ComplexGTest.x \
 	StackHolderGTest.x \
-	QueueHolderGTest.x 		
+	QueueHolderGTest.x \
+	NumberToStringGTest.x 		
 
 PACKAGE=
 ROOT_DIR=../..
@@ -63,8 +64,10 @@ include $(MAKEDEFAULTDIR)/MakeStdLibDefs.$(TARGET)
 INCLUDE += -I../ 
 INCLUDE += -I../Core/L0Portability
 INCLUDE += -I../Core/L1CLib
+INCLUDE += -I../Core/LXTypeDev
 INCLUDE += -I../../Source/Core/L0Portability
 INCLUDE += -I../../Source/Core/L1CLib
+INCLUDE += -I../../Source/Core/LXTypeDev
 INCLUDE += -I../../Lib/gtest-1.7.0/include
 
 all: $(OBJS)    \
