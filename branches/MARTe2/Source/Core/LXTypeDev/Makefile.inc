@@ -24,8 +24,7 @@
 #
 #############################################################
 
-OBJSX= 
-
+OBJSX=NumberToString.x 
 MAKEDEFAULTDIR=../../../MakeDefaults
 
 PACKAGE=Core
@@ -35,9 +34,10 @@ include $(MAKEDEFAULTDIR)/MakeStdLibDefs.$(TARGET)
 INCLUDE += -I.
 INCLUDE += -I../L0Portability
 INCLUDE += -I../L1CLib
+INCLUDE += -I../LXTypeDev
 
 all: $(OBJS)    \
-                $(BUILD_DIR)/Test$(EXEEXT) 
+	        $(BUILD_DIR)/LXTypeDev$(LIBEXT)  
 	echo  $(OBJS)
 
 include depends.$(TARGET)

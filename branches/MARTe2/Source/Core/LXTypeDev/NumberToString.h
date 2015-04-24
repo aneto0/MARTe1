@@ -555,14 +555,6 @@ template <typename T, class streamer> bool NumberToOctalStream(streamer &stream,
 
 		int bits=(numberDigits-1)*3;
 
-		if((bits+3)>(sizeof(T)*8)){
-			uint8 digit = (number >> bits) & 0x7;
-			bits-=3;			
-			if ((digit != 0) || (putTrailingZeros)){
-				putTrailingZeros=true;
-				stream.PutC('0'+digit);
-			}
-		}	
 
 		for (int i = bits; i>=0; i-=3){
 			uint8 digit = (number >> i) & 0x7;			
@@ -666,7 +658,7 @@ template <typename T> void NtoDecimalPrivate(char *buffer,int &nextFree,T number
  * if there is enough space a pointer is returned to the start of the number in buffer.
  * buffer is filled from the end backwards
  */
-template <typename T> const char *NumberToDecimal(uint16 &stringSize,char *buffer,uint16 bufferSize,T number,bool addPositiveSign=false){
+template <typename T> char *NumberToDecimal(uint16 &stringSize,char *buffer,uint16 bufferSize,T number,bool addPositiveSign=false){
 	// 5/4,7/6,12/11,22/21 depending on the byte size of number - include 0 and eventual sign
 	int neededSize = (sizeof(number)*5 +3)/2;	
 	if (number<0)neededSize++; 
@@ -674,7 +666,7 @@ template <typename T> const char *NumberToDecimal(uint16 &stringSize,char *buffe
 	// there must be space for the number in the worst case
     if (bufferSize < neededSize)   {
     	stringSize = 1;
-    	return "?";
+    	return (char*)"?";
     }
 
     stringSize = 0;
@@ -731,7 +723,7 @@ template <typename T> const char *NumberToDecimal(uint16 &stringSize,char *buffe
  * if there is enough space a pointer is returned to the start of the number in buffer.
  * buffer is filled from the end backwards
  */
-template <typename T> const char *NumberToHexadecimal(uint16 &stringSize,char *buffer,uint16 bufferSize,T number, bool putTrailingZeros,bool addHeader=false){       
+template <typename T> char *NumberToHexadecimal(uint16 &stringSize,char *buffer,uint16 bufferSize,T number, bool putTrailingZeros=false,bool addHeader=false){       
 	// sizeof(number) * 8 = totalBits
 	// divided by 4 = number of digits
 	int totalNumberSize = sizeof(number) * 2;
@@ -745,7 +737,7 @@ template <typename T> const char *NumberToHexadecimal(uint16 &stringSize,char *b
 	// from now on we do need to check for buffer size anymore!
 	if (bufferSize < totalBufferSize) {
 		stringSize = 1;
-    	return "?";
+    	return (char*)"?";
     }
 	// size is now the avilable size for the number
 	// nextFree is an index within the buffer for the next free space
@@ -791,7 +783,7 @@ template <typename T> const char *NumberToHexadecimal(uint16 &stringSize,char *b
  * if there is enough space a pointer is returned to the start of the number in buffer.
  * buffer is filled from the end backwards
  */
-template <typename T> const char *NumberToOctal(uint16 &stringSize,char *buffer,uint16 bufferSize,T number, bool putTrailingZeros,bool addHeader=false){       
+template <typename T> char *NumberToOctal(uint16 &stringSize,char *buffer,uint16 bufferSize,T number, bool putTrailingZeros,bool addHeader=false){       
 	// sizeof(number) * 8 = totalBits
 	// divided by 3 and rounded up = number of digits
 	int totalNumberSize = (sizeof(number) * 8 + 2 ) / 3;
@@ -805,7 +797,7 @@ template <typename T> const char *NumberToOctal(uint16 &stringSize,char *buffer,
 	// from now on we do need to check for buffer size anymore!
 	if (bufferSize < totalBufferSize) {
 		stringSize = 1;
-    	return "?";
+    	return (char*)"?";
     }
 	// size is now the avilable size for the number
 	// nextFree is an index within the buffer for the next free space
@@ -850,7 +842,7 @@ template <typename T> const char *NumberToOctal(uint16 &stringSize,char *buffer,
  * if there is enough space a pointer is returned to the start of the number in buffer.
  * buffer is filled from the end backwards
  */
-template <typename T> const char *NumberToBinary(uint16 &stringSize,char *buffer,uint16 bufferSize,T number, bool putTrailingZeros,bool addHeader=false){       
+template <typename T> char *NumberToBinary(uint16 &stringSize,char *buffer,uint16 bufferSize,T number, bool putTrailingZeros,bool addHeader=false){       
 
 	// sizeof(number) * 8 = totalBits
 	int totalNumberSize = sizeof(number) * 8;
