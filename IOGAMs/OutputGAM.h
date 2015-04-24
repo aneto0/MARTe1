@@ -45,6 +45,12 @@ protected:
     /** Interface with the DDB. Points to the Time Base
         signal. */
     DDBInputInterface                           *usecTime;
+    /**
+     * DDB input interface to read the enable signal.
+     * If used, the OutputGAM will not write if the enable
+     * signal is not > 0;
+     */
+    DDBInputInterface                           *enableSignalInterface;
 
     /** Interface with the DDB. Points to the area
         where the inputs that should be written are */
@@ -77,6 +83,7 @@ public:
     OutputGAM(){
         // Interfaces
         usecTime                           = NULL;
+        enableSignalInterface              = NULL;
         input                              = NULL;
         // Packet Size
         dataWordSize                       = 0;
