@@ -84,73 +84,77 @@ template <typename T> uint8 GetOrderOfMagnitude(T positiveNumber){
 }
 
 // returns the number of digits necessary to represent this number -1 
-// positiveNumber is the abs (number)
-template <typename T> uint8 GetOrderOfMagnitudeHex(T positiveNumber){
-	uint8 exp = 0;
+template <typename T> uint8 GetNumberOfDigitsHexNotation(T number){
+	uint8 exp = 1;
+	
+	// negative numbers are 2 complements and have therefore all bits
+	if (number < 0) return sizeof(T) * 2;
 
 	// check if larger than 2**32
 	if (sizeof(T)==8)
-		if  (positiveNumber >= 0x100000000){
+		if  (number >= 0x100000000){
 			exp += 8;
-			positiveNumber >>= 32;
+			number >>= 32;
 		}
 
 	// check if larger than 2**16
 	if (sizeof(T)>=4)
-		if  (positiveNumber >= 0x10000){
+		if  (number >= 0x10000){
 			exp += 4;
-			positiveNumber >>= 16;
+			number >>= 16;
 		}
 
 	// check if larger than 2**8
 	if (sizeof(T)>=2)
-		if  (positiveNumber >= 0x100){
+		if  (number >= 0x100){
 			exp += 2;
-			positiveNumber >>= 8;
+			number >>= 8;
 		}
 
 	// check if larger than 2**4
-	if  (positiveNumber >= 0x10){
+	if  (number >= 0x10){
 		exp += 1;
-		positiveNumber >>= 4;
+		number >>= 4;
 	}
 
     return exp;
 }
 
 // returns the number of digits necessary to represent this number -1 
-// positiveNumber is the abs (number)
-template <typename T> uint8 GetOrderOfMagnitudeOct(T positiveNumber){
-	uint8 exp = 0;
+template <typename T> uint8 GetNumberOfDigitsOctalNotation(T number){
+	// negative numbers are 2 complements and have therefore all bits
+	if (number < 0) return (sizeof(T) * 8 + 2) / 3;
+
+	uint8 exp = 1;
 	if (sizeof(T)==8)
-		if  (positiveNumber >= 0x1000000000000){
+		if  (number >= 0x1000000000000){
 			exp += 16;
-			positiveNumber >>= 48;
+			number >>= 48;
 		} 
 
 	if (sizeof(T)>=4)
-		if  (positiveNumber >= 0x1000000){
+		if  (number >= 0x1000000){
 			exp += 8;
-			positiveNumber >>= 24;
+			number >>= 24;
 		}
 
 	// check if larger than 2**12
 	if (sizeof(T)>=2)
-		if  (positiveNumber >= 0x1000){
+		if  (number >= 0x1000){
 			exp += 4;
-			positiveNumber >>= 12;
+			number >>= 12;
 		}
 
 	// check if larger than 2**6
-	if  (positiveNumber >= 0x40){
+	if  (number >= 0x40){
 		exp += 2;
-		positiveNumber >>= 6;
+		number >>= 6;
 	}
 
 	// check if larger than 2**2
-	if  (positiveNumber >= 0x8){
+	if  (number >= 0x8){
 		exp += 1;
-		positiveNumber >>= 3;
+		number >>= 3;
 	}
 
     return exp;
@@ -159,47 +163,50 @@ template <typename T> uint8 GetOrderOfMagnitudeOct(T positiveNumber){
 
 // returns the number of digits necessary to represent this number -1 
 // positiveNumber is the abs (number)
-template <typename T> uint8 GetOrderOfMagnitudeBin(T positiveNumber){
-	uint8 exp = 0;
+template <typename T> uint8 GetNumberOfDigitsBinaryNotation(T number){
+	// negative numbers are 2 complements and have therefore all bits
+	if (number < 0) return sizeof(T) * 8 ;
+
+	uint8 exp = 1;
 
 	// check if larger than 2**32
 	// if so shift 
 	if (sizeof(T)==8)
-		if  (positiveNumber >= 0x100000000){
+		if  (number >= 0x100000000){
 			exp += 32;
-			positiveNumber >>= 32;
+			number >>= 32;
 		}
 
 	// check if larger than 2**16
 	if (sizeof(T)>=4)
-		if  (positiveNumber >= 0x10000){
+		if  (number >= 0x10000){
 			exp += 16;
-			positiveNumber >>= 16;
+			number >>= 16;
 		}
 
 	// check if larger than 2**8
 	if (sizeof(T)>=2)
-		if  (positiveNumber >= 0x100){
+		if  (number >= 0x100){
 			exp += 8;
-			positiveNumber >>= 8;
+			number >>= 8;
 		}
 	
 	// check if larger than 2**4
-	if  (positiveNumber >= 0x10){
+	if  (number >= 0x10){
 		exp += 4;
-		positiveNumber >>= 4;
+		number >>= 4;
 	}
 
 	// check if larger than 2**2
-	if  (positiveNumber >= 0x4){
+	if  (number >= 0x4){
 		exp += 2;
-		positiveNumber >>= 2;
+		number >>= 2;
 	}
 
 	// check if larger than 2**1
-	if  (positiveNumber >= 0x2){
+	if  (number >= 0x2){
 		exp += 1;
-		positiveNumber >>= 1;
+		number >>= 1;
 	}
 
     return exp;
@@ -228,7 +235,8 @@ static inline void Number2StreamDecimalNotationPrivate(streamer &s, T positiveNu
 		uint16 figures = 16;
 		for (i=0;i<4;i++){
 			// enter if a big number or if zero padding required			
-			if ((positiveNumber > tests[i])|| (numberFillLength > figures))  {
+			if ((positiveNumber > (T)tests[i]) || 
+			    (numberFillLength > figures))  {
 				// call this template with 16 bit number
 				// otherwise infinite recursion!
 				uint16 x       = positiveNumber / tests[i];
@@ -260,7 +268,8 @@ static inline void Number2StreamDecimalNotationPrivate(streamer &s, T positiveNu
 		int16 figures = 16;
 		uint8 i;
 		for (i=0;i<2;i++){
-			if ((positiveNumber > tests[i])|| (numberFillLength > figures))  {
+			if ((positiveNumber > (T)tests[i]) || 
+			    (numberFillLength > figures))  {
 				// call this template with 16 bit number
 				// otherwise infinite recursion!
 				uint16 x       = positiveNumber / tests[i];
@@ -389,7 +398,7 @@ bool IntegerToStreamDecimalNotation(
  * if not possible outputs ?
  */
 template <typename T, class streamer> 
-bool IntegerToStreamHexadecimalNotation(
+bool IntegerToStreamExadecimalNotation(
 			streamer &		stream, 
 			T 				number,
 			uint16 			maximumSize			= 0,       // 0 means that the number is printed in its entirety
@@ -405,7 +414,7 @@ bool IntegerToStreamHexadecimalNotation(
 	if (addHeader) headerSize =2;
 
 	// actual meaningful digits
-	uint8 numberOfDigits   = GetOrderOfMagnitudeHex(number) + 1;
+	uint8 numberOfDigits   = GetNumberOfDigitsHexNotation(number);
 
 	// add header for total size if padded
 	uint8 numberSize  = headerSize + numberOfDigits;
@@ -499,7 +508,7 @@ template <typename T, class streamer>
 bool IntegerToStreamOctalNotation(       
 	streamer &		stream, 
 	T 				number,
-	uint8 			maximumSize			= 0,       // 0 means that the number is printed in its entirety
+	uint16 			maximumSize			= 0,       // 0 means that the number is printed in its entirety
 	bool 			padded				= false,   // if maximumSize!=0 & align towards the right or the left
 	bool 			leftAligned			= false,   // if padded and maximumSize!=0 align towards the left
 	bool 			putTrailingZeros	= false,   // trailing zeroes are not omitted (unless breaking the maximumSize)
@@ -513,7 +522,7 @@ bool IntegerToStreamOctalNotation(
 	if (addHeader) headerSize =2;
 
 	// actual meaningful digits
-	uint8 numberOfDigits   = GetOrderOfMagnitudeOct(number) + 1;
+	uint8 numberOfDigits   = GetNumberOfDigitsOctalNotation(number);
 
 	// add header for total size if padded
 	uint8 numberSize  = headerSize + numberOfDigits;
@@ -605,7 +614,7 @@ template <typename T, class streamer>
 bool IntegerToStreamBinaryNotation(
 		streamer &		stream, 
 		T 				number,
-		uint8 			maximumSize			= 0,       // 0 means that the number is printed in its entirety
+		uint16 			maximumSize			= 0,       // 0 means that the number is printed in its entirety
 		bool 			padded				= false,   // if maximumSize!=0 & align towards the right or the left
 		bool 			leftAligned			= false,   // if padded and maximumSize!=0 align towards the left
 		bool 			putTrailingZeros	= false,   // trailing zeroes are not omitted (unless breaking the maximumSize)
@@ -619,7 +628,7 @@ bool IntegerToStreamBinaryNotation(
 	if (addHeader) headerSize =2;
 
 	// actual meaningful digist
-	uint8 numberOfDigits   = GetOrderOfMagnitudeBin(number) + 1;
+	uint8 numberOfDigits   = GetNumberOfDigitsBinaryNotation(number);
 
 	// add header for total size if padded
 	uint8 numberSize  = headerSize + numberOfDigits;

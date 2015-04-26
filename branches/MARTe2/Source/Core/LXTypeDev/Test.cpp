@@ -235,18 +235,66 @@ template <typename T> void Test_FloatToStream(T number){
 
 }
 
+template <typename T> void Test_IntegerToStream(T n){
+	FormatDescriptor	format;
+	const char *pFormat;
+	
+	while (n != 0){
+		
+		putchar('\n');
+		pFormat= "- 22i";	
+		format.InitialiseFromString(pFormat);	
+		putchar('>');		
+		IntegerToStream(myStream,n,format);
+		putchar('<');		
+		pFormat= " #022x";	
+		format.InitialiseFromString(pFormat);	
+		putchar('>');		
+		IntegerToStream(myStream,n,format);
+		putchar('<');		
+		pFormat= "- #026o";	
+		format.InitialiseFromString(pFormat);	
+		putchar('>');		
+		IntegerToStream(myStream,n,format);
+		putchar('<');		
+		pFormat= " #66b";	
+		format.InitialiseFromString(pFormat);	
+		putchar('>');		
+		IntegerToStream(myStream,n,format);
+		putchar('<');		
+		
+		putchar('\n');	
+		n = n / 2;
+	}
+}
 
 int main(int argc, char **argv){
 	
-	
+/*	
+	putchar('\n');	
 	float n1 = 12345678;	
 	Test_FloatToStream(n1);
 
+	putchar('\n');	
 	double n2 = 12345678;	
 	Test_FloatToStream(n2);
 	
+	putchar('\n');	
 	__float128 n3 = 12345678;
 	Test_FloatToStream(n3);
+*/
+	
+	putchar('\n');	
+	uint64 in1 = 1234567890123456789;
+	Test_IntegerToStream(in1);	
+
+	putchar('\n');	
+	int64 in2 =  1234567890123456789;
+	Test_IntegerToStream(in2);	
+
+	putchar('\n');	
+	int64 in3 = -1234567890123456789;
+	Test_IntegerToStream(in3);	
 
 /*	
     char buffer[100];
