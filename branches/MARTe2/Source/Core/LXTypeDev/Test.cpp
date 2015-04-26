@@ -199,43 +199,54 @@ public:
 	
 }myStream;
 
-int main(int argc, char **argv){
-	
+template <typename T> void Test_FloatToStream(T number){
+
 	FormatDescriptor	format;
-	double number = 123456;	
 	const char *pFormat;
 	
-	for (int i = 0;i<20;i++){
-		pFormat= "- 10.5f";	
+	for (int i = 0;i<30;i++){
+		pFormat= "- 10.7f";	
 		format.InitialiseFromString(pFormat);	
 		putchar('>');		
 		FloatToStream(myStream,number,format);
 		putchar('<');		
-		putchar('\n');		
 		
-		pFormat = " 10.5e";	
+		pFormat = " 10.7e";	
 		format.InitialiseFromString(pFormat);	
 		putchar('>');		
 		FloatToStream(myStream,number,format);
 		putchar('<');		
-		putchar('\n');		
 		
-		pFormat = "- 10.5E";	
+		pFormat = "- 10.7E";	
 		format.InitialiseFromString(pFormat);
 		putchar('>');		
 		FloatToStream(myStream,number,format);
 		putchar('<');		
-		putchar('\n');		
 
-		pFormat = " 10.5g";	
+		pFormat = " 10.7g";	
 		format.InitialiseFromString(pFormat);	
 		putchar('>');		
 		FloatToStream(myStream,number,format);
 		putchar('<');		
-		putchar('\n');	
 		
+		putchar('\n');	
 		number = number/10;
 	}
+
+}
+
+
+int main(int argc, char **argv){
+	
+	
+	float n1 = 12345678;	
+	Test_FloatToStream(n1);
+
+	double n2 = 12345678;	
+	Test_FloatToStream(n2);
+	
+	__float128 n3 = 12345678;
+	Test_FloatToStream(n3);
 
 /*	
     char buffer[100];

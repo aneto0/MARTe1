@@ -191,7 +191,7 @@ static inline uint8 NumberOfDigitsFixedNotation(int16 exponent,bool hasSign,int1
 	    	precision = -1;
 	    } else {
 			// if we need to go below zero consider also the . this  is why +1
-		    if (fixedNotationSize < (precision-1)) fixedNotationSize = precision + 1;
+		    if (fixedNotationSize < precision) fixedNotationSize = precision + 1;
 			// consider the sign
 		    if (hasSign) fixedNotationSize++;
 
@@ -312,17 +312,23 @@ bool FloatToFixedPrivate(
 		uint8 			precision){
 
 	// what is the exponent associated to the least significative figure?
-	int16 leastSignificativeExponent = exponent - precision + 1;  
-	
-	// round up
-	if (leastSignificativeExponent >= 0 ) positiveNumber += 0.5;
-	else {
-		// to round up add a correctionvalue just below last visible digit
-		T correction;
-		FastPowerOf10Private(correction,leastSignificativeExponent);
-		correction *= 0.5;
-		positiveNumber += correction;
+	int16 leastSignificativeExponent = exponent - precision;
+	int16 correctionExponent = 0;
+
+	// if least signicative figure is > 0 
+	if (leastSignificativeExponent >= 0 ) {
+		correctionExponent = -exponent;
+	} else {
+		correctionExponent = -precision+1;
 	}
+		// to round up add a correctionvalue just below last visible digit
+	T correction;
+	FastPowerOf10Private(correction,correctionExponent);
+	correction *= 0.5;
+//printf("##%f %i %i##\n",positiveNumber,exponent,precision);	
+	positiveNumber += correction;
+	
+//printf("##%f %i ##\n",positiveNumber,leastSignificativeExponent);	
 	
 	// numbers below 1.0
 	if (exponent < 0){
@@ -342,7 +348,7 @@ bool FloatToFixedPrivate(
 	
 	// loop to fulfil precision 
 	// also must reach the end of the integer part thus exponent is checked
-	while ((exponent > 0) || (precision > 0) ){
+	while ((exponent >= 0) || (precision > 0) ){
 		// before outputting the fractional part add a '.'
 		if (exponent == -1) stream.PutC('.');
 
@@ -512,7 +518,10 @@ bool FloatToStream(
 	    if ((format.floatNotation == Notation::FixedPointNotation) || (format.floatNotation == Notation::CompactNotation)){
 	    	// obtain size and associated realizable precision
 	    	testPrecision = precision;
+//printf("##%i %i %i##\n",exponent,hasSign,testPrecision);	
 	    	testFormatSize = NumberOfDigitsFixedNotation(exponent,hasSign,testPrecision,maximumSize);
+//printf("##%i %i ##\n",testFormatSize,testPrecision);	
+	    	
 	    	// if the number fits then precision is >=1
 	    	if (testPrecision > chosenPrecision){	    		
 	    		chosenMode = FixedFloat;
@@ -549,7 +558,9 @@ bool FloatToStream(
 	    		chosenPrecision = testPrecision; 
 	    		numberSize = testFormatSize; 
 	    	}
-	    }    
+	    }   
+	    
+	    precision = chosenPrecision;
 	}
 
 	// in case of left alignment
@@ -607,7 +618,7 @@ bool FloatToStream(
             // check if exponent in correct range
             if ((engineeringExponent != 0) && (engineeringExponent<=12) && (engineeringExponent>=-12)){
                 static const char *symbols = "pnum kMGT";
-                stream.PutC(symbols[engineeringExponent/3]);
+                stream.PutC(symbols[engineeringExponent/3+4]);
             } else {
                 // writes exponent
              	ExponentToStreamPrivate(stream, engineeringExponent);
