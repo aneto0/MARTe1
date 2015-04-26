@@ -205,38 +205,44 @@ template <typename T> uint8 GetOrderOfMagnitudeBin(T positiveNumber){
     return exp;
 }
 
-
-
 /** implements a 2 step conversion - step1 32/64 to 16bit step2 10bit to decimal
  *  this way the number of 32/64 bit operations are reduced
- *  numberFillLength shall be set to 4 
+ *  numberFillLength is used to specify how many digits to prints at least (this would include trailingzeros)
+ *  it will never print more trailing zeros than the maximum size of a number of that format
  *  streamer must have a PutC(char) method. It will be used to output the digits
  */   
-template <typename T, class streamer> void NToDecimalStreamPrivate(streamer &s, T positiveNumber,int8 numberFillLength=0){
+template <typename T, class streamer> 
+static inline void NToDecimalStreamPrivate(streamer &s, T positiveNumber,int16 numberFillLength=0){
 
+	// no negative!
 	if (numberFillLength < 0) numberFillLength=0;
-	// calculates the number of obligatory digits for first section by removing the nearest multiple of 4
-	if (numberFillLength > 0) numberFillLength &= 0x3;
-	
-	// treat 64 bit numbers dividing them into 5 blocks of max 4 digits
+
+	// 64 bits
 	if (sizeof(T)==8){  
+		// treat 64 bit numbers dividing them into 5 blocks of max 4 digits
+		// 16 12 8 4 zeroes
 		const uint64 tests[4] = {10000000000000000,1000000000000,100000000,10000};
-		// calculates the number of obligatory digits for first section 
-		if (numberFillLength > 0)numberFillLength %=4;
-		int i;
+
+		uint8 i;
+		// how many figures are below the current test point
+		uint8 figures = 16;
 		for (i=0;i<4;i++){
-			// enter if a big number or if zero padding required
-			if ((positiveNumber > tests[i])|| (numberFillLength>0))  {
+			// enter if a big number or if zero padding required			
+			if ((positiveNumber > tests[i])|| (numberFillLength > figures))  {
 				// call this template with 16 bit number
 				// otherwise infinite recursion!
-				uint16 x = positiveNumber / tests[i];
-				positiveNumber %= tests[i];
+				uint16 x       = positiveNumber / tests[i];
+				positiveNumber = positiveNumber % tests[i];
+				
 				// process the upper part as uint16
 				// recurse into this function
-				NToDecimalStreamPrivate(s,x,numberFillLength);
-				// next blocks will all be padded to 4 digits 
-				numberFillLength = 4;
-			} 
+				NToDecimalStreamPrivate(s,x,numberFillLength-figures);
+				
+				// print all the blocks in full from now on 
+				numberFillLength = figures;
+			}
+			// update
+			figures -= 4;
 		}
 		// call this template with 16 bit number
 		// otherwise infinite recursion!
@@ -248,18 +254,31 @@ template <typename T, class streamer> void NToDecimalStreamPrivate(streamer &s, 
 
 	// treat 32 bit numbers dividing them into 3 blocks of max 4 digits
 	if (sizeof(T)==4){  
+		// 8 4 zeroes
 		const uint32 tests[2] = {100000000,10000};
-		int i;
+		// how many figures are below the current test point
+		uint8 figures = 16;
+		uint8 i;
 		for (i=0;i<2;i++){
 			if ((positiveNumber > tests[i])|| (numberFillLength>0))  {
-				uint16 x = positiveNumber / tests[i];
-				positiveNumber %= tests[i];
-				// process the upper part as uint32
-				NToDecimalStreamPrivate(s,x,numberFillLength);
-				numberFillLength = 4;
+				// call this template with 16 bit number
+				// otherwise infinite recursion!
+				uint16 x       = positiveNumber / tests[i];
+				positiveNumber = positiveNumber % tests[i];
+
+				// process the upper part as uint16
+				// recurse into this function
+				NToDecimalStreamPrivate(s,x,numberFillLength-figures);
+
+				// print all the blocks in full from now on 
+				numberFillLength = figures;
 			} // after this 11 max
+			figures -= 4;
 		}
+		// call this template with 16 bit number
+		// otherwise infinite recursion!
 		uint16 x = positiveNumber;
+		// recurse into this function
 		NToDecimalStreamPrivate(s,x,numberFillLength);
 		return;
 	}
@@ -280,6 +299,9 @@ template <typename T, class streamer> void NToDecimalStreamPrivate(streamer &s, 
 		// first fill in all necessary zeros 
 		uint8 i= 0;		
 		if (numberFillLength > 0){
+			// clamp to 5
+			if (numberFillLength > 5)numberFillLength = 5;
+			// fill up with zeros
 			for (i=(5-numberFillLength);i<=index;i++) s.PutC('0');
 		}
 		// then complete by outputting all digits 
@@ -567,7 +589,7 @@ bool NumberToOctalStream(
 	
 	// in case of right alignment
 	if (padded && leftAligned){
-		for (int i=0;i < maximumSize-numberSize;i++) stream.PutC(' ');
+		for (int i = numberSize;i < maximumSize;i++) stream.PutC(' ');
 	}
     return true;	
 }
@@ -664,7 +686,6 @@ bool NumberToBinaryStream(
 			} 
 		}	
 	}
-	
 
 // in case of right alignment
 	if (padded && leftAligned){
@@ -673,26 +694,6 @@ bool NumberToBinaryStream(
     return true;	
 	
 }
-
-
-/// This function allows determining rapidly the minimum number of digits 
-/// necessary to describe a number
-/// it takes the exponent in base2 and multiplies it by log10(2)
-/// this is the minimum log of the number
-/// the maximum is this value + log10(2)
-/// all of this unless the float is subnormal...
-/*static inline template <typename T> unsigned short FastLog10(T x){
-unsigned short exponent;
-if (sizeof(x) == 4){
-    unsigned long  &px = (unsigned long &)x;
-    exponent = ((px & 0x7F800000) >> 23)-127;   
-}
-if (sizeof(x) == 8){
-    unsigned long long &px = (unsigned long long &)x;
-    exponent = ((px & 0x7FFC000000000000) >> 52)-1023;
-}
-    return (0.30102996 * exponent );
-}*/
 
 #define CHECK_AND_REDUCE(number,step,exponent)\
 if (number >= 1E ## step){ \
@@ -706,15 +707,24 @@ if (number <= 1E- ## step){ \
 } 
 
 // exponent is increased or decreased,not set
+// support numbers up to quad precision
 template <typename T> 
 static inline void NormalizeNumber(T &positiveNumber, int16 &exponent){
 	// used internally 
 	if (positiveNumber <= 0.0) return ;
 
+	// check and normalize progressively following a logaritmic pattern
 	if (positiveNumber >= 1.0){
-        CHECK_AND_REDUCE(positiveNumber,256,exponent)
-        CHECK_AND_REDUCE(positiveNumber,128,exponent)
-        CHECK_AND_REDUCE(positiveNumber,64,exponent)
+		if (sizeof(T)>8){
+            CHECK_AND_REDUCE(positiveNumber,2048,exponent)
+            CHECK_AND_REDUCE(positiveNumber,1024,exponent)
+            CHECK_AND_REDUCE(positiveNumber,512,exponent)
+	    }
+		if (sizeof(T)>4){
+            CHECK_AND_REDUCE(positiveNumber,256,exponent)
+            CHECK_AND_REDUCE(positiveNumber,128,exponent)
+            CHECK_AND_REDUCE(positiveNumber,64,exponent)
+		}
         CHECK_AND_REDUCE(positiveNumber,32,exponent)
         CHECK_AND_REDUCE(positiveNumber,16,exponent)
         CHECK_AND_REDUCE(positiveNumber,8,exponent)
@@ -722,9 +732,16 @@ static inline void NormalizeNumber(T &positiveNumber, int16 &exponent){
         CHECK_AND_REDUCE(positiveNumber,2,exponent)
         CHECK_AND_REDUCE(positiveNumber,1,exponent)
 	} else {
-        CHECK_AND_INCREASE(positiveNumber,256,exponent)
-        CHECK_AND_INCREASE(positiveNumber,128,exponent)
-        CHECK_AND_INCREASE(positiveNumber,64,exponent)
+		if (sizeof(T)>8){
+			CHECK_AND_INCREASE(positiveNumber,2048,exponent)
+		    CHECK_AND_INCREASE(positiveNumber,1024,exponent)
+            CHECK_AND_INCREASE(positiveNumber,512,exponent)
+	    }
+		if (sizeof(T)>4){
+            CHECK_AND_INCREASE(positiveNumber,256,exponent)
+            CHECK_AND_INCREASE(positiveNumber,128,exponent)
+            CHECK_AND_INCREASE(positiveNumber,64,exponent)
+		}
         CHECK_AND_INCREASE(positiveNumber,32,exponent)
         CHECK_AND_INCREASE(positiveNumber,16,exponent)
         CHECK_AND_INCREASE(positiveNumber,8,exponent)
@@ -735,6 +752,8 @@ static inline void NormalizeNumber(T &positiveNumber, int16 &exponent){
 	}
 }
 
+// rapid calculation of 10 to n both positive and negative
+// suports up to quad precision
 template <typename T> 
 static inline void fastPow10(T &output, int16 exponent){
 	T radix = 10.0;
@@ -760,17 +779,233 @@ static inline void fastPow10(T &output, int16 exponent){
 	}		
 }
 
+
+
 /**
- * converts a couple of normalizedNumber/exponent (or any other equivalent) to a string using fixed format
- * normalizedNumber is not 0 nor Nan nor Inf and is positive
+ * performs standard operations for all float representations
+ * 
+ */
+template <typename T> 
+const char * BasicFloatChecks(
+		T 				number,
+		T & 			positiveNumber,
+		uint8 &         precision,
+		uint16 &		maximumSize,
+		uint8 &			neededSize){
+	
+	if (isnan(number)) {
+		neededSize = 3;
+        return "NaN";
+	}
+
+	if (isinf(number)) {
+		neededSize = 4;
+		if (number < 0)   return "-Inf";
+		return "+Inf";
+	}
+
+	if (number == 0) {
+		neededSize = 1;
+		return "0";
+	}
+
+	T positiveNumber = number;
+	if (positiveNumber < 0) positiveNumber = -positiveNumber;
+	
+	// on precision 0 the max useful precision is chosen
+	if (precision == 0){
+		if (sizeof(T)  > 8)precision = 34; 
+		if (sizeof(T) == 8)precision = 15;
+		if (sizeof(T) <  8)precision = 7;
+	}
+	
+	// 1000 should not constitute a limit
+	if (maximumSize == 0) maximumSize = 1000;
+
+	neededSize = 0;
+	return NULL;
+}
+
+/**
+Encodes the exponent in the classical form E+/-nn
+ */
+template <class streamer> 
+static inline void ExpToDecimalPrivate(
+		streamer &		stream, 
+		int16           exponent
+){
+    // output exponent if exists
+    if (exponent != 0){
+		stream.PutC('E');
+		// print the exponent sign (both)
+		// get the absolute value
+		if (exponent > 0){
+			stream.PutC('+');
+		} else {
+			exponent = -exponent;
+			stream.PutC('-');
+		}
+		// fast convert to int
+		NToDecimalStreamPrivate(stream, exponent);
+    }
+}
+
+/// rapid determination of size of exponet part
+static inline 
+uint8 NumberOfDigitsOfExponent(int16 exponent){
+	// no exponent!
+	if (exponent == 0) return 0;
+	
+	// workout the size of exponent
+	// the size of exponent is 2+expNDigits
+	// sign of exponent is always produced
+	int16 exponentNumberOfDigits = 3;// E+n
+
+	// remove sign
+	if (exponent < 0) exponent = - exponent;
+	
+	// work out size
+	if (exponent < 100){ // below 100 is either 3 or 4
+		if (exponent >= 10){
+			exponentNumberOfDigits ++;
+		} 
+	} else { // above or equal 100 is at least 5
+		exponentNumberOfDigits +=2;
+		// just add one for each size step above
+		if (exponent >= 1000){
+			exponentNumberOfDigits ++;
+		} 
+		// just add one for each size step above
+		if (exponent >= 10000){
+			exponentNumberOfDigits ++;
+		} 
+	}	
+	return exponentNumberOfDigits;
+}
+
+/** decompose an exponent into a multiple of 3 and a remainder part
+ *  returns the multiple of 3
+ *  exponent is modified to be the remiander
+ *  original exponent is the sum of the 2 
+ */
+static inline int16 ExponentToEngineering(int16 &exponent){
+    int16 engineeringExponent = 0;
+    // if negative we need to bias by 2 so that exp=-1 => eng_exp = -3 and not 0
+    if (engineeringExponent < 0) engineeringExponent = (exponent-2) / 3;
+	// if positive it is simply exp/3  
+    else                         engineeringExponent = exponent / 3;
+
+    // multiply by 3 so that it is the actual exponent
+    engineeringExponent *= 3;
+    // calculate remainder 
+    exponent = exponent - engineeringExponent;
+    
+    return engineeringExponent;
+}
+
+// calculate size of fixed numeric representation considering the zeros and the . needed beyond the significative digits 
+// excludes from the size the eventual sign 
+// precision is int16 to allow safe subtraction
+// precision is updated to fit within maximumSize
+// negative or zero precision means cannot fit
+static inline uint8 FixedFormatSize(int16 exponent,int16 &precision, uint16 maximumSize){    
+	uint8 fixedNotationSize = 0;	
+	if (exponent >= 0){
+		// fixed notation for large numbers needs a number of digits = 1+ exponent in this case no . is used 
+		fixedNotationSize = exponent+1;
+		// if we need to go below zero consider also the . this  is why +1
+	    if (fixedNotationSize < (precision-1)) fixedNotationSize = precision + 1;
+	    minFormatSize = exponent+1;
+	} else { // negative exponent 
+		exponent = -exponent;
+		// a precision 1 exp = -1 needs 3 (0.x) so add 1 
+		fixedNotationSize = exponent+precision+1;
+		// are we within limits?		
+	    if (fixedNotationSize > maximumSize){
+	    	// try reducing precision
+	    	precision += (maximumSize - fixedNotationSize);
+	    	if (precision >= 1){
+	    		// fits to the limits
+		    	fixedNotationSize = maximumSize;
+	    	} else {
+	    		// less than 1 is meaningless
+		    	fixedNotationSize = 1;
+		    	// -1 means no space! 
+		    	precision = -1;
+	    	}
+	    }
+	}
+    return fixedNotationSize;
+}
+
+// calculate size of smart numeric representation considering the exponent and the desired precision
+// excludes from the size the eventual sign 
+static inline uint8 ExponentialFormatSize(int16 exponent,int16 &precision, uint16 maximumSize){    
+	//	exponential notation number size
+	uint8 exponentNotationSize = 0;
+	// include exponent size 
+	exponentNotationSize += NumberOfDigitsOfExponent(exponent);    
+	// include mantissa size 
+    uint8 mantissaSize = FixedFormatSize(0,precision,maximumSize-exponentNotationSize);
+    // does not fit
+    if (precision < 0) return 1;
+    return exponentNotationSize + mantissaSize;
+}
+
+// calculate size of engineering representation considering the exponent and the desired precision
+// excludes from the size the eventual sign 
+static inline uint8 EngineeringFormatSize(int16 exponent,uint8 precision){
+		
+	// decompose exponent in two parts 
+	int16 exponentRemainder = exponent;
+	int16 engineeringExponent = ExponentToEngineering(exponentRemainder);
+
+	uint8 engineeringNotationSize = 0;
+	// include exponent size 
+	engineeringNotationSize += NumberOfDigitsOfExponent(engineeringExponent);    
+	// include mantissa size 
+    uint8 mantissaSize = FixedFormatSize(exponentRemainder,precision,maximumSize-engineeringNotationSize);
+    // does not fit
+    if (precision < 0) return 1;
+    return engineeringNotationSize+mantissaSize;
+}
+
+// calculate size of smart numeric representation considering the exponent and the desired precision
+// excludes from the size the eventual sign 
+static inline uint8 SmartFormatSize(int16 exponent,uint8 precision){
+	
+	// decompose exponent in two parts 
+	int16 exponentRemainder = exponent;
+	int16 engineeringExponent = ExponentToEngineering(exponentRemainder);
+
+	uint8 smartNotationSize = 0;
+    // check if in range for smart replacement of exponent
+    if ((engineeringExponent != 0) && (engineeringExponent<=12) && (engineeringExponent>=-12)){
+    	// if so the exponent is simply a letter
+    	smartNotationSize++;
+    } else {
+    	// or the whole E-xxx
+    	smartNotationSize += NumberOfDigitsOfExponent(engineeringExponent);
+    }
+	// include mantissa size 
+    uint8 mantissaSize = FixedFormatSize(exponentRemainder,precision,maximumSize-smartNotationSize );
+    // does not fit
+    if (precision < 0) return 1;
+    
+    return smartNotationSize + mantissaSize;
+}	
+
+/**
+ * converts a couple of positiveNumber/exponent (or any other equivalent) to a string using fixed format
+ * positiveNumber is not 0 nor Nan nor Inf and is positive
  * sizeLeft is the buffer size left
  * pBuffer is a writable area of memory of at least sizeLeft
  * precision determines the number of significative digits and is always not 0
  */
 template <typename T, class streamer> 
-bool FPToFixedStream(
+bool FloatToFixedPrivate(
 		streamer &		stream, 
-		T 				normalizedNumber,
+		T 				positiveNumber,
 		int16           exponent,
 		uint8 			precision){
 
@@ -778,12 +1013,12 @@ bool FPToFixedStream(
 	int16 leastSignificativeExponent = exponent - precision + 1;  
 	
 	// round up
-	if (leastSignificativeExponent >= 0 ) normalizedNumber += 0.5;
+	if (leastSignificativeExponent >= 0 ) positiveNumber += 0.5;
 	else {
 		// to round up add a correctionvalue just below last visible digit
 		T correction;
 		fastPow10(correction,leastSignificativeExponent) * 0.5;
-		normalizedNumber += correction;
+		positiveNumber += correction;
 	}
 	
 	// numbers below 1.0
@@ -821,325 +1056,19 @@ bool FPToFixedStream(
 	}
 }
 
-/**
-Encodes the exponent in the classical form E+nn
- */
-template <class streamer> 
-static inline void ExpToDecimalStream(
-		streamer &		stream, 
-		int16           exponent
-){
-    // output exponent if exists
-    if (exponent != 0){
-		stream.PutC('E'+ digit);
-		NumberToDecimalStream(stream,exponent,0,false,false,true);
-    }
-}
 
-template <typename T, class streamer> 
-bool BasicFloatConversion(
-		streamer &		stream, 
-		T 				number,
-		uint8 			precision){
 
-	if (isnan(number)) {
-		stringSize = 3;
-		pBuffer = "NaN";	
-        return false;
-	}
-
-	if (isinf(number)) {
-		stringSize = 3;
-		pBuffer = "Inf";		
-        return false;
-	}
-
-	if (number == 0) {
-		stringSize = 1;
-		pBuffer = "0";		
-        return false;
-	}
-
-	// 0 not allowed
-	if (precision == 0) precision = 1;
-
-	// not space even for "0"!
-	if (sizeLeft < 1) {
-		stringSize = 1;
-		pBuffer = "?"; 
-        return false;
-	}
-	// stringSize is also an index within the buffer for the next free space
-	stringSize = 0;
-
-	// flip sign if necessary;
-	if (number < 0){
-		number = -number;
-		if (sizeLeft--) *pBuffer++ = '-';
-	}
-    
-    return true;
-}
-
-static inline uint8 FixedFormatSize(int16 exponent,uint16 precision){    
-
-	// fixed notation 
-	uint8 fixedNotationSize = precision;
-    if (exponent > (precision-1)) fixedNotationSize = exponent;
-    if (exponent < (precision-1)) fixedNotationSize++;
-    return fixedNotationSize;
-}
-
-/**
- * converts a float/double (or any other equivalent) to a string using fixed format
- * bufferSize is the buffer size and includes the space for the 0 terminator
- * buffer is a writable area of memory of at least bufferSize
- * returns pointer to the string either within the buffer or (in case of errors or inf/nan to a const char)
- * returns stringSize with the actual length of the string
- * precision determines the number of significative digits
- */
-template <typename T> const char *FloatToFixed(uint16 &stringSize,char *buffer,uint16 bufferSize,T number, uint8 precision){
-	// we will use sizeLeft to control use of buffer
-	// 16 bit and signed so that we can count negatively 
-	// (max exponent is -310 and max precision is 255 so the sum of the two is the max number of digits) 
-	int16 sizeLeft = bufferSize-1;
-	// we will also use pBuffer to mark the current active location in the buffer
-	char *pBuffer = buffer;
-
-    // deals with nan, 0 etc
-    if (!BasicFloatConversion(stringSize,pBuffer,sizeLeft,number, precision)){
-        return pBuffer;
-    }
-
-	// normalize number
-	int16 exponent = 0;
-	NormalizeNumber(number,exponent);
-
-    // does all the work of conversion but for the sign and special cases
-    FPToFixed(pBuffer,sizeLeft,number, exponent,precision);
-
-	// no space to complete number exit
-	if (sizeLeft < 0) {
-		stringSize = 1;
-		return "?";
-	}
-	
-	// terminate string - space is guaranteed by check above  
-	*pBuffer = 0;
-	stringSize = (pBuffer - buffer);	
-
-	return buffer;
-}
-
-static inline uint16 NumberOfDigitsOfExponent(int16 exponent){
-	// workout the size of exponent
-	// the size of exponent is 2+expNDigits 
-	int16 exponentNumberOfDigits = 3;// E+nn
-	uint16 absExponent = exponent;
-	if(absExponent<0){
-		absExponent*=-1;
-	}
-	while (absExponent > 10){
-		exponentNumberOfDigits++;
-		absExponent /= 10;
-	}
-    return exponentNumberOfDigits;
-}
-
-static inline uint8 ExponentialFormatSize(int16 exponent,uint16 precision){    
-	//	exponential notation number size
-	uint8 exponentNotationSize = precision+NumberOfDigitsOfExponent(exponent);
-    // add space for .
-    if (1 < precision) exponentNotationSize++;
-    return exponentNotationSize;
-}
-
-/**
- * converts a float/double (or any other equivalent) to a string using exponential format
- * bufferSize is the buffer size and includes the space for the 0 terminator
- * buffer is a writable area of memory of at least bufferSize
- * returns pointer to the string either within the buffer or (in case of errors or inf/nan to a const char)
- * returns stringSize with the actual length of the string
- * precision determines the number of significative digits
- */
-template <typename T> const char *FloatToExponential(uint16 &stringSize,char *buffer,uint16 bufferSize,T number, uint8 precision){
-	// we will use sizeLeft to control use of buffer
-	// 16 bit and signed so that we can count negatively 
-	// (max exponent is -310 and max precision is 255 so the sum of the two is the max number of digits) 
-	int16 sizeLeft = bufferSize-1;
-	// we will also use pBuffer to mark the current active location in the buffer
-	char *pBuffer = buffer;
-
-    // deals with nan, 0 etc
-    if (!BasicFloatConversion(stringSize,pBuffer,sizeLeft,number, precision)){
-        return pBuffer;
-    }
-
-	// normalize number
-	int16 exponent = 0;
-	NormalizeNumber(number,exponent);
-
-    // does all the work of conversion but for the sign and special cases
-    FPToFixed(pBuffer,sizeLeft,number, 0,precision);
-    
-    // writes exponent
-    ExpToDecimal(pBuffer,sizeLeft, exponent);
-
-	// no space to complete number exit
-	if (sizeLeft < 0) {
-		stringSize = 1;
-		return "?";
-	}
-	
-	// terminate string - space is guaranteed by check above  
-	*pBuffer = 0;
-	stringSize = (pBuffer - buffer);	
-
-	return buffer;
-}
-
-static inline int16 ExponentToEngineering(int16 &exponent){
-    int16 engineeringExponent = exponent / 3;
-    if (engineeringExponent < 0) engineeringExponent = (exponent-2)/3;
-    engineeringExponent *= 3;
-    exponent -= engineeringExponent;
-    return engineeringExponent;
-}
-
-static inline uint8 EngineeringFormatSize(int16 exponent,uint16 precision){    
-	uint8 engineeringNotationSize = precision;
-	int16 exponentCopy=exponent;
-    engineeringNotationSize += NumberOfDigitsOfExponent(ExponentToEngineering(exponentCopy));
-        
-    if (exponent > (precision-1)) engineeringNotationSize = exponentCopy;
-    if (exponent < (precision-1)) engineeringNotationSize++;
-    return engineeringNotationSize;
-}
-
-/**
- * converts a float/double (or any other equivalent) to a string using engineering format
- * bufferSize is the buffer size and includes the space for the 0 terminator
- * buffer is a writable area of memory of at least bufferSize
- * returns pointer to the string either within the buffer or (in case of errors or inf/nan) to a const char
- * returns stringSize with the actual length of the string
- * precision determines the number of significative digits
- */
-template <typename T> const char *FloatToEngineering(uint16 &stringSize,char *buffer,uint16 bufferSize,T number, uint8 precision){
-	// we will use sizeLeft to control use of buffer
-	// 16 bit and signed so that we can count negatively 
-	// (max exponent is -310 and max precision is 255 so the sum of the two is the max number of digits) 
-	int16 sizeLeft = bufferSize-1;
-	// we will also use pBuffer to mark the current active location in the buffer
-	char *pBuffer = buffer;
-
-    // deals with nan, 0 etc
-    if (!BasicFloatConversion(stringSize,pBuffer,sizeLeft,number, precision)){
-        return pBuffer;
-    }
-
-	// normalize number
-	int16 exponent = 0;
-	NormalizeNumber(number,exponent);
-
-    // partitions the exponent between engineering part and residual 
-    int16 engineeringExponent = ExponentToEngineering(exponent);
-    
-    // does all the work of conversion but for the sign and special cases
-    FPToFixed(pBuffer,sizeLeft,number, exponent,precision);
-    
-    // output exponent if exists
-    if (exponent != 0){
-		if (sizeLeft--) *pBuffer++ = 'E';
-        char buffer2[7];
-        uint16 stringSize;
-        const char *expNumber = NumberToDecimal(stringSize,buffer2,sizeof(buffer2),exponent,true);
-        while (*expNumber != 0){
-            *pBuffer++ = *expNumber++;
-        }
-    }
-
-    	// no space to complete number exit
-	if (sizeLeft < 0) {
-		stringSize = 1;
-		return "?";
-	}
-	
-	// terminate string - space is guaranteed by check above  
-	*pBuffer = 0;
-	stringSize = (pBuffer - buffer);	
-
-	return buffer;
-}
-
-static inline uint8 SmartFormatSize(int16 exponent,uint16 precision){    
-	uint8 smartNotationSize = precision;
-    int16 exponentCopy = exponent;
-	uint16 engineeringNotationSize=precision;
-    int16 engineeringExponent = ExponentToEngineering(exponentCopy);
-        
-    if ((engineeringExponent != 0) && (engineeringExponent<=12) && (engineeringExponent>=-12)){
-        engineeringNotationSize++;
-    } else {
-        engineeringNotationSize += NumberOfDigitsOfExponent(engineeringExponent);
-    }
-        
-    if (exponent > (precision-1)) smartNotationSize = exponentCopy;
-    if (exponent < (precision-1)) smartNotationSize++;
-    
-    return smartNotationSize;
-}	
-/**
- * converts a float/double (or any other equivalent) to a string using engineering format
- * bufferSize is the buffer size and includes the space for the 0 terminator
- * buffer is a writable area of memory of at least bufferSize
- * returns pointer to the string either within the buffer or (in case of errors or inf/nan) to a const char
- * returns stringSize with the actual length of the string
- * precision determines the number of significative digits
- */
-template <typename T> const char *FloatToSmart(uint16 &stringSize,char *buffer,uint16 bufferSize,T number, uint8 precision){
-	// we will use sizeLeft to control use of buffer
-	// 16 bit and signed so that we can count negatively 
-	// (max exponent is -310 and max precision is 255 so the sum of the two is the max number of digits) 
-	int16 sizeLeft = bufferSize-1;
-	// we will also use pBuffer to mark the current active location in the buffer
-	char *pBuffer = buffer;
-
-    // deals with nan, 0 etc
-    if (!BasicFloatConversion(stringSize,pBuffer,sizeLeft,number, precision)){
-        return pBuffer;
-    }
-
-	// normalize number
-	int16 exponent = 0;
-	NormalizeNumber(number,exponent);
-
-    // partitions the exponent between engineering part and residual 
-    int16 engineeringExponent = ExponentToEngineering(exponent);
-    
-    // does all the work of conversion but for the sign and special cases
-    FPToFixed(pBuffer,sizeLeft,number, exponent,precision);
-
-    if ((engineeringExponent != 0) && (engineeringExponent<=12) && (engineeringExponent>=-12)){
-        static const char *symbols = "pnum kMGT";
-		if (sizeLeft--) *pBuffer++ = symbols[engineeringExponent/3];        
-    } else {
-        // writes exponent
-        ExpToDecimal(pBuffer,sizeLeft, engineeringExponent);
-    }
-      
-   	// no space to complete number exit
-	if (sizeLeft < 0) {
-		stringSize = 1;
-		return "?";
-	}
-	
-	// terminate string - space is guaranteed by check above  
-	*pBuffer = 0;
-	stringSize = (pBuffer - buffer);	
-
-	return buffer;
-}
-
+/// to manage the behaviour of the function
+enum FloatDisplayModes{
+	FixedFloat               =0,
+	ExponentialFloat         =1,
+	EngineeringFloat         =2,
+	SmartFloat               =3,
+	MostCompact              =11,
+	InsufficientSpaceForFloat=77, // not enough space
+	SimpleFloat              =88, // 0, +/-Inf Nan etc
+	NoFormat                 =99
+};
 
 /**
  * converts a float/double (or any other equivalent) to a string using whatever format achieves best compact representation
@@ -1149,95 +1078,236 @@ template <typename T> const char *FloatToSmart(uint16 &stringSize,char *buffer,u
  * returns stringSize with the actual length of the string
  * precision determines the number of significative digits
  */
-template <typename T> const char *FloatToCompact(uint16 &stringSize,char *buffer,uint16 bufferSize,T number, uint8 precision){
-	// we will use sizeLeft to control use of buffer
-	// 16 bit and signed so that we can count negatively 
-	// (max exponent is -310 and max precision is 255 so the sum of the two is the max number of digits) 
-	int16 sizeLeft = bufferSize-1;
-	// we will also use pBuffer to mark the current active location in the buffer
-	char *pBuffer = buffer;
+template <typename T, class streamer> 
+bool FloatToStreamer(
+		streamer &		    stream,                        // must have a GetC(c) function where c is of a type that can be obtained from chars  
+		T 				    number,
+		FloatDisplayModes   mode,
+		uint16 			    maximumSize			= 0,       // 0 means that the number is printed in its entirety
+		uint8 			    precision           = 0,       // full precision for the given format
+		bool 			    padded				= false,   // if maximumSize!=0 & align towards the right or the left
+		bool 			    leftAligned			= false,   // if padded and maximumSize!=0 align towards the left
+		bool 			    addPositiveSign		= false)   // prepend with + not just with - for negative numbers
+{
 
-    // deals with nan, 0 etc
-    if (!BasicFloatConversion(stringSize,pBuffer,sizeLeft,number, precision)){
-        return pBuffer;
-    }
+	FloatDisplayModes chosenMode =  NoFormat;
 
-	// normalize number
-	int16 exponent = 0;
-	NormalizeNumber(number,exponent);
-    
-    uint8 fs[4];
-    fs[0] = FixedFormatSize(exponent,precision);
-    fs[1] = ExponentialFormatSize(exponent,precision);
-    fs[2] = EngineeringFormatSize(exponent,precision);
-    fs[3] = SmartFormatSize(exponent,precision);
-    
-    int chosen = 0;
-    int size = fs[0];
-    for (int i = 1; i < 4;i++){
-        if (((fs[i] <=  sizeLeft) && (fs[i] > fs[chosen])) || ((fs[i] < fs[chosen]) && (fs[chosen] > sizeLeft))) chosen = i;
-    }
-    if (fs[chosen] > sizeLeft){
-        precision -= (fs[chosen] + sizeLeft);
-    }
-    
-    if ( precision < 1) return "?";
-    
-    switch (chosen){
-        case 0:{
-            // does all the work of conversion but for the sign and special cases
-            FPToFixed(pBuffer,sizeLeft,number, exponent,precision);
-            
-        }break;
-        case 1:{
-    
-            // does all the work of conversion but for the sign and special cases
-            FPToFixed(pBuffer,sizeLeft,number, 0,precision);
+	// this is the second main objective of the first part
+	// to find out the size 
+	uint8 numberSize; 
 
-            // writes exponent
-            ExpToDecimal(pBuffer,sizeLeft, exponent);
-            
-        }break;
-        case 2:{
-            // partitions the exponent between engineering part and residual 
-            int16 engineeringExponent = ExponentToEngineering(exponent); 
+	// this will be used everywhere!
+	T positiveNumber;
+	// the main common checks
+	const char *simpleRepresentation =  BasicFloatChecks(number,positiveNumber,precision,maximumSize,numberSize);
+	if (simpleRepresentation != NULL) chosenMode = SimpleFloat;
+	
+	// no chosen mode yet try all formats
+	if (chosenMode != SimpleFloat){
+		
+		// normalize number
+		int16 exponent = 0;
+		NormalizeNumber(positiveNumber,exponent);
     
-            // does all the work of conversion but for the sign and special cases
-            FPToFixed(pBuffer,sizeLeft,number, exponent,precision);
+		// account for sign
+		uint8 signSize = 0;
+		if (number < 0) signSize++;
 
-            // writes exponent
-            ExpToDecimal(pBuffer,sizeLeft, engineeringExponent);
-            
-        }break;
-        case 3:{
-            // partitions the exponent between engineering part and residual 
-            int16 engineeringExponent = ExponentToEngineering(exponent); 
-    
-            // does all the work of conversion but for the sign and special cases
-            FPToFixed(pBuffer,sizeLeft,number, exponent,precision);
+        // precision 0 means no significant bits		
+		int16 chosenPrecision = 0;
+		// just the space for '?'
+	    numberSize = 1;	   
+	    // assume the worst 
+	    chosenMode = InsufficientSpaceForFloat;
 
-            if ((engineeringExponent != 0) && (engineeringExponent<=12) && (engineeringExponent>=-12)){
-                static const char *symbols = "pnum kMGT";
-                if (sizeLeft--) *pBuffer++ = symbols[engineeringExponent/3];        
-                } else {
-                   // writes exponent
-                ExpToDecimal(pBuffer,sizeLeft, engineeringExponent);
-            }            
-        }break;
-    }
+		int16 testPrecision;
+	    uint16 testFormatSize;
+	    if ((mode == MostCompact) || (mode == FixedFloat)){ 		
+	    	testPrecision = precision;
+	    	testFormatSize = FixedFormatSize(exponent,testPrecision,maximumSize-signSize) + signSize;
+	    	if (testPrecision > chosenPrecision){
+	    		chosenMode = FixedFloat;
+	    		chosenPrecision = testPrecision;
+	    		numberSize = testFormatSize; 
+	    	}
+	    }
+	    
+	    if ((mode == MostCompact) || (mode == EngineeringFloat)){ 		
+	    	testPrecision = precision;
+	    	testFormatSize = EngineeringFormatSize(exponent,testPrecision,maximumSize-signSize) + signSize;
+	    	if (testPrecision > chosenPrecision){
+	    		chosenMode = EngineeringFloat;
+	    		chosenPrecision = testPrecision;
+	    		numberSize = testFormatSize; 
+	    	}
+	    }
 
-    	// no space to complete number exit
-	if (sizeLeft < 0) {
-		stringSize = 1;
-		return "?";
+	    if ((mode == MostCompact) || (mode == ExponentialFloat)){ 		
+	    	testPrecision = precision;
+	    	testFormatSize = ExponentialFormatSize(exponent,testPrecision,maximumSize-signSize) + signSize;
+	    	if (testPrecision > chosenPrecision){
+	    		chosenMode = ExponentialFloat;
+	    		chosenPrecision = testPrecision; 
+	    		numberSize = testFormatSize; 
+	    	}
+	    }
+		
+	    if ((mode == MostCompact) || (mode == SmartFloat)){ 		
+	    	testPrecision = precision;
+	    	testFormatSize = SmartFormatSize(exponent,testPrecision,maximumSize-signSize) + signSize;
+	    	if (testPrecision > chosenPrecision){
+	    		chosenMode = SmartFloat;
+	    		chosenPrecision = testPrecision; 
+	    		numberSize = testFormatSize; 
+	    	}
+	    }
+	    
+	}
+
+	// in case of left alignment
+	if (padded && !leftAligned){
+		for (int i=numberSize;i < maximumSize;i++) stream.PutC(' ');
 	}
 	
-	// terminate string - space is guaranteed by check above  
-	*pBuffer = 0;
-	stringSize = (pBuffer - buffer);	
+    switch (chosenMode){
+        case FixedFloat:{
+        	// output sign
+        	if (signSize)stream.PutC('-');
 
-	return buffer;
+        	// does all the work of conversion but for the sign and special cases
+        	FloatToFixedPrivate(stream,positiveNumber,exponent,precision);
+            
+        }break;
+        case ExponentialFloat:{
+        	// output sign
+        	if (signSize)stream.PutC('-');
+    
+            // does all the work of conversion but for the sign and special cases
+        	FloatToFixedPrivate(stream,positiveNumber, 0,precision);
+
+            // writes exponent
+        	ExpToDecimalPrivate(stream, exponent);
+            
+        }break;
+        case EngineeringFloat:{
+        	// output sign
+        	if (signSize)stream.PutC('-');
+
+        	// partitions the exponent between engineering part and residual 
+            int16 engineeringExponent = ExponentToEngineering(exponent); 
+    
+            // does all the work of conversion but for the sign and special cases
+            FloatToFixedPrivate(stream,positiveNumber exponent,precision);
+
+            // writes exponent
+            ExpToDecimalPrivate(stream, engineeringExponent);
+            
+        }break;
+        case SmartFloat:{
+        	// output sign
+        	if (signSize)stream.PutC('-');
+
+        	// partitions the exponent between engineering part and residual 
+            int16 engineeringExponent = ExponentToEngineering(exponent); 
+    
+            // does all the work of conversion but for the sign and special cases
+            FloatToFixedPrivate(stream,positiveNumber, exponent,precision);
+            // check if exponent in correct range
+            if ((engineeringExponent != 0) && (engineeringExponent<=12) && (engineeringExponent>=-12)){
+                static const char *symbols = "pnum kMGT";
+                stream.PutC(symbols[engineeringExponent/3]);
+            } else {
+                // writes exponent
+             	ExpToDecimalPrivate(stream, engineeringExponent);
+            }            
+
+        }break;
+        case InsufficientSpaceForFloat:{
+        	stream.PutC('?');
+        }break;
+        case SimpleFloat:{
+        	uint8 i = 0;
+        	for(i=0;i<sizeOfNumber;i++)stream.PutC(simpleRepresentation[i]);
+        }break;
+    }
+
+	// in case of right alignment
+	if (padded && leftAligned){
+		for (int i = numberSize;i < maximumSize;i++) stream.PutC(' ');
+	}
+    
+    
+    return true;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
