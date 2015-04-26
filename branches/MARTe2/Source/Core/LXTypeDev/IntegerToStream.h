@@ -265,7 +265,7 @@ static inline void Number2StreamDecimalNotationPrivate(streamer &s, T positiveNu
 		// 8 4 zeroes
 		const int32 tests[2] = {100000000,10000};
 		// how many figures are below the current test point
-		int16 figures = 16;
+		int16 figures = 8;
 		uint8 i;
 		for (i=0;i<2;i++){
 			if ((positiveNumber > (T)tests[i]) || 

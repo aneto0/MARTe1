@@ -296,7 +296,42 @@ int main(int argc, char **argv){
 	int64 in3 = -1234567890123456789;
 	Test_IntegerToStream(in3);	
 
-/*	
+	putchar('\n');	
+	uint32 in4 = 3456789012;
+	Test_IntegerToStream(in4);	
+
+	putchar('\n');	
+	int32 in5 =  1234567890;
+	Test_IntegerToStream(in5);	
+
+	putchar('\n');	
+	int32 in6 = -1234567890;
+	Test_IntegerToStream(in6);	
+
+	putchar('\n');	
+	uint16 in7 = 65432;
+	Test_IntegerToStream(in7);	
+
+	putchar('\n');	
+	int16 in8 =  32109;
+	Test_IntegerToStream(in8);	
+
+	putchar('\n');	
+	int16 in9 = -32109;
+	Test_IntegerToStream(in9);	
+	
+	putchar('\n');	
+	uint8 in10 = 210;
+	Test_IntegerToStream(in10);	
+
+	putchar('\n');	
+	int8 in11 =  109;
+	Test_IntegerToStream(in11);	
+
+	putchar('\n');	
+	int8 in12 = -109;
+	Test_IntegerToStream(in12);	
+	/*	
     char buffer[100];
     double d = 1.2345;
     int32  n = 12345;

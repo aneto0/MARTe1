@@ -38,10 +38,23 @@ if (number >= 1E ## step){ \
 	exponent+=step; \
 	number *= 1E- ## step; \
 } 
+
+#define CHECK_AND_REDUCE_Q(number,step,exponent)\
+if (number >= 1E ## step ## Q){ \
+	exponent+=step; \
+	number *= 1E- ## step ## Q; \
+} 
+
 #define CHECK_AND_INCREASE(number,step,exponent)\
 if (number <= 1E- ## step){ \
 	exponent-=(step+1); \
 	number *= 10E ## step; \
+} 
+
+#define CHECK_AND_INCREASE_Q(number,step,exponent)\
+if (number <= 1E- ## step ## Q){ \
+	exponent-=(step+1); \
+	number *= 10E ## step ## Q; \
 } 
 
 // exponent is increased or decreased,not set
@@ -54,9 +67,9 @@ static inline void NormalizeFloatNumberPrivate(T &positiveNumber, int16 &exponen
 	// check and normalize progressively following a logaritmic pattern
 	if (positiveNumber >= 1.0){
 		if (sizeof(T)>8){
-            CHECK_AND_REDUCE(positiveNumber,2048,exponent)
-            CHECK_AND_REDUCE(positiveNumber,1024,exponent)
-            CHECK_AND_REDUCE(positiveNumber,512,exponent)
+            CHECK_AND_REDUCE_Q(positiveNumber,2048,exponent)
+            CHECK_AND_REDUCE_Q(positiveNumber,1024,exponent)
+            CHECK_AND_REDUCE_Q(positiveNumber,512,exponent)
 	    }
 		if (sizeof(T)>4){
             CHECK_AND_REDUCE(positiveNumber,256,exponent)
@@ -71,9 +84,9 @@ static inline void NormalizeFloatNumberPrivate(T &positiveNumber, int16 &exponen
         CHECK_AND_REDUCE(positiveNumber,1,exponent)
 	} else {
 		if (sizeof(T)>8){
-			CHECK_AND_INCREASE(positiveNumber,2048,exponent)
-		    CHECK_AND_INCREASE(positiveNumber,1024,exponent)
-            CHECK_AND_INCREASE(positiveNumber,512,exponent)
+			CHECK_AND_INCREASE_Q(positiveNumber,2048,exponent)
+		    CHECK_AND_INCREASE_Q(positiveNumber,1024,exponent)
+		    CHECK_AND_INCREASE_Q(positiveNumber,512,exponent)
 	    }
 		if (sizeof(T)>4){
             CHECK_AND_INCREASE(positiveNumber,256,exponent)
