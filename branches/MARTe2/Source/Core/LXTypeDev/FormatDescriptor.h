@@ -54,7 +54,7 @@ struct Notation{
           Choice among FixedPoint, Exponent Notation and Engineering notation with size symbols
           3000 -> 3K  3.6E12  3.6T
         */
-        SmartNotation       =   3
+        CompactNotation     =   3
     };
 
     enum Binary {
@@ -62,7 +62,7 @@ struct Notation{
         /** 
           print in the native format (integer base 10, float as ieee or whatever ....)
         */
-        NormalNotation      =   0,
+        DecimalNotation     =   0,
 
         /** 
           print in hexadecimal -> the data pointed to by the pointer is treated as a char *
@@ -96,7 +96,7 @@ public:
     /** maximum size of representation  max 255
         0 means unlimited
     */
-    unsigned int            width:8;
+    unsigned int            size:8;
 
     /**
         minimum (whenever applicable) number of meaningful digits (unless overridden by width)  max 64 
@@ -116,12 +116,12 @@ public:
 		True means produce a number of characters equal to width 
 		fill up using spaces 
 	*/
-    bool                    pad:1;
+    bool                    padded:1;
 
     /** 
 		True means to produce pad spaces after printing the object representation
     */
-    bool                    leftAlign:1; 
+    bool                    leftAligned:1; 
 
     
     /// in case of a float, this field is used to determine how to print it
@@ -181,6 +181,7 @@ public:
 		d,i,u,s,c --> no effect (format depends on actual data type not the letter here!)
         f --> fixed point numeric format selected
         e --> exponential format
+        E --> engineering format
 		g --> smart format (more powerful than printf)
 		a,x,p --> activate exadecimal display
         o --> activate octal display
@@ -194,6 +195,15 @@ public:
      * Format descriptor is not initialised
      */
 	FormatDescriptor(){
+		this->size = 0;
+		this->precision = 0;
+		this->padded = false;
+		this->leftAligned = false;
+		this->floatNotation = Notation::FixedPointNotation;
+		this->binaryNotation = Notation::DecimalNotation;
+		this->binaryPadded = false;
+		this->fullNotation = false;
+        this->spareBits = 0;
     }
 
 	/** 
@@ -245,14 +255,14 @@ public:
 		constructor from unsigned integer
 		Just copy bit by bit
 	*/
-    FormatDescriptor(uint8 width, uint8 precision, bool pad, bool leftAlign, 
+    FormatDescriptor(uint8 size, uint8 precision, bool padded, bool leftAligned, 
                         Notation::Float floatNotation,Notation::Binary binaryNotation, 
                         bool binaryPadded, bool fullNotation ){
 
-		this->width = width;
+		this->size = size;
 		this->precision = precision;
-		this->pad = pad;
-		this->leftAlign = leftAlign;
+		this->padded = padded;
+		this->leftAligned = leftAligned;
 		this->floatNotation = floatNotation;
 		this->binaryNotation = binaryNotation;
 		this->binaryPadded = binaryPadded;
@@ -264,7 +274,7 @@ public:
 /** 
    default printf notation %i or %f or %s etc... 
 */
-static const FormatDescriptor  standardFormatDescriptor(0,0,false,false,Notation::FixedPointNotation,Notation::NormalNotation,False,False);
+static const FormatDescriptor  standardFormatDescriptor(0,0,false,false,Notation::FixedPointNotation,Notation::DecimalNotation,False,False);
 
 
 #endif

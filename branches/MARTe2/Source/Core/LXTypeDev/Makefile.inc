@@ -24,7 +24,7 @@
 #
 #############################################################
 
-OBJSX=NumberToString.x 
+OBJSX=FormatDescriptor.x 
 MAKEDEFAULTDIR=../../../MakeDefaults
 
 PACKAGE=Core
@@ -37,7 +37,8 @@ INCLUDE += -I../L1CLib
 INCLUDE += -I../LXTypeDev
 
 all: $(OBJS)    \
-	        $(BUILD_DIR)/LXTypeDev$(LIBEXT)  
+	        $(BUILD_DIR)/LXTypeDev$(LIBEXT)  \
+	        $(BUILD_DIR)/Test$(EXEEXT)  
 	echo  $(OBJS)
 
 include depends.$(TARGET)

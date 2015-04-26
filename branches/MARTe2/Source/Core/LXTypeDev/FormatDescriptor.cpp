@@ -28,6 +28,7 @@
 
 #include "FormatDescriptor.h"
 
+/*
 
 DATA TABLES FIRST
 
@@ -46,10 +47,10 @@ struct FDLookup{
 
 /// 0 terminated vector of FDLookups 
 static const FDLookup flagsLookup[] = {
-    { ' ', 	FormatDescriptor(0,0,True ,False,Notation::FixedPointNotation, Notation::NormalNotation,False,False) },  // ' '	
-	{ '-', 	FormatDescriptor(0,0,True ,True ,Notation::FixedPointNotation, Notation::NormalNotation,False,False) },  // '-'
-    { '0', 	FormatDescriptor(0,0,False,False,Notation::FixedPointNotation, Notation::NormalNotation,True ,False) },  // '0'
-    { '#', 	FormatDescriptor(0,0,False,False,Notation::FixedPointNotation, Notation::NormalNotation,False,True)  },  // '#'
+    { ' ', 	FormatDescriptor(0,0,True ,False,Notation::FixedPointNotation, Notation::DecimalNotation,False,False) },  // ' '	
+	{ '-', 	FormatDescriptor(0,0,True ,True ,Notation::FixedPointNotation, Notation::DecimalNotation,False,False) },  // '-'
+    { '0', 	FormatDescriptor(0,0,False,False,Notation::FixedPointNotation, Notation::DecimalNotation,True ,False) },  // '0'
+    { '#', 	FormatDescriptor(0,0,False,False,Notation::FixedPointNotation, Notation::DecimalNotation,False,True)  },  // '#'
     { 0  ,  FormatDescriptor(0)}
 };
 
@@ -60,9 +61,10 @@ static const FDLookup typesLookup[] = {
     { 'u', 	FormatDescriptor(0) },  //u
     { 's', 	FormatDescriptor(0) },  //s
     { 'c', 	FormatDescriptor(0) },  //c
-    { 'f', 	FormatDescriptor(0,0,False,False,Notation::FixedPointNotation, Notation::NormalNotation,False,False) },  //f
-    { 'e', 	FormatDescriptor(0,0,False,False,Notation::ExponentNotation  , Notation::NormalNotation,False,False) },  //e
-    { 'g', 	FormatDescriptor(0,0,False,False,Notation::SmartNotation     , Notation::NormalNotation,False,False) },  //g
+    { 'f', 	FormatDescriptor(0,0,False,False,Notation::FixedPointNotation, Notation::DecimalNotation,False,False) },  //f
+    { 'e', 	FormatDescriptor(0,0,False,False,Notation::ExponentNotation  , Notation::DecimalNotation,False,False) },  //e
+    { 'g', 	FormatDescriptor(0,0,False,False,Notation::CompactNotation   , Notation::DecimalNotation,False,False) },  //g
+    { 'E', 	FormatDescriptor(0,0,False,False,Notation::EngineeringNotation,Notation::DecimalNotation,False,False) },  //E
     { 'a', 	FormatDescriptor(0,0,False,False,Notation::FixedPointNotation, Notation::HexNotation   ,False,False) },  //a
     { 'x', 	FormatDescriptor(0,0,False,False,Notation::FixedPointNotation, Notation::HexNotation   ,False,False) },  //x
     { 'p', 	FormatDescriptor(0,0,False,False,Notation::FixedPointNotation, Notation::HexNotation   ,False,False) },  //p
@@ -132,7 +134,7 @@ static inline uint32 GetIntegerNumber(const char *&string){
     uint32 number = 0;
     int32 digit = 0;
     // 
-    while ((digit = GetDigit(string[0]))>0){
+    while ((digit = GetDigit(string[0]))>=0){
         number *= 10;
         number += digit;
         string++;
@@ -141,6 +143,8 @@ static inline uint32 GetIntegerNumber(const char *&string){
     return number;
 }
 
+
+#include <stdio.h>
 bool FDInitialiseFromString(FormatDescriptor &fd, const char *&string){
     
     // prepare clean FormatDescriptor
@@ -156,14 +160,14 @@ bool FDInitialiseFromString(FormatDescriptor &fd, const char *&string){
     if (string[0] == 0) {
         return False;
     }
-    
+
     //parse options
     while (ParseCharacter(string[0],temporaryFormat,&flagsLookup[0])) {
         string++;
     }
     
     // get any integer number from string if any
-    temporaryFormat.width = GetIntegerNumber(string);
+    temporaryFormat.size = GetIntegerNumber(string);
     
     // after a dot look for the precision field
     if (string[0] == '.') {        
@@ -175,9 +179,11 @@ bool FDInitialiseFromString(FormatDescriptor &fd, const char *&string){
     // the next must be the code!
     if (ParseCharacter(string[0],temporaryFormat,&typesLookup[0])){
         fd = temporaryFormat;
+        string++;
         return True;
     }
            
+    string++;
     return False;
 }
 

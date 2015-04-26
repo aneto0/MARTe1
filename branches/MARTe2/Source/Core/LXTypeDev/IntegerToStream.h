@@ -221,11 +221,11 @@ static inline void Number2StreamDecimalNotationPrivate(streamer &s, T positiveNu
 	if (sizeof(T)==8){  
 		// treat 64 bit numbers dividing them into 5 blocks of max 4 digits
 		// 16 12 8 4 zeroes
-		const uint64 tests[4] = {10000000000000000,1000000000000,100000000,10000};
+		const int64 tests[4] = {10000000000000000,1000000000000,100000000,10000};
 
 		uint8 i;
 		// how many figures are below the current test point
-		uint8 figures = 16;
+		uint16 figures = 16;
 		for (i=0;i<4;i++){
 			// enter if a big number or if zero padding required			
 			if ((positiveNumber > tests[i])|| (numberFillLength > figures))  {
@@ -255,12 +255,12 @@ static inline void Number2StreamDecimalNotationPrivate(streamer &s, T positiveNu
 	// treat 32 bit numbers dividing them into 3 blocks of max 4 digits
 	if (sizeof(T)==4){  
 		// 8 4 zeroes
-		const uint32 tests[2] = {100000000,10000};
+		const int32 tests[2] = {100000000,10000};
 		// how many figures are below the current test point
-		uint8 figures = 16;
+		int16 figures = 16;
 		uint8 i;
 		for (i=0;i<2;i++){
-			if ((positiveNumber > tests[i])|| (numberFillLength>0))  {
+			if ((positiveNumber > tests[i])|| (numberFillLength > figures))  {
 				// call this template with 16 bit number
 				// otherwise infinite recursion!
 				uint16 x       = positiveNumber / tests[i];
@@ -310,9 +310,9 @@ static inline void Number2StreamDecimalNotationPrivate(streamer &s, T positiveNu
 }
 
 /**
- * Converts any integer type, signed and unsigned to string 
- * uses any class with method PutC
- * if it does not fit returns "?" 
+ * Converts any integer type, signed and unsigned to a sequence of characters inserted into the stream stream by mean of a method PutC
+ * respects maximumSize and number integrity 
+ * if not possible outputs ?
  */
 template <typename T, class streamer> 
 bool IntegerToStreamDecimalNotation(
@@ -383,23 +383,20 @@ bool IntegerToStreamDecimalNotation(
 
 
 /**
- * Converts any integer type, signed and unsigned to string in hexadecimal notation 
- * writes to a buffer up to the length of the buffer
- * if it does not fit returns "?" 
- * size contains the size of the buffer (including space for terminator 0)
- * size returns the size of the string excluding the trailing 0
- * if there is enough space a pointer is returned to the start of the number in buffer.
- * buffer is filled from the end backwards
+ * Converts any integer type, signed and unsigned to a sequence of characters inserted into the stream stream by mean of a method PutC
+ * uses hexadecimal notation 
+ * respects maximumSize and number integrity 
+ * if not possible outputs ?
  */
 template <typename T, class streamer> 
 bool IntegerToStreamHexadecimalNotation(
 			streamer &		stream, 
 			T 				number,
-			uint8 			maximumSize			=0,
-			bool 			padded				=false,
-			bool 			leftAligned			=false, 
-			bool 			putTrailingZeros	=false,
-			bool 			addHeader			=false)
+			uint16 			maximumSize			= 0,       // 0 means that the number is printed in its entirety
+			bool 			padded				= false,   // if maximumSize!=0 & align towards the right or the left
+			bool 			leftAligned			= false,   // if padded and maximumSize!=0 align towards the left
+			bool 			putTrailingZeros	= false,   // trailing zeroes are not omitted (unless breaking the maximumSize)
+			bool 			addHeader    		= false)   // prepend with 0x
 {       
 	// put here size of number
 	uint8 headerSize       = 0;
@@ -407,24 +404,16 @@ bool IntegerToStreamHexadecimalNotation(
 	// adding two chars 0x header
 	if (addHeader) headerSize =2;
 
-	// if we add the trailing zeroes
-	// sizeof(number) * 8 = totalBits
-	// divided by 4 = number of digits	
-	uint8 numberOfDigitsPadded= sizeof (T) * 2;
-	
-	// actual meaningful digist
-	uint8 totalNumberOfDigits   = GetOrderOfMagnitudeHex(number) + 1;
-	
+	// actual meaningful digits
+	uint8 numberOfDigits   = GetOrderOfMagnitudeHex(number) + 1;
+
 	// add header for total size if padded
-	uint8 fullNumberSize  = headerSize + totalNumberOfDigits;
+	uint8 numberSize  = headerSize + numberOfDigits;
 
-	// nort padded size : add header for total size if padded
-	uint8 numberSize = headerSize + numberOfDigits;
+	// 1000 = no limits
+	if (maximumSize == 0) maximumSize = 1000;
 
-	// if not limits then use the number size as limt
-	if (maximumSize==0) maximumSize = fullNumberSize;
-
-	// cannot fit the number
+	// cannot fit the number even without trailing zeroes
 	if (maximumSize < numberSize){
 		numberSize = 1; // just the '?'
 		
@@ -439,6 +428,13 @@ bool IntegerToStreamHexadecimalNotation(
 
 		//In case of trailing zeros the digits are the maximum possible or equal to maximum size (-2 if there is header)
 		if (putTrailingZeros){
+			// if we add the trailing zeroes
+			// sizeof(number) * 8 = totalBits
+			// divided by 4 = number of digits	
+			uint8 numberOfDigitsPadded= sizeof (T) * 2;
+
+			// add header for total size if padded
+			uint8 fullNumberSize  = headerSize + numberOfDigitsPadded;
 
 			// check if adding all zeros number will not fit
 			if (fullNumberSize > maximumSize){
@@ -447,12 +443,12 @@ bool IntegerToStreamHexadecimalNotation(
 				// number is made to fit the available space
 				numberSize     = maximumSize;
 				// we cannot print all the zeros, remove excess
-				numberOfDigits = totalNumberOfDigits - excess; 
+				numberOfDigits = numberOfDigitsPadded - excess; 
 			} else {	
 				// we will use the full number size
 				numberSize     = fullNumberSize;
 				// we will print all digits
-				numberOfDigits = totalNumberOfDigits; 
+				numberOfDigits = numberOfDigitsPadded; 
 			}
 		}
 
@@ -469,7 +465,7 @@ bool IntegerToStreamHexadecimalNotation(
 		
 		// work out how much to shift number to extract most significative hex
 		// we use the above claculate number size 
-		int bits=(numberDigits-1)*4;	
+		int bits=(numberOfDigits-1)*4;	
 	
 		// loop backwards stepping each nibble
 		for (int i = bits; i>=0; i-=4){
@@ -493,54 +489,60 @@ bool IntegerToStreamHexadecimalNotation(
 	
 }
 
+/**
+ * Converts any integer type, signed and unsigned to a sequence of characters inserted into the stream stream by mean of a method PutC
+ * uses octal notation 
+ * respects maximumSize and number integrity 
+ * if not possible outputs ?
+ */
 template <typename T, class streamer> 
 bool IntegerToStreamOctalNotation(       
 	streamer &		stream, 
 	T 				number,
-	uint8 			maximumSize			=0,
-	bool 			padded				=false,
-	bool 			leftAligned			=false, 
-	bool 			putTrailingZeros	=false,
-	bool 			addHeader			=false){
-
+	uint8 			maximumSize			= 0,       // 0 means that the number is printed in its entirety
+	bool 			padded				= false,   // if maximumSize!=0 & align towards the right or the left
+	bool 			leftAligned			= false,   // if padded and maximumSize!=0 align towards the left
+	bool 			putTrailingZeros	= false,   // trailing zeroes are not omitted (unless breaking the maximumSize)
+	bool 			addHeader    		= false)   // prepend with 0o
+{
+	
 	// put here size of number
 	uint8 headerSize       = 0;
 
 	// adding two chars 0x header
 	if (addHeader) headerSize =2;
 
-	// if we add the trailing zeroes
-	// sizeof(number) * 8 = totalBits
-	// divided by 3 and rounded up = number of digits	
-	uint8 numberOfDigitsPadded= (sizeof(T) * 8 + 2)/3;
-	
-	// actual meaningful digist
-	uint8 totalNumberOfDigits   = GetOrderOfMagnitudeOct(number) + 1;
-	
+	// actual meaningful digits
+	uint8 numberOfDigits   = GetOrderOfMagnitudeOct(number) + 1;
+
 	// add header for total size if padded
-	uint8 fullNumberSize  = headerSize + totalNumberOfDigits;
+	uint8 numberSize  = headerSize + numberOfDigits;
 
-	// nort padded size : add header for total size if padded
-	uint8 numberSize = headerSize + numberOfDigits;
+	// 1000 = no limits
+	if (maximumSize == 0) maximumSize = 1000;
 
-	// if not limits then use the number size as limt
-	if (maximumSize==0) maximumSize = fullNumberSize;
-
-	// cannot fit the number
+	// cannot fit the number even without trailing zeroes
 	if (maximumSize < numberSize){
 		numberSize = 1; // just the '?'
 		
 		// pad on the left
 		if (padded && !leftAligned){
-			for (int i=0;i < maximumSize-1;i++) stream.PutC(' ');
+			for (int i=1;i < maximumSize;i++) stream.PutC(' ');
 		}
-		
+		// put the ?
 		stream.PutC('?');
 		
 	} else {
-	
+
 		//In case of trailing zeros the digits are the maximum possible or equal to maximum size (-2 if there is header)
 		if (putTrailingZeros){
+			// if we add the trailing zeroes
+			// sizeof(number) * 8 = totalBits
+			// divided by 4 = number of digits	
+			uint8 numberOfDigitsPadded= sizeof (T) * 2;
+
+			// add header for total size if padded
+			uint8 fullNumberSize  = headerSize + numberOfDigitsPadded;
 
 			// check if adding all zeros number will not fit
 			if (fullNumberSize > maximumSize){
@@ -549,15 +551,14 @@ bool IntegerToStreamOctalNotation(
 				// number is made to fit the available space
 				numberSize     = maximumSize;
 				// we cannot print all the zeros, remove excess
-				numberOfDigits = totalNumberOfDigits - excess; 
+				numberOfDigits = numberOfDigitsPadded - excess; 
 			} else {	
 				// we will use the full number size
 				numberSize     = fullNumberSize;
 				// we will print all digits
-				numberOfDigits = totalNumberOfDigits; 
+				numberOfDigits = numberOfDigitsPadded; 
 			}
 		}
-
 		
 		// in case of left alignment
 		if (padded && !leftAligned){
@@ -572,7 +573,7 @@ bool IntegerToStreamOctalNotation(
 		
 		// work out how much to shift number to extract most significative hex
 		// we use the above claculate number size 
-		int bits=(numberDigits-1)*3;	
+		int bits=(numberOfDigits-1)*3;	
 	
 		// loop backwards stepping each nibble
 		for (int i = bits; i >= 0; i-= 3){
@@ -594,54 +595,60 @@ bool IntegerToStreamOctalNotation(
     return true;	
 }
 
+/**
+ * Converts any integer type, signed and unsigned to a sequence of characters inserted into the stream stream by mean of a method PutC
+ * uses binary notation 
+ * respects maximumSize and number integrity 
+ * if not possible outputs ?
+ */
 template <typename T, class streamer> 
 bool IntegerToStreamBinaryNotation(
 		streamer &		stream, 
 		T 				number,
-		uint8 			maximumSize			=0,
-		bool 			padded				=false,
-		bool 			leftAligned			=false, 
-		bool 			putTrailingZeros	=false,
-		bool 			addHeader			=false){
-
+		uint8 			maximumSize			= 0,       // 0 means that the number is printed in its entirety
+		bool 			padded				= false,   // if maximumSize!=0 & align towards the right or the left
+		bool 			leftAligned			= false,   // if padded and maximumSize!=0 align towards the left
+		bool 			putTrailingZeros	= false,   // trailing zeroes are not omitted (unless breaking the maximumSize)
+		bool 			addHeader    		= false)   // prepend with 0b
+{
+	
 	// put here size of number
 	uint8 headerSize       = 0;
 
 	// adding two chars 0x header
 	if (addHeader) headerSize =2;
 
-	// if we add the trailing zeroes
-	// sizeof(number) * 8 = totalBits
-	// divided by 4 = number of digits	
-	uint8 numberOfDigitsPadded= sizeof (T) * 8;
-	
 	// actual meaningful digist
-	uint8 totalNumberOfDigits   = GetOrderOfMagnitudeBin(number) + 1;
-	
+	uint8 numberOfDigits   = GetOrderOfMagnitudeBin(number) + 1;
+
 	// add header for total size if padded
-	uint8 fullNumberSize  = headerSize + totalNumberOfDigits;
+	uint8 numberSize  = headerSize + numberOfDigits;
 
-	// nort padded size : add header for total size if padded
-	uint8 numberSize = headerSize + numberOfDigits;
+	// 1000 = no limits
+	if (maximumSize == 0) maximumSize = 1000;
 
-	// if not limits then use the number size as limt
-	if (maximumSize==0) maximumSize = fullNumberSize;
-
-	// cannot fit the number
+	// cannot fit the number even without trailing zeroes
 	if (maximumSize < numberSize){
 		numberSize = 1; // just the '?'
 		
 		// pad on the left
 		if (padded && !leftAligned){
-			for (int i=0;i < maximumSize-1;i++) stream.PutC(' ');
+			for (int i=1;i < maximumSize;i++) stream.PutC(' ');
 		}
-		
+		// put the ?
 		stream.PutC('?');
 		
 	} else {
-
+		
 		//In case of trailing zeros the digits are the maximum possible or equal to maximum size (-2 if there is header)
 		if (putTrailingZeros){
+			// if we add the trailing zeroes
+			// sizeof(number) * 8 = totalBits
+			// divided by 4 = number of digits	
+			uint8 numberOfDigitsPadded= sizeof (T) * 8;
+
+			// add header for total size if padded
+			uint8 fullNumberSize  = headerSize + numberOfDigitsPadded;
 
 			// check if adding all zeros number will not fit
 			if (fullNumberSize > maximumSize){
@@ -650,14 +657,14 @@ bool IntegerToStreamBinaryNotation(
 				// number is made to fit the available space
 				numberSize     = maximumSize;
 				// we cannot print all the zeros, remove excess
-				numberOfDigits = totalNumberOfDigits - excess; 
+				numberOfDigits = numberOfDigitsPadded - excess; 
 			} else {	
 				// we will use the full number size
 				numberSize     = fullNumberSize;
 				// we will print all digits
-				numberOfDigits = totalNumberOfDigits; 
+				numberOfDigits = numberOfDigitsPadded; 
 			}
-		}
+		}		
 		
 		// in case of left alignment
 		if (padded && !leftAligned){
@@ -672,7 +679,7 @@ bool IntegerToStreamBinaryNotation(
 
 		// work out how much to shift number to extract most significative hex
 		// we use the above claculate number size 
-		int bits=numberDigits-1;	
+		int bits=numberOfDigits-1;	
 
 		// loop backwards stepping each nibble
 		for (int i = bits; i >= 0; i--){
@@ -694,6 +701,13 @@ bool IntegerToStreamBinaryNotation(
     return true;	
 }
 
+/**
+ * Converts any integer type, signed and unsigned to a sequence of characters inserted into the stream stream by mean of a method PutC
+ * uses notation specified in format
+ * also respects all relevant format parameters 
+ * respects format.size and number integrity 
+ * if not possible outputs ?
+ */
 template <typename T, class streamer> 
 bool IntegerToStream(
 		streamer &			stream, 
@@ -701,17 +715,17 @@ bool IntegerToStream(
 		FormatDescriptor	format){
 
 	switch (format.binaryNotation){
-	case DecimalNotation:{
+	case Notation::DecimalNotation:{
 		return IntegerToStreamDecimalNotation(stream,number,format.size,format.padded,format.leftAligned,format.fullNotation);
 	}break;
-	case HexNotation:{
-		return IntegerToStreamExadecimalNotation(stream,number,format.size,format.padded,format.leftAligned,format.fullNotation); 
+	case Notation::HexNotation:{
+		return IntegerToStreamExadecimalNotation(stream,number,format.size,format.padded,format.leftAligned,format.binaryPadded,format.fullNotation); 
 	}break;
-	case OctalNotation:{
-		return IntegerToStreamOctalNotation(stream,number,format.size,format.padded,format.leftAligned,format.fullNotation); 
+	case Notation::OctalNotation:{
+		return IntegerToStreamOctalNotation(stream,number,format.size,format.padded,format.leftAligned,format.binaryPadded,format.fullNotation); 
 	}break;
-	case BitNotation:{
-		return IntegerToStreamBinaryNotation(stream,number,format.size,format.padded,format.leftAligned,format.fullNotation); 
+	case Notation::BitNotation:{
+		return IntegerToStreamBinaryNotation(stream,number,format.size,format.padded,format.leftAligned,format.binaryPadded,format.fullNotation); 
 	}break;
 	}
 	

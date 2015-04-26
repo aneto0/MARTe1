@@ -1,13 +1,17 @@
 #include <stdio.h>
 #include "FormatDescriptor.h"
+#include "FloatToStream.h"
+#include "IntegerToStream.h"
+
+/*
 #include "TypeConversion.h"
 #include "TypeDescriptor.h"
 #include "AnyType.h"
 #include "CStream.h"
 #include "CharBuffer.h"
 #include "Streamable.h"
-/*#include "StreamInterface.h"*/
-#include "NumberToString.h"
+//#include "StreamInterface.h"
+*/
 
 #define MAX_DIMENSION 64
 
@@ -124,6 +128,7 @@ void TestAll(){
     
 }*/
 
+/*
 
 bool TestMagnitude(){
 	int number=12345;
@@ -182,7 +187,57 @@ bool TestToBinaryStream(){
 	return True;
 }
 
+
+*/
+
+class MyStream{
+	
+public:
+	void PutC(char c){
+		putchar(c);		
+	}
+	
+}myStream;
+
 int main(int argc, char **argv){
+	
+	FormatDescriptor	format;
+	double number = 123456;	
+	const char *pFormat;
+	
+	for (int i = 0;i<20;i++){
+		pFormat= "- 10.5f";	
+		format.InitialiseFromString(pFormat);	
+		putchar('>');		
+		FloatToStream(myStream,number,format);
+		putchar('<');		
+		putchar('\n');		
+		
+		pFormat = " 10.5e";	
+		format.InitialiseFromString(pFormat);	
+		putchar('>');		
+		FloatToStream(myStream,number,format);
+		putchar('<');		
+		putchar('\n');		
+		
+		pFormat = "- 10.5E";	
+		format.InitialiseFromString(pFormat);
+		putchar('>');		
+		FloatToStream(myStream,number,format);
+		putchar('<');		
+		putchar('\n');		
+
+		pFormat = " 10.5g";	
+		format.InitialiseFromString(pFormat);	
+		putchar('>');		
+		FloatToStream(myStream,number,format);
+		putchar('<');		
+		putchar('\n');	
+		
+		number = number/10;
+	}
+
+/*	
     char buffer[100];
     double d = 1.2345;
     int32  n = 12345;
@@ -209,10 +264,11 @@ int main(int argc, char **argv){
     printf("->%s<-size=%d\n", retString, size);
 
 //    TestAll();
-/*    TestFormatDescriptor("d");
+//    TestFormatDescriptor("d");
 
-    FormatDescriptor expected();
-    TestFormatDescriptor("5d");*/
+//    FormatDescriptor expected();
+//    TestFormatDescriptor("5d");
+	*/
     return 0;
 }
 
