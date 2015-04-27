@@ -41,7 +41,7 @@ char* StringHelperConcatenate(char* destination, const char* source);
 char* StringHelperConcatenateN(char* destination, const char* source,
                                uint32 size);
 /** @see StringHelper::SearchChar(). */
-char* StringHelperSearchChar(char* string, char c);
+const char* StringHelperSearchChar(const char* string, char c);
 
 /** @see StringHelper::Compare(). */
 int32 StringHelperCompare(const char* string1, const char* string2);
@@ -109,7 +109,7 @@ public:
       * @param string is the source string.
       * @param c is the character to find in c.
       * @return a pointer to the first occurrence of c in string, NULL if c is not found. */
-    static char* SearchChar(char* string, char c) {
+    static const char* SearchChar(const char* string, char c) {
         return StringHelperSearchChar(string, c);
     }
 

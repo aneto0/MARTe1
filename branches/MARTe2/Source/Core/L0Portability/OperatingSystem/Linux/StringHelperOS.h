@@ -58,7 +58,7 @@ char* StringOsConcatenateN(char* destination, const char* source, uint32 size) {
   * @param string is the string.
   * @param c is the character to search.
   * @return a pointer to the first occurrence of c in string. */
-char* StringOsSearchChar(char* string, char c) {
+const char* StringOsSearchChar(const char* string, char c) {
     if (string == NULL) {
         return NULL;
     }

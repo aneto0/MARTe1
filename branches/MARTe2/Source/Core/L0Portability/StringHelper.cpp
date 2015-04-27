@@ -37,7 +37,7 @@ char* StringHelperConcatenateN(char* destination, const char* source,
 }
 
 //Returns a pointer to the first occurrence of c in string.
-char* StringHelperSearchChar(char* string, char c) {
+const char* StringHelperSearchChar(const char* string, char c) {
     return StringOsSearchChar(string, c);
 }
 
