@@ -325,7 +325,7 @@ bool FloatToFixedPrivate(
 		int16           exponent,
 		uint8 			precision){
 
-/*	
+	
 	// what is the exponent associated to the least significative figure?
 	int16 leastSignificativeExponent = exponent - precision;
 	int16 correctionExponent = 0;
@@ -336,19 +336,17 @@ bool FloatToFixedPrivate(
 	} else {
 		correctionExponent = -precision+1;
 	}
-		// to round up add a correctionvalue just below last visible digit
+	
+    // to round up add a correction value just below last visible digit
 	T correction;
 	FastPowerOf10Private(correction,correctionExponent);
 	correction *= 0.5;
-	positiveNumber += correction;
+	correction += positiveNumber;
 	
-	// check for number now exceedin 10;
-	if (positiveNumber > 10.0){
-		positiveNumber /= 10;
-		exponent++;
-	}
-	
-*/
+	// if number now exceedin 10 do not apply correction
+	if (correction < 10.0){
+		positiveNumber = correction;
+	}	
 	
 	// numbers below 1.0
 	if (exponent < 0){
@@ -521,32 +519,6 @@ bool FloatToStream(
 				
 		// normalize number
 		NormalizeFloatNumberPrivate(positiveNumber,exponent);
-/*			
-		// apply rounding up for fixed format
-		if (0){	
-			// what is the exponent associated to the least significative figure?
-			int16 leastSignificativeExponent = exponent - precision;
-			int16 correctionExponent = 0;
-
-			// if least signicative figure is > 0 
-			if (leastSignificativeExponent >= 0 ) {
-				correctionExponent = -exponent;
-			} else {
-				correctionExponent = -precision+1;
-			}
-				// to round up add a correctionvalue just below last visible digit
-			T correction;
-			FastPowerOf10Private(correction,correctionExponent);
-			correction *= 0.5;
-		//printf("##%f %i %i##\n",positiveNumber,exponent,precision);	
-			positiveNumber += correction;
-
-			if (positiveNumber >= 10.0){
-				positiveNumber /= 10;
-				exponent++;
-			}
-		}	
-*/			
     	
         // precision 0 means no significant bits		
 		int16 chosenPrecision = 0;
