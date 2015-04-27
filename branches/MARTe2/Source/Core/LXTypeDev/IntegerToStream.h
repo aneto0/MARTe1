@@ -548,7 +548,7 @@ bool IntegerToStreamOctalNotation(
 			// if we add the trailing zeroes
 			// sizeof(number) * 8 = totalBits
 			// divided by 4 = number of digits	
-			uint8 numberOfDigitsPadded= sizeof (T) * 2;
+			uint8 numberOfDigitsPadded= (sizeof (T) * 8+2)/3;
 
 			// add header for total size if padded
 			uint8 fullNumberSize  = headerSize + numberOfDigitsPadded;
