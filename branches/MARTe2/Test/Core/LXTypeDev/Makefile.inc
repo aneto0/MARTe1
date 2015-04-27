@@ -24,7 +24,8 @@
 #
 #############################################################
 
-OBJSX= NumberToStringTest.x           	
+OBJSX= IntegerToStreamTest.x \
+	FloatToStreamTest.x           	
 		
 PACKAGE=Core
 ROOT_DIR=../../..
