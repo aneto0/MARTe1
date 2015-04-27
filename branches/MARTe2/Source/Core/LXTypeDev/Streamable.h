@@ -1,9 +1,13 @@
 #if !defined STREAMABLE
 #define STREAMABLE
 
-#include "TypeConversion.h"
+//#include "TypeConversion.h"
 #include "TimeoutType.h"
 #include "StreamInterface.h"
+#include "CharBuffer.h"
+#include "AnyType.h"
+#include "FormatDescriptor.h"
+
 
 class Streamable;
 extern "C"{
@@ -242,16 +246,14 @@ public:
 
     /**
         sets appropriate buffer sizes and adjusts operatingModes
+        must be called by descendant
+        can be overridden but is not meant to - just accessed via VT
     */
-    bool SetBufferSize(uint32 readBufferSize=0, uint32 writeBufferSize=0){
-    	return StreamableSetBufferSize(*this, readBufferSize, writeBufferSize);
-    }   
+    virtual bool SetBufferSize(uint32 readBufferSize=0, uint32 writeBufferSize=0);
     
 protected:
     /// default constructor
-    Streamable(
-    			uint32 readBufferSize=0, 
-    			uint32 writeBufferSize=0)
+    Streamable()
     {
         readBufferAccessPosition    = 0;
         writeBufferAccessPosition   = 0;
@@ -260,16 +262,7 @@ protected:
     	operatingModes.mutexReadMode = false;
     	operatingModes.mutexWriteMode = false;
     	operatingModes.stringMode = false;
-        //FISA change this!
-        operatingModes.canSeek = CanSeek(); 
     	
-        // mutex mode is enabled if CanSeek and both can Read and Write
-    	// in that case the stream is single and bidirectional
-        if (CanSeek() && CanWrite() && CanRead()) {
-        	operatingModes.mutexWriteMode = true;
-        }    	
-        
-        SetBufferSize(readBufferSize,writeBufferSize);
        
     }
 
@@ -369,7 +362,7 @@ public:  // replaced StreamInterface methods
         timeout behaviour is class specific. I.E. sockets with blocking activated wait forever
         when noWait is used .... */
     virtual bool         Write(
-                            const void*         buffer,
+                            const char*         buffer,
                             uint32 &            size,
                             TimeoutType         msecTimeout     = TTDefault,
                             bool                completeWrite   = false);
@@ -501,12 +494,6 @@ public:  // auxiliary functions based on buffering
  *  Methods to convert and print numbers and other objects 
  */    
     
-private:
-    
-    /**
-     * Simple Print of an integer
-     */
-    template <typename T> bool PrintInteger(const T &number,FormatDescriptor fd=standardFormatDescriptor);    
 
 public:
     

@@ -39,7 +39,7 @@
     Access as char * both read-only and read-write
 */
 class CharBuffer {
-
+public:
     /**
         allocate or reallocate memory to the desired size
         content is preserved by copy as long as it fits the newsize
@@ -67,7 +67,6 @@ class CharBuffer {
             allocatedSize = neededMemory;
         }
 
-        char *newBuffer;
         if (buffer == NULL) {
             buffer = (char *) MemoryMalloc(neededMemory);
         }
@@ -79,7 +78,7 @@ class CharBuffer {
             allocatedSize = neededMemory;
         }
     }
-
+private:
     /** the size of the allocated memory block  */
     uint32 allocatedSize;
 

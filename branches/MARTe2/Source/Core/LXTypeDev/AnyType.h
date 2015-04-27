@@ -59,6 +59,18 @@ public:
     	return (dataDescriptor == VoidType);
     }
 
+    /// constructor from a float
+    AnyType(float &i){
+		dataPointer = (void *) &i; 
+		dataDescriptor = Float32Bit;
+	}   	
+
+    /// constructor from a float
+    AnyType(double &i){
+		dataPointer = (void *) &i; 
+		dataDescriptor = Float64Bit;
+	}   	
+
     /// constructor from an integer 8 bit
     AnyType(const int8 &i){
 		dataPointer = (void *) &i; 

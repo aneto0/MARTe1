@@ -40,11 +40,11 @@ struct TypeDescriptor {
     /// The basic types that can be used 
     enum BasicType{
         /** An integer   pointer = intxx * 
-            size is in bytes */
+            size is in bits */
         SignedInteger         = 0,
 
         /** An integer   pointer = uintxx * 
-            size is in bytes */
+            size is in bits */
         UnsignedInteger       = 1,
 
         /** standard float   pointer = float32 or float64 * 
@@ -112,7 +112,7 @@ struct TypeDescriptor {
             BasicType 		type:4;
           
             /** 
-		the size in bytes or bits (bitset types)
+		the size in bytes or bits 
             */
             unsigned int 	size:10;
 
@@ -134,35 +134,44 @@ struct TypeDescriptor {
     }
 };
 
+/// describes float
+const TypeDescriptor Float32Bit                 = {  False, False, {{ TypeDescriptor::Float , 32}} };
+
+/// describes double
+const TypeDescriptor Float64Bit                 = {  False, False, {{ TypeDescriptor::Float , 64}} };
+
+/// describes double double
+const TypeDescriptor Float128Bit                = {  False, False, {{ TypeDescriptor::Float , 128}} };
+
 /// describes int0
 const TypeDescriptor VoidType                   = {  False, False, {{ TypeDescriptor::SignedInteger , 0}} };
 
 /// describes int8
-const TypeDescriptor SignedInteger8Bit          = {  False, False, {{ TypeDescriptor::SignedInteger , 1}} };
+const TypeDescriptor SignedInteger8Bit          = {  False, False, {{ TypeDescriptor::SignedInteger , 8}} };
 
 /// describes uint8
-const TypeDescriptor UnsignedInteger8Bit        = { False, False, {{ TypeDescriptor::UnsignedInteger , 1}} };
+const TypeDescriptor UnsignedInteger8Bit        = { False, False, {{ TypeDescriptor::UnsignedInteger , 8}} };
 
 /// describes int16
-const TypeDescriptor SignedInteger16Bit         = { False, False, {{ TypeDescriptor::SignedInteger , 2}} };
+const TypeDescriptor SignedInteger16Bit         = { False, False, {{ TypeDescriptor::SignedInteger , 16}} };
 
 /// describes uint16
-const TypeDescriptor UnsignedInteger16Bit       = { False, False, {{ TypeDescriptor::UnsignedInteger , 2}} };
+const TypeDescriptor UnsignedInteger16Bit       = { False, False, {{ TypeDescriptor::UnsignedInteger , 16}} };
 
 /// describes int32
-const TypeDescriptor SignedInteger32Bit         = { False, False, {{ TypeDescriptor::SignedInteger , 4}} };
+const TypeDescriptor SignedInteger32Bit         = { False, False, {{ TypeDescriptor::SignedInteger , 32}} };
 
 /// describes uint32
-const TypeDescriptor UnsignedInteger32Bit       = { False, False, {{ TypeDescriptor::UnsignedInteger , 4}} };
+const TypeDescriptor UnsignedInteger32Bit       = { False, False, {{ TypeDescriptor::UnsignedInteger , 32}} };
 
 /// describes int64
-const TypeDescriptor SignedInteger64Bit         = { False, False, {{ TypeDescriptor::SignedInteger , 8}} };
+const TypeDescriptor SignedInteger64Bit         = { False, False, {{ TypeDescriptor::SignedInteger , 64}} };
 
 /// describes uint64
-const TypeDescriptor UnsignedInteger64Bit       = { False, False, {{ TypeDescriptor::UnsignedInteger , 8}} };
+const TypeDescriptor UnsignedInteger64Bit       = { False, False, {{ TypeDescriptor::UnsignedInteger , 64}} };
 
 /// describes const int8
-const TypeDescriptor ConstSignedInteger8Bit     = { False, True , {{ TypeDescriptor::SignedInteger , 1}} };
+const TypeDescriptor ConstSignedInteger8Bit     = { False, True , {{ TypeDescriptor::SignedInteger , 8}} };
 
 #endif
 

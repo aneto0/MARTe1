@@ -417,7 +417,7 @@ enum FloatDisplayModes{
 	InfNFloat                =44,
 	InsufficientSpaceForFloat=77, // not enough space
 	NoFormat                 =99
-}  chosenMode =  NoFormat;
+}  ;
 
 /**
  * performs standard operations for all float representations
@@ -474,6 +474,7 @@ bool FloatToStream(
 		FormatDescriptor	format)
 {
 
+	FloatDisplayModes chosenMode =  NoFormat;
 	
 	uint16 maximumSize = format.size;
 	// 1000 should not constitute a limit
