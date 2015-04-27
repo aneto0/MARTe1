@@ -24,7 +24,8 @@
 #
 #############################################################
 
-OBJSX=FormatDescriptor.x  Streamable.x
+OBJSX=FormatDescriptor.x  
+#Streamable.x
 MAKEDEFAULTDIR=../../../MakeDefaults
 
 PACKAGE=Core

@@ -57,6 +57,7 @@ if (number <= 1E- ## step ## Q){ \
 	number *= 10E ## step ## Q; \
 } 
 
+
 // exponent is increased or decreased,not set
 // support numbers up to quad precision
 template <typename T> 
@@ -69,7 +70,7 @@ static inline void NormalizeFloatNumberPrivate(T &positiveNumber, int16 &exponen
 		if (sizeof(T)>8){
             CHECK_AND_REDUCE_Q(positiveNumber,2048,exponent)
             CHECK_AND_REDUCE_Q(positiveNumber,1024,exponent)
-            CHECK_AND_REDUCE_Q(positiveNumber,512,exponent)
+            CHECK_AND_REDUCE_Q(positiveNumber, 512,exponent)
 	    }
 		if (sizeof(T)>4){
             CHECK_AND_REDUCE(positiveNumber,256,exponent)
@@ -324,6 +325,7 @@ bool FloatToFixedPrivate(
 		int16           exponent,
 		uint8 			precision){
 
+/*	
 	// what is the exponent associated to the least significative figure?
 	int16 leastSignificativeExponent = exponent - precision;
 	int16 correctionExponent = 0;
@@ -338,10 +340,15 @@ bool FloatToFixedPrivate(
 	T correction;
 	FastPowerOf10Private(correction,correctionExponent);
 	correction *= 0.5;
-//printf("##%f %i %i##\n",positiveNumber,exponent,precision);	
 	positiveNumber += correction;
 	
-//printf("##%f %i ##\n",positiveNumber,leastSignificativeExponent);	
+	// check for number now exceedin 10;
+	if (positiveNumber > 10.0){
+		positiveNumber /= 10;
+		exponent++;
+	}
+	
+*/
 	
 	// numbers below 1.0
 	if (exponent < 0){
@@ -457,8 +464,6 @@ FloatDisplayModes CheckNumber(
 	return NoFormat;
 }
 
-
-
 /**
  * converts a float/double (or any other equivalent) to a string using whatever format achieves best compact representation
  * bufferSize is the buffer size and includes the space for the 0 terminator
@@ -486,8 +491,7 @@ bool FloatToStream(
 		if (sizeof(T)  > 8)precision = 34; 
 		if (sizeof(T) == 8)precision = 15;
 		if (sizeof(T) <  8)precision = 7;
-	}
-	
+	}	
 	
 	// this is the second main objective of the first part
 	// to find out the size 
@@ -501,7 +505,7 @@ bool FloatToStream(
 	
 	// whether the - needs to be output
 	bool hasSign = false;
-	
+
 	// adjust sign 
 	if (number < 0){
 		hasSign = true;
@@ -517,6 +521,32 @@ bool FloatToStream(
 				
 		// normalize number
 		NormalizeFloatNumberPrivate(positiveNumber,exponent);
+/*			
+		// apply rounding up for fixed format
+		if (0){	
+			// what is the exponent associated to the least significative figure?
+			int16 leastSignificativeExponent = exponent - precision;
+			int16 correctionExponent = 0;
+
+			// if least signicative figure is > 0 
+			if (leastSignificativeExponent >= 0 ) {
+				correctionExponent = -exponent;
+			} else {
+				correctionExponent = -precision+1;
+			}
+				// to round up add a correctionvalue just below last visible digit
+			T correction;
+			FastPowerOf10Private(correction,correctionExponent);
+			correction *= 0.5;
+		//printf("##%f %i %i##\n",positiveNumber,exponent,precision);	
+			positiveNumber += correction;
+
+			if (positiveNumber >= 10.0){
+				positiveNumber /= 10;
+				exponent++;
+			}
+		}	
+*/			
     	
         // precision 0 means no significant bits		
 		int16 chosenPrecision = 0;
@@ -524,17 +554,15 @@ bool FloatToStream(
 	    numberSize = 1;	   
 	    // assume the worst 
 	    chosenMode = InsufficientSpaceForFloat;
-
 	    
 		int16 testPrecision;
 	    uint16 testFormatSize;
 	    // if selected fixed notation or compact then test effectiveness of fixed 
-	    if ((format.floatNotation == Notation::FixedPointNotation) || (format.floatNotation == Notation::CompactNotation)){
+	    if ((format.floatNotation == Notation::FixedPointNotation) || 
+	        (format.floatNotation == Notation::CompactNotation)){
 	    	// obtain size and associated realizable precision
 	    	testPrecision = precision;
-//printf("##%i %i %i##\n",exponent,hasSign,testPrecision);	
 	    	testFormatSize = NumberOfDigitsFixedNotation(exponent,hasSign,testPrecision,maximumSize);
-//printf("##%i %i ##\n",testFormatSize,testPrecision);	
 	    	
 	    	// if the number fits then precision is >=1
 	    	if (testPrecision > chosenPrecision){	    		
@@ -544,7 +572,8 @@ bool FloatToStream(
 	    	}
 	    }
 	    
-	    if ((format.floatNotation == Notation::EngineeringNotation) || (format.floatNotation == Notation::CompactNotation)){ 		
+	    if ((format.floatNotation == Notation::EngineeringNotation) || 
+	        (format.floatNotation == Notation::CompactNotation)){ 		
 	    	testPrecision = precision;
 	    	testFormatSize = NumberOfDigitsEngineeringNotation(exponent,hasSign,testPrecision,maximumSize);
 	    	if (testPrecision > chosenPrecision){
@@ -554,7 +583,8 @@ bool FloatToStream(
 	    	}
 	    }
 
-	    if ((format.floatNotation == Notation::ExponentNotation) || (format.floatNotation == Notation::CompactNotation)){ 		
+	    if ((format.floatNotation == Notation::ExponentNotation) || 
+	        (format.floatNotation == Notation::CompactNotation)){ 		
 	    	testPrecision = precision;
 	    	testFormatSize = NumberOfDigitsExponentialNotation(exponent,hasSign,testPrecision,maximumSize);
 	    	if (testPrecision > chosenPrecision){
@@ -573,7 +603,7 @@ bool FloatToStream(
 	    		numberSize = testFormatSize; 
 	    	}
 	    }   
-	    
+	    // update precision with the achievable value
 	    precision = chosenPrecision;
 	}
 
@@ -605,8 +635,6 @@ bool FloatToStream(
         case EngineeringFloat:{
         	// output sign
         	if (hasSign)stream.PutC('-');
-
-//printf(" %i ",exponent)  ;          
 
         	// partitions the exponent between engineering part and residual 
             int16 engineeringExponent = ExponentToEngineeringPrivate(exponent); 

@@ -90,18 +90,21 @@ template <typename T> uint8 GetNumberOfDigitsHexNotation(T number){
 	// negative numbers are 2 complements and have therefore all bits
 	if (number < 0) return sizeof(T) * 2;
 
+	uint8 shift = 0;
 	// check if larger than 2**32
 	if (sizeof(T)==8)
 		if  (number >= 0x100000000){
 			exp += 8;
-			number >>= 32;
+			shift = 32; // used a variable to trick the compiler warning not to issue a warning of too long shift
+			number >>= shift;
 		}
 
 	// check if larger than 2**16
 	if (sizeof(T)>=4)
 		if  (number >= 0x10000){
 			exp += 4;
-			number >>= 16;
+			shift = 16; // used a variable to trick the compiler warning not to issue a warning of too long shift
+			number >>= shift;
 		}
 
 	// check if larger than 2**8
@@ -125,24 +128,28 @@ template <typename T> uint8 GetNumberOfDigitsOctalNotation(T number){
 	// negative numbers are 2 complements and have therefore all bits
 	if (number < 0) return (sizeof(T) * 8 + 2) / 3;
 
+	uint8 shift = 0;
 	uint8 exp = 1;
 	if (sizeof(T)==8)
 		if  (number >= 0x1000000000000){
 			exp += 16;
-			number >>= 48;
+			shift = 48; // used a variable to trick the compiler warning not to issue a warning of too long shift
+			number >>= shift;
 		} 
 
 	if (sizeof(T)>=4)
 		if  (number >= 0x1000000){
 			exp += 8;
-			number >>= 24;
+			shift = 24; // used a variable to trick the compiler warning not to issue a warning of too long shift
+			number >>= shift;
 		}
 
 	// check if larger than 2**12
 	if (sizeof(T)>=2)
 		if  (number >= 0x1000){
 			exp += 4;
-			number >>= 12;
+			shift = 12; // used a variable to trick the compiler warning not to issue a warning of too long shift
+			number >>= shift;
 		}
 
 	// check if larger than 2**6
@@ -168,20 +175,22 @@ template <typename T> uint8 GetNumberOfDigitsBinaryNotation(T number){
 	if (number < 0) return sizeof(T) * 8 ;
 
 	uint8 exp = 1;
-
+	uint8 shift = 0;
 	// check if larger than 2**32
 	// if so shift 
 	if (sizeof(T)==8)
 		if  (number >= 0x100000000){
 			exp += 32;
-			number >>= 32;
+			shift = 32; // used a variable to trick the compiler warning not to issue a warning of too long shift
+			number >>= shift;
 		}
 
 	// check if larger than 2**16
 	if (sizeof(T)>=4)
 		if  (number >= 0x10000){
 			exp += 16;
-			number >>= 16;
+			shift = 16; // used a variable to trick the compiler warning not to issue a warning of too long shift
+			number >>= shift;
 		}
 
 	// check if larger than 2**8

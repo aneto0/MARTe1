@@ -243,7 +243,7 @@ template <typename T> void Test_IntegerToStream(T n){
 		
 		putchar('\n');
 		pFormat= "- 22i";	
-		format.InitialiseFromString(pFormat);	
+		format.InitialiseFromString(pFormat);	 
 		putchar('>');		
 		IntegerToStream(myStream,n,format);
 		putchar('<');		
@@ -269,21 +269,25 @@ template <typename T> void Test_IntegerToStream(T n){
 }
 
 int main(int argc, char **argv){
-	
-/*	
+
 	putchar('\n');	
-	float n1 = 12345678;	
+	double n0 = 999999960000;
+	Test_FloatToStream(n0);
+	
+	
+	putchar('\n');	
+	float n1 = 1234567800;	
 	Test_FloatToStream(n1);
 
 	putchar('\n');	
-	double n2 = 12345678;	
+	double n2 = 1234567800;	
 	Test_FloatToStream(n2);
 	
 	putchar('\n');	
-	__float128 n3 = 12345678;
+	__float128 n3 = 1234567800;
 	Test_FloatToStream(n3);
-*/
-	
+
+
 	putchar('\n');	
 	uint64 in1 = 1234567890123456789;
 	Test_IntegerToStream(in1);	
