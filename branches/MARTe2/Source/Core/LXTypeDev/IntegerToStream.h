@@ -31,8 +31,11 @@
 
 // returns the exponent
 // positiveNumber is the abs (number)
-// operates by comparing with 10**N with converging by bisection to the correct value
-// returns the number of digits after the first or the exponent
+/** @brief Calculates the order of a number, namely its number of digits minus one.
+  * @param positiveNumber is the number argument which must be positive.
+  * @return the number of digits minus one.
+  * 
+  * The function operates by comparing with 10**N with converging by bisection to the correct value. */
 template <typename T> uint8 GetOrderOfMagnitude(T positiveNumber){       
     T tenToExponent = 1;
     T temp ;
@@ -84,6 +87,13 @@ template <typename T> uint8 GetOrderOfMagnitude(T positiveNumber){
 }
 
 // returns the number of digits necessary to represent this number -1 
+/** @brief Calculates the number of digits for a hexadecimal representation.
+  * @param number is the number argument.
+  * @return the minimum number of digits for an hexadecimal print.
+  *
+  * This function operates comparing the number with 16**N numbers with N=1,2,4,8 converging by 
+  * bisection to the correct value. */ 
+
 template <typename T> uint8 GetNumberOfDigitsHexNotation(T number){
 	uint8 exp = 1;
 	
@@ -124,6 +134,13 @@ template <typename T> uint8 GetNumberOfDigitsHexNotation(T number){
 }
 
 // returns the number of digits necessary to represent this number -1 
+/** @brief Calculates the number of digits for an octal representation.
+  * @param number is the number argument.
+  * @return the minimum number of digits for an octal print.
+  *
+  * This function operates comparing the number with 8**N numbers with N=1,2,4,8,16 converging by 
+  * bisection to the correct value. */ 
+
 template <typename T> uint8 GetNumberOfDigitsOctalNotation(T number){
 	// negative numbers are 2 complements and have therefore all bits
 	if (number < 0) return (sizeof(T) * 8 + 2) / 3;
@@ -169,7 +186,13 @@ template <typename T> uint8 GetNumberOfDigitsOctalNotation(T number){
 
 
 // returns the number of digits necessary to represent this number -1 
-// positiveNumber is the abs (number)
+/** @brief Calculates the number of digits for a binary representation.
+  * @param number is the number argument.
+  * @return the minimum number of digits for a binary print.
+  *
+  * This function operates comparing the number with 2**N numbers with N=1,2,4,8,16,32 converging by 
+  * bisection to the correct value. */ 
+
 template <typename T> uint8 GetNumberOfDigitsBinaryNotation(T number){
 	// negative numbers are 2 complements and have therefore all bits
 	if (number < 0) return sizeof(T) * 8 ;
