@@ -34,6 +34,7 @@ bool FloatToStreamTest::TestFixedPoint() {
     FormatDescriptor format;
     const char* pformat;
 
+    //Left padded negative full precision
     pformat = "- 12.8f";
     format.InitialiseFromString(pformat);
     FloatToStream(thisStream, sbit32, format);
@@ -44,6 +45,7 @@ bool FloatToStreamTest::TestFixedPoint() {
 
     thisStream.Clear();
 
+    //4 as precision
     pformat = "- 12.4f";
     format.InitialiseFromString(pformat);
     FloatToStream(thisStream, sbit32, format);
@@ -54,6 +56,7 @@ bool FloatToStreamTest::TestFixedPoint() {
 
     thisStream.Clear();
 
+    //Right aligned padding
     sbit32 = 112345.67; //112345,...
     pformat = " 12.8f";
     format.InitialiseFromString(pformat);
@@ -65,6 +68,7 @@ bool FloatToStreamTest::TestFixedPoint() {
 
     thisStream.Clear();
 
+    //Round up correction
     double sbit64 = 12345.9999;
 
     pformat = " 10.8f";
@@ -78,6 +82,7 @@ bool FloatToStreamTest::TestFixedPoint() {
 
     thisStream.Clear();
 
+    //Over precision
     sbit64 = 999999.55556;
 
     pformat = " 17.15f"; //4 zeri
@@ -89,8 +94,31 @@ bool FloatToStreamTest::TestFixedPoint() {
         return False;
     }
 
+    //Point removing
+    thisStream.Clear();
+    pformat = "- 7.15f"; //4 zeri
+
+    format.InitialiseFromString(pformat);
+    FloatToStream(thisStream, sbit64, format);
+
+    if (!StringTestHelper::Compare("999999 ", thisStream.Buffer())) {
+        return False;
+    }
+
+    //Enough space for the point
+    thisStream.Clear();
+    pformat = "- 8.15f"; //4 zeri
+
+    format.InitialiseFromString(pformat);
+    FloatToStream(thisStream, sbit64, format);
+
+    if (!StringTestHelper::Compare("999999.6", thisStream.Buffer())) {
+        return False;
+    }
+
     thisStream.Clear();
 
+    //No correction because the overflow
     pformat = "10.6f"; //4 zeri
 
     format.InitialiseFromString(pformat);
@@ -102,6 +130,7 @@ bool FloatToStreamTest::TestFixedPoint() {
 
     thisStream.Clear();
 
+    //The minimum precision is the integer part ciphers.
     pformat = "- 10.1f";
     format.InitialiseFromString(pformat);
     FloatToStream(thisStream, sbit64, format);
@@ -112,6 +141,7 @@ bool FloatToStreamTest::TestFixedPoint() {
 
     thisStream.Clear();
 
+    //Not enough space for the integer part
     pformat = " 5.10f";
     format.InitialiseFromString(pformat);
     FloatToStream(thisStream, sbit64, format);
@@ -121,7 +151,21 @@ bool FloatToStreamTest::TestFixedPoint() {
     }
 
     thisStream.Clear();
+   
+    //Not enough space (it must be at least 12+1(zero)+1(point)=14)
+    __float128 sbit128=1e-12
 
+    pformat = " 12.12f";
+    format.InitialiseFromString(pformat);
+    FloatToStream(thisStream, sbit128, format);
+
+    if (!StringTestHelper::Compare("           ?", thisStream.Buffer())) {
+        return False;
+    }
+
+    thisStream.Clear();
+
+    //Poisitive inf.
     float inf = 1.0 / 0.0;
 
     pformat = "10.10f";
@@ -134,6 +178,8 @@ bool FloatToStreamTest::TestFixedPoint() {
     }
 
     thisStream.Clear();
+
+    //Negative inf
     double ninf = -1.0 / 0.0;
 
     pformat = " 10.10f";
@@ -146,6 +192,7 @@ bool FloatToStreamTest::TestFixedPoint() {
 
     thisStream.Clear();
 
+    //Not enough space to print -Inf
     pformat = "- 1.10f";
 
     format.InitialiseFromString(pformat);
@@ -157,6 +204,7 @@ bool FloatToStreamTest::TestFixedPoint() {
 
     thisStream.Clear();
 
+    //NaN
     __float128 nan = 0.0 / 0.0;
 
     pformat = "- 10.10f";
@@ -172,6 +220,7 @@ bool FloatToStreamTest::TestFixedPoint() {
 
     pformat = " 0.10f";
 
+    //Nan with automatic size
     format.InitialiseFromString(pformat);
     FloatToStream(thisStream, nan, format);
 
@@ -183,6 +232,7 @@ bool FloatToStreamTest::TestFixedPoint() {
 
     pformat = " 2.10f";
 
+    //Not enough space to print Nan
     format.InitialiseFromString(pformat);
     FloatToStream(thisStream, nan, format);
 
