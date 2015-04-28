@@ -36,27 +36,23 @@
 #include "FormatDescriptor.h"
 #define MAX_DIMENSION 128 
 
-
-
-
-
-class IntegerToStreamTest{
+class IntegerToStreamTest {
 
 private:
 
 public:
 
-	bool TestDecimalMagnitude();
-	bool TestHexadecimalMagnitude();
-	bool TestOctalMagnitude();
-	bool TestBinaryMagnitude();
-	bool TestDecimalStream();
-	bool TestHexadecimalStream();
-	bool TestOctalStream();
-	bool TestBinaryStream();
-	bool TestDecimalPrint();
-	bool TestHexadecimalPrint();
-	bool TestIntegerToStream();
+    bool TestDecimalMagnitude();
+    bool TestHexadecimalMagnitude();
+    bool TestOctalMagnitude();
+    bool TestBinaryMagnitude();
+    bool TestDecimalStream();
+    bool TestHexadecimalStream();
+    bool TestOctalStream();
+    bool TestBinaryStream();
+    bool TestDecimalPrint();
+    bool TestHexadecimalPrint();
+    bool TestIntegerToStream();
 };
 
 #endif

@@ -35,18 +35,16 @@
 #include "FloatToStream.h"
 #include "FormatDescriptor.h"
 
-
-
-class FloatToStreamTest{
+class FloatToStreamTest {
 
 private:
 
 public:
 
-	bool TestFixedPoint();
-	bool TestEngeneering();
-	bool TestExponential();
-/*	bool TestCompact();*/
+    bool TestFixedPoint();
+    bool TestEngeneering();
+    bool TestExponential();
+    bool TestCompact();
 };
 
 #endif

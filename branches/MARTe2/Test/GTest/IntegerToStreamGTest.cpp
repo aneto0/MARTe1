@@ -65,10 +65,10 @@ TEST_F(IntegerToStreamGTest,TestBinaryStream) {
     IntegerToStreamTest numbertest;
     ASSERT_TRUE(numbertest.TestBinaryStream());
 }
-/*
+
 TEST_F(IntegerToStreamGTest,TestIntegerToStream) {
     IntegerToStreamTest numbertest;
     ASSERT_TRUE(numbertest.TestBinaryStream());
-}*/
+}
 
 

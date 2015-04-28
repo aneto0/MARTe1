@@ -33,7 +33,7 @@ bool BasicConsoleTest::TestOpen(ConsoleOpeningMode openingMode) {
 }
 
 //write the string passed by argument
-bool BasicConsoleTest::TestWrite(char* string, int32 padding) {
+bool BasicConsoleTest::TestWrite(const char* string, int32 padding) {
     //since this function is used by other tests, open the console only if padding !=0.
     if (padding != 0) {
         if (!TestOpen(ConsoleDefault)) {
@@ -63,7 +63,7 @@ bool BasicConsoleTest::TestWrite(char* string, int32 padding) {
 }
 
 //compare the read string with the string passed by argument
-bool BasicConsoleTest::TestRead(char* stringArg, int32 sizeArg) {
+bool BasicConsoleTest::TestRead(const char* stringArg, int32 sizeArg) {
     //size must be positive
     if (sizeArg < 0) {
         return False;

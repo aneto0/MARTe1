@@ -65,14 +65,14 @@ public:
      * @param string is the string to write.
      * @param padding is the difference between the size that we want to pass to the write function and the real string size.
      * @return true if the size returned is the real string size. **/
-    bool TestWrite(char* string, int32 padding);
+    bool TestWrite(const char* string, int32 padding);
 
     /**
      * @brief Tests if the string read by console is the same of the string passed by argument (the user must write in console the same word) with the same size.
      * @param stringArg is the string to match with the read string. 
      * @param sizeArg is the size to match with the read string size.
      * @return true if the read string is equal to the passed argument. **/
-    bool TestRead(char* stringArg, int32 sizeArg);
+    bool TestRead(const char* stringArg, int32 sizeArg);
 
     /**
      * @brief Tests the behavior of the paging property. This means that if the rows of string to write exceeds the row dimension of the console, you must press enter to begin a new page. 
