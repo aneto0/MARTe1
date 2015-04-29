@@ -842,7 +842,7 @@ bool FloatToStream(streamer & stream, // must have a GetC(c) function where c is
             }
 	    // break in case of no overflow.	
             else{
-//                precision = chosenPrecision;
+                precision = chosenPrecision;
                 break;
 	   }
 
