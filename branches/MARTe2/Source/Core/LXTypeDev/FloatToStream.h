@@ -829,7 +829,7 @@ bool FloatToStream(streamer & stream, // must have a GetC(c) function where c is
                 precision = chosenPrecision;
 
             // apply rounding up. Remember that for fix point precision is different.
-	    if(format.floatNotation == Notation::FixedPointNotation) 
+	    if(format.floatNotation == Notation::FixedPointNotation && chosenPrecision < 0) 
                 positiveNumber = RoundUpNumber(positiveNumber, exponent + precision + 1);
 	    else
 	        positiveNumber = RoundUpNumber(positiveNumber, precision);
