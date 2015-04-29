@@ -21,9 +21,12 @@
  * $Id: CStream.cpp 3 2012-01-15 16:26:07Z aneto $
  *
 **/
-
-#if !defined NUMBER_TO_STREAM
-#define NUMBER_TO_STREAM
+/**
+ * @file 
+ * @brief Functions to print integer numbers on generic streams.
+*/
+#if !defined INTEGER_TO_STREAM
+#define INTEGER_TO_STREAM
 
 #include "GeneralDefinitions.h"
 #include "FormatDescriptor.h"
@@ -243,12 +246,17 @@ template <typename T> uint8 GetNumberOfDigitsBinaryNotation(T number){
     return exp;
 }
 
-/** implements a 2 step conversion - step1 32/64 to 16bit step2 10bit to decimal
- *  this way the number of 32/64 bit operations are reduced
- *  numberFillLength is used to specify how many digits to prints at least (this would include trailingzeros)
- *  it will never print more trailing zeros than the maximum size of a number of that format
- *  streamer must have a PutC(char) method. It will be used to output the digits
- */   
+/** @brief Prints an integer number on a general stream in decimal notation.
+  * @param s is a general stream class which implements a putC() function.
+  * @param positiveNumber is the number to print (it must be positive the '-' is added a part).
+  * @param numberFillLength is the minimum number of digits requested for each 16 bit number (<5 because 2**16 has 5 digits) and 
+  * the function fillw the different between it and the minimum necessary space with zeros.
+  * 
+  * This function implements a 2 step conversion - step1 32/64 to 16bit step2 10bit to decimal
+  * this way the number of 32/64 bit operations are reduced
+  * numberFillLength is used to specify how many digits to prints at least (this would include trailingzeros)
+  * it will never print more trailing zeros than the maximum size of a number of that format
+  * streamer must have a PutC(char) method. It will be used to output the digits. */
 template <typename T, class streamer> 
 static inline void Number2StreamDecimalNotationPrivate(streamer &s, T positiveNumber,int16 numberFillLength=0){
 
@@ -349,11 +357,18 @@ static inline void Number2StreamDecimalNotationPrivate(streamer &s, T positiveNu
 	}
 }
 
-/**
- * Converts any integer type, signed and unsigned to a sequence of characters inserted into the stream stream by mean of a method PutC
- * respects maximumSize and number integrity 
- * if not possible outputs ?
- */
+
+/** @brief Prints an integer number on a general stream in decimal notation.
+  * @param stream is a general stream class which implements a PutC() function.
+  * @param maximumSize is the maximum requested space for the number print. 
+  * @param padded specifies if the difference between maximumSize and the necessary space for the number must be filled by spaces ' '.
+  * @param leftAligned specifies if the number must be print with left or right alignment.
+  * @param addPositiveSign specifies if we want print the '+' before positive numbers.
+  * @return true.
+  *
+  * Converts any integer type, signed and unsigned to a sequence of characters inserted into the stream stream by mean of a method PutC
+  * respects maximumSize and number integrity. 
+  * if not possible (maximum size minor than the minimum space for the number print) outputs is ? */
 template <typename T, class streamer> 
 bool IntegerToStreamDecimalNotation(
 			streamer &		stream,                        // must have a GetC(c) function where c is of a type that can be obtained from chars  
@@ -422,12 +437,19 @@ bool IntegerToStreamDecimalNotation(
 }
 
 
-/**
- * Converts any integer type, signed and unsigned to a sequence of characters inserted into the stream stream by mean of a method PutC
- * uses hexadecimal notation 
- * respects maximumSize and number integrity 
- * if not possible outputs ?
- */
+/** @brief Prints an integer number on a general stream in hexadecimal notation.
+  * @param stream is a general stream class which implements a PutC() function.
+  * @param maximumSize is the maximum requested space for the number print. 
+  * @param padded specifies if the difference between maximumSize and the necessary space for the number must be filled by spaces ' '.
+  * @param leftAligned specifies if the number must be print with left or right alignment.
+  * @param putTrailingZeros specifiec if we want fill with zeros the digits before the minimum necessary digits (ex 16 bit: ab -> 00ab).
+  * @param addHeader specifies if we want to add the hex header '0x' before the number.
+  * @return true.
+  *
+  * Converts any integer type, signed and unsigned to a sequence of characters inserted into the stream stream by mean of a method PutC
+  * uses hexadecimal notation 
+  * respects maximumSize and number integrity 
+  * if not possible (maximum size minor than the minimum space for the number print) output is ? */
 template <typename T, class streamer> 
 bool IntegerToStreamExadecimalNotation(
 			streamer &		stream, 
@@ -529,12 +551,21 @@ bool IntegerToStreamExadecimalNotation(
 	
 }
 
-/**
- * Converts any integer type, signed and unsigned to a sequence of characters inserted into the stream stream by mean of a method PutC
- * uses octal notation 
- * respects maximumSize and number integrity 
- * if not possible outputs ?
- */
+
+
+/** @brief Prints an integer number on a general stream in octal notation.
+  * @param stream is a general stream class which implements a PutC() function.
+  * @param maximumSize is the maximum requested space for the number print. 
+  * @param padded specifies if the difference between maximumSize and the necessary space for the number must be filled by spaces ' '.
+  * @param leftAligned specifies if the number must be print with left or right alignment.
+  * @param putTrailingZeros specifiec if we want fill with zeros the digits before the minimum necessary digits.
+  * @param addHeader specifies if we want to add the oct header '0o' before the number.
+  * @return true.
+  *
+  * Converts any integer type, signed and unsigned to a sequence of characters inserted into the stream stream by mean of a method PutC
+  * uses octal notation 
+  * respects maximumSize and number integrity 
+  * if not possible (maximum size minor than the minimum space for the number print) output is ?  */
 template <typename T, class streamer> 
 bool IntegerToStreamOctalNotation(       
 	streamer &		stream, 
@@ -635,12 +666,20 @@ bool IntegerToStreamOctalNotation(
     return true;	
 }
 
-/**
- * Converts any integer type, signed and unsigned to a sequence of characters inserted into the stream stream by mean of a method PutC
- * uses binary notation 
- * respects maximumSize and number integrity 
- * if not possible outputs ?
- */
+
+/** @brief Prints an integer number on a general stream in binary notation.
+  * @param stream is a general stream class which implements a PutC() function.
+  * @param maximumSize is the maximum requested space for the number print. 
+  * @param padded specifies if the difference between maximumSize and the necessary space for the number must be filled by spaces ' '.
+  * @param leftAligned specifies if the number must be print with left or right alignment.
+  * @param putTrailingZeros specifiec if we want fill with zeros the digits before the minimum necessary digits.
+  * @param addHeader specifies if we want to add the bin header '0b' before the number.
+  * @return true.
+  *
+  * Converts any integer type, signed and unsigned to a sequence of characters inserted into the stream stream by mean of a method PutC
+  * uses binary notation 
+  * respects maximumSize and number integrity 
+  * if not possible (maximum size minor than the minimum space for the number print) output is ?  */
 template <typename T, class streamer> 
 bool IntegerToStreamBinaryNotation(
 		streamer &		stream, 
@@ -741,13 +780,17 @@ bool IntegerToStreamBinaryNotation(
     return true;	
 }
 
-/**
- * Converts any integer type, signed and unsigned to a sequence of characters inserted into the stream stream by mean of a method PutC
- * uses notation specified in format
- * also respects all relevant format parameters 
- * respects format.size and number integrity 
- * if not possible outputs ?
- */
+/** @brief Print on a general stream using a specific format.
+  * @param stream is a general stream class which implements a PutC() function.
+  * @param number is the integer to print.
+  * @param format is the desired format.
+  * @return true if the format is correct, false otherwise.
+  *
+  * Converts any integer type, signed and unsigned to a sequence of characters inserted into the stream stream by mean of a method PutC
+  * uses notation specified in format
+  * also respects all relevant format parameters 
+  * respects format.size and number integrity 
+  * if not possible output is ? */
 template <typename T, class streamer> 
 bool IntegerToStream(
 		streamer &			stream, 
