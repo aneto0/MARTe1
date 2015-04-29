@@ -199,7 +199,7 @@ public:
 	
 }myStream;
 
-template <typename T> void Test_FloatToStream(T number){
+template <typename T> void Test_FloatToStream(T number, int size = 12){
 
 	FormatDescriptor	format;
 	const char *pFormat;
@@ -207,36 +207,42 @@ template <typename T> void Test_FloatToStream(T number){
 	for (int i = 0;i<32;i++){
 		pFormat= " 12.7f";	
 		format.InitialiseFromString(pFormat);	
+		format.size = size;
 		putchar('>');		
 		FloatToStream(myStream,number,format);
 		putchar('<');		
 		
 		pFormat= "- 12.7F";	
 		format.InitialiseFromString(pFormat);	
+		format.size = size;
 		putchar('>');		
 		FloatToStream(myStream,number,format);
 		putchar('<');		
 
 		pFormat = " 11.7e";	
 		format.InitialiseFromString(pFormat);	
+		format.size = size;
 		putchar('>');		
 		FloatToStream(myStream,number,format);
 		putchar('<');		
 		
 		pFormat = "- 11.7E";	
 		format.InitialiseFromString(pFormat);
+		format.size = size;
 		putchar('>');		
 		FloatToStream(myStream,number,format);
 		putchar('<');		
 
 		pFormat = " 11.7g";	
 		format.InitialiseFromString(pFormat);	
+		format.size = size;
 		putchar('>');		
 		FloatToStream(myStream,number,format);
 		putchar('<');		
 		
 		pFormat = " 11.7G";	
 		format.InitialiseFromString(pFormat);	
+		format.size = size;
 		putchar('>');		
 		FloatToStream(myStream,number,format);
 		putchar('<');		
@@ -285,6 +291,18 @@ int main(int argc, char **argv){
 	putchar('\n');	
 	double n0 = 9999995054321000;
 	Test_FloatToStream(n0);
+	putchar('\n');	
+	Test_FloatToStream(n0,6);
+	putchar('\n');	
+	Test_FloatToStream(n0,5);
+	putchar('\n');	
+	Test_FloatToStream(n0,4);
+	putchar('\n');	
+	Test_FloatToStream(n0,3);
+	putchar('\n');	
+	Test_FloatToStream(n0,2);
+	putchar('\n');	
+	Test_FloatToStream(n0,1);
 	
 	
 	putchar('\n');	
