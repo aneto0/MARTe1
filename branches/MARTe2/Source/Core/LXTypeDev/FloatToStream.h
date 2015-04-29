@@ -838,8 +838,10 @@ bool FloatToStream(streamer & stream, // must have a GetC(c) function where c is
                 precision = format.precision;
             }
 	    // break in case of no overflow.	
-            else
+            else{
+                precision = chosenPrecision;
                 break;
+	   }
 
         }
 
