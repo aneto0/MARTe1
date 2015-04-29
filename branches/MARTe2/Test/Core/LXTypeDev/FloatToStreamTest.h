@@ -42,7 +42,9 @@ private:
 public:
 
     bool TestFixedPoint();
+    bool TestFixedRelativePoint();
     bool TestEngeneering();
+    bool TestSmart();
     bool TestExponential();
     bool TestCompact();
 };

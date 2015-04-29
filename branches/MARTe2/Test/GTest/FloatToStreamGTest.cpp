@@ -20,11 +20,14 @@ protected:
     }
 };
 
-
-
 TEST_F(FloatToStreamGTest,TestFixedPoint) {
     FloatToStreamTest numbertest;
     ASSERT_TRUE(numbertest.TestFixedPoint());
+}
+
+TEST_F(FloatToStreamGTest,TestFixedRelativePoint) {
+    FloatToStreamTest numbertest;
+    ASSERT_TRUE(numbertest.TestFixedRelativePoint());
 }
 
 TEST_F(FloatToStreamGTest,TestEngeneering) {
@@ -32,14 +35,20 @@ TEST_F(FloatToStreamGTest,TestEngeneering) {
     ASSERT_TRUE(numbertest.TestEngeneering());
 }
 
+
+TEST_F(FloatToStreamGTest,TestSmart) {
+    FloatToStreamTest numbertest;
+    ASSERT_TRUE(numbertest.TestSmart());
+}
+
 TEST_F(FloatToStreamGTest,TestExponential) {
     FloatToStreamTest numbertest;
     ASSERT_TRUE(numbertest.TestExponential());
 }
-
+/*
 TEST_F(FloatToStreamGTest,TestCompact) {
     FloatToStreamTest numbertest;
     ASSERT_TRUE(numbertest.TestCompact());
 }
-
+*/
 
