@@ -62,9 +62,11 @@ static const FDLookup typesLookup[] = {
     { 's', 	FormatDescriptor(0) },  //s
     { 'c', 	FormatDescriptor(0) },  //c
     { 'f', 	FormatDescriptor(0,0,False,False,Notation::FixedPointNotation, Notation::DecimalNotation,False,False) },  //f
+    { 'F', 	FormatDescriptor(0,0,False,False,Notation::FixedPointRNotation,Notation::DecimalNotation,False,False) },  //F
     { 'e', 	FormatDescriptor(0,0,False,False,Notation::ExponentNotation  , Notation::DecimalNotation,False,False) },  //e
-    { 'g', 	FormatDescriptor(0,0,False,False,Notation::CompactNotation   , Notation::DecimalNotation,False,False) },  //g
     { 'E', 	FormatDescriptor(0,0,False,False,Notation::EngineeringNotation,Notation::DecimalNotation,False,False) },  //E
+    { 'g', 	FormatDescriptor(0,0,False,False,Notation::SmartNotation     , Notation::DecimalNotation,False,False) },  //g
+    { 'G', 	FormatDescriptor(0,0,False,False,Notation::CompactNotation   , Notation::DecimalNotation,False,False) },  //
     { 'a', 	FormatDescriptor(0,0,False,False,Notation::FixedPointNotation, Notation::HexNotation   ,False,False) },  //a
     { 'x', 	FormatDescriptor(0,0,False,False,Notation::FixedPointNotation, Notation::HexNotation   ,False,False) },  //x
     { 'p', 	FormatDescriptor(0,0,False,False,Notation::FixedPointNotation, Notation::HexNotation   ,False,False) },  //p
@@ -144,7 +146,7 @@ static inline uint32 GetIntegerNumber(const char *&string){
 }
 
 
-#include <stdio.h>
+//#include <stdio.h>
 bool FDInitialiseFromString(FormatDescriptor &fd, const char *&string){
     
     // prepare clean FormatDescriptor

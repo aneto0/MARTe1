@@ -38,11 +38,10 @@
   * The function operates by comparing with 10**N with converging by bisection to the correct value. */
 template <typename T> uint8 GetOrderOfMagnitude(T positiveNumber){       
     T tenToExponent = 1;
-    T temp ;
     uint8 exp = 0;
     // check whether exponent greater than 10  
     if (sizeof(T)>=8){ // max 19
-        temp = tenToExponent * 10000000000; // 10 zeros 
+        T temp = tenToExponent * 10000000000; // 10 zeros 
         if (positiveNumber >= temp )  {
             tenToExponent = temp;
             exp += 10;
@@ -51,7 +50,7 @@ template <typename T> uint8 GetOrderOfMagnitude(T positiveNumber){
     
     // check whether exponent greater than 5  
     if (sizeof(T)>=4){ // max 9 
-        temp = tenToExponent * 100000; // 5 zeros
+        T temp = tenToExponent * 100000; // 5 zeros
         if (positiveNumber >= temp ) {
             tenToExponent = temp;
             exp += 5;
@@ -60,7 +59,7 @@ template <typename T> uint8 GetOrderOfMagnitude(T positiveNumber){
     
     // check whether exponent greater than 2  
     if (sizeof(T)>=2){ // max 4 zeros
-        temp = tenToExponent * 100; // 2 zeros
+        T temp = tenToExponent * 100; // 2 zeros
         if (positiveNumber >= temp ) {
             tenToExponent = temp;
             exp += 2;
@@ -68,7 +67,7 @@ template <typename T> uint8 GetOrderOfMagnitude(T positiveNumber){
     }
     
     // check whether exponent greater than 1  
-    temp = tenToExponent * 10; // 1 
+    T temp = tenToExponent * 10; // 1 
     if (positiveNumber >= temp ){
             tenToExponent = temp;
             exp ++;

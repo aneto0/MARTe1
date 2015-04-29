@@ -40,21 +40,32 @@ struct Notation{
         FixedPointNotation  =   0,
 
         /** 
+          0.99  3.5 35000.2 etc... but number of significative digits = precision
+          the others are all zeroes 
+        */
+        FixedPointRNotation =   1,
+
+        /** 
           9.9E-1 3.5E0 3.5E4 etc....
         */
-        ExponentNotation    =   1,
+        ExponentNotation    =   2,
 
         /** 
           990E-3 3.5E0 35E3 etc....
         */
-        EngineeringNotation =   2,
+        EngineeringNotation =   3,
 
         /** 
           Most meaningful notation fitting within constraints
-          Choice among FixedPoint, Exponent Notation and Engineering notation with size symbols
+          Engineering notation with size symbols
           3000 -> 3K  3.6E12  3.6T
         */
-        CompactNotation     =   3
+        SmartNotation       =   6,
+        /** 
+          Most meaningful notation fitting within constraints
+          Choice among FixedPointRel, Exponent Notation and Smart notation 
+        */
+        CompactNotation     =   7
     };
 
     enum Binary {
@@ -125,7 +136,7 @@ public:
 
     
     /// in case of a float, this field is used to determine how to print it
-    Notation::Float         floatNotation:2;
+    Notation::Float         floatNotation:3;
 
     /// used for ints, floats, pointers, char * etc...
     Notation::Binary        binaryNotation:2;
@@ -179,10 +190,12 @@ public:
 		This is one character among the following
 		
 		d,i,u,s,c --> no effect (format depends on actual data type not the letter here!)
-        f --> fixed point numeric format selected
+        f --> fixed point numeric format selected - absolute precision mode : precision is the number of digits below 1
+        F --> fixed point relative precision selected 
         e --> exponential format
         E --> engineering format
-		g --> smart format (more powerful than printf)
+		g --> smart format   - like E but replaces E-12 to E+12 with one of the following letters "TGMK munp" 
+		G --> compact format 
 		a,x,p --> activate exadecimal display
         o --> activate octal display
         b --> activate binary display

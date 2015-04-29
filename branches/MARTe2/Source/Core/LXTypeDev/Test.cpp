@@ -204,31 +204,43 @@ template <typename T> void Test_FloatToStream(T number){
 	FormatDescriptor	format;
 	const char *pFormat;
 	
-	for (int i = 0;i<30;i++){
-		pFormat= "- 10.7f";	
+	for (int i = 0;i<32;i++){
+		pFormat= " 12.7f";	
 		format.InitialiseFromString(pFormat);	
 		putchar('>');		
 		FloatToStream(myStream,number,format);
 		putchar('<');		
 		
-		pFormat = " 10.7e";	
+		pFormat= "- 12.7F";	
+		format.InitialiseFromString(pFormat);	
+		putchar('>');		
+		FloatToStream(myStream,number,format);
+		putchar('<');		
+
+		pFormat = " 11.7e";	
 		format.InitialiseFromString(pFormat);	
 		putchar('>');		
 		FloatToStream(myStream,number,format);
 		putchar('<');		
 		
-		pFormat = "- 10.7E";	
+		pFormat = "- 11.7E";	
 		format.InitialiseFromString(pFormat);
 		putchar('>');		
 		FloatToStream(myStream,number,format);
 		putchar('<');		
 
-		pFormat = " 10.7g";	
+		pFormat = " 11.7g";	
 		format.InitialiseFromString(pFormat);	
 		putchar('>');		
 		FloatToStream(myStream,number,format);
 		putchar('<');		
 		
+		pFormat = " 11.7G";	
+		format.InitialiseFromString(pFormat);	
+		putchar('>');		
+		FloatToStream(myStream,number,format);
+		putchar('<');		
+
 		putchar('\n');	
 		number = number/10;
 	}
@@ -271,7 +283,7 @@ template <typename T> void Test_IntegerToStream(T n){
 int main(int argc, char **argv){
 
 	putchar('\n');	
-	double n0 = 999999960000;
+	double n0 = 9999995054321000;
 	Test_FloatToStream(n0);
 	
 	

@@ -193,79 +193,236 @@ static inline int16 ExponentToEngineeringPrivate(int16 &exponent) {
 // excludes from the size the eventual sign 
 // precision is int16 to allow safe subtraction
 // precision is updated to fit within maximumSize
+// precision is converted into relative format 
 // negative or zero precision means cannot fit
-static inline uint8 NumberOfDigitsFixedNotation(int16 exponent, bool hasSign,
-                                                int16 &precision,
-                                                int16 maximumSize) {
-    uint8 fixedNotationSize = 0;
+static inline int16 
+NumberOfDigitsFixedNotation(
+		int16 		exponent, 
+		bool 		hasSign,
+        int16 &		precision,
+        int16 		maximumSize) 
+{
+    // this will be the output
+	int16 fixedNotationSize = 0;
+
+    // how many extra digits to print below zero
+    int16 desiredDecimalDigits = 0;
+    
+    // in the positive case
+    // start by evaluating size of number of minimum resolution
     if (exponent >= 0) {
-        // fixed notation for large numbers needs a number of digits = 1+ exponent in this case no . is used 
-        fixedNotationSize = exponent + 1;
+  	
+    	// fixed notation for large numbers needs a number of digits = 1+ exponent in this case no . is used 
+        fixedNotationSize = exponent + 1;        
+   
+    } 
+    else 
+    { // negative exponent 
+    	
+    	// consider space for minimum resolution --> 0;
+        fixedNotationSize = 1;
 
-        // consider the sign
-        if (hasSign)
-            fixedNotationSize++;
+    }    
 
-        // are we within limits even when disregarding precision?		
-        if (fixedNotationSize > maximumSize) {
-            // less than 1 is meaningless
+    // these are the decimal digits required beyond the minimum size
+    desiredDecimalDigits = precision;        
+
+    // consider the sign
+    if (hasSign){
+        fixedNotationSize++;
+    }
+    
+    // how much space left?
+    int16 spaceLeft = maximumSize - fixedNotationSize;
+
+    // are we not within limits even when disregarding precision?		
+    if (spaceLeft < 0) {
+
+        if (exponent >= 0) {
+
+            // 1 for the ?
             fixedNotationSize = 1;
+            
             // -1 means no space! 
             precision = -1;
+        
+        } else {
+            // 1 for the ?
+            fixedNotationSize = 1;
+            
+            // 0  means no zero 
+            precision = 0;
+        	
         }
-        else {
-
-            // if we need to go below zero consider also the . this  is why +1
-            if (fixedNotationSize < precision) {
-                fixedNotationSize = precision + 1;
-                // consider the sign
-                if (hasSign)
-                    fixedNotationSize++;
-            }
-
-            // are we within limits now that we have introduced precision?		
-            if (fixedNotationSize > maximumSize) {
-                // we adjust precision
-                precision += (maximumSize - fixedNotationSize);
-
-                // size depends on precision
-                // if precision exceeds exponent than we consider the space for the . as well
-                if (precision > (exponent + 1)) {
-                    fixedNotationSize = maximumSize;
-                }
-                else {
-                    //If this happen, before the number had the point and now it doesn't. 
-                    precision = exponent + 1;
-                    fixedNotationSize = exponent + 1;
-                }
-            }
-
-        }
+        
+        // just exit here
+        return fixedNotationSize;
     }
-    else { // negative exponent 
-        exponent = -exponent;
-        // a precision 1 exp = -1 needs 3 (0.x) so add 1 
-        fixedNotationSize = exponent + precision + 1;
-        // consider the sign
-        if (hasSign)
+    
+    // do we need more
+    if (desiredDecimalDigits > 0){
+    	    	
+    	// no space for adding a single digit and the . exit
+    	if (spaceLeft < 2){
+    	
+    		// clip all of the precision expressed by decimals
+    		precision -= desiredDecimalDigits; 
+    		
+    	    // convert precision into relative format
+    	    precision += exponent;
+    	    precision ++;   		
+    		
+            // just exit here
+            return fixedNotationSize;
+            
+        } else {
+    		// deduct the space for .
+    		spaceLeft--;        	
+
+    		// account for . in the space
             fixedNotationSize++;
+        }
+        
+        // how many digits will I not be able to print?
+        int16 excessOfDigits = desiredDecimalDigits - spaceLeft;
 
-        // are we within limits?		
-        if (fixedNotationSize > maximumSize) {
-            // try reducing precision
-            precision += (maximumSize - fixedNotationSize);
-            if (precision >= 1) {
-                // fits to the limits
-                fixedNotationSize = maximumSize;
-            }
-            else {
-                // less than 1 is meaningless
-                fixedNotationSize = 1;
-                // -1 means no space! 
-                precision = -1;
+        // if any adjust precision and digits
+		if (excessOfDigits > 0){
+			desiredDecimalDigits = spaceLeft;
+			precision -= excessOfDigits; 
+		}
+
+		// account for the extra digits
+        fixedNotationSize += desiredDecimalDigits;   	
+    }
+
+    // convert precision into relative format
+    precision += exponent;
+    precision ++;
+    
+    return fixedNotationSize;
+}
+
+
+// calculate size of fixed numeric representation considering the zeros and the . needed beyond the significative digits 
+// excludes from the size the eventual sign 
+// precision is int16 to allow safe subtraction
+// precision is updated to fit within maximumSize
+// negative or zero precision means cannot fit
+static inline int16 
+NumberOfDigitsFixedRelativeNotation(
+		int16 		exponent, 
+		bool 		hasSign,
+        int16 &		precision,
+        int16 		maximumSize) 
+{
+    // this will be the output
+	int16 fixedNotationSize = 0;
+
+    // how many digits to print below zero
+    int16 desiredDecimalDigits = 0;
+    
+    // in the positive case
+    // start by evaluating size of number without decimals
+    if (exponent >= 0) {
+
+        // size of integer part
+        // this needs to be printed
+        int16 integerPartSize = exponent + 1;
+
+        // these are the decimal digits required
+        desiredDecimalDigits = precision - integerPartSize;
+   	
+    	// fixed notation for large numbers needs a number of digits = 1+ exponent in this case no . is used 
+        fixedNotationSize = integerPartSize;       
+    } 
+    else 
+    { // negative exponent 
+    	
+    	// consider space for minimum resolution;
+        fixedNotationSize = 2 - exponent;
+
+        // these are the decimal digits required beyond the minimum size
+        desiredDecimalDigits = precision - 1;        
+    }    
+
+    // consider the sign
+    if (hasSign){
+        fixedNotationSize++;
+    }
+    
+    // how much space left?
+    int16 spaceLeft = maximumSize - fixedNotationSize;
+
+    // are we not within limits even when disregarding precision?		
+    if (spaceLeft < 0) {
+    	
+        if (exponent >= 0) {
+
+            // 1 for the ?
+            fixedNotationSize = 1;
+            
+            // -1 means no space! 
+            precision = -1;
+        
+        } else {
+            // 1 for the ?
+            fixedNotationSize = 1;
+            
+            // 0  means no zero 
+            precision = 0;
+        	
+        }
+        
+        // just exit here
+        return fixedNotationSize;
+    }
+    
+    // do we need more
+    if (desiredDecimalDigits > 0){
+    	
+    	// no space for adding a single digit exit
+    	if (spaceLeft == 0){
+
+    		// clip all of the precision expressed by decimals
+			precision -= desiredDecimalDigits; 
+    		
+            // just exit here
+            return fixedNotationSize;
+        }
+    	
+    	// no space for adding a single digit and the . exit
+        if (exponent >= 0) {
+        	if (spaceLeft == 1){
+        	
+    		// clip all of the precision expressed by decimals
+			precision -= desiredDecimalDigits; 
+    		
+            // just exit here
+            return fixedNotationSize;
+            
+            } else {
+        		// deduct the space for .
+        		spaceLeft--;        	
+
+        		// account for . in the space
+                fixedNotationSize++;
             }
         }
+        
+        // how many digits will I not be able to print?
+        int16 excessOfDigits = desiredDecimalDigits - spaceLeft;
+
+        // if any adjust precision and digits
+		if (excessOfDigits > 0){
+			desiredDecimalDigits = spaceLeft;
+			precision -= excessOfDigits; 
+		}
+
+		// account for the extra digits
+        fixedNotationSize += desiredDecimalDigits;   	
     }
+
     return fixedNotationSize;
 }
 
@@ -274,20 +431,25 @@ static inline uint8 NumberOfDigitsFixedNotation(int16 exponent, bool hasSign,
 // precision is int16 to allow safe subtraction
 // precision is updated to fit within maximumSize
 // negative or zero precision means cannot fit
-static inline uint8 NumberOfDigitsExponentialNotation(int16 exponent,
+static inline int16 NumberOfDigitsExponentialNotation(int16 exponent,
                                                       bool hasSign,
                                                       int16 &precision,
                                                       int16 maximumSize) {
     //	exponential notation number size
-    uint8 exponentNotationSize = 0;
-    // include exponent size 
+	int16 exponentNotationSize = 0;
+	
+    // include exponent size    
     exponentNotationSize += NumberOfDigitsOfExponent(exponent);
+    
     // include mantissa size 
-    uint8 mantissaSize = NumberOfDigitsFixedNotation(
-            0, hasSign, precision, maximumSize - exponentNotationSize);
+    int16 mantissaSize = NumberOfDigitsFixedRelativeNotation
+            (0, hasSign, precision, maximumSize - exponentNotationSize);
+    
     // does not fit
-    if (precision < 0)
+    if (precision < 0){
         return 1;
+    }
+    
     return exponentNotationSize + mantissaSize;
 }
 
@@ -296,7 +458,7 @@ static inline uint8 NumberOfDigitsExponentialNotation(int16 exponent,
 // precision is int16 to allow safe subtraction
 // precision is updated to fit within maximumSize
 // negative or zero precision means cannot fit
-static inline uint8 NumberOfDigitsEngineeringNotation(int16 exponent,
+static inline int16 NumberOfDigitsEngineeringNotation(int16 exponent,
                                                       bool hasSign,
                                                       int16 &precision,
                                                       int16 maximumSize) {
@@ -305,16 +467,21 @@ static inline uint8 NumberOfDigitsEngineeringNotation(int16 exponent,
     int16 exponentRemainder = exponent;
     int16 engineeringExponent = ExponentToEngineeringPrivate(exponentRemainder);
 
-    uint8 engineeringNotationSize = 0;
+    int16 engineeringNotationSize = 0;
+    
     // include exponent size 
     engineeringNotationSize += NumberOfDigitsOfExponent(engineeringExponent);
+    
     // include mantissa size 
-    uint8 mantissaSize = NumberOfDigitsFixedNotation(
+    int16 mantissaSize = NumberOfDigitsFixedRelativeNotation(
             exponentRemainder, hasSign, precision,
             maximumSize - engineeringNotationSize);
+    
     // does not fit
-    if (precision < 0)
+    if (precision < 0){
         return 1;
+    }
+    
     return engineeringNotationSize + mantissaSize;
 }
 
@@ -323,7 +490,7 @@ static inline uint8 NumberOfDigitsEngineeringNotation(int16 exponent,
 // precision is int16 to allow safe subtraction
 // precision is updated to fit within maximumSize
 // negative or zero precision means cannot fit
-static inline uint8 NumberOfDigitsSmartNotation(int16 exponent, bool hasSign,
+static inline int16 NumberOfDigitsSmartNotation(int16 exponent, bool hasSign,
                                                 int16 &precision,
                                                 int16 maximumSize) {
 
@@ -331,25 +498,31 @@ static inline uint8 NumberOfDigitsSmartNotation(int16 exponent, bool hasSign,
     int16 exponentRemainder = exponent;
     int16 engineeringExponent = ExponentToEngineeringPrivate(exponentRemainder);
 
-    uint8 smartNotationSize = 0;
+    int16 smartNotationSize = 0;
+    
     // check if in range for smart replacement of exponent
-    if ((engineeringExponent != 0) && (engineeringExponent <= 12)
-            && (engineeringExponent >= -12)) {
+    if ((engineeringExponent != 0)  && 
+        (engineeringExponent <= 12) && 
+        (engineeringExponent >= -12)) {
         // if so the exponent is simply a letter
         smartNotationSize++;
     }
-    else {
+    else 
+    {
         // or the whole E-xxx
         smartNotationSize += NumberOfDigitsOfExponent(engineeringExponent);
     }
+    
     // include mantissa size 
-    uint8 mantissaSize = NumberOfDigitsFixedNotation(
+    uint8 mantissaSize = NumberOfDigitsFixedRelativeNotation(
             exponentRemainder, hasSign, precision,
             maximumSize - smartNotationSize);
+    
     // does not fit
-    if (precision < 0)
+    if (precision < 0){
         return 1;
-
+    }
+    
     return smartNotationSize + mantissaSize;
 }
 
@@ -359,35 +532,19 @@ static inline uint8 NumberOfDigitsSmartNotation(int16 exponent, bool hasSign,
  * sizeLeft is the buffer size left
  * pBuffer is a writable area of memory of at least sizeLeft
  * precision determines the number of significative digits and is always not 0
+ * PURE RELATIVE VERSION
  */
 template<typename T, class streamer>
-bool FloatToFixedPrivate(streamer & stream, T positiveNumber, int16 exponent,
-                         uint8 precision) {
+bool FloatToFixedPrivate(
+		streamer & 		stream, 
+		T 				positiveNumber, 
+		int16 			exponent,
+		int16 			precision) 
+{
 
-    // what is the exponent associated to the least significative figure?
-    int16 leastSignificativeExponent = exponent - precision;
-    int16 correctionExponent = 0;
-
-    // if least signicative figure is > 0 
-    if (leastSignificativeExponent >= 0) {
-        correctionExponent = -exponent;
-    }
-    else {
-        correctionExponent = -precision + 1;
-    }
-
-    // to round up add a correction value just below last visible digit
-    T correction;
-    FastPowerOf10Private(correction, correctionExponent);
-    correction *= 0.5;
-    correction += positiveNumber;
-
-    // if number now exceedin 10 do not apply correction
-    if (correction < 10.0) {
-        positiveNumber = correction;
-    }
-
+       
     // numbers below 1.0
+    // start with a 0.000 until we reach the first non zero digit
     if (exponent < 0) {
 
         stream.PutC('0');
@@ -406,20 +563,28 @@ bool FloatToFixedPrivate(streamer & stream, T positiveNumber, int16 exponent,
     // loop to fulfil precision 
     // also must reach the end of the integer part thus exponent is checked
     while ((exponent >= 0) || (precision > 0)) {
-        // before outputting the fractional part add a '.'
-        if (exponent == -1)
+        
+    	// before outputting the fractional part add a '.'
+        if (exponent == -1){
             stream.PutC('.');
+        }
 
-        // get a digit and shift the number
-        uint8 digit = (uint8) (positiveNumber);
-        positiveNumber -= digit;
-        positiveNumber *= 10.0;
+        if (precision == 0){
+            stream.PutC('0');        	
+        } else {
+            // get a digit and shift the number
+            uint8 digit = (uint8) (positiveNumber);
+            positiveNumber -= digit;
+            positiveNumber *= 10.0;
 
-        stream.PutC('0' + digit);
+            stream.PutC('0' + digit);
+        }
 
         // update precision and exponent
-        if (precision > 0)
+        if (precision > 0){
             precision--;
+        }
+        
         exponent--;
     }
     return true;
@@ -453,6 +618,7 @@ enum FloatDisplayModes {
     ExponentialFloat = 1,
     EngineeringFloat = 2,
     SmartFloat = 3,
+//    FixedRFloat = 4,
 
     ZeroFloat = 11,
     NanFloat = 22,
@@ -499,6 +665,21 @@ FloatDisplayModes CheckNumber(T number, uint16 maximumSize,
     return NoFormat;
 }
 
+template<typename T>
+T RoundUpNumber(T number,int16 precision){
+	// what is the magnitude of the correction
+	int16 correctionExponent = -precision;
+
+	// to round up add a correction value just below last visible digit
+	// calculates 0.5 * 10**correctionExponent
+	T correction;
+	FastPowerOf10Private(correction, correctionExponent);
+	correction *= 5.0;
+	number += correction;
+
+	return number; 
+}
+
 /**
  * converts a float/double (or any other equivalent) to a string using whatever format achieves best compact representation
  * bufferSize is the buffer size and includes the space for the 0 terminator
@@ -520,7 +701,7 @@ bool FloatToStream(streamer & stream, // must have a GetC(c) function where c is
         format.padded = false;
     }
 
-    uint8 precision = format.precision;
+    int16 precision = format.precision;
     // on precision 0 the max useful precision is chosen
     if (precision == 0) {
         if (sizeof(T) > 8)
@@ -560,46 +741,70 @@ bool FloatToStream(streamer & stream, // must have a GetC(c) function where c is
         // normalize number
         NormalizeFloatNumberPrivate(positiveNumber, exponent);
 
-        // precision 0 means no significant bits		
-        int16 chosenPrecision = 0;
+        // precision -1 means no significant bits		
+        int16 chosenPrecision = -1;
+        
         // just the space for '?'
         numberSize = 1;
+        
         // assume the worst 
         chosenMode = InsufficientSpaceForFloat;
 
-        int16 testPrecision;
-        uint16 testFormatSize;
+        int16 	testPrecision;
+        uint16 	testFormatSize;
+
         // if selected fixed notation or compact then test effectiveness of fixed 
-        if ((format.floatNotation == Notation::FixedPointNotation)
-                || (format.floatNotation == Notation::CompactNotation)) {
+        if (format.floatNotation == Notation::FixedPointNotation)
+        { 
             // obtain size and associated realizable precision
             testPrecision = precision;
             testFormatSize = NumberOfDigitsFixedNotation(exponent, hasSign,
                                                          testPrecision,
                                                          maximumSize);
+            
+            // if the number fits then precision is >=1
+            if (testPrecision > chosenPrecision) {
+                chosenMode      = FixedFloat;
+                chosenPrecision = testPrecision;
+                numberSize      = testFormatSize;
+            }
+        }
+        
+        
+        // if selected fixed relative notation or compact then test effectiveness of fixed 
+        if ((format.floatNotation == Notation::FixedPointRNotation) || 
+            (format.floatNotation == Notation::CompactNotation)) 
+        {
+            // obtain size and associated realizable precision
+            testPrecision = precision;
+            testFormatSize = NumberOfDigitsFixedRelativeNotation(exponent, hasSign,
+                                                         testPrecision,
+                                                         maximumSize);
 
             // if the number fits then precision is >=1
             if (testPrecision > chosenPrecision) {
-                chosenMode = FixedFloat;
+                chosenMode 		= FixedFloat;
                 chosenPrecision = testPrecision;
-                numberSize = testFormatSize;
+                numberSize 		= testFormatSize;
             }
         }
 
-        if (format.floatNotation == Notation::CompactNotation) {
+        // test against SmartNotation 
+        if ((format.floatNotation == Notation::SmartNotation) ||
+            (format.floatNotation == Notation::CompactNotation)) {
             testPrecision = precision;
             testFormatSize = NumberOfDigitsSmartNotation(exponent, hasSign,
                                                          testPrecision,
                                                          maximumSize);
             if (testPrecision > chosenPrecision) {
-                chosenMode = SmartFloat;
+                chosenMode 		= SmartFloat;
                 chosenPrecision = testPrecision;
-                numberSize = testFormatSize;
+                numberSize 		= testFormatSize;
             }
         }
 
-        if ((format.floatNotation == Notation::EngineeringNotation)
-                || (format.floatNotation == Notation::CompactNotation)) {
+        if ((format.floatNotation == Notation::EngineeringNotation) || 
+            (format.floatNotation == Notation::CompactNotation)) {
             testPrecision = precision;
             testFormatSize = NumberOfDigitsEngineeringNotation(exponent,
                                                                hasSign,
@@ -628,6 +833,65 @@ bool FloatToStream(streamer & stream, // must have a GetC(c) function where c is
 
         // update precision with the achievable value
         precision = chosenPrecision;
+        if (precision == 0){
+            numberSize = 1;
+            chosenMode = ZeroFloat;
+        } 
+        else
+        {
+
+            // apply rounding up     
+            positiveNumber = RoundUpNumber(positiveNumber,precision);
+        
+            // if we have an overflow recalculate numbersize
+            if (positiveNumber >= 10){
+            	positiveNumber /= 10;
+            	exponent++;
+            	precision = format.precision;
+
+                // do round ups    
+                switch (chosenMode) {
+                case FixedFloat: {
+                	if (format.floatNotation == Notation::FixedPointNotation){
+                        numberSize = NumberOfDigitsFixedNotation(exponent, hasSign,
+                                                                     precision,
+                                                                     maximumSize);            	
+                		
+                	} else {
+                		numberSize = NumberOfDigitsFixedRelativeNotation(exponent, hasSign,
+                                                                 precision,
+                                                                 maximumSize);            	
+                	}
+                }
+                    break;
+                case ExponentialFloat: {
+                    numberSize = NumberOfDigitsExponentialNotation(exponent, hasSign,
+                                                                 precision,
+                                                                 maximumSize);            	
+                }
+                    break;
+                case EngineeringFloat: {
+                    numberSize = NumberOfDigitsEngineeringNotation(exponent, hasSign,
+                                                                 precision,
+                                                                 maximumSize);            	
+                }
+                    break;
+                case SmartFloat: {
+                    numberSize = NumberOfDigitsSmartNotation(exponent, hasSign,
+                                                                 precision,
+                                                                 maximumSize);            	
+                }
+                    break;
+                case NoFormat:
+                case InsufficientSpaceForFloat: 
+                case NanFloat: 
+                case InfPFloat:
+                case InfNFloat:
+                case ZeroFloat:
+                    break;
+                }
+            }
+        }
     }
 
     // in case of right alignment
@@ -667,8 +931,6 @@ bool FloatToStream(streamer & stream, // must have a GetC(c) function where c is
 
         // partitions the exponent between engineering part and residual 
         int16 engineeringExponent = ExponentToEngineeringPrivate(exponent);
-
-//printf("%i %i \n",engineeringExponent,exponent)   ;         
 
         // does all the work of conversion but for the sign and special cases
         FloatToFixedPrivate(stream, positiveNumber, exponent, precision);
