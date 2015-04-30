@@ -54,8 +54,13 @@ if (number <= 1E- ## step ## Q){ \
 	number *= 10E ## step ## Q; \
 } 
 
-// exponent is increased or decreased,not set
-// support numbers up to quad precision
+/** @brief Normalize numbers in the form x.xxxxx 10**y, calculating the related exponent y.
+  * @param positiveNumber is the number to normalize.
+  * @param is the exponent in return.
+  *
+  * Exponent is increased or decreased, not set.
+  * Supports numbers up to quad precision. */
+
 template<typename T>
 static inline void NormalizeFloatNumberPrivate(T &positiveNumber,
                                                int16 &exponent) {
@@ -103,8 +108,13 @@ static inline void NormalizeFloatNumberPrivate(T &positiveNumber,
     }
 }
 
-// rapid calculation of 10 to n both positive and negative
-// suports up to quad precision
+
+/** @brief Rapid calculation of 10**x passing the exponent x as argument.
+  * @param output is 10**exponent.
+  * @param exponent is the exponent.
+  * 
+  * Rapid calculation of 10 to n both positive and negative.
+  * Supports up to quad precision. */
 template<typename T>
 static inline void FastPowerOf10Private(T &output, int16 exponent) {
     T radix = 10.0;
@@ -132,7 +142,9 @@ static inline void FastPowerOf10Private(T &output, int16 exponent) {
     }
 }
 
-/// rapid determination of size of exponet part
+/** @brief Rapid determination of size of the exponent.
+  * @param exponent is the exponent parameter.
+  * @return the number of digits for the exponent notation E+n. */
 static inline uint8 NumberOfDigitsOfExponent(int16 exponent) {
     // no exponent!
     if (exponent == 0)
@@ -167,11 +179,13 @@ static inline uint8 NumberOfDigitsOfExponent(int16 exponent) {
     return exponentNumberOfDigits;
 }
 
-/** decompose an exponent into a multiple of 3 and a remainder part
- *  returns the multiple of 3
- *  exponent is modified to be the remiander
- *  original exponent is the sum of the 2 
- */
+/** @brief Decompose an exponent into a multiple of 3 and a remainder part.
+  * @param is the exponent parameter.
+  * @return the the exponent immediately precedent to argument multiple of 3.
+  *
+  * Exponent is modified to be the remainder.
+  * Original exponent is the sum of the two parts. 
+  */
 static inline int16 ExponentToEngineeringPrivate(int16 &exponent) {
     int16 engineeringExponent = 0;
     // if negative we need to bias by 2 so that exp=-1 => eng_exp = -3 and not 0
@@ -189,12 +203,18 @@ static inline int16 ExponentToEngineeringPrivate(int16 &exponent) {
     return engineeringExponent;
 }
 
-// calculate size of fixed numeric representation considering the zeros and the . needed beyond the significative digits 
-// excludes from the size the eventual sign 
-// precision is int16 to allow safe subtraction
-// precision is updated to fit within maximumSize
-// precision is converted into relative format 
-// negative or zero precision means cannot fit
+
+
+/** @brief Calculate the size necessary for the rappresentation in fixed point with precision as the number of decimal digits.
+  * @param exponent is the exponent of the number.
+  * @param hasSign is true if the number is negative.
+  * @param precision is the number of decimal digits.
+  * @param maximumSize is the desired maximum size.
+  * @return the necessary space for the print of the number.
+  *
+  * Calculates size of fixed numeric representation considering the zeros and the . needed beyond the significative digits. 
+  * Precision is int16 to allow safe subtraction and is updated to fit within maximumSize and converted into relative format 
+  * (first significative digits of the number). Negative precision means overflow (? print), zero precision means underflow (0 print). */
 static inline int16 NumberOfDigitsFixedNotation(int16 exponent, bool hasSign,
                                                 int16 & precision,
                                                 int16 maximumSize) {
@@ -258,12 +278,12 @@ static inline int16 NumberOfDigitsFixedNotation(int16 exponent, bool hasSign,
         // no space for adding a single digit and the . exit
         if (spaceLeft < 2) {
 
-            // clip all of the precision expressed by decimals
-            precision -= desiredDecimalDigits;
-
-            // convert precision into relative format
-            precision += exponent;
-            precision++;
+	    if(exponent >=0)
+                //precision remains the integer part size
+		precision = exponent + 1;
+	    else
+                //precision remains 0 because it means underflow (maxSize < 3 in this case)
+		precision = 0;
 
             // just exit here
             return fixedNotationSize;
@@ -307,11 +327,17 @@ static inline int16 NumberOfDigitsFixedNotation(int16 exponent, bool hasSign,
     return fixedNotationSize;
 }
 
-// calculate size of fixed numeric representation considering the zeros and the . needed beyond the significative digits 
-// excludes from the size the eventual sign 
-// precision is int16 to allow safe subtraction
-// precision is updated to fit within maximumSize
-// negative or zero precision means cannot fit
+
+/** @brief Calculates the size necessary for the representation of a number in relative fixed point representation.
+  * @param exponent is the exponent of the number.
+  * @param hasSign is true if the number is negative.
+  * @param precision is the number of the desired first significative digits to print.
+  * @param maxSize is the desired maximum size.
+  * @return the space necessary to print a number in fixed point relative notation.
+  *
+  * Calculate size of fixed numeric representation considering the zeros and the . needed beyond the significative digits 
+  * precision is int16 to allow safe subtraction and is updated to fit within maximumSize. Negative precision means overflow (? print),
+  * zero precision means underflow (0 print). */ 
 static inline int16 NumberOfDigitsFixedRelativeNotation(int16 exponent,
                                                         bool hasSign,
                                                         int16 & precision,
@@ -427,11 +453,17 @@ static inline int16 NumberOfDigitsFixedRelativeNotation(int16 exponent,
     return fixedNotationSize;
 }
 
-// calculate size of smart numeric representation considering the exponent and the desired precision
-// excludes from the size the eventual sign 
-// precision is int16 to allow safe subtraction
-// precision is updated to fit within maximumSize
-// negative or zero precision means cannot fit
+
+
+/** @brief Calculates the size necessary for the representation of a number in exponential representation.
+  * @param exponent is the exponent of the number.
+  * @param hasSign is true if the number is negative.
+  * @param precision is the number of the desired first significative digits to print.
+  * @param maxSize is the desired maximum size.
+  * @return the space necessary to print a number in exponential notation.
+  *
+  * Calculate size of exponential representation considering the zeros and the . needed beyond the significative digits 
+  * precision is int16 to allow safe subtraction and is updated to fit within maximumSize. Negative precision means overflow (? print).*/
 static inline int16 NumberOfDigitsExponentialNotation(int16 exponent,
                                                       bool hasSign,
                                                       int16 &precision,
@@ -453,11 +485,15 @@ static inline int16 NumberOfDigitsExponentialNotation(int16 exponent,
     return exponentNotationSize + mantissaSize;
 }
 
-// calculate size of engineering representation considering the exponent and the desired precision
-// excludes from the size the eventual sign 
-// precision is int16 to allow safe subtraction
-// precision is updated to fit within maximumSize
-// negative or zero precision means cannot fit
+/** @brief Calculates the size necessary for the representation of a number in engineering representation.
+  * @param exponent is the exponent of the number.
+  * @param hasSign is true if the number is negative.
+  * @param precision is the number of the desired first significative digits to print.
+  * @param maxSize is the desired maximum size.
+  * @return the space necessary to print a number in engineering notation.
+  *
+  * Calculate size of engineering representation considering the zeros and the . needed beyond the significative digits 
+  * precision is int16 to allow safe subtraction and is updated to fit within maximumSize. Negative precision means overflow (? print).*/
 static inline int16 NumberOfDigitsEngineeringNotation(int16 exponent,
                                                       bool hasSign,
                                                       int16 &precision,
@@ -485,11 +521,15 @@ static inline int16 NumberOfDigitsEngineeringNotation(int16 exponent,
     return engineeringNotationSize + mantissaSize;
 }
 
-// calculate size of smart numeric representation considering the exponent and the desired precision
-// excludes from the size the eventual sign 
-// precision is int16 to allow safe subtraction
-// precision is updated to fit within maximumSize
-// negative or zero precision means cannot fit
+/** @brief Calculates the size necessary for the representation of a number in smart representation.
+  * @param exponent is the exponent of the number.
+  * @param hasSign is true if the number is negative.
+  * @param precision is the number of the desired first significative digits to print.
+  * @param maxSize is the desired maximum size.
+  * @return the space necessary to print a number in smart notation.
+  *
+  * Calculate size of smart representation considering the zeros and the . needed beyond the significative digits 
+  * precision is int16 to allow safe subtraction and is updated to fit within maximumSize. Negative precision means overflow (? print).*/
 static inline int16 NumberOfDigitsSmartNotation(int16 exponent, bool hasSign,
                                                 int16 &precision,
                                                 int16 maximumSize) {
@@ -522,11 +562,15 @@ static inline int16 NumberOfDigitsSmartNotation(int16 exponent, bool hasSign,
     return smartNotationSize + mantissaSize;
 }
 
-// calculate size of compact numeric representation considering the exponent and the desired precision
-// excludes from the size the eventual sign 
-// precision is int16 to allow safe subtraction
-// precision is updated to fit within maximumSize
-// negative or zero precision means cannot fit
+/** @brief Calculates the size necessary for the representation of a number in compact representation.
+  * @param exponent is the exponent of the number.
+  * @param hasSign is true if the number is negative.
+  * @param precision is the number of the desired first significative digits to print.
+  * @param maxSize is the desired maximum size.
+  * @return the space necessary to print a number in compact notation.
+  *
+  * Calculate size of compact representation considering the zeros and the . needed beyond the significative digits 
+  * precision is int16 to allow safe subtraction and is updated to fit within maximumSize. Negative precision means overflow (? print).*/
 static inline int16 NumberOfDigitsCompactNotation(
 		int16 		exponent, 
 		bool 		hasSign,
@@ -542,10 +586,10 @@ static inline int16 NumberOfDigitsCompactNotation(
     int16 mantissaSize = 0;    
 
     // check if in range for smart replacement of exponent
-    if ((engineeringExponent != 0) && (engineeringExponent <= 24)
-            && (engineeringExponent >= -24)) {
+    if ((engineeringExponent <= 24) && (engineeringExponent >= -24)) {
         // if so the exponent is simply a letter
-        smartNotationSize++;
+	if(engineeringExponent != 0)
+            smartNotationSize++;
 
         // include mantissa size 
         mantissaSize = NumberOfDigitsFixedRelativeNotation(exponentRemainder, hasSign, precision,maximumSize - smartNotationSize);
@@ -569,10 +613,15 @@ static inline int16 NumberOfDigitsCompactNotation(
     return smartNotationSize + mantissaSize;
 }
 
-/* 
- *  Given the format the exponent, the sign and the available size
- *  calculates number size and achievable precision
- */
+/** @brief Calculates the necessary size for the print of the number for each format.
+  * @param notation specifies what is the desired notation.
+  * @param exponent is the exponent of the number.
+  * @param hasSign is true if the number is negative.
+  * @param precision is the desired first significative numbers to print.
+  * @param maximumSize is the desired maximum size.
+  *
+  * Given the format the exponent, the sign and the available size
+  * calculates number size and achievable precision. */
 static inline int16 NumberOfDigitsNotation(
 		Notation::Float notation,
 		int16 			exponent, 
@@ -625,14 +674,15 @@ static inline int16 NumberOfDigitsNotation(
 	
 }
 
-/**
- * converts a couple of positiveNumber/exponent (or any other equivalent) to a string using fixed format
- * positiveNumber is not 0 nor Nan nor Inf and is positive
- * sizeLeft is the buffer size left
- * pBuffer is a writable area of memory of at least sizeLeft
- * precision determines the number of significative digits and is always not 0
- * PURE RELATIVE VERSION
- */
+/** @brief Print the number (without sign and padding) on a generic stream which implements a PutC() function.
+  * @param stream is the generic stream.
+  * @param positiveNumber is the absolute value of the normalized number.
+  * @param exponent is the exponent of the number.
+  * @param precision is the number of first significative digits to print.
+  * @return false only in case of incorrect digits.
+  *
+  * Converts a couple of positiveNumber-exponent to a string using fixed format.
+  * PositiveNumber is not 0 nor Nan nor Inf and is positive, precision should be strictly positive. */
 template<typename T, class streamer>
 bool FloatToFixedPrivate(
 		streamer & 		stream, 
@@ -640,6 +690,11 @@ bool FloatToFixedPrivate(
 		int16 			exponent,
 		int16 			precision) {
 
+
+    if(positiveNumber<0 || positiveNumber>=10){
+	stream.PutC('!');
+	return false;
+    }
     // numbers below 1.0
     // start with a 0.000 until we reach the first non zero digit
     if (exponent < 0) {
@@ -688,9 +743,10 @@ bool FloatToFixedPrivate(
     return true;
 }
 
-/**
- Encodes the exponent in the classical form E+/-nn
- */
+/** @brief Prints the notation E+/-n on a generic stream which implements a PutC() function.
+  * @param stream is the generic stream.
+  * @param exponent is the exponent of the number.
+  */
 template<class streamer>
 static inline void ExponentToStreamPrivate(streamer & stream, int16 exponent) {
     // output exponent if exists
@@ -710,9 +766,13 @@ static inline void ExponentToStreamPrivate(streamer & stream, int16 exponent) {
     }
 }
 
-/**
- Encodes the exponent in the classical form E+/-nn
- */
+/** @brief Implements functions to print the number for each format on a generic stream which implements a PutC() function.
+  * @param notation is the desired notation.
+  * @param stream is the generic stream.
+  * @param normalizedNumber is the normalized number.
+  * @param exponent is the exponent of the number.
+  * @param precision is the number of the first significative digits to print.
+  */
 template<typename T, class streamer>
 bool FloatToStreamPrivate(
 		Notation::Float 	notation,
@@ -766,7 +826,7 @@ bool FloatToStreamPrivate(
             (engineeringExponent >= -24)) 
         {
             static const char *symbols = "yzafpnum KMGTPEZY";
-            stream.PutC(symbols[engineeringExponent / 3 + 6]);
+            stream.PutC(symbols[engineeringExponent / 3 + 8]);
         }
         else 
         {
@@ -782,14 +842,18 @@ bool FloatToStreamPrivate(
         int16 engineeringExponent = ExponentToEngineeringPrivate(exponent);
 
         // check if exponent in correct range
-        if ((engineeringExponent != 0) && (engineeringExponent <= 24) && 
-            (engineeringExponent >= -24)) 
+        if ((engineeringExponent <= 24) && (engineeringExponent >= -24)) 
         {
+		
+ 
             // does all the work of conversion but for the sign and special cases
             FloatToFixedPrivate(stream, normalizedNumber, exponent, precision);
 
+            //Put the symbol only if the engineering exp is different than zero.
+	    if(engineeringExponent != 0){
         	static const char *symbols = "yzafpnum KMGTPEZY";
-            stream.PutC(symbols[engineeringExponent / 3 + 6]);
+                stream.PutC(symbols[engineeringExponent / 3 + 8]);
+	    }
         }
         else 
         {
@@ -808,7 +872,7 @@ bool FloatToStreamPrivate(
 
 
 
-/// to manage the behaviour of the function
+/** @brief A list of avaiable display modalities to manage the behaviour of the function. */
 enum FloatDisplayModes {
     Normal  = 0,
 //    FixedRFloat = 4,
@@ -821,9 +885,10 @@ enum FloatDisplayModes {
     NoFormat = 99
 };
 
-/**
- * performs standard operations for all float representations
- * 
+/** @brief Check if a number is NaN or +/- Inf.
+  * @param number is the number to be checked.
+  * @param maximumSize is the desired maximum size.
+  * @param neededSize returns the size necessary to print NaN or +/- Inf. It is 0 in case of normal number. 
  */
 template<typename T>
 FloatDisplayModes CheckNumber(
@@ -860,6 +925,13 @@ FloatDisplayModes CheckNumber(
     return NoFormat;
 }
 
+
+/** @brief Implements the rounding of the number looking at the precision.
+  * @param number is the normalized number to be rounded.
+  * @param precision is the desired precision for the round. 
+  * @return the rounded number.
+  *
+  * It adds 5 to the first digit after the precision digits. */
 template<typename T>
 T RoundUpNumber(T number, int16 precision) {
     // what is the magnitude of the correction
@@ -876,14 +948,15 @@ T RoundUpNumber(T number, int16 precision) {
 }
 
 
-/**
- * converts a float/double (or any other equivalent) to a string using whatever format achieves best compact representation
- * bufferSize is the buffer size and includes the space for the 0 terminator
- * buffer is a writable area of memory of at least bufferSize
- * returns pointer to the string either within the buffer or (in case of errors or inf/nan) to a const char
- * returns stringSize with the actual length of the string
- * precision determines the number of significative digits
- */
+/** @brief Prints a float (or equivalent) number on a generic stream which implements a PutC() function.
+  * @param stream is a generic stream class.
+  * @param number is the number to print.
+  * @param format specifies the desired format (padding, precision, max size)
+  * @return true.
+  *
+  * In case of incorrect characters a '!' will be printed.
+  * If the number cannot fit in the desired maximum size  because the overflow '?' will be printed, '0' in case of underflow.
+  * It prints NaN in case of nan (i.e 0/0) or +Inf (i.e 1/0) or -Inf (i.e -1/0). */
 template<typename T, class streamer>
 bool FloatToStream(
 		streamer & 			stream, // must have a GetC(c) function where c is of a type that can be obtained from chars  
@@ -943,30 +1016,51 @@ bool FloatToStream(
 
         // work out achievable precision  and number size
     	numberSize = NumberOfDigitsNotation(format.floatNotation,exponent, hasSign, precision, maximumSize);
-//printf ("(%i %i)",numberSize,precision );    	
         
+	//the precision to use after the rounding in case of overflow.
+        int16 maxPrecisionAfterRounding = format.precision;
         // apply rounding up. Remember that for fix point precision is different.
-        if (format.floatNotation == Notation::FixedPointNotation){
+        if (format.floatNotation == Notation::FixedPointNotation || format.floatNotation == Notation::FixedPointRNotation){
         	if (precision >= 0){
-        		positiveNumber = RoundUpNumber(positiveNumber, exponent + precision + 1);
-        	}
+			//If the precision is clipped, it will be clipped again because the size could only increase for fix point after round up.
+			maxPrecisionAfterRounding = format.precision;
+
+			//Round up.
+			positiveNumber = RoundUpNumber(positiveNumber, precision);
+		}
+		//If a fixed point fails, it will fail also after the rounding up, so do nothing.
         }    
         else {
         	if (precision >= 0){
-        		positiveNumber = RoundUpNumber(positiveNumber, precision);
+			//In case of overflow and precision clip it add a digit.
+			maxPrecisionAfterRounding = precision + 1;
+                        
+			//Round up.
+			positiveNumber = RoundUpNumber(positiveNumber, precision);
         	} else {
-        		positiveNumber = RoundUpNumber(positiveNumber, maximumSize);
+			//We enter here only in case of exponential forms.
+
+			//Consider for the approximation precision=1 (i.e 950e3 in format 4.x become 1e6, 949.999 not).
+                        //(or in exp format 9.5e-10 in 4.x format become 1E-9, 9.4e-10 not).
+			maxPrecisionAfterRounding = 2;
+			
+			//Round up at the first decimal number.
+        		positiveNumber = RoundUpNumber(positiveNumber, 1);
         	}
         }
+
+	//Saturate maxPrecisionAfterRounding to format.precision
+	if(maxPrecisionAfterRounding > format.precision)
+		maxPrecisionAfterRounding = format.precision;
+
 
         // if we have an overflow recalculate numbersize and precision
         if (positiveNumber >= 10) {
             positiveNumber /= 10;
             exponent++;
-            precision = format.precision;
+            precision = maxPrecisionAfterRounding;
             // work out achievable precision  and number size
-        	numberSize = NumberOfDigitsNotation(format.floatNotation,exponent, hasSign, precision, maximumSize);
-//printf ("(%i %i)",numberSize,precision );    	
+            numberSize = NumberOfDigitsNotation(format.floatNotation,exponent, hasSign, precision, maximumSize);
             
         }
 
@@ -983,7 +1077,6 @@ bool FloatToStream(
             numberSize = 1;
             chosenMode = InsufficientSpaceForFloat;
         }
-//        printf ("%i %i <<\n",numberSize,precision );    	
 
     }
 
