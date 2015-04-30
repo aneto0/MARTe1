@@ -45,10 +45,10 @@ TEST_F(FloatToStreamGTest,TestExponential) {
     FloatToStreamTest numbertest;
     ASSERT_TRUE(numbertest.TestExponential());
 }
-/*
+
 TEST_F(FloatToStreamGTest,TestCompact) {
     FloatToStreamTest numbertest;
     ASSERT_TRUE(numbertest.TestCompact());
 }
-*/
+
 
