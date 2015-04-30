@@ -182,6 +182,11 @@ bool PlotWindow::Initialise(ConfigurationDataBase &cdbData) {
         signals[i].input->AddSignal(signals[i].signalName.Buffer(),
                                     signals[i].signalType.Buffer());
         signals[i].numberOfSamplesPerCycle = signals[i].input->BufferWordSize(); // This works only because we have one input interface per signal
+		//Double is two words...
+		if (signals[i].signalType == "double") {
+			signals[i].numberOfSamplesPerCycle = signals[i].numberOfSamplesPerCycle / 2;		
+		}
+
 
         if (i < totalNumberOfSignals - 1) {
             title.Printf("'%s',", signals[i].signalName.Buffer());
@@ -200,6 +205,11 @@ bool PlotWindow::Initialise(ConfigurationDataBase &cdbData) {
             signals[i].numberOfBytesPerBuffer =
                     signals[i].numberOfSamplesPerCycle * sizeof(float);
             signals[i].signalTypeMask = TYPE_FLOAT;
+        }
+        else if (signals[i].signalType == "double") {
+            signals[i].numberOfBytesPerBuffer =
+                    signals[i].numberOfSamplesPerCycle * sizeof(double);
+            signals[i].signalTypeMask = TYPE_DOUBLE;
         }
         else if (signals[i].signalType == "int32") {
             signals[i].numberOfBytesPerBuffer =
@@ -263,12 +273,17 @@ bool PlotWindow::Initialise(ConfigurationDataBase &cdbData) {
                             + n * signals[i].numberOfBytesPerBuffer);
                     (*incrementDataPtr)=0;
                 }
-                if (signals[i].signalTypeMask == TYPE_FLOAT) {
+                else if (signals[i].signalTypeMask == TYPE_DOUBLE) {
+                    double* incrementDataPtr = (double *) (signals[i].buffer2plot
+                            + n * signals[i].numberOfBytesPerBuffer);
+                    (*incrementDataPtr)=0;
+                }
+                else if (signals[i].signalTypeMask == TYPE_FLOAT) {
                     float* incrementDataPtr = (float*) (signals[i].buffer2plot
                             + n * signals[i].numberOfBytesPerBuffer);
                     (*incrementDataPtr)=0;
                 }
-                if (signals[i].signalTypeMask == TYPE_UINT32) {
+                else if (signals[i].signalTypeMask == TYPE_UINT32) {
                     uint32* incrementDataPtr = (uint32*) (signals[i].buffer2plot
                             + n * signals[i].numberOfBytesPerBuffer);
                     (*incrementDataPtr)=0;
@@ -294,12 +309,17 @@ bool PlotWindow::Execute(GAM_FunctionNumbers execFlag) {
                             + n * signals[i].numberOfBytesPerBuffer);
                     (*incrementDataPtr)=0;
                 }
-                if (signals[i].signalTypeMask == TYPE_FLOAT) {
+                else if (signals[i].signalTypeMask == TYPE_FLOAT) {
                     float* incrementDataPtr = (float*) (signals[i].buffer2plot
                             + n * signals[i].numberOfBytesPerBuffer);
                     (*incrementDataPtr)=0;
                 }
-                if (signals[i].signalTypeMask == TYPE_UINT32) {
+                else if (signals[i].signalTypeMask == TYPE_DOUBLE) {
+                    double *incrementDataPtr = (double *) (signals[i].buffer2plot
+                            + n * signals[i].numberOfBytesPerBuffer);
+                    (*incrementDataPtr)=0;
+                }
+                else if (signals[i].signalTypeMask == TYPE_UINT32) {
                     uint32* incrementDataPtr = (uint32*) (signals[i].buffer2plot
                             + n * signals[i].numberOfBytesPerBuffer);
                     (*incrementDataPtr)=0;
@@ -353,12 +373,16 @@ bool PlotWindow::Execute(GAM_FunctionNumbers execFlag) {
                 if (signals[i].signalTypeMask == TYPE_INT32)
                     n = (int32) ((*(((int32*) (signals[i].input->Buffer())))
                             - xLimits[0]) / granularity);
-                if (signals[i].signalTypeMask == TYPE_UINT32)
+                else if (signals[i].signalTypeMask == TYPE_UINT32)
                     n = (int32) ((*(((uint32*) (signals[i].input->Buffer())))
                             - xLimits[0]) / granularity);
-                if (signals[i].signalTypeMask == TYPE_FLOAT)
+                else if (signals[i].signalTypeMask == TYPE_FLOAT)
                     n = (int32) ((*(((float*) (signals[i].input->Buffer())))
                             - xLimits[0]) / granularity);
+                else if (signals[i].signalTypeMask == TYPE_DOUBLE)
+                    n = (int32) ((*(((double*) (signals[i].input->Buffer())))
+                            - xLimits[0]) / granularity);
+
 
                 //If data falls out of range, intervals are the bounds.
                 if (n < 0) {
@@ -374,12 +398,17 @@ bool PlotWindow::Execute(GAM_FunctionNumbers execFlag) {
                             + n * signals[i].numberOfBytesPerBuffer);
                     (*incrementDataPtr)++;
                 }
-                if (signals[i].signalTypeMask == TYPE_FLOAT) {
+                else if (signals[i].signalTypeMask == TYPE_FLOAT) {
                     float* incrementDataPtr = (float*) (signals[i].buffer2plot
                             + n * signals[i].numberOfBytesPerBuffer);
                     (*incrementDataPtr)++;
                 }
-                if (signals[i].signalTypeMask == TYPE_UINT32) {
+                else if (signals[i].signalTypeMask == TYPE_DOUBLE) {
+                    double *incrementDataPtr = (double *) (signals[i].buffer2plot
+                            + n * signals[i].numberOfBytesPerBuffer);
+                    (*incrementDataPtr)++;
+                }
+                else if (signals[i].signalTypeMask == TYPE_UINT32) {
                     uint32* incrementDataPtr = (uint32*) (signals[i].buffer2plot
                             + n * signals[i].numberOfBytesPerBuffer);
                     (*incrementDataPtr)++;
@@ -420,7 +449,7 @@ bool PlotWindow::AppendJsDataString(FString &jsDataString) {
                     jsDataString.Printf(
                             "%f",
                             (float) (yAxisScaleFactor
-                                    * *((float *) (signals[i].buffer2plot) + j)));
+                                * *((float *) (signals[i].buffer2plot) + j)));
                 }
                 else if (yAxisScaleMask == YSCALE_LOG10) {
 
@@ -430,16 +459,49 @@ bool PlotWindow::AppendJsDataString(FString &jsDataString) {
                     float value = (float) (yAxisScaleFactor
                             * *((float *) (signals[i].buffer2plot) + j));
 
-		    if(value < -1) {
+                    if(value < -1) {
                         value=-log10f(-value);
                         jsDataString.Printf("%f", value);
-		    }
-		    else {
+                    }
+                    else {
                         if (value > 1) {
-			    value=log10f(value);
+                            value=log10f(value);
                             jsDataString.Printf("%f", value);
                         }	    
-                    //In case of log10 y-axis, if y=0 the y-value remains to zero (also if it should be -inf)
+                        //In case of log10 y-axis, if y=0 the y-value remains to zero (also if it should be -inf)
+                        else {
+                            value = 0.0;
+                            jsDataString.Printf("%f", value);
+                        }
+                    }
+#endif
+                }
+            }
+            else if (signalTypeState == TYPE_DOUBLE) {
+                if (yAxisScaleMask == YSCALE_LINEAR) {
+                    jsDataString.Printf(
+                            "%lf",
+                            (double) (yAxisScaleFactor
+                                * *((double *) (signals[i].buffer2plot) + j)));
+                }
+                else if (yAxisScaleMask == YSCALE_LOG10) {
+
+#if (defined (_VXWORKS))
+                    jsDataString.Printf("%f", log10((double)(yAxisScaleFactor * *((double *)(signals[i].buffer2plot)+j))));
+#else
+                    double value = (double) (yAxisScaleFactor
+                            * *((double *) (signals[i].buffer2plot) + j));
+
+                    if(value < -1) {
+                        value=-log10f(-value);
+                        jsDataString.Printf("%f", value);
+                    }
+                    else {
+                        if (value > 1) {
+                            value=log10f(value);
+                            jsDataString.Printf("%f", value);
+                        }	    
+                        //In case of log10 y-axis, if y=0 the y-value remains to zero (also if it should be -inf)
                         else {
                             value = 0.0;
                             jsDataString.Printf("%f", value);

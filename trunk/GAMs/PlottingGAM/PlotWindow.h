@@ -33,6 +33,7 @@ const uint32 TYPE_NONE = 0x0;
 const uint32 TYPE_FLOAT = 0x1;
 const uint32 TYPE_INT32 = 0x2;
 const uint32 TYPE_UINT32 = 0x4;
+const uint32 TYPE_DOUBLE = 0x8;
 
 const uint32 YSCALE_LINEAR = 0x0;
 const uint32 YSCALE_LOG10 = 0x1;
