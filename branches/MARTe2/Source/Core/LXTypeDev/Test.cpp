@@ -199,50 +199,122 @@ public:
 	
 }myStream;
 
+template <typename T> void Test_FloatToStream2(T number, int size = 12){
+
+	FormatDescriptor	format;
+	const char *pFormat;
+	int spacing = size;
+
+	while (size > 0){
+		pFormat= "- f";	
+		format.InitialiseFromString(pFormat);	
+		format.size = size;
+		format.precision = 0;
+		putchar('>');		
+		FloatToStream(myStream,number,format);
+		putchar('<');
+		for (int i=size;i<spacing; i++) putchar(' ');		
+		
+		pFormat= "- F";	
+		format.InitialiseFromString(pFormat);	
+		format.size = size;
+		format.precision = 0;
+		putchar('>');		
+		FloatToStream(myStream,number,format);
+		putchar('<');		
+		for (int i=size;i<spacing; i++) putchar(' ');		
+
+		pFormat = "- e";	
+		format.InitialiseFromString(pFormat);	
+		format.size = size;
+		format.precision = 0;
+		putchar('>');		
+		FloatToStream(myStream,number,format);
+		putchar('<');		
+		for (int i=size;i<spacing; i++) putchar(' ');		
+		
+		pFormat = "- E";	
+		format.InitialiseFromString(pFormat);
+		format.size = size;
+		format.precision = 0;
+		putchar('>');		
+		FloatToStream(myStream,number,format);
+		putchar('<');		
+		for (int i=size;i<spacing; i++) putchar(' ');		
+
+		pFormat = "- g";	
+		format.InitialiseFromString(pFormat);	
+		format.size = size;
+		format.precision = 0;
+		putchar('>');		
+		FloatToStream(myStream,number,format);
+		putchar('<');		
+		for (int i=size;i<spacing; i++) putchar(' ');		
+		
+		pFormat = "- G";	
+		format.InitialiseFromString(pFormat);	
+		format.size = size;
+		format.precision = 0;
+		putchar('>');		
+		FloatToStream(myStream,number,format);
+		putchar('<');		
+		
+		size--;
+		putchar('\n');	
+	}
+	
+}
+
 template <typename T> void Test_FloatToStream(T number, int size = 12){
 
 	FormatDescriptor	format;
 	const char *pFormat;
 	
 	for (int i = 0;i<32;i++){
-		pFormat= " 12.7f";	
+		pFormat= " f";	
 		format.InitialiseFromString(pFormat);	
 		format.size = size;
+		format.precision = 7;
 		putchar('>');		
 		FloatToStream(myStream,number,format);
 		putchar('<');		
 		
-		pFormat= "- 12.7F";	
+		pFormat= "- F";	
 		format.InitialiseFromString(pFormat);	
 		format.size = size;
+		format.precision = 7;
 		putchar('>');		
 		FloatToStream(myStream,number,format);
 		putchar('<');		
 
-		pFormat = " 11.7e";	
+		pFormat = " e";	
 		format.InitialiseFromString(pFormat);	
 		format.size = size;
+		format.precision = 7;
 		putchar('>');		
 		FloatToStream(myStream,number,format);
 		putchar('<');		
 		
-		pFormat = "- 11.7E";	
+		pFormat = "- E";	
 		format.InitialiseFromString(pFormat);
 		format.size = size;
+		format.precision = 7;
 		putchar('>');		
 		FloatToStream(myStream,number,format);
 		putchar('<');		
 
-		pFormat = " 11.7g";	
+		pFormat = " g";	
 		format.InitialiseFromString(pFormat);	
 		format.size = size;
+		format.precision = 7;
 		putchar('>');		
 		FloatToStream(myStream,number,format);
 		putchar('<');		
 		
-		pFormat = " 11.7G";	
+		pFormat = " G";	
 		format.InitialiseFromString(pFormat);	
 		format.size = size;
+		format.precision = 7;
 		putchar('>');		
 		FloatToStream(myStream,number,format);
 		putchar('<');		
@@ -286,8 +358,29 @@ template <typename T> void Test_IntegerToStream(T n){
 	}
 }
 
+
+
 int main(int argc, char **argv){
 
+	if (debug){
+		FormatDescriptor	format;
+		const char *pFormat;
+		double nnn = 9.9E-0;
+		pFormat = "2e";	
+		format.InitialiseFromString(pFormat);
+		FloatToStream(myStream,nnn,format);
+		return 0;
+	}
+	
+	putchar('\n');	
+	double nn0 = 9.94560995409945;
+	Test_FloatToStream2(nn0,20);
+
+	putchar('\n');	
+	double nn1 = 99456.0995409945;
+	Test_FloatToStream2(nn1,20);
+
+	
 	putchar('\n');	
 	double n0 = 9999995054321000;
 	Test_FloatToStream(n0);
