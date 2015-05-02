@@ -613,7 +613,6 @@ static inline int16 NumberOfDigitsCompactNotation(
     
     }
 
-
     // does not fit
     if (precision <= 0) {
         return 1;

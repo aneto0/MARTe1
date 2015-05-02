@@ -332,20 +332,21 @@ static inline void Number2StreamDecimalNotationPrivate(streamer &s, T positiveNu
 	}
 
 	// 16 bit code 
-	if (sizeof(T)<=2){ 
+	if (sizeof(T)<=2){
 		// sufficient for  a 16 - 8 bit number NO terminator needed
 		char buffer[5]; 
 
-		uint8 index = sizeof(buffer)-1;
+		int index = sizeof(buffer)-1;
+	
 		// if not zero extract digits backwards
-		while (positiveNumber > 0){
+		do {
 			uint8 digit    = positiveNumber % 10;
 			positiveNumber = positiveNumber / 10;
 			buffer[index--] = '0' + digit;
-		}
+		} while(positiveNumber > 0);
 		
 		// first fill in all necessary zeros 
-		uint8 i= 0;		
+		int i = 0;		
 		if (numberFillLength > 0){
 			// clamp to 5
 			if (numberFillLength > 5)numberFillLength = 5;
@@ -357,6 +358,13 @@ static inline void Number2StreamDecimalNotationPrivate(streamer &s, T positiveNu
 	}
 }
 
+template <class streamer>
+static inline void PutS(streamer & stream,const char *s){
+	while (*s != 0){
+		stream.PutC(*s);
+		*s++;
+	}
+}
 
 /** @brief Prints an integer number on a general stream in decimal notation.
   * @param stream is a general stream class which implements a PutC() function.
@@ -379,6 +387,9 @@ bool IntegerToStreamDecimalNotation(
 			bool 			addPositiveSign		= false)   // prepend with + not just with - for negative numbers
 {
 
+	// if no limits set the numberSize as big enough for the largest integer
+	if (maximumSize==0) maximumSize=20;
+	
 	// put here the unsigned version of the number
 	T positiveNumber;
 	// put here the total space needed for the number
@@ -389,17 +400,39 @@ bool IntegerToStreamDecimalNotation(
 	if (number < 0) {
 		positiveNumber = -number;
 		numberSize++;
+		
 	} else {
 		// if positive copy it and account for the '+' in the size if addPositiveSign set
 		positiveNumber = number;
 		if (addPositiveSign) numberSize++;
 	}
 
-	// add the number of figures beyond the first 
-	numberSize += GetOrderOfMagnitude(positiveNumber);
-
-	// if no limits set the numberSize as the limit
-	if (maximumSize==0) maximumSize=numberSize;
+	// 0x800000....
+	if (positiveNumber < 0){
+		if ((sizeof(T)==8) && (maximumSize >= 20 )){
+			PutS(stream,"-9223372036854775808");
+			return true;
+		}
+		if ((sizeof(T)==4) && (maximumSize >= 10 )){
+			PutS(stream,"-2147483648");
+			return true;
+		}
+		if ((sizeof(T)==2) && (maximumSize >= 6 )){
+			PutS(stream,"-32768");
+			return true;
+		}
+		if ((sizeof(T)==1) && (maximumSize >= 4 )){
+			PutS(stream,"-128");
+			return true;
+		}			
+		
+		// does not fit
+		numberSize = maximumSize+1; 
+	} else {
+	
+		// add the number of figures beyond the first 
+		numberSize += GetOrderOfMagnitude(positiveNumber);
+	}
 
     // is there enough space for the number?
 	if (maximumSize < numberSize){
@@ -420,8 +453,9 @@ bool IntegerToStreamDecimalNotation(
 		if (padded && !leftAligned){
 			for (int i=numberSize;i < maximumSize;i++) stream.PutC(' ');
 		}
+
 		// add sign 
-		if (number < 0)      stream.PutC('-');
+		if (number <  0)     stream.PutC('-');
 		else 
         if (addPositiveSign) stream.PutC('+');
 
@@ -796,7 +830,6 @@ bool IntegerToStream(
 		streamer &			stream, 
 		T 					number,
 		FormatDescriptor	format){
-
 	switch (format.binaryNotation){
 	case Notation::DecimalNotation:{
 		return IntegerToStreamDecimalNotation(stream,number,format.size,format.padded,format.leftAligned,format.fullNotation);

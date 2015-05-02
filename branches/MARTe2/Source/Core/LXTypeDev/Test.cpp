@@ -2,6 +2,7 @@
 #include "FormatDescriptor.h"
 #include "FloatToStream.h"
 #include "IntegerToStream.h"
+#include "IntegerToInteger.h"
 
 /*
 #include "TypeConversion.h"
@@ -362,6 +363,73 @@ template <typename T> void Test_IntegerToStream(T n){
 
 int main(int argc, char **argv){
 
+	
+	
+	if (1){
+		
+		FormatDescriptor	format,format2;
+		const char *pFormat;
+		pFormat = "#0x";	
+		format.InitialiseFromString(pFormat);
+		pFormat = "0x";	
+		format2.InitialiseFromString(pFormat);
+/*		
+		int64 n = 0x0000123456780000;		
+		IntegerToStream(myStream,n,format);
+		putchar('\n');		
+		
+		DoubleInteger<uint32> pippo((uint32*)&n);
+		IntegerToStream(myStream,pippo.upper,format);
+		IntegerToStream(myStream,pippo.lower,format2);
+		putchar('\n');		
+		
+		n >>= 7;
+		IntegerToStream(myStream,n,format);
+		putchar('\n');		
+		
+		pippo >>= 7;	
+		IntegerToStream(myStream,pippo.upper,format);
+		IntegerToStream(myStream,pippo.lower,format2);
+		putchar('\n');		
+
+		pippo = (int64)0x123456789A;
+		IntegerToStream(myStream,pippo.upper,format);
+		IntegerToStream(myStream,pippo.lower,format2);
+		putchar('\n');		
+*/		
+		int64 destination[5] =   { 0,0,0};                    
+		int64 source[5] =   { 0x13579BDF02468ACE,0x13579BDF02468ACE,0x123456789ABCDEF0,0xDEADBABEBAB00111,0xABBA00CACCA00123};
+		PutS(myStream,"source      = ");
+		IntegerToStream(myStream,source[4],format);
+		IntegerToStream(myStream,source[3],format2);
+		IntegerToStream(myStream,source[2],format2);
+		IntegerToStream(myStream,source[1],format2);
+		IntegerToStream(myStream,source[0],format2);
+		putchar('\n');		
+		
+		uint8 *p= (uint8 *)&source[0];
+		uint8 pShift=8;
+		uint8 pSize=66;
+		uint8 *q= (uint8 *)&destination[0];
+		uint8 qShift=0;
+		uint8 qSize=pSize;
+		for (int i = 0;i<1;i++){
+			IntegerToInteger(q,qShift,qSize,false,p,pShift,pSize,false);
+			PutS(myStream,"destination = ");
+			IntegerToStream(myStream,destination[4],format);
+			IntegerToStream(myStream,destination[3],format2);
+			IntegerToStream(myStream,destination[2],format2);
+			IntegerToStream(myStream,destination[1],format2);
+			IntegerToStream(myStream,destination[0],format2);
+			putchar('\n');		
+//printf("sourc shift=%i address=%i\n",pShift,(int)(p-(uint8 *)&source[0]));
+//printf("dest  shift=%i address=%i\n",qShift,(int)(q-(uint8 *)&destination[0]));
+		}
+		
+		return 0;
+	}
+	
+	
 	if (debug){
 		FormatDescriptor	format;
 		const char *pFormat;
