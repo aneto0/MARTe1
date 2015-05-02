@@ -104,7 +104,13 @@ static inline void BSToBS(
 					// 0x8000.. is the maximum negative
 					sourceCopy = destinationSignMask;
 				}					
-			} 
+			} else { // smaller to larger sign extension needed
+				// maks has all the bits that will be added
+				T mask = destinationMask - sourceMask ;
+				// it already had a sign bit, now we extend it to the full destination size
+				sourceCopy |= mask;
+				
+			}
 		}			
 	} else {
 		// 0xFFF.. is the max value for unsigned
