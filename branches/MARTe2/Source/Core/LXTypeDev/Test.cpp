@@ -397,6 +397,60 @@ int main(int argc, char **argv){
 		IntegerToStream(myStream,pippo.lower,format2);
 		putchar('\n');		
 */		
+/*		
+		DoubleInteger<uint64> dd;
+		dd=0x123456789ABCDEF0;
+		dd=0;
+		IntegerToStream(myStream,dd.upper,format);
+		IntegerToStream(myStream,dd.lower,format2);
+		putchar('\n');		
+		dd=~dd;
+		IntegerToStream(myStream,dd.upper,format);
+		IntegerToStream(myStream,dd.lower,format2);
+		putchar('\n');		
+		dd>>=33;
+		IntegerToStream(myStream,dd.upper,format);
+		IntegerToStream(myStream,dd.lower,format2);
+		putchar('\n');		
+		dd>>=33;
+		IntegerToStream(myStream,dd.upper,format);
+		IntegerToStream(myStream,dd.lower,format2);
+		putchar('\n');		
+		dd<<=33;
+		IntegerToStream(myStream,dd.upper,format);
+		IntegerToStream(myStream,dd.lower,format2);
+		putchar('\n');		
+		dd<<=33;
+		IntegerToStream(myStream,dd.upper,format);
+		IntegerToStream(myStream,dd.lower,format2);
+		putchar('\n');		
+		return 0;
+*/		
+/*
+		{
+			uint64 upper = 0x123456789ABCDEF0;
+			uint64 lower = 0x0FEDCBA987654321;
+			IntegerToStream(myStream,upper,format);
+			IntegerToStream(myStream,lower,format2);
+			putchar('\n');		
+			
+			uint8 shift = 1;
+			uint8 bitSize = 64;
+			lower = lower >> shift;
+			uint64 tmp = upper << (bitSize-shift);
+			IntegerToStream(myStream,tmp,format);
+			putchar('\n');		
+			
+			lower |= tmp;
+			upper = upper >> shift;
+
+			IntegerToStream(myStream,upper,format);
+			IntegerToStream(myStream,lower,format2);
+			putchar('\n');		
+			
+			return 0;
+		}
+*/		
 		int64 destination[5] =   { 0,0,0};                    
 		int64 source[5] =   { 0x13579BDF02468ACE,0x13579BDF02468ACE,0x123456789ABCDEF0,0xDEADBABEBAB00111,0xABBA00CACCA00123};
 		PutS(myStream,"source      = ");
@@ -407,14 +461,15 @@ int main(int argc, char **argv){
 		IntegerToStream(myStream,source[0],format2);
 		putchar('\n');		
 		
-		uint8 *p= (uint8 *)&source[0];
-		uint8 pShift=8;
-		uint8 pSize=66;
-		uint8 *q= (uint8 *)&destination[0];
+		uint64 *p= (uint64 *)&source[0];
+		uint8 pShift=0;
+		uint8 pSize=59;
+		uint64 *q= (uint64 *)&destination[0];
 		uint8 qShift=0;
 		uint8 qSize=pSize;
-		for (int i = 0;i<1;i++){
-			IntegerToInteger(q,qShift,qSize,false,p,pShift,pSize,false);
+		for (int i = 0;i<6;i++){
+			
+			BitSetToBitSet(q,qShift,qSize,false,p,pShift,pSize,false);
 			PutS(myStream,"destination = ");
 			IntegerToStream(myStream,destination[4],format);
 			IntegerToStream(myStream,destination[3],format2);
@@ -429,7 +484,7 @@ int main(int argc, char **argv){
 		return 0;
 	}
 	
-	
+/*	
 	if (debug){
 		FormatDescriptor	format;
 		const char *pFormat;
@@ -439,7 +494,7 @@ int main(int argc, char **argv){
 		FloatToStream(myStream,nnn,format);
 		return 0;
 	}
-	
+*/	
 	putchar('\n');	
 	double nn0 = 9.94560995409945;
 	Test_FloatToStream2(nn0,20);

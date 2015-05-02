@@ -938,7 +938,7 @@ FloatDisplayModes CheckNumber(
     return NoFormat;
 }
 
-const bool debug = false;
+//const bool debug = false;
 
 /** @brief Implements the rounding of the number looking at the precision.
   * @param number is the normalized number to be rounded.
@@ -1036,12 +1036,12 @@ bool FloatToStream(
         // normalize number
         NormalizeFloatNumberPrivate(positiveNumber, exponent);
 
-if (debug)printf ("normN = %f exp =%i prec= %i\n",positiveNumber,exponent,precision);
+//if (debug)printf ("normN = %f exp =%i prec= %i\n",positiveNumber,exponent,precision);
 
         // work out achievable precision  and number size
     	numberSize = NumberOfDigitsNotation(format.floatNotation,exponent, hasSign, precision, maximumSize);
         
-if (debug)printf ("Nsize = %i prec= %i\n",numberSize,precision);
+//if (debug)printf ("Nsize = %i prec= %i\n",numberSize,precision);
     	
 		//the precision to use after the rounding in case of overflow.
         int16 maxPrecisionAfterRounding = format.precision;
@@ -1065,7 +1065,7 @@ if (debug)printf ("Nsize = %i prec= %i\n",numberSize,precision);
                         
         		//Round up.
         		positiveNumber = RoundUpNumber(positiveNumber, precision);
-if (debug)printf ("roundN = %f maxP = %i\n",positiveNumber,maxPrecisionAfterRounding);
+//if (debug)printf ("roundN = %f maxP = %i\n",positiveNumber,maxPrecisionAfterRounding);
         	} else {
         		//We enter here only in case of exponential forms.
         		
@@ -1075,7 +1075,7 @@ if (debug)printf ("roundN = %f maxP = %i\n",positiveNumber,maxPrecisionAfterRoun
 			
         		//Round up at the first decimal number.
         		positiveNumber = RoundUpNumber(positiveNumber, 1);
-if (debug)printf ("roundN = %f \n",positiveNumber);
+//if (debug)printf ("roundN = %f \n",positiveNumber);
         		
         	}
         }
@@ -1088,11 +1088,11 @@ if (debug)printf ("roundN = %f \n",positiveNumber);
        	
             precision = maxPrecisionAfterRounding;
 
-if (debug)printf ("2nd normN = %f exp =%i prec= %i\n",positiveNumber,exponent,precision);
+//if (debug)printf ("2nd normN = %f exp =%i prec= %i\n",positiveNumber,exponent,precision);
 
             // work out achievable precision  and number size
             numberSize = NumberOfDigitsNotation(format.floatNotation,exponent, hasSign, precision, maximumSize);
-if (debug)printf ("2nd Nsize = %i prec= %i\n",numberSize,precision);
+//if (debug)printf ("2nd Nsize = %i prec= %i\n",numberSize,precision);
             
         }
         

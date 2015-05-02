@@ -362,7 +362,7 @@ template <class streamer>
 static inline void PutS(streamer & stream,const char *s){
 	while (*s != 0){
 		stream.PutC(*s);
-		*s++;
+		s++;
 	}
 }
 
