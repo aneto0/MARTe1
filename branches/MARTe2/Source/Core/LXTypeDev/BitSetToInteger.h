@@ -23,7 +23,7 @@
 **/
 /**
  * @file 
- * @brief Functions to print integer numbers on generic streams.
+ * @brief Functions to convert range of bits among each other.
 */
 #if !defined BITSET_TO_INTEGER
 #define BITSET_TO_INTEGER
@@ -33,9 +33,12 @@
 #include <math.h>
 #include "DoubleInteger.h"
 
-
+/**BitSet to BitSet
+ * for private use only
+ * T must be chosen correctly to avoid overflows
+*/
 template <typename T>
-void BSToBS(
+static inline void BSToBS(
     T *&                destination,
     uint8  &            destinationBitShift,
     uint8               destinationBitSize,
@@ -45,29 +48,41 @@ void BSToBS(
     uint8               sourceBitSize,
     bool                sourceIsSigned)
 {
-	
+	// how many bits in T
 	uint8 dataSize = sizeof(T)*8;
 	
+	// calculate mask covering range of input bits (starting from bit 0)
 	T sourceMask           = 0 ;
+	// all FFFFF....
 	sourceMask 			   =~sourceMask;
+	// shift FFFF.. to cover just the number bit size
 	sourceMask 			   >>= (dataSize - sourceBitSize);
 	
+	// calculate mask covering range of output bits (starting from bit 0)
 	T destinationMask      = 0;
 	destinationMask 	   =~destinationMask;
 	destinationMask 	   >>= (dataSize - destinationBitSize);
-	
+
+	// mask pinpointing sign bit (starting from bit 0)
 	T sourceSignMask       = 1;
 	sourceSignMask         <<= (sourceBitSize - 1);
 	
+	// mask pinpointing sign bit (starting from bit 0)
 	T destinationSignMask  = 1;
 	destinationSignMask    <<= (destinationBitSize - 1);
 	
+	// here we put the number while processing it
 	T sourceCopy;
 	
+	// copy
 	sourceCopy = *source;
+	// shift number so LSB at bit 0
+	// removes lower bits
 	sourceCopy >>= sourceBitShift;	
+	// mask out upper bits
 	sourceCopy &= sourceMask;
-
+	
+	// extract sign bit
 	T signBit = sourceCopy & sourceSignMask;
 	
 	// is negative if it has sign and last bit is 1
@@ -77,9 +92,10 @@ void BSToBS(
 	if (sourceIsNegative ){
 		// if destination is not signed saturates to 0
 		if (!destinationIsSigned){
+			// saturate to 0
 			sourceCopy = 0;
 		} else {
-			// if I need to squeeze 
+			// if I need to squeeze a larger number into a smaller 
 			if (sourceBitSize > destinationBitSize){
 				// create a mask of bits covering the bits where source exceeds destination 
 				T mask = sourceMask - destinationMask;
@@ -102,15 +118,17 @@ void BSToBS(
 			sourceCopy = maxPositiveValue;					
 		}
 	}
-	
+	// move the bits into output position
 	sourceCopy <<= destinationBitShift;
-	
+	// shift mask as well
 	destinationMask <<= destinationBitShift;
-	
+	// complementary mask- to erase all bits in destination range
 	destinationMask = ~destinationMask;
+	// use destinationMask to hold the current value at destination after masking 
 	destinationMask &= *destination;
+	// merge into sourceCopy
 	sourceCopy |= destinationMask;
-	
+	// finally write result
 	*destination = sourceCopy;  
 
 }
@@ -120,8 +138,10 @@ void BSToBS(
  * located at address source and bitAddress sourceBitShift
  * into an integer of bitSize destinationBitSize 
  * located at address destination and bitAddress destinationBitShift
- * 
- * T must be of byte size power of 2 (8,16,32,64,128...) not 24 48 etc...
+ * destination and source must be of the same type T 
+ * T must be unsigned int of byte size power of 2 (8,16,32,64,128...) not 24 48 etc...
+ * T determines the minimum number size used for the operations
+ * T=uint8 means that any number may be used
  */
 template <typename T>
 static inline bool BitSetToBitSet(
@@ -135,9 +155,12 @@ static inline bool BitSetToBitSet(
         bool                sourceIsSigned)
 {
 	
-	
+	// calculates granularity as bits
 	int16 granularity      = sizeof(T) * 8;
+	// mask to eliminate multiples of granularity - 
+	// granularity must be a power of 2 
 	int16 granularityMask  = granularity - 1;
+	// exponent of the power of 2 that is granularity 
 	int16 granularityShift = 3;
 	int16 temp = sizeof(T);
 	while (temp > 1){
@@ -145,47 +168,60 @@ static inline bool BitSetToBitSet(
 		temp >>=1;
 	}
 		
+	// normalise sourceBitShift so that  0<sourceBitShift<granularity
+	// adjusts source pointer
 	if (sourceBitShift >= granularity){
 		source += (sourceBitShift >> granularityShift);
 		sourceBitShift &= granularityMask;
 	} 
+	// normalise destinationBitShift so that  0<destinationBitShift<granularity
+	// adjusts destination pointer
 	if (destinationBitShift >= granularity){
 		destination += (destinationBitShift >> granularityShift);
 		destinationBitShift &= granularityMask;
 	}
 
-	
+	// work out range of bits involved 
+	// for source 
 	int sourceBitEnd      =  sourceBitShift     +destinationBitSize;
+	// and for destination
 	int destinationBitEnd =  destinationBitShift+sourceBitSize;
 	
+	// check number able to accomodate in full both input and output numbers 
+	// and is big than granularity
 	if ((sourceBitEnd < 8) && (destinationBitEnd < 8) && (granularity == 8)){
-
+		// if 8 is fine then operate with 8 bit integers
 		uint8 *destination8 = (uint8 *)destination;
 		uint8 *source8      = (uint8 *)source;
 
 		BSToBS(destination8,destinationBitShift,destinationBitSize,destinationIsSigned,source8,sourceBitShift,sourceBitSize,sourceIsSigned);	
 		
 	} else if ((sourceBitEnd < 16) && (granularity <= 16)){
+		// if 16 is fine then operate with 16 bit integers
 		uint16 *destination16 = (uint16 *)destination;
 		uint16 *source16      = (uint16 *)source;
 
 		BSToBS(destination16,destinationBitShift,destinationBitSize,destinationIsSigned,source16,sourceBitShift,sourceBitSize,sourceIsSigned);
 			
 	} else if ((sourceBitEnd < 32) && (granularity <= 32)){
+		// if 32 is fine then operate with 32 bit integers
 		uint32 *destination32 = (uint32 *)destination;
 		uint32 *source32      = (uint32 *)source;
 
 		BSToBS(destination32,destinationBitShift,destinationBitSize,destinationIsSigned,source32,sourceBitShift,sourceBitSize,sourceIsSigned);
 	
 	} else if ((sourceBitEnd < 64) && (granularity <= 64)){
+		// if 64 is fine then operate with 64 bit integers
 		uint64 *destination64 = (uint64 *)destination;
 		uint64 *source64      = (uint64 *)source;
 
 		BSToBS(destination64,destinationBitShift,destinationBitSize,destinationIsSigned,source64,sourceBitShift,sourceBitSize,sourceIsSigned);
 	}
     else if ((sourceBitEnd < 128) && (granularity <= 128)){
+		// if 128 is fine then operate with double(uint64)
     	DoubleInteger<uint64> *destination128  = (DoubleInteger<uint64> *)destination;
     	DoubleInteger<uint64> *source128       = (DoubleInteger<uint64> *)source;
+    	
     	BSToBS(destination128,destinationBitShift,destinationBitSize,destinationIsSigned,source128,sourceBitShift,sourceBitSize,sourceIsSigned);
 	}
 	
@@ -197,7 +233,12 @@ static inline bool BitSetToBitSet(
 
 
 /**
- * T,T2 must be of byte size power of 2 (8,16,32,64,128...) not 24 48 etc...
+ * Converts an integer of bitSize sourceBitSize 
+ * located at address source and bitAddress sourceBitShift
+ * into an integer of type T2
+ * T must be unsigned int of byte size power of 2 (8,16,32,64,128...) not 24 48 etc...
+ * T determines the minimum number size used for the operations
+ * T=uint8 means that any number may be used
  */
 template <typename T,typename T2>
 static inline bool BitSetToInteger(
@@ -208,16 +249,23 @@ static inline bool BitSetToInteger(
         bool                sourceIsSigned)
 {
 
+    // converts T2 into destination,destinationBitShift,destinationBitSize,destinationIsSigned
     T *destination = (T*) &dest;
     uint8 destinationBitShift = 0;
     uint8 destinationBitSize = sizeof(T2) *8;
+    // detect if T2 has sign by seing if we can initialise a number negative
     bool destinationIsSigned = (((T2)-1) < 0); 
 
     return BitSetToBitSet(destination,destinationBitShift,destinationBitSize,destinationIsSigned,source,sourceBitShift,sourceBitSize,sourceIsSigned);
 }
 
 /**
- * T,T2 must be of byte size power of 2 (8,16,32,64,128...) not 24 48 etc...
+ * Converts an integer of type T2
+ * into an integer of bitSize destinationBitSize 
+ * located at address destination and bitAddress destinationBitShift
+ * T must be unsigned int of byte size power of 2 (8,16,32,64,128...) not 24 48 etc...
+ * T determines the minimum number size used for the operations
+ * T=uint8 means that any number may be used
  */
 template <typename T,typename T2>
 static inline bool IntegerToBitSet(
@@ -228,9 +276,11 @@ static inline bool IntegerToBitSet(
         T2 &               src)
 {
 
+    // converts T2 into source,sourceBitShift,sourceBitSize,sourceIsSigned
     T *source = (T*) &src;
     uint8 sourceBitShift = 0;
     uint8 sourceBitSize = sizeof(T2) *8;
+    // detect if T2 has sign by seing if we can initialise a number negative
     bool sourceIsSigned = (((T2)-1) < 0); 
 
     return BitSetToBitSet(destination,destinationBitShift,destinationBitSize,destinationIsSigned,source,sourceBitShift,sourceBitSize,sourceIsSigned);

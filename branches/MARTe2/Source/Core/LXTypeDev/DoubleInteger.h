@@ -23,7 +23,7 @@
 **/
 /**
  * @file 
- * @brief Functions to print integer numbers on generic streams.
+ * @brief Constructs integer of double size. limited operator support
 */
 
 #if !defined DOUBLE_INTEGER
