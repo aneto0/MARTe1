@@ -2,7 +2,7 @@
 #include "FormatDescriptor.h"
 #include "FloatToStream.h"
 #include "IntegerToStream.h"
-#include "IntegerToInteger.h"
+#include "BitSetToInteger.h"
 
 /*
 #include "TypeConversion.h"

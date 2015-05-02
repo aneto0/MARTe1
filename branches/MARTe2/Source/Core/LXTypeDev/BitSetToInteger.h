@@ -186,7 +186,7 @@ static inline bool BitSetToBitSet(
     else if ((sourceBitEnd < 128) && (granularity <= 128)){
     	DoubleInteger<uint64> *destination128  = (DoubleInteger<uint64> *)destination;
     	DoubleInteger<uint64> *source128       = (DoubleInteger<uint64> *)source;
-    	BSToBSPrivate(destination128,destinationBitShift,destinationBitSize,destinationIsSigned,source128,sourceBitShift,sourceBitSize,sourceIsSigned);
+    	BSToBS(destination128,destinationBitShift,destinationBitSize,destinationIsSigned,source128,sourceBitShift,sourceBitSize,sourceIsSigned);
 	}
 	
 	sourceBitShift      += sourceBitSize;
