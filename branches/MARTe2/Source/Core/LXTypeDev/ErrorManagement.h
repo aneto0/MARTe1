@@ -29,9 +29,11 @@
 #ifndef _ERROR_MANAGEMENT_H
 #define _ERROR_MANAGEMENT_H
 
-//#include "System.h"
+#include "GeneralDefinitions.h"
+#include "HighResolutionTimer.h"
+#include "Threads.h"
 
-struct ErrorInformation;
+ struct ErrorInformation;
 /** values to be used in ErrorManagementFunction */
 enum ErrorType {
 	/** Debug Information (should never be found in production code) */
@@ -83,60 +85,62 @@ struct ErrorInformation{
 		///
 		uint16      lineNumber;
 
-		///
+		/// implies that ObjectPointer and ClassName are sent as well
 		bool        isObject:1;
 
-		///
-		bool        hasProcessId:1;
-
-		///
-		bool        hasObjectPointer:1;
-
-		///
-		bool        hasClassName:1;
 
 	} header;
 
-	/// msecs from start of time -  
-	uint64     	msecTime;
 
-	///
-	char *      fileName;
+	/**
+	 *  time as high resoution timer ticks
+	*/  
+	int64     		hrtTime;
+	
+	/** a pointer to a const char * which is persistent
+	 * so a real constant, not a char * relabeled as const char *
+	 * scope should be global to the application and persistent 
+	 */ 
+	const char * 	fileName;
 	
 	/// thread ID
-	TID		    threadId;
+	TID		    	threadId;
 	
-	///
-//	PID         processId;
-	
-	///
-	void *      objectPointer;
+	/**
+	 * address of the object that produced the error
+	 * object may be temporary in memory
+	 * as objectPointer will only be printed, not used
+	 */
+	void *      	objectPointer;
 
-	///
-	char *      className;
+	/** a pointer to a const char * which is persistent
+	 * so a real constant, not a char * relabeled as const char *
+	 * scope should be global to the application and persistent 
+	 */ 
+	const char * 	className;
 	
-	/// 
+	/// initialise to 0 all parts that are not set by all the reporting functions
 	ErrorInformation(){
-		
+		threadId 		= (TID)0;
+		objectPointer 	= NULL;
+		className       = NULL;
 	}
-
 };
 
 /** the type of an user provided ErrorProcessing function */
-typedef void (*AssembleErrorMessageFunctionType)(ErrorInformation &information,const char *errorDescription);
+typedef void (*ErrorMessageProcessFunctionType)(ErrorInformation &errorInfo,const char *errorDescription);
 
+/**
+ * pointer to the function that will process the errors
+ */
+extern ErrorMessageProcessFunctionType errorMessageProcessFunction; 
 
 extern "C" {
-
+	/// translates ErrorType to string 
 	const char *ErrorManagement_ErrorName(ErrorType errorCode);
 
-	void ErrorManagement_ReportError(ErrorType code, const char *errorDescription);
-
-	void ErrorManagement_ReportErrorWithinInterrupt(ErrorType errorCode,const char *errorDescription);
-
-	void ErrorManagement_SetUserAssembleErrorMessageFunction(AssembleErrorMessageFunctionType userFun=NULL);
-
-	void ErrorManagement_SetUserAssembleISRErrorMessageFunction(AssembleErrorMessageFunctionType userFun);
+	/// installs a user defined Error Handling function
+	void ErrorManagement_SetErrorMessageProcessFunction(ErrorMessageProcessFunctionType userFun=NULL);
 
 }
 
@@ -145,71 +149,60 @@ extern "C" {
  */
 class ErrorManagement{
 
-	
-public:
-
 public:    
     /** translate ErrorManagement::ErrorType to ErrorName */
 	static inline const char *ErrorName(ErrorType errorCode){
 		return ErrorManagement_ErrorName(errorCode);
 	}
-	
 
-public:
-	/** what to do in case of error */
-	enum ErrorBehaviour {
-		/** on error loop infinitely */
-		onErrorSulk           = 0x0001,
-		/** on error just exit the thread*/
-		onErrorQuit           = 0x0002,
-		/** on error remember the error code */
-//		onErrorRemember       = 0x0004,
-		/** on error print the error on a remote error-console non UDP.. not supported now */
-		onErrorReport         = 0x0008,
-		/** on error print the error on the = console */
-		onErrorReportConsole  = 0x0010,
-		/** on error print the error on a log file */
-//		onErrorLog            = 0x0020,
-		/** Remote debugging support option : on error sends an UDP packet with the error content */
-//		onErrorRemoteLog      = 0x0040
-	};
-	
-public:
-	
-public:
-
-    /** Sets the error status and depending on setup does appropriate action
-        Most simple error function
-        Must be non blocking.
-        Must be thread safe
+    /** 
+        Simplest error report function
+        Non blocking. Thread and interrupt safe        
 	 */
-	static inline void ReportError(ErrorType code, const char *errorDescription){
-		ErrorManagement_ReportError(code, errorDescription);
+	static inline void ReportError(
+				ErrorType 			code, 
+				const char *		errorDescription,
+				const char *        fileName			= NULL,
+				unsigned int		lineNumber  		= 0){
+		ErrorInformation errorInfo;
+		errorInfo.header.errorType  = code;
+		errorInfo.header.lineNumber = lineNumber;
+		errorInfo.fileName 	 		= fileName;
+		errorInfo.hrtTime 			= HighResolutionTimer::Counter();		
+		errorMessageProcessFunction(errorInfo, errorDescription);
 	}
 
-    /** Sets the error status and depending on setup does appropriate action
-        This call is to be called from Interrupt Service Routines
-        Most simple error function
-        Must be non blocking.
-        Must be thread and interrupt safe
-    */
-	static inline void ReportErrorWithinInterrupt(ErrorType errorCode,const char *errorDescription){
-		ErrorManagement_ReportErrorWithinInterrupt(errorCode,errorDescription);
-	}
+    /** 
+        Simplest error report function
+        Non blocking. Thread safe     
+        Not Interrupt safe   
+	 */
+	static inline void ReportErrorFullContext(
+			ErrorType 			code, 
+			const char *		errorDescription,
+			const char *        fileName			= NULL,
+			unsigned int		lineNumber  		= 0){
 
+		ErrorInformation errorInfo;
+		errorInfo.header.errorType  = code;
+		errorInfo.header.lineNumber = lineNumber;
+		errorInfo.fileName 	 		= fileName;
+		errorInfo.hrtTime 			= HighResolutionTimer::Counter();		
+		errorInfo.threadId 			= Threads::Id();	
+		errorMessageProcessFunction(errorInfo, errorDescription);
+	}
 
 public:    
     /** set the handler for error messages */
-	static inline void SetUserAssembleErrorMessageFunction(AssembleErrorMessageFunctionType userFun=NULL){
-		ErrorManagement_SetUserAssembleErrorMessageFunction(userFun);
+	static inline void SetErrorMessageProcessFunction(ErrorMessageProcessFunctionType userFun=NULL){
+		ErrorManagement_SetErrorMessageProcessFunction(userFun);
 	}
-
-    /** sets the handler for error messages coming from interrupts */
-	static inline void SetUserAssembleISRErrorMessageFunction(AssembleErrorMessageFunctionType userFun){
-		ErrorManagement_SetUserAssembleISRErrorMessageFunction(userFun);
-	}
-
 };
 
+#define REPORT_ERROR(code,message)\
+		ErrorManagement::ReportError(code,message,__FILE__,__LINE__);
+
+#define REPORT_ERROR_FULL(code,message)\
+		ErrorManagement::ReportErrorFullContext(code,message,__FILE__,__LINE__);
 
 #endif

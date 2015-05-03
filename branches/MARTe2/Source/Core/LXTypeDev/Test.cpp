@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "ErrorManagement.h"
 #include "FormatDescriptor.h"
 #include "FloatToStream.h"
 #include "IntegerToStream.h"
@@ -389,9 +390,19 @@ void TestBitSetPrint(void *data,int dataBitSize){
 	}
 }
 
+void MyErrorReportFunction(ErrorInformation &errorInfo,const char *errorDescription){
+	if ((errorInfo.fileName!=NULL) && (errorInfo.header.lineNumber!=0)){
+		printf ("[%s:%i] ", errorInfo.fileName,errorInfo.header.lineNumber);		
+	}
+	
+	printf ("%s : %s \n", ErrorManagement::ErrorName(errorInfo.header.errorType),errorDescription);	
+	
+}
 
 int main(int argc, char **argv){
-
+	ErrorManagement::SetErrorMessageProcessFunction(MyErrorReportFunction);
+	
+	REPORT_ERROR(Debug,"Testing Error")
 	{
 		int64 source[5] =   { 0x13579BDF02468ACE,0x13579BDF02468ACE,0x123456789ABCDEF0,0xDEADBABEBAB00111,0xABBA00CACCA00123};
 		TestBitSetPrint(&source[0],320);

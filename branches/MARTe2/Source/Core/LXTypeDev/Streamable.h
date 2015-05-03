@@ -150,6 +150,7 @@ protected: // mode switch methods
         if (!ResyncReadBuffer()) return false;
         operatingModes.mutexWriteMode = true;
         operatingModes.mutexReadMode = false;
+        return true;
     }
     
     /** 
@@ -162,6 +163,7 @@ protected: // mode switch methods
         if (!FlushWriteBuffer()) return false;
         operatingModes.mutexWriteMode = false;
         operatingModes.mutexReadMode = true; 
+        return true;
     }
 
 protected: // read buffer protected methods
