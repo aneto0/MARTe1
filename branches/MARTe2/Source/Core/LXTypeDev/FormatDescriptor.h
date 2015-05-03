@@ -155,7 +155,7 @@ public:
     bool                    fullNotation:1;
 
     //       
-    int                     spareBits:8;
+    int                     spareBits:7;
     
 	/** takes a printf like string already pointing at the character after % (see below format)
 	    and parses it recovering all the useful information, discarding all redundant ones,

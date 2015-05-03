@@ -359,13 +359,72 @@ template <typename T> void Test_IntegerToStream(T n){
 	}
 }
 
+void TestBitSetPrint(void *data,int dataBitSize){
+	FormatDescriptor	format,format2;
+	const char *pFormat;
+	pFormat = "#0b";	
+	format.InitialiseFromString(pFormat);
+	pFormat = "0b";	
+	format2.InitialiseFromString(pFormat);
+	
+	int data64WordSize = (dataBitSize+63)/64;
+	int data64BitSize  = data64WordSize * 64;
+	uint64 *source = (uint64 *)data;
+	
+	//from size =1 to size = 64
+	for(int size=1;size<64;size++){
+		for(int shift=0;shift<data64BitSize;shift+=size){
+			IntegerToStream(myStream,source[data64WordSize-1],format);
+			for (int i=(data64WordSize-1);i>0;i--){
+				IntegerToStream(myStream,source[i-1],format2);
+			}
+			putchar('\n');
+			
+			for(int k=0;k<(data64BitSize-(shift+size));k++)putchar(' ');
+			putchar(' ');						
+			putchar(' ');						
+			BitSetToStream(myStream,(unsigned int *)&source[0],shift,size,false,format2);
+			putchar('\n');						
+		}
+	}
+}
 
 
 int main(int argc, char **argv){
 
-	
-	
-	if (1){
+	{
+		int64 source[5] =   { 0x13579BDF02468ACE,0x13579BDF02468ACE,0x123456789ABCDEF0,0xDEADBABEBAB00111,0xABBA00CACCA00123};
+		TestBitSetPrint(&source[0],320);
+/*		
+		FormatDescriptor	format,format2;
+		const char *pFormat;
+		pFormat = "#0b";	
+		format.InitialiseFromString(pFormat);
+		pFormat = "0b";	
+		format2.InitialiseFromString(pFormat);
+		
+		//from size =1 to size = 64
+		for(int size=1;size<64;size++){
+			for(int shift=0;shift<320;shift+=size){				
+				IntegerToStream(myStream,source[4],format);
+				IntegerToStream(myStream,source[3],format2);
+				IntegerToStream(myStream,source[2],format2);
+				IntegerToStream(myStream,source[1],format2);
+				IntegerToStream(myStream,source[0],format2);
+				putchar('\n');
+				
+				for(int k=0;k<(320-(shift+size));k++)putchar(' ');
+				putchar(' ');						
+				putchar(' ');						
+				BitSetToStream(myStream,(unsigned int *)&source[0],shift,size,false,format2);
+				putchar('\n');						
+			}
+			
+		}
+*/		
+		return 0;
+	}
+	if (0){
 		
 		FormatDescriptor	format,format2;
 		const char *pFormat;
@@ -373,84 +432,6 @@ int main(int argc, char **argv){
 		format.InitialiseFromString(pFormat);
 		pFormat = "0x";	
 		format2.InitialiseFromString(pFormat);
-/*		
-		int64 n = 0x0000123456780000;		
-		IntegerToStream(myStream,n,format);
-		putchar('\n');		
-		
-		DoubleInteger<uint32> pippo((uint32*)&n);
-		IntegerToStream(myStream,pippo.upper,format);
-		IntegerToStream(myStream,pippo.lower,format2);
-		putchar('\n');		
-		
-		n >>= 7;
-		IntegerToStream(myStream,n,format);
-		putchar('\n');		
-		
-		pippo >>= 7;	
-		IntegerToStream(myStream,pippo.upper,format);
-		IntegerToStream(myStream,pippo.lower,format2);
-		putchar('\n');		
-
-		pippo = (int64)0x123456789A;
-		IntegerToStream(myStream,pippo.upper,format);
-		IntegerToStream(myStream,pippo.lower,format2);
-		putchar('\n');		
-*/		
-/*		
-		DoubleInteger<uint64> dd;
-		dd=0x123456789ABCDEF0;
-		dd=0;
-		IntegerToStream(myStream,dd.upper,format);
-		IntegerToStream(myStream,dd.lower,format2);
-		putchar('\n');		
-		dd=~dd;
-		IntegerToStream(myStream,dd.upper,format);
-		IntegerToStream(myStream,dd.lower,format2);
-		putchar('\n');		
-		dd>>=33;
-		IntegerToStream(myStream,dd.upper,format);
-		IntegerToStream(myStream,dd.lower,format2);
-		putchar('\n');		
-		dd>>=33;
-		IntegerToStream(myStream,dd.upper,format);
-		IntegerToStream(myStream,dd.lower,format2);
-		putchar('\n');		
-		dd<<=33;
-		IntegerToStream(myStream,dd.upper,format);
-		IntegerToStream(myStream,dd.lower,format2);
-		putchar('\n');		
-		dd<<=33;
-		IntegerToStream(myStream,dd.upper,format);
-		IntegerToStream(myStream,dd.lower,format2);
-		putchar('\n');		
-		return 0;
-*/		
-/*
-		{
-			uint64 upper = 0x123456789ABCDEF0;
-			uint64 lower = 0x0FEDCBA987654321;
-			IntegerToStream(myStream,upper,format);
-			IntegerToStream(myStream,lower,format2);
-			putchar('\n');		
-			
-			uint8 shift = 1;
-			uint8 bitSize = 64;
-			lower = lower >> shift;
-			uint64 tmp = upper << (bitSize-shift);
-			IntegerToStream(myStream,tmp,format);
-			putchar('\n');		
-			
-			lower |= tmp;
-			upper = upper >> shift;
-
-			IntegerToStream(myStream,upper,format);
-			IntegerToStream(myStream,lower,format2);
-			putchar('\n');		
-			
-			return 0;
-		}
-*/		
 		int64 destination[5] =   { 0,0,0};                    
 		int64 source[5] =   { 0x13579BDF02468ACE,0x13579BDF02468ACE,0x123456789ABCDEF0,0xDEADBABEBAB00111,0xABBA00CACCA00123};
 		PutS(myStream,"source      = ");
