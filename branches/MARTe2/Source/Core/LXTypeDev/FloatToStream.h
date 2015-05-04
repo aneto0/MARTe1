@@ -992,7 +992,7 @@ bool FloatToStream(
 
     // on precision 0 the max useful precision is chosen 
     // based on the ieee float format number of significative digits
-    if (format.precision == 0) {
+    if (format.precision == 0 && format.floatNotation != Notation::FixedPointNotation) {
         if (sizeof(T) > 8){
         	format.precision = 34;
         }
@@ -1082,16 +1082,20 @@ bool FloatToStream(
 
         // if we have an overflow recalculate numbersize and precision
         if (positiveNumber >= 10) {
-            
-        	positiveNumber /= 10;
-            exponent++;
+
+            //The precision can't be greater than format.precision
+	    if(maxPrecisionAfterRounding > format.precision)
+                maxPrecisionAfterRounding = format.precision;
+	            
+             positiveNumber /= 10;
+             exponent++;
        	
-            precision = maxPrecisionAfterRounding;
+             precision = maxPrecisionAfterRounding;
 
 //if (debug)printf ("2nd normN = %f exp =%i prec= %i\n",positiveNumber,exponent,precision);
 
             // work out achievable precision  and number size
-            numberSize = NumberOfDigitsNotation(format.floatNotation,exponent, hasSign, precision, maximumSize);
+             numberSize = NumberOfDigitsNotation(format.floatNotation,exponent, hasSign, precision, maximumSize);
 //if (debug)printf ("2nd Nsize = %i prec= %i\n",numberSize,precision);
             
         }
