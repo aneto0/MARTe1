@@ -990,9 +990,12 @@ bool FloatToStream(
         format.padded = false;
     }
 
+    
+
+
     // on precision 0 the max useful precision is chosen 
     // based on the ieee float format number of significative digits
-    if (format.precision == 0 && format.floatNotation != Notation::FixedPointNotation) {
+    if (format.precision == -1) {
         if (sizeof(T) > 8){
         	format.precision = 34;
         }
@@ -1002,6 +1005,10 @@ bool FloatToStream(
         if (sizeof(T) < 8){
         	format.precision = 7;
         }
+
+        //Default 6 decimal digits for fixed point notation.
+        if(format.floatNotation == Notation::FixedPointNotation)
+           	format.precision = 6;
 	}        
     
     // number of decimal digits or number of significative digits

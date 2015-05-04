@@ -359,6 +359,10 @@ static inline void Number2StreamDecimalNotationPrivate(streamer &s, T positiveNu
 	}
 }
 
+
+/** @brief Prints a string on a generic stream.
+  * @param stream is a generic stream class which implements a PutC() function.
+  * @param s is the string to be printed. */
 template <class streamer>
 static inline void PutS(streamer & stream,const char *s){
 	while (*s != 0){
@@ -477,7 +481,6 @@ bool IntegerToStreamDecimalNotation(
   * @param maximumSize is the maximum requested space for the number print. 
   * @param padded specifies if the difference between maximumSize and the necessary space for the number must be filled by spaces ' '.
   * @param leftAligned specifies if the number must be print with left or right alignment.
-//  * @param putTrailingZeros specifiec if we want fill with zeros the digits before the minimum necessary digits (ex 16 bit: ab -> 00ab).
   * @param zeroPaddedBitSize specifies the actual number of bits in format. Set to sizeof(T) means to add trailing zeros, any smaller, non zero value means determines how many bits to print 
   * @param addHeader specifies if we want to add the hex header '0x' before the number.
   * @return true.
@@ -493,7 +496,6 @@ bool IntegerToStreamExadecimalNotation(
 			uint16 			maximumSize			= 0,       // 0 means that the number is printed in its entirety
 			bool 			padded				= false,   // if maximumSize!=0 & align towards the right or the left
 			bool 			leftAligned			= false,   // if padded and maximumSize!=0 align towards the left
-//			bool 			putTrailingZeros	= false,   // trailing zeroes are not omitted (unless breaking the maximumSize)
 		    uint16          zeroPaddedBitSize   = 0,       // if not 0 is used to determine how many trailing zeroes to print 
 			bool 			addHeader    		= false)   // prepend with 0x
 {       
@@ -593,7 +595,6 @@ bool IntegerToStreamExadecimalNotation(
   * @param maximumSize is the maximum requested space for the number print. 
   * @param padded specifies if the difference between maximumSize and the necessary space for the number must be filled by spaces ' '.
   * @param leftAligned specifies if the number must be print with left or right alignment.
-//  * @param putTrailingZeros specifiec if we want fill with zeros the digits before the minimum necessary digits.
   * @param zeroPaddedBitSize specifies the actual number of bits in format. Set to sizeof(T) means to add trailing zeros, any smaller, non zero value means determines how many bits to print 
   * @param addHeader specifies if we want to add the oct header '0o' before the number.
   * @return true.
@@ -708,7 +709,6 @@ bool IntegerToStreamOctalNotation(
   * @param maximumSize is the maximum requested space for the number print. 
   * @param padded specifies if the difference between maximumSize and the necessary space for the number must be filled by spaces ' '.
   * @param leftAligned specifies if the number must be print with left or right alignment.
-//  * @param putTrailingZeros specifiec if we want fill with zeros the digits before the minimum necessary digits.
   * @param zeroPaddedBitSize specifies the actual number of bits in format. Set to sizeof(T) means to add trailing zeros, any smaller, non zero value means determines how many bits to print 
   * @param addHeader specifies if we want to add the bin header '0b' before the number.
   * @return true.

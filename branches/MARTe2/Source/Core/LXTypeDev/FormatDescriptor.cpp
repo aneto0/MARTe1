@@ -134,7 +134,8 @@ static inline uint32 GetIntegerNumber(const char *&string){
     if (string == NULL) return False;
     
     uint32 number = 0;
-    int32 digit = 0;
+    int32 digit = 0; 
+
     // 
     while ((digit = GetDigit(string[0]))>=0){
         number *= 10;
@@ -151,7 +152,7 @@ bool FDInitialiseFromString(FormatDescriptor &fd, const char *&string){
     
     // prepare clean FormatDescriptor
     // copy to this only if parsing successful
-    FormatDescriptor temporaryFormat(0);
+    FormatDescriptor temporaryFormat;
     
     /// check pointer
     if (string == NULL) {
@@ -174,8 +175,13 @@ bool FDInitialiseFromString(FormatDescriptor &fd, const char *&string){
     // after a dot look for the precision field
     if (string[0] == '.') {        
         string++;
-        // get any integer number from string if any
-        temporaryFormat.precision = GetIntegerNumber(string);        
+        
+	if(GetDigit(string[0]) < 0)
+	    //If the precision field is empty return -1 to use default precision.
+            temporaryFormat.precision = -1;
+	else
+	    // get any integer number from string if any
+            temporaryFormat.precision = GetIntegerNumber(string);        
     }
     
     // the next must be the code!

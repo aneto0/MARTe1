@@ -121,7 +121,7 @@ public:
 		0x4ABCD has precision 5     -> (precision =8) unchanged  still precision 5  
 		1-64 
 	*/	 
-    unsigned int 			precision:8;
+    int 			precision:8;
 
     /**
 		True means produce a number of characters equal to width 
@@ -209,7 +209,7 @@ public:
      */
 	FormatDescriptor(){
 		this->size = 0;
-		this->precision = 0;
+		this->precision = -1;
 		this->padded = false;
 		this->leftAligned = false;
 		this->floatNotation = Notation::FixedPointNotation;
