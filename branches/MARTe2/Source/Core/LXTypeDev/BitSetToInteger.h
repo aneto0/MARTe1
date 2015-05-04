@@ -166,7 +166,7 @@ static inline bool BitSetToBitSet(
 	// mask to eliminate multiples of granularity - 
 	// granularity must be a power of 2 
 	int16 granularityMask  = granularity - 1;
-	// exponent of the power of 2 that is granularity 
+	// exponent of the power of 2 that is granularity (log2 of the number of bytes)
 	int16 granularityShift = 3;
 	int16 temp = sizeof(T);
 	while (temp > 1){
@@ -175,7 +175,7 @@ static inline bool BitSetToBitSet(
 	}
 		
 	// normalise sourceBitShift so that  0<sourceBitShift<granularity
-	// adjusts source pointer
+	// adjusts source pointer adding sourceBitShift/numberOfBytes.
 	if (sourceBitShift >= granularity){
 		source += (sourceBitShift >> granularityShift);
 		sourceBitShift &= granularityMask;
@@ -188,10 +188,10 @@ static inline bool BitSetToBitSet(
 	}
 
 	// work out range of bits involved 
-	// for source 
-	int sourceBitEnd      =  sourceBitShift     +destinationBitSize;
+	// for source  
+	int sourceBitEnd      =  sourceBitShift     +sourceBitSize;
 	// and for destination
-	int destinationBitEnd =  destinationBitShift+sourceBitSize;
+	int destinationBitEnd =  destinationBitShift+destinationBitSize;
 	
 	// check number able to accomodate in full both input and output numbers 
 	// and is big than granularity
@@ -202,28 +202,28 @@ static inline bool BitSetToBitSet(
 
 		BSToBS(destination8,destinationBitShift,destinationBitSize,destinationIsSigned,source8,sourceBitShift,sourceBitSize,sourceIsSigned);	
 		
-	} else if ((sourceBitEnd < 16) && (granularity <= 16)){
+	} else if ((sourceBitEnd < 16)  && (destinationBitEnd < 16) && (granularity <= 16)){
 		// if 16 is fine then operate with 16 bit integers
 		uint16 *destination16 = (uint16 *)destination;
 		uint16 *source16      = (uint16 *)source;
 
 		BSToBS(destination16,destinationBitShift,destinationBitSize,destinationIsSigned,source16,sourceBitShift,sourceBitSize,sourceIsSigned);
 			
-	} else if ((sourceBitEnd < 32) && (granularity <= 32)){
+	} else if ((sourceBitEnd < 32) &&  (destinationBitEnd < 32) && (granularity <= 32)){
 		// if 32 is fine then operate with 32 bit integers
 		uint32 *destination32 = (uint32 *)destination;
 		uint32 *source32      = (uint32 *)source;
 
 		BSToBS(destination32,destinationBitShift,destinationBitSize,destinationIsSigned,source32,sourceBitShift,sourceBitSize,sourceIsSigned);
 	
-	} else if ((sourceBitEnd < 64) && (granularity <= 64)){
+	} else if ((sourceBitEnd < 64) &&  (destinationBitEnd < 64) && (granularity <= 64)){
 		// if 64 is fine then operate with 64 bit integers
 		uint64 *destination64 = (uint64 *)destination;
 		uint64 *source64      = (uint64 *)source;
 
 		BSToBS(destination64,destinationBitShift,destinationBitSize,destinationIsSigned,source64,sourceBitShift,sourceBitSize,sourceIsSigned);
 	}
-    else if ((sourceBitEnd < 128) && (granularity <= 128)){
+    else if ((sourceBitEnd < 128) && (destinationBitEnd < 128) && (granularity <= 128)){
 		// if 128 is fine then operate with double(uint64)
     	DoubleInteger<uint64> *destination128  = (DoubleInteger<uint64> *)destination;
     	DoubleInteger<uint64> *source128       = (DoubleInteger<uint64> *)source;
