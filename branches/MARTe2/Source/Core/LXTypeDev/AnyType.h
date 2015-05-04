@@ -44,13 +44,17 @@ public:
 	/// what type is the data 
     TypeDescriptor      dataDescriptor;
  
-	/// used only for bit range types
-    unsigned int        bitAddress:3;	
+	/** 
+	 * used only for bit range types
+	 * range is 0 - 255 
+	 */
+    uint8               bitAddress;	
 	
 public:
 	/// constructor from an integer 8 bit
     AnyType(void){
 		dataPointer = NULL; 
+		bitAddress  = 0;
 		dataDescriptor = VoidType;
 	}   	
     
@@ -62,47 +66,55 @@ public:
     /// constructor from a float
     AnyType(float &i){
 		dataPointer = (void *) &i; 
+		bitAddress  = 0;
 		dataDescriptor = Float32Bit;
 	}   	
 
     /// constructor from a float
     AnyType(double &i){
 		dataPointer = (void *) &i; 
+		bitAddress  = 0;
 		dataDescriptor = Float64Bit;
 	}   	
 
     /// constructor from an integer 8 bit
     AnyType(const int8 &i){
 		dataPointer = (void *) &i; 
+		bitAddress  = 0;
 		dataDescriptor = ConstSignedInteger8Bit;
 	}   	
 
 	/// constructor from an integer 8 bit
     AnyType(int8 &i){
 		dataPointer = &i;
+		bitAddress  = 0;
 		dataDescriptor = SignedInteger8Bit;
 	}   	
 
 	/// constructor from an integer 8 bit
     AnyType(uint8 &i){
 		dataPointer = &i;
+		bitAddress  = 0;
 		dataDescriptor = UnsignedInteger8Bit;
 	}   	
 	/// constructor from an integer 8 bit
     AnyType(int16 &i){
 		dataPointer = &i;
+		bitAddress  = 0;
 		dataDescriptor = SignedInteger16Bit;
 	}   	
 
 	/// constructor from an integer 8 bit
     AnyType(uint16 &i){
 		dataPointer = &i;
+		bitAddress  = 0;
 		dataDescriptor = UnsignedInteger16Bit;
 	}   	
 
 	/// constructor from an integer 8 bit
     AnyType(uint32 &i){
 		dataPointer = &i;
+		bitAddress  = 0;
 		dataDescriptor = UnsignedInteger32Bit;
 	}   	
 };

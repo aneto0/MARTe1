@@ -392,7 +392,7 @@ void TestBitSetPrint(void *data,int dataBitSize){
 
 void MyErrorReportFunction(ErrorInformation &errorInfo,const char *errorDescription){
 	if ((errorInfo.fileName!=NULL) && (errorInfo.header.lineNumber!=0)){
-		printf ("[%s:%i] ", errorInfo.fileName,errorInfo.header.lineNumber);		
+		printf ("[%s:%i:%s()] ", errorInfo.fileName,errorInfo.header.lineNumber,errorInfo.functionName);		
 	}
 	
 	printf ("%s : %s \n", ErrorManagement::ErrorName(errorInfo.header.errorType),errorDescription);	

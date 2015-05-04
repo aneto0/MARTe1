@@ -102,6 +102,12 @@ struct ErrorInformation{
 	 * scope should be global to the application and persistent 
 	 */ 
 	const char * 	fileName;
+
+	/** a pointer to a const char * which is persistent
+	 * so a real constant, not a char * relabeled as const char *
+	 * scope should be global to the application and persistent 
+	 */ 
+	const char * 	functionName;
 	
 	/// thread ID
 	TID		    	threadId;
@@ -163,11 +169,14 @@ public:
 				ErrorType 			code, 
 				const char *		errorDescription,
 				const char *        fileName			= NULL,
-				unsigned int		lineNumber  		= 0){
+				unsigned int		lineNumber  		= 0,
+				const char *		functionName        = NULL
+				){
 		ErrorInformation errorInfo;
 		errorInfo.header.errorType  = code;
 		errorInfo.header.lineNumber = lineNumber;
 		errorInfo.fileName 	 		= fileName;
+		errorInfo.functionName      = functionName;
 		errorInfo.hrtTime 			= HighResolutionTimer::Counter();		
 		errorMessageProcessFunction(errorInfo, errorDescription);
 	}
@@ -181,12 +190,15 @@ public:
 			ErrorType 			code, 
 			const char *		errorDescription,
 			const char *        fileName			= NULL,
-			unsigned int		lineNumber  		= 0){
+			unsigned int		lineNumber  		= 0,
+			const char *		functionName        = NULL
+			){
 
 		ErrorInformation errorInfo;
 		errorInfo.header.errorType  = code;
 		errorInfo.header.lineNumber = lineNumber;
 		errorInfo.fileName 	 		= fileName;
+		errorInfo.functionName      = functionName;
 		errorInfo.hrtTime 			= HighResolutionTimer::Counter();		
 		errorInfo.threadId 			= Threads::Id();	
 		errorMessageProcessFunction(errorInfo, errorDescription);
@@ -199,10 +211,24 @@ public:
 	}
 };
 
+#ifndef __FUNCTION_NAME__
+    #if  defined __FUNCTION__ 
+        // Undeclared
+        #define __FUNCTION_NAME__   __FUNCTION__  
+    #elif defined __PRETTY_FUNCTION__
+        // Undeclared
+        #define __FUNCTION_NAME__   __PRETTY_FUNCTION__
+    #else
+        // Declared 
+		#define __FUNCTION_NAME__   __func__ 
+    #endif // __func__ 
+
+#endif // __FUNCTION_NAME__
+
 #define REPORT_ERROR(code,message)\
-		ErrorManagement::ReportError(code,message,__FILE__,__LINE__);
+		ErrorManagement::ReportError(code,message,__FILE__,__LINE__,__FUNCTION_NAME__);
 
 #define REPORT_ERROR_FULL(code,message)\
-		ErrorManagement::ReportErrorFullContext(code,message,__FILE__,__LINE__);
+		ErrorManagement::ReportErrorFullContext(code,message,__FILE__,__LINE__,__FUNCTION_NAME__);
 
 #endif

@@ -431,53 +431,59 @@ bool Streamable::Print(const AnyType& par,FormatDescriptor fd){
 
 	case TypeDescriptor::UnsignedInteger: 
 	{
-		switch (par.dataDescriptor.size){
-		case 8:{
-			uint8 *data = (uint8 *)par.dataPointer;
-			return IntegerToStream(*this,*data,fd);
-		} break;
-		case 16:{
-			uint16 *data = (uint16 *)par.dataPointer;
-			return IntegerToStream(*this,*data,fd);
-		} break;
-		case 32:{
-			uint32 *data = (uint32 *)par.dataPointer;
-			return IntegerToStream(*this,*data,fd);
-		} break;
-		case 64:{
-			uint64 *data = (uint64 *)par.dataPointer;
-			return IntegerToStream(*this,*data,fd);
-		} break;
-		default:{
-//			uint64 number = ExpandToUint64(par.dataPointer, par.dataDescriptor.size);
-//			return IntegerToStream(*this,number,fd);
-		}
-		}
+		if (par.bitAddress == 0){
+			switch (par.dataDescriptor.size){
+			case 8:{
+				uint8 *data = (uint8 *)par.dataPointer;
+				return IntegerToStream(*this,*data,fd);
+			} break;
+			case 16:{
+				uint16 *data = (uint16 *)par.dataPointer;
+				return IntegerToStream(*this,*data,fd);
+			} break;
+			case 32:{
+				uint32 *data = (uint32 *)par.dataPointer;
+				return IntegerToStream(*this,*data,fd);
+			} break;
+			case 64:{
+				uint64 *data = (uint64 *)par.dataPointer;
+				return IntegerToStream(*this,*data,fd);
+			} break;
+			}
+		} 
+		// use native standard integer
+		unsigned int *number = (unsigned int *)par.dataPointer;
+		// all the remaining cases here
+		return BitSetToStream(*this,number,par.bitAddress,par.dataDescriptor.size,false,fd);
+		
 	} break;
 	case TypeDescriptor::SignedInteger:
 	{
-		switch (par.dataDescriptor.size){
-		case 8:{
-			int8 *data = (int8 *)par.dataPointer;
-			return IntegerToStream(*this,*data,fd);
-		} break;
-		case 16:{
-			int16 *data = (int16 *)par.dataPointer;
-			return IntegerToStream(*this,*data,fd);
-		} break;
-		case 32:{
-			int32 *data = (int32 *)par.dataPointer;
-			return IntegerToStream(*this,*data,fd);
-		} break;
-		case 64:{
-			int64 *data = (int64 *)par.dataPointer;
-			return IntegerToStream(*this,*data,fd);
-		} break;
-		default:{
-//			int64 number = ExpandToInt64(par.dataPointer, par.dataDescriptor.size);
-//			return IntegerToStream(*this,*data,fd);
+		if (par.bitAddress == 0){
+			switch (par.dataDescriptor.size){
+			case 8:{
+				int8 *data = (int8 *)par.dataPointer;
+				return IntegerToStream(*this,*data,fd);
+			} break;
+			case 16:{
+				int16 *data = (int16 *)par.dataPointer;
+				return IntegerToStream(*this,*data,fd);
+			} break;
+			case 32:{
+				int32 *data = (int32 *)par.dataPointer;
+				return IntegerToStream(*this,*data,fd);
+			} break;
+			case 64:{
+				int64 *data = (int64 *)par.dataPointer;
+				return IntegerToStream(*this,*data,fd);
+			} break;
+			}
 		}
-		} 
+		// use native standard integer
+		unsigned int *number = (unsigned int *)par.dataPointer;
+		// all the remaining cases here
+		return BitSetToStream(*this,number,par.bitAddress,par.dataDescriptor.size,true,fd);
+		
 	}break;
 	case TypeDescriptor::Float:{
 		switch (par.dataDescriptor.size){
@@ -489,9 +495,12 @@ bool Streamable::Print(const AnyType& par,FormatDescriptor fd){
 			double *data = (double *)par.dataPointer;
 			return FloatToStream(*this,*data,fd);
 		} break;
+		case 128:{
+			REPORT_ERROR(UnsupportedError,"unsupported 128 bit float")			
+			return false;
+		} break;
 		default:{
-			
-			// unhandled!
+			REPORT_ERROR(ParametersError,"non standard float size")			
 			return false;
 		}
 		} 
@@ -502,6 +511,7 @@ bool Streamable::Print(const AnyType& par,FormatDescriptor fd){
 	}
 	}
 
+	REPORT_ERROR(UnsupportedError,"unsupported format")			
 	return false;
 }
 
