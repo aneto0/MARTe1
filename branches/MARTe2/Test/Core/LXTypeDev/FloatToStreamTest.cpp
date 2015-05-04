@@ -43,6 +43,15 @@ bool FloatToStreamTest::TestFixedPoint() {
     }
     thisStream.Clear();
 
+    //6 decimal numbers by default.
+    pformat = "f";
+    format.InitialiseFromString(pformat);
+    FloatToStream(thisStream, sbit32, format);
+    if (!StringTestHelper::Compare("-1.123457", thisStream.Buffer())) {
+        return False;
+    }
+    thisStream.Clear();
+
     //Less precision.
     pformat = "- 12.3f";
     format.InitialiseFromString(pformat);
@@ -181,7 +190,7 @@ bool FloatToStreamTest::TestFixedPoint() {
     thisStream.Clear();
 
     //Not enough space (it must be at least 12+1(zero)+1(point)=14)
-    __float128 sbit128 = 1e-12;
+    __float128 sbit128 = 1e-12Q;
     pformat = " 12.10f";
     format.InitialiseFromString(pformat);
     FloatToStream(thisStream, sbit128, format);
@@ -262,6 +271,25 @@ bool FloatToStreamTest::TestFixedRelativePoint() {
     format.InitialiseFromString(pformat);
     FloatToStream(thisStream, sbit32, format);
     if (!StringTestHelper::Compare("-1.1234567  ", thisStream.Buffer())) {
+        return False;
+    }
+    thisStream.Clear();
+
+
+    //Automatic precision set to 7 for 32 bit numbers.
+    pformat = "- 12.F";
+    format.InitialiseFromString(pformat);
+    FloatToStream(thisStream, sbit32, format);
+    if (!StringTestHelper::Compare("-1.123457   ", thisStream.Buffer())) {
+        return False;
+    }
+    thisStream.Clear();
+
+    //Precision 0.
+    pformat = "- 12.0F";
+    format.InitialiseFromString(pformat);
+    FloatToStream(thisStream, sbit32, format);
+    if (!StringTestHelper::Compare("0           ", thisStream.Buffer())) {
         return False;
     }
     thisStream.Clear();
@@ -388,7 +416,7 @@ bool FloatToStreamTest::TestFixedRelativePoint() {
     thisStream.Clear();
 
     //Not enough space (it must be at least 12+1(zero)+1(point)=14)
-    __float128 sbit128 = 1e-12;
+    __float128 sbit128 = 1e-12Q;
     pformat = " 12.12F";
     format.InitialiseFromString(pformat);
     FloatToStream(thisStream, sbit128, format);
@@ -435,9 +463,10 @@ bool FloatToStreamTest::TestFixedRelativePoint() {
         return False;
     }
     thisStream.Clear();
-    pformat = " 0.10F";
+    
 
     //Nan with automatic size
+    pformat = " 0.10F";
     format.InitialiseFromString(pformat);
     FloatToStream(thisStream, nan, format);
     if (!StringTestHelper::Compare("NaN", thisStream.Buffer())) {
@@ -492,8 +521,18 @@ bool FloatToStreamTest::TestExponential() {
     }
     thisStream.Clear();
 
-    //Round up and zero added because the chosen precision.
+    //Automatic precision=15 for 64 bit.
     double sbit64 = -12345.9999;
+    pformat = " 21.e";
+    format.InitialiseFromString(pformat);
+    FloatToStream(thisStream, sbit64, format);
+    if (!StringTestHelper::Compare(" -1.23459999000000E+4", thisStream.Buffer())) {
+        return False;
+    }
+    thisStream.Clear();
+
+    //Round up and zero added because the chosen precision.
+    sbit64 = -12345.9999;
     pformat = " 13.8e";
     format.InitialiseFromString(pformat);
     FloatToStream(thisStream, sbit64, format);
@@ -502,8 +541,9 @@ bool FloatToStreamTest::TestExponential() {
     }
     thisStream.Clear();
 
+
     //In case of round up overflow.
-    __float128 sbit128 = 999999.55556;
+    __float128 sbit128 = 999999.55556Q;
     pformat = ".6e"; //
     format.InitialiseFromString(pformat);
     FloatToStream(thisStream, sbit128, format);
@@ -532,7 +572,7 @@ bool FloatToStreamTest::TestExponential() {
 
 
     //The number initially does not fit but later yes thanks to the approximation.
-    sbit128 = 9.5e-10;
+    sbit128 = 9.5e-10Q;
     pformat = "- 4.2e";
     format.InitialiseFromString(pformat);
     FloatToStream(thisStream, sbit128, format);
@@ -542,7 +582,7 @@ bool FloatToStreamTest::TestExponential() {
     thisStream.Clear();
 
     //The approximation is not sufficient now.
-    sbit128 = 9.4999e-10;
+    sbit128 = 9.4999e-10Q;
     pformat = "- 4.2e";
     format.InitialiseFromString(pformat);
     FloatToStream(thisStream, sbit128, format);
@@ -622,7 +662,7 @@ bool FloatToStreamTest::TestEngeneering() {
     thisStream.Clear();
 
     //Round up and right aligned padd.
-    __float128 sbit128 = 999999.99999;
+    __float128 sbit128 = 999999.99999Q;
     pformat = " 20.10E"; //
     format.InitialiseFromString(pformat);
     FloatToStream(thisStream, sbit128, format);
@@ -632,8 +672,18 @@ bool FloatToStreamTest::TestEngeneering() {
     }
     thisStream.Clear();
 
+    //Automatic precision=34 for 128 bit number (clipped).
+    sbit128 = 999999.9999900000000000000000000000Q;
+    pformat = " 19E"; //
+    format.InitialiseFromString(pformat);
+    FloatToStream(thisStream, sbit128, format);
+    if (!StringTestHelper::Compare("999.999999990000E+3",
+                                   thisStream.Buffer())) {
+        return False;
+    }
+    thisStream.Clear();
     //Not enough space for decimal numbers.
-    sbit128 = -9.99999e9;
+    sbit128 = -9.99999e9Q;
     pformat = "- 7.3E"; //
     format.InitialiseFromString(pformat);
     FloatToStream(thisStream, sbit128, format);
@@ -672,7 +722,7 @@ bool FloatToStreamTest::TestEngeneering() {
     thisStream.Clear();
 
     //The number enter as 999 not approximated, and then approximation enter again in the size 
-    sbit128 = 999.9;
+    sbit128 = 999.9Q;
     pformat = " 4.10E";
     format.InitialiseFromString(pformat);
     FloatToStream(thisStream, sbit128, format);
@@ -691,7 +741,7 @@ bool FloatToStreamTest::TestEngeneering() {
     thisStream.Clear();
 
     //The number does not enter as 999E+3 but after approximation enter in the size as 1E+6
-    sbit128 = 999.9e3;
+    sbit128 = 999.9e3Q;
     pformat = " 4.10E";
     format.InitialiseFromString(pformat);
     FloatToStream(thisStream, sbit128, format);
@@ -701,7 +751,7 @@ bool FloatToStreamTest::TestEngeneering() {
     thisStream.Clear();
 
     //The number initially does not fit, but it fit later thanks to approximation. 
-    sbit128 = 950.0e-6;
+    sbit128 = 950.0e-6Q;
     pformat = " 4.10E";
     format.InitialiseFromString(pformat);
     FloatToStream(thisStream, sbit128, format);
@@ -711,7 +761,7 @@ bool FloatToStreamTest::TestEngeneering() {
     thisStream.Clear();
 
     //The approximation is not enough for the rounding.
-    sbit128 = 949.9e-6;
+    sbit128 = 949.9e-6Q;
     pformat = " 4.10E";
     format.InitialiseFromString(pformat);
     FloatToStream(thisStream, sbit128, format);
@@ -778,7 +828,7 @@ bool FloatToStreamTest::TestSmart() {
     thisStream.Clear();
 
     //Round up and right aligned padd.
-    __float128 sbit128 = 999999.99999;
+    __float128 sbit128 = 999999.99999Q;
 
     pformat = " 20.10g"; //
 
@@ -792,7 +842,7 @@ bool FloatToStreamTest::TestSmart() {
     thisStream.Clear();
 
     //Automatic size definition
-    sbit128 = -9.99999e9;
+    sbit128 = -9.99999e9Q;
 
     pformat = "- 7.3g"; //
 
@@ -824,7 +874,7 @@ bool FloatToStreamTest::TestSmart() {
     thisStream.Clear();
 
     //The number enter as 999 not approximated, and then approximation enter again in the size 
-    sbit128 = 999.9;
+    sbit128 = 999.9Q;
     pformat = " 4.10g";
     format.InitialiseFromString(pformat);
     FloatToStream(thisStream, sbit128, format);
@@ -834,7 +884,7 @@ bool FloatToStreamTest::TestSmart() {
     thisStream.Clear();
 
     //The number does not enter as 999K but after approximation enter in the size as 1M
-    sbit128 = 999.9e3;
+    sbit128 = 999.9e3Q;
     pformat = " 3.10g";
     format.InitialiseFromString(pformat);
     FloatToStream(thisStream, sbit128, format);
@@ -844,7 +894,7 @@ bool FloatToStreamTest::TestSmart() {
     thisStream.Clear();
 
     //print as engineering for exponents >24 and <-24
-    sbit128 = 9e28;
+    sbit128 = 9e28Q;
     pformat = "- 7.10g";
     format.InitialiseFromString(pformat);
     FloatToStream(thisStream, sbit128, format);
@@ -920,7 +970,7 @@ bool FloatToStreamTest::TestCompact() {
     thisStream.Clear();
 
     //Round up and right aligned padd.
-    __float128 sbit128 = 999999.99999;
+    __float128 sbit128 = 999999.99999Q;
 
     pformat = " 20.10G"; //
 
@@ -934,7 +984,7 @@ bool FloatToStreamTest::TestCompact() {
     thisStream.Clear();
 
     //Automatic size definition
-    sbit128 = -9.99999e9;
+    sbit128 = -9.99999e9Q;
 
     pformat = "- 7.3G"; //
 
@@ -966,7 +1016,7 @@ bool FloatToStreamTest::TestCompact() {
     thisStream.Clear();
 
     //The number enter as 999 not approximated, and then approximation enter again in the size 
-    sbit128 = 999.9;
+    sbit128 = 999.9Q;
     pformat = " 4.10G";
     format.InitialiseFromString(pformat);
     FloatToStream(thisStream, sbit128, format);
@@ -976,7 +1026,7 @@ bool FloatToStreamTest::TestCompact() {
     thisStream.Clear();
 
     //The number does not enter as 999K but after approximation enter in the size as 1M
-    sbit128 = 999.9e3;
+    sbit128 = 999.9e3Q;
     pformat = " 3.10G";
     format.InitialiseFromString(pformat);
     FloatToStream(thisStream, sbit128, format);
@@ -986,7 +1036,7 @@ bool FloatToStreamTest::TestCompact() {
     thisStream.Clear();
 
     //print as engineering for exponents >24 and <-24
-    sbit128 = 9e28;
+    sbit128 = 9e28Q;
     pformat = "- 7.10G";
     format.InitialiseFromString(pformat);
     FloatToStream(thisStream, sbit128, format);

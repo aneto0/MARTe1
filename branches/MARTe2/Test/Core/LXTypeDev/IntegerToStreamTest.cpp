@@ -180,6 +180,16 @@ bool IntegerToStreamTest::TestDecimalStream() {
 
     thisStream.Clear();
 
+    //Max int8
+    sbit8 = 0x80;
+    IntegerToStreamDecimalNotation(thisStream, sbit8);
+
+    if (!StringTestHelper::Compare("-128", thisStream.Buffer())) {
+        return False;
+    }
+
+    thisStream.Clear();
+
     uint16 ubit16 = 12345;
     IntegerToStreamDecimalNotation(thisStream, ubit16);
 
@@ -202,6 +212,16 @@ bool IntegerToStreamTest::TestDecimalStream() {
     IntegerToStreamDecimalNotation(thisStream, sbit16);
 
     if (!StringTestHelper::Compare("-12345", thisStream.Buffer())) {
+
+        return False;
+    }
+    thisStream.Clear();
+
+    //Max int16
+    sbit16 = 0x8000;
+    IntegerToStreamDecimalNotation(thisStream, sbit16);
+
+    if (!StringTestHelper::Compare("-32768", thisStream.Buffer())) {
 
         return False;
     }
@@ -234,6 +254,19 @@ bool IntegerToStreamTest::TestDecimalStream() {
     }
 
     thisStream.Clear();
+
+    //Max int32
+    sbit32 = 0x80000000;
+
+    IntegerToStreamDecimalNotation(thisStream, sbit32);
+
+    if (!StringTestHelper::Compare("-2147483648", thisStream.Buffer())) {
+        return False;
+    }
+
+    thisStream.Clear();
+
+
     uint64 ubit64 = 12345678912345678;
     IntegerToStreamDecimalNotation(thisStream, ubit64);
     if (!StringTestHelper::Compare("12345678912345678", thisStream.Buffer())) {
@@ -249,6 +282,16 @@ bool IntegerToStreamTest::TestDecimalStream() {
         return False;
     }
     thisStream.Clear();
+
+    //Max int64
+    sbit64 = 0x8000000000000000;
+    IntegerToStreamDecimalNotation(thisStream, sbit64);
+
+    if (!StringTestHelper::Compare("-9223372036854775808", thisStream.Buffer())) {
+        return False;
+    }
+    thisStream.Clear();
+
     //? if the maxSize is incorrect	
     IntegerToStreamDecimalNotation(thisStream, sbit64, 11, true, false, true);
 
@@ -291,7 +334,7 @@ bool IntegerToStreamTest::TestHexadecimalStream() {
     ubit8 = 0xf;
     //Add only trailing zeros
     thisStream.Clear();
-    IntegerToStreamExadecimalNotation(thisStream, ubit8, 0, false, false, true,
+    IntegerToStreamExadecimalNotation(thisStream, ubit8, 0, false, false, sizeof(ubit8)*8,
                                       false);
     if (!StringTestHelper::Compare("0F", thisStream.Buffer())) {
         return False;
@@ -301,7 +344,7 @@ bool IntegerToStreamTest::TestHexadecimalStream() {
 
     //All true with a space more... it must print only a space after.
     uint16 ubit16 = 0xabcd;
-    IntegerToStreamExadecimalNotation(thisStream, ubit16, 7, true, true, true,
+    IntegerToStreamExadecimalNotation(thisStream, ubit16, 7, true, true, sizeof(ubit16)*8,
                                       true);
 
     if (!StringTestHelper::Compare("0xABCD ", thisStream.Buffer())) {
@@ -312,7 +355,7 @@ bool IntegerToStreamTest::TestHexadecimalStream() {
 
     ubit16 = 0xcd;
     //With zeros and 3 as number of digits (without header).
-    IntegerToStreamExadecimalNotation(thisStream, ubit16, 5, true, true, true,
+    IntegerToStreamExadecimalNotation(thisStream, ubit16, 5, true, true, sizeof(ubit16)*8,
                                       true);
     if (!StringTestHelper::Compare("0x0CD", thisStream.Buffer())) {
         return False;
@@ -323,7 +366,7 @@ bool IntegerToStreamTest::TestHexadecimalStream() {
     //Only right aligned with header
     uint32 ubit32 = 0xabcdef78;
     IntegerToStreamExadecimalNotation(thisStream, ubit32, 12, true, false,
-                                      false, true);
+                                      0, true);
     if (!StringTestHelper::Compare("  0xABCDEF78", thisStream.Buffer())) {
         return False;
     }
@@ -332,7 +375,7 @@ bool IntegerToStreamTest::TestHexadecimalStream() {
 
     ubit32 = 0x00abcd0f;
     //Right align with zero and header
-    IntegerToStreamExadecimalNotation(thisStream, ubit32, 11, true, false, true,
+    IntegerToStreamExadecimalNotation(thisStream, ubit32, 11, true, false, sizeof(ubit32)*8,
                                       true);
     if (!StringTestHelper::Compare(" 0x00ABCD0F", thisStream.Buffer())) {
         return False;
@@ -342,7 +385,7 @@ bool IntegerToStreamTest::TestHexadecimalStream() {
 
     //Right align without zeros and header
     IntegerToStreamExadecimalNotation(thisStream, ubit32, 11, true, false,
-                                      false, false);
+                                      0, false);
     if (!StringTestHelper::Compare("     ABCD0F", thisStream.Buffer())) {
         return False;
     }
@@ -367,7 +410,7 @@ bool IntegerToStreamTest::TestHexadecimalStream() {
     thisStream.Clear();
 
     ubit64 = 0xfff0;
-    IntegerToStreamExadecimalNotation(thisStream, ubit64, 7, true, true, true);
+    IntegerToStreamExadecimalNotation(thisStream, ubit64, 7, true, true, sizeof(ubit64)*8);
     if (!StringTestHelper::Compare("000FFF0", thisStream.Buffer())) {
         return False;
     }
@@ -395,7 +438,7 @@ bool IntegerToStreamTest::TestOctalStream() {
 
     //Add Header and trailing zeros
     thisStream.Clear();
-    IntegerToStreamOctalNotation(thisStream, ubit8, 0, false, false, true,
+    IntegerToStreamOctalNotation(thisStream, ubit8, 0, false, false, sizeof(ubit8)*8,
                                  true);
     if (!StringTestHelper::Compare("0o352", thisStream.Buffer())) {
         return False;
@@ -405,7 +448,7 @@ bool IntegerToStreamTest::TestOctalStream() {
     ubit8 = 0xf;
     //Add only trailing zeros
     thisStream.Clear();
-    IntegerToStreamOctalNotation(thisStream, ubit8, 0, false, false, true,
+    IntegerToStreamOctalNotation(thisStream, ubit8, 0, false, false, sizeof(ubit8)*8,
                                  false);
     if (!StringTestHelper::Compare("017", thisStream.Buffer())) {
         return False;
@@ -414,7 +457,7 @@ bool IntegerToStreamTest::TestOctalStream() {
 
     //All true with a space more... it must print a space after.
     uint16 ubit16 = 0x7bcd; //6 is the maximum now are 5
-    IntegerToStreamOctalNotation(thisStream, ubit16, 9, true, true, true, true);
+    IntegerToStreamOctalNotation(thisStream, ubit16, 9, true, true, sizeof(ubit16)*8, true);
     if (!StringTestHelper::Compare("0o075715 ", thisStream.Buffer())) {
         return False;
     }
@@ -422,7 +465,7 @@ bool IntegerToStreamTest::TestOctalStream() {
 
     ubit16 = 0xcd;
     //With zeros and 5 as number of digits (without header).
-    IntegerToStreamOctalNotation(thisStream, ubit16, 7, true, true, true, true);
+    IntegerToStreamOctalNotation(thisStream, ubit16, 7, true, true, sizeof(ubit16)*8, true);
     if (!StringTestHelper::Compare("0o00315", thisStream.Buffer())) {
         return False;
     }
@@ -430,7 +473,7 @@ bool IntegerToStreamTest::TestOctalStream() {
 
     //Only right aligned with header
     uint32 ubit32 = 0xabcdef78;
-    IntegerToStreamOctalNotation(thisStream, ubit32, 15, true, false, false,
+    IntegerToStreamOctalNotation(thisStream, ubit32, 15, true, false, 0,
                                  true);
     if (!StringTestHelper::Compare("  0o25363367570", thisStream.Buffer())) {
         return False;
@@ -439,7 +482,7 @@ bool IntegerToStreamTest::TestOctalStream() {
 
     ubit32 = 0xcd0f;
     //Right align with zero and header
-    IntegerToStreamOctalNotation(thisStream, ubit32, 15, true, false, true,
+    IntegerToStreamOctalNotation(thisStream, ubit32, 15, true, false, sizeof(ubit32)*8,
                                  true);
     if (!StringTestHelper::Compare("  0o00000146417", thisStream.Buffer())) {
         return False;
@@ -447,7 +490,7 @@ bool IntegerToStreamTest::TestOctalStream() {
     thisStream.Clear();
 
     //Right align without zeros and header
-    IntegerToStreamOctalNotation(thisStream, ubit32, 15, true, false, false,
+    IntegerToStreamOctalNotation(thisStream, ubit32, 15, true, false, 0,
                                  false);
     if (!StringTestHelper::Compare("         146417", thisStream.Buffer())) {
         return False;
@@ -472,7 +515,7 @@ bool IntegerToStreamTest::TestOctalStream() {
     thisStream.Clear();
 
     ubit64 = 0xfff0;
-    IntegerToStreamOctalNotation(thisStream, ubit64, 7, true, true, true);
+    IntegerToStreamOctalNotation(thisStream, ubit64, 7, true, true, sizeof(ubit64)*8);
     if (!StringTestHelper::Compare("0177760", thisStream.Buffer())) {
         return False;
     }
@@ -500,7 +543,7 @@ bool IntegerToStreamTest::TestBinaryStream() {
 
     //Add trailing zeros
     thisStream.Clear();
-    IntegerToStreamBinaryNotation(thisStream, ubit8, 0, false, false, true,
+    IntegerToStreamBinaryNotation(thisStream, ubit8, 0, false, false, sizeof(ubit8)*8,
                                   true);
     if (!StringTestHelper::Compare("0b11101010", thisStream.Buffer())) {
         return False;
@@ -510,7 +553,7 @@ bool IntegerToStreamTest::TestBinaryStream() {
     ubit8 = 0xf;
     //Add only trailing zeros
     thisStream.Clear();
-    IntegerToStreamBinaryNotation(thisStream, ubit8, 0, false, false, true,
+    IntegerToStreamBinaryNotation(thisStream, ubit8, 0, false, false, sizeof(ubit8)*8,
                                   false);
     if (!StringTestHelper::Compare("00001111", thisStream.Buffer())) {
         return False;
@@ -519,7 +562,7 @@ bool IntegerToStreamTest::TestBinaryStream() {
 
     //All true with a space more... it must print a space after.
     uint16 ubit16 = 0x7bcd; //
-    IntegerToStreamBinaryNotation(thisStream, ubit16, 19, true, true, true,
+    IntegerToStreamBinaryNotation(thisStream, ubit16, 19, true, true, sizeof(ubit16)*8,
                                   true);
     if (!StringTestHelper::Compare("0b0111101111001101 ",
                                    thisStream.Buffer())) {
@@ -529,7 +572,7 @@ bool IntegerToStreamTest::TestBinaryStream() {
 
     ubit16 = 0xcd;
     //With zeros and 10 as number of digits (without header).
-    IntegerToStreamBinaryNotation(thisStream, ubit16, 12, true, true, true,
+    IntegerToStreamBinaryNotation(thisStream, ubit16, 12, true, true, sizeof(ubit16)*8,
                                   true);
     if (!StringTestHelper::Compare("0b0011001101", thisStream.Buffer())) {
         return False;
@@ -547,7 +590,7 @@ bool IntegerToStreamTest::TestBinaryStream() {
 
     ubit32 = 0xcd0f;
     //Right align with zero and header
-    IntegerToStreamBinaryNotation(thisStream, ubit32, 34, true, false, true);
+    IntegerToStreamBinaryNotation(thisStream, ubit32, 34, true, false, sizeof(ubit32)*8);
     if (!StringTestHelper::Compare("  00000000000000001100110100001111",
                                    thisStream.Buffer())) {
         return False;
@@ -555,7 +598,7 @@ bool IntegerToStreamTest::TestBinaryStream() {
     thisStream.Clear();
 
     //Right align without zeros and header
-    IntegerToStreamBinaryNotation(thisStream, ubit32, 34, true, false, false);
+    IntegerToStreamBinaryNotation(thisStream, ubit32, 34, true, false, 0);
     if (!StringTestHelper::Compare("                  1100110100001111",
                                    thisStream.Buffer())) {
         return False;
@@ -581,7 +624,7 @@ bool IntegerToStreamTest::TestBinaryStream() {
     thisStream.Clear();
 
     ubit64 = 0xff0;
-    IntegerToStreamBinaryNotation(thisStream, ubit64, 14, true, true, true);
+    IntegerToStreamBinaryNotation(thisStream, ubit64, 14, true, true, sizeof(ubit64)*8);
     if (!StringTestHelper::Compare("00111111110000", thisStream.Buffer())) {
         return False;
     }
