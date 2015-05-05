@@ -44,8 +44,8 @@ public:
     StringHelperTest() {
     }
 
-    /** @brief Tests the Length() function 
-     .     * @param string.
+    /** @brief Tests the Length() function.
+     * @param string.
      * @return true if the length of the string is correct. */
     bool TestLength(const char* string);
 
@@ -72,7 +72,7 @@ public:
 
     /** @brief Test the tokenize functions (by string, by chars).
      * @return true if the operations return the expected result. */
-    bool TestToken();
+//    bool TestToken();
 
 };
 

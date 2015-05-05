@@ -47,8 +47,8 @@ TEST_F(StringHelperGTest,TestSearch) {
     StringHelperTest mystringhelper;
     ASSERT_TRUE(mystringhelper.TestSearch());
 }
-
+/*
 TEST_F(StringHelperGTest,TestToken) {
     StringHelperTest mystringhelper;
     ASSERT_TRUE(mystringhelper.TestToken());
-}
+}*/

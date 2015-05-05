@@ -166,8 +166,8 @@ bool StringHelperTest::TestConcatenate() {
 }
 
 bool StringHelperTest::TestSearch() {
-    char* buffer =(char*) "Hello World";
-    char* retPointer;
+    const char* buffer ="Hello World";
+    const char* retPointer;
 
     //Since u is not in the string this must be return false
     if (StringHelper::SearchChar(buffer, 'u') != NULL) {
@@ -175,7 +175,7 @@ bool StringHelperTest::TestSearch() {
     }
 
     //Test the return pointer (search first occurrence).
-    if ((retPointer =(char*) StringHelper::SearchChar((const char*)buffer, 'l')) == NULL) {
+    if ((retPointer =StringHelper::SearchChar(buffer, 'l')) == NULL) {
         return False;
     }
 
@@ -244,7 +244,7 @@ bool StringHelperTest::TestSearch() {
 
     return True;
 }
-
+/*
 bool StringHelperTest::TestToken() {
 
     char buffer1[32];
@@ -282,4 +282,4 @@ bool StringHelperTest::TestToken() {
 
     return True;
 
-}
+}*/
