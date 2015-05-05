@@ -23,10 +23,10 @@
  *
  **/
 /**
- * @class CStreamTest
- * @brief Tests the CStream functions.
+ * @class BitSetToIntegerTest
+ * @brief Tests the BitSetToInteger functions.
  *
- * The test consists in observe the results of the various operators between BStrings, const char* and char.
+ * The test consists in observe the results of the various functions which manipulate bitSet data.
  */
 
 #ifndef BITSET_TO_INTEGER_TEST_H
@@ -41,8 +41,13 @@ class BitSetToIntegerTest {
 private:
 
 public:
+	/** @brief Tests the write from source bitSet to destination bitSet. */
 	bool TestBitSetToBitSet();
+
+	/** @brief Tests the write from a bitSet to an integer. */
 	bool TestBitSetToInteger();
+
+	/** @brief Tests the write from an integer to a bitSet. */
 	bool TestIntegerToBitSet();
 };
 

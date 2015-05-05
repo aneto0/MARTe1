@@ -26,6 +26,7 @@
 #include "IntegerToStreamTest.h"
 #include "StringTestHelper.h"
 #include "StreamTestHelper.h"
+#include "StringPortable.h"
 
 bool IntegerToStreamTest::TestDecimalMagnitude() {
     uint8 bit8 = 255;
@@ -670,4 +671,50 @@ bool IntegerToStreamTest::TestIntegerToStream() {
         return False;
     }
     return True;
+}
+
+
+
+
+
+bool IntegerToStreamTest::TestBitSetToStream() {
+	uint64 data[5] =   {0x13579BDF02468ACE,0x13579BDF02468ACE,0x123456789ABCDEF0,0xDEADBABEBAB00111};
+	const char streamString[] = "DEADBABEBAB00111123456789ABCDEF013579BDF02468ACE13579BDF02468ACE";
+	int32 sizeStr=63;   
+	int32 dataBitSize=256;
+	MyStream myStream;
+
+	FormatDescriptor	format;
+	const char *pFormat;
+	pFormat = "0x";	
+	format.InitialiseFromString(pFormat);
+	uint32*	source = (uint32*) data;
+
+	//from size =1 to size = 64
+	for(int size=4; size<64; size+=4){
+		int32 beg=0;
+		int32 end=0;
+		
+		for(int myShift=0; myShift<dataBitSize; myShift+=size){
+			//source and shift are automatically modified by the function.
+			BitSetToStream(myStream, source , myShift, size, false, format);
+			char buffer[128];
+			
+			end=sizeStr-myShift/4;
+			beg=end-size/4 + 1;
+			StringPortable::Substr(beg, end, streamString, buffer);
+//			printf("\n%s",buffer);
+
+			if(!StringTestHelper::Compare(buffer, myStream.Buffer())){
+				return False;
+			}
+			myStream.Clear();
+
+			//Avoids to print shit. (it remains less than size)
+			if((dataBitSize-myShift)<(2*size))
+				break;			
+		}
+	}
+
+        return True;
 }

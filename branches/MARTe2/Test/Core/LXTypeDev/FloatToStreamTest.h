@@ -23,10 +23,11 @@
  *
  **/
 /**
- * @class CStreamTest
- * @brief Tests the CStream functions.
+ * @class FloatToStreamTest
+ * @brief Tests the Float To stream functions.
  *
- * The test consists in observe the results of the various operators between BStrings, const char* and char.
+ * The test consists in observing the results of the conversions from float (or equivalent) numbers and strings and their correct
+ * print on a generic stream which implements a PutC(c) function.
  */
 
 #ifndef FLOAT_TO_STREAM_TEST_H
@@ -41,11 +42,22 @@ private:
 
 public:
 
+    /** Tests the print of a float on a stream in fixed point notation (precision = #decimals) */
     bool TestFixedPoint();
+ 
+    /** Tests the print of a float on a stream in fixed point relative notation (precision = #significative digits). */
     bool TestFixedRelativePoint();
+    
+    /** Tests the print of a float on a stream in engineering notation (precision = #significative digits). */
     bool TestEngeneering();
+    
+    /** Tests the print of a float on a stream in smart notation (precision = #significative digits). */
     bool TestSmart();
+
+    /** Tests the print of a float on a stream in exponential notation (precision = #significative digits). */
     bool TestExponential();
+    
+    /** Tests the print of a float on a stream in compact notation (precision = #significative digits). */
     bool TestCompact();
 };
 

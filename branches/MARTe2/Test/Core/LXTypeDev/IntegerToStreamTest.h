@@ -23,14 +23,15 @@
  *
  **/
 /**
- * @class CStreamTest
- * @brief Tests the CStream functions.
+ * @class IntegerToStreamTest
+ * @brief Tests the Integer to Stream functions.
  *
- * The test consists in observe the results of the various operators between BStrings, const char* and char.
+ * The test consists in observing the results of the conversion from integer-bitSet to a string, and its corrent print
+ * on a generic stream which implements a generic PutC(c) function.
  */
 
-#ifndef NUMBER_TO_STRING_TEST_H
-#define NUMBER_TO_STRING_TEST_H
+#ifndef INTEGER_TO_STREAM_TEST_H
+#define INTEGER_TO_STREAM_TEST_H
 
 #include "IntegerToStream.h"
 #include "FormatDescriptor.h"
@@ -42,17 +43,35 @@ private:
 
 public:
 
+    /** @brief Tests the goodness of the function which returns the exponent of a decimal number.*/ 
     bool TestDecimalMagnitude();
+
+    /** @brief Tests the goodness of the function which returns the number of digits for an exadecimal notation. */
     bool TestHexadecimalMagnitude();
+
+    /** @brief Tests the goodness of the function which returns the number of digits for an octal notation. */
     bool TestOctalMagnitude();
+   
+    /** @brief Tests the goodness of the function which returns the number of digits for a binary notation. */
     bool TestBinaryMagnitude();
+    
+    /** @brief Tests the print of an integer on a generic stream using the decimal notation. */
     bool TestDecimalStream();
+
+    /** @brief Tests the print of an integer on a generic stream using the exadecimal notation. */
     bool TestHexadecimalStream();
+    
+    /** @brief Tests the print of an integer on a generic stream using the octal notation. */
     bool TestOctalStream();
+    
+    /** @brief Tests the print of an integer on a generic stream using the binary notation. */
     bool TestBinaryStream();
-    bool TestDecimalPrint();
-    bool TestHexadecimalPrint();
+    
+    /** @brief Tests the print of an integer on a generic stream using different notations. */
     bool TestIntegerToStream();
+    
+    /** @brief Tests the print of a bitSet on a generic stream. */
+    bool TestBitSetToStream();
 };
 
 #endif
