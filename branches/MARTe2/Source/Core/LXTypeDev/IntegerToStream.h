@@ -253,11 +253,11 @@ template <typename T> uint16 GetNumberOfDigitsBinaryNotation(T number){
   * @param numberFillLength is the minimum number of digits requested for each 16 bit number (<5 because 2**16 has 5 digits) and 
   * the function fillw the different between it and the minimum necessary space with zeros.
   * 
-  * This function implements a 2 step conversion - step1 32/64 to 16bit step2 10bit to decimal
-  * this way the number of 32/64 bit operations are reduced
-  * numberFillLength is used to specify how many digits to prints at least (this would include trailingzeros)
-  * it will never print more trailing zeros than the maximum size of a number of that format
-  * streamer must have a PutC(char) method. It will be used to output the digits. */
+  * This function implements a 2 step conversion - step1 32/64 to 16bit step2 10bit to decimal.
+  * This way the number of 32/64 bit operations are reduced.
+  * NumberFillLength is used to specify how many digits to prints at least (this would include trailingzeros).
+  * It will never prints more trailing zeros than the maximum size of a number of that format.
+  * Streamer must have a PutC(char) method. It will be used to output the digits. */
 template <typename T, class streamer> 
 static inline void Number2StreamDecimalNotationPrivate(streamer &s, T positiveNumber,int16 numberFillLength=0){
 
@@ -379,9 +379,9 @@ static inline void PutS(streamer & stream,const char *s){
   * @param addPositiveSign specifies if we want print the '+' before positive numbers.
   * @return true.
   *
-  * Converts any integer type, signed and unsigned to a sequence of characters inserted into the stream stream by mean of a method PutC
-  * respects maximumSize and number integrity. 
-  * if not possible (maximum size minor than the minimum space for the number print) outputs is ? */
+  * Converts any integer type, signed and unsigned to a sequence of characters inserted into the stream stream by mean of a method PutC.
+  * Respects maximumSize and number integrity. 
+  * If not possible (maximum size minor than the minimum space for the number print) outputs is ? */
 template <typename T, class streamer> 
 bool IntegerToStreamDecimalNotation(
 			streamer &		stream,                        // must have a GetC(c) function where c is of a type that can be obtained from chars  
@@ -485,10 +485,10 @@ bool IntegerToStreamDecimalNotation(
   * @param addHeader specifies if we want to add the hex header '0x' before the number.
   * @return true.
   *
-  * Converts any integer type, signed and unsigned to a sequence of characters inserted into the stream stream by mean of a method PutC
-  * uses hexadecimal notation 
-  * respects maximumSize and number integrity 
-  * if not possible (maximum size minor than the minimum space for the number print) output is ? */
+  * Converts any integer type, signed and unsigned to a sequence of characters inserted into the stream stream by mean of a method PutC.
+  * Uses hexadecimal notation. 
+  * Respects maximumSize and number integrity. 
+  * If not possible (maximum size minor than the minimum space for the number print) output is ? */
 template <typename T, class streamer> 
 bool IntegerToStreamExadecimalNotation(
 			streamer &		stream, 
@@ -599,10 +599,10 @@ bool IntegerToStreamExadecimalNotation(
   * @param addHeader specifies if we want to add the oct header '0o' before the number.
   * @return true.
   *
-  * Converts any integer type, signed and unsigned to a sequence of characters inserted into the stream stream by mean of a method PutC
-  * uses octal notation 
-  * respects maximumSize and number integrity 
-  * if not possible (maximum size minor than the minimum space for the number print) output is ?  */
+  * Converts any integer type, signed and unsigned to a sequence of characters inserted into the stream stream by mean of a method PutC.
+  * Uses octal notation.
+  * Respects maximumSize and number integrity.
+  * If not possible (maximum size minor than the minimum space for the number print) output is ?  */
 template <typename T, class streamer> 
 bool IntegerToStreamOctalNotation(       
 	streamer &		stream, 
@@ -713,10 +713,10 @@ bool IntegerToStreamOctalNotation(
   * @param addHeader specifies if we want to add the bin header '0b' before the number.
   * @return true.
   *
-  * Converts any integer type, signed and unsigned to a sequence of characters inserted into the stream stream by mean of a method PutC
-  * uses binary notation 
-  * respects maximumSize and number integrity 
-  * if not possible (maximum size minor than the minimum space for the number print) output is ?  */
+  * Converts any integer type, signed and unsigned to a sequence of characters inserted into the stream stream by mean of a method PutC.
+  * Uses binary notation. 
+  * Respects maximumSize and number integrity. 
+  * If not possible (maximum size minor than the minimum space for the number print) output is ?  */
 template <typename T, class streamer> 
 bool IntegerToStreamBinaryNotation(
 		streamer &		stream, 
@@ -822,11 +822,11 @@ bool IntegerToStreamBinaryNotation(
   * @param format is the desired format.
   * @return true if the format is correct, false otherwise.
   *
-  * Converts any integer type, signed and unsigned to a sequence of characters inserted into the stream stream by mean of a method PutC
-  * uses notation specified in format
-  * also respects all relevant format parameters 
-  * respects format.size and number integrity 
-  * if not possible output is ? */
+  * Converts any integer type, signed and unsigned to a sequence of characters inserted into the stream stream by mean of a method PutC.
+  * Uses notation specified in format.
+  * Also respects all relevant format parameters.
+  * Respects format.size and number integrity. 
+  * If not possible output is ? */
 template <typename T, class streamer> 
 bool IntegerToStream(
 		streamer &			stream, 
@@ -861,11 +861,11 @@ bool IntegerToStream(
   * @param format is the desired format.
   * @return true if the format is correct, false otherwise.
   *
-  * Converts any integer type, signed and unsigned to a sequence of characters inserted into the stream stream by mean of a method PutC
-  * uses notation specified in format
-  * also respects all relevant format parameters 
-  * respects format.size and number integrity 
-  * if not possible output is ? */
+  * Converts any integer type, signed and unsigned to a sequence of characters inserted into the stream stream by mean of a method PutC.
+  * Uses notation specified in format.
+  * Also respects all relevant format parameters.
+  * Respects format.size and number integrity.
+  * If not possible output is ? */
 template < class streamer> 
 bool BitSetToStream(
 		streamer &			stream, 

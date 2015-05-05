@@ -21,6 +21,10 @@
  * $Id: CStream.cpp 3 2012-01-15 16:26:07Z aneto $
  *
  **/
+/**
+ * @file 
+ * @brief Functions to print float numbers on generic streams.
+*/
 
 #if !defined FLOAT_TO_STREAM
 #define FLOAT_TO_STREAM

@@ -33,9 +33,22 @@
 #include <math.h>
 #include "DoubleInteger.h"
 
-/**BitSet to BitSet
- * for private use only
- * T must be chosen correctly to avoid overflows
+/** @Brief BitSet to BitSet function for private use only.
+  * @param destination is a pointer to the bitSet destination.
+  * @param destinationBitShift is the desired shift in bit in destination variable.
+  * @param destinationBitSize is the desired size in bit for the number to copy in destination.
+  * @param destinationIsSigned specifies is the number in destination will be considered signed (true) or not (false).
+  * @param source is a pointer to the bitSet source.
+  * @param sourceBitShift defines the shift from which extract the number.
+  * @param sourceBitSize is the desired size in bit for the number to extract from source.
+  * @param sourceIsSigned specifies if the number to extract from source will be considered signed (true) or not (false).
+  *
+  * Source negative (then signed) and destination unsigned leads that zero is copied (saturation).
+  * Source negative and destination signed with a greater dimension leads that will be copied the number with the sign extension.
+  * If source is negative and destination is signed with a minor dimension, the function checks if source is minor than the minimum
+  * supported by the destination dimension and in positive case copy the minimum possible (1000...). 
+  * If source is positive and destination is signed the function operates a saturation observing the destination size (-1 in case of 
+  * destination signed).
 */
 template <typename T>
 static inline void BSToBS(
@@ -98,7 +111,11 @@ static inline void BSToBS(
 			// if I need to squeeze a larger number into a smaller 
 			if (sourceBitSize > destinationBitSize){
 				// create a mask of bits covering the bits where source exceeds destination 
-				T mask = sourceMask - destinationMask;
+                                // the mask contains sourceBitSize-destinationBitSize+1 ones, and 
+                                // if all of these bits are ones in the source the number can be written in the destination.
+                                // ex. 1101 in 3 bits can be written (mask=1100), 1001 not.
+				T mask = sourceMask - (destinationMask >> 1);
+
 				// if any of these bits is not 1 then we have a larger negative number
 				if ((sourceCopy & mask) != mask){
 					// 0x8000.. is the maximum negative
@@ -139,16 +156,27 @@ static inline void BSToBS(
 
 }
 
-/**
- * Converts an integer of bitSize sourceBitSize 
- * located at address source and bitAddress sourceBitShift
- * into an integer of bitSize destinationBitSize 
- * located at address destination and bitAddress destinationBitShift
- * destination and source must be of the same type T 
- * T must be unsigned int of byte size power of 2 (8,16,32,64,128...) not 24 48 etc...
- * T determines the minimum number size used for the operations
- * T=uint8 means that any number may be used
- */
+
+
+
+
+/** @Brief BitSet to BitSet function for copy a bit range from a source to a destination.
+  * @param destination is a pointer to the bitSet destination.
+  * @param destinationBitShift is the desired shift in bit in destination variable.
+  * @param destinationBitSize is the desired size in bit for the number to copy in destination.
+  * @param destinationIsSigned specifies is the number in destination will be considered signed (true) or not (false).
+  * @param source is a pointer to the bitSet source.
+  * @param sourceBitShift defines the shift from which extract the number.
+  * @param sourceBitSize is the desired size in bit for the number to extract from source.
+  * @param sourceIsSigned specifies if the number to extract from source will be considered signed (true) or not (false).
+  *
+  * Converts an integer of bitSize sourceBitSize located at address source and bitAddress sourceBitShift
+  * into an integer of bitSize destinationBitSize located at address destination and bitAddress destinationBitShift
+  * destination and source must be of the same type T. 
+  * T must be unsigned int of byte size power of 2 (8,16,32,64,128...) not 24 48 etc...
+  * T determines the minimum number size used for the operations.
+  * T=uint8 means that any number may be used.
+  */
 template <typename T>
 static inline bool BitSetToBitSet(
         T *&                destination,
@@ -166,7 +194,7 @@ static inline bool BitSetToBitSet(
 	// mask to eliminate multiples of granularity - 
 	// granularity must be a power of 2 
 	int16 granularityMask  = granularity - 1;
-	// exponent of the power of 2 that is granularity (log2 of the number of bytes)
+	// exponent of the power of 2 that is granularity (log2 of the number of bits in T)
 	int16 granularityShift = 3;
 	int16 temp = sizeof(T);
 	while (temp > 1){
@@ -237,14 +265,19 @@ static inline bool BitSetToBitSet(
 	return true;
 }
 
-
-/**
- * Converts an integer of bitSize sourceBitSize 
- * located at address source and bitAddress sourceBitShift
- * into an integer of type T2
- * T must be unsigned int of byte size power of 2 (8,16,32,64,128...) not 24 48 etc...
- * T determines the minimum number size used for the operations
- * T=uint8 means that any number may be used
+/** @Brief BitSet to Integer function.
+  * @param dest is the location for the copy of the desired bit range.
+  * @param source is a pointer to the bitSet source.
+  * @param sourceBitShift defines the shift from which extract the number.
+  * @param sourceBitSize is the desired size in bit for the number to extract from source.
+  * @param sourceIsSigned specifies if the number to extract from source will be considered signed (true) or not (false).
+  *
+  *
+  * Converts an integer of bitSize sourceBitSize located at address source and bitAddress sourceBitShift
+  * into an integer of type T2.
+  * T must be unsigned int of byte size power of 2 (8,16,32,64,128...) not 24 48 etc...
+  * T determines the minimum number size used for the operations.
+  * T=uint8 means that any number may be used
  */
 template <typename T,typename T2>
 static inline bool BitSetToInteger(
@@ -265,14 +298,19 @@ static inline bool BitSetToInteger(
     return BitSetToBitSet(destination,destinationBitShift,destinationBitSize,destinationIsSigned,source,sourceBitShift,sourceBitSize,sourceIsSigned);
 }
 
-/**
- * Converts an integer of type T2
- * into an integer of bitSize destinationBitSize 
- * located at address destination and bitAddress destinationBitShift
- * T must be unsigned int of byte size power of 2 (8,16,32,64,128...) not 24 48 etc...
- * T determines the minimum number size used for the operations
- * T=uint8 means that any number may be used
- */
+/** @Brief Integer to BitSet function.
+  * @param destination is a pointer to the bitSet destination.
+  * @param destinationBitShift is the desired shift in bit in destination variable.
+  * @param destinationBitSize is the desired size in bit for the number to copy in destination.
+  * @param destinationIsSigned specifies is the number in destination will be considered signed (true) or not (false).
+  * @param source is the integer to copy.
+  * 
+  * Converts an integer of type T2 into an integer of bitSize destinationBitSize 
+  * located at address destination and bitAddress destinationBitShift.
+  * T must be unsigned int of byte size power of 2 (8,16,32,64,128...) not 24 48 etc...
+  * T determines the minimum number size used for the operations.
+  * T=uint8 means that any number may be used.
+  */
 template <typename T,typename T2>
 static inline bool IntegerToBitSet(
         T *&                destination,
