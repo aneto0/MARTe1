@@ -144,7 +144,7 @@ int32 StringOsLength(const char* string) {
 }
 
 /** @see StringHelper::SearchChars. */
-char* StringOsSearchChars(char* string1, const char* string2) {
+const char* StringOsSearchChars(const char* string1, const char* string2) {
     if (string1 == NULL || string2 == NULL) {
         return NULL;
     }
@@ -152,7 +152,7 @@ char* StringOsSearchChars(char* string1, const char* string2) {
 }
 
 /** @see StringHelper::SearchLastChar */
-char* StringOsSearchLastChar(char* string, char c) {
+const char* StringOsSearchLastChar(const char* string, char c) {
     if (string == NULL) {
         return NULL;
     }
@@ -160,7 +160,7 @@ char* StringOsSearchLastChar(char* string, char c) {
 }
 
 /** @see StringHelper::SearchString */
-char* StringOsSearchString(char* string, const char* substring) {
+const char* StringOsSearchString(const char* string, const char* substring) {
     if (string == NULL || substring == NULL) {
         return NULL;
     }
@@ -168,9 +168,9 @@ char* StringOsSearchString(char* string, const char* substring) {
 }
 
 /** @see StringHelper::Tokenizer */
-char* StringOsTokenizer(char* string, const char* delimiter) {
+/*char* StringOsTokenizer(char* string, const char* delimiter) {
     return strtok(string, delimiter);
 }
-
+*/
 #endif
 

@@ -73,22 +73,22 @@ int32 StringHelperLength(const char* string) {
 }
 
 //Return the pointer of the first char in string1 matched with one of chars in string2.
-char* StringHelperSearchChars(char* string1, const char* string2) {
+const char* StringHelperSearchChars(const char* string1, const char* string2) {
     return StringOsSearchChars(string1, string2);
 }
 
 //Return a pointer at the last char c founded in string
-char* StringHelperSearchLastChar(char* string, char c) {
+const char* StringHelperSearchLastChar(const char* string, char c) {
     return StringOsSearchLastChar(string, c);
 }
 
 //Return a pointer to the first occurrence of substring in string.
-char* StringHelperSearchString(char* string, const char* substring) {
+const char* StringHelperSearchString(const char* string, const char* substring) {
     return StringOsSearchString(string, substring);
 }
 
 //if string is NULL the function tokenize from the pointer of the previous success strtok function.
-char* StringHelperTokenizer(char* string, const char* delimiter) {
+/*char* StringHelperTokenizer(char* string, const char* delimiter) {
     return StringOsTokenizer(string, delimiter);
-}
+}*/
 

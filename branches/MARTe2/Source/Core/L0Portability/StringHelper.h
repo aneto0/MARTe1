@@ -63,16 +63,16 @@ int32 StringHelperSearchIndex(const char* string1, const char* string2);
 int32 StringHelperLength(const char* string);
 
 /** @see StringHelper::SearchChars(). */
-char* StringHelperSearchChars(char* string1, const char* string2);
+const char* StringHelperSearchChars(const char* string1, const char* string2);
 
 /** @see StringHelper::SearchLastChar(). */
-char* StringHelperSearchLastChar(char* string, char c);
+const char* StringHelperSearchLastChar(const char* string, char c);
 
 /** @see StringHelper::SearchString(). */
-char* StringHelperSearchString(char* string, const char* substring);
+const char* StringHelperSearchString(const char* string, const char* substring);
 
 /** @see StringHelper::Tokenizer(). */
-char* StringHelperTokenizer(char* string, const char* delimiter);
+/*char* StringHelperTokenizer(char* string, const char* delimiter);*/
 }
 
 /**
@@ -168,7 +168,7 @@ public:
       * @param string1 is the source string.
       * @param string2 contains characters which must be searched in string1.
       * @return a pointer to the first occurrence of a character in string2 contained in string1. */
-    static char* SearchChars(char* string1, const char* string2) {
+    static const char* SearchChars(const char* string1, const char* string2) {
         return StringHelperSearchChars(string1, string2);
     }
 
@@ -177,7 +177,7 @@ public:
       * @param string is the source string.
       * @param c is the character to search.
       * @return the last occurrence of c in string. */
-    static char* SearchLastChar(char* string, char c) {
+    static const char* SearchLastChar(const char* string, char c) {
         return StringHelperSearchLastChar(string, c);
     }
 
@@ -185,7 +185,7 @@ public:
       * @param string is the source string.
       * @param substring is the string which must be searched in string.
       * @returns a pointer to the first occurrence of substring in string. */
-    static char* SearchString(char* string, const char* substring) {
+    static const char* SearchString(const char* string, const char* substring) {
         return StringHelperSearchString(string, substring);
     }
 
@@ -194,9 +194,9 @@ public:
       * @param string is the source string.
       * @param delimiter contains delimiter characters.
       * @return a pointer to string terminated where delimiter is found. */
-    static char* Tokenizer(char* string, const char* delimiter) {
+   /* static char* Tokenizer(char* string, const char* delimiter) {
         return StringHelperTokenizer(string, delimiter);
-    }
+    }*/
 
 };
 
