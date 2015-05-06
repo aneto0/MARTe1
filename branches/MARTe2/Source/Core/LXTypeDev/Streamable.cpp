@@ -26,7 +26,7 @@
 #include "Streamable.h"
 #include "ErrorManagement.h"
 #include "StringHelper.h"
-
+#include "StreamHelper.h"
 
 
 bool Streamable::SetBufferSize(uint32 readBufferSize, uint32 writeBufferSize){
@@ -280,55 +280,8 @@ bool Streamable::GetToken(
                             uint32              outputBufferSize,
                             char *              saveTerminator,
                             const char *        skipCharacters){
-    // need space for trailing 0
-	outputBufferSize--;
-
-    if (skipCharacters == NULL) skipCharacters = terminator;
-
-    uint32 tokenSize=0;
-    while(1){
-        char c;
-        if (GetC(c)==False){
-
-            // 0 terminated string
-        	outputBuffer[tokenSize] = 0;
-
-            if (saveTerminator!=NULL) *saveTerminator = 0;
-
-            //
-            if (tokenSize == 0) return False;
-            else                return True;
-        }
-        
-        bool isTerminator = (StringHelper::SearchChar(terminator,c)!=NULL);
-        bool isSkip       = (StringHelper::SearchChar(skipCharacters,c)!=NULL);
-        if (isTerminator || ( c==0 )){
-
-            // exit only if some data was read, otw just skip separator block
-            if ((tokenSize != 0) || (!isSkip)){
-                // 0 terminated string
-            	outputBuffer[tokenSize] = 0;
-
-                if (saveTerminator!=NULL) *saveTerminator = c;
-
-                return True;
-            }
-        } else
-        if (!isSkip && !isTerminator){
-
-        	outputBuffer[tokenSize++] = c;
-            if (tokenSize >= outputBufferSize){
-                // 0 terminated string
-            	outputBuffer[tokenSize] = 0;
-
-                if (saveTerminator!=NULL) *saveTerminator = c;
-
-                return True;
-            }
-        }
-    }
-
-    return True;
+	
+	return GetTokenFromStream(*this, outputBuffer,terminator,outputBufferSize,saveTerminator,skipCharacters);
 }
 
 
@@ -350,38 +303,7 @@ bool Streamable::GetToken(
                             char *              saveTerminator,
                             const char *        skipCharacters){
 
-    if (skipCharacters == NULL) skipCharacters = terminator;
-
-    uint32 tokenSize=0;
-    while(1){
-        char c;
-        if (GetC(c)==False){
-
-            if (saveTerminator != NULL) *saveTerminator = 0;
-
-            //
-            if (tokenSize==0) return False;
-            else              return True;
-        }
-
-        bool isTerminator = (StringHelper::SearchChar(terminator,c)!=NULL);
-        bool isSkip       = (StringHelper::SearchChar(skipCharacters ,c)!=NULL);
-        if (isTerminator || ( c==0 )){
-            // exit only if some data was read, otw just skip separator block
-            if ((tokenSize != 0) || (!isSkip)){
-
-                if (saveTerminator != NULL) *saveTerminator = c;
-
-                return True;
-            }
-        } else
-        if (!isSkip && !isTerminator){
-            output.PutC(c);
-            tokenSize++;
-        }
-    }
-
-    return True;
+	return GetTokenFromStream(*this, output,terminator,saveTerminator,skipCharacters);
 }
 
 /** to skip a series of tokens delimited by terminators or 0
@@ -390,129 +312,17 @@ bool Streamable::SkipTokens(
                             uint32              count,
                             const char *        terminator){
 
-    uint32 tokenSize=0;
-    while(count>0){
-        char c;
-        if (GetC(c)==False){
-
-            if (tokenSize==0) return False;
-            else              return (count == 0);
-        } else
-        //
-        if ((StringHelper::SearchChar(terminator,c)!=NULL)||(c==0)){
-            // exit only if some data was read, otw just skip separator block
-            if (tokenSize!=0) {
-                tokenSize = 0;
-                count--;
-            }
-        } else {
-            tokenSize++;
-        }
-    }
-
-    return True;
+	return SkipTokensInStream(*this,count,terminator);
 }
-
-#include "IntegerToStream.h"
-#include "FloatToStream.h"
-
 
 bool Streamable::Print(const AnyType& par,FormatDescriptor fd){
 
-	/// empty - an error?
-	if (par.dataPointer == NULL) return false;
+	return PrintToStream(*this,par,fd);
+}
 
-	if (par.dataDescriptor.isStructuredData ){
-		ErrorManagement::ReportError(UnsupportedError, "Streamable::Print StructuredData not supported");
-		return false;
-	}
+bool Streamable::PrintFormatted(const char *format, const AnyType pars[]){
 
-	switch (par.dataDescriptor.type){
-
-	case TypeDescriptor::UnsignedInteger: 
-	{
-		if (par.bitAddress == 0){
-			switch (par.dataDescriptor.size){
-			case 8:{
-				uint8 *data = (uint8 *)par.dataPointer;
-				return IntegerToStream(*this,*data,fd);
-			} break;
-			case 16:{
-				uint16 *data = (uint16 *)par.dataPointer;
-				return IntegerToStream(*this,*data,fd);
-			} break;
-			case 32:{
-				uint32 *data = (uint32 *)par.dataPointer;
-				return IntegerToStream(*this,*data,fd);
-			} break;
-			case 64:{
-				uint64 *data = (uint64 *)par.dataPointer;
-				return IntegerToStream(*this,*data,fd);
-			} break;
-			}
-		} 
-		// use native standard integer
-		unsigned int *number = (unsigned int *)par.dataPointer;
-		// all the remaining cases here
-		return BitSetToStream(*this,number,par.bitAddress,par.dataDescriptor.size,false,fd);
-		
-	} break;
-	case TypeDescriptor::SignedInteger:
-	{
-		if (par.bitAddress == 0){
-			switch (par.dataDescriptor.size){
-			case 8:{
-				int8 *data = (int8 *)par.dataPointer;
-				return IntegerToStream(*this,*data,fd);
-			} break;
-			case 16:{
-				int16 *data = (int16 *)par.dataPointer;
-				return IntegerToStream(*this,*data,fd);
-			} break;
-			case 32:{
-				int32 *data = (int32 *)par.dataPointer;
-				return IntegerToStream(*this,*data,fd);
-			} break;
-			case 64:{
-				int64 *data = (int64 *)par.dataPointer;
-				return IntegerToStream(*this,*data,fd);
-			} break;
-			}
-		}
-		// use native standard integer
-		unsigned int *number = (unsigned int *)par.dataPointer;
-		// all the remaining cases here
-		return BitSetToStream(*this,number,par.bitAddress,par.dataDescriptor.size,true,fd);
-		
-	}break;
-	case TypeDescriptor::Float:{
-		switch (par.dataDescriptor.size){
-		case 32:{
-			float *data = (float *)par.dataPointer;
-			return FloatToStream(*this,*data,fd);
-		} break;
-		case 64:{
-			double *data = (double *)par.dataPointer;
-			return FloatToStream(*this,*data,fd);
-		} break;
-		case 128:{
-			REPORT_ERROR(UnsupportedError,"unsupported 128 bit float")			
-			return false;
-		} break;
-		default:{
-			REPORT_ERROR(ParametersError,"non standard float size")			
-			return false;
-		}
-		} 
-	}break;
-
-	default:{
-		
-	}
-	}
-
-	REPORT_ERROR(UnsupportedError,"unsupported format")			
-	return false;
+	return PrintFormattedToStream(*this,format,pars);
 }
 
 

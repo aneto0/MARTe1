@@ -138,7 +138,9 @@ protected: // read buffer and statuses
     */
     uint32                  readBufferFillAmount;
 
-protected: // mode switch methods
+    
+    
+private: // mode switch methods
     
     /** 
         sets the readBufferFillAmount to 0
@@ -166,7 +168,7 @@ protected: // mode switch methods
         return true;
     }
 
-protected: // read buffer protected methods
+private: // read buffer private methods
 
     /**
         sets the readBufferFillAmount to 0
@@ -195,13 +197,12 @@ protected: // read buffer protected methods
         return UnBufferedRead(readBuffer.BufferReference(),readBufferFillAmount);  
     }
 
-private:    
     /// copies to buffer size bytes from the end of readBuffer
     void BufferRead(char *buffer, uint32 &size);
     // NOTE used privately by Read 
 
 
-protected: // write buffer and statuses
+private: // write buffer and statuses
 
     /** starts empty 
         used exclusively for separate output operations 
@@ -215,7 +216,7 @@ protected: // write buffer and statuses
     */
     uint32                  writeBufferAccessPosition;
 
-protected: // write buffer methods
+private: // write buffer methods
     
     /**  
         empty writeBuffer
@@ -252,7 +253,62 @@ public:
         can be overridden but is not meant to - just accessed via VT
     */
     virtual bool SetBufferSize(uint32 readBufferSize=0, uint32 writeBufferSize=0);
+
     
+protected: // methods to be implemented by deriving classes
+    
+    /** 
+        Reads data into buffer. 
+        As much as size byte are read, 
+        actual read size is returned in size. 
+        msecTimeout is how much the operation should last - no more
+        timeout behaviour depends on class characteristics and sync mode. 
+        I.E. sockets with blocking activated wait forever when noWait is used .... 
+    */
+    virtual bool        UnBufferedRead(
+                            char*               buffer,
+                            uint32 &            size,
+                            TimeoutType         msecTimeout     = TTDefault,
+                            bool                complete        = false)=0;
+
+    /** 
+        Write data from a buffer to the stream. 
+        As much as size byte are written, 
+        actual written size is returned in size. 
+        msecTimeout is how much the operation should last.
+        timeout behaviour depends on class characteristics and sync mode. 
+        I.E. sockets with blocking activated wait forever when noWait is used .... 
+    */
+    virtual bool        UnBufferedWrite(
+                            const char*         buffer,
+                            uint32 &            size,
+                            TimeoutType         msecTimeout     = TTDefault,
+                            bool                complete        = false)=0;
+
+    // RANDOM ACCESS INTERFACE
+
+    /** The size of the stream */
+    virtual int64       UnBufferedSize()=0;
+
+    /** Moves within the file to an absolute location */
+    virtual bool        UnBufferedSeek(int64 pos)=0;
+
+    /** Returns current position */
+    virtual int64       UnBufferedPosition()=0;
+
+    /** Clip the stream size to a specified point */
+    virtual bool        UnBufferedSetSize(int64 size)=0;
+
+    // Extended Attributes or Multiple Streams INTERFACE
+
+    /** select the stream to read from. Switching may reset the stream to the start. */
+    virtual bool        UnBufferedSwitch(uint32 n)=0;
+
+    /** select the stream to read from. Switching may reset the stream to the start. */
+    virtual bool        UnBufferedSwitch(const char *name)=0;
+    
+    virtual bool        UnBufferedRemoveStream(const char *name)=0;
+
 protected:
     /// default constructor
     Streamable()
@@ -260,11 +316,10 @@ protected:
         readBufferAccessPosition    = 0;
         writeBufferAccessPosition   = 0;
         readBufferFillAmount        = 0;
-    	operatingModes.canSeek      = false;
-    	operatingModes.mutexReadMode = false;
-    	operatingModes.mutexWriteMode = false;
-    	operatingModes.stringMode = false;
-    	
+    	operatingModes.canSeek      	= false;
+    	operatingModes.mutexReadMode 	= false;
+    	operatingModes.mutexWriteMode 	= false;
+    	operatingModes.stringMode 		= false;
        
     }
 
@@ -464,41 +519,8 @@ public:  // auxiliary functions based on buffering
                             const char *        terminator);
 
     
-    /** Extract a line */
-    inline bool 		GetLine(
-    						char *				outputBuffer,
-    						uint32 				outputBufferSize,
-    						bool 				skipTerminators=True){
-        const char *skipCharacters = "\r";
-#if defined (_WIN32)
-        if (!skipTerminators) skipCharacters = "\r";
-#else
-        if (!skipTerminators) skipCharacters = "";
-#endif
-        return GetToken(outputBuffer,"\n",outputBufferSize,NULL,skipCharacters);
-    }
-
-    /** @param skipTerminators will skip an empty line or any part of a line termination */
-    inline bool 		GetLine(
-    						Streamable &	output,
-    						bool 				skipTerminators=True){
-        const char *skipCharacters = "\r";
-#if defined (_WIN32)
-        if (!skipTerminators) skipCharacters = "\r";
-#else
-        if (!skipTerminators) skipCharacters = "";
-#endif
-        return GetToken(output,"\n",NULL,skipCharacters);
-    }
-
-    
-/**
- *  Methods to convert and print numbers and other objects 
- */    
-    
-
-public:
-    
+   
+public: //  Methods to convert and print numbers and other objects 
     
     /**
      * Very powerful function to handle data conversion into a stream of chars
@@ -510,64 +532,8 @@ public:
          format follows the TypeDescriptor::InitialiseFromString
          prints all data pointed to by pars
     */
-    inline bool PrintFormatted(const char *format, const AnyType pars[]){
-    	// indicates active parameter
-    	int parsIndex = 0;
-    	// checks silly parameter
-    	if (format == NULL) return false;
-    	
-    	// loops through parameters
-    	while(1){
-    		// scans for % and in the meantime prints what it encounters
-    		while ((*format !=0) && (*format != '%')) {
-    			if (!PutC(*format)) return false;
-    			format++;
-    		}
-    		// end of format
-    		if (*format == 0) return true;
-    		
-    		// if not end then %
-    		// keep on parsing format to build a FormatDescriptor
-    		FormatDescriptor fd;
-    		if (!fd.InitialiseFromString(format)) return false;
-    		
-    		// if void simply skip and continue
-    		if (!pars[parsIndex].IsVoid()){
-    		    // use it to process parameters
-    		    if (!Print(pars[parsIndex++], fd)) return false;
-    		}
-    	}
-        // never comes here!
-    	return false;
-    }
+    virtual bool PrintFormatted(const char *format, const AnyType pars[]);
 
-    /** 
-    */
-    inline bool PrintFormatted(const char *format, const AnyType& par1){
-    	AnyType pars[2] = { par1,voidAnyType};
-    	return PrintFormatted(format, pars);
-    }
-
-    /** 
-    */
-    inline bool PrintFormatted(const char *format, const AnyType& par1, const AnyType& par2){
-    	AnyType pars[3] = { par1,par2,voidAnyType}; 
-    	return PrintFormatted(format, pars);
-    }
-
-    /** 
-    */
-    inline bool PrintFormatted(const char *format, const AnyType& par1, const AnyType& par2, const AnyType& par3){
-    	AnyType pars[4] = { par1,par2,par3,voidAnyType}; 
-    	return PrintFormatted(format, pars);
-    }
-
-    /** 
-    */
-    inline bool PrintFormatted(const char *format, const AnyType& par1, const AnyType& par2, const AnyType& par3, const AnyType& par4){
-    	AnyType pars[5] = { par1,par2,par3,par4,voidAnyType}; 
-    	return PrintFormatted(format, pars);
-    }
 
 };
 #endif
