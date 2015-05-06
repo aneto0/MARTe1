@@ -27,7 +27,7 @@
 #include "StringTestHelper.h"
 #include "StreamTestHelper.h"
 #include "StringPortable.h"
-
+#include "stdio.h"
 bool IntegerToStreamTest::TestDecimalMagnitude() {
     uint8 bit8 = 255;
 
@@ -316,6 +316,17 @@ bool IntegerToStreamTest::TestHexadecimalStream() {
 
     thisStream.Clear();
 
+    //Check if works also for negative signed numbers.
+    int8 sbit8 = 0xea;
+
+    IntegerToStreamExadecimalNotation(thisStream, sbit8);
+    if (!StringTestHelper::Compare("EA", thisStream.Buffer())) {
+        return False;
+    }
+
+    thisStream.Clear();
+
+
     //LeftAligned and not padded (nothing happen)
     IntegerToStreamExadecimalNotation(thisStream, ubit8, 5, false, true);
     if (!StringTestHelper::Compare("EA", thisStream.Buffer())) {
@@ -431,6 +442,15 @@ bool IntegerToStreamTest::TestOctalStream() {
     }
     thisStream.Clear();
 
+    //Test if works also for negative signed numbers.
+    int8 sbit8 = -22;
+
+    IntegerToStreamOctalNotation(thisStream, sbit8);
+    if (!StringTestHelper::Compare("352", thisStream.Buffer())) {
+        return False;
+    }
+    thisStream.Clear();
+   
     //LeftAligned and not padded (nothing happen)
     IntegerToStreamOctalNotation(thisStream, ubit8, 5, false, true);
     if (!StringTestHelper::Compare("352", thisStream.Buffer())) {
@@ -467,7 +487,7 @@ bool IntegerToStreamTest::TestOctalStream() {
     ubit16 = 0xcd;
     //With zeros and 5 as number of digits (without header).
     IntegerToStreamOctalNotation(thisStream, ubit16, 7, true, true, sizeof(ubit16)*8, true);
-    if (!StringTestHelper::Compare("0o00315", thisStream.Buffer())) {
+if (!StringTestHelper::Compare("0o00315", thisStream.Buffer())) {
         return False;
     }
     thisStream.Clear();
@@ -536,6 +556,14 @@ bool IntegerToStreamTest::TestBinaryStream() {
     }
     thisStream.Clear();
 
+    //Test if works also for negative signed numbers
+    int8 sbit8 = 0xea;
+
+    IntegerToStreamBinaryNotation(thisStream, sbit8);
+    if (!StringTestHelper::Compare("11101010", thisStream.Buffer())) {
+        return False;
+    }
+    thisStream.Clear();
     //LeftAligned and not padded (nothing happen)
     IntegerToStreamBinaryNotation(thisStream, ubit8, 50, false, true);
     if (!StringTestHelper::Compare("11101010", thisStream.Buffer())) {

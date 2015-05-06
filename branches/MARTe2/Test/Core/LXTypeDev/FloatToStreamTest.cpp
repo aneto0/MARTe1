@@ -71,6 +71,17 @@ bool FloatToStreamTest::TestFixedPoint() {
     }
     thisStream.Clear();
 
+
+    //Print 0
+    sbit32 = 0; //112345,...
+    pformat = " 3.2f";
+    format.InitialiseFromString(pformat);
+    FloatToStream(thisStream, sbit32, format);
+    if (!StringTestHelper::Compare("  0", thisStream.Buffer())) {
+        return False;
+    }
+    thisStream.Clear();
+    
     //Underflow
     sbit32 = 0.09; //112345,...
     pformat = " 1.2f";
@@ -189,12 +200,37 @@ bool FloatToStreamTest::TestFixedPoint() {
 
     thisStream.Clear();
 
+
+    //Negative exponent.
+    sbit64=0.009;
+    pformat = " 5.2f";
+    format.InitialiseFromString(pformat);
+    FloatToStream(thisStream, sbit64, format);
+
+    if (!StringTestHelper::Compare(" 0.01", thisStream.Buffer())) {
+        return False;
+    }
+
+    thisStream.Clear();
+
+
     //Not enough space (it must be at least 12+1(zero)+1(point)=14)
     __float128 sbit128 = 1e-12Q;
     pformat = " 12.10f";
     format.InitialiseFromString(pformat);
     FloatToStream(thisStream, sbit128, format);
     if (!StringTestHelper::Compare("           0", thisStream.Buffer())) {
+        return False;
+    }
+    thisStream.Clear();
+
+
+    //Not enough space with 1 as maxSize and for negative number (it must be at least 12+1(zero)+1(point)=14)
+    sbit128 = -1e-12Q;
+    pformat = " 1.10f";
+    format.InitialiseFromString(pformat);
+    FloatToStream(thisStream, sbit128, format);
+    if (!StringTestHelper::Compare("0", thisStream.Buffer())) {
         return False;
     }
     thisStream.Clear();
@@ -591,6 +627,27 @@ bool FloatToStreamTest::TestExponential() {
     }
     thisStream.Clear();
 
+
+    //Support exponent with 3 digits
+    sbit128 = 9.9999e-101Q;
+    pformat = "- 6.2e";
+    format.InitialiseFromString(pformat);
+    FloatToStream(thisStream, sbit128, format);
+    if (!StringTestHelper::Compare("1E-100", thisStream.Buffer())) {
+        return False;
+    }
+    thisStream.Clear();
+
+    //Support exponent with 4 digits
+    sbit128 = 9.9999e+999Q;
+    pformat = "- 7.2e";
+    format.InitialiseFromString(pformat);
+    FloatToStream(thisStream, sbit128, format);
+    if (!StringTestHelper::Compare("1E+1000", thisStream.Buffer())) {
+        return False;
+    }
+    thisStream.Clear();
+    
     return True;
 
 }
