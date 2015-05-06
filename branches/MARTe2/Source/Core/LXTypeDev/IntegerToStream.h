@@ -31,7 +31,9 @@
 #include "GeneralDefinitions.h"
 #include "FormatDescriptor.h"
 #include "BitSetToInteger.h"
+#include "SafeShift.h"
 #include <math.h>
+
 
 // returns the exponent
 // positiveNumber is the abs (number)
@@ -147,6 +149,7 @@ template <typename T> uint16 GetNumberOfDigitsHexNotation(T number){
 template <typename T> uint16 GetNumberOfDigitsOctalNotation(T number){
 	// negative numbers are 2 complements and have therefore all bits
 	if (number < 0) return (sizeof(T) * 8 + 2) / 3;
+            
 
 	uint8 shift = 0;
 	uint8 exp = 1;
@@ -683,10 +686,16 @@ bool IntegerToStreamOctalNotation(
 		// we use the above claculate number size 
 		int bits=(numberOfDigits-1)*3;	
 	
+		SafeShift <T> sNumber(&number);
+	
 		// loop backwards stepping each nibble
 		for (int i = bits; i >= 0; i-= 3){
+			
+
+			uint8 digit = sNumber>>i & 0x7;
 			//to get the digit, shift the number and by masking select only the 4 LSB bits  
-			uint8 digit = (number >> i) & 0x7;			
+//			uint8 digit = rightShift(number,i) & 0x7;		
+//	uint8 digit = (number >> i) & 0x7;			
 			
 			// skips trailing zeros until we encounter the first non zero, or if putTrailingZeros was already set
 //			if ((digit != 0) || (putTrailingZeros)){
