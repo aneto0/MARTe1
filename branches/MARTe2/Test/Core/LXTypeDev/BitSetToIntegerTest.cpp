@@ -150,13 +150,13 @@ bool BitSetToIntegerTest::TestBitSetToBitSet(){
 	}
 	
 	//16 bit pointer. Not padding because source is unsigned. 
-	destShift=104;
+	destShift=96;
 	sourceShift=80;//64+16
 	sourceSize=10;
 	destSize=16;
 	uint16 *sPointer16=(uint16*)source;
 	uint16 *dPointer16=(uint16*)dest;
-	test=(int32)0x22210;
+	test=(int32)0x222;
 	BitSetToBitSet(dPointer16, destShift, destSize, false, sPointer16, sourceShift, sourceSize, false);
 	if(dest[3]!=test){
 		return False;
@@ -169,7 +169,7 @@ bool BitSetToIntegerTest::TestBitSetToBitSet(){
 	destSize=16;
 	sPointer16=(uint16*)source;
 	dPointer16=(uint16*)dest;
-	test=(int32)0xfff110;
+	test=(int32)0xfff122;
 	BitSetToBitSet(dPointer16, destShift, destSize, true, sPointer16, sourceShift, sourceSize, true);
 	if(dest[3]!=test){
 		return False;
