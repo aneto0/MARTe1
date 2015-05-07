@@ -8,16 +8,85 @@
 #include "AnyType.h"
 #include "FormatDescriptor.h"
 
-
 class Streamable;
-extern "C"{
 
-	bool StreamableSetBufferSize(
-            Streamable & stream,  
-            uint32 				readBufferSize, 
-            uint32 				writeBufferSize);
-}
+/// Read buffer Mechanism for Streamable
+class StreamableReadBuffer:public CharBuffer{
 
+public:	
+    /**
+        for read mode is from where to read data from readBuffer
+    */
+    uint32                  readBufferAccessPosition;
+
+    /**
+        for read mode is how much data was filled in the buffer
+    */
+    uint32                  readBufferFillAmount;
+       
+public: // read buffer private methods
+
+    ///
+    StreamableReadBuffer(){
+        readBufferAccessPosition    	= 0;
+        readBufferFillAmount        	= 0;
+    }
+    /**
+        sets the readBufferFillAmount to 0
+        adjust the seek position
+    */
+    bool 				ResyncReadBuffer(Streamable &stream);
+    
+    /**  
+        refill readBuffer
+        assumes that the read position is now at the end of buffer
+    */
+    bool 				RefillReadBuffer(Streamable &stream);
+
+    /** 
+     * 	NOTE: used privately by Read 
+    	copies to buffer size bytes from the end of readBuffer
+    */
+    void 				BufferRead(char *buffer, uint32 &size);
+
+    /// simply read from buffer 
+    inline bool         GetC(Streamable &stream,char &c) ;
+    
+};
+
+
+/// Read buffer Mechanism for Streamable
+class StreamableWriteBuffer:public CharBuffer{
+
+public:	
+	
+	/**
+	    for write mode is from where to write data
+	    or how much data was added
+	*/
+	uint32                  writeBufferAccessPosition;
+
+public:
+
+    ///
+    StreamableWriteBuffer(){
+        writeBufferAccessPosition   	= 0;
+    }
+	
+	/**  
+	    empty writeBuffer
+	    only called internally when no more space available 
+	*/
+	bool FlushWriteBuffer(Streamable &stream,TimeoutType         msecTimeout     = TTDefault);
+
+	/** copies buffer of size size at the end of writeBuffer
+		NOTE used privately by Read
+	 */ 
+	void BufferWrite(const char *buffer, uint32 &size);
+
+    /// simply write to buffer if space exist and if operatingModes allows
+    inline bool         PutC(Streamable &stream, char c);
+};
 
 /**
     Replaces CStream and BufferedStream of BL1
@@ -89,6 +158,7 @@ extern "C"{
 */
 class Streamable: public StreamInterface {
  
+private:    
     /**
        Defines the operation mode and statsu of a basic stream
        one only can be set of the first 4.
@@ -114,31 +184,27 @@ class Streamable: public StreamInterface {
         bool stringMode:1;
 
     };
-
-private:    
     /// set automatically on initialisation by calling of the Canxxx functions 
     OperatingModes           operatingModes;
+   
+    
+private: // read and write buffers
+friend class StreamableReadBuffer; 
+friend class StreamableWriteBuffer; 
     
     
-protected: // read buffer and statuses
-
     /** starts empty 
         used for separate input operations or dual operations
         to be sized up by final class appropriately 
     */
-    CharBuffer              readBuffer;
+    StreamableReadBuffer	readBuffer;
     
-    /**
-        for read mode is from where to read data from readBuffer
-    */
-    uint32                  readBufferAccessPosition;
 
-    /**
-        for read mode is how much data was filled in the buffer
+    /** starts empty 
+        used exclusively for separate output operations 
+        to be sized up by final class appropriately 
     */
-    uint32                  readBufferFillAmount;
-
-    
+    StreamableWriteBuffer   writeBuffer;
     
 private: // mode switch methods
     
@@ -149,7 +215,7 @@ private: // mode switch methods
         does not check for mutexBuffering to be active
     */
     inline bool SwitchToWriteMode(){
-        if (!ResyncReadBuffer()) return false;
+        if (!readBuffer.ResyncReadBuffer(*this)) return false;
         operatingModes.mutexWriteMode = true;
         operatingModes.mutexReadMode = false;
         return true;
@@ -162,97 +228,12 @@ private: // mode switch methods
     */
     inline bool SwitchToReadMode(){
         // adjust seek position
-        if (!FlushWriteBuffer()) return false;
+        if (!writeBuffer.FlushWriteBuffer(*this)) return false;
         operatingModes.mutexWriteMode = false;
         operatingModes.mutexReadMode = true; 
         return true;
     }
-
-private: // read buffer private methods
-
-    /**
-        sets the readBufferFillAmount to 0
-        adjust the seek position
-    */
-    inline bool ResyncReadBuffer(){
-        if (readBufferFillAmount == 0) return true;
-        // adjust seek position
-        // in read mode the actual stream 
-        // position is to the character after the buffer end
-        if (!UnBufferedSeek (UnBufferedPosition()-readBufferFillAmount+readBufferAccessPosition)) return false;
-        readBufferFillAmount = 0;
-        readBufferAccessPosition = 0;
-        return true;
-    } 
     
-    /**  
-        refill readBuffer
-        assumes that the read position is now at the end of buffer
-    */
-    inline bool RefillReadBuffer(){
-    	if (readBuffer.Buffer() == NULL) return false;
-        // load next batch of data
-        readBufferAccessPosition = 0;
-        readBufferFillAmount = readBuffer.BufferAllocatedSize();
-        return UnBufferedRead(readBuffer.BufferReference(),readBufferFillAmount);  
-    }
-
-    /// copies to buffer size bytes from the end of readBuffer
-    void BufferRead(char *buffer, uint32 &size);
-    // NOTE used privately by Read 
-
-
-private: // write buffer and statuses
-
-    /** starts empty 
-        used exclusively for separate output operations 
-        to be sized up by final class appropriately 
-    */
-    CharBuffer              writeBuffer;
-
-    /**
-        for write mode is from where to write data
-        or how much data was added
-    */
-    uint32                  writeBufferAccessPosition;
-
-private: // write buffer methods
-    
-    /**  
-        empty writeBuffer
-        only called internally when no more space available 
-    */
-    inline bool FlushWriteBuffer(TimeoutType         msecTimeout     = TTDefault){
-    	// no buffering!
-    	if (writeBuffer.Buffer()== NULL) return true;
-    	// how much was written?
-        uint32 writeSize = writeBufferAccessPosition;
-        // write
-        if (!UnBufferedWrite(writeBuffer.Buffer(),writeSize,msecTimeout,true)) return False;
-
-        writeBufferAccessPosition = 0;
-        
-        return True;  
-    }
-private:
-    /// copies buffer of size size at the end of writeBuffer
-    void BufferWrite(const char *buffer, uint32 &size);
-    // NOTE used privately by Read 
-
-public:
-
-    //
-    friend bool StreamableSetBufferSize(
-	            Streamable & 		stream,  
-	            uint32 				readBufferSize, 
-	            uint32 				writeBufferSize);
-
-    /**
-        sets appropriate buffer sizes and adjusts operatingModes
-        must be called by descendant
-        can be overridden but is not meant to - just accessed via VT
-    */
-    virtual bool SetBufferSize(uint32 readBufferSize=0, uint32 writeBufferSize=0);
 
     
 protected: // methods to be implemented by deriving classes
@@ -309,13 +290,12 @@ protected: // methods to be implemented by deriving classes
     
     virtual bool        UnBufferedRemoveStream(const char *name)=0;
 
+
+   
 protected:
     /// default constructor
     Streamable()
     {
-        readBufferAccessPosition    = 0;
-        writeBufferAccessPosition   = 0;
-        readBufferFillAmount        = 0;
     	operatingModes.canSeek      	= false;
     	operatingModes.mutexReadMode 	= false;
     	operatingModes.mutexWriteMode 	= false;
@@ -324,12 +304,17 @@ protected:
     }
 
     /// default destructor
-    virtual ~Streamable(){
-    	Flush();
-    }
+    virtual ~Streamable();
+    
+    /**
+        sets appropriate buffer sizes and adjusts operatingModes
+        must be called by descendant
+        can be overridden but is not meant to - just accessed via VT
+    */
+    virtual bool SetBufferSize(uint32 readBufferSize=0, uint32 writeBufferSize=0);
+    
 
-
-public:  // special methods for buffering
+public:  // special inline methods for buffering
     
     /** 
          on dual separate buffering (CanSeek=False) just Flush output 
@@ -340,12 +325,11 @@ public:  // special methods for buffering
     inline bool Flush(TimeoutType         msecTimeout     = TTDefault){
     	// mutexReadMode --> can seek so makes sense to resync
     	if (operatingModes.mutexReadMode){
-    		return ResyncReadBuffer();
+    		return readBuffer.ResyncReadBuffer(*this);
     	} 
          	
-   		return FlushWriteBuffer();
+   		return writeBuffer.FlushWriteBuffer(*this);
     }
-
 
     /// simply write to buffer if space exist and if operatingModes allows
     inline bool         PutC(char c)
@@ -354,22 +338,8 @@ public:  // special methods for buffering
         if (operatingModes.mutexReadMode) {
            if (!SwitchToWriteMode()) return false;
         }
-        
-        // if write buffer exists then we have write buffer capabilities
-        if (writeBuffer.Buffer() != NULL){
-            // check if buffer needs updating
-            if (writeBufferAccessPosition >= writeBuffer.BufferAllocatedSize()){ 
-                // on success the access position is set to 0
-                if (!FlushWriteBuffer()) return false;
-            }
-            // write data
-            writeBuffer.BufferReference()[writeBufferAccessPosition++] = c;
-            
-            return True;
-        }
 
-        uint32 size = 1;
-        return (UnBufferedWrite(&c, size) && (size == 1));
+        return writeBuffer.PutC(*this,c);
     }    
 
     /// simply read from buffer 
@@ -380,21 +350,8 @@ public:  // special methods for buffering
            if (!SwitchToReadMode()) return false;
         }
 
-        // if read buffer exists then we are either in joint buffer or separated read mode enabled
-        if (readBuffer.Buffer() != NULL){
-
-            // check if buffer needs updating and or saving            
-            if (readBufferAccessPosition >= readBufferFillAmount) {
-                if (!RefillReadBuffer()) return false;
-            }
-
-            c = readBuffer.BufferReference()[readBufferAccessPosition++];
-
-            return True;
-        }
-
-        uint32 size = 1;
-        return (UnBufferedRead(&c, size) && (size == 1));
+        return readBuffer.GetC(*this,c);
+        
     }    
 
 
@@ -430,13 +387,7 @@ public:  // replaced StreamInterface methods
     // RANDOM ACCESS INTERFACE
 
     /** The size of the stream */
-    virtual int64       Size()    {
-    	// just commit all pending changes if any
-    	// so stream size will be updated     	
-    	Flush();
-    	// then call Size from unbuffered stream 
-    	return UnBufferedSize(); 
-    }
+    virtual int64       Size();
 
     /** Moves within the file to an absolute location */
     virtual bool        Seek(int64 pos);
@@ -457,27 +408,15 @@ public:  // replaced StreamInterface methods
     // Extended Attributes or Multiple Streams INTERFACE
 
     /** select the stream to read from. Switching may reset the stream to the start. */
-    virtual bool        Switch(uint32 n)
-    {
-        Flush();
-    	return UnBufferedSwitch(n);
-    }
+    virtual bool        Switch(uint32 n);
 
     /** select the stream to read from. Switching may reset the stream to the start. */
-    virtual bool        Switch(const char *name)
-    {
-        Flush();
-        return UnBufferedSwitch(name);
-    }
+    virtual bool        Switch(const char *name);
 
     /**  remove an existing stream .
         current stream cannot be removed 
     */
-    virtual bool        RemoveStream(const char *name)
-    {
-    	Flush();
-        return UnBufferedRemoveStream(name);
-    }
+    virtual bool        RemoveStream(const char *name);
 
 public:  // auxiliary functions based on buffering
     
@@ -518,8 +457,7 @@ public:  // auxiliary functions based on buffering
                             uint32              count,
                             const char *        terminator);
 
-    
-   
+      
 public: //  Methods to convert and print numbers and other objects 
     
     /**
@@ -534,6 +472,52 @@ public: //  Methods to convert and print numbers and other objects
     */
     virtual bool PrintFormatted(const char *format, const AnyType pars[]);
 
-
 };
+
+
+/// simply read from buffer 
+inline bool StreamableReadBuffer::GetC(Streamable &stream,char &c) {
+
+    // if read buffer exists then we are either in joint buffer or separated read mode enabled
+    if (Buffer() != NULL){
+
+        // check if buffer needs updating and or saving            
+        if (readBufferAccessPosition >= readBufferFillAmount) {
+            if (!RefillReadBuffer(stream)) return false;
+        }
+
+        c = BufferReference()[readBufferAccessPosition++];
+
+        return True;
+    }
+
+    uint32 size = 1;
+    return (stream.UnBufferedRead(&c, size) && (size == 1));
+}    
+
+/// simply write to buffer if space exist and if operatingModes allows
+inline bool StreamableWriteBuffer::PutC(Streamable &stream, char c)
+{
+    
+    // if write buffer exists then we have write buffer capabilities
+    if (BufferReference() != NULL){
+    	
+        // check if buffer needs updating
+        if (writeBufferAccessPosition >= BufferSize()){
+        	
+            // on success the access position is set to 0
+            if (!FlushWriteBuffer(stream)) return false;
+        }
+        
+        // write data
+        BufferReference()[writeBufferAccessPosition++] = c;
+        
+        return True;
+    }
+
+    uint32 size = 1;
+    return (stream.UnBufferedWrite(&c, size) && (size == 1));
+}    
+
+
 #endif

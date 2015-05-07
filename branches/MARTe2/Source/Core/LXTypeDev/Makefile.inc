@@ -24,7 +24,7 @@
 #
 #############################################################
 
-OBJSX=FormatDescriptor.x  Streamable.x ErrorManagement.x 
+OBJSX=CharBuffer.x FormatDescriptor.x  Streamable.x ErrorManagement.x 
 # StreamString.x
 MAKEDEFAULTDIR=../../../MakeDefaults
 

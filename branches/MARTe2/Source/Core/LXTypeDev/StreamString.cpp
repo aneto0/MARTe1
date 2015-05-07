@@ -25,5 +25,7 @@
 
 #include "StreamString.h"
 #include "GeneralDefinitions.h"
+#include "StreamHelper.h"
+
 
 

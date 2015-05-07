@@ -31,86 +31,87 @@
 #define CHAR_BUFFER_H
 
 #include "GeneralDefinitions.h"
-#include "Memory.h"
 
 /**
     A basic implementation of a buffer of character.
     A replacement for dealing directly with mallocs and reallocs 
     Access as char * both read-only and read-write
+    Supports up to 4G of ram 
 */
 class CharBuffer {
-public:
-    /**
-        allocate or reallocate memory to the desired size
-        content is preserved by copy as long as it fits the newsize
-        or if contiguus memory is available
-        allocationGranularityMask defines how many bits to consider 
-        for the buffer size. round up the others
-    */
-    inline void SetBufferSize(uint32 desiredSize,
-                              uint32 allocationGranularityMask = 0xFFFFFFFF){
-        // the mask is the 2 complement of the actual granularity
-        uint32 allocationGranularity = ~allocationGranularityMask + 1;
-        uint32 allocationBoundary    = ~(2 * allocationGranularity - 1);
-
-        // stay within matematical limits
-        if (desiredSize > allocationBoundary ) return ;
-        uint32 neededMemory = 
-	            desiredSize 
-                 +  allocationGranularity // to increase up to granularity boundaries
-                 -  1; // so that 0 still stays below granularity 
-
-        neededMemory &= allocationGranularityMask;
-        
-        if (neededMemory == 0){
-            if (buffer != NULL) MemoryFree((void *&)buffer);
-            allocatedSize = neededMemory;
-        }
-
-        if (buffer == NULL) {
-            buffer = (char *) MemoryMalloc(neededMemory);
-        }
-        else {
-            buffer = (char *) MemoryRealloc((void *&) buffer, neededMemory);
-        }
-        // if the pointer is not NULL it means we have been successful
-        if (buffer != NULL){
-            allocatedSize = neededMemory;
-        }
-    }
 private:
+	
+	struct {
+		/** true if memory was allocated by this class methods 
+		 *  false means that it is a reference to a buffer*/
+		bool 		allocated:1;		
+		
+		/** true if it is read-only memory */
+		bool 		readOnly:1;		
+				
+	} bufferMode;
+	
     /** the size of the allocated memory block  */
-    uint32 allocatedSize;
+    uint32 		bufferSize;
 
     /**  the memory buffer  */
-    char * buffer;
+    char * 		buffer;
+	   
+private:
 
-    /** used for constructors */
-    void InitMembers() {
-        allocatedSize = 0;
-        buffer = NULL;
-    }
-
-    /** used for destructors */
-    void FinishMembers() {
-        if (buffer != NULL)
-            MemoryFree((void *&) buffer);
-        allocatedSize = 0;
-    }
+    /** 
+     * deallocates memory if appropriate
+     * sets all members to default  
+     */
+    virtual void Clean();
 
 public:
 
     /** Creates a buffer of a given size */
-    inline CharBuffer(uint32 desiredSize=0) {
-        InitMembers();
-        SetBufferSize(desiredSize);
+    CharBuffer() {
+    	this->bufferSize 		= 0;
+        this->buffer 			= NULL;
+        bufferMode.readOnly 	= true;
+        bufferMode.allocated 	= false;
     }
 
     /** Destructor */
-    virtual ~CharBuffer() {
-        FinishMembers();
-    }
-
+    virtual ~CharBuffer();
+    
+    /**
+        allocate or reallocate memory to the desired size
+        content is preserved by copy, if contiguus memory is not available, as long as it fits the newsize
+        allocationGranularityMask defines how many bits to consider 
+        for the buffer size. round up the others
+    */
+    virtual void SetBufferAllocationSize(
+    		uint32 			desiredSize,
+            uint32 			allocationGranularityMask 		= 0xFFFFFFFF);
+    
+    /**
+        allocate or reallocate memory to the desired size
+        content is preserved by copy, if contiguus memory is not available, as long as it fits the newsize
+        allocationGranularityMask defines how many bits to consider 
+        for the buffer size. round up the others
+    */
+    virtual void SetBufferReference(
+    		char *			buffer, 
+    		uint32 			bufferSize
+    );
+    
+    /**
+        allocate or reallocate memory to the desired size
+        content is preserved by copy, if contiguus memory is not available, as long as it fits the newsize
+        allocationGranularityMask defines how many bits to consider 
+        for the buffer size. round up the others
+    */
+    virtual void SetBufferReference(
+    		const char *	buffer, 
+    		uint32 			bufferSize
+    );
+    
+public:
+    
     /** Read Only access to the internal buffer
      @return The pointer to the buffer
      */
@@ -122,12 +123,13 @@ public:
        @return The pointer to the buffer
      */
     inline char *BufferReference() const {
+    	if (bufferMode.readOnly) return NULL;
         return buffer;
     }
 
-    /// access to the current memory used by buffer
-    inline uint32 BufferAllocatedSize(){
-        return allocatedSize;
+    /// how much memory used by buffer
+    inline uint32 BufferSize() const{
+        return bufferSize;
     }
 
 };

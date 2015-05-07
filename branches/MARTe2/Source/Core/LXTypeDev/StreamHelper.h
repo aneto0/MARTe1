@@ -44,7 +44,7 @@
     {BUFFERED}    */
 template< class streamer>
 bool GetTokenFromStream(
-							streamer &          stream,
+	                    streamer &          stream,
                             char *              outputBuffer,
                             const char *        terminator,
                             uint32              outputBufferSize,
@@ -116,8 +116,8 @@ bool GetTokenFromStream(
 */
 template< class streamer>
 bool GetTokenFromStream(
-							streamer &          inputStream,
-		                    streamer &  		outputStream,
+		            streamer &          inputStream,
+		            streamer &  	outputStream,
                             const char *        terminator,
                             char *              saveTerminator,
                             const char *        skipCharacters){

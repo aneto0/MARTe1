@@ -22,11 +22,90 @@
  *
 **/
 
-
 #include "Streamable.h"
 #include "ErrorManagement.h"
 #include "StringHelper.h"
 #include "StreamHelper.h"
+
+
+/**
+    sets the readBufferFillAmount to 0
+    adjust the seek position
+*/
+bool StreamableReadBuffer::ResyncReadBuffer(Streamable &stream){
+    if (readBufferFillAmount == 0) return true;
+    // adjust seek position
+    // in read mode the actual stream 
+    // position is to the character after the buffer end
+    if (!stream.UnBufferedSeek (stream.UnBufferedPosition()-readBufferFillAmount+readBufferAccessPosition)) return false;
+    readBufferFillAmount = 0;
+    readBufferAccessPosition = 0;
+    return true;
+} 
+
+/**  
+    refill readBuffer
+    assumes that the read position is now at the end of buffer
+*/
+bool StreamableReadBuffer::RefillReadBuffer(Streamable &stream){
+	if (BufferReference() == NULL) return false;
+    // load next batch of data
+    readBufferAccessPosition = 0;
+    readBufferFillAmount = BufferSize();
+    return stream.UnBufferedRead(BufferReference(),readBufferFillAmount);  
+}
+
+/// copies to buffer size bytes from the end of readBuffer
+void StreamableReadBuffer::BufferRead(char *buffer, uint32 &size){
+
+    uint32 spaceLeft = readBufferFillAmount - readBufferAccessPosition;
+    
+    // clip to available space
+    if (size > spaceLeft) size = spaceLeft;
+	
+	    // fill the buffer with the remainder 
+	if (size > 0) MemoryCopy(buffer, Buffer()+readBufferAccessPosition,size);
+    readBufferAccessPosition+=size;
+}
+
+
+/**  
+    empty writeBuffer
+    only called internally when no more space available 
+*/
+bool StreamableWriteBuffer::FlushWriteBuffer(Streamable &stream,TimeoutType         msecTimeout  ){
+	// no buffering!
+	if (Buffer()== NULL) return true;
+	// how much was written?
+    uint32 writeSize = writeBufferAccessPosition;
+    // write
+    if (!stream.UnBufferedWrite(Buffer(),writeSize,msecTimeout,true)) return False;
+
+    writeBufferAccessPosition = 0;
+    
+    return True;  
+}
+
+/// copies buffer of size size at the end of writeBuffer
+void StreamableWriteBuffer::BufferWrite(const char *buffer, uint32 &size){
+
+	// recalculate how much we can write
+	uint32 spaceLeft = BufferSize() - writeBufferAccessPosition;
+
+	// clip to spaceLeft
+	if (size > spaceLeft) size = spaceLeft;
+
+	// fill the buffer with the remainder 
+	MemoryCopy(BufferReference()+writeBufferAccessPosition,buffer,size);
+	writeBufferAccessPosition+=size;
+}
+
+
+
+/// default destructor
+Streamable::~Streamable(){
+	Flush();
+}
 
 
 bool Streamable::SetBufferSize(uint32 readBufferSize, uint32 writeBufferSize){
@@ -46,27 +125,13 @@ bool Streamable::SetBufferSize(uint32 readBufferSize, uint32 writeBufferSize){
     if (!Flush()) return false;
     
     // adjust readBufferSize
-    readBuffer.SetBufferSize(readBufferSize);
+    readBuffer.SetBufferAllocationSize(readBufferSize);
 
     // adjust writeBufferSize
-    writeBuffer.SetBufferSize(writeBufferSize);
+    writeBuffer.SetBufferAllocationSize(writeBufferSize);
     
     return true;
 } 
-
-/// copies to buffer size bytes from the end of readBuffer
-void Streamable::BufferRead(char *buffer, uint32 &size){
-
-    uint32 spaceLeft = readBufferFillAmount - readBufferAccessPosition;
-    
-    // clip to available space
-    if (size > spaceLeft) size = spaceLeft;
-	
-	    // fill the buffer with the remainder 
-	if (size > 0) MemoryCopy(buffer, readBuffer.Buffer()+readBufferAccessPosition,size);
-    readBufferAccessPosition+=size;
-
-}
 
 
 bool Streamable::Read(
@@ -85,16 +150,16 @@ bool Streamable::Read(
         // read from buffer first
         uint32 toRead = size;
     	
-    	BufferRead(buffer, size);
+    	readBuffer.BufferRead(buffer, size);
     	
     	if (size != toRead ){
     		
     		toRead -= size;
     		
-    		if ((toRead*4) < readBuffer.BufferAllocatedSize()){
-    			if (!RefillReadBuffer()) return false;
+    		if ((toRead*4) < readBuffer.BufferSize()){
+    			if (!readBuffer.RefillReadBuffer(*this)) return false;
     			
-    			BufferRead(buffer+size, toRead);
+    			readBuffer.BufferRead(buffer+size, toRead);
     			size+= toRead;
     			
     			// should have completed
@@ -112,22 +177,7 @@ bool Streamable::Read(
    // if needed read directly from stream
    return UnBufferedRead(buffer,size,msecTimeout);
 }
-    
-
-/// copies buffer of size size at the end of writeBuffer
-void Streamable::BufferWrite(const char *buffer, uint32 &size){
-
-	// recalculate how much we can write
-	uint32 spaceLeft = writeBuffer.BufferAllocatedSize() - writeBufferAccessPosition;
-
-	// clip to spaceLeft
-	if (size > spaceLeft) size = spaceLeft;
-
-	// fill the buffer with the remainder 
-	MemoryCopy(writeBuffer.BufferReference()+writeBufferAccessPosition,buffer,size);
-	writeBufferAccessPosition+=size;
-}
-
+  
     
 /** Write data from a buffer to the stream. As much as size byte are written, actual size
     is returned in size. msecTimeout is how much the operation should last.
@@ -147,15 +197,16 @@ bool Streamable::Write(
     }
     
     // buffering active?
-    if (writeBuffer.Buffer() != NULL){
+    if (writeBuffer.BufferReference() != NULL){
     	// separate input and output size
     	uint32 toWrite = size;
     	// check available buffer size versus write size 
         // if size is comparable to buffer size there 
         // is no reason to use the buffering mechanism
-        if (writeBuffer.BufferAllocatedSize() > (4 *size)){
+        if (writeBuffer.BufferSize() > (4 *size)){
+        	
         	// try writing the buffer
-        	BufferWrite(buffer, size);
+        	writeBuffer.BufferWrite(buffer, size);
         	
         	// all done! space available! 
         	if (size == toWrite) return true;
@@ -167,7 +218,7 @@ bool Streamable::Write(
         	uint32 leftToWrite = toWrite;
         	
         	// try writing the buffer
-        	BufferWrite(buffer+size, leftToWrite);
+        	writeBuffer.BufferWrite(buffer+size, leftToWrite);
 
         	size+= leftToWrite;
         	
@@ -184,6 +235,16 @@ bool Streamable::Write(
 
 } 
 
+/** The size of the stream */
+int64 Streamable::Size()    {
+	// just commit all pending changes if any
+	// so stream size will be updated     	
+	Flush();
+	// then call Size from unbuffered stream 
+	return UnBufferedSize(); 
+}
+
+
 /** Moves within the file to an absolute location */
 bool Streamable::Seek(int64 pos)
 {
@@ -191,21 +252,21 @@ bool Streamable::Seek(int64 pos)
     
     // if write mode on then just flush out data
     if (operatingModes.mutexWriteMode){
-    	FlushWriteBuffer();
+    	writeBuffer.FlushWriteBuffer(*this);
     } else {
     	// if read buffer has some data, check whether seek can be within buffer
-    	if (readBufferFillAmount > 0){
+    	if (readBuffer.readBufferFillAmount > 0){
     		int64 currentStreamPosition = UnBufferedPosition();
-    		int64 bufferStartPosition = currentStreamPosition - readBufferFillAmount;
+    		int64 bufferStartPosition = currentStreamPosition - readBuffer.readBufferFillAmount;
     		
     		// if within range just update readBufferAccessPosition
     		if ((pos >= bufferStartPosition) &&
     	        (pos < currentStreamPosition)){
-    			readBufferAccessPosition = pos - bufferStartPosition;
+    			readBuffer.readBufferAccessPosition = pos - bufferStartPosition;
     			return true;
     		} else { // otherwise mark read buffer empty and proceed with normal seek
-                readBufferFillAmount = 0;
-                readBufferAccessPosition = 0;
+    			readBuffer.readBufferFillAmount = 0;
+                readBuffer.readBufferAccessPosition = 0;
     		}
     	}       	
     }
@@ -219,18 +280,18 @@ bool  Streamable::RelativeSeek(int32 deltaPos){
     
     // if write mode on then just flush out data
     if (operatingModes.mutexWriteMode){
-    	FlushWriteBuffer();
+    	writeBuffer.FlushWriteBuffer(*this);
     } else {
     	// if read buffer has some data, check whether seek can be within buffer
-    	if (readBufferFillAmount > 0){
+    	if (readBuffer.readBufferFillAmount > 0){
     		
-    		if (((readBufferAccessPosition + deltaPos) < readBufferFillAmount) && (deltaPos>=0))
+    		if (((readBuffer.readBufferAccessPosition + deltaPos) < readBuffer.readBufferFillAmount) && (deltaPos>=0))
     		{
-    			readBufferAccessPosition += deltaPos;
+    			readBuffer.readBufferAccessPosition += deltaPos;
     			return true;
     		}
-    		if (((readBufferAccessPosition + deltaPos) > 0)&& (deltaPos<0)){
-    			readBufferAccessPosition += deltaPos;
+    		if (((readBuffer.readBufferAccessPosition + deltaPos) > 0)&& (deltaPos<0)){
+    			readBuffer.readBufferAccessPosition += deltaPos;
     			return true;
     		}
    		
@@ -246,9 +307,9 @@ int64 Streamable::Position() {
     
     // if write mode on then just flush out data
     if (operatingModes.mutexWriteMode){
-    	return UnBufferedPosition() + writeBufferAccessPosition;
+    	return UnBufferedPosition() + writeBuffer.writeBufferAccessPosition;
     } else {
-    	return UnBufferedPosition() + readBufferAccessPosition - readBufferFillAmount;
+    	return UnBufferedPosition() + readBuffer.readBufferAccessPosition - readBuffer.readBufferFillAmount;
     }
 }
 
@@ -259,12 +320,36 @@ bool Streamable::SetSize(int64 size)
     
     // if write mode on then just flush out data
     if (operatingModes.mutexWriteMode){
-    	FlushWriteBuffer();
+    	writeBuffer.FlushWriteBuffer(*this);
     } else { // simply empty read buffer
-        readBufferFillAmount = 0;
-        readBufferAccessPosition = 0;
+    	readBuffer.readBufferFillAmount = 0;
+    	readBuffer.readBufferAccessPosition = 0;
     }
     return UnBufferedSetSize(size);
+}
+
+
+/** select the stream to read from. Switching may reset the stream to the start. */
+bool Streamable::Switch(uint32 n)
+{
+    Flush();
+	return UnBufferedSwitch(n);
+}
+
+/** select the stream to read from. Switching may reset the stream to the start. */
+bool Streamable::Switch(const char *name)
+{
+    Flush();
+    return UnBufferedSwitch(name);
+}
+
+/**  remove an existing stream .
+    current stream cannot be removed 
+*/
+bool Streamable::RemoveStream(const char *name)
+{
+	Flush();
+    return UnBufferedRemoveStream(name);
 }
 
 
