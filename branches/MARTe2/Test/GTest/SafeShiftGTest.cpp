@@ -22,20 +22,20 @@ protected:
 
 TEST_F(SafeShiftGTest,TestLogicalRightShift) {
     SafeShiftTest myShift;
-    ASSERT_TRUE(myShift.TestLogicalRightShift);
+    ASSERT_TRUE(myShift.TestLogicalRightShift());
 }
 
 TEST_F(SafeShiftGTest,TestLogicalLeftShift) {
     SafeShiftTest myShift;
-    ASSERT_TRUE(myShift.TestLogicalLeftShift);
+    ASSERT_TRUE(myShift.TestLogicalLeftShift());
 }
 
-TEST_F(SafeShiftGTest,TestMatematicRightShift) {
+TEST_F(SafeShiftGTest,TestMathematicRightShift) {
     SafeShiftTest myShift;
-    ASSERT_TRUE(myShift.TestMatematicRightShift);
+    ASSERT_TRUE(myShift.TestMathematicRightShift());
 }
 
-TEST_F(SafeShiftGTest,TestMatematicLeftShift) {
+TEST_F(SafeShiftGTest,TestMathematicLeftShift) {
     SafeShiftTest myShift;
-    ASSERT_TRUE(myShift.TestMatematicLeftShift);
+    ASSERT_TRUE(myShift.TestMathematicLeftShift());
 }

@@ -27,63 +27,37 @@
 #define SAFE_SHIFT_TEST_H
 
 #include "GeneralDefinitions.h"
-#include "SafeShift.h"
-
+#include "Shift.h"
 class SafeShiftTest{
 
-private:
-	SafeShift number;
 public:
-
-    /**
-     * @param testValue the value to be tested by the all
-     * the test functions
-     */
-    SafeShiftTest() {
-    }
-
   
+
+    /** @brief Tests the logical right shift. */
     bool TestLogicalRightShift() {
+	
 	int8 sbit8=(int8)0xf0;
-	number.Set(sbit8);
 	
-	if(number>>9 != 0){
+	//shift greater than size
+	if(Shift::LogicalSafeShift(sbit8, -8) != 0){
 		return False;
 	}
 
-	if(number>>4 !=(int8) 0x0f){
+	//logical shift, no sign extension
+	if(Shift::LogicalSafeShift(sbit8, -4) !=(int16) 0xf){
 		return False;
 	}
-
-	int16 sbit16=(int16)0xf000;
-	number.Set(sbit16);
 	
-	if(number>>16 != 0){
-		return False;
-	}
-
-	if(number>>4 !=(int16) 0xf00){
-		return False;
-	}
-	int32 sbit32=(int32)0xf0000000;
-	number.Set(sbit32);
 	
-	if(number>>33 != 0){
+
+	uint8 ubit8=0xf0;
+
+	//shift greater than size
+	if(Shift::LogicalSafeShift(ubit8, -100) != 0){
 		return False;
 	}
 
-	if(number>>4 !=(int32) 0xf000000){
-		return False;
-	}
-
-	int64 sbit64=(int64)0xf000000000000000;
-	number.Set(sbit64);
-	
-	if(number>>63 != 1){
-		return False;
-	}
-
-	if(number>>0 !=(int64) 0xf000000000000000){
+	if(Shift::LogicalSafeShift(ubit8, -7) !=(int16) 0x1){
 		return False;
 	}
 
@@ -91,59 +65,92 @@ public:
 
     }
 
+
+    /** @brief Tests the logical left shift. */
     bool TestLogicalLeftShift(){
-	int8 sbit8=(int8)0xf;
-	number.Set(sbit8);
-	
-	if(number<<9 != 0){
-		return False;
-	}
-
-	if(number<<4 !=(int8) 0xf0){
-		return False;
-	}
-
 	int16 sbit16=(int16)0xf;
-	number.Set(sbit16);
-	
-	if(number<<16 != 0){
+
+	if(Shift::LogicalSafeShift(sbit16, 16) != 0){
 		return False;
 	}
 
-	if(number<<4 !=(int16) 0xf0){
-		return False;
-	}
-	int32 sbit32=(int32)0xf;
-	number.Set(sbit32);
-	
-	if(number<<33 != 0){
+	if(Shift::LogicalSafeShift(sbit16, 13) !=(int16) 0xe000){
 		return False;
 	}
 
-	if(number<<4 !=(int32) 0xf0){
+
+
+	uint16 ubit16=0xf;
+	
+	if(Shift::LogicalSafeShift(ubit16, 12) != 0xf000){
 		return False;
 	}
 
-	int64 sbit64=(int64)0x0f0000000000000;
-	number.Set(sbit64);
-	
-	if(number<<8 != 1){
+	if(Shift::LogicalSafeShift(ubit16, 18) != 0){
 		return False;
 	}
 
-	if(number>>0 !=(int64) 0x0f00000000000000){
-		return False;
-	}
-	
 	return True;
 
     }
 
-    bool TestMatematicRightShift() {
+
+    /** @brief Tests the mathematic right shift. */
+    bool TestMathematicRightShift() {
+	int32 sbit32=(int32)0xf0000000;
+	
+	if(Shift::MathematicSafeShift(sbit32, -32) != 0){
+		return False;
+	}
+
+	//sign extension for negative number
+	if(Shift::MathematicSafeShift(sbit32, -31) != -1){
+		return False;
+	}
+
+	uint32 ubit32=0xf0000000;
+	
+	if(Shift::MathematicSafeShift(ubit32, -33) != 0){
+		return False;
+	}
+
+
+	if(Shift::MathematicSafeShift(ubit32, -4) != 0xf000000){
+		return False;
+	}
+
 	return True;
     }
 
-    bool TestMatematicRightShift() {
+
+    /** @brief Tests the mathematic left shift. */
+    bool TestMathematicLeftShift() {
+	
+
+	int64 sbit64=(int64)0xf;
+	
+	if(Shift::MathematicSafeShift(sbit64, 64) != 0){
+		return False;
+	}
+
+
+	if(Shift::MathematicSafeShift(sbit64, 60) != (int64)0xf000000000000000){
+		return False;
+	}
+
+	uint64 ubit64=0xf;
+	
+	if(Shift::MathematicSafeShift(ubit64, 64) != 0){
+		return False;
+	}
+
+
+	if(Shift::MathematicSafeShift(ubit64, 61) != 0xe000000000000000){
+		return False;
+	}
+
+
+
 	return True;
     }
    
