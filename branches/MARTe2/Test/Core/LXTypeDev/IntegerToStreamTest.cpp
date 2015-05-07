@@ -27,7 +27,7 @@
 #include "StringTestHelper.h"
 #include "StreamTestHelper.h"
 #include "StringPortable.h"
-#include "stdio.h"
+
 bool IntegerToStreamTest::TestDecimalMagnitude() {
     uint8 bit8 = 255;
 
@@ -670,27 +670,29 @@ bool IntegerToStreamTest::TestIntegerToStream() {
     pFormat = "- i";
     format.InitialiseFromString(pFormat);
     IntegerToStream(myStream, sbit8, format);
-    if (!StringTestHelper::Compare("-106", myStream.Buffer())) {
+    if (!StringTestHelper::Compare("-22", myStream.Buffer())) {
         return False;
     }
+	myStream.Clear();
 
-    int16 sbit64 = 0xf0;
+    int64 sbit64 = 0xf0;
     pFormat = " #0x";
     format.InitialiseFromString(pFormat);
     IntegerToStream(myStream, sbit64, format);
-    if (!StringTestHelper::Compare("0x00000000000000f0", myStream.Buffer())) {
+    if (!StringTestHelper::Compare("0x00000000000000F0", myStream.Buffer())) {
         return False;
     }
-
+    myStream.Clear();
     int32 sbit32 = 0x18;
 
     pFormat = "- #0o";
     format.InitialiseFromString(pFormat);
     IntegerToStream(myStream, sbit32, format);
-    if (!StringTestHelper::Compare("0o00000011000", myStream.Buffer())) {
+    if (!StringTestHelper::Compare("0o00000000030", myStream.Buffer())) {
         return False;
     }
-
+    myStream.Clear();
+    
     int16 sbit16 = 0x71;
     pFormat = " #b";
     format.InitialiseFromString(pFormat);

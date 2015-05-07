@@ -396,7 +396,10 @@ bool IntegerToStreamDecimalNotation(
 {
 
 	// if no limits set the numberSize as big enough for the largest integer
-	if (maximumSize==0) maximumSize=20;
+	if (maximumSize==0){
+		maximumSize=20;
+		padded=false;
+	}
 	
 	// put here the unsigned version of the number
 	T positiveNumber;
@@ -515,7 +518,10 @@ bool IntegerToStreamExadecimalNotation(
 	uint16 numberSize  = headerSize + numberOfDigits;
 
 	// 1000 = no limits
-	if (maximumSize == 0) maximumSize = 1000;
+	if (maximumSize == 0){
+		maximumSize = 1000;
+		padded=false;
+	}
 
 	// cannot fit the number even without trailing zeroes
 	if (maximumSize < numberSize){
@@ -631,8 +637,10 @@ bool IntegerToStreamOctalNotation(
 	uint16 numberSize  = headerSize + numberOfDigits;
 
 	// 1000 = no limits
-	if (maximumSize == 0) maximumSize = 1000;
-
+	if (maximumSize == 0){
+		maximumSize = 1000;
+		padded = false;
+	}
 	// cannot fit the number even without trailing zeroes
 	if (maximumSize < numberSize){
 		numberSize = 1; // just the '?'
@@ -734,7 +742,11 @@ bool IntegerToStreamBinaryNotation(
 {
 
 	// 1000 = no limits
-	if (maximumSize == 0) maximumSize = 1000;
+	if (maximumSize == 0){
+		maximumSize = 1000;
+		padded = false;
+	}
+		
 	
 	// put here size of number
 	uint16 headerSize       = 0;
