@@ -56,7 +56,8 @@ OBJSX=  EndianityGTest.x \
 	IntegerToStreamGTest.x \
 	FloatToStreamGTest.x \
 	BitSetToIntegerGTest.x \
-	SafeShiftGTest.x  		
+	SafeShiftGTest.x \
+	DoubleIntegerGTest.x 		
 
 PACKAGE=
 ROOT_DIR=../..

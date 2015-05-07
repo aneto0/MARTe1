@@ -88,7 +88,9 @@ public:
 		upper = *memory;
 	}
 	*/
-	
+
+
+
 	// safe left shift
 	void operator<<=(int16 shift){
 		// shift of sizeof(T)*8 is treated as shift 0
@@ -136,7 +138,8 @@ public:
 			// swap upper -> lower and shift with the remainder
 			lower = upper >> shift;
 			// upper is 0
-			upper = 0;
+			if(upper < 0) upper = -1;
+			else upper = 0;
 		}
 	}	
 	// bitwise and
@@ -153,6 +156,12 @@ public:
 	bool operator!=(const DoubleInteger<T> &n)const{
 		return ((upper != n.upper) || (lower != n.lower)); 
 	}
+
+	// logical ==
+	bool operator==(const DoubleInteger<T> &n)const{
+		return !((*this)!=n);
+	}
+
 	// logical >
 	bool operator>(const DoubleInteger<T> &n)const{
 		return ((upper > n.upper) || ((upper == n.upper) && (lower > n.lower))); 
@@ -189,6 +198,8 @@ public:
 		output.lower = lower - n.lower;
 		return output;
 	}
+
+
 	// math add binary op
 	DoubleInteger<T>  operator+(const DoubleInteger<T> &n)const{
 		DoubleInteger<T>output;
@@ -200,6 +211,17 @@ public:
         if ((output.lower < lower) && (output.lower < n.lower)) output.upper++;  			
 		return output;
 	}
+
+	// math subtract binary op 
+	void  operator-=(const DoubleInteger<T> &n){
+		(*this)=(*this)-n;
+	}
+	// math add binary op
+	void  operator+=(const DoubleInteger<T> &n){
+		(*this)=(*this)+n;
+	}
+
+
 	// right shift binary op
 	DoubleInteger<T>  operator>>(uint8 shift)const{
 		DoubleInteger<T>output(*this);
