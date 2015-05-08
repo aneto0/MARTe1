@@ -14,7 +14,7 @@ bool StaticListTemplateTest::ListAddTestInt32() {
     numberOfElements = 66;
     //Fulfill the table
     i = 0;
-    while (i < numberOfElements) {
+    while (((uint32)i) < numberOfElements) {
         elementInt32In = i;
         successful &= sltInt32.ListAdd(elementInt32In);
         i++;
@@ -30,7 +30,7 @@ bool StaticListTemplateTest::ListAddTestInt64() {
     //Fulfill the table
     //elementInPtr = &i;
     i = 0;
-    while (i < numberOfElements) {
+    while (((uint32)i) < numberOfElements) {
         elementInt64In = (int64) i;
         //add at the end of the list
         successful &= sltInt64.ListAdd(elementInt64In);
@@ -57,7 +57,7 @@ bool StaticListTemplateTest::ListExtractTestInt64() {
     numberOfElements = 64;
     //Fulfill the table
     i = 0;
-    while (i < numberOfElements) {
+    while (((uint32)i) < numberOfElements) {
         elementInt64In = (int64) i;
         successful &= sltInt64.ListAdd(elementInt64In);
         i++;
@@ -66,7 +66,7 @@ bool StaticListTemplateTest::ListExtractTestInt64() {
 
     //Extract elements
     i = 0;
-    while (i < numberOfElements) {
+    while (((uint32)i) < numberOfElements) {
         successful &= sltInt64.ListExtract(elementInt64Out);
         successful &= (numberOfElements - i - 1 == elementInt64Out);
         i++;
@@ -75,7 +75,7 @@ bool StaticListTemplateTest::ListExtractTestInt64() {
 
     //Fulfill the table (again)
     i = 0;
-    while (i < numberOfElements) {
+    while (((uint32)i) < numberOfElements) {
         elementInt64In = (int64) i;
         successful &= sltInt64.ListAdd(elementInt64In);
         i++;
@@ -99,7 +99,7 @@ bool StaticListTemplateTest::ListPeekTest() {
     numberOfElements = 64;
     //Fulfill the List
     i = 0;
-    while (i < numberOfElements) {
+    while (((uint32)i) < numberOfElements) {
         elementInt64In = (int64) i;
         successful &= sltInt64.ListAdd(elementInt64In);
         i++;
@@ -107,7 +107,7 @@ bool StaticListTemplateTest::ListPeekTest() {
 
     //Read the list
     i = 0;
-    while (i < numberOfElements) {
+    while (((uint32)i) < numberOfElements) {
         //Check the returned value
         successful &= sltInt64.ListPeek(elementInt64Out, i);
         //check that the element in the position i is as expected
@@ -128,7 +128,7 @@ bool StaticListTemplateTest::ListDeleteTest() {
     numberOfElements = 64;
     //Fulfill the List
     i = 0;
-    while (i < numberOfElements) {
+    while (((uint32)i) < numberOfElements) {
         elementInt64In = (int64) i;
         successful &= sltInt64.ListAdd(elementInt64In);
         i++;
@@ -144,7 +144,6 @@ bool StaticListTemplateTest::ListDeleteTest() {
     //add the value numberOfElements in the position 1
     elementInt64In = (int64) numberOfElements;
     i = 1;
-    printf("\i %d\n", i);
     successful &= sltInt64.ListAdd(elementInt64In, i);
     //Check that the value was added
     successful &= sltInt64.ListPeek(elementInt64Out, i);
@@ -166,7 +165,7 @@ bool StaticListTemplateTest::ListFindTest() {
     numberOfElements = 64;
     //Fulfill the List
     i = 0;
-    while (i < numberOfElements) {
+    while (((uint32)i) < numberOfElements) {
         elementInt64In = (int64) i;
         successful &= sltInt64.ListAdd(elementInt64In);
         i++;
@@ -193,7 +192,7 @@ bool StaticListTemplateTest::ListInsertTest() {
     numberOfElements = 64;
     //Fulfill the List add at the beginning of the table
     i = 0;
-    while (i < numberOfElements) {
+    while (((uint32)i) < numberOfElements) {
         elementInt64In = (int64) i;
         successful &= sltInt64.ListInsert(elementInt64In);
         i++;
@@ -201,7 +200,7 @@ bool StaticListTemplateTest::ListInsertTest() {
 
     //Read the list
     i = 0;
-    while (i < numberOfElements) {
+    while (((uint32)i) < numberOfElements) {
         //Check the returned value
         successful &= sltInt64.ListPeek(elementInt64Out, i);
         //check that the element in the position i is as expected
