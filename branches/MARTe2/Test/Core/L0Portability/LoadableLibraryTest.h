@@ -23,7 +23,7 @@
  *
  **/
 /**
- * @class LoadableLibraryTest
+ * @file LoadableLibraryTest.h
  * @brief Tests the LoadableLibrary and associated functions.
  *
  * The test consists in concurrent threads incrementing a shared variable.
@@ -36,23 +36,25 @@
 #include "LoadableLibrary.h"
 #include "Sleep.h"
 
+/** @brief Class for testing of LoadableLibrary functions. */
 class LoadableLibraryTest {
 
 private:
 
 public:
+    /** LoadableLibrary object */
     LoadableLibrary myLoadableLibrary;
 
     LoadableLibraryTest() {
     }
 
     /**
-     * Tests the correct open of the library specified in the name.
+     * @brief Tests the correct open of the library specified in the name.
      * @param dllName is the name of the library.
      * @return true if the library is open, false otherwise. **/
     bool TestOpenCloseLibrary(const char *dllName);
     
-    /** Tests the correct load of a library function.
+    /**@brief Tests the correct load of a library function.
      * @param dllName is the name of the library to open.
      * @param dllFunction is the name of the function to load. **/
     bool TestLoadFunction(const char *dllName, const char *dllFunction);

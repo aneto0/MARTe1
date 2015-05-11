@@ -23,7 +23,7 @@
  *
  **/
 /**
- * @class EventSemTest
+ * @file EventSemTest.h
  * @brief Tests the EventSem and associated functions.
  *
  * The test consists in concurrent threads incrementing a shared variable.
@@ -36,6 +36,7 @@
 #include "Threads.h"
 #include "EventSem.h"
 
+/**@brief Class for testing of EventSem functions. */
 class EventSemTest {
 private:
     /**
@@ -70,7 +71,7 @@ public:
     TimeoutType timeout;
 
     /**
-     *
+     * @brief Constructor
      */
     EventSemTest() {
         sharedVariable = 0;
@@ -79,29 +80,31 @@ public:
     }
 
     /**
-     * @see Test for an infinite timeout
+     * @brief Test for an infinite timeout
      * @return True if the final value of sharedVariable == nOfThreads
      */
     bool WaitNoTimeoutTest(uint32 nOfThreads);
 
     /**
-     * @see Test for an finite timeout of 2 seconds
+     * @brief Test for an finite timeout of 2 seconds
      * @return True if the final value of sharedVariable == nOfThreads
      */
     bool WaitTimeoutTestSuccess(uint32 nOfThreads);
 
     /**
-     * @see Test for a finite timeout of 2 seconds
+     * @brief Test for a finite timeout of 2 seconds
+     *
      * In this test the timeout of the semaphore will be very low with respect to the time of the test. So that it
      * is very likely that when the semaphore is posted some of the semaphores will have already timed-out and
      * changed the initial value of the sharedVariable (set to 0xABCD).
+     *
      * @param nOfThreads Number of threads that will change the sharedVariable value
      * @return True if when the semaphore is posted the sharedVariable is different from its initial value
      */
     bool WaitTimeoutTestFailure(uint32 nOfThreads);
 
     /**
-     * Checks that a semaphore, even after timing out still works.
+     * @brief Checks that a semaphore, even after timing out still works.
      * @return Forces timeout by calling WaitTimeoutTestFailure and WaitNoTimeoutTest returns True afterwards.
      */
     bool WaitTimeoutTestFailureFollowedBySuccess(uint32 nOfThreads);

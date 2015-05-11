@@ -22,12 +22,15 @@
  * $Id:$
  *
  **/
-
+/**
+ * @file FastMathTest.h
+ * @brief Tests the FastMath.h functions. */
 #ifndef FASTMATH_TEST_H
 #define FASTMATH_TEST_H
 
 #include "FastMath.h"
 
+/** @brief Class fot testing of FastMath functions. */
 class FastMathTest {
 private:
 
@@ -46,7 +49,10 @@ public:
     }
 
     /**
-     * Tests the fast float to int32 conversion
+     * @brief Tests the fast float to int32 conversion.
+     * @param testFloat is the number to convert.
+     * @param is the expected integer value after conversion.
+     * @return true if the conversion result is equal to the expected value.
      */
     bool TestFloatToInt32(float testFloat, int32 expectedValue) {
         int32 testInt32 = 0;
@@ -57,7 +63,10 @@ public:
     }
 
     /**
-     * Tests the fast Sin function
+     * @brief Tests the fast Sin function
+     * @param testFloat is the number input.
+     * @param is the expected result value after the operation.
+     * @return true if the result is equal to the expected value.
      */
     bool TestSin(float angle, float expectedValue) {
         float result = 0.0;
@@ -73,8 +82,11 @@ public:
     }
 
     /**
-     * Tests the fast Cos function
-     */
+     * @brief Tests the fast Cos function
+     * @param testFloat is the number input.
+     * @param is the expected result value after the operation.
+     * @return true if the result is equal to the expected value.
+     */   
     bool TestCos(float angle, float expectedValue) {
         float result = 0.0;
         bool testResult = false;
@@ -89,7 +101,8 @@ public:
     }
 
     /**
-     * Tests for each angle 'a' that sin^2(a)+cos^2(a)=1 
+     * @brief Tests for each angle that sin^2(a)+cos^2(a)=1. 
+     * @return true if the circle tests works.
      */
     bool CircleTest() {
         float angle = 0;
@@ -108,7 +121,8 @@ public:
     }
 
     /**
-     * Executes all the tests
+     * @brief Executes all the tests.
+     * @return true if all tests return true.
      */
     bool All() {
         bool ok = TestFloatToInt32(42.24, 42);

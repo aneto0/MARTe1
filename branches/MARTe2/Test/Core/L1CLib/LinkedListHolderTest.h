@@ -21,9 +21,9 @@
  *
  * $Id:  $
  *
- **/
+ */
 /**
- * @class LinkedListHolderTest
+ * @file LinkedListHolderTest.h
  * @brief Tests the LinkListHolder and Iterators associated functions.
  *
  * The test consists in adding, remove and sort elements in a list specified by LinkedListHolder class.
@@ -35,7 +35,7 @@
 #include "LinkedListHolder.h"
 #include "Iterators.h"
 
-/** Create a list of integers**/
+/** @brief Create a list of integers**/
 class IntegerList: public LinkedListable {
 public:
     uint32 intNumber;
@@ -49,6 +49,7 @@ public:
     }
 };
 
+/** @brief Iterator which sum a constant to the list element. */
 class SumIterator: public Iterator {
 private:
     int32 toSum;
@@ -64,7 +65,7 @@ public:
     }
 };
 
-/** Create a sorter which sorts integers in a decrescent order. **/
+/** @brief Create a sorter which sorts integers in a decrescent order. **/
 class SortDecrescent: public SortFilter {
 public:
     SortDecrescent() {
@@ -78,7 +79,7 @@ public:
     }
 };
 
-/** Create a searcher to find integer in the list. **/
+/** @brief Create a searcher to find integer in the list. **/
 class SearchInteger: public SearchFilter {
 private:
     uint32 searchIntNumber;
@@ -98,7 +99,7 @@ public:
     }
 };
 
-/** Create a searcher to find integers in the list. **/
+/** @brief Create a searcher to find integers in the list. **/
 class SearchGreatInteger: public SearchFilter {
 private:
     uint32 searchIntNumber;
@@ -118,7 +119,7 @@ public:
     }
 };
 
-/** Class used for tests. **/
+/** @brief Class used for tests on LinkedListHolder functions. **/
 class LinkedListHolderTest {
 public:
 
@@ -130,17 +131,17 @@ public:
     }
 
     /**
-     * Inserts integers and lists of integers in different ways and sorts the final list in a decrescent order. 
+     * @brief Inserts integers and lists of integers in different ways and sorts the final list in a decrescent order. 
      * @return true if all operations works correctly and the final list is sorted. **/
     bool TestInsertAndSorting();
 
     /** 
-     * Tests the add, extract, peek and delete functions. 
+     * @brief Tests the add, extract, peek and delete functions. 
      * @return true if all operations works correctly. **/
     bool TestAddRemoveAndSearch();
 
     /** 
-     * Tests the behavior of many functions with NULL passed by argument.
+     * @brief Tests the behavior of many functions with NULL passed by argument.
      * @return true if all functions returns as expected (and without segmentation faults). **/
     bool TestNULLConditions();
 };

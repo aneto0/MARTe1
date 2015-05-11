@@ -23,8 +23,8 @@
  *
  **/
 /**
- * @file
- * Tests the Timer class and associated functions
+ * @file TimerTest.h
+ * @brief Tests the Timer class and associated functions
  */
 #ifndef TIMER_TEST_H
 #define TIMER_TEST_H
@@ -32,6 +32,7 @@
 #include "Timer.h"
 #include "EventSem.h"
 
+/** @brief A class for testing of Timer functions. */
 class TimerTest: public Timer {
     /**
      * Generic event sem used for synchronisations in the test
@@ -44,10 +45,13 @@ public:
     }
 
     /**
-     * Tests the ConfigAndStartTimer function. It starts the timer with a 1 msec period
+     * @brief Tests the ConfigAndStartTimer function.
+     *
+     * It starts the timer with a 1 msec period
      * and waits on an event semaphore with a timeout of 1 sec. It is expected
      * that the callback function of the timer (UserTimerServiceRoutine) will
      * unlock the semaphore before 1 sec.
+     *
      * @return True if the callback unlocks the semaphore which demonstrates that the
      * Timer has been configured and started.
      */
@@ -76,6 +80,13 @@ public:
         return True;
     }
 
+    /**
+     * @brief Tests the ResetTimer function.
+     *
+     * It configure and start timer, then the reset should return true.
+     * If the timer is stopped, the reset should return false.
+     * 
+     * @return true if the reset return the correct value. */
     bool ResetTimerTest() {
 
         if (!ConfigAndStartTimer(10000, 0xff)) {
@@ -102,9 +113,12 @@ public:
     }
 
     /**
-     * Configures but does not start the timer. It waits for 1 second on a semaphore
+     * @brief Configures but does not start the timer.
+     *
+     * It waits for 1 second on a semaphore
      * that should not be unlocked by the callback routine, as otherwise the Timer
      * would have been started without being requested
+     *
      * @return True if the semaphore is not unlocked and consequently the Timer is not
      * started.
      */
@@ -131,7 +145,7 @@ public:
     }
 
     /**
-     * Callback function of the timer, called everytime the timer is fired
+     * @brief Callback function of the timer, called everytime the timer is fired
      */
     virtual void UserTimerServiceRoutine() {
         eventSem.Post();

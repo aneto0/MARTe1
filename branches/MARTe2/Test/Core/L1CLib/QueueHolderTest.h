@@ -21,9 +21,9 @@
  *
  * $Id:  $
  *
- **/
+ */
 /**
- * @class QueueHolderTest
+ * @file QueueHolderTest.h
  * @brief Tests the QueueHolder class and Iterators associated functions.
  *
  * The test consists in insert and remove elements from the queue observing if the operations are FIFO.
@@ -36,7 +36,7 @@
 #include "Iterators.h"
 
 
-/** Create a list of integers**/
+/** @brief Create a list of integers**/
 class IntegerLinkedListable: public LinkedListable {
 public:
     uint32 intNumber;
@@ -50,7 +50,7 @@ public:
     }
 };
 
-/** Class used for tests. **/
+/** @brief Class used for tests on QueueHolder functions. **/
 class QueueHolderTest {
 public:
 
@@ -62,12 +62,12 @@ public:
     }
 
     /**
-     * Tests many functions of QueueHolder class. 
+     * @brief Tests many functions of QueueHolder class. 
      * @return true if all operations works correctly. **/
     bool TestAll();
 
     /**
-     * Tests the adding, peek and extracting functions with null or index out of bounds as argument.
+     * @brief Tests the adding, peek and extracting functions with null or index out of bounds as argument.
      * @return true if all functions return as expected. **/
     bool TestNULLConditions();
 

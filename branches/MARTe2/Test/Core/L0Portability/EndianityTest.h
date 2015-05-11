@@ -23,8 +23,8 @@
  *
  **/
 /**
- * @file 
- * @see EndianityTest
+ * @file EndianityTest.h 
+ * @brief Tests of Endianity.h functions.
  */
 #ifndef ENDIANITY_TEST_H
 #define ENDIANITY_TEST_H
@@ -32,7 +32,6 @@
 #include "Endianity.h"
 
 /**
- * @class EndianityTest
  * @brief Tests all the Endianity class functions.
  *
  * This class is designed to test all the Endianity functions,
@@ -55,6 +54,7 @@ private:
 
 public:
     /**
+     * @brief Constructor.
      * @param testValue the value to be tested by the all
      * the test functions.
      */

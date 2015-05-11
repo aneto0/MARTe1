@@ -22,12 +22,16 @@
  * $Id$
  *
  **/
+/** @file AtomicTest.h
+   @brief Tests of Atomic.h functions. */
 
 #ifndef ATOMIC_TEST_H
 #define ATOMIC_TEST_H
 
 #include "Atomic.h"
 
+
+/** @brief Template class for Atomic tests. */
 template<class T>
 class AtomicTest {
 
@@ -36,16 +40,16 @@ private:
 
 public:
 
-    /**
+    /**@brief Constructor.
      * @param testValue the value to be tested by the all
-     * the test functions
+     * the test functions.
      */
     AtomicTest(T testValue) {
         this->testValue = testValue;
     }
 
-    /**
-     * Tests the increment function
+    /**@brief Tests the increment function.
+     * @return true if the value is incremented.
      */
     bool TestIncrement() {
         bool testResult = false;
@@ -58,7 +62,8 @@ public:
     }
 
     /**
-     * Tests the decrement function
+     * @brief Tests the decrement function.
+     * @return true if the value is decremented.
      */
     bool TestDecrement() {
         bool testResult = false;
@@ -71,7 +76,8 @@ public:
     }
 
     /**
-     * Tests the test and set function
+     * @brief Tests the test and set function.
+     * @return true if when the value is 0, is setted to one.
      */
     bool TestTestAndSet() {
         T testVal = 0;
@@ -91,7 +97,8 @@ public:
     }
 
     /**
-     * Tests the exchange function
+     * @brief Tests the exchange function.
+     * @return true if the values are exchanged.
      */
     bool TestExchange() {
         bool testResult = false;
@@ -104,7 +111,8 @@ public:
     }
 
     /**
-     * Tests the addition function
+     * @brief Tests the addition function.
+     * @return true if the sum works correctly.
      */
     bool TestAdd() {
         bool testResult = false;
@@ -117,7 +125,8 @@ public:
     }
 
     /**
-     * Tests the subtraction function
+     * @brief Tests the subtraction function.
+     * @return true if the subtraction works correctly.
      */
     bool TestSub() {
         bool testResult = false;
@@ -130,7 +139,8 @@ public:
     }
 
     /**
-     * Executes all the tests
+     * @brief Executes all the tests.
+     * @return true if all tests return true.
      */
     bool All() {
         bool ok = TestIncrement();

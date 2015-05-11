@@ -23,8 +23,8 @@
  *
  **/
 /**
- * @file 
- * Tests the ProcessorType class and associated functions
+ * @file ProcessorTypeTest.h 
+ * @brief Tests the ProcessorType class and associated functions
  */
 
 #ifndef PROCESSORTYPE_TEST_H
@@ -32,6 +32,7 @@
 
 #include "ProcessorType.h"
 
+/** @brief A class for testing of the ProcessorType functions. */
 class ProcessorTypeTest {
 private:
     ProcessorType ptFirst;
@@ -47,7 +48,7 @@ public:
     }
 
     /**
-     * Tests the overloaded assignment operator in ProcessorType
+     * @brief Tests the overloaded assignment operator in ProcessorType
      * @return True if the test is successful
      */
     bool TestAssignmentOperator() {
@@ -65,7 +66,7 @@ public:
     }
 
     /**
-     * Tests the overloaded OR operator in ProcessorType
+     * @brief Tests the overloaded OR operator in ProcessorType
      * @return True if the test is successful
      */
     bool TestOROperator() {
@@ -89,7 +90,7 @@ public:
     }
 
     /**
-     * Tests the overloaded equality operator in ProcessorType
+     * @brief Tests the overloaded equality operator in ProcessorType
      * @return True if the test is successful
      */
     bool TestEqualityOperator() {
@@ -107,7 +108,7 @@ public:
     }
 
     /**
-     * Tests the overloaded inequality operator in ProcessorType
+     * @brief Tests the overloaded inequality operator in ProcessorType
      * @return True if the test is successful
      */
     bool TestInequalityOperator() {
@@ -124,7 +125,7 @@ public:
     }
 
     /**
-     * Tests Get/SetDefaultCPUs in ProcessorType
+     * @brief Tests Get/SetDefaultCPUs in ProcessorType
      * @return True if the test is successful
      */
     bool TestGetSetDefaultCPUs() {
@@ -137,7 +138,7 @@ public:
     }
 
     /**
-     * Tests ProcessorType's constructors
+     * @brief Tests ProcessorType's constructors
      * @return True if the test is successful
      */
     bool TestConstructors() {

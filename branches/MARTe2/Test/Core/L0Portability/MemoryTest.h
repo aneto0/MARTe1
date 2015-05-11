@@ -23,7 +23,7 @@
  *
  **/
 /**
- * @class MemoryTest
+ * @file MemoryTest.h
  * @brief Tests the Memory class and associated functions.
  *
  * The test consists in allocate and reallocate parts of memory observing if it's possible de-reference it later.
@@ -38,13 +38,16 @@
 #include "Threads.h"
 #include "EventSem.h"
 
+/** @brief Class for testing of Memory functions. */
 class MemoryTest {
 
 private:
 
 public:
+    /** a semaphore used for the shared memory test. */
     EventSem eventSem;
 
+    /** @brief Constructor. */
     MemoryTest() {
         eventSem.Create();
     }
@@ -73,8 +76,14 @@ public:
      * @return true if the shared int and the shared bool are consistent with the operations done by threads. **/
     bool TestSharedMemory();
 
+    /** 
+     * @brief Tests the copy and the move functions.
+     * @return true if the memory is copied correctly. */
     bool TestCopyAndMove();
 
+    /**
+     * @brief Tests the set and the search functions.
+     * @return true if the functions work correctly. */
     bool TestSetAndSearch();
 };
 

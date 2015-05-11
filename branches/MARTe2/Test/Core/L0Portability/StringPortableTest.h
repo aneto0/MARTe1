@@ -23,7 +23,7 @@
  *
  **/
 /**
- * @class StringPortableTest
+ * @file StringPortableTest.h
  * @brief Tests the StringPortable class and associated functions.
  *
  * The test consists in manipulate strings in different ways trying 
@@ -35,17 +35,16 @@
 
 #include "StringPortable.h"
 
+/** @brief A class for testing of StringPortable functions. */
 class StringPortableTest {
 
 private:
 
 public:
 
-    StringPortableTest() {
-    }
 
     /** @brief Tests the Length() function.
-     * @param string.
+     * @param string .
      * @return true if the length of the string is correct. */
     bool TestLength(const char* string);
 
@@ -74,6 +73,8 @@ public:
      * @return true if the operations return the expected result. */
     bool TestToken();
 
+    /** @brief Test the functions with NULL arguments .
+     * @return true if their behavior is correct. */
     bool TestNull();
 
 };

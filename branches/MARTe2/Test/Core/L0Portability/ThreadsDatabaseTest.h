@@ -23,7 +23,7 @@
  *
  **/
 /**
- * @class ThreadsDatabaseTest
+ * @file ThreadsDatabaseTest.h
  * @brief Tests the ThreadsDatabase and associated functions.
  *
  * The test consists in observing if the database returns the correct informations foe each thread and if it remoce information when they exit.
@@ -64,8 +64,10 @@ public:
     /** timeout for the lock with timeout **/
     TimeoutType timeout;
 
+    /** semaphore for threads syncronization. */
     EventSem eventsem;
 
+    /** @brief Constructor. */
     ThreadsDatabaseTest() {
         returnValue = True;
         exitCondition = 0;

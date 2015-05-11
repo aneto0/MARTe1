@@ -22,13 +22,15 @@
  * $Id$
  *
  **/
-
+/** @file SleepTest.h
+  * @brief Tests the Sleep functions. */
 #ifndef SLEEP_TEST_H
 #define SLEEP_TEST_H
 
 #include "Sleep.h"
 #include <time.h>
 
+/** @brief A class for testing of the sleep functions. */
 class SleepTest {
 
 public:
@@ -36,7 +38,9 @@ public:
     }
 
     /**
-     * Tests the SleepAtLeast function
+     * @brief Tests the SleepAtLeast function.
+     * @param sec is the minimum time to sleep.
+     * @return true if it sleeps less than the double of sec.
      */
     bool TestSleepAtleast(double sec) {
         bool testResult = false;
@@ -52,7 +56,9 @@ public:
     }
 
     /**
-     * Tests the SleepNoMore function
+     * @brief Tests the SleepNoMore function
+     * @param sec is the maximum time to sleep.
+     * @return true if it sleeps less than the double of sec.
      */
     bool TestSleepNoMore(double sec) {
         bool testResult = false;
@@ -68,8 +74,9 @@ public:
     }
 
     /**
-     * Tests the SleepSec function
-     * Sleep time indicated by a double
+     * @brief Tests the SleepSec function
+     * @param sec is the time to sleep.
+     * @return true if it sleeps less than the double of sec.
      */
     bool TestSleepSec(double sec) {
         bool testResult = false;
@@ -85,8 +92,9 @@ public:
     }
 
     /**
-     * Tests the SleepSec function
-     * Sleep time indicated by a float
+     * @brief Tests the SleepSec function
+     * @param sec is the time to sleep.
+     * @return true if it sleeps less than the double of sec.
      */
     bool TestSleepSec(float sec) {
         bool testResult = false;
@@ -102,7 +110,9 @@ public:
     }
 
     /**
-     * Tests the SleepMSec function
+     * @brief Tests the SleepMSec function
+     * @param sec is the time to sleep in milliseconds.
+     * @return true if it sleeps less than the double of sec.
      */
     bool TestSleepMSec(int32 msec) {
         bool testResult = false;
@@ -118,7 +128,9 @@ public:
     }
 
     /**
-     * Tests the SleepBusy function
+     * @brief Tests the SleepBusy function.
+     * @param sec is the time to sleep.
+     * @return true if it sleeps less than the double of sec.
      */
     bool TestSleepBusy(double sec) {
         bool testResult = false;
@@ -134,7 +146,10 @@ public:
     }
 
     /**
-     * Tests the SleepMSec function
+     * @brief Tests the SleepSemiBusy function.
+     * @param totalSleepSec is the time to sleep using cpu.
+     * @param nonBusySleepSec is the time to sleep without using cpu.
+     * @return true if it sleeps less than the double of sec.
      */
     bool TestSemiBusy(double totalSleepSec, double nonBusySleepSec) {
         bool testResult = false;
@@ -150,7 +165,8 @@ public:
     }
 
     /**
-     * Executes all the tests
+     * @brief Executes all the tests
+     * @return true if all tests return true.
      */
     bool All() {
         bool ok = TestSleepAtleast(1.2);

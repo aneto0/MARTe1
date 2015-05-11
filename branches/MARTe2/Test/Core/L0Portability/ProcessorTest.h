@@ -22,21 +22,26 @@
  * $Id$
  *
  **/
-
+/**
+ * @file ProcessorTest.h
+ * @brief Tests the Processor functions. */
 #ifndef PROCESSOR_TEST_H
 #define PROCESSOR_TEST_H
 
 #include "Processor.h"
 
+/** @brief A class for testing of the Processor functions. */
 class ProcessorTest {
 
 public:
+
+    /** @brief Constructor */
     ProcessorTest() {
     }
 
     /**
-     * Tests the vendor identifier function
-     */
+     * @brief Tests the vendor identifier function.
+     * @return true if the function returns the vendor id. */
     bool TestVendorId() {
         bool testResult = false;
         const char * vendorId = NULL;
@@ -48,7 +53,8 @@ public:
     }
 
     /**
-     * Tests the family function
+     * @brief Tests the family function.
+     * @return true.
      */
     bool TestFamily() {
         bool testResult = false;
@@ -62,7 +68,8 @@ public:
     }
 
     /**
-     * Tests the model function
+     * @brief Tests the model function.
+     * @return true.
      */
     bool TestModel() {
         bool testResult = false;
@@ -76,7 +83,8 @@ public:
     }
 
     /**
-     * Tests the available function
+     * @brief Tests the available function.
+     * @return true.
      */
     bool TestAvailable() {
         bool testResult = false;

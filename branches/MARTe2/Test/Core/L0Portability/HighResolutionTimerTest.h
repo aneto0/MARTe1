@@ -21,9 +21,9 @@
  *
  * $Id:$
  *
- **/
+ */
 /**
- * @class HighResoulutionTimerTest
+ * @file HighResolutionTimerTest.h
  * @brief Tests the HighResolutionTimer and associated functions.
  *
  * The test consists in concurrent threads incrementing a shared variable.
@@ -35,23 +35,23 @@
 
 #include "Sleep.h"
 
+/** @brief Class for testing of HighResolutionTimer functions. */
 class HighResolutionTimerTest {
 
 private:
 
 public:
-    HighResolutionTimerTest() {
-    }
-    /**
-     * Check The functions Period() and Frequency() comparing the returned frequency with the mutual of the period 
+
+   /**
+     * @brief Checks The functions Period() and Frequency() comparing the returned frequency with the mutual of the period 
      * @reurn true if period and frequency are mutual, false otherwise. **/
     bool TestFrequency();
 
     /**
-     * Sleep for sleepTime time and check if the time measured with Counter() is more or less the same. 
-     * @param sleepTime, time to sleep.
+     * @brief Sleep for sleepTime time and check if the time measured with Counter() is more or less the same. 
+     * @param sleepTime is the time to sleep.
      * @return true if the measured time is the same of the sleep time less than a tolerance, false otherwise. **/
-    bool TestCounter(double);
+    bool TestCounter(double sleepTime);
 
 };
 

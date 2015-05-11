@@ -22,9 +22,10 @@
  * $Id:$
  *
  **/
+
 /**
- * @class StringPortableTest
- * @brief Tests the StringPortable class and associated functions.
+ * @file StringHelperTest.h
+ * @brief Tests the StringHelper class and associated functions.
  *
  * The test consists in manipulate strings in different ways trying 
  * to check the StringPortable functions behavior.
@@ -35,17 +36,16 @@
 
 #include "StringHelper.h"
 
+/** @brief A class for testing of StringHelper functions. */
 class StringHelperTest {
 
 private:
 
 public:
 
-    StringHelperTest() {
-    }
 
     /** @brief Tests the Length() function.
-     * @param string.
+     * @param string .
      * @return true if the length of the string is correct. */
     bool TestLength(const char* string);
 
@@ -61,8 +61,6 @@ public:
     bool TestCopy(const char* string);
 
     /** @brief Tests Append() and Cat() functions.
-     * @param string1 is the first string.
-     * @param string2 is the string to concatenate to string1.
      * @return true if the concatenate string is correct. */
     bool TestConcatenate();
 
@@ -70,8 +68,6 @@ public:
      * @return true if the operations return the expected result. */
     bool TestSearch();
 
-    /** @brief Test the tokenize functions (by string, by chars).
-     * @return true if the operations return the expected result. */
 //    bool TestToken();
 
 };

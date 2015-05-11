@@ -22,8 +22,8 @@
  *
  **/
 /**
- * @file
- * Tests the StaticList class and associated functions
+ * @file StaticStackHolderTest.h
+ * @brief Tests the StaticList class and associated functions
  */
 #ifndef STATICLISCTHOLDER_test_H_
 #define STATICLISCTHOLDER_test_H_
@@ -32,8 +32,10 @@
 #include "EventSem.h"
 #include "MutexSem.h"
 
+/** @brief Class used for tests on StaticStackHolder functions. */
 class StaticStackHolderTest {
 public:
+    /** @brief Constructor */
     StaticStackHolderTest() {
         successful = false;
         elements[0] = 0;
@@ -59,9 +61,11 @@ public:
     }
     /**
      * @brief Test all the functions of @see StaticStackHolder.
+     *
      * The function tested are: StackPush (notice that in returns void), StackPop
      * StackDepth, StackPeek, StackTop. All the functions are a direct call to
      * the StaticListHolder.
+     *
      * @return true when the values are as expected.
      */
     bool StackTest();

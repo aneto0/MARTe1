@@ -22,7 +22,6 @@
  * $Id:  $
  *
  **/
-
 #include "LinkedListableTest.h"
 
 

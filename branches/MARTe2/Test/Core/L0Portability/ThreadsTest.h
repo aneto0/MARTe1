@@ -23,8 +23,8 @@
  *
  **/
 /**
- * @file 
- * Tests the Threads class and associated functions
+ * @file ThreadsTest.h
+ * @brief Tests the Threads class and associated functions
  */
 
 #ifndef THREADS_TEST_H
@@ -34,6 +34,7 @@
 #include "EventSem.h"
 #include "MutexSem.h"
 
+/** @brief A class for testing of Threads functions. */
 class ThreadsTest {
 public:
     ThreadsTest() {

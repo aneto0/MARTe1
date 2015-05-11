@@ -23,7 +23,7 @@
  *
  **/
 /**
- * @class BasicConsoleTest
+ * @file BasicConsoleTest.h
  * @brief Tests the BasicConsole and associated functions.
  *
  * The test consists in reading and writing specified words with console functions
@@ -50,6 +50,7 @@ public:
     /**Basic console object.**/
     BasicConsole myConsole;
 
+    /** @brief Empty constructor. */
     BasicConsoleTest() {
     }
 

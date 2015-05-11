@@ -21,9 +21,9 @@
  *
  * $Id:  $
  *
- **/
+ */
 /**
- * @class LinkedListableTest
+ * @file LinkedListableTest.h
  * @brief Tests the LinkListable and Iterators associated functions.
  *
  * The test consists in adding, remove and sort elements in a list specified by LinkedListable class.
@@ -37,7 +37,7 @@
 #include "Memory.h"
 
 
-/** Create a list of integers**/
+/** @brief Create a list of integers**/
 class IntegerList: public LinkedListable {
 public:
     uint32 intNumber;
@@ -52,7 +52,7 @@ public:
 };
 
 
-/** Create a sorter which sorts integers in a decrescent order. **/
+/** @brief Create a sorter which sorts integers in a decrescent order. **/
 class SortDecrescent: public SortFilter {
 public:
     SortDecrescent() {
@@ -66,7 +66,7 @@ public:
     }
 };
 
-/** Create a searcher to find integer in the list. **/
+/** @brief Create a searcher to find integer in the list. **/
 class SearchInteger: public SearchFilter {
 private:
     uint32 searchIntNumber;
@@ -87,25 +87,19 @@ public:
 };
 
 
-/** Class used for tests. **/
+/** @brief Class used for tests on LinkedListable functions. **/
 class LinkedListableTest {
 public:
 
  
 
-    LinkedListableTest() {
- 
-    }
-    virtual ~LinkedListableTest() {
-
-    }
 
     /**
-     * Inserts integers and sorts them in decrescent order. Then another list is created and it is merged with the first list with the sorted insert. 
+     * @brief Inserts integers and sorts them in decrescent order. Then another list is created and it is merged with the first list with the sorted insert. 
      * @return true if all operations works correctly and the final list is sorted. **/
     bool TestInsertAndSorting();
 
-    /** Tests the add, extract and peek functions. 
+    /** @brief Tests the add, extract and peek functions. 
       * @return true if all operations works correctly. **/
     bool TestAddAndRemove();
 };

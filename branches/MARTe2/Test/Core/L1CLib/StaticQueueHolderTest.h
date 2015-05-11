@@ -5,12 +5,17 @@
  *      Author: shareuser
  */
 
+/** @file StaticQueueHolderTest.h
+  * @brief Tests the StaticQueueHolder class and associate functions. */
+
 #ifndef STATICQUEUEHOLDERTEST_H_
 #define STATICQUEUEHOLDERTEST_H_
 
 #include "StaticStackHolder.h"
 #include "StaticQueueHolder.h"
 
+
+/** @brief Class used for tests on StaticQueueHolder functions. */
 class StaticQueueHolderTest {
 public:
     StaticQueueHolderTest() {
@@ -47,8 +52,10 @@ public:
 
     /**
      * @brief Test QueueExtract
+     *
      * Fulfill a list and then extract all the elements. Also is tested the extraction from
      * an empty List
+     *
      * @return true when all the elements are extracted correctly if is possible.
      */
     bool QueueExtractTest();

@@ -22,6 +22,9 @@
  * $Id$
  *
  **/
+/**
+ * @file SafeShiftTest.h
+ * @brief Tests the Shift functions.*/ 
 
 #ifndef SAFE_SHIFT_TEST_H
 #define SAFE_SHIFT_TEST_H
@@ -33,7 +36,8 @@ class SafeShiftTest{
 public:
   
 
-    /** @brief Tests the logical right shift. */
+    /** @brief Tests the logical right shift.
+      * @return true if the shifts give the expected results. */
     bool TestLogicalRightShift() {
 	
 	int8 sbit8=(int8)0xf0;
@@ -66,7 +70,8 @@ public:
     }
 
 
-    /** @brief Tests the logical left shift. */
+    /** @brief Tests the logical left shift.
+      * @return true if the shifts give the expected results. */
     bool TestLogicalLeftShift(){
 	int16 sbit16=(int16)0xf;
 
@@ -95,7 +100,8 @@ public:
     }
 
 
-    /** @brief Tests the mathematic right shift. */
+    /** @brief Tests the mathematic right shift. 
+      * @return true if the shifts give the expected results.*/
     bool TestMathematicRightShift() {
 	int32 sbit32=(int32)0xf0000000;
 	
@@ -123,7 +129,9 @@ public:
     }
 
 
-    /** @brief Tests the mathematic left shift. */
+    /**
+     * @brief Tests the mathematic left shift.
+     * @return true if the shifts give the expected results. */
     bool TestMathematicLeftShift() {
 	
 
