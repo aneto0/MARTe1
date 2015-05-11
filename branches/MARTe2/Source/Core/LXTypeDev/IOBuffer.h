@@ -48,6 +48,12 @@ protected:
         to be initialised by derived class
     */
     uint32               	amountLeft;
+    
+    /**
+     * how many chars less than the full size of the buffer
+     * distinct from amountLeft to allow duplex operation read and write
+     */
+    uint32                  fillLeft;
 
     /**
 		pointer to the next character
@@ -91,20 +97,31 @@ public:
     	amountLeft = 0;
     	maxAmount = 0;
     	bufferPtr = NULL;
+    	fillLeft = 0;
     }
     
 	///
-    inline uint32 		MaxAmount(){
+    inline uint32 		MaxAmount() const {
     	return maxAmount;
     }
     
 	///
-    inline uint32 		AmountLeft(){
+    inline uint32 		AmountLeft() const {
     	return amountLeft;
     }
 
-    char *			    BufferPtr(){
+    char *			    BufferPtr() const {
     	return bufferPtr;
+    }
+    
+    ///
+    inline uint32 		Position() const{
+    	return maxAmount - amountLeft;
+    }
+
+    ///
+    inline uint32 		Size() const{
+    	return maxAmount - fillLeft;
     }
     
     /** 
@@ -122,6 +139,9 @@ public:
         
         bufferPtr++;
         amountLeft--;
+        if (fillLeft > amountLeft){
+        	fillLeft = amountLeft;
+        }
 
         return True;    	
     }	
@@ -142,6 +162,9 @@ public:
 
     		amountLeft -=size;
         	bufferPtr += size; 
+            if (fillLeft > amountLeft){
+            	fillLeft = amountLeft;
+            }
     	}    	
     }
 
@@ -151,11 +174,12 @@ public:
     */ 
     inline bool         GetC(char &c) {
 
+    	
         // check if buffer needs updating and or saving            
-        if (amountLeft <= 0) {
+        if (amountLeft <= fillLeft) {
             if (!Refill()) return false;
         }
-
+    	
         c = *bufferPtr;
         
         bufferPtr++;
@@ -170,9 +194,10 @@ public:
     */
     inline void 		Read(char *buffer, uint32 &size){
 	    
+    	uint32 maxSize = amountLeft-fillLeft;
 	    // clip to available space
-	    if (size > amountLeft) {
-	    	size = amountLeft;
+	    if (size > maxSize) {
+	    	size = maxSize;
 	    }
 		    
 		// fill the buffer with the remainder 
@@ -187,8 +212,8 @@ public:
      * reset to empty read buffer
     */
     inline void 		Empty(){
-		amountLeft = 0;
-		maxAmount = 0;
+		amountLeft = maxAmount;  // Seek 0 
+		fillLeft = maxAmount;    // SetSize 0
     }
     
 };

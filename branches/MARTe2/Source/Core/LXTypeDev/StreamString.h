@@ -26,55 +26,67 @@
 class StreamString;
 
 /// Read buffer Mechanism for Streamable
-class SSReadBuffer:public InputBuffer{
+class StreamStringBuffer:public IOBuffer,public CharBuffer {
 private:
 	///
 	StreamString &string;
+	
+	/**
+	 * maxAmount is bufferSize - 1;
+	 * amountLeft refers to maxAmount
+	 * fillLeft determines the actual size of string
+	 */ 
+//	uint32 stringSize;
        
-public: // read buffer private methods
+public: // 
 
     ///
-	SSReadBuffer(StreamString &s):string(s){
-    	bufferPtr = s.Buffer();
-//    	this->stream = stream;
-    }
+	StreamStringBuffer(StreamString &s);
+	
+	///
+	virtual ~StreamStringBuffer();
+	
+	/** sets the size of the buffer to be desiredSize or greater up next granularity
+	 *  truncates stringSize to desiredSize-1 
+	*/
+    virtual void SetBufferAllocationSize(
+    		uint32 			desiredSize,
+            uint32 			allocationGranularityMask 		= 0xFFFFFFFF);
+	
+public: // read buffer private methods
+    /// if buffer is full this is called 
+    virtual bool 		Flush(TimeoutType         msecTimeout     = TTDefault);
 
-    /**  
-        refill readBuffer
-        assumes that the read position is now at the end of buffer
-    */
-    virtual bool 		Refill(TimeoutType         msecTimeout     = TTDefault){return false;}
+    /** 
+     * loads more data into buffer and sets amountLeft and bufferEnd
+     * READ OPERATIONS 
+     * */
+    virtual bool 		Refill(TimeoutType         msecTimeout     = TTDefault);
     
     /**
-        sets the readBufferFillAmount to 0
-        adjust the seek position
+        sets amountLeft to 0
+        adjust the seek position of the stream to reflect the bytes read from the buffer
+     * READ OPERATIONS 
     */
-    virtual bool 		Resync(TimeoutType         msecTimeout     = TTDefault){return false;}    
-  
-};
+    virtual bool 		Resync(TimeoutType         msecTimeout     = TTDefault);
 
+    /**
+     * position is set relative to start of buffer
+     */
+    virtual bool        Seek(uint32 position);
 
-/// Read buffer Mechanism for Streamable
-class SSWriteBuffer:public OutputBuffer{
-private:
-	///
-	StreamString &string;
+    /**
+     * position is set relative to start of buffer
+     */
+    virtual bool        RelativeSeek(int32 delta);    
+    
 
-public:
-
-    ///
-	SSWriteBuffer(Streamable &s):string(s){
-    	bufferPtr = s.BufferReference();
+    /// add trailing 0
+    void Terminate(){
+    	BufferReference()[Size()]= 0;
     }
-	
-	/**  
-	    empty writeBuffer
-	    only called internally when no more space available 
-	*/
-	virtual bool Flush(TimeoutType         msecTimeout     = TTDefault){return false;}
-
-    	return true;
-	}
+    
+    
 };
 
 
@@ -103,75 +115,52 @@ public:
     Compare with      a  char *    
     Access as char * both read-only and read-write
 */
-class StreamString: protected IOBuffer,public BufferedStream {
+class StreamString: public BufferedStream {
 
 private:    
 
+	///
+	StreamStringBuffer 	buffer;
+	
     /** the size of the used memory block -1 (It excludes the 0)  */
 ///    uint32 size; replaced by maxAmount
     
     /** */ 
-    int64 position;
-
+///    int64 				position;
+    
 protected: // methods to be implemented by deriving classes
     ///
-    virtual InputBuffer &GetInputBuffer(){
-    	return *this;
+    virtual IOBuffer &GetInputBuffer(){
+    	return buffer;
     }
 
     ///
-    virtual OutputBuffer &GetOputBuffer(){
-    	return *this;
-    }
-private:
-    /** sets the size of the buffer so that to fit a fitStringSize
-        accounts for string terminator
-    */
-    inline void SetStringBufferSize(uint32 fitStringSize){
-        uint32 desiredBufferSize = fitStringSize+1;
-        // 32 bytes granularity
-        CharBuffer::SetBufferSize(desiredBufferSize, 0xFFFFFFE0);
-    }
-
-    /** used for constructors */
-    void InitMembers() {
-        size = 0;
-        position = 0;
-        SetStringBufferSize(0);
-    }
-
-    /** used for destructors */
-    void FinishMembers() {
-        size = 0;
+    virtual IOBuffer &GetOputBuffer(){
+    	return buffer;
     }
 
 public: // usable constructors
 
     /** Creates an empty string */
-    inline BasicString() {
-        InitMembers();
-    }
-
+    StreamString():buffer(*this){}
+    
+    /** Destructor */
+    virtual ~StreamString() ;
+    
     /** Creates a StreamString as a copy of a StreamString.
      @param x The StreamString to use for initialisation
      */
-    inline BasicString(const StreamString &x) {
-        InitMembers();
-        *this = x;
+    inline StreamString(const StreamString &x) {
+        Copy(x);
     }
 
     /** Creates a StreamString as a copy of string
      @param x The pointer to the string to use for initialisation
      */
-    inline BasicString(const char *x) {
-        InitMembers();
-        *this = x;
+    inline StreamString(const char *x) {
+        Copy(x);
     }
 
-    /** Destructor */
-    virtual ~BasicString() {
-        FinishMembers();
-    }
 
 public:
     /** 
@@ -201,101 +190,32 @@ public:
                             bool                complete        = false);
     
     /** whether it can be written into */
-    virtual bool        CanWrite(){ return true; };
+    virtual bool        CanWrite();
 
     /** whether it can be  read */
-    virtual bool        CanRead(){ return true; };
+    virtual bool        CanRead();
     
     /** The size of the stream */
-    virtual int64       Size(){ return size; }
+    virtual int64       Size();
 
     /** Moves within the file to an absolute location */
-    virtual bool        Seek(int64 pos){
-    	if ((pos < size) && (pos >=0)){
-    		position = pos;
-    		return true;
-    	} else {
-    		REPORT_ERROR(ParametersError,"pos out of range")
-    		return false;
-    	}
-    }
+    virtual bool        Seek(int64 pos);
     
     /** Moves within the file relative to current location */
-    virtual bool        RelativeSeek(int32 deltaPos){
-    	return Seek(position+deltaPos);
-    }
+    virtual bool        RelativeSeek(int32 deltaPos);
     
     /** Returns current position */
-    virtual int64       Position() { return position; }
+    virtual int64       Position();
 
     /** Clip the string size to a specified point
      @param newStringSize The size of the buffer.
      @return True if successful. False otherwise.
      */
-    virtual bool        SetSize(int64 size) = 0;
-        SetStringBufferSize(size);
-        uint32 maxSize = BufferAllocatedSize() - 1;
-        if (size > maxSize) size = maxSize;
-        buffer[size] = 0;
-        
-        if (position > size) position = size;
-        this->size = size;
-        
-        return True;
-    }
+    virtual bool        SetSize(int64 size);
 
     /** can you move the pointer */
-    virtual bool        CanSeek(){ return true; };
-
-    /** extract a token from the stream into a string data until a terminator or 0 is found.
-        Skips all skip characters and those that are also terminators at the beginning
-        returns true if some data was read before any error or file termination. False only on error and no data available
-        The terminator (just the first encountered) is consumed in the process and saved in saveTerminator if provided
-        skipCharacters=NULL is equivalent to skipCharacters = terminator
-        {BUFFERED}    */
-    virtual bool        GetToken(
-                            char *              outputBuffer,
-                            const char *        terminator,
-                            uint32              outputBufferSize,
-                            char *              saveTerminator,
-                            const char *        skipCharacters);
-
-    /** extract a token from the stream into a string data until a terminator or 0 is found.
-        Skips all skip characters and those that are also terminators at the beginning
-        returns true if some data was read before any error or file termination. False only on error and no data available
-        The terminator (just the first encountered) is consumed in the process and saved in saveTerminator if provided
-        skipCharacters=NULL is equivalent to skipCharacters = terminator
-        {BUFFERED}
-        A character can be found in the terminator or in the skipCharacters list  in both or in none
-        0) none                 the character is copied
-        1) terminator           the character is not copied the string is terminated
-        2) skip                 the character is not copied
-        3) skip + terminator    the character is not copied, the string is terminated if not empty
-    */
-    virtual bool        GetToken(
-    		                StreamInterface &  	output,
-                            const char *        terminator,
-                            char *              saveTerminator=NULL,
-                            const char *        skipCharacters=NULL);
-
-    /** to skip a series of tokens delimited by terminators or 0
-        {BUFFERED}    */
-    virtual bool        SkipTokens(
-                            uint32              count,
-                            const char *        terminator); 
-    
-    /**
-     * Very powerful function to handle data conversion into a stream of chars
-    */
-    virtual bool 		Print(const AnyType& par,FormatDescriptor fd=standardFormatDescriptor);
-
-    /** 
-         pars is a vector terminated by voidAnyType value
-         format follows the TypeDescriptor::InitialiseFromString
-         prints all data pointed to by pars
-    */
-    virtual bool 		PrintFormatted(const char *format, const AnyType pars[]);
-    
+    virtual bool        CanSeek();
+  
     
 public: // DIRECT ACCESS FUNCTIONS
       
@@ -304,23 +224,25 @@ public: // DIRECT ACCESS FUNCTIONS
      @return The pointer to the buffer
      */
     inline const char *Buffer() const {
-        return buffer;
+        return buffer.Buffer();
     }
 
     /** Read Write access top the internal buffer
      @return The pointer to the buffer
      */
     inline char *BufferReference() const {
-        return buffer;
+        return buffer.BufferReference();
     }
 
 
     /** Returns a pointer to the tail of the buffer.
-     @param  ix the offset from the end of buffer
+     @param  ix the offset from the end of buffer. valid ranges is 0 to Size()-1
      @return pointer to the tail of the buffer
      */
     inline const char *Tail(int32 ix) const {
-        return buffer + size - ix - 1;
+    	if (ix > 0) 				return 0;
+    	if ((ix - Size() -1)< 0) 	return 0;
+    	return buffer.BufferReference() + Size() - ix - 1;
     }
 
 public: // DIRECT MANIPULATION FUNCTIONS
@@ -329,35 +251,53 @@ public: // DIRECT MANIPULATION FUNCTIONS
      @param  c the character to be copied
      @return True if successful. False otherwise.
      */
-    bool Copy(char c) {
-        uint32 wsize = 1;
-        size = 0;
-        bool ret = BSWrite(*this, &c, 0, wsize);
-        return ret;
+    bool Copy(char c, bool append=false) {
+        if (append){
+        	buffer.Seek(buffer.Size());
+    	} else {
+    		buffer.Empty();
+    	} 
+    	bool ret = buffer.PutC(c);
+    	Terminate();
+    	return ret;
     }
 
     /** Copy a string into the StreamString buffer.
      @param  s The pointer to the string to be copied
      @return True if successful. False otherwise.
      */
-    bool Copy(const char *s) {
-        if (s == NULL)
-            return False;
-        uint32 wsize = strlen(s);
-        size = 0;
-        bool ret = BSWrite(*this, s, 0, wsize);
-        return ret;
+    bool Copy(const char *s, bool append=false) {
+        if (s == NULL){
+            return false;
+        }
+        uint32 size = strlen(s);
+
+        if (append){
+        	buffer.Seek(buffer.Size());
+    	} else {
+    		buffer.Empty();
+    	} 
+    	bool ret = buffer.Write(s,size);
+    	Terminate();
+    	return ret;
     }
 
     /** Copy a StreamString into a StreamString.
      @param  s The StreamString to be copied
      @return True if successful. False otherwise.
      */
-    bool Copy(const BasicString &s) {
-        uint32 wsize = s.size;
-        size = 0;
-        bool ret = BSWrite(*this, s.Buffer(), 0, wsize);
-        return ret;
+    bool Copy(const StreamString &s, bool append=false) {
+        uint32 size = s.buffer.Size();
+
+        if (append){
+        	buffer.Seek(buffer.Size());
+    	} else {
+    		buffer.Empty();
+    	} 
+
+        bool ret = buffer.Write(s.Buffer(),size);
+    	Terminate();
+    	return ret;
     }
     
     /** Sets StreamString to be a copy of the input parameter.
@@ -365,11 +305,7 @@ public: // DIRECT MANIPULATION FUNCTIONS
      @return True if successful. False otherwise.
      */
     inline bool operator=(char c) {
-    	size = 1;
-    	position = 0;
-    	buffer[0] = c;
-    	buffer[1] = 0;
-        return ;
+    	return Copy(c);
     }
 
     /** Sets StreamString to be a copy of the input parameter.
@@ -393,9 +329,7 @@ public: // DIRECT MANIPULATION FUNCTIONS
      @return True if successful. False otherwise.
      */
     inline bool operator+=(const char c) {
-        uint32 wsize = 1;
-        char temp = c;
-        return BSWrite(*this, &temp, size, wsize);
+    	return Copy(c,true);
     }
 
     /** Concatenate the string to the string contained in the buffer
@@ -403,10 +337,7 @@ public: // DIRECT MANIPULATION FUNCTIONS
      @return True if successful. False otherwise.
      */
     inline bool operator+=(const char *s) {
-        if (s == NULL)
-            return False;
-        uint32 wsize = strlen(s);
-        return BSWrite(*this, s, size, wsize);
+    	return Copy(s,true);
     }
 
     /** Concatenate the StreamString to the string contained in the buffer
@@ -414,8 +345,7 @@ public: // DIRECT MANIPULATION FUNCTIONS
      @return True if successful. False otherwise.
      */
     inline bool operator+=(StreamString &s) {
-        uint32 wsize = s.Size();
-        return BSWrite(*this, s.Buffer(), size, wsize);
+    	return Copy(s,true);
     }
 
     /** Compare the buffer content with the input content
@@ -423,11 +353,13 @@ public: // DIRECT MANIPULATION FUNCTIONS
      @return True if the two buffers are the same. False otherwise.
      */
     inline bool operator==(StreamString &s) const {
-        if (size != s.size)
-            return False;
-        if (strcmp(buffer, s.buffer) != 0)
-            return False;
-        return True;
+        if (buffer.Size() != s.buffer.Size()){
+            return false;
+        }
+        if (strcmp(Buffer(), s.Buffer()) != 0){
+            return false;
+        }
+        return true;
     }
 
     /** Compare the buffer content with the input content
@@ -435,11 +367,13 @@ public: // DIRECT MANIPULATION FUNCTIONS
      @return True if the two buffers are the same. False otherwise.
      */
     inline bool operator==(const char *s) const {
-        if (s == NULL)
-            return False;
-        if (strcmp(buffer, s) != 0)
-            return False;
-        return True;
+        if (s == NULL){
+            return false;
+        }
+        if (strcmp(Buffer(), s) != 0){
+            return false;
+        }
+        return true;
     }
 
     inline bool operator!=(StreamString &s) const {
@@ -455,11 +389,12 @@ public: // DIRECT MANIPULATION FUNCTIONS
      @return 0 if the position is outside the buffer limits. The character at position pos otherwise.
      */
     inline char operator[](uint32 pos) {
-        if (pos >= size)
-            return 0; // was -1 ?? Anton ??
-        return buffer[pos];
+        if (pos >= buffer.Size()){
+            return 0; 
+        }
+        return buffer.BufferReference()[pos];
     }
-
+#if 0
     /** Checks if a char is in the string
      @param c The character to look for.
      @return True if found. False otherwise.
@@ -483,7 +418,7 @@ public: // DIRECT MANIPULATION FUNCTIONS
                 return True;
         return False;
     }
-
+#endif
 };
 
 #endif
