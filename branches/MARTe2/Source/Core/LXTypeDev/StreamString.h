@@ -23,6 +23,61 @@
  *
  **/
 
+class StreamString;
+
+/// Read buffer Mechanism for Streamable
+class SSReadBuffer:public InputBuffer{
+private:
+	///
+	StreamString &string;
+       
+public: // read buffer private methods
+
+    ///
+	SSReadBuffer(StreamString &s):string(s){
+    	bufferPtr = s.Buffer();
+//    	this->stream = stream;
+    }
+
+    /**  
+        refill readBuffer
+        assumes that the read position is now at the end of buffer
+    */
+    virtual bool 		Refill(TimeoutType         msecTimeout     = TTDefault){return false;}
+    
+    /**
+        sets the readBufferFillAmount to 0
+        adjust the seek position
+    */
+    virtual bool 		Resync(TimeoutType         msecTimeout     = TTDefault){return false;}    
+  
+};
+
+
+/// Read buffer Mechanism for Streamable
+class SSWriteBuffer:public OutputBuffer{
+private:
+	///
+	StreamString &string;
+
+public:
+
+    ///
+	SSWriteBuffer(Streamable &s):string(s){
+    	bufferPtr = s.BufferReference();
+    }
+	
+	/**  
+	    empty writeBuffer
+	    only called internally when no more space available 
+	*/
+	virtual bool Flush(TimeoutType         msecTimeout     = TTDefault){return false;}
+
+    	return true;
+	}
+};
+
+
 /** 
  * @file
  * Basic implementation of strings 
@@ -48,16 +103,26 @@
     Compare with      a  char *    
     Access as char * both read-only and read-write
 */
-class StreamString: public CharBuffer,public StreamInterface {
+class StreamString: protected IOBuffer,public BufferedStream {
 
 private:    
 
     /** the size of the used memory block -1 (It excludes the 0)  */
-    uint32 size;
+///    uint32 size; replaced by maxAmount
     
     /** */ 
     int64 position;
 
+protected: // methods to be implemented by deriving classes
+    ///
+    virtual InputBuffer &GetInputBuffer(){
+    	return *this;
+    }
+
+    ///
+    virtual OutputBuffer &GetOputBuffer(){
+    	return *this;
+    }
 private:
     /** sets the size of the buffer so that to fit a fitStringSize
         accounts for string terminator
