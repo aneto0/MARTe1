@@ -232,7 +232,7 @@ protected: // methods to be implemented by deriving classes
     }
 
     ///
-    virtual IOBuffer &GetOputBuffer(){
+    virtual IOBuffer &GetOutputBuffer(){
     	return writeBuffer;
     }
     
