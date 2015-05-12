@@ -22,10 +22,30 @@ protected:
 
 TEST_F(StreamableGTest,TestGetC) {
     StreamableTest streamtest;
-    ASSERT_TRUE(streamtest.TestGetC());
+    ASSERT_TRUE(streamtest.TestGetC("Hello World"));
 }
 
 TEST_F(StreamableGTest,TestPutC) {
     StreamableTest streamtest;
-    ASSERT_TRUE(streamtest.TestPutC());
+    ASSERT_TRUE(streamtest.TestPutC("Hello World"));
 }
+
+
+TEST_F(StreamableGTest,TestRead) {
+    StreamableTest streamtest;
+    ASSERT_TRUE(streamtest.TestRead("Hello World"));
+}
+
+
+TEST_F(StreamableGTest,TestWrite) {
+    StreamableTest streamtest;
+    ASSERT_TRUE(streamtest.TestWrite("Hello World"));
+}
+
+
+TEST_F(StreamableGTest,TestReadAndWrite) {
+    StreamableTest streamtest;
+    ASSERT_TRUE(streamtest.TestReadAndWrite("ThisIsTheStringToRead","ThisIsTheStringToWrite"));
+}
+
+

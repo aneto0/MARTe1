@@ -41,8 +41,11 @@ class StreamableTest {
 private:
 
 public:
-	bool TestGetC();
-	bool TestPutC();
+	bool TestGetC(const char* inputString);
+	bool TestPutC(const char* inputString);
+	bool TestRead(const char* inputString);
+	bool TestWrite(const char* inputString);
+	bool TestReadAndWrite(const char* stringToRead, const char* stringToWrite);
 };
 
 #endif

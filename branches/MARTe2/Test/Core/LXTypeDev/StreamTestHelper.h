@@ -40,13 +40,21 @@ class SimpleStreamable : public Streamable{
 public:
 	char buffer[MAX_DIMENSION];
 	uint32 size;
+	bool doubleBuffer;
 public:
 
 
 	SimpleStreamable(){
 		size=0;
+		doubleBuffer=false;
+		operatingModes.canSeek=true;
 		for(int i=0; i<MAX_DIMENSION; i++) buffer[i]=0;
 	}
+
+	~SimpleStreamable(){
+		Flush();
+	}
+	
 
 	void Clear(){
 		size=0;
@@ -82,15 +90,21 @@ public:
 	}
 
 
-	int64 UnBufferedSize(){
+	bool SetBuffered(uint32 defSize){
+		return SetBufferSize(defSize, defSize);			
+	}
+
+
+	int64 UnBufferedSize()const{
 		return size;
 	}
 	
 	bool UnBufferedSeek(int64 seek){
+		size=seek;	
 		return true;
 	}
 
-	int64 UnBufferedPosition(){
+	int64 UnBufferedPosition()const{
 		return size;
 	}
 
@@ -112,15 +126,15 @@ public:
 	}
 
 ///Useless functions	
-	bool CanWrite(){
+	bool CanWrite()const{
 		return true;
 	}
 
-	bool CanSeek(){
-		return true;
+	bool CanSeek()const{
+		return doubleBuffer;
 	}
 	
-	bool CanRead(){
+	bool CanRead()const{
 		return true;
 	}
 
@@ -128,7 +142,7 @@ public:
 		return 1;
 	}
 
-	bool StreamName(uint32 a, char* some, int b){
+	bool StreamName(uint32 a, char* some, int b)const{
 		return false;
 	}
 
