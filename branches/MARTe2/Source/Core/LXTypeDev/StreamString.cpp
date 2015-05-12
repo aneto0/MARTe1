@@ -25,7 +25,12 @@
 
 #include "StreamString.h"
 #include "GeneralDefinitions.h"
-#include "StreamHelper.h"
+#include "StringHelper.h"
+#include "ErrorManagement.h"
+
+StreamStringBuffer::~StreamStringBuffer(){
+
+}
 
 ///
 StreamStringBuffer::StreamStringBuffer(StreamString &s):string(s){
@@ -39,18 +44,15 @@ StreamStringBuffer::StreamStringBuffer(StreamString &s):string(s){
 	fillLeft   = maxAmount;
 }
 
-~StreamStringBuffer::StreamStringBuffer(){
-
-}
 
 /** 
  *  desiredSize is the desired buffer size
  *  strings will fit upto desiredSize-1 
  *  sets the size of the buffer to be desiredSize or greater up next granularity
  */
-void StreamStringBuffer::SetBufferAllocationSize(
+bool  StreamStringBuffer::SetBufferAllocationSize(
 		uint32 			desiredSize,
-		uint32 			allocationGranularityMask 		= 0xFFFFFFFF){
+		uint32 			allocationGranularityMask){
 
 	// save position    	
 	uint32 position   = Position();
@@ -88,7 +90,7 @@ void StreamStringBuffer::SetBufferAllocationSize(
 
 // read buffer private methods
 /// if buffer is full this is called 
-bool 		StreamStringBuffer::Flush(){
+bool 		StreamStringBuffer::Flush(TimeoutType         msecTimeout){
 
 	// reallocate buffer
 	// uses safe version of the function
@@ -104,7 +106,7 @@ bool 		StreamStringBuffer::Flush(){
  * loads more data into buffer and sets amountLeft and bufferEnd
  * READ OPERATIONS 
  * */
-bool 		StreamStringBuffer::Refill(){
+bool 		StreamStringBuffer::Refill(TimeoutType         msecTimeout){
 		// nothing to do.
 		return true;
 }
@@ -114,7 +116,7 @@ bool 		StreamStringBuffer::Refill(){
         adjust the seek position of the stream to reflect the bytes read from the buffer
  * READ OPERATIONS 
  */
-bool 		StreamStringBuffer::Resync(){
+bool 		StreamStringBuffer::Resync(TimeoutType         msecTimeout){
 	// nothing to do.
 	return true;
 }    
@@ -154,7 +156,7 @@ bool        StreamStringBuffer::RelativeSeek(int32 delta){
 
 
 /** Destructor */
-~StreamString::StreamString() {
+StreamString::~StreamString() {
 }
 
 
@@ -171,7 +173,8 @@ bool StreamString::Read(
                         uint32 &            size,
                         TimeoutType         msecTimeout,
                         bool                complete){
-	return buffer.Read(buffer,size);
+	this->buffer.Read(buffer,size);
+	return true;
 }
 
 /** 
@@ -186,19 +189,19 @@ bool StreamString::Write(
                         uint32 &            size,
                         TimeoutType         msecTimeout,
                         bool                complete){
-	bool ret = buffer.Write(buffer,size);
-	Terminate();
-	return ret;
+	this->buffer.Write(buffer,size);
+	this->buffer.Terminate();
+	return true;
 	
 }
 
 /** whether it can be written into */
-bool StreamString::CanWrite(){ 
+bool StreamString::CanWrite()const { 
 	return true; 
 };
 
 /** whether it can be  read */
-bool StreamString::CanRead(){ 
+bool StreamString::CanRead()const { 
 	return true; 
 };
 
@@ -219,7 +222,7 @@ bool StreamString::Seek(int64 pos){
 
 /** Moves within the file relative to current location */
 bool StreamString::RelativeSeek(int32 deltaPos){
-	return buffer.RelativeSeek((uint32)pos);
+	return buffer.RelativeSeek(deltaPos);
 }
 
 /** Returns current position */
@@ -232,201 +235,16 @@ int64 StreamString::Position() {
  @param newStringSize The size of the buffer.
  @return True if successful. False otherwise.
  */
-bool StreamString::SetSize(int64 size) = 0;
-    buffer.SetStringBufferSize(size+1, 0xFFFFFFC0);
+bool StreamString::SetSize(int64 size){
+    buffer.SetBufferAllocationSize(size+1, 0xFFFFFFC0);
     return True;
 }
 
 /** can you move the pointer */
-bool StreamString::CanSeek(){ return true; };
+bool StreamString::CanSeek() const {
+	return true; 
+};
 
-
-public: // DIRECT ACCESS FUNCTIONS
-  
-
-/** Read Only access to the internal buffer
- @return The pointer to the buffer
- */
-inline const char *Buffer() const {
-    return buffer.Buffer();
-}
-
-/** Read Write access top the internal buffer
- @return The pointer to the buffer
- */
-inline char *BufferReference() const {
-    return buffer;
-}
-
-
-/** Returns a pointer to the tail of the buffer.
- @param  ix the offset from the end of buffer
- @return pointer to the tail of the buffer
- */
-inline const char *Tail(int32 ix) const {
-    return buffer + size - ix - 1;
-}
-
-public: // DIRECT MANIPULATION FUNCTIONS
-
-/** Copy a character into the StreamString buffer.
- @param  c the character to be copied
- @return True if successful. False otherwise.
- */
-bool Copy(char c) {
-    uint32 wsize = 1;
-    size = 0;
-    bool ret = BSWrite(*this, &c, 0, wsize);
-    return ret;
-}
-
-/** Copy a string into the StreamString buffer.
- @param  s The pointer to the string to be copied
- @return True if successful. False otherwise.
- */
-bool Copy(const char *s) {
-    if (s == NULL)
-        return False;
-    uint32 wsize = strlen(s);
-    size = 0;
-    bool ret = BSWrite(*this, s, 0, wsize);
-    return ret;
-}
-
-/** Copy a StreamString into a StreamString.
- @param  s The StreamString to be copied
- @return True if successful. False otherwise.
- */
-bool Copy(const BasicString &s) {
-    uint32 wsize = s.size;
-    size = 0;
-    bool ret = BSWrite(*this, s.Buffer(), 0, wsize);
-    return ret;
-}
-
-/** Sets StreamString to be a copy of the input parameter.
- @param c The character to copy
- @return True if successful. False otherwise.
- */
-inline bool operator=(char c) {
-	size = 1;
-	position = 0;
-	buffer[0] = c;
-	buffer[1] = 0;
-    return ;
-}
-
-/** Sets StreamString to be a copy of the input parameter.
- @param s The string to copy
- @return True if successful. False otherwise.
- */
-inline bool operator=(const char *s) {
-    return Copy(s);
-}
-
-/** Sets StreamString to be a copy of the input parameter.
- @param s The StreamString to copy
- @return True if successful. False otherwise.
- */
-inline bool operator=(const StreamString &s) {
-    return Copy(s);
-}
-
-/** Concatenate the character to the string contained in the buffer
- @param  c The character to concatenate
- @return True if successful. False otherwise.
- */
-inline bool operator+=(const char c) {
-    uint32 wsize = 1;
-    char temp = c;
-    return BSWrite(*this, &temp, size, wsize);
-}
-
-/** Concatenate the string to the string contained in the buffer
- @param  s The string to concatenate
- @return True if successful. False otherwise.
- */
-inline bool operator+=(const char *s) {
-    if (s == NULL)
-        return False;
-    uint32 wsize = strlen(s);
-    return BSWrite(*this, s, size, wsize);
-}
-
-/** Concatenate the StreamString to the string contained in the buffer
- @param  s The StreamString to concatenate
- @return True if successful. False otherwise.
- */
-inline bool operator+=(StreamString &s) {
-    uint32 wsize = s.Size();
-    return BSWrite(*this, s.Buffer(), size, wsize);
-}
-
-/** Compare the buffer content with the input content
- @param s The buffer to be compared with
- @return True if the two buffers are the same. False otherwise.
- */
-inline bool operator==(StreamString &s) const {
-    if (size != s.size)
-        return False;
-    if (strcmp(buffer, s.buffer) != 0)
-        return False;
-    return True;
-}
-
-/** Compare the buffer content with the input content
- @param s The buffer to be compared with
- @return True if the two buffers are the same. False otherwise.
- */
-inline bool operator==(const char *s) const {
-    if (s == NULL)
-        return False;
-    if (strcmp(buffer, s) != 0)
-        return False;
-    return True;
-}
-
-inline bool operator!=(StreamString &s) const {
-    return !((*this) == s);
-}
-
-inline bool operator!=(const char *s) const {
-    return !((*this) == s);
-}
-
-/** Allows access to character within the buffer
- @param  pos The position in the buffer to be accessed.
- @return 0 if the position is outside the buffer limits. The character at position pos otherwise.
- */
-inline char operator[](uint32 pos) {
-    if (pos >= size)
-        return 0; // was -1 ?? Anton ??
-    return buffer[pos];
-}
-
-/** Checks if a char is in the string
- @param c The character to look for.
- @return True if found. False otherwise.
- */
-inline bool In(char c) const {
-    for (uint32 i = 0; i < size; i++)
-        if (buffer[i] == c)
-            return True;
-    return False;
-}
-
-/** Checks if a string is contained in the string.
- @param x The string to look for.
- @return True if the string is found. False otherwise.
- */
-inline bool In(StreamString &x) const {
-    if (x.Size() == 0)
-        return False;
-    for (uint32 i = 0; i < (size - x.Size() + 1); i++)
-        if (memcmp(&buffer[i], x.Buffer(), x.Size()) == 0)
-            return True;
-    return False;
-}
 
 
 

@@ -57,7 +57,7 @@ CharBuffer::~CharBuffer() {
     allocationGranularityMask defines how many bits to consider 
     for the buffer size. round up the others
 */
-void CharBuffer::SetBufferAllocationSize(
+bool CharBuffer::SetBufferAllocationSize(
 		uint32 			desiredSize,
         uint32 			allocationGranularityMask
 ){
@@ -73,7 +73,7 @@ void CharBuffer::SetBufferAllocationSize(
 
     // stay within matematical limits
     if (desiredSize > allocationBoundary ) {
-    	return ;
+    	return false;
     }
     
     uint32 neededMemory = 
@@ -101,7 +101,9 @@ void CharBuffer::SetBufferAllocationSize(
         bufferMode.allocated 	= true;        	
     } else {
     	bufferSize = 0;
+    	return false;
     }
+    return true;
 }
 
 /**

@@ -24,8 +24,8 @@
 #
 #############################################################
 
-OBJSX=CharBuffer.x FormatDescriptor.x   ErrorManagement.x  BufferedStream.x Streamable.x
-# StreamString.x 
+OBJSX=CharBuffer.x FormatDescriptor.x   ErrorManagement.x  BufferedStream.x \
+Streamable.x StreamString.x 
 MAKEDEFAULTDIR=../../../MakeDefaults
 
 PACKAGE=Core

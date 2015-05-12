@@ -30,9 +30,9 @@
 #ifndef IO_BUFFER_H
 #define IO_BUFFER_H
 
-
 #include "CharBuffer.h"
 #include "Memory.h"
+#include "TimeoutType.h"
 
 ///
 class IOBuffer

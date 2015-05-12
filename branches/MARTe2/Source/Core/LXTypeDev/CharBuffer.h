@@ -84,7 +84,7 @@ public:
         allocationGranularityMask defines how many bits to consider 
         for the buffer size. round up the others
     */
-    virtual void SetBufferAllocationSize(
+    virtual bool SetBufferAllocationSize(
     		uint32 			desiredSize,
             uint32 			allocationGranularityMask 		= 0xFFFFFFFF);
     

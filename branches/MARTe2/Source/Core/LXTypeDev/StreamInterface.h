@@ -72,10 +72,10 @@ public:
                             bool                complete        = false) = 0;
 
     /** whether it can be written into */
-    virtual bool        CanWrite()=0;
+    virtual bool        CanWrite()const =0;
 
     /** whether it can be  read */
-    virtual bool        CanRead()=0;
+    virtual bool        CanRead()const =0;
     
     
     /// simply write to buffer if space exist and if operatingModes allows
@@ -113,7 +113,7 @@ public:
     // RANDOM ACCESS INTERFACE
 
     /** The size of the stream */
-    virtual int64       Size() = 0;
+    virtual int64       Size()  = 0;
 
     /** Moves within the file to an absolute location */
     virtual bool        Seek(int64 pos) = 0;
@@ -122,18 +122,18 @@ public:
     virtual bool        RelativeSeek(int32 deltaPos)=0;
     
     /** Returns current position */
-    virtual int64       Position() = 0 ;
+    virtual int64       Position()  = 0 ;
 
     /** Clip the stream size to a specified point */
     virtual bool        SetSize(int64 size) = 0;
 
     /** can you move the pointer */
-    virtual bool        CanSeek()=0;
+    virtual bool        CanSeek()const =0;
 
     // Extended Attributes or Multiple Streams INTERFACE
 
     /** how many streams are available */
-    virtual uint32      NOfStreams()=0;
+    virtual uint32      NOfStreams() =0;
 
     /** select the stream to read from. Switching may reset the stream to the start. */
     virtual bool        Switch(uint32 n)=0;
@@ -145,7 +145,7 @@ public:
     virtual uint32      SelectedStream()=0;
 
     /** the name of the stream we are using */
-    virtual bool        StreamName(uint32 n,char *name,int nameSize)=0;
+    virtual bool        StreamName(uint32 n,char *name,int nameSize)const =0;
 
     /**  add a new stream to write to. */
     virtual bool        AddStream(const char *name)=0;

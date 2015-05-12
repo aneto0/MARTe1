@@ -271,13 +271,13 @@ protected: // methods to be implemented by deriving classes
     // RANDOM ACCESS INTERFACE
 
     /** The size of the stream */
-    virtual int64       UnBufferedSize()=0;
+    virtual int64       UnBufferedSize()const =0;
 
     /** Moves within the file to an absolute location */
     virtual bool        UnBufferedSeek(int64 pos)=0;
 
     /** Returns current position */
-    virtual int64       UnBufferedPosition()=0;
+    virtual int64       UnBufferedPosition()const =0;
 
     /** Clip the stream size to a specified point */
     virtual bool        UnBufferedSetSize(int64 size)=0;
@@ -296,12 +296,12 @@ protected: // methods to be implemented by deriving classes
    
 protected: // methods to be implemented by deriving classes
     ///
-    virtual IOBuffer &GetInputBuffer(){
+    virtual IOBuffer &GetInputBuffer() {
     	return readBuffer;
     }
 
     ///
-    virtual IOBuffer &GetOutputBuffer(){
+    virtual IOBuffer &GetOutputBuffer() {
     	return writeBuffer;
     }
     
@@ -437,7 +437,7 @@ public:
     // RANDOM ACCESS INTERFACE
 
     /** The size of the stream */
-    virtual int64       Size();
+    virtual int64       Size() ;
 
     /** Moves within the file to an absolute location */
     virtual bool        Seek(int64 pos);

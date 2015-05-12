@@ -23,6 +23,22 @@
  *
  **/
 
+
+
+/** 
+ * @file
+ * Basic implementation of strings 
+ */
+#ifndef STREAM_STRING_H
+#define STREAM_STRING_H
+
+#include "GeneralDefinitions.h"
+#include "Memory.h"
+#include "CharBuffer.h"
+#include "IOBuffer.h"
+#include "BufferedStream.h"
+#include "TimeoutType.h"
+
 class StreamString;
 
 /// Read buffer Mechanism for Streamable
@@ -49,7 +65,7 @@ public: //
 	/** sets the size of the buffer to be desiredSize or greater up next granularity
 	 *  truncates stringSize to desiredSize-1 
 	*/
-    virtual void SetBufferAllocationSize(
+    virtual bool  SetBufferAllocationSize(
     		uint32 			desiredSize,
             uint32 			allocationGranularityMask 		= 0xFFFFFFFF);
 	
@@ -86,21 +102,8 @@ public: // read buffer private methods
     	BufferReference()[Size()]= 0;
     }
     
-    
+   
 };
-
-
-/** 
- * @file
- * Basic implementation of strings 
- */
-#ifndef STREAM_STRING_H
-#define STREAM_STRING_H
-
-#include "GeneralDefinitions.h"
-#include "Memory.h"
-#include "CharBuffer.h"
-#include "StreamInterface.h"
 
 /**
     A basic implementation of a string.
@@ -130,12 +133,12 @@ private:
     
 protected: // methods to be implemented by deriving classes
     ///
-    virtual IOBuffer &GetInputBuffer(){
+    virtual IOBuffer &GetInputBuffer() {
     	return buffer;
     }
 
     ///
-    virtual IOBuffer &GetOputBuffer(){
+    virtual IOBuffer &GetOputBuffer() {
     	return buffer;
     }
 
@@ -147,21 +150,6 @@ public: // usable constructors
     /** Destructor */
     virtual ~StreamString() ;
     
-    /** Creates a StreamString as a copy of a StreamString.
-     @param x The StreamString to use for initialisation
-     */
-    inline StreamString(const StreamString &x) {
-        Copy(x);
-    }
-
-    /** Creates a StreamString as a copy of string
-     @param x The pointer to the string to use for initialisation
-     */
-    inline StreamString(const char *x) {
-        Copy(x);
-    }
-
-
 public:
     /** 
         Reads data into buffer. 
@@ -190,13 +178,13 @@ public:
                             bool                complete        = false);
     
     /** whether it can be written into */
-    virtual bool        CanWrite();
+    virtual bool        CanWrite() const ;
 
     /** whether it can be  read */
-    virtual bool        CanRead();
+    virtual bool        CanRead() const ;
     
     /** The size of the stream */
-    virtual int64       Size();
+    virtual int64       Size() ;
 
     /** Moves within the file to an absolute location */
     virtual bool        Seek(int64 pos);
@@ -205,7 +193,7 @@ public:
     virtual bool        RelativeSeek(int32 deltaPos);
     
     /** Returns current position */
-    virtual int64       Position();
+    virtual int64       Position() ;
 
     /** Clip the string size to a specified point
      @param newStringSize The size of the buffer.
@@ -214,7 +202,7 @@ public:
     virtual bool        SetSize(int64 size);
 
     /** can you move the pointer */
-    virtual bool        CanSeek();
+    virtual bool        CanSeek() const ;
   
     
 public: // DIRECT ACCESS FUNCTIONS
@@ -241,8 +229,8 @@ public: // DIRECT ACCESS FUNCTIONS
      */
     inline const char *Tail(int32 ix) const {
     	if (ix > 0) 				return 0;
-    	if ((ix - Size() -1)< 0) 	return 0;
-    	return buffer.BufferReference() + Size() - ix - 1;
+    	if ((ix - buffer.Size() -1)< 0) 	return 0;
+    	return buffer.BufferReference() + buffer.Size() - ix - 1;
     }
 
 public: // DIRECT MANIPULATION FUNCTIONS
@@ -258,7 +246,7 @@ public: // DIRECT MANIPULATION FUNCTIONS
     		buffer.Empty();
     	} 
     	bool ret = buffer.PutC(c);
-    	Terminate();
+    	buffer.Terminate();
     	return ret;
     }
 
@@ -277,9 +265,9 @@ public: // DIRECT MANIPULATION FUNCTIONS
     	} else {
     		buffer.Empty();
     	} 
-    	bool ret = buffer.Write(s,size);
-    	Terminate();
-    	return ret;
+    	buffer.Write(s,size);
+    	buffer.Terminate();
+    	return true;
     }
 
     /** Copy a StreamString into a StreamString.
@@ -295,9 +283,9 @@ public: // DIRECT MANIPULATION FUNCTIONS
     		buffer.Empty();
     	} 
 
-        bool ret = buffer.Write(s.Buffer(),size);
-    	Terminate();
-    	return ret;
+        buffer.Write(s.Buffer(),size);
+    	buffer.Terminate();
+    	return true;
     }
     
     /** Sets StreamString to be a copy of the input parameter.
