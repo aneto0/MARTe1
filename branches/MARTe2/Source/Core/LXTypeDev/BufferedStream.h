@@ -41,10 +41,10 @@ class BufferedStream: public StreamInterface {
        
 protected: // methods to be implemented by deriving classes
     ///
-    virtual IOBuffer &GetInputBuffer() = 0;
+    virtual IOBuffer *GetInputBuffer() = 0;
 
     ///
-    virtual IOBuffer &GetOutputBuffer() = 0;
+    virtual IOBuffer *GetOutputBuffer() = 0;
 
 protected: // mode switch methods
 

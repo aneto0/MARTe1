@@ -38,6 +38,7 @@
 #include "IOBuffer.h"
 #include "BufferedStream.h"
 #include "TimeoutType.h"
+#include "StringHelper.h"
 
 class StreamString;
 
@@ -133,13 +134,13 @@ private:
     
 protected: // methods to be implemented by deriving classes
     ///
-    virtual IOBuffer &GetInputBuffer() {
-    	return buffer;
+    virtual IOBuffer *GetInputBuffer() {
+    	return &buffer;
     }
 
     ///
-    virtual IOBuffer &GetOputBuffer() {
-    	return buffer;
+    virtual IOBuffer *GetOputBuffer() {
+    	return &buffer;
     }
 
 public: // usable constructors
@@ -258,7 +259,7 @@ public: // DIRECT MANIPULATION FUNCTIONS
         if (s == NULL){
             return false;
         }
-        uint32 size = strlen(s);
+        uint32 size = StringHelper::Length(s);
 
         if (append){
         	buffer.Seek(buffer.Size());
@@ -344,7 +345,7 @@ public: // DIRECT MANIPULATION FUNCTIONS
         if (buffer.Size() != s.buffer.Size()){
             return false;
         }
-        if (strcmp(Buffer(), s.Buffer()) != 0){
+        if (StringHelper::Compare(Buffer(), s.Buffer()) != 0){
             return false;
         }
         return true;
@@ -358,7 +359,7 @@ public: // DIRECT MANIPULATION FUNCTIONS
         if (s == NULL){
             return false;
         }
-        if (strcmp(Buffer(), s) != 0){
+        if (StringHelper::Compare(Buffer(), s) != 0){
             return false;
         }
         return true;

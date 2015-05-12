@@ -15,12 +15,13 @@ class Streamable;
 class StreamableReadBuffer:public IOBuffer,protected CharBuffer{
 private:
 	///
-	Streamable &stream;
+	Streamable *stream;
        
 public: // read buffer private methods
 
     ///
-    StreamableReadBuffer(Streamable &s):stream(s){
+    StreamableReadBuffer(Streamable *s){
+	stream=s;
     	bufferPtr = BufferReference();
 //    	this->stream = stream;
     }
@@ -63,12 +64,13 @@ public: // read buffer private methods
 class StreamableWriteBuffer:public IOBuffer,protected CharBuffer{
 private:
 	///
-	Streamable &stream;
+	Streamable *stream;
 
 public:
 
     ///
-    StreamableWriteBuffer(Streamable &s):stream(s){
+    StreamableWriteBuffer(Streamable *s){
+	stream=s;
     	bufferPtr = BufferReference();
     }
 	
@@ -296,13 +298,13 @@ protected: // methods to be implemented by deriving classes
    
 protected: // methods to be implemented by deriving classes
     ///
-    virtual IOBuffer &GetInputBuffer() {
-    	return readBuffer;
+    virtual IOBuffer *GetInputBuffer() {
+    	return &readBuffer;
     }
 
     ///
-    virtual IOBuffer &GetOutputBuffer() {
-    	return writeBuffer;
+    virtual IOBuffer *GetOutputBuffer() {
+    	return &writeBuffer;
     }
     
 private: // mode switch methods
@@ -314,7 +316,7 @@ private: // mode switch methods
         does not check for mutexBuffering to be active
     */
     inline bool SwitchToWriteMode(){
-        if (!GetInputBuffer().Resync()) return false;
+        if (!GetInputBuffer()->Resync()) return false;
         operatingModes.mutexWriteMode = true;
         operatingModes.mutexReadMode = false;
         return true;
@@ -327,7 +329,7 @@ private: // mode switch methods
     */
     inline bool SwitchToReadMode(){
         // adjust seek position
-        if (!GetOutputBuffer().Flush()) return false;
+        if (!GetOutputBuffer()->Flush()) return false;
         operatingModes.mutexWriteMode = false;
         operatingModes.mutexReadMode = true; 
         return true;
@@ -335,7 +337,7 @@ private: // mode switch methods
    
 protected:
     /// default constructor
-    Streamable() : readBuffer(*this),writeBuffer(*this)
+    Streamable() : readBuffer(this),writeBuffer(this)
     {
     	operatingModes.canSeek      	= false;
     	operatingModes.mutexReadMode 	= false;
@@ -364,10 +366,10 @@ public:  // special inline methods for buffering
     inline bool Flush(TimeoutType         msecTimeout     = TTDefault){
     	// mutexReadMode --> can seek so makes sense to resync
     	if (operatingModes.mutexReadMode){
-    		return GetInputBuffer().Resync();
+    		return GetInputBuffer()->Resync();
     	} 
          	
-   		return GetOutputBuffer().Flush();
+   		return GetOutputBuffer()->Flush();
     }
 
     /**
@@ -380,9 +382,9 @@ public:  // special inline methods for buffering
            if (!SwitchToWriteMode()) return false;
         }
         
-        IOBuffer& outputBuffer = GetOutputBuffer();
-        if (outputBuffer.BufferPtr()!= NULL){
-        	return outputBuffer.PutC(c);
+        IOBuffer* outputBuffer = GetOutputBuffer();
+        if (outputBuffer->BufferPtr()!= NULL){
+        	return outputBuffer->PutC(c);
         }
         
         uint32 size = 1;
@@ -397,9 +399,9 @@ public:  // special inline methods for buffering
            if (!SwitchToReadMode()) return false;
         }
 
-        IOBuffer& inputBuffer = GetInputBuffer();
-        if (inputBuffer.BufferPtr()!= NULL){
-        	return inputBuffer.GetC(c);
+        IOBuffer* inputBuffer = GetInputBuffer();
+        if (inputBuffer->BufferPtr()!= NULL){
+        	return inputBuffer->GetC(c);
         }
         
         uint32 size = 1;

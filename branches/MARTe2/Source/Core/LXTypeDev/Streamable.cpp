@@ -44,7 +44,7 @@ bool StreamableReadBuffer::Resync(TimeoutType         msecTimeout){
     // adjust seek position
     // in read mode the actual stream 
     // position is to the character after the buffer end
-    if (!stream.UnBufferedSeek (stream.UnBufferedPosition()-deltaToEnd)) {
+    if (!stream->UnBufferedSeek (stream->UnBufferedPosition()-deltaToEnd)) {
     	return false;
     }
                                                                           
@@ -69,7 +69,7 @@ bool StreamableReadBuffer::Refill(TimeoutType         msecTimeout){
 	amountLeft = maxAmount;
 	// just use this as a temp variable
     fillLeft   = maxAmount; 
-    if (stream.UnBufferedRead(BufferReference(),fillLeft)){
+    if (stream->UnBufferedRead(BufferReference(),fillLeft)){
     	fillLeft   = maxAmount - fillLeft; 
     	return true;
     }  
@@ -112,19 +112,23 @@ bool StreamableWriteBuffer::Flush(TimeoutType         msecTimeout  ){
     uint32 writeSize = maxAmount - fillLeft;
     
     // write
-    if (!stream.UnBufferedWrite(Buffer(),writeSize,msecTimeout,true)) {
+    if (!stream->UnBufferedWrite(Buffer(),writeSize,msecTimeout,true)) {
     	return False;
     }
 
-    Empty(); 
+    bufferPtr=BufferReference(); 
+
     maxAmount = BufferSize();
+    Empty();
     return True;  
 }
 
 
 /// default destructor
 Streamable::~Streamable(){
-	Flush();
+	//This class cannot be implemented
+
+//	Flush();
 }
 
 
@@ -165,14 +169,14 @@ bool Streamable::Read(
     }
 
     // check whether we have a buffer
-    IOBuffer &ib = GetInputBuffer();
-    if (ib.BufferPtr()!=NULL){ 
+    IOBuffer *ib = GetInputBuffer();
+    if (ib->BufferPtr()!=NULL){ 
 
         // read from buffer first
         uint32 toRead = size;
     	
         // try once 
-    	ib.Read(buffer, size);
+    	ib->Read(buffer, size);
     	
     	if (size == toRead ){
     		return true;
@@ -182,10 +186,10 @@ bool Streamable::Read(
     		toRead -= size;
     		
     		// decide whether to use the buffer again or just to read directly
-    		if ((toRead*4) < ib.MaxAmount()){
-    			if (!ib.Refill()) return false;
+    		if ((toRead*4) < ib->MaxAmount()){
+    			if (!ib->Refill()) return false;
     			
-    			ib.Read(buffer+size, toRead);
+    			ib->Read(buffer+size, toRead);
     			size += toRead;
     			
     			// should have completed
@@ -223,31 +227,31 @@ bool Streamable::Write(
        if (!SwitchToWriteMode()) return false;
     }
     
-    IOBuffer &ob = GetOutputBuffer();
+    IOBuffer *ob = GetOutputBuffer();
     // buffering active?
-    if (ob.BufferPtr() != NULL){
+    if (ob->BufferPtr() != NULL){
     	// separate input and output size
     	
     	uint32 toWrite = size;
     	// check available buffer size versus write size 
         // if size is comparable to buffer size there 
         // is no reason to use the buffering mechanism
-        if (ob.MaxAmount() > (4 *size)){
+        if (ob->MaxAmount() > (4 *size)){
         	
         	// try writing the buffer
-        	ob.Write(buffer, size);
+        	ob->Write(buffer, size);
         	
         	// all done! space available! 
         	if (size == toWrite) return true;
         	
         	// make space
-        	if (!ob.Flush()) return false;
+        	if (!ob->Flush()) return false;
 
         	toWrite -= size;
         	uint32 leftToWrite = toWrite;
         	
         	// try writing the buffer
-        	ob.Write(buffer+size, leftToWrite);
+        	ob->Write(buffer+size, leftToWrite);
 
         	size+= leftToWrite;
         	
@@ -256,7 +260,7 @@ bool Streamable::Write(
         	return true;               
         } else {
         	// write the buffer so far
-        	if (!ob.Flush()) return false;
+        	if (!ob->Flush()) return false;
         }
         
     }
@@ -281,22 +285,22 @@ bool Streamable::Seek(int64 pos)
     
     // if write mode on then just flush out data
     if (operatingModes.mutexWriteMode){
-    	GetOutputBuffer().Flush();
+    	GetOutputBuffer()->Flush();
     } else {
-        IOBuffer &ib = GetInputBuffer();
+        IOBuffer *ib = GetInputBuffer();
     	// if read buffer has some data, check whether seek can be within buffer
-    	if (ib.MaxAmount() > 0){
+    	if (ib->MaxAmount() > 0){
     		int64 currentStreamPosition = UnBufferedPosition();
-    		int64 bufferStartPosition = currentStreamPosition - ib.MaxAmount();
+    		int64 bufferStartPosition = currentStreamPosition - ib->MaxAmount();
     		
     		// if within range just update readBufferAccessPosition
     		if ((pos >= bufferStartPosition) &&
     	        (pos < currentStreamPosition)){
-    			ib.Seek(pos - bufferStartPosition);
+    			ib->Seek(pos - bufferStartPosition);
     			
     			return true;
     		} else { // otherwise mark read buffer empty and proceed with normal seek
-    			ib.Empty();
+    			ib->Empty();
     			// continues at the end of the function
     		}
     	}       	
@@ -312,16 +316,16 @@ bool  Streamable::RelativeSeek(int32 deltaPos){
     
     // if write mode on then just flush out data
     if (operatingModes.mutexWriteMode){
-    	GetOutputBuffer().Flush();
+    	GetOutputBuffer()->Flush();
     } else {
-    	if (GetInputBuffer().RelativeSeek(deltaPos)){
+    	if (GetInputBuffer()->RelativeSeek(deltaPos)){
     		return true;
     	}
 		// adjust seek poistion to account for buffer usage
-		deltaPos -= GetInputBuffer().AmountLeft();
+		deltaPos -= GetInputBuffer()->AmountLeft();
 		
 		// empty buffer
-		GetInputBuffer().Empty();
+		GetInputBuffer()->Empty();
     	
     }
 	
@@ -334,9 +338,9 @@ int64 Streamable::Position() {
     
     // if write mode on then just flush out data
     if (operatingModes.mutexWriteMode){
-    	return UnBufferedPosition() + GetOutputBuffer().MaxAmount() - GetOutputBuffer().AmountLeft();
+    	return UnBufferedPosition() + GetOutputBuffer()->MaxAmount() - GetOutputBuffer()->AmountLeft();
     } else {
-    	return UnBufferedPosition() - GetInputBuffer().AmountLeft();
+    	return UnBufferedPosition() - GetInputBuffer()->AmountLeft();
     }
 }
 
@@ -347,9 +351,9 @@ bool Streamable::SetSize(int64 size)
     
     // if write mode on then just flush out data
     if (operatingModes.mutexWriteMode){
-    	GetOutputBuffer().Flush();
+    	GetOutputBuffer()->Flush();
     } else { // simply empty read buffer
-    	GetInputBuffer().Empty();
+    	GetInputBuffer()->Empty();
     }
     return UnBufferedSetSize(size);
 }
