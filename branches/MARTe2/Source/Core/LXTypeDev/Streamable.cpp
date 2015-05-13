@@ -145,6 +145,7 @@ bool Streamable::SetBufferSize(uint32 readBufferSize, uint32 writeBufferSize){
 	// in that case the stream is single and bidirectional
     if (CanSeek() && CanWrite() && CanRead()) {
     	operatingModes.mutexWriteMode = true;
+	operatingModes.mutexReadMode = false;
     }    	
     
     if (!CanRead())  readBufferSize = 0;   
@@ -323,8 +324,9 @@ bool Streamable::Seek(int64 pos)
     		if ((pos >= bufferStartPosition) &&
     	        (pos < currentStreamPosition)){
     			readBuffer.Seek(pos - bufferStartPosition);
-    			
-    			return true;
+
+		
+   			return true;
     		} else { // otherwise mark read buffer empty and proceed with normal seek
     			readBuffer.Empty();
     			// continues at the end of the function
@@ -352,7 +354,7 @@ bool  Streamable::RelativeSeek(int32 deltaPos){
     	}
     	// out of buffer range
 		// adjust stream seek poistion to account for actual read buffer usage
-		deltaPos -= readBuffer.Size();
+		deltaPos -= (readBuffer.Size()-readBuffer.Position());
 		
 		// empty buffer
 		readBuffer.Empty();

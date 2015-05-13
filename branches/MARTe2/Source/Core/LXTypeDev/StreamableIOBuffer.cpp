@@ -94,7 +94,7 @@ bool StreamableIOBuffer::RelativeSeek(int32 delta){
 	if (delta < 0){
 		if ((amountLeft-delta) > maxAmount) return false;
 	}
-	amountLeft += delta;
+	amountLeft -= delta;
 	bufferPtr += delta;
 	return true;
 }
