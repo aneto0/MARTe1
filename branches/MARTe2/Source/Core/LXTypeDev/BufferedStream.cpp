@@ -26,6 +26,7 @@
 #include "ErrorManagement.h"
 #include "StringHelper.h"
 #include "StreamHelper.h"
+#include "BufferedStreamIOBuffer.h"
 
 
 /// default destructor
@@ -45,7 +46,16 @@ bool BufferedStream::GetToken(
                             char *              saveTerminator,
                             const char *        skipCharacters){
 	
-	return GetTokenFromStream(*this, outputBuffer,terminator,outputBufferSize,saveTerminator,skipCharacters);
+	// retrieve stream mechanism
+	IOBuffer *inputBuffer = GetInputBuffer(); 
+	if (inputBuffer == NULL){
+		inputBuffer = new BufferedStreamIOBuffer(this,64);
+		bool ret = GetTokenFromStream(*inputBuffer, outputBuffer,terminator,outputBufferSize,saveTerminator,skipCharacters);
+		delete inputBuffer;
+		return ret;
+	}
+	
+	return GetTokenFromStream(*inputBuffer, outputBuffer,terminator,outputBufferSize,saveTerminator,skipCharacters);
 }
 
 
@@ -62,13 +72,31 @@ bool BufferedStream::GetToken(
     3) skip + terminator    the character is not copied, the string is terminated if not empty
 */
 bool BufferedStream::GetToken(
-		                    BufferedStream &  output,
+							StreamInterface &   output,
                             const char *        terminator,
                             char *              saveTerminator,
                             const char *        skipCharacters){
 
-	return GetTokenFromStream(*this, output,terminator,saveTerminator,skipCharacters);
+	// retrieve stream mechanism
+	IOBuffer *inputBuffer  = GetInputBuffer();
+	IOBuffer *outputBuffer = output.GetOutputBuffer();
+	bool inputBufferAllocated = (inputBuffer == NULL); 
+	bool outputBufferAllocated = (outputBuffer == NULL); 
+	if (inputBuffer == NULL){
+		inputBuffer = new BufferedStreamIOBuffer(this,64);
+	}
+	if (outputBuffer == NULL){
+		outputBuffer = new BufferedStreamIOBuffer(&output,64);
+	}
+	
+	
+	bool ret = GetTokenFromStream(*inputBuffer, *outputBuffer,terminator,saveTerminator,skipCharacters);
+	
+	if (inputBufferAllocated)  delete inputBuffer;
+	if (outputBufferAllocated) delete outputBuffer;
+	return ret;
 }
+	
 
 /** to skip a series of tokens delimited by terminators or 0
     {BUFFERED}    */

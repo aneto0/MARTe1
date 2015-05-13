@@ -8,7 +8,10 @@
 #include "AnyType.h"
 #include "FormatDescriptor.h"
 #include "BufferedStream.h"
+#include "StreamableIOBuffer.h"
 
+
+#if 0
 class Streamable;
 
 /// Read buffer Mechanism for Streamable
@@ -55,8 +58,6 @@ public: // read buffer private methods
     	bufferPtr = BufferReference();
     	return true;
 	}
-   
-	
 };
 
 
@@ -124,6 +125,8 @@ public:
 	}
 	
 };
+#endif 
+
 
 /**
     Replaces CStream and BufferedStream of BL1
@@ -224,21 +227,35 @@ protected:
     OperatingModes           operatingModes;
     
 private: // read and write buffers
-friend class StreamableReadBuffer; 
-friend class StreamableWriteBuffer; 
+friend class StreamableIOBuffer; 
+//friend class StreamableWriteBuffer; 
        
     /** starts empty 
         used for separate input operations or dual operations
         to be sized up by final class appropriately 
     */
-    StreamableReadBuffer	readBuffer;
+	StreamableIOBuffer	readBuffer;
     
 
     /** starts empty 
         used exclusively for separate output operations 
         to be sized up by final class appropriately 
     */
-    StreamableWriteBuffer   writeBuffer;
+	StreamableIOBuffer   writeBuffer;
+    
+protected: // methods to be implemented by deriving classes
+
+    /**
+     * switches to input mode and returns input buffer
+     * used in read operations 
+    */
+    virtual IOBuffer *		GetInputBuffer();
+    
+    /** 
+     * switches to output mode and returns output buffer
+     * used in write operations 
+     */ 
+    virtual IOBuffer *		GetOutputBuffer();
     
 protected: // methods to be implemented by deriving classes
     
@@ -293,19 +310,7 @@ protected: // methods to be implemented by deriving classes
     virtual bool        UnBufferedSwitch(const char *name)=0;
     
     virtual bool        UnBufferedRemoveStream(const char *name)=0;
-
-
-   
-protected: // methods to be implemented by deriving classes
-    ///
-    virtual IOBuffer *GetInputBuffer() {
-    	return &readBuffer;
-    }
-
-    ///
-    virtual IOBuffer *GetOutputBuffer() {
-    	return &writeBuffer;
-    }
+ 
     
 private: // mode switch methods
     
@@ -363,13 +368,18 @@ public:  // special inline methods for buffering
          on joint buffering (CanSeek= True) depending on read/write mode 
          either Resync or Flush
     */
-    inline bool Flush(TimeoutType         msecTimeout     = TTDefault){
-    	// mutexReadMode --> can seek so makes sense to resync
-    	if (operatingModes.mutexReadMode){
-    		return GetInputBuffer()->Resync();
+    inline bool FlushAndResync(TimeoutType         msecTimeout     = TTDefault){
+    	// if there is something in the buffer, and canSeek it means we can and need to resync
+    	// if the buffers are separated (!canseek) than resync cannot be done
+    	if (readBuffer.Size() && operatingModes.canSeek){
+    		return readBuffer.Resync();
     	} 
-         	
-   		return GetOutputBuffer()->Flush();
+        // some data in writeBuffer
+    	// we can flush in all cases then
+    	if (writeBuffer.Size() ){
+       		return writeBuffer.Flush();    		
+    	}
+    	return true;
     }
 
     /**
@@ -377,11 +387,7 @@ public:  // special inline methods for buffering
      */  
     inline bool         PutC(char c)
     {
-        // if in mutex mode switch to write mode
-        if (operatingModes.mutexReadMode) {
-           if (!SwitchToWriteMode()) return false;
-        }
-        
+    	
         IOBuffer* outputBuffer = GetOutputBuffer();
         if (outputBuffer->BufferPtr()!= NULL){
         	return outputBuffer->PutC(c);
@@ -394,10 +400,6 @@ public:  // special inline methods for buffering
     /// simply read from buffer 
     inline bool         GetC(char &c) {
 
-        // if in mutex mode switch to write mode
-        if (operatingModes.mutexWriteMode) {
-           if (!SwitchToReadMode()) return false;
-        }
 
         IOBuffer* inputBuffer = GetInputBuffer();
         if (inputBuffer->BufferPtr()!= NULL){
@@ -457,7 +459,7 @@ public:
     virtual bool        SetSize(int64 size);
     // NOTE: Implemented in .cpp but no need to have c- mangling functions as function will be normally acceessed via VT 
 
-    // Extended Attributes or Multiple Streams INTERFACE
+    // MULTISTREAM INTERFACE
 
     /** select the stream to read from. Switching may reset the stream to the start. */
     virtual bool        Switch(uint32 n);

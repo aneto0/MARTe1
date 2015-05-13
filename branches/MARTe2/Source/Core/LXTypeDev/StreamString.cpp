@@ -24,141 +24,21 @@
  **/
 
 #include "StreamString.h"
-#include "GeneralDefinitions.h"
-#include "StringHelper.h"
 #include "ErrorManagement.h"
-
-StreamStringBuffer::~StreamStringBuffer(){
-
-}
-
-///
-StreamStringBuffer::StreamStringBuffer(StreamString &s):string(s){
-	bufferPtr = BufferReference();
-	maxAmount = BufferSize();
-	if (maxAmount > 0){
-		// remove one for the terminator 0
-		maxAmount--;
-	} 
-	amountLeft = maxAmount;	
-	fillLeft   = maxAmount;
-}
-
-
-/** 
- *  desiredSize is the desired buffer size
- *  strings will fit upto desiredSize-1 
- *  sets the size of the buffer to be desiredSize or greater up next granularity
- */
-bool  StreamStringBuffer::SetBufferAllocationSize(
-		uint32 			desiredSize,
-		uint32 			allocationGranularityMask){
-
-	// save position    	
-	uint32 position   = Position();
-	uint32 stringSize = Size();
-	
-	// truncating
-	if ((desiredSize-1) < stringSize){
-		BufferReference()[desiredSize-1] = 0;
-		stringSize = desiredSize-1;
-	}
-	// saturate index 
-	if (position > stringSize) position = stringSize;  
-
-	// reallocate buffer
-	if (!CharBuffer::SetBufferAllocationSize(desiredSize,allocationGranularityMask)) {
-		return false;
-	}
-
-	// update max size
-	maxAmount  = BufferSize();
-	if (maxAmount > 0){
-		// remove one for the terminator 0
-		maxAmount--;
-	} 
-
-	// update bufferPtr and amountLeft
-	// stringSize is not changing here
-	bufferPtr  = BufferReference() + position;
-	amountLeft = maxAmount - position;
-	fillLeft = maxAmount - stringSize;
-
-	return true;
-
-}
-
-// read buffer private methods
-/// if buffer is full this is called 
-bool 		StreamStringBuffer::Flush(TimeoutType         msecTimeout){
-
-	// reallocate buffer
-	// uses safe version of the function
-	// implemented in this class
-	if (!SetBufferAllocationSize(BufferSize()+1)) {
-		return false;
-	}
-
-	return true;
-}
-
-/** 
- * loads more data into buffer and sets amountLeft and bufferEnd
- * READ OPERATIONS 
- * */
-bool 		StreamStringBuffer::Refill(TimeoutType         msecTimeout){
-		// nothing to do.
-		return true;
-}
-
-/**
-        sets amountLeft to 0
-        adjust the seek position of the stream to reflect the bytes read from the buffer
- * READ OPERATIONS 
- */
-bool 		StreamStringBuffer::Resync(TimeoutType         msecTimeout){
-	// nothing to do.
-	return true;
-}    
-
-/**
- * position is set relative to start of buffer
- */
-bool        StreamStringBuffer::Seek(uint32 position){
-	if (position >= Size()) {
-		return false;
-	}
-	bufferPtr = BufferReference() + position;
-	amountLeft = maxAmount - position; 
-	return true;
-}
-
-/**
- * position is set relative to start of buffer
- */
-bool        StreamStringBuffer::RelativeSeek(int32 delta){
-	if (delta >= 0){
-		//cannot seek beyond fillLeft
-		if ((uint32)delta > (amountLeft-fillLeft)){
-			/// maybe saturate at the end?
-			return false;
-		}
-	} else 
-		// cannot seek below 0
-		if ((amountLeft - delta) > maxAmount){
-			/// maybe saturate at the beginning?
-			return false;
-		}
-	amountLeft -= delta;
-	bufferPtr += delta;
-	return true;
-}    
-
 
 /** Destructor */
 StreamString::~StreamString() {
 }
 
+///
+IOBuffer *StreamString::GetInputBuffer() {
+	return &buffer;
+}
+
+///
+IOBuffer *StreamString::GetOutputBuffer() {
+	return &buffer;
+}
 
 
 /** 
@@ -190,6 +70,7 @@ bool StreamString::Write(
                         TimeoutType         msecTimeout,
                         bool                complete){
 	this->buffer.Write(buffer,size);
+	
 	this->buffer.Terminate();
 	return true;
 	
@@ -214,6 +95,7 @@ int64 StreamString::Size(){
 bool StreamString::Seek(int64 pos){
 	if (pos > buffer.Size()) {
 		REPORT_ERROR(ParametersError,"pos out of range")
+		buffer.Seek(buffer.Size());
 		return false;
 	}
 	
@@ -246,5 +128,25 @@ bool StreamString::CanSeek() const {
 };
 
 
+/** how many streams are available */
+uint32 StreamString::NOfStreams() { return 0; }
+
+/** select the stream to read from. Switching may reset the stream to the start. */
+bool StreamString::Switch(uint32 n){ return false; }
+
+/** select the stream to read from. Switching may reset the stream to the start. */
+bool StreamString::Switch(const char *name){ return false; }
+
+/** how many streams are available */
+uint32 StreamString::SelectedStream(){ return 0; }
+
+/** the name of the stream we are using */
+bool StreamString::StreamName(uint32 n,char *name,int nameSize)const { return false; }
+
+/**  add a new stream to write to. */
+bool StreamString::AddStream(const char *name){ return false; }
+
+/**  remove an existing stream . */
+bool StreamString::RemoveStream(const char *name){ return false; }
 
 

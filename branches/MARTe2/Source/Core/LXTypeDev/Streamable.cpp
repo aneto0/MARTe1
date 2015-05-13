@@ -27,6 +27,7 @@
 #include "StringHelper.h"
 #include "StreamHelper.h"
 
+#if 0
 
 /**
     sets the readBufferFillAmount to 0
@@ -122,6 +123,10 @@ bool StreamableWriteBuffer::Flush(TimeoutType         msecTimeout  ){
     Empty();
     return True;  
 }
+#endif
+
+
+
 
 
 /// default destructor
@@ -146,7 +151,7 @@ bool Streamable::SetBufferSize(uint32 readBufferSize, uint32 writeBufferSize){
     if (!CanWrite()) writeBufferSize = 0;   
 
     // dump any data in the write Queue
-    if (!Flush()) return false;
+    if (!FlushAndResync()) return false;
     
     // adjust readBufferSize
     readBuffer.SetBufferSize(readBufferSize);
@@ -155,7 +160,27 @@ bool Streamable::SetBufferSize(uint32 readBufferSize, uint32 writeBufferSize){
     writeBuffer.SetBufferSize(writeBufferSize);
     
     return true;
-} 
+}
+
+///
+IOBuffer *Streamable::GetInputBuffer() {
+    if (operatingModes.mutexWriteMode) {
+       if (!SwitchToReadMode()) return NULL;
+    }
+	return &readBuffer;
+}
+
+///
+IOBuffer *Streamable::GetOutputBuffer() {
+    // check for mutually exclusive buffering and 
+    // whether one needs to switch to WriteMode
+    if (operatingModes.mutexReadMode) {
+       if (!SwitchToWriteMode()) return NULL;
+    }
+
+    return &writeBuffer;
+}
+
 
 bool Streamable::Read(
                         char *              buffer,
@@ -164,9 +189,9 @@ bool Streamable::Read(
                         bool                completeRead){
     // check for mutually exclusive buffering and 
     // whether one needs to switch to ReadMode
-    if (operatingModes.mutexWriteMode) {
-       if (!SwitchToReadMode()) return false;
-    }
+//    if (operatingModes.mutexWriteMode) {
+//       if (!SwitchToReadMode()) return false;
+//    }
 
     // check whether we have a buffer
     IOBuffer *ib = GetInputBuffer();
@@ -223,9 +248,9 @@ bool Streamable::Write(
 
     // check for mutually exclusive buffering and 
     // whether one needs to switch to WriteMode
-    if (operatingModes.mutexReadMode) {
-       if (!SwitchToWriteMode()) return false;
-    }
+//    if (operatingModes.mutexReadMode) {
+//       if (!SwitchToWriteMode()) return false;
+//    }
     
     IOBuffer *ob = GetOutputBuffer();
     // buffering active?
@@ -272,7 +297,7 @@ bool Streamable::Write(
 int64 Streamable::Size()    {
 	// just commit all pending changes if any
 	// so stream size will be updated     	
-	Flush();
+	FlushAndResync();
 	// then call Size from unbuffered stream 
 	return UnBufferedSize(); 
 }
@@ -281,26 +306,27 @@ int64 Streamable::Size()    {
 /** Moves within the file to an absolute location */
 bool Streamable::Seek(int64 pos)
 {
+	// no point to go here if cannot seek
     if (!operatingModes.canSeek) return false;
     
     // if write mode on then just flush out data
-    if (operatingModes.mutexWriteMode){
-    	GetOutputBuffer()->Flush();
+    // then seek the stream
+    if (writeBuffer.Size() > 0){
+    	writeBuffer.Flush();
     } else {
-        IOBuffer *ib = GetInputBuffer();
     	// if read buffer has some data, check whether seek can be within buffer
-    	if (ib->MaxAmount() > 0){
+        if (readBuffer.Size() > 0){
     		int64 currentStreamPosition = UnBufferedPosition();
-    		int64 bufferStartPosition = currentStreamPosition - ib->MaxAmount();
+    		int64 bufferStartPosition = currentStreamPosition - readBuffer.Size();
     		
     		// if within range just update readBufferAccessPosition
     		if ((pos >= bufferStartPosition) &&
     	        (pos < currentStreamPosition)){
-    			ib->Seek(pos - bufferStartPosition);
+    			readBuffer.Seek(pos - bufferStartPosition);
     			
     			return true;
     		} else { // otherwise mark read buffer empty and proceed with normal seek
-    			ib->Empty();
+    			readBuffer.Empty();
     			// continues at the end of the function
     		}
     	}       	
@@ -311,36 +337,42 @@ bool Streamable::Seek(int64 pos)
 
 /** Moves within the file relative to current location */
 bool  Streamable::RelativeSeek(int32 deltaPos){
-    if (!operatingModes.canSeek) return false;
 	if (deltaPos == 0) return true;
+    if (!operatingModes.canSeek) return false;
     
     // if write mode on then just flush out data
-    if (operatingModes.mutexWriteMode){
-    	GetOutputBuffer()->Flush();
+    if (writeBuffer.Size() > 0){
+    	// this will move the stream pointer ahead to the correct position
+    	writeBuffer.Flush();
     } else {
-    	if (GetInputBuffer()->RelativeSeek(deltaPos)){
+    	// on success it means we are in range
+    	if (readBuffer.RelativeSeek(deltaPos)){
+    		// no need to move stream pointer
     		return true;
     	}
-		// adjust seek poistion to account for buffer usage
-		deltaPos -= GetInputBuffer()->AmountLeft();
+    	// out of buffer range
+		// adjust stream seek poistion to account for actual read buffer usage
+		deltaPos -= readBuffer.Size();
 		
 		// empty buffer
-		GetInputBuffer()->Empty();
+		readBuffer.Empty();
     	
     }
-	
+
+    // seek 
 	return UnBufferedSeek( UnBufferedPosition() + deltaPos);
 }    
 
 /** Returns current position */
 int64 Streamable::Position() {
-    if (!operatingModes.canSeek) return false;
+	// cannot seek
+    if (!operatingModes.canSeek) return -1;
     
     // if write mode on then just flush out data
-    if (operatingModes.mutexWriteMode){
-    	return UnBufferedPosition() + GetOutputBuffer()->MaxAmount() - GetOutputBuffer()->AmountLeft();
+    if (writeBuffer.Size() > 0){
+    	return UnBufferedPosition() + writeBuffer.Position();
     } else {
-    	return UnBufferedPosition() - GetInputBuffer()->AmountLeft();
+    	return UnBufferedPosition() - readBuffer.Size() + readBuffer.Position();
     }
 }
 
@@ -349,12 +381,9 @@ bool Streamable::SetSize(int64 size)
 {
     if (!operatingModes.canSeek) return false;
     
-    // if write mode on then just flush out data
-    if (operatingModes.mutexWriteMode){
-    	GetOutputBuffer()->Flush();
-    } else { // simply empty read buffer
-    	GetInputBuffer()->Empty();
-    }
+    // commit all changes
+    FlushAndResync();
+    
     return UnBufferedSetSize(size);
 }
 
@@ -362,14 +391,16 @@ bool Streamable::SetSize(int64 size)
 /** select the stream to read from. Switching may reset the stream to the start. */
 bool Streamable::Switch(uint32 n)
 {
-    Flush();
+    // commit all changes
+    FlushAndResync();
 	return UnBufferedSwitch(n);
 }
 
 /** select the stream to read from. Switching may reset the stream to the start. */
 bool Streamable::Switch(const char *name)
 {
-    Flush();
+    // commit all changes
+    FlushAndResync();
     return UnBufferedSwitch(name);
 }
 
@@ -378,7 +409,8 @@ bool Streamable::Switch(const char *name)
 */
 bool Streamable::RemoveStream(const char *name)
 {
-	Flush();
+    // commit all changes
+    FlushAndResync();
     return UnBufferedRemoveStream(name);
 }
 

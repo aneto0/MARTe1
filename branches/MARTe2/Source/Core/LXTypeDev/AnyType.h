@@ -31,6 +31,8 @@
 #include "GeneralDefinitions.h"
 #include "TypeDescriptor.h"
 
+#include <stdio.h>
+
 /**
    a pointer and a type descriptor
    used to process data on the basis of its type
@@ -69,12 +71,27 @@ public:
 		bitAddress  = 0;
 		dataDescriptor = Float32Bit;
 	}   	
+    /// constructor from a float
+    AnyType(const float &i){
+		dataPointer = (void *) &i; 
+		bitAddress  = 0;
+		dataDescriptor = Float32Bit;
+		dataDescriptor.isConstant = true;
+	}   	
 
     /// constructor from a float
     AnyType(double &i){
 		dataPointer = (void *) &i; 
 		bitAddress  = 0;
 		dataDescriptor = Float64Bit;
+	}   	
+
+    /// constructor from a float
+    AnyType(const double &i){
+		dataPointer = (void *) &i; 
+		bitAddress  = 0;
+		dataDescriptor = Float64Bit;
+		dataDescriptor.isConstant = true;
 	}   	
 
     /// constructor from an integer 8 bit
@@ -116,6 +133,19 @@ public:
 		dataPointer = &i;
 		bitAddress  = 0;
 		dataDescriptor = UnsignedInteger32Bit;
+	}   	
+	/// constructor from an integer 8 bit
+    AnyType(int32 &i){
+		dataPointer = &i;
+		bitAddress  = 0;
+		dataDescriptor = SignedInteger32Bit;
+	}   	
+	/// 
+    AnyType(const int32 &i){
+		dataPointer = (void *)&i;
+		bitAddress  = 0;
+		dataDescriptor = SignedInteger32Bit;
+		dataDescriptor.isConstant = true;
 	}   	
 };
 

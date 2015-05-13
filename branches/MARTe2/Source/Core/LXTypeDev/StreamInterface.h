@@ -32,11 +32,20 @@
 #include "TimeoutType.h"
 #include "AnyType.h"
 #include "FormatDescriptor.h"
+#include "IOBuffer.h"
 
 
 /** A more abstract version of Streamable. It is used to allow referring to streams at lower levels */
 class StreamInterface{
+friend class BufferedStream;
+protected:
+// BUFFERED STREAMING 
+    /// 
+    virtual IOBuffer *GetInputBuffer() = 0;
 
+    ///
+    virtual IOBuffer *GetOutputBuffer() = 0;
+	
 public:
     /** the destructor */
     virtual             ~StreamInterface(){};
@@ -130,7 +139,7 @@ public:
     /** can you move the pointer */
     virtual bool        CanSeek()const =0;
 
-    // Extended Attributes or Multiple Streams INTERFACE
+    // MULTISTREAM INTERFACE
 
     /** how many streams are available */
     virtual uint32      NOfStreams() =0;
@@ -230,31 +239,31 @@ public:
          prints all data pointed to by pars
     */
     virtual bool 		PrintFormatted(const char *format, const AnyType pars[])=0;
-    
-    /** 
-    */
-    inline bool PrintFormatted(const char *format, const AnyType& par1){
-    	AnyType pars[2] = { par1,voidAnyType};
-    	return PrintFormatted(format, pars);
-    }
 
     /** 
     */
-    inline bool PrintFormatted(const char *format, const AnyType& par1, const AnyType& par2){
+    inline bool Printf(const char *format, const AnyType& par1){
+    	AnyType pars[2] = { par1,voidAnyType};
+    	return PrintFormatted(format, pars);
+    }
+    
+    /** 
+    */
+    inline bool Printf(const char *format, const AnyType& par1, const AnyType& par2){
     	AnyType pars[3] = { par1,par2,voidAnyType}; 
     	return PrintFormatted(format, pars);
     }
 
     /** 
     */
-    inline bool PrintFormatted(const char *format, const AnyType& par1, const AnyType& par2, const AnyType& par3){
+    inline bool Printf(const char *format, const AnyType& par1, const AnyType& par2, const AnyType& par3){
     	AnyType pars[4] = { par1,par2,par3,voidAnyType}; 
     	return PrintFormatted(format, pars);
     }
 
     /** 
     */
-    inline bool PrintFormatted(const char *format, const AnyType& par1, const AnyType& par2, const AnyType& par3, const AnyType& par4){
+    inline bool Printf(const char *format, const AnyType& par1, const AnyType& par2, const AnyType& par3, const AnyType& par4){
     	AnyType pars[5] = { par1,par2,par3,par4,voidAnyType}; 
     	return PrintFormatted(format, pars);
     }

@@ -29,8 +29,6 @@
 //#include "TypeConversion.h"
 #include "TimeoutType.h"
 #include "StreamInterface.h"
-#include "IOBuffer.h"
-
 
 /** 
  * common point of implementtion between Streamable descendent 
@@ -39,13 +37,6 @@
  */
 class BufferedStream: public StreamInterface {
        
-protected: // methods to be implemented by deriving classes
-    ///
-    virtual IOBuffer *GetInputBuffer() = 0;
-
-    ///
-    virtual IOBuffer *GetOutputBuffer() = 0;
-
 protected: // mode switch methods
 
     /// default constructor
@@ -54,7 +45,8 @@ protected: // mode switch methods
 
     /// default destructor
     virtual ~BufferedStream();
-      
+
+    
 public:  // auxiliary functions based on buffering
     
     /** extract a token from the stream into a string data until a terminator or 0 is found.
@@ -83,11 +75,12 @@ public:  // auxiliary functions based on buffering
         3) skip + terminator    the character is not copied, the string is terminated if not empty
     */
     virtual bool        GetToken(
-    		                BufferedStream &    output,
+    						StreamInterface &   output,
                             const char *        terminator,
                             char *              saveTerminator=NULL,
                             const char *        skipCharacters=NULL);
-
+   
+    
     /** to skip a series of tokens delimited by terminators or 0
         {BUFFERED}    */
     virtual bool        SkipTokens(

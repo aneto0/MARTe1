@@ -24,8 +24,8 @@
 #
 #############################################################
 
-OBJSX=CharBuffer.x FormatDescriptor.x   ErrorManagement.x  BufferedStream.x \
-Streamable.x StreamString.x 
+OBJSX=CharBuffer.x FormatDescriptor.x ErrorManagement.x  BufferedStream.x BufferedStreamIOBuffer.x \
+StreamableIOBuffer.x Streamable.x StreamStringIOBuffer.x  StreamString.x 
 MAKEDEFAULTDIR=../../../MakeDefaults
 
 PACKAGE=Core
@@ -39,6 +39,7 @@ INCLUDE += -I../LXTypeDev
 
 all: $(OBJS)    \
 	        $(BUILD_DIR)/LXTypeDev$(LIBEXT)  \
+	        $(BUILD_DIR)/TestString$(EXEEXT)  \
 #	        $(BUILD_DIR)/Test$(EXEEXT)  \
 #	        $(BUILD_DIR)/TestDI$(EXEEXT)  
 	echo  $(OBJS)

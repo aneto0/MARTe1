@@ -85,12 +85,12 @@ public:
     /**
      * position is set relative to start of buffer
      */
-    virtual bool        Seek(uint32 position) = 0;
+//    virtual bool        Seek(uint32 position) = 0;
 
     /**
      * position is set relative to start of buffer
      */
-    virtual bool        RelativeSeek(int32 position) = 0;
+//    virtual bool        RelativeSeek(int32 position) = 0;
 public:
     ///
     IOBuffer(){
@@ -98,6 +98,9 @@ public:
     	maxAmount = 0;
     	bufferPtr = NULL;
     	fillLeft = 0;
+    }
+    
+    virtual ~IOBuffer(){
     }
     
 	///
@@ -114,12 +117,12 @@ public:
     	return bufferPtr;
     }
     
-    ///
+    /// seek position
     inline uint32 		Position() const{
     	return maxAmount - amountLeft;
     }
 
-    ///
+    /// how many characters in it
     inline uint32 		Size() const{
     	return maxAmount - fillLeft;
     }
@@ -148,8 +151,9 @@ public:
 	
     /** copies buffer of size size at the end of writeBuffer
      * before calling check that bufferPtr is not NULL
+     * can be overridden to allow resizeable buffers
 	 */ 
-    inline void Write(const char *buffer, uint32 &size){
+    virtual void Write(const char *buffer, uint32 &size){
     	
     	// clip to spaceLeft
     	if (size > amountLeft) {

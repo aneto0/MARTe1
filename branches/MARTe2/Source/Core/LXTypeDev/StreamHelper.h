@@ -198,6 +198,7 @@ bool PrintToStream(
 						FormatDescriptor 		fd)
 {
 
+
 	/// empty - an error?
 	if (par.dataPointer == NULL) return false;
 
@@ -312,13 +313,19 @@ bool PrintFormattedToStream(
 			if (!stream.PutC(*format)) return false;
 			format++;
 		}
+                
 		// end of format
 		if (*format == 0) return true;
+
+                // consume %
+                format++;
 		
 		// if not end then %
 		// keep on parsing format to build a FormatDescriptor
 		FormatDescriptor fd;
-		if (!fd.InitialiseFromString(format)) return false;
+		if (!fd.InitialiseFromString(format)) {
+                    return false;
+                }
 		
 		// if void simply skip and continue
 		if (!pars[parsIndex].IsVoid()){

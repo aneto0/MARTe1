@@ -35,76 +35,13 @@
 #include "GeneralDefinitions.h"
 #include "Memory.h"
 #include "CharBuffer.h"
-#include "IOBuffer.h"
+#include "StreamStringIOBuffer.h"
 #include "BufferedStream.h"
 #include "TimeoutType.h"
 #include "StringHelper.h"
 
-class StreamString;
 
-/// Read buffer Mechanism for Streamable
-class StreamStringBuffer:public IOBuffer,public CharBuffer {
-private:
-	///
-	StreamString &string;
-	
-	/**
-	 * maxAmount is bufferSize - 1;
-	 * amountLeft refers to maxAmount
-	 * fillLeft determines the actual size of string
-	 */ 
-//	uint32 stringSize;
-       
-public: // 
 
-    ///
-	StreamStringBuffer(StreamString &s);
-	
-	///
-	virtual ~StreamStringBuffer();
-	
-	/** sets the size of the buffer to be desiredSize or greater up next granularity
-	 *  truncates stringSize to desiredSize-1 
-	*/
-    virtual bool  SetBufferAllocationSize(
-    		uint32 			desiredSize,
-            uint32 			allocationGranularityMask 		= 0xFFFFFFFF);
-	
-public: // read buffer private methods
-    /// if buffer is full this is called 
-    virtual bool 		Flush(TimeoutType         msecTimeout     = TTDefault);
-
-    /** 
-     * loads more data into buffer and sets amountLeft and bufferEnd
-     * READ OPERATIONS 
-     * */
-    virtual bool 		Refill(TimeoutType         msecTimeout     = TTDefault);
-    
-    /**
-        sets amountLeft to 0
-        adjust the seek position of the stream to reflect the bytes read from the buffer
-     * READ OPERATIONS 
-    */
-    virtual bool 		Resync(TimeoutType         msecTimeout     = TTDefault);
-
-    /**
-     * position is set relative to start of buffer
-     */
-    virtual bool        Seek(uint32 position);
-
-    /**
-     * position is set relative to start of buffer
-     */
-    virtual bool        RelativeSeek(int32 delta);    
-    
-
-    /// add trailing 0
-    void Terminate(){
-    	BufferReference()[Size()]= 0;
-    }
-    
-   
-};
 
 /**
     A basic implementation of a string.
@@ -124,24 +61,14 @@ class StreamString: public BufferedStream {
 private:    
 
 	///
-	StreamStringBuffer 	buffer;
-	
-    /** the size of the used memory block -1 (It excludes the 0)  */
-///    uint32 size; replaced by maxAmount
-    
-    /** */ 
-///    int64 				position;
-    
+	StreamStringIOBuffer 	buffer;	
+   
 protected: // methods to be implemented by deriving classes
     ///
-    virtual IOBuffer *GetInputBuffer() {
-    	return &buffer;
-    }
+    virtual IOBuffer *GetInputBuffer();
 
     ///
-    virtual IOBuffer *GetOputBuffer() {
-    	return &buffer;
-    }
+    virtual IOBuffer *GetOutputBuffer();
 
 public: // usable constructors
 
@@ -204,7 +131,29 @@ public:
 
     /** can you move the pointer */
     virtual bool        CanSeek() const ;
-  
+
+    // MULTISTREAM INTERFACE
+    
+    /** how many streams are available */
+    virtual uint32      NOfStreams();
+
+    /** select the stream to read from. Switching may reset the stream to the start. */
+    virtual bool        Switch(uint32 n);
+
+    /** select the stream to read from. Switching may reset the stream to the start. */
+    virtual bool        Switch(const char *name);
+
+    /** how many streams are available */
+    virtual uint32      SelectedStream();
+
+    /** the name of the stream we are using */
+    virtual bool        StreamName(uint32 n,char *name,int nameSize) const ;
+
+    /**  add a new stream to write to. */
+    virtual bool        AddStream(const char *name);
+
+    /**  remove an existing stream . */
+    virtual bool        RemoveStream(const char *name);
     
 public: // DIRECT ACCESS FUNCTIONS
       
