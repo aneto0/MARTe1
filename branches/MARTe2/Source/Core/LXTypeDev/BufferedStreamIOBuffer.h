@@ -8,7 +8,7 @@
 
 
 /// Read buffer Mechanism for Streamable
-class BufferedStreamIOBuffer:public IOBuffer,protected CharBuffer{
+class BufferedStreamIOBuffer:public IOBuffer{
 private:
 	///
 	StreamInterface *stream;
@@ -18,9 +18,7 @@ public: // read buffer private methods
     ///
     BufferedStreamIOBuffer(StreamInterface *s,uint32 size){
         stream=s;
-        SetBufferAllocationSize(size);
-        bufferPtr = BufferReference();
-        Empty();
+        SetBufferHeapMemory(size);
     }
 
     /**  

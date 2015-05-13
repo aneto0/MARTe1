@@ -27,113 +27,10 @@
 #include "StringHelper.h"
 #include "StreamHelper.h"
 
-#if 0
-
-/**
-    sets the readBufferFillAmount to 0
-    adjust the seek position
-*/
-bool StreamableReadBuffer::Resync(TimeoutType         msecTimeout){
-	// empty!
-    if (maxAmount == 0) {
-    	return true;
-    }
-    
-    // distance to end 
-    uint32 deltaToEnd =  amountLeft - fillLeft;
-    
-    // adjust seek position
-    // in read mode the actual stream 
-    // position is to the character after the buffer end
-    if (!stream->UnBufferedSeek (stream->UnBufferedPosition()-deltaToEnd)) {
-    	return false;
-    }
-                                                                          
-    // mark it as empty
-    Empty();
-    return true;
-} 
-
-/**  
-    refill readBuffer
-    assumes that the read position is now at the end of buffer
-*/
-bool StreamableReadBuffer::Refill(TimeoutType         msecTimeout){
-	// can we write on it?
-	if (BufferReference() == NULL) {
-		return false;
-	}
-	
-    // load next batch of data
-    bufferPtr = BufferReference();
-    maxAmount  = BufferSize();
-	amountLeft = maxAmount;
-	// just use this as a temp variable
-    fillLeft   = maxAmount; 
-    if (stream->UnBufferedRead(BufferReference(),fillLeft)){
-    	fillLeft   = maxAmount - fillLeft; 
-    	return true;
-    }  
-
-    Empty();
-	return false;
-    	
-}
-
-bool StreamableReadBuffer::Seek(uint32 position){
-	if (position >= (maxAmount-fillLeft)) return false; 
-	amountLeft = maxAmount - position;
-	bufferPtr = BufferReference() + position;
-	return true;
-}
-
-///
-bool StreamableReadBuffer::RelativeSeek(int32 delta){
-	if (delta > 0){
-		if ((uint32)delta >= (amountLeft-fillLeft)) return false;
-	}
-	if (delta < 0){
-		if ((amountLeft-delta) > maxAmount) return false;
-	}
-	amountLeft += delta;
-	bufferPtr += delta;
-	return true;
-}
-
-
-/**  
-    empty writeBuffer
-    only called internally when no more space available 
-*/
-bool StreamableWriteBuffer::Flush(TimeoutType         msecTimeout  ){
-	// no buffering!
-	if (Buffer()== NULL) return true;
-	
-	// how much was written?
-    uint32 writeSize = maxAmount - fillLeft;
-    
-    // write
-    if (!stream->UnBufferedWrite(Buffer(),writeSize,msecTimeout,true)) {
-    	return False;
-    }
-
-    bufferPtr=BufferReference(); 
-
-    maxAmount = BufferSize();
-    Empty();
-    return True;  
-}
-#endif
-
-
-
-
-
 /// default destructor
 Streamable::~Streamable(){
-	//This class cannot be implemented
 
-//	Flush();
+	writeBuffer.Flush();
 }
 
 
@@ -190,19 +87,18 @@ bool Streamable::Read(
                         bool                completeRead){
     // check for mutually exclusive buffering and 
     // whether one needs to switch to ReadMode
-//    if (operatingModes.mutexWriteMode) {
-//       if (!SwitchToReadMode()) return false;
-//    }
+    if (operatingModes.mutexWriteMode) {
+       if (!SwitchToReadMode()) return false;
+    }
 
     // check whether we have a buffer
-    IOBuffer *ib = GetInputBuffer();
-    if (ib->BufferPtr()!=NULL){ 
+    if (readBuffer.BufferSize() > 0){ 
 
         // read from buffer first
         uint32 toRead = size;
     	
         // try once 
-    	ib->Read(buffer, size);
+        readBuffer.Read(buffer, size);
     	
     	if (size == toRead ){
     		return true;
@@ -212,10 +108,10 @@ bool Streamable::Read(
     		toRead -= size;
     		
     		// decide whether to use the buffer again or just to read directly
-    		if ((toRead*4) < ib->MaxAmount()){
-    			if (!ib->Refill()) return false;
+    		if ((toRead*4) < readBuffer.MaxUsableAmount()){
+    			if (!readBuffer.Refill()) return false;
     			
-    			ib->Read(buffer+size, toRead);
+    			readBuffer.Read(buffer+size, toRead);
     			size += toRead;
     			
     			// should have completed
@@ -249,35 +145,34 @@ bool Streamable::Write(
 
     // check for mutually exclusive buffering and 
     // whether one needs to switch to WriteMode
-//    if (operatingModes.mutexReadMode) {
-//       if (!SwitchToWriteMode()) return false;
-//    }
+    if (operatingModes.mutexReadMode) {
+       if (!SwitchToWriteMode()) return false;
+    }
     
-    IOBuffer *ob = GetOutputBuffer();
     // buffering active?
-    if (ob->BufferPtr() != NULL){
+    if (writeBuffer.BufferSize() > 0){
     	// separate input and output size
     	
     	uint32 toWrite = size;
     	// check available buffer size versus write size 
         // if size is comparable to buffer size there 
         // is no reason to use the buffering mechanism
-        if (ob->MaxAmount() > (4 *size)){
+        if (writeBuffer.MaxUsableAmount() > (4 *size)){
         	
         	// try writing the buffer
-        	ob->Write(buffer, size);
+        	writeBuffer.Write(buffer, size);
         	
         	// all done! space available! 
         	if (size == toWrite) return true;
         	
         	// make space
-        	if (!ob->Flush()) return false;
+        	if (!writeBuffer.Flush()) return false;
 
         	toWrite -= size;
         	uint32 leftToWrite = toWrite;
         	
         	// try writing the buffer
-        	ob->Write(buffer+size, leftToWrite);
+        	writeBuffer.Write(buffer+size, leftToWrite);
 
         	size+= leftToWrite;
         	
@@ -286,7 +181,7 @@ bool Streamable::Write(
         	return true;               
         } else {
         	// write the buffer so far
-        	if (!ob->Flush()) return false;
+        	if (!writeBuffer.Flush()) return false;
         }
         
     }
@@ -312,19 +207,18 @@ bool Streamable::Seek(int64 pos)
     
     // if write mode on then just flush out data
     // then seek the stream
-    if (writeBuffer.Size() > 0){
+    if (writeBuffer.UsedSize() > 0){
     	writeBuffer.Flush();
     } else {
     	// if read buffer has some data, check whether seek can be within buffer
-        if (readBuffer.Size() > 0){
+        if (readBuffer.UsedSize() > 0){
     		int64 currentStreamPosition = UnBufferedPosition();
-    		int64 bufferStartPosition = currentStreamPosition - readBuffer.Size();
+    		int64 bufferStartPosition = currentStreamPosition - readBuffer.UsedSize();
     		
     		// if within range just update readBufferAccessPosition
     		if ((pos >= bufferStartPosition) &&
-    	        (pos < currentStreamPosition)){
+                    (pos < currentStreamPosition)){
     			readBuffer.Seek(pos - bufferStartPosition);
-
 		
    			return true;
     		} else { // otherwise mark read buffer empty and proceed with normal seek
@@ -339,11 +233,11 @@ bool Streamable::Seek(int64 pos)
 
 /** Moves within the file relative to current location */
 bool  Streamable::RelativeSeek(int32 deltaPos){
-	if (deltaPos == 0) return true;
+    if (deltaPos == 0) return true;
     if (!operatingModes.canSeek) return false;
     
     // if write mode on then just flush out data
-    if (writeBuffer.Size() > 0){
+    if (writeBuffer.UsedSize() > 0){
     	// this will move the stream pointer ahead to the correct position
     	writeBuffer.Flush();
     } else {
@@ -354,7 +248,7 @@ bool  Streamable::RelativeSeek(int32 deltaPos){
     	}
     	// out of buffer range
 		// adjust stream seek poistion to account for actual read buffer usage
-		deltaPos -= (readBuffer.Size()-readBuffer.Position());
+		deltaPos -= (readBuffer.UsedSize()-readBuffer.Position());
 		
 		// empty buffer
 		readBuffer.Empty();
@@ -371,11 +265,11 @@ int64 Streamable::Position() {
     if (!operatingModes.canSeek) return -1;
     
     // if write mode on then just flush out data
-    if (writeBuffer.Size() > 0){
+    if (writeBuffer.UsedSize() > 0){
     	return UnBufferedPosition() + writeBuffer.Position();
-    } else {
-    	return UnBufferedPosition() - readBuffer.Size() + readBuffer.Position();
     }
+
+    return UnBufferedPosition() - readBuffer.UsedSize() + readBuffer.Position();
 }
 
 /** Clip the stream size to a specified point */

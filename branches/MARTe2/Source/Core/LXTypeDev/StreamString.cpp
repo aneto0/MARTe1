@@ -88,14 +88,14 @@ bool StreamString::CanRead()const {
 
 /** The size of the stream */
 int64 StreamString::Size(){ 
-	return buffer.Size(); 
+	return buffer.UsedSize(); 
 }
 
 /** Moves within the file to an absolute location */
 bool StreamString::Seek(int64 pos){
-	if (pos > buffer.Size()) {
+	if (pos > buffer.UsedSize()) {
 		REPORT_ERROR(ParametersError,"pos out of range")
-		buffer.Seek(buffer.Size());
+		buffer.Seek(buffer.UsedSize());
 		return false;
 	}
 	

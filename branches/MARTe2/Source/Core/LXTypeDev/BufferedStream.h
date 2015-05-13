@@ -88,7 +88,7 @@ public:  // auxiliary functions based on buffering
                             const char *        terminator);
 
       
-public: //  Methods to convert and print numbers and other objects 
+    //  Methods to convert and print numbers and other objects 
     
     /**
      * Very powerful function to handle data conversion into a stream of chars

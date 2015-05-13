@@ -12,39 +12,11 @@ StreamStringIOBuffer::~StreamStringIOBuffer(){
 bool  StreamStringIOBuffer::SetBufferAllocationSize(
 		uint32 			desiredSize,
 		uint32 			allocationGranularityMask){
-
-	// save position    	
-	uint32 position   = Position();
-	uint32 stringSize = Size();
 	
-	// truncating
-	if ((desiredSize-1) < stringSize){
-		BufferReference()[desiredSize-1] = 0;
-		stringSize = desiredSize-1;
-	}
-	// saturate index 
-	if (position > stringSize) position = stringSize;  
-
-	// reallocate buffer
-	if (!CharBuffer::SetBufferAllocationSize(desiredSize,allocationGranularityMask)) {
-		return false;
-	}
-
-	// update max size
-	maxAmount  = BufferSize();
-	if (maxAmount > 0){
-		// remove one for the terminator 0
-		maxAmount--;
-	} 
-
-	// update bufferPtr and amountLeft
-	// stringSize is not changing here
-	bufferPtr  = BufferReference() + position;
-	amountLeft = maxAmount - position;
-	fillLeft = maxAmount - stringSize;
-
-	return true;
-
+    bool ret = SetBufferHeapMemory(desiredSize,allocationGranularityMask,1);
+    Terminate();
+    return ret;
+    
 }
 
 /** copies buffer of size size at the end of writeBuffer
@@ -53,23 +25,12 @@ bool  StreamStringIOBuffer::SetBufferAllocationSize(
 void StreamStringIOBuffer::Write(const char *buffer, uint32 &size){
 	
 	// clip to spaceLeft
-	if (size > amountLeft) {
-		SetBufferAllocationSize(Size() + size);
-    	if (size > amountLeft) {
-    		size = amountLeft;
-    	}
+	if (size > AmountLeft()) {
+		SetBufferAllocationSize(UsedSize() + size);
 	}
+	
+	IOBuffer::Write(buffer,size);
 
-	// fill the buffer with the remainder 
-	if (size > 0){
-		MemoryCopy(bufferPtr,buffer,size);
-
-		amountLeft -=size;
-    	bufferPtr += size; 
-        if (fillLeft > amountLeft){
-        	fillLeft = amountLeft;
-        }
-	}    	
 }
 
 
@@ -110,18 +71,21 @@ bool 		StreamStringIOBuffer::Resync(TimeoutType         msecTimeout){
 /**
  * position is set relative to start of buffer
  */
+/*
 bool        StreamStringIOBuffer::Seek(uint32 position){
-	if (position > Size()) {
+	if (position > UsedSize()) {
 		return false;
 	}
 	bufferPtr = BufferReference() + position;
-	amountLeft = maxAmount - position; 
+	amountLeft = MaxUsableAmount() - position; 
 	return true;
 }
+*/
 
 /**
  * position is set relative to start of buffer
  */
+/*
 bool        StreamStringIOBuffer::RelativeSeek(int32 delta){
 	bool ret = true;
 	if (delta >= 0){
@@ -144,5 +108,5 @@ bool        StreamStringIOBuffer::RelativeSeek(int32 delta){
 	bufferPtr += delta;
 	return ret;
 }    
-
+*/
 

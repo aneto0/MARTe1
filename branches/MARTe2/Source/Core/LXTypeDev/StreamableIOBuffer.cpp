@@ -9,12 +9,12 @@
 */
 bool StreamableIOBuffer::Resync(TimeoutType         msecTimeout){
 	// empty!
-    if (maxAmount == 0) {
+    if (MaxUsableAmount() == 0) {
     	return true; 
     }
     
     // distance to end 
-    uint32 deltaToEnd =  amountLeft - fillLeft;
+    uint32 deltaToEnd =  AmountLeft() - fillLeft;
     
     // adjust seek position
     // in read mode the actual stream 
@@ -34,20 +34,22 @@ bool StreamableIOBuffer::Resync(TimeoutType         msecTimeout){
 */
 bool StreamableIOBuffer::Refill(TimeoutType         msecTimeout){
 	// can we write on it?
-	if (BufferReference() == NULL) {
-		return false;
-	}
+    if (BufferReference() == NULL) {
+        return false;
+    }
 	
+    // move all pointers and indexes to empty status
+    Empty();
     // load next batch of data
-    bufferPtr = BufferReference();    	
+//    bufferPtr = BufferReference();    	
     	
-
-    maxAmount  = BufferSize();
-    amountLeft = maxAmount;
-	// just use this as a temp variable
-    fillLeft   = maxAmount; 
+//    maxAmount  = BufferSize();
+//    amountLeft = MaxUsableAmount();
+    // just use this as a temp variable
+//    fillLeft   = MaxUsableAmount();
+ 
     if (stream->UnBufferedRead(BufferReference(),fillLeft)){
-    	fillLeft   = maxAmount - fillLeft; 
+    	fillLeft   = MaxUsableAmount() - fillLeft; 
     	return true;
     }  
 
@@ -61,29 +63,29 @@ bool StreamableIOBuffer::Refill(TimeoutType         msecTimeout){
     only called internally when no more space available 
 */
 bool StreamableIOBuffer::Flush(TimeoutType         msecTimeout  ){
-	// no buffering!
-	if (Buffer()== NULL) return true;
+    // no buffering!
+    if (Buffer()== NULL) return true;
 	
-	// how much was written?
-    uint32 writeSize = maxAmount - fillLeft;
+    // how much was written?
+    uint32 writeSize = UsedSize();
     
     // write
     if (!stream->UnBufferedWrite(Buffer(),writeSize,msecTimeout,true)) {
     	return False;
     }
 
-    bufferPtr=BufferReference(); 
-
-    maxAmount = BufferSize();
+//    bufferPtr=BufferReference(); 
+//    maxAmount = BufferSize();
     Empty();
     return True;  
 }
 
+/*
 bool StreamableIOBuffer::Seek(uint32 position){
-	if (position >= (maxAmount-fillLeft)) return false; 
-	amountLeft = maxAmount - position;
-	bufferPtr = BufferReference() + position;
-	return true;
+    if (position >= UsedSize()) return false; 
+    amountLeft = MaxUsableAmount() - position;
+    bufferPtr = BufferReference() + position;
+    return true;
 }
 
 ///
@@ -92,9 +94,10 @@ bool StreamableIOBuffer::RelativeSeek(int32 delta){
 		if ((uint32)delta >= (amountLeft-fillLeft)) return false;
 	}
 	if (delta < 0){
-		if ((amountLeft-delta) > maxAmount) return false;
+		if ((amountLeft-delta) > MaxUsableAmount()) return false;
 	}
 	amountLeft -= delta;
 	bufferPtr += delta;
 	return true;
 }
+*/

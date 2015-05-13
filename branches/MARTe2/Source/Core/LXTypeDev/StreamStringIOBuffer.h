@@ -9,31 +9,39 @@
 class StreamString;
 
 /// Read buffer Mechanism for Streamable
-class StreamStringIOBuffer:public IOBuffer,public CharBuffer {
+class StreamStringIOBuffer:public IOBuffer {
        
 public: // 
 
 	///
-	StreamStringIOBuffer(StreamString &s)//:string(s)
+	StreamStringIOBuffer()
 	{
+/*
 		bufferPtr = BufferReference();
-		maxAmount = BufferSize();
-		if (maxAmount > 0){
+		maxUsableAmount = BufferSize();
+		if (maxUsableAmount > 0){
 			// remove one for the terminator 0
-			maxAmount--;
+			maxUsableAmount--;
 		} 
-		amountLeft = maxAmount;	
-		fillLeft   = maxAmount;
+		amountLeft = maxUsableAmount;	
+		fillLeft   = maxUsableAmount;
+*/		
 	}
-	
 	
 	///
 	virtual ~StreamStringIOBuffer();
 	
+    /// add trailing 0
+    void Terminate(){
+    	if (BufferReference() != NULL)
+    		BufferReference()[UsedSize()]= 0;
+    }
+	
+	
 	/** sets the size of the buffer to be desiredSize or greater up next granularity
 	 *  truncates stringSize to desiredSize-1 
 	*/
-    virtual bool  SetBufferAllocationSize(
+    virtual bool  		SetBufferAllocationSize(
                 uint32 			desiredSize,
                 uint32 			allocationGranularityMask 		= 0xFFFFFFC0);
 	
@@ -57,23 +65,18 @@ public: // read buffer private methods
     /**
      * position is set relative to start of buffer
      */
-    virtual bool        Seek(uint32 position);
+//    virtual bool        Seek(uint32 position);
 
     /**
      * position is set relative to start of buffer
      */
-    virtual bool        RelativeSeek(int32 delta);    
+//    virtual bool        RelativeSeek(int32 delta);    
     
-    /// add trailing 0
-    void Terminate(){
-    	if (BufferReference() != NULL)
-    		BufferReference()[Size()]= 0;
-    }
-    
+   
     /** copies buffer of size size at the end of writeBuffer
      * before calling check that bufferPtr is not NULL
 	 */ 
-    virtual void Write(const char *buffer, uint32 &size);    
+    virtual void 		Write(const char *buffer, uint32 &size);    
    
 };
 

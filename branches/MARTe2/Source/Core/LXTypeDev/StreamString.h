@@ -73,7 +73,7 @@ protected: // methods to be implemented by deriving classes
 public: // usable constructors
 
     /** Creates an empty string */
-    StreamString():buffer(*this){}
+    StreamString(){}
     
     /** Destructor */
     virtual ~StreamString() ;
@@ -179,8 +179,8 @@ public: // DIRECT ACCESS FUNCTIONS
      */
     inline const char *Tail(int32 ix) const {
     	if (ix > 0) 				return 0;
-    	if ((ix - buffer.Size() -1)< 0) 	return 0;
-    	return buffer.BufferReference() + buffer.Size() - ix - 1;
+    	if ((ix - buffer.UsedSize() -1)< 0) 	return 0;
+    	return buffer.BufferReference() + buffer.UsedSize() - ix - 1;
     }
 
 public: // DIRECT MANIPULATION FUNCTIONS
@@ -191,7 +191,7 @@ public: // DIRECT MANIPULATION FUNCTIONS
      */
     bool Copy(char c, bool append=false) {
         if (append){
-        	buffer.Seek(buffer.Size());
+        	buffer.Seek(buffer.UsedSize());
     	} else {
     		buffer.Empty();
     	} 
@@ -211,7 +211,7 @@ public: // DIRECT MANIPULATION FUNCTIONS
         uint32 size = StringHelper::Length(s);
 
         if (append){
-        	buffer.Seek(buffer.Size());
+        	buffer.Seek(buffer.UsedSize());
     	} else {
     		buffer.Empty();
     	} 
@@ -225,10 +225,10 @@ public: // DIRECT MANIPULATION FUNCTIONS
      @return True if successful. False otherwise.
      */
     bool Copy(const StreamString &s, bool append=false) {
-        uint32 size = s.buffer.Size();
+        uint32 size = s.buffer.UsedSize();
 
         if (append){
-        	buffer.Seek(buffer.Size());
+        	buffer.Seek(buffer.UsedSize());
     	} else {
     		buffer.Empty();
     	} 
@@ -291,7 +291,7 @@ public: // DIRECT MANIPULATION FUNCTIONS
      @return True if the two buffers are the same. False otherwise.
      */
     inline bool operator==(StreamString &s) const {
-        if (buffer.Size() != s.buffer.Size()){
+        if (buffer.UsedSize() != s.buffer.UsedSize()){
             return false;
         }
         if (StringHelper::Compare(Buffer(), s.Buffer()) != 0){
@@ -327,7 +327,7 @@ public: // DIRECT MANIPULATION FUNCTIONS
      @return 0 if the position is outside the buffer limits. The character at position pos otherwise.
      */
     inline char operator[](uint32 pos) {
-        if (pos >= buffer.Size()){
+        if (pos >= buffer.UsedSize()){
             return 0; 
         }
         return buffer.BufferReference()[pos];
@@ -349,10 +349,10 @@ public: // DIRECT MANIPULATION FUNCTIONS
      @return True if the string is found. False otherwise.
      */
     inline bool In(StreamString &x) const {
-        if (x.Size() == 0)
+        if (x.UsedSize() == 0)
             return False;
-        for (uint32 i = 0; i < (size - x.Size() + 1); i++)
-            if (memcmp(&buffer[i], x.Buffer(), x.Size()) == 0)
+        for (uint32 i = 0; i < (size - x.UsedSize() + 1); i++)
+            if (memcmp(&buffer[i], x.Buffer(), x.UsedSize()) == 0)
                 return True;
         return False;
     }

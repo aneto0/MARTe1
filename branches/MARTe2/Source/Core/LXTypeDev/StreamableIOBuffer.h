@@ -9,7 +9,7 @@
 class Streamable;
 
 /// Read buffer Mechanism for Streamable
-class StreamableIOBuffer:public IOBuffer,protected CharBuffer{
+class StreamableIOBuffer:public IOBuffer{
 private:
     ///
     Streamable *stream;
@@ -19,7 +19,6 @@ public: // read buffer private methods
     ///
     StreamableIOBuffer(Streamable *s){
         stream=s;
-        bufferPtr = BufferReference();        
     }
 
     /**  
@@ -40,20 +39,18 @@ public: // read buffer private methods
     /**
      * position is set relative to start of buffer
      */
-    virtual bool        Seek(uint32 			position);
+//    virtual bool        Seek(uint32 			position);
     
     ///
     virtual bool        RelativeSeek(int32 		delta);
     
     /**
+        allocate or reallocate memory to the desired size
     */ 
     bool SetBufferSize(uint32 size){
-        SetBufferAllocationSize(size);
-        bufferPtr = BufferReference();
-        maxAmount = BufferSize();
-	Empty();
-    	return true;
+    	return IOBuffer::SetBufferHeapMemory(size);
     }
+    
 };
 
 

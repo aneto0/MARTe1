@@ -35,26 +35,31 @@
 #include "TimeoutType.h"
 
 ///
-class IOBuffer
+class IOBuffer: protected CharBuffer
 {
-protected:	
+private:	
     /**
 		how many chars usable in buffer
         to be initialised by derived class
+        may be = bufferSize or bufferSize - 1 
     */
-    uint32              	maxAmount;
+    uint32              	maxUsableAmount;
+   
+private:	
     /**
 		how many chars left in buffer
         to be initialised by derived class
     */
     uint32               	amountLeft;
     
+protected:	
     /**
      * how many chars less than the full size of the buffer
      * distinct from amountLeft to allow duplex operation read and write
      */
     uint32                  fillLeft;
 
+private:	
     /**
 		pointer to the next character
         to be initialised by derived class
@@ -81,50 +86,105 @@ public:
      * READ OPERATIONS 
     */
     virtual bool 		Resync(TimeoutType         msecTimeout     = TTDefault)=0;    
-
+    
+    
     /**
      * position is set relative to start of buffer
      */
-//    virtual bool        Seek(uint32 position) = 0;
-
+    virtual bool Seek(uint32 position);
+    
     /**
-     * position is set relative to start of buffer
+     * position is set relative to current position
      */
-//    virtual bool        RelativeSeek(int32 position) = 0;
+    virtual bool RelativeSeek(int32 delta);
+   
 public:
+    
     ///
     IOBuffer(){
     	amountLeft = 0;
-    	maxAmount = 0;
+    	maxUsableAmount = 0;
     	bufferPtr = NULL;
     	fillLeft = 0;
     }
     
-    virtual ~IOBuffer(){
+    virtual ~IOBuffer();
+    
+    /**
+     * reset to empty read/write buffer
+    */
+    inline void 		Empty(){
+		amountLeft = maxUsableAmount;   // Seek 0 
+		fillLeft   = maxUsableAmount;   // SetSize 0
+        bufferPtr  = ( char *)Buffer(); // seek 0
     }
     
-	///
-    inline uint32 		MaxAmount() const {
-    	return maxAmount;
+    /**
+        allocate or reallocate memory to the desired size
+        content is preserved by copy, if contiguus memory is not available, as long as it fits the newsize
+        allocationGranularityMask defines how many bits to consider 
+        for the buffer size. round up the others
+    */
+    virtual bool SetBufferHeapMemory(
+    		uint32 			desiredSize,
+            uint32 			allocationGranularityMask 		= 0xFFFFFFFF,
+            uint32          reservedSpaceAtEnd              = 0
+    );    
+    /**
+     * wipes all content and replaces the used buffer
+    */
+    virtual bool SetBufferReferencedMemory(
+    		char *			buffer, 
+    		uint32 			bufferSize,
+            uint32          reservedSpaceAtEnd              = 0
+    );
+    
+    /**
+     * wipes all content and replaces the used buffer
+    */
+    virtual bool SetBufferReadOnlyReferencedMemory(
+    		const char *	buffer, 
+    		uint32 			bufferSize,
+            uint32          reservedSpaceAtEnd              = 0
+    );
+    
+public:    
+    
+    /// The raw size of the buffer
+    uint32 BufferSize() const{
+    	return CharBuffer::BufferSize();
     }
     
-	///
+	/** amount of space of buffer that can be used
+     	not reserved for other use
+     */
+    inline uint32 		MaxUsableAmount() const {
+    	return maxUsableAmount;
+    }
+    
+	/// how much before filling buffer (considering any reserved space)
     inline uint32 		AmountLeft() const {
     	return amountLeft;
-    }
-
-    char *			    BufferPtr() const {
-    	return bufferPtr;
-    }
+    }  
     
     /// seek position
     inline uint32 		Position() const{
-    	return maxAmount - amountLeft;
+    	return MaxUsableAmount() - amountLeft;
     }
 
     /// how many characters in it
-    inline uint32 		Size() const{
-    	return maxAmount - fillLeft;
+    inline uint32 		UsedSize() const{
+    	return MaxUsableAmount() - fillLeft;
+    }
+
+    ///
+    inline const char *Buffer() const {
+    	return CharBuffer::Buffer();    	
+    }
+
+    ///
+    inline char *BufferReference() const {
+    	return CharBuffer::BufferReference();    	
     }
     
     /** 
@@ -132,12 +192,13 @@ public:
      * before calling check that bufferPtr is not NULL
      */ 
     inline bool         PutC(char &c) {
+    	if (!CanWrite()) return false;
 
         // check if buffer needs updating and or saving            
         if (amountLeft <= 0) {
             if (!Flush()) return false;
         }
-
+       
         *bufferPtr = c;
         
         bufferPtr++;
@@ -153,31 +214,12 @@ public:
      * before calling check that bufferPtr is not NULL
      * can be overridden to allow resizeable buffers
 	 */ 
-    virtual void Write(const char *buffer, uint32 &size){
-    	
-    	// clip to spaceLeft
-    	if (size > amountLeft) {
-    		size = amountLeft;
-    	}
-
-    	// fill the buffer with the remainder 
-    	if (size > 0){
-    		MemoryCopy(bufferPtr,buffer,size);
-
-    		amountLeft -=size;
-        	bufferPtr += size; 
-            if (fillLeft > amountLeft){
-            	fillLeft = amountLeft;
-            }
-    	}    	
-    }
-
+    virtual void Write(const char *buffer, uint32 &size);
     /** 
      * reads from buffer at current position
      * before calling make sure that bufferPtr is not NULL
     */ 
     inline bool         GetC(char &c) {
-
     	
         // check if buffer needs updating and or saving            
         if (amountLeft <= fillLeft) {
@@ -212,13 +254,6 @@ public:
 			bufferPtr += size;
 		}
     }    
-    /**
-     * reset to empty read buffer
-    */
-    inline void 		Empty(){
-		amountLeft = maxAmount;  // Seek 0 
-		fillLeft = maxAmount;    // SetSize 0
-    }
     
 };
 #endif 

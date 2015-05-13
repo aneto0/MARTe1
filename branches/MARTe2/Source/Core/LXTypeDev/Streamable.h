@@ -234,14 +234,14 @@ friend class StreamableIOBuffer;
         used for separate input operations or dual operations
         to be sized up by final class appropriately 
     */
-	StreamableIOBuffer	readBuffer;
+	StreamableIOBuffer		readBuffer;
     
 
     /** starts empty 
         used exclusively for separate output operations 
         to be sized up by final class appropriately 
     */
-	StreamableIOBuffer   writeBuffer;
+	StreamableIOBuffer   	writeBuffer;
     
 protected: // methods to be implemented by deriving classes
 
@@ -371,12 +371,12 @@ public:  // special inline methods for buffering
     inline bool FlushAndResync(TimeoutType         msecTimeout     = TTDefault){
     	// if there is something in the buffer, and canSeek it means we can and need to resync
     	// if the buffers are separated (!canseek) than resync cannot be done
-    	if (readBuffer.Size() && operatingModes.canSeek){
+    	if (readBuffer.UsedSize() && operatingModes.canSeek){
     		return readBuffer.Resync();
     	} 
         // some data in writeBuffer
     	// we can flush in all cases then
-    	if (writeBuffer.Size() ){
+    	if (writeBuffer.UsedSize() ){
        		return writeBuffer.Flush();    		
     	}
     	return true;
@@ -386,11 +386,13 @@ public:  // special inline methods for buffering
      *  simply write to buffer if space exist and if operatingModes allows
      */  
     inline bool         PutC(char c)
-    {
+    {   	
+    	if (operatingModes.mutexReadMode) {
+    	     if (!SwitchToWriteMode()) return false;
+    	}
     	
-        IOBuffer* outputBuffer = GetOutputBuffer();
-        if (outputBuffer->BufferPtr()!= NULL){
-        	return outputBuffer->PutC(c);
+        if (writeBuffer.BufferSize() > 0){
+        	return writeBuffer.PutC(c);
         }
         
         uint32 size = 1;
@@ -400,10 +402,12 @@ public:  // special inline methods for buffering
     /// simply read from buffer 
     inline bool         GetC(char &c) {
 
+    	if (operatingModes.mutexWriteMode) {
+    	     if (!SwitchToReadMode()) return false;
+    	}
 
-        IOBuffer* inputBuffer = GetInputBuffer();
-        if (inputBuffer->BufferPtr()!= NULL){
-        	return inputBuffer->GetC(c);
+        if (readBuffer.BufferSize() > 0){
+        	return readBuffer.GetC(c);
         }
         
         uint32 size = 1;

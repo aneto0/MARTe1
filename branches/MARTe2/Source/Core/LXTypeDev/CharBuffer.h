@@ -131,6 +131,11 @@ public:
     inline uint32 BufferSize() const{
         return bufferSize;
     }
+    
+    ///
+    bool CanWrite() const {
+    	return !bufferMode.readOnly;
+    }
 
 };
 
