@@ -247,7 +247,6 @@ private:
                                      Colours foreGroundColour,
                                      Colours backGroundColour, int32 column,
                                      int32 row);
-    friend bool BasicConsoleClear(BasicConsole &con);
 
 public:
 

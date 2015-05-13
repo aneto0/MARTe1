@@ -38,7 +38,6 @@ bool StreamableTest::TestGetC(const char* inputString){
 	//Unbuffered way
 	while(myStream.buffer[i]!=0){
 		myStream.GetC(retC);
-		printf("\n%c\n", retC);	
 		if(retC!=myStream.buffer[i++]){
 			return false;
 		}
@@ -54,7 +53,6 @@ bool StreamableTest::TestGetC(const char* inputString){
 	StringHelper::Copy(myStream.buffer, inputString);
 	while(myStream.buffer[i]!=0){
 		myStream.GetC(retC);
-		printf("\n%c\n", retC);	
 		if(retC!=myStream.buffer[i++]){
 			return false;
 		}
@@ -72,7 +70,7 @@ bool StreamableTest::TestPutC(const char* inputString){
 	while((*toPut)!=0){
 		myStream.PutC(*toPut);
 		char retC= myStream.buffer[i++];
-		printf("\n%c\n",retC);
+		//printf("\n%c\n",retC);
 		if(retC!=(*toPut)){
 			return False;
 		}
@@ -88,12 +86,12 @@ bool StreamableTest::TestPutC(const char* inputString){
 	myStream.Clear();
 	toPut=inputString;
 	while((*toPut)!=0){
-		myStream.PutC(*toPut);
+		//myStream.PutC(*toPut);
 		toPut++;
 	}
 
 	//Flush the buffer on the stream
-	myStream.Flush();
+	myStream.FlushAndResync();
 	printf("\n%s\n", myStream.buffer);
 	return True;
 }
@@ -104,20 +102,46 @@ bool StreamableTest::TestRead(const char* inputString){
 	SimpleStreamable myStream;
 	char outputBuffer[32];
 	StringHelper::Copy(myStream.buffer, inputString);
-	uint32 size=StringHelper::Length(inputString)+1;
+	uint32 size=StringHelper::Length(inputString);
 	myStream.Read(outputBuffer, size);
+	outputBuffer[size]=0;
 	printf("\n%s %d\n", outputBuffer, size);
 
 	//Buffered way.
 	myStream.Clear();
-	uint32 buffSize=2;
+
+	//The buffer must have a size at least 4 times greater than the size to read	
+	
+	uint32 buffSize=size*4+1;
+
 	if(!myStream.SetBuffered(buffSize)){
 		return False;
 	}
+
+	//Read one char at once.
+	size=1;
+
+	//Put inputString in the stream
 	StringHelper::Copy(myStream.buffer, inputString);
-	size=12;
-	myStream.Read(outputBuffer, size);
-	myStream.Flush();
+	
+	char result[128];
+	StringHelper::Copy(result,"");
+	uint32 sumSize=0;
+	while(sumSize<buffSize){
+		myStream.Read(outputBuffer, size);
+		outputBuffer[size]=0;
+		//Fill the result for each read operation.
+		StringHelper::Concatenate(result,outputBuffer);
+		sumSize+=size;
+	}
+	result[sumSize]=0;
+
+	//Compare the result with the stream.
+	if(StringHelper::Compare(result, myStream.buffer)!=0){
+		printf("\n%s, %s\n", result, inputString);
+		return False;
+	}
+
 	printf("\n%s\n", outputBuffer);
 
 	return True;
@@ -128,20 +152,52 @@ bool StreamableTest::TestRead(const char* inputString){
 bool StreamableTest::TestWrite(const char* inputString){
 	//UnBuffered Way
 	SimpleStreamable myStream;
+	myStream.doubleBuffer=True;
 	const char *toWrite=inputString;
-	uint32 size=StringHelper::Length(inputString)+1;
+	uint32 size=StringHelper::Length(inputString);
 	myStream.Write(toWrite, size);
 	printf("\n%s\n", myStream.buffer);
 
 	//Buffered way
 	myStream.Clear();
-	uint32 buffSize=2;
+	
+	//The buffer must have at least a size 4 times greater than the write size.
+	uint32 buffSize=size*4+1;
 	if(!myStream.SetBuffered(buffSize)){
 		return False;
 	}
+	
+	//Put the input string in the stream
 	StringHelper::Copy(myStream.buffer, inputString);
-	size=12;
-	myStream.Write(toWrite, size);
+	
+	char result[128];
+	
+	StringHelper::Copy(result,"");
+	
+	uint32 sumSize=0;
+	while(sumSize<buffSize){
+		myStream.Write(toWrite,size);
+		//On the stream input string should be added.
+		StringHelper::Concatenate(result, inputString);
+		sumSize+=size;
+		if(myStream.Position()!=sumSize){
+			printf("\n%d %d %d \n",sumSize, myStream.Position(), myStream.UnBufferedPosition());
+			return False;
+		}
+	}
+	
+	result[sumSize]=0;
+
+	if(myStream.Size()!=sumSize){
+		printf("\n%d %d\n", myStream.Size(), sumSize);
+		return False;
+	}
+
+	//Compare the expected result with the stream.
+	if(StringHelper::Compare(result, myStream.buffer)!=0){
+		return False;
+	}
+	
 	printf("\n%s\n", myStream.buffer);
 	return True;
 }
@@ -149,43 +205,313 @@ bool StreamableTest::TestWrite(const char* inputString){
 bool StreamableTest::TestReadAndWrite(const char *stringToRead, const char *stringToWrite){
 	SimpleStreamable myStream;
 	myStream.doubleBuffer=True;
-	//Upload the string to write in the stream
+	//Upload the string to write in the stream. The buffer size is small so it chooses the unbuffered read/write.
 	StringHelper::Copy(myStream.buffer, stringToRead);
-	uint32 buffSize=4;
-	if(!myStream.SetBuffered(buffSize)){
-		return False;
-	}
+	
 	uint32 readSize=StringHelper::Length(stringToRead);
 	uint32 writeSize=StringHelper::Length(stringToWrite);
 
-	//output buffer for reading.
-	char outputBuffer[32];
-	myStream.Read(outputBuffer, readSize);
-	outputBuffer[readSize+1]=0;
-	myStream.Write(stringToWrite, writeSize);
-	printf("\n%s %s\n", myStream.buffer, outputBuffer);
-
-	myStream.Clear();
-	StringHelper::Copy(myStream.buffer, stringToRead);
-	
+	//The size of the buffer is the minor of the two sizes.
+	uint32 buffSize=readSize;
 	if(readSize>writeSize){
-		buffSize=readSize;
-	}
-	else{
 		buffSize=writeSize;
 	}
 
-	buffSize+=10;
 	if(!myStream.SetBuffered(buffSize)){
 		return False;
 	}
 	//output buffer for reading.
+	char outputBuffer[32];
 	myStream.Read(outputBuffer, readSize);
-	outputBuffer[readSize+1]=0;
+	outputBuffer[readSize]=0;
+	
+	if(StringHelper::Compare(outputBuffer, myStream.buffer)!=0){
+		return False;
+	}
+
+	//write on the stream
 	myStream.Write(stringToWrite, writeSize);
+		
+	//This should be on the stream.
+	StringHelper::Concatenate(outputBuffer, stringToWrite);
+
+	if(StringHelper::Compare(outputBuffer, myStream.buffer)!=0){
+		return False;
+	}
+
+	
+
 	printf("\n%s %s\n", myStream.buffer, outputBuffer);
+
+
+	//Increase the buffer size to allow buffered read/write.
+	SimpleStreamable myNewStream;
+	myNewStream.doubleBuffer=true;
+	StringHelper::Copy(myNewStream.buffer, stringToRead);
+	
+	//Buffer size enough large to allow buffered operations.
+	buffSize=readSize*4;
+	if(writeSize>readSize){
+		buffSize=writeSize*4;
+	}
+	buffSize++;
+		
+	
+	if(!myNewStream.SetBuffered(buffSize)){
+		return False;
+	}
+
+	//output buffer for reading.
+	myNewStream.Read(outputBuffer, readSize);
+	outputBuffer[readSize]=0;
+
+	if(StringHelper::Compare(outputBuffer, myNewStream.buffer)!=0){
+		return False;
+	}
+	printf("\nhere\n");
+	myNewStream.Write(stringToWrite, writeSize);
+
+	myNewStream.FlushAndResync();
+
+	StringHelper::Concatenate(outputBuffer, stringToWrite);
+		printf("\n%s %s\n", myNewStream.buffer, outputBuffer);
+	if(StringHelper::Compare(outputBuffer, myNewStream.buffer)!=0){
+		return False;
+	}
+
+
 	return True;
 }
+
+
+
+
+bool StreamableTest::TestSeek(const char *stringToRead, const char *stringToWrite){
+	SimpleStreamable myStream;
+	
+	//canSeek is false so the seek should return false
+	if(myStream.Seek(1)){
+		return False;
+	}
+	
+	myStream.doubleBuffer=True;
+	
+	//Upload the string to write in the stream. The buffer size is small so it chooses the unbuffered seek.
+	StringHelper::Copy(myStream.buffer, stringToRead);
+	uint32 buffSize=StringHelper::Length(stringToRead);
+
+	if(!myStream.SetBuffered(buffSize)){
+		return False;
+	}
+	uint32 readSize=buffSize;
+
+	char outputBuffer[32];
+
+	//Unbuffered read
+	myStream.Read(outputBuffer, readSize);
+	outputBuffer[readSize]=0;
+	printf("\n%s\n", outputBuffer);
+	if(StringHelper::Compare(outputBuffer, myStream.buffer)!=0){
+		return False;
+	}
+	//Unbuffered seek
+	myStream.Seek(2);
+	myStream.Read(outputBuffer, readSize);
+	outputBuffer[readSize]=0;
+	printf("\n%s\n", outputBuffer);
+
+	if(StringHelper::Compare(outputBuffer, myStream.buffer+2)!=0){
+		return False;
+	}
+
+	//Buffered operations
+	myStream.Clear();
+	StringHelper::Copy(myStream.buffer, stringToRead);
+	uint32 writeSize=StringHelper::Length(stringToWrite);
+
+	buffSize=readSize*4+1;
+
+	if(writeSize>readSize){
+		buffSize=writeSize*4+1;
+	}
+
+	if(!myStream.SetBuffered(buffSize)){
+		return False;
+	}
+
+	//Buffered read
+	myStream.Read(outputBuffer, readSize);
+	outputBuffer[readSize]=0;
+	printf("\n%s\n", outputBuffer);
+
+	//The position falls in the buffer	
+	myStream.Seek(2);
+	myStream.Read(outputBuffer, readSize);
+	if(myStream.Position()!=(readSize+2)){
+		printf("\n%d %d\n",myStream.UnBufferedPosition(), buffSize);
+		return False;
+	}
+
+	printf("\n%s\n", outputBuffer);
+
+	//Buffered write
+	myStream.Write(stringToWrite, writeSize);
+	myStream.Seek(readSize);
+
+	if(myStream.Position()!=readSize){
+		return False;
+	}
+
+	
+	//Buffered operations
+	myStream.Clear();
+	StringHelper::Copy(myStream.buffer, stringToRead);
+	
+	//initial seek	
+	myStream.Seek(3);
+	
+
+	myStream.Read(outputBuffer, readSize);
+	outputBuffer[readSize]=0;
+
+	if(StringHelper::Compare(outputBuffer, stringToRead+3)!=0){
+		return False;
+	}
+
+	printf("\n%s\n", outputBuffer);
+	
+	//Seek not in the range of the buffer.
+	myStream.Seek(2);
+	myStream.Read(outputBuffer, readSize);
+	outputBuffer[readSize]=0;
+
+	if(StringHelper::Compare(outputBuffer, stringToRead+2)!=0){
+		return False;
+	}
+	printf("\n%s\n", outputBuffer);
+
+	
+
+
+	//Relative seek
+
+	//Append the write string.
+	myStream.Seek(readSize);
+	myStream.Write(stringToWrite, writeSize);
+
+
+	//The write buffer is still full, then before the seek it should be flushed.
+	myStream.RelativeSeek(-readSize-writeSize);
+
+	//Return at the beginning
+	if(myStream.Position()!=0){
+		return False;
+	}
+
+	//Return at readSize.
+	myStream.Seek(readSize);
+	
+	//Read buffered operation.
+	myStream.Read(outputBuffer, writeSize);
+	outputBuffer[writeSize]=0;
+	
+	if(StringHelper::Compare(outputBuffer, stringToWrite)!=0){
+		return False;
+	}
+
+	//The read buffer is still full, the position falls in the buffer.
+	myStream.RelativeSeek(-22);
+	
+	if(myStream.Position()!=readSize){
+		return False;
+	}
+
+	//Again with positive relative position.
+	myStream.RelativeSeek(writeSize);
+	uint32 dummySize=1;
+	myStream.Read(outputBuffer,dummySize);
+	outputBuffer[dummySize]=0;
+	if(*outputBuffer!=0){
+		return False;
+	}
+
+	myStream.RelativeSeek(-writeSize-2);
+	if(myStream.Position()!=(readSize-1)){
+		printf("\n%d %d\n", readSize-1, myStream.Position());
+		return False;
+	}
+
+	
+	return True;
+}
+
+
+
+bool StreamableTest::TestSwitch(const char* onStream1, const char* onStream2){
+	SimpleStreamable myStream;
+
+	StringHelper::Copy(myStream.buffer,onStream1);
+
+	myStream.Switch(2);
+	StringHelper::Copy(myStream.buffer,onStream2);
+
+	const char a='1';
+	myStream.Switch(&a);
+	//We have two streams.
+	if(myStream.NOfStreams()!=2){
+		return False;
+	}
+
+	char outputBuffer[32];
+	uint32 readSize = StringHelper::Length(onStream1);
+	myStream.Read(outputBuffer,readSize);
+	outputBuffer[readSize]=0;
+	printf("\n%s\n", outputBuffer);
+
+	const char b='2';
+	myStream.Switch(&b);
+	readSize=StringHelper::Length(onStream2);
+	myStream.Read(outputBuffer,readSize);
+	outputBuffer[readSize]=0;
+	printf("\n%s\n",outputBuffer);
+	
+	myStream.RemoveStream(&b);
+
+	myStream.Seek(0);
+	myStream.Read(outputBuffer,readSize);
+	outputBuffer[readSize]=0;
+	printf("\n%s\n", outputBuffer);
+
+	if(myStream.SelectedStream()!=1){
+		return False;
+	}
+
+	if(myStream.SetSize(1)){
+		return False;
+	}
+	
+	myStream.doubleBuffer=True;
+	uint32 fakeSize=2;
+	myStream.SetBuffered(fakeSize);
+	if(!myStream.SetSize(1)){
+		return False;
+	}
+
+
+	return True;
+}
+
+
+
+
+		
+
+
+
+	
+	
+		
+
 
 
 

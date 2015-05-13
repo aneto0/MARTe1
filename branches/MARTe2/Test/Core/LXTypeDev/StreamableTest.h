@@ -46,6 +46,8 @@ public:
 	bool TestRead(const char* inputString);
 	bool TestWrite(const char* inputString);
 	bool TestReadAndWrite(const char* stringToRead, const char* stringToWrite);
+	bool TestSeek(const char* stringToRead, const char* stringToWrite);
+	bool TestSwitch(const char* onStream1, const char* onStream2);
 };
 
 #endif
