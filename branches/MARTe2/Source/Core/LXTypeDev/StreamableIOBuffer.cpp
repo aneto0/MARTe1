@@ -14,12 +14,13 @@ bool StreamableIOBuffer::Resync(TimeoutType         msecTimeout){
     }
     
     // distance to end 
-    uint32 deltaToEnd =  AmountLeft() - fillLeft;
+    uint32 deltaToEnd = UsedSize() - Position();   
     
     // adjust seek position
     // in read mode the actual stream 
     // position is to the character after the buffer end
     if (!stream->UnBufferedSeek (stream->UnBufferedPosition()-deltaToEnd)) {
+        Empty();
     	return false;
     }
                                                                           
@@ -40,16 +41,11 @@ bool StreamableIOBuffer::Refill(TimeoutType         msecTimeout){
 	
     // move all pointers and indexes to empty status
     Empty();
-    // load next batch of data
-//    bufferPtr = BufferReference();    	
-    	
-//    maxAmount  = BufferSize();
-//    amountLeft = MaxUsableAmount();
-    // just use this as a temp variable
-//    fillLeft   = MaxUsableAmount();
+
+    uint32 readSize = MaxUsableAmount();
  
-    if (stream->UnBufferedRead(BufferReference(),fillLeft)){
-    	fillLeft   = MaxUsableAmount() - fillLeft; 
+    if (stream->UnBufferedRead(BufferReference(),readSize)){
+    	SetUsedSize(readSize);
     	return true;
     }  
 
@@ -74,30 +70,7 @@ bool StreamableIOBuffer::Flush(TimeoutType         msecTimeout  ){
     	return False;
     }
 
-//    bufferPtr=BufferReference(); 
-//    maxAmount = BufferSize();
     Empty();
     return True;  
 }
 
-/*
-bool StreamableIOBuffer::Seek(uint32 position){
-    if (position >= UsedSize()) return false; 
-    amountLeft = MaxUsableAmount() - position;
-    bufferPtr = BufferReference() + position;
-    return true;
-}
-
-///
-bool StreamableIOBuffer::RelativeSeek(int32 delta){
-	if (delta > 0){
-		if ((uint32)delta >= (amountLeft-fillLeft)) return false;
-	}
-	if (delta < 0){
-		if ((amountLeft-delta) > MaxUsableAmount()) return false;
-	}
-	amountLeft -= delta;
-	bufferPtr += delta;
-	return true;
-}
-*/

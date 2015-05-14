@@ -124,7 +124,7 @@ bool StreamString::SetSize(int64 size){
 
 /** can you move the pointer */
 bool StreamString::CanSeek() const {
-	return true; 
+    return true; 
 };
 
 

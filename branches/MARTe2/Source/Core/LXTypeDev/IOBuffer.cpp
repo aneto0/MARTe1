@@ -67,7 +67,7 @@ bool IOBuffer::RelativeSeek(int32 delta){
 	return ret;
 }    
 
-bool IOBuffer::SetSize(uint32 size){
+bool IOBuffer::SetUsedSize(uint32 size){
 	if (size > maxUsableAmount){
 		size = maxUsableAmount;
 	}

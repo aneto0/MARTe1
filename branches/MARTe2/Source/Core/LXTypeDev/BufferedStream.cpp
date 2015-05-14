@@ -47,15 +47,17 @@ bool BufferedStream::GetToken(
                             const char *        skipCharacters){
 	
 	// retrieve stream mechanism
-	IOBuffer *inputBuffer = GetInputBuffer(); 
-	if (inputBuffer == NULL){
-		inputBuffer = new BufferedStreamIOBuffer(this,64);
-		bool ret = GetTokenFromStream(*inputBuffer, outputBuffer,terminator,outputBufferSize,saveTerminator,skipCharacters);
-		delete inputBuffer;
+	IOBuffer *inputIOBuffer = GetInputBuffer(); 
+	if (inputIOBuffer == NULL){
+		char stackBuffer[64];		
+		BufferedStreamIOBuffer inputIOBuffer (this,stackBuffer,sizeof (stackBuffer));
+		
+		bool ret = GetTokenFromStream(inputIOBuffer, outputBuffer,terminator,outputBufferSize,saveTerminator,skipCharacters);
+		
 		return ret;
 	}
 	
-	return GetTokenFromStream(*inputBuffer, outputBuffer,terminator,outputBufferSize,saveTerminator,skipCharacters);
+	return GetTokenFromStream(*inputIOBuffer, outputBuffer,terminator,outputBufferSize,saveTerminator,skipCharacters);
 }
 
 
@@ -78,22 +80,45 @@ bool BufferedStream::GetToken(
                             const char *        skipCharacters){
 
 	// retrieve stream mechanism
-	IOBuffer *inputBuffer  = GetInputBuffer();
-	IOBuffer *outputBuffer = output.GetOutputBuffer();
-	bool inputBufferAllocated = (inputBuffer == NULL); 
-	bool outputBufferAllocated = (outputBuffer == NULL); 
-	if (inputBuffer == NULL){
-		inputBuffer = new BufferedStreamIOBuffer(this,64);
+	IOBuffer *inputIOBuffer   = GetInputBuffer();
+	IOBuffer *outputIOBuffer  = output.GetOutputBuffer();
+
+	bool ret = false; 
+	
+	if (inputIOBuffer == NULL){
+		char stackBuffer[64];		
+		BufferedStreamIOBuffer inputIOBufferS (this,stackBuffer,sizeof (stackBuffer));		
+		
+		IOBuffer *outputIOBuffer  = GetOutputBuffer();		
+		if (outputIOBuffer == NULL){
+			char stackBuffer[64];		
+			BufferedStreamIOBuffer outputIOBufferS (this,stackBuffer,sizeof (stackBuffer));		
+
+			ret = GetTokenFromStream(inputIOBufferS, outputIOBufferS,terminator,saveTerminator,skipCharacters);
+			
+		} else { 
+			inputIOBuffer = &inputIOBufferS; 
+		
+			ret = GetTokenFromStream(*inputIOBuffer, *outputIOBuffer,terminator,saveTerminator,skipCharacters);
+		
+		}
+	} else {
+		
+		if (outputIOBuffer == NULL){
+			char stackBuffer[64];		
+			BufferedStreamIOBuffer outputIOBufferS (this,stackBuffer,sizeof (stackBuffer));		
+
+			outputIOBuffer = &outputIOBufferS; 
+
+			ret = GetTokenFromStream(*inputIOBuffer, *outputIOBuffer,terminator,saveTerminator,skipCharacters);
+			
+		} else { 
+		
+			ret = GetTokenFromStream(*inputIOBuffer, *outputIOBuffer,terminator,saveTerminator,skipCharacters);
+		
+		}		
 	}
-	if (outputBuffer == NULL){
-		outputBuffer = new BufferedStreamIOBuffer(&output,64);
-	}
-	
-	
-	bool ret = GetTokenFromStream(*inputBuffer, *outputBuffer,terminator,saveTerminator,skipCharacters);
-	
-	if (inputBufferAllocated)  delete inputBuffer;
-	if (outputBufferAllocated) delete outputBuffer;
+
 	return ret;
 }
 	
@@ -104,17 +129,43 @@ bool BufferedStream::SkipTokens(
                             uint32              count,
                             const char *        terminator){
 
-	return SkipTokensInStream(*this,count,terminator);
+	// retrieve stream mechanism
+	IOBuffer *inputBuffer = GetInputBuffer(); 
+	if (inputBuffer == NULL){
+		char stackBuffer[64];		
+		BufferedStreamIOBuffer inputBuffer (this,stackBuffer,sizeof (stackBuffer));
+		
+		return SkipTokensInStream(inputBuffer,count,terminator);
+	}
+	
+	return SkipTokensInStream(*inputBuffer,count,terminator);
 }
 
 bool BufferedStream::Print(const AnyType& par,FormatDescriptor fd){
 
-	return PrintToStream(*this,par,fd);
+	// retrieve stream mechanism
+	IOBuffer *inputBuffer = GetInputBuffer(); 
+	if (inputBuffer == NULL){
+		char stackBuffer[64];		
+		BufferedStreamIOBuffer inputBuffer (this,stackBuffer,sizeof (stackBuffer));
+
+		return PrintToStream(inputBuffer,par,fd);
+	}
+		
+	return PrintToStream(*inputBuffer,par,fd);
 }
 
 bool BufferedStream::PrintFormatted(const char *format, const AnyType pars[]){
 
-	return PrintFormattedToStream(*this,format,pars);
+	// retrieve stream mechanism
+	IOBuffer *inputBuffer = GetInputBuffer(); 
+	if (inputBuffer == NULL){
+		char stackBuffer[64];
+		BufferedStreamIOBuffer inputBuffer (this,stackBuffer,sizeof (stackBuffer));
+		
+		return PrintFormattedToStream(inputBuffer,format,pars);
+	}
+	return PrintFormattedToStream(*inputBuffer,format,pars);
 }
 
 

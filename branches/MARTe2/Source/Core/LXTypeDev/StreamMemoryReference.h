@@ -69,7 +69,7 @@ public: // usable constructors
      * */
     StreamMemoryReference(const char *buffer,uint32 bufferSize){
     	this->buffer.SetBufferReadOnlyReferencedMemory(buffer,bufferSize);
-    	this->buffer.SetSize(bufferSize);
+    	this->buffer.SetUsedSize(bufferSize);
     }
     
     /** Destructor */

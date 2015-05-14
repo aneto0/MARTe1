@@ -45,21 +45,18 @@ private:
     */
     uint32              	maxUsableAmount;
    
-private:	
     /**
 		how many chars left in buffer
         to be initialised by derived class
     */
     uint32               	amountLeft;
     
-protected:	
     /**
      * how many chars less than the full size of the buffer
      * distinct from amountLeft to allow duplex operation read and write
      */
     uint32                  fillLeft;
 
-private:	
     /**
 		pointer to the next character
         to be initialised by derived class
@@ -101,7 +98,7 @@ public:
     /**
      * forces the used size of the buffer  
      */
-    virtual bool 		SetSize(uint32 size);
+    virtual bool 		SetUsedSize(uint32 size);
     
 public:
     
@@ -196,7 +193,7 @@ public:
      * reads from buffer at current position
      * before calling check that bufferPtr is not NULL
      */ 
-    inline bool         PutC(char &c) {
+    inline bool         PutC(char c) {
     	if (!CanWrite()) return false;
 
         // check if buffer needs updating and or saving            
@@ -219,7 +216,7 @@ public:
      * before calling check that bufferPtr is not NULL
      * can be overridden to allow resizeable buffers
 	 */ 
-    virtual void Write(const char *buffer, uint32 &size);
+    virtual void 		Write(const char *buffer, uint32 &size);
     /** 
      * reads from buffer at current position
      * before calling make sure that bufferPtr is not NULL

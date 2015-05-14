@@ -91,8 +91,8 @@ int64 StreamMemoryReference::Size(){
 
 bool StreamMemoryReference::SetSize(int64 size){
     if (size < 0) size = 0;	
-	buffer.SetSize((uint32)size);
-	return true; 
+    buffer.SetUsedSize((uint32)size);
+    return true; 
 }
 
 

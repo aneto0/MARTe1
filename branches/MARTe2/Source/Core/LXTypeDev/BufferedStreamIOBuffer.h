@@ -15,12 +15,18 @@ private:
        
 public: // read buffer private methods
 
-    ///
+    /// allocate from dynamic memory
     BufferedStreamIOBuffer(StreamInterface *s,uint32 size){
         stream=s;
         SetBufferHeapMemory(size);
     }
 
+    /// allocate from any memory
+    BufferedStreamIOBuffer(StreamInterface *s,char *buffer,uint32 size){
+        stream=s;
+        SetBufferReferencedMemory(buffer,size);
+    }
+    
     /**  
         refill readBuffer
         assumes that the read position is now at the end of buffer
