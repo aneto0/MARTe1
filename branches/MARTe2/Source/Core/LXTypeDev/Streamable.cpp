@@ -30,7 +30,7 @@
 /// default destructor
 Streamable::~Streamable(){
 
-	writeBuffer.Flush();
+//	writeBuffer.Flush();
 }
 
 
@@ -236,11 +236,16 @@ bool  Streamable::RelativeSeek(int32 deltaPos){
     if (deltaPos == 0) return true;
     if (!operatingModes.canSeek) return false;
     
-    // if write mode on then just flush out data
+     // if write mode on then just flush out data
     if (writeBuffer.UsedSize() > 0){
     	// this will move the stream pointer ahead to the correct position
     	writeBuffer.Flush();
     } else {
+
+	//save the current position because in case of out of range
+        //the position becomes one of the buffer bounds.
+	int64 currentPos=readBuffer.Position();
+
     	// on success it means we are in range
     	if (readBuffer.RelativeSeek(deltaPos)){
     		// no need to move stream pointer
@@ -248,7 +253,7 @@ bool  Streamable::RelativeSeek(int32 deltaPos){
     	}
     	// out of buffer range
 		// adjust stream seek poistion to account for actual read buffer usage
-		deltaPos -= (readBuffer.UsedSize()-readBuffer.Position());
+		deltaPos -= (readBuffer.UsedSize()-currentPos);
 		
 		// empty buffer
 		readBuffer.Empty();

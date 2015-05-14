@@ -42,7 +42,7 @@ bool StreamableTest::TestGetC(const char* inputString){
 			return false;
 		}
 	}
-	//Buffered way. it works but gives virtual fault because the reference (in the Flush() function).
+	//Buffered way. 
 	//read 2 bytes at once.
 	uint32 buffSize=2;
 	if(!myStream.SetBuffered(buffSize)){
@@ -54,7 +54,7 @@ bool StreamableTest::TestGetC(const char* inputString){
 	while(myStream.buffer[i]!=0){
 		myStream.GetC(retC);
 		if(retC!=myStream.buffer[i++]){
-			return false;
+			return False;
 		}
 	}
 
@@ -76,7 +76,13 @@ bool StreamableTest::TestPutC(const char* inputString){
 		}
 		toPut++;
 	}
-	//Buffered way. it works but gives virtual fault because the reference (in the Flush() function).
+
+
+	if(StringHelper::Compare(myStream.buffer, inputString)!=0){
+		return False;
+	}
+
+	//Buffered way. 
 	//write 2 bytes at once
 	uint32 buffSize=2;
 	if(!myStream.SetBuffered(buffSize)){
@@ -86,15 +92,62 @@ bool StreamableTest::TestPutC(const char* inputString){
 	myStream.Clear();
 	toPut=inputString;
 	while((*toPut)!=0){
-		//myStream.PutC(*toPut);
+		myStream.PutC(*toPut);
 		toPut++;
 	}
 
 	//Flush the buffer on the stream
 	myStream.FlushAndResync();
-	printf("\n%s\n", myStream.buffer);
+
+	if(StringHelper::Compare(myStream.buffer, inputString)!=0){
+		return False;
+	}
+
+	//printf("\n%s\n", myStream.buffer);
 	return True;
 }
+
+
+
+bool StreamableTest::TestGetCAndPutC(const char *inputString){
+	
+	SimpleStreamable myStream;
+	myStream.doubleBuffer=True;
+	
+	//Buffered operations.
+	uint32 buffSize=StringHelper::Length(inputString);
+	if(!myStream.SetBuffered(buffSize)){
+		return False;
+	}
+
+	StringHelper::Copy(myStream.buffer, inputString);
+	
+	char c;
+	myStream.GetC(c);
+	
+	if(c!=*inputString){
+		return False;
+	}
+
+	//useless but is the only with read buffer not empy in tests
+	myStream.FlushAndResync();
+
+
+	myStream.PutC(*inputString);
+	
+	myStream.FlushAndResync();
+
+	if(myStream.buffer[*(myStream.sizePtr)-1]!=*inputString){
+		return False;
+	}
+
+	
+
+
+	return True;
+}
+
+
 
 
 bool StreamableTest::TestRead(const char* inputString){
@@ -105,7 +158,7 @@ bool StreamableTest::TestRead(const char* inputString){
 	uint32 size=StringHelper::Length(inputString);
 	myStream.Read(outputBuffer, size);
 	outputBuffer[size]=0;
-	printf("\n%s %d\n", outputBuffer, size);
+	//printf("\n%s %d\n", outputBuffer, size);
 
 	//Buffered way.
 	myStream.Clear();
@@ -138,11 +191,11 @@ bool StreamableTest::TestRead(const char* inputString){
 
 	//Compare the result with the stream.
 	if(StringHelper::Compare(result, myStream.buffer)!=0){
-		printf("\n%s, %s\n", result, inputString);
+		//printf("\n%s, %s\n", result, inputString);
 		return False;
 	}
 
-	printf("\n%s\n", outputBuffer);
+	//printf("\n%s\n", outputBuffer);
 
 	return True;
 }
@@ -156,7 +209,7 @@ bool StreamableTest::TestWrite(const char* inputString){
 	const char *toWrite=inputString;
 	uint32 size=StringHelper::Length(inputString);
 	myStream.Write(toWrite, size);
-	printf("\n%s\n", myStream.buffer);
+	//printf("\n%s\n", myStream.buffer);
 
 	//Buffered way
 	myStream.Clear();
@@ -181,7 +234,7 @@ bool StreamableTest::TestWrite(const char* inputString){
 		StringHelper::Concatenate(result, inputString);
 		sumSize+=size;
 		if(myStream.Position()!=sumSize){
-			printf("\n%d %d %d \n",sumSize, myStream.Position(), myStream.UnBufferedPosition());
+			//printf("\n%d %d %d \n",sumSize, myStream.Position(), myStream.UnBufferedPosition());
 			return False;
 		}
 	}
@@ -189,7 +242,7 @@ bool StreamableTest::TestWrite(const char* inputString){
 	result[sumSize]=0;
 
 	if(myStream.Size()!=sumSize){
-		printf("\n%d %d\n", myStream.Size(), sumSize);
+		//printf("\n%d %d\n", myStream.Size(), sumSize);
 		return False;
 	}
 
@@ -198,7 +251,7 @@ bool StreamableTest::TestWrite(const char* inputString){
 		return False;
 	}
 	
-	printf("\n%s\n", myStream.buffer);
+	//printf("\n%s\n", myStream.buffer);
 	return True;
 }
 
@@ -241,7 +294,7 @@ bool StreamableTest::TestReadAndWrite(const char *stringToRead, const char *stri
 
 	
 
-	printf("\n%s %s\n", myStream.buffer, outputBuffer);
+	//printf("\n%s %s\n", myStream.buffer, outputBuffer);
 
 
 	//Increase the buffer size to allow buffered read/write.
@@ -268,13 +321,13 @@ bool StreamableTest::TestReadAndWrite(const char *stringToRead, const char *stri
 	if(StringHelper::Compare(outputBuffer, myNewStream.buffer)!=0){
 		return False;
 	}
-	printf("\nhere\n");
+	//printf("\nhere\n");
 	myNewStream.Write(stringToWrite, writeSize);
 
 	myNewStream.FlushAndResync();
 
 	StringHelper::Concatenate(outputBuffer, stringToWrite);
-		printf("\n%s %s\n", myNewStream.buffer, outputBuffer);
+		//printf("\n%s %s\n", myNewStream.buffer, outputBuffer);
 	if(StringHelper::Compare(outputBuffer, myNewStream.buffer)!=0){
 		return False;
 	}
@@ -310,7 +363,7 @@ bool StreamableTest::TestSeek(const char *stringToRead, const char *stringToWrit
 	//Unbuffered read
 	myStream.Read(outputBuffer, readSize);
 	outputBuffer[readSize]=0;
-	printf("\n%s\n", outputBuffer);
+	//printf("\n%s\n", outputBuffer);
 	if(StringHelper::Compare(outputBuffer, myStream.buffer)!=0){
 		return False;
 	}
@@ -318,7 +371,7 @@ bool StreamableTest::TestSeek(const char *stringToRead, const char *stringToWrit
 	myStream.Seek(2);
 	myStream.Read(outputBuffer, readSize);
 	outputBuffer[readSize]=0;
-	printf("\n%s\n", outputBuffer);
+	//printf("\n%s\n", outputBuffer);
 
 	if(StringHelper::Compare(outputBuffer, myStream.buffer+2)!=0){
 		return False;
@@ -342,17 +395,17 @@ bool StreamableTest::TestSeek(const char *stringToRead, const char *stringToWrit
 	//Buffered read
 	myStream.Read(outputBuffer, readSize);
 	outputBuffer[readSize]=0;
-	printf("\n%s\n", outputBuffer);
+	//printf("\n%s\n", outputBuffer);
 
 	//The position falls in the buffer	
 	myStream.Seek(2);
 	myStream.Read(outputBuffer, readSize);
 	if(myStream.Position()!=(readSize+2)){
-		printf("\n%d %d\n",myStream.UnBufferedPosition(), buffSize);
+		//printf("\n%d %d\n",myStream.UnBufferedPosition(), buffSize);
 		return False;
 	}
 
-	printf("\n%s\n", outputBuffer);
+	//printf("\n%s\n", outputBuffer);
 
 	//Buffered write
 	myStream.Write(stringToWrite, writeSize);
@@ -378,7 +431,7 @@ bool StreamableTest::TestSeek(const char *stringToRead, const char *stringToWrit
 		return False;
 	}
 
-	printf("\n%s\n", outputBuffer);
+	//printf("\n%s\n", outputBuffer);
 	
 	//Seek not in the range of the buffer.
 	myStream.Seek(2);
@@ -388,7 +441,7 @@ bool StreamableTest::TestSeek(const char *stringToRead, const char *stringToWrit
 	if(StringHelper::Compare(outputBuffer, stringToRead+2)!=0){
 		return False;
 	}
-	printf("\n%s\n", outputBuffer);
+	//printf("\n%s\n", outputBuffer);
 
 	
 
@@ -426,7 +479,7 @@ bool StreamableTest::TestSeek(const char *stringToRead, const char *stringToWrit
 		return False;
 	}
 
-	//Again with positive relative position.
+	//The position falls out of the buffer.
 	myStream.RelativeSeek(writeSize);
 	uint32 dummySize=1;
 	myStream.Read(outputBuffer,dummySize);
@@ -437,7 +490,7 @@ bool StreamableTest::TestSeek(const char *stringToRead, const char *stringToWrit
 
 	myStream.RelativeSeek(-writeSize-2);
 	if(myStream.Position()!=(readSize-1)){
-		printf("\n%d %d\n", readSize-1, myStream.Position());
+		//printf("\n%d %d\n", readSize-1, myStream.Position());
 		return False;
 	}
 
@@ -466,33 +519,38 @@ bool StreamableTest::TestSwitch(const char* onStream1, const char* onStream2){
 	uint32 readSize = StringHelper::Length(onStream1);
 	myStream.Read(outputBuffer,readSize);
 	outputBuffer[readSize]=0;
-	printf("\n%s\n", outputBuffer);
+	//printf("\n%s\n", outputBuffer);
 
 	const char b='2';
 	myStream.Switch(&b);
 	readSize=StringHelper::Length(onStream2);
 	myStream.Read(outputBuffer,readSize);
 	outputBuffer[readSize]=0;
-	printf("\n%s\n",outputBuffer);
+	//printf("\n%s\n",outputBuffer);
 	
 	myStream.RemoveStream(&b);
 
 	myStream.Seek(0);
 	myStream.Read(outputBuffer,readSize);
 	outputBuffer[readSize]=0;
-	printf("\n%s\n", outputBuffer);
+//	printf("\n%s\n", outputBuffer);
 
+	//the seclected stream is the first
 	if(myStream.SelectedStream()!=1){
 		return False;
 	}
 
+	//set the size, but is false if !canSeek
 	if(myStream.SetSize(1)){
 		return False;
 	}
 	
+	//enable canSeek
 	myStream.doubleBuffer=True;
 	uint32 fakeSize=2;
 	myStream.SetBuffered(fakeSize);
+
+	//now it is true
 	if(!myStream.SetSize(1)){
 		return False;
 	}

@@ -31,6 +31,12 @@ TEST_F(StreamableGTest,TestPutC) {
 }
 
 
+TEST_F(StreamableGTest,TestGetCAndPutC) {
+    StreamableTest streamtest;
+    ASSERT_TRUE(streamtest.TestGetCAndPutC("HelloWorld"));
+}
+
+
 TEST_F(StreamableGTest,TestRead) {
     StreamableTest streamtest;
     ASSERT_TRUE(streamtest.TestRead("HelloWorld"));

@@ -9,7 +9,16 @@
 #include "FormatDescriptor.h"
 #include "BufferedStream.h"
 #include "StreamableIOBuffer.h"
-
+/**
+ * @file Streamable.h
+ * @brief Implementation of streamable type functions.
+ * 
+ * Implementation of streamable type functions for read, write and seek operations in buffered and unbuffered modes for streamable types
+ * i.e files. Most of the functions depends from the virtual UnBuffered functions which must be implemented in the derived classes
+ * because could be differents for different streamable types. 
+ *
+ * Streamable uses two IOBuffer in buffered modes, one for reading and one for writing operations and they are used togheter if the stream is defined as
+ * readable, writable and seekable.*/ 
 
 #if 0
 class Streamable;
@@ -129,6 +138,8 @@ public:
 
 
 /**
+  * @brief Streamable class.
+
     Replaces CStream and BufferedStream of BL1
     Inherits from pure virtual StreamInterface and does not resolve all pure virtual functions
    
@@ -223,21 +234,21 @@ protected:
         bool stringMode:1;
 
     };
-    /// set automatically on initialisation by calling of the Canxxx functions 
+    /** set automatically on initialisation by calling of the Canxxx functions */
     OperatingModes           operatingModes;
     
 private: // read and write buffers
 friend class StreamableIOBuffer; 
 //friend class StreamableWriteBuffer; 
        
-    /** starts empty 
+    /** starts empty, 
         used for separate input operations or dual operations
         to be sized up by final class appropriately 
     */
 	StreamableIOBuffer		readBuffer;
     
 
-    /** starts empty 
+    /** starts empty, 
         used exclusively for separate output operations 
         to be sized up by final class appropriately 
     */
@@ -260,12 +271,17 @@ protected: // methods to be implemented by deriving classes
 protected: // methods to be implemented by deriving classes
     
     /** 
-        Reads data into buffer. 
-        As much as size byte are read, 
-        actual read size is returned in size. 
-        msecTimeout is how much the operation should last - no more
-        timeout behaviour depends on class characteristics and sync mode. 
-        I.E. sockets with blocking activated wait forever when noWait is used .... 
+     * @brief Reads data into buffer.
+     * @param buffer is the buffer where stream datas must be written
+     * @param size is the number of bytes to read.
+     * @param msecTimeout is the timeout.
+     * @param complete is a flag which specifies if the read operation is completed.
+     *
+     *  As much as size byte are read, 
+     *  actual read size is returned in size. 
+     *  msecTimeout is how much the operation should last - no more.
+     *  Timeout behaviour depends on class characteristics and sync mode. 
+     *  I.E. sockets with blocking activated wait forever when noWait is used .... 
     */
     virtual bool        UnBufferedRead(
                             char*               buffer,
@@ -273,13 +289,20 @@ protected: // methods to be implemented by deriving classes
                             TimeoutType         msecTimeout     = TTDefault,
                             bool                complete        = false)=0;
 
+  
     /** 
-        Write data from a buffer to the stream. 
-        As much as size byte are written, 
-        actual written size is returned in size. 
-        msecTimeout is how much the operation should last.
-        timeout behaviour depends on class characteristics and sync mode. 
-        I.E. sockets with blocking activated wait forever when noWait is used .... 
+     * @brief Write data from a buffer to the stream.
+     * @param buffer is the buffer which contains datas to write on the stream.
+     * @param size is the number of bytes to write.
+     * @param msecTimeout is the timeout.
+     * @param complete is a flag which specifies if the read operation is completed.
+     *
+     *  This function is not implemented here but depends from the derived classes.
+     *  As much as size byte are written, 
+     *  actual written size is returned in size. 
+     *  msecTimeout is how much the operation should last.
+     *  Timeout behaviour depends on class characteristics and sync mode. 
+     *  I.E. sockets with blocking activated wait forever when noWait is used .... 
     */
     virtual bool        UnBufferedWrite(
                             const char*         buffer,
@@ -289,36 +312,54 @@ protected: // methods to be implemented by deriving classes
 
     // RANDOM ACCESS INTERFACE
 
-    /** The size of the stream */
+    /** @brief The size of the stream.
+      * 
+      * Not implemented here. */
     virtual int64       UnBufferedSize()const =0;
 
-    /** Moves within the file to an absolute location */
+    /** @brief Moves within the file to an absolute location.
+     *
+     * Not implemented here. */
     virtual bool        UnBufferedSeek(int64 pos)=0;
 
-    /** Returns current position */
+    /** @brief Returns current position.
+     *
+     * Not implemented here. */
     virtual int64       UnBufferedPosition()const =0;
 
-    /** Clip the stream size to a specified point */
+    /** @brief Clip the stream size to a specified point.
+      * 
+      * Not implemented here. */
     virtual bool        UnBufferedSetSize(int64 size)=0;
 
     // Extended Attributes or Multiple Streams INTERFACE
 
-    /** select the stream to read from. Switching may reset the stream to the start. */
+    /** @brief Select the stream to read from. Switching may reset the stream to the start.
+      * 
+      * Not implemented here. */
     virtual bool        UnBufferedSwitch(uint32 n)=0;
 
-    /** select the stream to read from. Switching may reset the stream to the start. */
+    /** @brief Select the stream to read from. Switching may reset the stream to the start.
+      * 
+      * Not implemented here. */
     virtual bool        UnBufferedSwitch(const char *name)=0;
     
+    /** @brief Remove a stream.
+      * 
+      * Not implemented here. */
     virtual bool        UnBufferedRemoveStream(const char *name)=0;
  
     
 private: // mode switch methods
     
     /** 
-        sets the readBufferFillAmount to 0
-        adjust the seek position
-        sets the mutexWriteMode
-        does not check for mutexBuffering to be active
+     * @brief Switch to the write mode.
+     * @return false if the resyncronization goes wrong.
+     *
+     *  Sets the readBufferFillAmount to 0.
+     *  Adjust the seek position
+     *  Sets the mutexWriteMode.
+     *  Does not check for mutexBuffering to be active
     */
     inline bool SwitchToWriteMode(){
         if (!GetInputBuffer()->Resync()) return false;
@@ -328,9 +369,12 @@ private: // mode switch methods
     }
     
     /** 
-        Flushes output buffer
-        resets mutexWriteMode
-        does not refill the buffer nor check the mutexBuffering is active
+     * @brief Switch to the read mode.
+     * @return false if the flush goes wrong.
+     *
+     *  Flushes write buffer.
+     *  Resets mutexWriteMode.
+     *  Does not refill the buffer nor check the mutexBuffering is active.
     */
     inline bool SwitchToReadMode(){
         // adjust seek position
@@ -341,7 +385,7 @@ private: // mode switch methods
     }
    
 protected:
-    /// default constructor
+    /** @brief Default constructor. */
     Streamable() : readBuffer(this),writeBuffer(this)
     {
     	operatingModes.canSeek      	= false;
@@ -350,24 +394,31 @@ protected:
     	operatingModes.stringMode 		= false;
     }
 
-    /// default destructor
+    /** @brief Default destructor. */
     virtual ~Streamable();
     
     /**
-        sets appropriate buffer sizes and adjusts operatingModes
-        must be called by descendant
-        can be overridden but is not meant to - just accessed via VT
+     * @brief Sets the buffers size, impose the buffered modality.
+     * @param readBufferSize is the desired size for the read buffer.
+     * @param readBufferSize is the desired size for the write buffer.
+     * @return true if the memory is allocated correctly.
+     *  
+     * Sets appropriate buffer sizes and adjusts operatingModes depending on CanRead, CanWrite and CanSeek functions.
+     * Must be called by descendant.
+     * Can be overridden but is not meant to - just accessed via VT.
     */
     virtual bool SetBufferSize(uint32 readBufferSize=0, uint32 writeBufferSize=0);
 
 public:  // special inline methods for buffering
     
     /** 
-         on dual separate buffering (CanSeek=False) just Flush output 
-     
-         on joint buffering (CanSeek= True) depending on read/write mode 
-         either Resync or Flush
-    */
+     * @brief Resyncronization and flush of the buffers.
+     * @param msecTimeout is the timeout.
+     * @return true if the Resync and Flush operations for buffers goes fine.
+     *
+     * On dual separate buffering (CanSeek=False) just Flush output.
+     * On joint buffering (CanSeek= True) depending on read/write mode 
+     * either Resync or Flush. */
     inline bool FlushAndResync(TimeoutType         msecTimeout     = TTDefault){
     	// if there is something in the buffer, and canSeek it means we can and need to resync
     	// if the buffers are separated (!canseek) than resync cannot be done
@@ -383,7 +434,9 @@ public:  // special inline methods for buffering
     }
 
     /**
-     *  simply write to buffer if space exist and if operatingModes allows
+     * @brief Simply write a character to the stream if space exist and if operatingModes allows.
+     * @param c is the character to be written on the stream.
+     * @return false in case of errors.
      */  
     inline bool         PutC(char c)
     {   	
@@ -399,7 +452,11 @@ public:  // special inline methods for buffering
         return UnBufferedWrite(&c,size);
     }    
 
-    /// simply read from buffer 
+    /**
+     * @brief Simply read a character from stream.
+     * @param c is the character by reference in return.
+     * @return false in case of errors.
+     */
     inline bool         GetC(char &c) {
 
     	if (operatingModes.mutexWriteMode) {
@@ -417,10 +474,15 @@ public:  // special inline methods for buffering
 public:
     // PURE STREAMING  built upon UnBuffered version 
 
-    /** Reads data into buffer. As much as size byte are written, actual size
-        is returned in size. msecTimeout is how much the operation should last.
-        timeout behaviour is class specific. I.E. sockets with blocking activated wait forever
-        when noWait is used .... */
+    /** @brief Reads data from stream into buffer.
+      * @param buffer is the output memory where datas must be written.
+      * @param size is the number of bytes to read from stream.
+      * @param msecTimeout is the timeout.
+      * @param completeRead is a flag which specified is the read operation is completed.
+      * As much as size byte are written, actual size
+      * is returned in size. msecTimeout is how much the operation should last.
+      * Timeout behaviour is class specific. I.E. sockets with blocking activated wait forever
+      * when noWait is used .... */
     virtual bool         Read(
                             char *              buffer,
                             uint32 &            size,
@@ -429,10 +491,17 @@ public:
     // NOTE: Implemented in .cpp but no need to have c- mangling functions as function will be normally acceessed via VT 
     
 
-    /** Write data from a buffer to the stream. As much as size byte are written, actual size
-        is returned in size. msecTimeout is how much the operation should last.
-        timeout behaviour is class specific. I.E. sockets with blocking activated wait forever
-        when noWait is used .... */
+    /**
+     * @brief Write data from a buffer to the stream.
+     * @param buffer contains the datas to write on the stream.
+     * @param size is the desired number of bytes to write.
+     * @param msecTimeout is the timeout.
+     * @param completeWrite is a flac which specified is the write operations is completed.
+     * 
+     * As much as size byte are written, actual size
+     * is returned in size. msecTimeout is how much the operation should last.
+     * Timeout behaviour is class specific. I.E. sockets with blocking activated wait forever
+     *  when noWait is used .... */
     virtual bool         Write(
                             const char*         buffer,
                             uint32 &            size,
@@ -444,35 +513,58 @@ public:
 
     // RANDOM ACCESS INTERFACE
 
-    /** The size of the stream */
+    /** @brief The size of the stream.
+      * 
+      * Depends on UnBufferedSize and should return the current size of the stream. */
     virtual int64       Size() ;
 
-    /** Moves within the file to an absolute location */
+    /** @brief Moves within the file to an absolute location.
+      * @param pos is the absolute desired position in the stream.
+      *
+      * Depends in UnBufferedSeek and should move the cursor to the desired position in the stream/file.
+      */
     virtual bool        Seek(int64 pos);
     // NOTE: Implemented in .cpp but no need to have c- mangling functions as function will be normally acceessed via VT 
 
-    /** Moves within the file relative to current location */
+    /** @brief Moves within the file relative to current location.
+      * @param deltaPos is the desired relative position from the current.
+      * 
+      * Depends on UnBufferedSeek and should move the cursor to current+deltaPos in the stream.*/
     virtual bool        RelativeSeek(int32 deltaPos);
     // NOTE: Implemented in .cpp but no need to have c- mangling functions as function will be normally acceessed via VT 
     
-    /** Returns current position */
+    /** @brief Returns current position.
+      * @return the current position in the stream.
+      *
+      * Depends on UnBufferedPosition. */
     virtual int64       Position() ;
     // NOTE: Implemented in .cpp but no need to have c- mangling functions as function will be normally acceessed via VT 
 
-    /** Clip the stream size to a specified point */
+    /** @brief Clip the stream size to a specified point.
+      * @param size is the new desired size for the stream.
+      *
+      * Depends on UnBufferedSetSize. */
     virtual bool        SetSize(int64 size);
     // NOTE: Implemented in .cpp but no need to have c- mangling functions as function will be normally acceessed via VT 
 
     // MULTISTREAM INTERFACE
 
-    /** select the stream to read from. Switching may reset the stream to the start. */
+    /** @brief Select the stream to read from. Switching may reset the stream to the start.ù
+      * @param n is the number of the desired stream.
+      * 
+      * Depends on UnBufferedSwitch. */
     virtual bool        Switch(uint32 n);
 
-    /** select the stream to read from. Switching may reset the stream to the start. */
+    /** @brief Select the stream to read from. Switching may reset the stream to the start.
+      * @param name is the name of the desired stream.
+      * 
+      * Depends on UnBufferedSwitch. */
     virtual bool        Switch(const char *name);
 
-    /**  remove an existing stream .
-        current stream cannot be removed 
+    /** @brief Remove an existing stream.
+      * @param name is the name of the stream which should be removed.
+      *
+      * Depends on UnBufferedRemoveStream.
     */
     virtual bool        RemoveStream(const char *name);
 

@@ -3,6 +3,7 @@
 #include "Streamable.h"
 #include "Memory.h"
 #define MAX_DIMENSION 128
+#define MAX_STREAM_DIMENSION 256
 
 //A generic stream class used for types print.
 class MyStream{
@@ -38,32 +39,41 @@ public:
 //A simple stream for streamable which implement unbuffered functions.
 class SimpleStreamable : public Streamable{
 public:
-	char buffer[MAX_DIMENSION];
-	uint32 size;
+	char buffer1[MAX_STREAM_DIMENSION];
+	char buffer2[MAX_STREAM_DIMENSION];
+	char* buffer;
+	uint32 size1;
+	uint32 size2;
+	uint32 *sizePtr;
+	uint32 nBuffers;
 	bool doubleBuffer;
 public:
 
 
 	SimpleStreamable(){
-		size=0;
+		size1=0;
+		size2=0;
+		nBuffers=2;
+		buffer=buffer1;
+		sizePtr=&size1;
 		doubleBuffer=false;
-		operatingModes.canSeek=true;
 		for(int i=0; i<MAX_DIMENSION; i++) buffer[i]=0;
 	}
 
 	~SimpleStreamable(){
-		Flush();
+		FlushAndResync();
 	}
 	
 
 	void Clear(){
-		size=0;
+		(*sizePtr)=0;
 		for(int i=0; i<MAX_DIMENSION; i++) buffer[i]=0;
 	}
 
 	//Copy buffer in inBuffer for the read from stream.
 	bool UnBufferedRead(char* inBuffer, uint32 &inSize, TimeoutType timeout=TTDefault, bool complete=false){
 	
+		uint32 size=*sizePtr;
 		if((size+inSize) >= MAX_DIMENSION){
 			size=0;
 		}
@@ -73,12 +83,15 @@ public:
 		}
 	
 		size+=inSize;
+		*sizePtr=size;
 		return true;
 
 	}		
 
 	//Copy outBuffer in buffer for the write to stream.
 	bool UnBufferedWrite(const char* outBuffer, uint32 &outSize, TimeoutType timeout=TTDefault, bool complete=false){
+
+		uint32 size=*sizePtr;
 		if((size+outSize) >= MAX_DIMENSION){
 			size=0;
 		}
@@ -86,6 +99,7 @@ public:
 			return false;
 		}
 		size+=outSize;
+		*sizePtr=size;
 		return true;
 	}
 
@@ -96,16 +110,16 @@ public:
 
 
 	int64 UnBufferedSize()const{
-		return size;
+		return *sizePtr;
 	}
 	
 	bool UnBufferedSeek(int64 seek){
-		size=seek;	
+		(*sizePtr)=seek;	
 		return true;
 	}
 
 	int64 UnBufferedPosition()const{
-		return size;
+		return *sizePtr;
 	}
 
 	bool UnBufferedSetSize(int64 desSize){
@@ -113,15 +127,33 @@ public:
 	}	
 
 	bool UnBufferedSwitch(uint32 a){
+		if(a==2){
+			buffer=buffer2;
+			sizePtr=&size2;
+		}
+		if(a==1){
+			buffer=buffer1;
+			sizePtr=&size1;
+		}
 		return true;
 	}
 
 	bool UnBufferedSwitch(const char* a){
+		if(*a=='1'){
+			sizePtr=&size1;
+			buffer=buffer1;
+		}
+		if(*a=='2'){
+			sizePtr=&size2;
+			buffer=buffer2;
+		}
 		return true;
 	}
 	
 
 	bool UnBufferedRemoveStream(const char* a){
+		UnBufferedSwitch((*a-'0')%2+1);	
+		nBuffers--;
 		return true;
 	}
 
@@ -139,7 +171,7 @@ public:
 	}
 
 	uint32 NOfStreams(){
-		return 1;
+		return nBuffers;
 	}
 
 	bool StreamName(uint32 a, char* some, int b)const{
@@ -147,17 +179,15 @@ public:
 	}
 
 	uint32 SelectedStream(){
-		return 1;
+		if(buffer==buffer1)
+			return 1;
+		else 
+			return 2;
 	}
 		
 	bool AddStream(const char* h){
+		nBuffers++;
 		return true;
 	}
-
-	bool GetToken(StreamInterface &a, const char* b, char* c, const char* d){
-		return true;
-	}
-
-	
 
 };
