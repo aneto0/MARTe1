@@ -91,13 +91,18 @@ public:
     /**
      * position is set relative to start of buffer
      */
-    virtual bool Seek(uint32 position);
+    virtual bool 		Seek(uint32 position);
     
     /**
      * position is set relative to current position
      */
-    virtual bool RelativeSeek(int32 delta);
-   
+    virtual bool 		RelativeSeek(int32 delta);
+    
+    /**
+     * forces the used size of the buffer  
+     */
+    virtual bool 		SetSize(uint32 size);
+    
 public:
     
     ///

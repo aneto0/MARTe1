@@ -6,12 +6,12 @@
 */
 bool BufferedStreamIOBuffer::Resync(TimeoutType         msecTimeout){
 	// empty!
-    if (maxAmount == 0) {
+    if (MaxUsableAmount() == 0) {
     	return true;
     }
     
     // distance to end 
-    uint32 deltaToEnd =  amountLeft - fillLeft;
+    uint32 deltaToEnd =  AmountLeft() - fillLeft;
     
     // adjust seek position
     // in read mode the actual stream 
@@ -34,17 +34,20 @@ bool BufferedStreamIOBuffer::Refill(TimeoutType         msecTimeout){
 	if (BufferReference() == NULL) {
 		return false;
 	}
-	
+
+	Empty();
     // load next batch of data
-    bufferPtr = BufferReference();    	
+//    bufferPtr = BufferReference();    	
     	
 
-    maxAmount  = BufferSize();
-	amountLeft = maxAmount;
+//    MaxUsableAmount()  = BufferSize();
+//	AmountLeft() = MaxUsableAmount();
+	
 	// just use this as a temp variable
-    fillLeft   = maxAmount; 
+//    fillLeft   = MaxUsableAmount();
+	
     if (stream->Read(BufferReference(),fillLeft)){
-    	fillLeft   = maxAmount - fillLeft; 
+    	fillLeft   = MaxUsableAmount() - fillLeft; 
     	return true;
     }  
 
@@ -62,16 +65,16 @@ bool BufferedStreamIOBuffer::Flush(TimeoutType         msecTimeout  ){
 	if (Buffer()== NULL) return true;
 	
 	// how much was written?
-    uint32 writeSize = maxAmount - fillLeft;
+    uint32 writeSize = MaxUsableAmount() - fillLeft;
     
     // write
     if (!stream->Write(Buffer(),writeSize,msecTimeout,true)) {
     	return False;
     }
 
-    bufferPtr=BufferReference(); 
+//    bufferPtr=BufferReference(); 
 
-    maxAmount = BufferSize();
+//    MaxUsableAmount() = BufferSize();
     Empty();
     return True;  
 }

@@ -67,6 +67,17 @@ bool IOBuffer::RelativeSeek(int32 delta){
 	return ret;
 }    
 
+bool IOBuffer::SetSize(uint32 size){
+	if (size > maxUsableAmount){
+		size = maxUsableAmount;
+	}
+	
+	fillLeft = maxUsableAmount - size;
+	
+	return true;
+}
+
+
 IOBuffer::~IOBuffer(){
 }
 
@@ -135,8 +146,6 @@ bool IOBuffer::SetBufferReadOnlyReferencedMemory(
     Empty();
     return true;    	
 }
-
-
 
 /** copies buffer of size size at the end of writeBuffer
  * before calling check that bufferPtr is not NULL
