@@ -131,7 +131,7 @@ public:
         for the buffer size. round up the others
     */
     virtual bool SetBufferHeapMemory(
-    		uint32 			desiredSize,
+            uint32 			desiredSize,
             uint32 			allocationGranularityMask 		= 0xFFFFFFFF,
             uint32          reservedSpaceAtEnd              = 0
     );    
@@ -139,8 +139,8 @@ public:
      * wipes all content and replaces the used buffer
     */
     virtual bool SetBufferReferencedMemory(
-    		char *			buffer, 
-    		uint32 			bufferSize,
+    	    char *			buffer, 
+    	    uint32 			bufferSize,
             uint32          reservedSpaceAtEnd              = 0
     );
     
