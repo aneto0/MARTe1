@@ -13,7 +13,8 @@ bool  StreamStringIOBuffer::SetBufferAllocationSize(
 		uint32 			desiredSize,
 		uint32 			allocationGranularityMask){
 	
-    bool ret = SetBufferHeapMemory(desiredSize,allocationGranularityMask,1);
+    //add one to desired size for the terminator character.
+    bool ret = SetBufferHeapMemory(desiredSize+1,allocationGranularityMask,1);
     Terminate();
     return ret;
     

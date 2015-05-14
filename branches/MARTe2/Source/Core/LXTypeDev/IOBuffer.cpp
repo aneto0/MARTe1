@@ -35,7 +35,7 @@
  * position is set relative to start of buffer
  */
 bool IOBuffer::Seek(uint32 position){
-    if (position >= UsedSize()) return false; 
+    if (position > UsedSize()) return false; 
     amountLeft = MaxUsableAmount() - position;
     bufferPtr = ( char *)Buffer() + position;
     return true;
@@ -105,8 +105,10 @@ bool IOBuffer::SetBufferHeapMemory(
 	if (position > usedSize) position = usedSize;  
 	
 	bool ret = CharBuffer::SetBufferAllocationSize(desiredSize,allocationGranularityMask);
-    bufferPtr 		= ( char *)Buffer();
-    maxUsableAmount = BufferSize();
+
+	bufferPtr = ( char *)Buffer();
+
+   	 maxUsableAmount = BufferSize();
 	if (maxUsableAmount <= reservedSpaceAtEnd){
 		maxUsableAmount = 0;
 	} else {
@@ -114,6 +116,8 @@ bool IOBuffer::SetBufferHeapMemory(
 	}
 	amountLeft = maxUsableAmount - position;
 	fillLeft   = maxUsableAmount - usedSize;
+
+	bufferPtr += position;
     return ret;
 }       
 

@@ -28,7 +28,8 @@ OBJSX= IntegerToStreamTest.x \
 	FloatToStreamTest.x \
 	BitSetToIntegerTest.x \
 	DoubleIntegerTest.x \
-	StreamableTest.x           	
+	StreamableTest.x \
+	StreamStringTest.x           	
 		
 PACKAGE=Core
 ROOT_DIR=../../..
