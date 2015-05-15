@@ -113,6 +113,11 @@ public:
  	 * For an use case of these functions see the derived class implementation (SimpleStreamable class in StreamTestHelper.h) 
 	 * where we have two different stream buffers. */
 	bool TestSwitch(const char* onStream1, const char* onStream2);
+
+
+	bool TestPrint();
+
+	bool TestToken();
 };
 
 #endif

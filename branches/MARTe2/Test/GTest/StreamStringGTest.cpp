@@ -58,3 +58,15 @@ TEST_F(StreamStringGTest,TestUseless) {
     StreamStringTest stringtest;
     ASSERT_TRUE(stringtest.TestUseless());
 }
+
+
+TEST_F(StreamStringGTest,TestPrint) {
+    StreamStringTest stringtest;
+    ASSERT_TRUE(stringtest.TestPrint());
+}
+
+
+TEST_F(StreamStringGTest,TestToken) {
+    StreamStringTest stringtest;
+    ASSERT_TRUE(stringtest.TestToken());
+}

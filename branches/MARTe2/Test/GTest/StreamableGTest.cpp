@@ -64,3 +64,19 @@ TEST_F(StreamableGTest,TestSwitch) {
     StreamableTest streamtest;
     ASSERT_TRUE(streamtest.TestSwitch("ThisIsTheStringToRead","ThisIsTheStringToWrite"));
 }
+
+TEST_F(StreamableGTest,TestPrint) {
+    StreamableTest streamtest;
+    ASSERT_TRUE(streamtest.TestPrint());
+}
+
+TEST_F(StreamableGTest,TestToken) {
+    StreamableTest streamtest;
+    ASSERT_TRUE(streamtest.TestToken());
+}
+
+
+
+
+
+

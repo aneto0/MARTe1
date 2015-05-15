@@ -23,20 +23,20 @@
  *
  **/
 /**
- * @class StreamStringTest.h
+ * @class StreamMemoryReferenceTest.h
  * @brief Tests the StreamString functions.
  *
- * Tests the StreamString functions and operators. */
+ * Tests the StreamMemoryReference functions and operators. */
 
 #ifndef STREAM_STRING_TEST_H
 #define STREAM_STRING_TEST_H
 
-#include "StreamString.h"
+#include "StreamMemoryReference.h"
 #include "FormatDescriptor.h"
 
 
 /** @brief Class for testing of StreamString functions. */
-class StreamStringTest {
+class StreamMemoryReferenceTest {
 
 private:
 
@@ -48,7 +48,7 @@ public:
          * @return true if the read string is equal to the parameter.
          *
          * The inputString is copied on the streamString and then read using GetC.*/ 
-	bool TestGetC(const char* inputString);
+	bool TestGetC();
 
 	/** 
          * @brief Test the streamString PutC function.
@@ -56,19 +56,19 @@ public:
          * @return true if on the stream is copied the parameter.
          *
          * The inputString is written on the stream using the PutC function. */
-	bool TestPutC(const char* inputString);
+	bool TestPutC();
 
 	/**
 	 * @brief Tests the streamString read function.
 	 * @param inputString is the string on the streamString.
  	 * @return true if the read string is equal to inputString using Read function. */ 
-	bool TestRead(const char* inputString);
+	bool TestRead();
 
 	/**
 	 * @brief Tests the streamString write function.
 	 * @param inputString is the string to write on the streamString.
  	 * @return true if the string written on the streamString using Write function is equal to inputString.*/
-	bool TestWrite(const char* inputString);
+//	bool TestWrite(const char* inputString);
 
 	/**
  	 * @brief Tests the streamString Seek and RelativeSeek.
@@ -77,7 +77,7 @@ public:
 	 * @return true if the seek operations returns the correct result. 
 	 *
 	 * Test the seek functions in different conditions, for example using a positions which falls out of bounds. */	 
-	bool TestSeek(const char* inputString);
+//	bool TestSeek(const char* inputString);
 
 	/** 
 	 * @brief Tests the streamString operators. 
@@ -86,16 +86,16 @@ public:
  	 * @return true if tests goes fine.
          *
  	 * Using the string parameters the streamString operators are tested. */
-	bool TestOperators(const char* firstString, const char* secondString);
+//	bool TestOperators(const char* firstString, const char* secondString);
 
 	/** 
          * @brief Tests the return of unused functions (implemented because pure virtual otherwise).
          * @return true if all functions returns as expected. */
-	bool TestUseless();
+//	bool TestUseless();
 
-	bool TestPrint();
+//	bool TestPrint();
 	
-	bool TestToken();
+//	bool TestToken();
 
 };
 

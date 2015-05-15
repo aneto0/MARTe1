@@ -24,9 +24,9 @@
 
 #include "GeneralDefinitions.h"
 #include "StreamableTest.h"
-#include "StringTestHelper.h"
 #include "StreamTestHelper.h"
 #include "StringHelper.h"
+#include "DoubleInteger.h"
 #include "stdio.h"
 
 
@@ -561,13 +561,260 @@ bool StreamableTest::TestSwitch(const char* onStream1, const char* onStream2){
 
 
 
+bool StreamableTest::TestPrint(){
 
+	//Create a read&write streamable.
+	SimpleStreamable myStream;
+	myStream.doubleBuffer=True;
+
+	uint32 buffSize=1;
+	
+	if(!myStream.SetBuffered(buffSize)){
+		return False;
+	}
+
+	uint8 ubit8=1;
+	uint16 ubit16=2;
+	uint32 ubit32=3;
+	uint64 ubit64=4;
+	DoubleInteger<uint64> ubit128Tmp=5;	
+	AnyType ubit128;
+	ubit128.dataPointer=&ubit128Tmp;
+	ubit128.dataDescriptor={False,False,{{TypeDescriptor::UnsignedInteger, 128}}};
+	ubit128.bitAddress=0;
+
+
+	int8 sbit8=-1;
+ 	int16 sbit16=-2;
+	int32 sbit32=-3;
+	int64 sbit64=-4;
+
+
+	DoubleInteger<int64> sbit128Tmp=-5;
+	AnyType sbit128;
+	sbit128.dataPointer=&sbit128Tmp;
+	sbit128.dataDescriptor={False,False,{{TypeDescriptor::SignedInteger, 128}}};
+	sbit128.bitAddress=0;
+	float fbit32=1.2;
+	double dbit64=3.4;
+	__float128 fbit128Tmp=5.6Q;
+	AnyType fbit128;
+	fbit128.dataPointer=&fbit128Tmp;
+	fbit128.dataDescriptor={False,False,{{TypeDescriptor::Float, 128}}};
+	fbit128.bitAddress=0;
+
+
+
+
+
+
+	//Use the unbuffered PutC, 4 parameters.	
+	//For integer the letter is useless
+	myStream.Printf("% 3u % 3f % 3d % 3x\n", sbit8, fbit32, sbit16, sbit8);
+
+
+	printf("\n%s\n", myStream.buffer);
+
+	//Use the unbuffered PutC, 4 parameters.	
+	//For integer the letter is useless
+	myStream.Printf("% 3u % 3f % 3d % 3x\n", ubit64, fbit32, ubit16, sbit8);
+
+	printf("\n%s\n", myStream.buffer);
+	//Use the unbuffered PutC, 3 parameters.
+	myStream.Printf("% 3u % 3c % 3d\n", sbit64, ubit32, fbit32);
+	printf("\n%s\n", myStream.buffer);
+
+	//Use the unbuffered PutC, 3 parameters.
+	myStream.Printf("% 3u % 3c % 3d\n", sbit128, ubit128, fbit32);
+	printf("\n%s\n", myStream.buffer);
+
+	//Use the unbuffered PutC, 2 parameters.
+	myStream.Printf("% 3c % 3F\n", ubit8, dbit64);
+	printf("\n%s\n", myStream.buffer);
+	//Use the unbuffered PutC, 2 parameters.
+	myStream.Printf("% 3c % 3F\n", ubit8, dbit64);
+	printf("\n%s\n", myStream.buffer);
+
+
+	//Use the unbuffered PutC, 1 parameter.
+	myStream.Printf("% 3o\n", sbit32);
+	printf("\n%s\n", myStream.buffer);
+
+	myStream.FlushAndResync();
+
+	if(StringHelper::Compare(" -1 1.2  -2  FF\n  4 1.2   2  FF\n -4   3 1.2\n  0   5 1.2\n  1 3.4\n  1 3.4\n  ?\n", myStream.buffer)!=0){
+		return False;
+	}
+	//Unsupported 128 float numbers
+	if(myStream.Printf("%f", fbit128)){
+		return False;
+	}
+
+	//structured data anytype
+	sbit128.dataDescriptor.isStructuredData=true;
+	if(myStream.Printf("% 3d", sbit128)){
+		return False;
+	}
+	
+	myStream.Clear();
+	//wrong type in the format
+	if(myStream.Printf("%3l",fbit32)){
+		return False;
+	}
+	
+	return True;
+}		
+
+
+
+	
+bool StreamableTest::TestToken(){
+
+	const char* inputString="Nome::: Giuseppe. Cognome: Ferrò:)";
+	uint32 size=StringHelper::Length(inputString);
+	SimpleStreamable myStream;
+	myStream.doubleBuffer=True;
+	
+	uint32 buffSize=1;
+	if(!myStream.SetBuffered(buffSize)){
+		return False;
+	}
+
+
+	StringHelper::Copy(myStream.buffer,inputString);
+	char buffer[32];
+	char saveTerminator;
+
+
+    //TESTS ON TOKEN FUNCTIONS BETWEEN A STREAM AND A STRING
+    myStream.GetToken(buffer, ".:", size, &saveTerminator, NULL);
+    if (StringHelper::Compare(buffer, "Nome")!=0 || saveTerminator != ':') {
+        return False;
+    }
+
+    //Without skip chars, the function skips consecutive terminators.
+    myStream.GetToken(buffer, ".:", size, &saveTerminator, NULL);
+    if (StringHelper::Compare(buffer, " Giuseppe")!=0
+            || saveTerminator != '.') {
+        return False;
+    }
+
+    //return before the :::
+    myStream.Seek(4);
+    
+    //The function skips correctly the second ":"
+    myStream.GetToken(buffer, ".:", size, &saveTerminator, ":");
+    if (StringHelper::Compare( buffer, " Giuseppe")!=0
+            || saveTerminator != '.') {
+        return False;
+    }
+
+    //The function does not skips because the terminator character is not correct
+    myStream.Seek(4);
+
+    myStream.GetToken(buffer, ".:", size, &saveTerminator, ".");
+    if (StringHelper::Compare(buffer, "")!=0 || saveTerminator != ':') {
+        return False;
+    }
+
+    //Test with a minor maximum size passed by argument. The terminated char is calculated in the size
+    myStream.Seek(4);  
+
+    size = 4;
+    myStream.GetToken(buffer, ".:", size, &saveTerminator, ":");
+    if (StringHelper::Compare( buffer,  " Gi")!=0 || saveTerminator != 'i') {
+        return False;
+    }
+    size = StringHelper::Length(inputString);
+
+	
+
+    //Arrive to the next terminator
+    myStream.GetToken(buffer, ".:", size, &saveTerminator, ":");
+
+
+    //Test if the functions terminate when the string is terminated
+    for (uint32 i = 0; i < 3; i++) {
+        myStream.GetToken(buffer, ".:", size, &saveTerminator, ":");
+    }
+    if (StringHelper::Compare(buffer, ")")!=0) {
+        return False;
+    }
+
+	myStream.Seek(0);    
+
+    myStream.SkipTokens(3, ":.");
+    myStream.GetToken(buffer, ")", size, &saveTerminator, NULL);
+    if (StringHelper::Compare(buffer, " Ferrò:")!=0) {
+        return False;
+    }
+ 
+
+
+//TESTS ON TOKEN FUNCTIONS BETWEEN A STREAM AND STREAM
+
+    SimpleStreamable outputStream;
+    outputStream.doubleBuffer=True;
+
+    uint32 buffOutputSize=1;
+    if(!outputStream.SetBuffered(buffOutputSize)){
+	return False;
+    }	
+    
+
+    myStream.GetToken(outputStream, ".:", &saveTerminator, NULL);
+    outputStream.Seek(0);
+    if (StringHelper::Compare(outputStream.buffer, "Nome")!=0 || saveTerminator != ':') {
+        return False;
+    }
+    outputStream.Clear();
+
+    //Without skip chars, the function skips consecutive terminators.
+    myStream.GetToken(outputStream, ".:", &saveTerminator, NULL);
+	outputStream.Seek(0);
+    if (StringHelper::Compare(outputStream.buffer, " Giuseppe")!=0
+            || saveTerminator != '.') {
+        return False;
+    }
+	outputStream.Clear();
+    //return before the :::
+    myStream.Seek(4);
+    
+    //The function skips correctly the second ":"
+    myStream.GetToken(outputStream, ".:", &saveTerminator, ":");
+	outputStream.Seek(0);
+    if (StringHelper::Compare(outputStream.buffer, " Giuseppe")!=0
+            || saveTerminator != '.') {
+        return False;
+    }
+	outputStream.Clear();
+    //The function does not skips because the terminator character is not correct
+    myStream.Seek(4);
+
+    myStream.GetToken(outputStream, ".:", &saveTerminator, ".");
+ 	outputStream.Seek(0);
+    if (StringHelper::Compare(outputStream.buffer, "")!=0 || saveTerminator != ':') {
+        return False;
+    }
+
+
+
+    //Test if the functions terminate when the string is terminated
+    for (uint32 i = 0; i < 3; i++) {
+        myStream.GetToken(outputStream, ".:",  &saveTerminator, ":");
+    }
+
+	outputStream.Seek(0);
+    if (StringHelper::Compare(outputStream.buffer, " Giuseppe Cognome Ferrò")!=0) {
+        return False;
+    }
+
+
+    return True;
+
+
+}
 		
-
-
-
-	
-	
 		
 
 

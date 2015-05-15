@@ -23,56 +23,68 @@
  **/
 
 #include "GeneralDefinitions.h"
-#include "StreamStringTest.h"
+#include "StreamMemoryReferenceTest.h"
 #include "StringHelper.h"
 #include "StreamTestHelper.h"
 #include "DoubleInteger.h"
 #include "stdio.h"
 
-static void cleanOutputBuffer(char* buffer,int32 size){
+
+
+void cleanBuffer(char* buffer,int32 size){
 	for(int32 i=0; i<size; i++){
 		buffer[i]=0;
 	}
 }
 
 
+bool StreamMemoryReferenceTest::TestGetC(){
+	char buffer[10];
+	StreamMemoryReference mBReference(buffer, 10);
+	const char* inputString="Hello World";
+	uint32 size=StringHelper::Length(inputString);	
 
-
-bool StreamStringTest::TestGetC(const char* inputString){
-	StreamString myString;
-
-	//The buffer pointer is at the end!
-	myString=inputString;
-
-	//To read from the beginning a seek is necessary.
-	myString.Seek(0);
+	mBReference.Write(inputString,size);
+	mBReference.Seek(0);
 
 	char retC;
-	int32 i=0;
-	while(inputString[i]!=0){
-		myString.GetC(retC);
-		if(retC!=inputString[i++]){
+
+	for(int32 i=0; i<10; i++){
+		mBReference.GetC(retC);
+		if(retC!=inputString[i]){
 			return False;
 		}
+	}
+
+	//out of range, retC remains the same!
+	mBReference.GetC(retC);
+
+	if(retC!='l'){
+		return False;
 	}
 
 	return True;	
 }
 
-bool StreamStringTest::TestPutC(const char* inputString){
-	StreamString myString;
-	const char* toPut=inputString;
+bool StreamMemoryReferenceTest::TestPutC(){
 
-	//Put all inputString on the StreamString
-	while((*toPut)!=0){
-		myString.PutC(*toPut);
+	char buffer[10];	
+	StreamMemoryReference mBReference(buffer,10);
+	const char* toPut="Hello World";
+
+	//Put all inputString on the StreamMemoryReference
+	for(int32 i=0; i<10; i++){
+		mBReference.PutC(*toPut);
 		toPut++;
 	}
 
-	myString.Seek(0);
+	//Size finished	
+	mBReference.PutC(*toPut);
+
+	mBReference.Seek(0);
 
 	//Check the result.	
-	if(myString!=inputString){
+	if(StringHelper::Compare(mBReference.Buffer(),"Hello Worl")!=0){
 		return False;
 	}
 
@@ -81,65 +93,45 @@ bool StreamStringTest::TestPutC(const char* inputString){
 
 
 
-bool StreamStringTest::TestRead(const char* inputString){
-	//UnBuffered way
-	StreamString myString;
-	myString=inputString;
+bool StreamMemoryReferenceTest::TestRead(){
 
-	myString.Seek(0);
+
+	char buffer[10];
+	StreamMemoryReference mBReference(buffer,10);
+
+
+	const char* inputString="Hello World";
+
+	//Write only 7
+	uint32 tempSize=7;
+	mBReference.Write(inputString,tempSize);
 	
+	mBReference.Seek(0);
 	char outputBuffer[32];
-	cleanOutputBuffer(outputBuffer,32);
+	cleanBuffer(outputBuffer,32);
 
+	tempSize=32;
+	mBReference.Read(outputBuffer,tempSize);
 
-	//size equal to inputString length (+1 for the terminated char).	
-	uint32 size=StringHelper::Length(inputString);
-	myString.Read(outputBuffer, size);
-
-
-	//Use Buffer() for comparison.
-	if(StringHelper::Compare(myString.Buffer(), outputBuffer)){
-		printf("\n%s %s\n", outputBuffer, myString.Buffer());
-		return False;
-	}
-	
-
-	cleanOutputBuffer(outputBuffer,32);
-	//size greater than inputString length.	
-	size+=10;
-	
-
-	//return at the beginning
-	myString.Seek(0);
-	myString.Read(outputBuffer, size);
-	myString.Seek(0);
-
-	if(myString!=outputBuffer){
-		printf("\n%s %s\n", outputBuffer, myString.Buffer());
+	if(StringHelper::Compare(outputBuffer,"Hello W")!=0){
 		return False;
 	}
 
+	cleanBuffer(outputBuffer,32);
 
-	//size minor than inputString length.	
-	size=StringHelper::Length(inputString)-1;
-	if(size<=0){
-		size++;
-	}
+	//reWrite
+	tempSize=32;
+	mBReference.Seek(0);
+	mBReference.Write(inputString, tempSize);
 
-	//Create a test string clipping the string at size.
-	outputBuffer[size]=0;
-	char test[32];
-	
-	StringHelper::Copy(test, outputBuffer);	
+	//reRead
+	tempSize=32;
+	mBReference.Seek(0);
+	mBReference.Read(outputBuffer,tempSize);
 
-	//clean the output buffer.
-	cleanOutputBuffer(outputBuffer,32);
-
-	myString.Seek(0);
-	myString.Read(outputBuffer, size);
-
-	if(StringHelper::Compare(test, outputBuffer)!=0){
-		printf("\n%s %s\n", outputBuffer, test);
+	//read all.
+	mBReference.Read(outputBuffer,tempSize);
+	if(StringHelper::Compare(outputBuffer, "Hello Worl")!=0){
 		return False;
 	}
 
@@ -147,20 +139,20 @@ bool StreamStringTest::TestRead(const char* inputString){
 	return True;
 }
 
+/*
 
-
-bool StreamStringTest::TestWrite(const char* inputString){
+bool StreamMemoryReferenceTest::TestWrite(const char* inputString){
 	//UnBuffered Way
-	StreamString myString;
+	StreamMemoryReference mBReference;
 	char test[128];
 	StringHelper::Copy(test, inputString);
 
 	//size equal to the inputString length	
 	uint32 size=StringHelper::Length(inputString);	
 	
-	myString.Write(inputString, size);
+	mBReference.Write(inputString, size);
 
-	if(StringHelper::Compare(test, myString.Buffer())!=0){
+	if(StringHelper::Compare(test, mBReference.Buffer())!=0){
 		return False;
 	}
 	
@@ -171,17 +163,17 @@ bool StreamStringTest::TestWrite(const char* inputString){
 
 	//create a buffer to avoid possible segfault.
 	char inputBuffer[32];
-	cleanOutputBuffer(inputBuffer,32);
+	cleanBuffer(inputBuffer,32);
 	StringHelper::Copy(inputBuffer, inputString);
 	StringHelper::Concatenate(test, inputString);
 	printf("\n%s\n", test);
 
 
-	myString.Write(inputBuffer, size);	
+	mBReference.Write(inputBuffer, size);	
 
-	printf("\n%s\n", myString.Buffer());
+	printf("\n%s\n", mBReference.Buffer());
 
-	if(StringHelper::Compare(test, myString.Buffer())!=0){
+	if(StringHelper::Compare(test, mBReference.Buffer())!=0){
 		return False;
 	}
 
@@ -195,10 +187,10 @@ bool StreamStringTest::TestWrite(const char* inputString){
 	printf("\n%s\n", test);
 
 	//padding zeros because of the precedent operation, adjust seek.
-	myString.RelativeSeek(-3);
-	myString.Write(inputString, size);
+	mBReference.RelativeSeek(-3);
+	mBReference.Write(inputString, size);
 	
-	if(StringHelper::Compare(test, myString.Buffer())!=0){
+	if(StringHelper::Compare(test, mBReference.Buffer())!=0){
 		return False;
 	}
 
@@ -209,63 +201,63 @@ bool StreamStringTest::TestWrite(const char* inputString){
 
 
 
-bool StreamStringTest::TestSeek(const char *inputString){
-	StreamString myString;
-	myString=inputString;
+bool StreamMemoryReferenceTest::TestSeek(const char *inputString){
+	StreamMemoryReference mBReference;
+	mBReference=inputString;
 	
 	//Test position
 	uint32 size= StringHelper::Length(inputString);
-	if(myString.Position()!=size){
+	if(mBReference.Position()!=size){
 		return False;
 	}
 
 	//seek to zero
-	if(!myString.Seek(0)){
+	if(!mBReference.Seek(0)){
 		return False;
 	}
 
-	if(StringHelper::Compare(inputString, myString.Buffer())!=0){
+	if(StringHelper::Compare(inputString, mBReference.Buffer())!=0){
 		return False;
 	}
 
 	//seek greater than the dimension
-	if(myString.Seek(size+10)){
+	if(mBReference.Seek(size+10)){
 		return False;
 	}
 
-	if(myString.Position()!=size){
+	if(mBReference.Position()!=size){
 		return False;
 	}
 
 	//relative seek
-	if(!myString.RelativeSeek(-1)){
+	if(!mBReference.RelativeSeek(-1)){
 		return False;
 	}
 
 	char outputBuffer[32];
 	uint32 dummySize=1;
-	myString.Read(outputBuffer,dummySize);
+	mBReference.Read(outputBuffer,dummySize);
 
 	//read a char. It increments the position.
-	if(myString.Position()!=size || (*outputBuffer)!=inputString[size-1] ){
+	if(mBReference.Position()!=size || (*outputBuffer)!=inputString[size-1] ){
 		return False;
 	}
 
 	//position under 0
-	if(myString.RelativeSeek(-size-1)){
+	if(mBReference.RelativeSeek(-size-1)){
 		return False;
 	}
 
-	if(StringHelper::Compare(inputString, myString.Buffer())!=0){
+	if(StringHelper::Compare(inputString, mBReference.Buffer())!=0){
 		return False;
 	}
 
 	//position over the size
-	if(myString.RelativeSeek(size+10)){
+	if(mBReference.RelativeSeek(size+10)){
 		return False;
 	}
 
-	if(myString.Position()!=size){
+	if(mBReference.Position()!=size){
 		return False;
 	}
 
@@ -274,119 +266,119 @@ bool StreamStringTest::TestSeek(const char *inputString){
 
 
 
-bool StreamStringTest::TestOperators(const char* firstString, const char* secondString){
-	StreamString myString1;
-	StreamString myString2;
+bool StreamMemoryReferenceTest::TestOperators(const char* firstString, const char* secondString){
+	StreamMemoryReference mBReference1;
+	StreamMemoryReference mBReference2;
 	
 	//string parameters must be different each other
 
 
 	//Assignment operator
-	myString1=firstString;
+	mBReference1=firstString;
 
 	//return at the beginning.
-	myString1.Seek(0);
+	mBReference1.Seek(0);
 	
 	//Is different operator.
-	if(myString1!=firstString || !(myString1==firstString) || myString1==secondString){
+	if(mBReference1!=firstString || !(mBReference1==firstString) || mBReference1==secondString){
 		return False;
 	}
 
 	char* s=NULL;
 	
 	//Null assignment return false	
-	if(myString1=s){
+	if(mBReference1=s){
 		return False;
 	}
 
-	if(myString1==s){
+	if(mBReference1==s){
 		return False;
 	}
 
 	//Different sizes.
-	myString2=secondString;
-	if(myString1 == myString2){
+	mBReference2=secondString;
+	if(mBReference1 == mBReference2){
 		return False;
 	}
 
-	myString2=firstString;
-	myString1.BufferReference()[0]='a';
+	mBReference2=firstString;
+	mBReference1.BufferReference()[0]='a';
 
 	//Same sizes but different strings
-	if(myString1 == myString2){
+	if(mBReference1 == mBReference2){
 		return False;
 	}
 
 	//Another assignment
-	myString1=secondString;
+	mBReference1=secondString;
 	
-	myString1.Seek(0);	
+	mBReference1.Seek(0);	
 	//Is equal operator
-	if(myString1==firstString || myString1!=secondString){
+	if(mBReference1==firstString || mBReference1!=secondString){
 		return False;
 	}
 	
-	//Same operators between two StreamStrings
-	myString1=firstString;	
-	myString2=myString1;
+	//Same operators between two StreamMemoryReferences
+	mBReference1=firstString;	
+	mBReference2=mBReference1;
 
-	myString1.Seek(0);
-	myString1.Seek(0);
-	if(myString1!=myString2 || !(myString1==myString2)){
+	mBReference1.Seek(0);
+	mBReference1.Seek(0);
+	if(mBReference1!=mBReference2 || !(mBReference1==mBReference2)){
 		return False;
 	}
 
 	//Append operation
-	myString1=secondString;
-	myString1+=firstString;
+	mBReference1=secondString;
+	mBReference1+=firstString;
 	char test[100];
 	
 	StringHelper::Copy(test, secondString);
 	StringHelper::Concatenate(test, firstString);
 
-	myString1.Seek(0);
-	if(myString1!=test){
+	mBReference1.Seek(0);
+	if(mBReference1!=test){
 		return False;
 	}
 
-	//Append another StreamString
-	myString2=firstString;
+	//Append another StreamMemoryReference
+	mBReference2=firstString;
 	
 	//Try to make it fail with a seek.
-	myString1.Seek(0);
+	mBReference1.Seek(0);
 
-	myString1+=myString2;
+	mBReference1+=mBReference2;
 	StringHelper::Concatenate(test, firstString);
 	
-	myString1.Seek(0);
-	if(myString1!=test){
+	mBReference1.Seek(0);
+	if(mBReference1!=test){
 		return False;
 	}
 	
 	//Use char
 	char c='c';
-	myString2=c;
-	myString2+=c;
-	if(myString2!="cc"){
+	mBReference2=c;
+	mBReference2+=c;
+	if(mBReference2!="cc"){
 		return False;
 	}
 	
 	//[] operator
 
-	myString1=secondString;
-	if(secondString[1]!=myString1[1]){
+	mBReference1=secondString;
+	if(secondString[1]!=mBReference1[1]){
 		return False;
 	}
 
 	//Should return 0 if the begin is greater than size.
 	uint32 size=StringHelper::Length(secondString);
-	if(myString1[size+1]!=0){
+	if(mBReference1[size+1]!=0){
 		return False;
 	}
 
 
 	//Size function
-	if(myString1.Size()!=size){
+	if(mBReference1.Size()!=size){
 		return False;
 	}
 
@@ -397,58 +389,58 @@ bool StreamStringTest::TestOperators(const char* firstString, const char* second
 
 
 
-bool StreamStringTest::TestUseless(){
-	StreamString myString;
-	StreamStringIOBuffer myStringBuffer;
-	myString="Hello";
+bool StreamMemoryReferenceTest::TestUseless(){
+	StreamMemoryReference mBReference;
+	StreamMemoryReferenceIOBuffer mBReferenceBuffer;
+	mBReference="Hello";
 	uint32 dummy=1;
 
 	//Resync return true
-	if(!myStringBuffer.Resync()){
+	if(!mBReferenceBuffer.Resync()){
 		return False;
 	}
 
 	//Refill return true
-	if(!myStringBuffer.Refill()){
+	if(!mBReferenceBuffer.Refill()){
 		return False;
 	}
 
 	//Flush allocate again the minimum granularity defined and 
         //return true in case of success.
-	if(!myStringBuffer.Flush()){
+	if(!mBReferenceBuffer.Flush()){
 		return False;
 	}
 
-	if(myString.NOfStreams()!=0){
+	if(mBReference.NOfStreams()!=0){
 		return False;
 	}
 
-	if(myString.Switch("a") || myString.Switch(dummy)){
+	if(mBReference.Switch("a") || mBReference.Switch(dummy)){
 		return False;
 	}	
 
-	if(myString.SelectedStream()!=0){
+	if(mBReference.SelectedStream()!=0){
 		return False;
 	}
 	
-	if(myString.StreamName(dummy, NULL, 1)){
+	if(mBReference.StreamName(dummy, NULL, 1)){
 		return False;
 	}
 
-	if(myString.AddStream(NULL)){
+	if(mBReference.AddStream(NULL)){
 		return False;
 	}
 
-	if(myString.RemoveStream(NULL)){
+	if(mBReference.RemoveStream(NULL)){
 		return False;
 	}
 	
-	if(!myString.CanSeek() || !myString.CanRead() || !myString.CanWrite()){
+	if(!mBReference.CanSeek() || !mBReference.CanRead() || !mBReference.CanWrite()){
 		return False;
 	}
 
 
-	if(!myString.SetSize(dummy)){
+	if(!mBReference.SetSize(dummy)){
 		return True;
 	}
 
@@ -456,14 +448,14 @@ bool StreamStringTest::TestUseless(){
 }
 
 
-bool StreamStringTest::TestPrint(){
+bool StreamMemoryReferenceTest::TestPrint(){
 
 	//Create a read&write streamable.
-	StreamString myString;
+	StreamMemoryReference mBReference;
 
 	//make writable the string.
-	myString="a";
-	myString.Seek(0);
+	mBReference="a";
+	mBReference.Seek(0);
 
 	uint8 ubit8=1;
 	uint16 ubit16=2;
@@ -503,46 +495,46 @@ bool StreamStringTest::TestPrint(){
 
 	//Use the unbuffered PutC, 4 parameters.	
 	//For integer the letter is useless
-	myString.Printf("% 3u % 3f % 3d % 3x\n", sbit8, fbit32, sbit16, sbit8);
+	mBReference.Printf("% 3u % 3f % 3d % 3x\n", sbit8, fbit32, sbit16, sbit8);
 
 
 
 	//Use the unbuffered PutC, 4 parameters.	
 	//For integer the letter is useless
-	myString.Printf("% 3u % 3f % 3d % 3x\n", ubit64, fbit32, ubit16, sbit8);
+	mBReference.Printf("% 3u % 3f % 3d % 3x\n", ubit64, fbit32, ubit16, sbit8);
 
 	//Use the unbuffered PutC, 3 parameters.
-	myString.Printf("% 3u % 3c % 3d\n", sbit64, ubit32, fbit32);
+	mBReference.Printf("% 3u % 3c % 3d\n", sbit64, ubit32, fbit32);
 
 	//Use the unbuffered PutC, 3 parameters.
-	myString.Printf("% 3u % 3c % 3d\n", sbit128, ubit128, fbit32);
+	mBReference.Printf("% 3u % 3c % 3d\n", sbit128, ubit128, fbit32);
 
 	//Use the unbuffered PutC, 2 parameters.
-	myString.Printf("% 3c % 3F\n", ubit8, dbit64);
+	mBReference.Printf("% 3c % 3F\n", ubit8, dbit64);
 	//Use the unbuffered PutC, 2 parameters.
-	myString.Printf("% 3c % 3F\n", ubit8, dbit64);
+	mBReference.Printf("% 3c % 3F\n", ubit8, dbit64);
 
 
 	//Use the unbuffered PutC, 1 parameter.
-	myString.Printf("% 3o\n", sbit32);
-	printf("\n%s\n", myString.Buffer());
+	mBReference.Printf("% 3o\n", sbit32);
+	printf("\n%s\n", mBReference.Buffer());
 
-	if(StringHelper::Compare(" -1 1.2  -2  FF\n  4 1.2   2  FF\n -4   3 1.2\n  0   5 1.2\n  1 3.4\n  1 3.4\n  ?\n", myString.Buffer())!=0){
+	if(StringHelper::Compare(" -1 1.2  -2  FF\n  4 1.2   2  FF\n -4   3 1.2\n  0   5 1.2\n  1 3.4\n  1 3.4\n  ?\n", mBReference.Buffer())!=0){
 		return False;
 	}
 	//Unsupported 128 float numbers
-	if(myString.Printf("%f", fbit128)){
+	if(mBReference.Printf("%f", fbit128)){
 		return False;
 	}
 
 	//structured data anytype
 	sbit128.dataDescriptor.isStructuredData=true;
-	if(myString.Printf("% 3d", sbit128)){
+	if(mBReference.Printf("% 3d", sbit128)){
 		return False;
 	}
 	
 	//wrong type in the format
-	if(myString.Printf("%3l",fbit32)){
+	if(mBReference.Printf("%3l",fbit32)){
 		return False;
 	}
 	
@@ -552,57 +544,57 @@ bool StreamStringTest::TestPrint(){
 
 
 	
-bool StreamStringTest::TestToken(){
+bool StreamMemoryReferenceTest::TestToken(){
 
 	const char* inputString="Nome::: Giuseppe. Cognome: Ferrò:)";
 	uint32 size=StringHelper::Length(inputString);
 
-	StreamString myString;
-	myString=inputString;	
+	StreamMemoryReference mBReference;
+	mBReference=inputString;	
 
 
 	char buffer[32];
 	char saveTerminator;
 
 
-	myString.Seek(0);
+	mBReference.Seek(0);
 
     //TESTS ON TOKEN FUNCTIONS BETWEEN A STREAM AND A STRING
-    myString.GetToken(buffer, ".:", size, &saveTerminator, NULL);
+    mBReference.GetToken(buffer, ".:", size, &saveTerminator, NULL);
     if (StringHelper::Compare(buffer, "Nome")!=0 || saveTerminator != ':') {
         return False;
     }
 
     //Without skip chars, the function skips consecutive terminators.
-    myString.GetToken(buffer, ".:", size, &saveTerminator, NULL);
+    mBReference.GetToken(buffer, ".:", size, &saveTerminator, NULL);
     if (StringHelper::Compare(buffer, " Giuseppe")!=0
             || saveTerminator != '.') {
         return False;
     }
 
     //return before the :::
-    myString.Seek(4);
+    mBReference.Seek(4);
     
     //The function skips correctly the second ":"
-    myString.GetToken(buffer, ".:", size, &saveTerminator, ":");
+    mBReference.GetToken(buffer, ".:", size, &saveTerminator, ":");
     if (StringHelper::Compare( buffer, " Giuseppe")!=0
             || saveTerminator != '.') {
         return False;
     }
 
     //The function does not skips because the terminator character is not correct
-    myString.Seek(4);
+    mBReference.Seek(4);
 
-    myString.GetToken(buffer, ".:", size, &saveTerminator, ".");
+    mBReference.GetToken(buffer, ".:", size, &saveTerminator, ".");
     if (StringHelper::Compare(buffer, "")!=0 || saveTerminator != ':') {
         return False;
     }
 
     //Test with a minor maximum size passed by argument. The terminated char is calculated in the size
-    myString.Seek(4);  
+    mBReference.Seek(4);  
 
     size = 4;
-    myString.GetToken(buffer, ".:", size, &saveTerminator, ":");
+    mBReference.GetToken(buffer, ".:", size, &saveTerminator, ":");
     if (StringHelper::Compare( buffer,  " Gi")!=0 || saveTerminator != 'i') {
         return False;
     }
@@ -611,21 +603,21 @@ bool StreamStringTest::TestToken(){
 	
 
     //Arrive to the next terminator
-    myString.GetToken(buffer, ".:", size, &saveTerminator, ":");
+    mBReference.GetToken(buffer, ".:", size, &saveTerminator, ":");
 
 
     //Test if the functions terminate when the string is terminated
     for (uint32 i = 0; i < 3; i++) {
-        myString.GetToken(buffer, ".:", size, &saveTerminator, ":");
+        mBReference.GetToken(buffer, ".:", size, &saveTerminator, ":");
     }
     if (StringHelper::Compare(buffer, ")")!=0) {
         return False;
     }
 
-	myString.Seek(0);    
+	mBReference.Seek(0);    
 
-    myString.SkipTokens(3, ":.");
-    myString.GetToken(buffer, ")", size, &saveTerminator, NULL);
+    mBReference.SkipTokens(3, ":.");
+    mBReference.GetToken(buffer, ")", size, &saveTerminator, NULL);
     if (StringHelper::Compare(buffer, " Ferrò:")!=0) {
         return False;
     }
@@ -634,7 +626,7 @@ bool StreamStringTest::TestToken(){
 
 //TESTS ON TOKEN FUNCTIONS BETWEEN A STRING AND STREAM
 
-	myString.Seek(0);
+	mBReference.Seek(0);
 
     SimpleStreamable outputStream;
     outputStream.doubleBuffer=True;
@@ -645,7 +637,7 @@ bool StreamStringTest::TestToken(){
     }	
     
 
-    myString.GetToken(outputStream, ".:", &saveTerminator, NULL);
+    mBReference.GetToken(outputStream, ".:", &saveTerminator, NULL);
     outputStream.Seek(0);
     if (StringHelper::Compare(outputStream.buffer, "Nome")!=0 || saveTerminator != ':') {
         return False;
@@ -653,7 +645,7 @@ bool StreamStringTest::TestToken(){
     outputStream.Clear();
 
     //Without skip chars, the function skips consecutive terminators.
-    myString.GetToken(outputStream, ".:", &saveTerminator, NULL);
+    mBReference.GetToken(outputStream, ".:", &saveTerminator, NULL);
 	outputStream.Seek(0);
     if (StringHelper::Compare(outputStream.buffer, " Giuseppe")!=0
             || saveTerminator != '.') {
@@ -661,10 +653,10 @@ bool StreamStringTest::TestToken(){
     }
 	outputStream.Clear();
     //return before the :::
-    myString.Seek(4);
+    mBReference.Seek(4);
     
     //The function skips correctly the second ":"
-    myString.GetToken(outputStream, ".:", &saveTerminator, ":");
+    mBReference.GetToken(outputStream, ".:", &saveTerminator, ":");
 	outputStream.Seek(0);
     if (StringHelper::Compare(outputStream.buffer, " Giuseppe")!=0
             || saveTerminator != '.') {
@@ -672,9 +664,9 @@ bool StreamStringTest::TestToken(){
     }
 	outputStream.Clear();
     //The function does not skips because the terminator character is not correct
-    myString.Seek(4);
+    mBReference.Seek(4);
 
-    myString.GetToken(outputStream, ".:", &saveTerminator, ".");
+    mBReference.GetToken(outputStream, ".:", &saveTerminator, ".");
  	outputStream.Seek(0);
     if (StringHelper::Compare(outputStream.buffer, "")!=0 || saveTerminator != ':') {
         return False;
@@ -684,7 +676,7 @@ bool StreamStringTest::TestToken(){
 
     //Test if the functions terminate when the string is terminated
     for (uint32 i = 0; i < 3; i++) {
-        myString.GetToken(outputStream, ".:",  &saveTerminator, ":");
+        mBReference.GetToken(outputStream, ".:",  &saveTerminator, ":");
     }
 
 	outputStream.Seek(0);
@@ -700,4 +692,4 @@ bool StreamStringTest::TestToken(){
 
 
 
-
+*/
