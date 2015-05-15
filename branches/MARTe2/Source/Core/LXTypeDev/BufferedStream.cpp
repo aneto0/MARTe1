@@ -144,28 +144,29 @@ bool BufferedStream::SkipTokens(
 bool BufferedStream::Print(const AnyType& par,FormatDescriptor fd){
 
 	// retrieve stream mechanism
-	IOBuffer *inputBuffer = GetInputBuffer(); 
-	if (inputBuffer == NULL){
+	IOBuffer *outputBuffer = GetOutputBuffer(); 
+	if (outputBuffer == NULL){
 		char stackBuffer[64];		
-		BufferedStreamIOBuffer inputBuffer (this,stackBuffer,sizeof (stackBuffer));
+		BufferedStreamIOBuffer outputBuffer (this,stackBuffer,sizeof (stackBuffer));
 
-		return PrintToStream(inputBuffer,par,fd);
+		return PrintToStream(outputBuffer,par,fd);
 	}
 		
-	return PrintToStream(*inputBuffer,par,fd);
+	return PrintToStream(*outputBuffer,par,fd);
 }
 
 bool BufferedStream::PrintFormatted(const char *format, const AnyType pars[]){
 
 	// retrieve stream mechanism
-	IOBuffer *inputBuffer = GetInputBuffer(); 
-	if (inputBuffer == NULL){
+	// the output buffer is flushed in streamable.
+	IOBuffer *outputBuffer = GetOutputBuffer(); 
+	if (outputBuffer == NULL){
 		char stackBuffer[64];
-		BufferedStreamIOBuffer inputBuffer (this,stackBuffer,sizeof (stackBuffer));
+		BufferedStreamIOBuffer outputBuffer (this,stackBuffer,sizeof (stackBuffer));
 		
-		return PrintFormattedToStream(inputBuffer,format,pars);
+		return PrintFormattedToStream(outputBuffer,format,pars);
 	}
-	return PrintFormattedToStream(*inputBuffer,format,pars);
+	return PrintFormattedToStream(*outputBuffer,format,pars);
 }
 
 
