@@ -151,6 +151,36 @@ bool IOBuffer::SetBufferReadOnlyReferencedMemory(
     return true;    	
 }
 
+bool IOBuffer::NoMoreSpaceToWrite(
+            uint32              neededSize,
+            TimeoutType         msecTimeout){ 
+	return false; 
+}
+
+/** 
+ * deals with the case when we do not have any more data to read 
+ * it might reset accessPosition and fill the buffer with more data
+ * or it might fail
+ * READ OPERATIONS 
+ * */
+bool IOBuffer::NoMoreDataToRead(TimeoutType         msecTimeout){ 
+	return false; 
+}
+
+/**
+    sets amountLeft to 0
+    adjust the seek position of the stream to reflect the bytes read from the buffer
+ * READ OPERATIONS 
+*/
+bool IOBuffer::Resync(TimeoutType         msecTimeout){ 
+	return false; 
+}   
+
+void IOBuffer::Terminate(){
+	
+}
+
+
 /** copies buffer of size size at the end of writeBuffer
  * before calling check that bufferPtr is not NULL
  * can be overridden to allow resizeable buffers

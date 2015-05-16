@@ -26,7 +26,7 @@
 
 OBJSX=CharBuffer.x FormatDescriptor.x ErrorManagement.x IOBuffer.x \
 BufferedStream.x BufferedStreamIOBuffer.x \
-StreamableIOBuffer.x Streamable.x StreamStringIOBuffer.x  StreamString.x \
+StreamWrapperIOBuffer.x Streamable.x StreamStringIOBuffer.x  StreamString.x \
 StreamMemoryReference.x MemoryReferenceIOBuffer.x
 MAKEDEFAULTDIR=../../../MakeDefaults
 

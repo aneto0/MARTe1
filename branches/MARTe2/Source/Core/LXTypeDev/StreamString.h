@@ -164,52 +164,7 @@ public:
      * @brief Specifies if you can move the cursor.
      * @return true if you can move the cursor in the string. */
     virtual bool        CanSeek() const ;
-
-    // MULTISTREAM INTERFACE
-    
-    /**
-     * @brief Returns how many streams are available.
-     * @return the number ov avaiable streams. */
-    virtual uint32      NOfStreams();
-
-    /**
-     * @brief Select the stream to read from. Switching may reset the stream to the start.
-     * @param n is the number of the desired stream.
-     * @return false in case of errors.  */
-    virtual bool        Switch(uint32 n);
-
-    /**
-     * @brief Select the stream to read from. Switching may reset the stream to the start.
-     * @param name is the name of the desired stream.
-     * @return false in case of errors. */
-    virtual bool        Switch(const char *name);
-
-    /** 
-     * @brief Returns the number of the selected stream.
-     * @return the number of the selected stream.
-     */
-    virtual uint32      SelectedStream();
-
-    /**
-     * @brief The name of a stream.
-     * @param n is the number of the desired stream.
-     * @param name is the output buffer which will contains the stream name.
-     * @param nameSize is the size of the buffer.
-     * @return false in case of errors.
-     */
-    virtual bool        StreamName(uint32 n,char *name,int nameSize) const ;
-
-    /**
-     * @brief Add a new stream to write to.
-     * @param name is the name to be assigned to the new stream.
-     * @return false in case of errors. */
-    virtual bool        AddStream(const char *name);
-
-    /**  
-     * @brief Remove an existing stream.
-     * @param name is the name of the stream to remove. */
-    virtual bool        RemoveStream(const char *name);
-    
+   
 public: // DIRECT ACCESS FUNCTIONS
       
 
@@ -241,71 +196,36 @@ public: // DIRECT ACCESS FUNCTIONS
     	return buffer.BufferReference() + buffer.UsedSize() - ix - 1;
     }
 
-public: // DIRECT MANIPULATION FUNCTIONS
+private: // DIRECT MANIPULATION FUNCTIONS
 
     /**
      * @brief Copy a character into the StreamString buffer.
      * @param  c the character to be copied.
      * @return True if successful. False otherwise.
      */
-    bool Copy(char c, bool append=false) {
-        if (append){
-        	buffer.Seek(buffer.UsedSize());
-    	} else {
-    		buffer.Empty();
-    	} 
-    	bool ret = buffer.PutC(c);
-    	buffer.Terminate();
-    	return ret;
-    }
+    virtual bool AppendOrSet(char c, bool append=true) ;
 
     /**
      * @brief Copy a string into the StreamString buffer.
      * @param  s The pointer to the string to be copied
      * @return True if successful. False otherwise.
      */
-    bool Copy(const char *s, bool append=false) {
-        if (s == NULL){
-            return false;
-        }
-        uint32 size = StringHelper::Length(s);
-
-        if (append){
-        	buffer.Seek(buffer.UsedSize());
-    	} else {
-    		buffer.Empty();
-    	} 
-    	buffer.Write(s,size);
-    	buffer.Terminate();
-    	return true;
-    }
+    virtual bool AppendOrSet(const char *s, bool append=true) ;
 
     /**
      * @brief Copy a StreamString into a StreamString.
      * @param  s The StreamString to be copied.
      * @return True if successful. False otherwise.
      */
-    bool Copy(const StreamString &s, bool append=false) {
-        uint32 size = s.buffer.UsedSize();
-
-        if (append){
-        	buffer.Seek(buffer.UsedSize());
-    	} else {
-    		buffer.Empty();
-    	} 
-
-        buffer.Write(s.Buffer(),size);
-    	buffer.Terminate();
-    	return true;
-    }
-    
+    virtual bool AppendOrSet(const StreamString &s, bool append=true) ;
+public:    
     /**
      * @brief Sets StreamString to be a copy of the input parameter.
      * @param c The character to copy.
      * @return True if successful. False otherwise.
      */
     inline bool operator=(char c) {
-    	return Copy(c);
+    	return AppendOrSet(c,false);
     }
 
     /**
@@ -314,7 +234,7 @@ public: // DIRECT MANIPULATION FUNCTIONS
      * @return True if successful. False otherwise.
      */
     inline bool operator=(const char *s) {
-        return Copy(s);
+        return AppendOrSet(s,false);
     }
 
     /**
@@ -322,8 +242,8 @@ public: // DIRECT MANIPULATION FUNCTIONS
      * @param s The StreamString to copy.
      * @return True if successful. False otherwise.
      */
-    inline bool operator=(const StreamString &s) {
-        return Copy(s);
+    inline bool operator=(const StreamString &s) {	
+        return AppendOrSet(s,false);
     }
 
     /**
@@ -332,7 +252,7 @@ public: // DIRECT MANIPULATION FUNCTIONS
      * @return True if successful. False otherwise.
      */
     inline bool operator+=(const char c) {
-    	return Copy(c,true);
+    	return AppendOrSet(c,true);
     }
 
     /**
@@ -341,7 +261,7 @@ public: // DIRECT MANIPULATION FUNCTIONS
      * @return True if successful. False otherwise.
      */
     inline bool operator+=(const char *s) {
-    	return Copy(s,true);
+    	return AppendOrSet(s,true);
     }
 
     /**
@@ -350,7 +270,7 @@ public: // DIRECT MANIPULATION FUNCTIONS
      * @return True if successful. False otherwise.
      */
     inline bool operator+=(StreamString &s) {
-    	return Copy(s,true);
+    	return AppendOrSet(s,true);
     }
 
     /**
@@ -383,10 +303,12 @@ public: // DIRECT MANIPULATION FUNCTIONS
         return true;
     }
 
+    ///
     inline bool operator!=(StreamString &s) const {
         return !((*this) == s);
     }
 
+    ///
     inline bool operator!=(const char *s) const {
         return !((*this) == s);
     }
@@ -402,31 +324,18 @@ public: // DIRECT MANIPULATION FUNCTIONS
         }
         return buffer.BufferReference()[pos];
     }
-#if 0
+    
     /** Checks if a char is in the string
      @param c The character to look for.
-     @return True if found. False otherwise.
+     @return >0 the first position if found. -1 otherwise.
      */
-    inline bool In(char c) const {
-        for (uint32 i = 0; i < size; i++)
-            if (buffer[i] == c)
-                return True;
-        return False;
-    }
+    virtual int32 Locate(char c) const ;
 
     /** Checks if a string is contained in the string.
      @param x The string to look for.
-     @return True if the string is found. False otherwise.
+     @return >0 the first position if found. -1 otherwise.
      */
-    inline bool In(StreamString &x) const {
-        if (x.UsedSize() == 0)
-            return False;
-        for (uint32 i = 0; i < (size - x.UsedSize() + 1); i++)
-            if (memcmp(&buffer[i], x.Buffer(), x.UsedSize()) == 0)
-                return True;
-        return False;
-    }
-#endif
+    virtual int32 Locate(const StreamString &x) const ;
 };
 
 #endif

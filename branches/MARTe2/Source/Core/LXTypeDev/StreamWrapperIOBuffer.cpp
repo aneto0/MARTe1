@@ -1,16 +1,13 @@
-#include "Streamable.h"
-#include "StreamableIOBuffer.h"
-
-
+#include "StreamWrapperIOBuffer.h"
 
 /**
     sets the readBufferFillAmount to 0
     adjust the seek position
 */
-bool StreamableIOBuffer::Resync(TimeoutType         msecTimeout){
+bool StreamWrapperIOBuffer::Resync(TimeoutType         msecTimeout){
 	// empty!
     if (MaxUsableAmount() == 0) {
-    	return true; 
+    	return true;
     }
     
     // distance to end 
@@ -19,7 +16,7 @@ bool StreamableIOBuffer::Resync(TimeoutType         msecTimeout){
     // adjust seek position
     // in read mode the actual stream 
     // position is to the character after the buffer end
-    if (!stream->UnBufferedSeek (stream->UnBufferedPosition()-deltaToEnd)) {
+    if (!stream->Seek (stream->Position()-deltaToEnd)) {
         Empty();
     	return false;
     }
@@ -33,24 +30,23 @@ bool StreamableIOBuffer::Resync(TimeoutType         msecTimeout){
     refill readBuffer
     assumes that the read position is now at the end of buffer
 */
-bool StreamableIOBuffer::Refill(TimeoutType         msecTimeout){
+bool StreamWrapperIOBuffer::NoMoreDataToRead(TimeoutType         msecTimeout){
 	// can we write on it?
-    if (BufferReference() == NULL) {
-        return false;
-    }
-	
-    // move all pointers and indexes to empty status
-    Empty();
+	if (BufferReference() == NULL) {
+		return false;
+	}
+
+	Empty();
 
     uint32 readSize = MaxUsableAmount();
- 
-    if (stream->UnBufferedRead(BufferReference(),readSize)){
+	
+    if (stream->Read(BufferReference(),readSize)){
     	SetUsedSize(readSize);
     	return true;
     }  
 
     Empty();
-    return false;
+	return false;
     	
 }
 
@@ -58,19 +54,22 @@ bool StreamableIOBuffer::Refill(TimeoutType         msecTimeout){
     empty writeBuffer
     only called internally when no more space available 
 */
-bool StreamableIOBuffer::Flush(TimeoutType         msecTimeout  ){
-    // no buffering!
-    if (Buffer()== NULL) return true;
+bool StreamWrapperIOBuffer::NoMoreSpaceToWrite(
+    		uint32 		    neededSize   ,
+    		TimeoutType         msecTimeout  ){
+	// no buffering!
+	if (Buffer()== NULL) return true;
 	
-    // how much was written?
+	// how much was written?
     uint32 writeSize = UsedSize();
     
     // write
-    if (!stream->UnBufferedWrite(Buffer(),writeSize,msecTimeout,true)) {
+    if (!stream->Write(Buffer(),writeSize,msecTimeout,true)) {
     	return False;
     }
 
     Empty();
     return True;  
 }
+
 

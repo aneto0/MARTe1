@@ -37,8 +37,8 @@
 
 /** A more abstract version of Streamable. It is used to allow referring to streams at lower levels */
 class StreamInterface{
-friend class BufferedStream;
-protected:
+//friend class Streamable;
+public:
 // BUFFERED STREAMING 
     /// 
     virtual IOBuffer *GetInputBuffer() = 0;
@@ -60,6 +60,11 @@ public:
         actual read size is returned in size. (unless complete = True)
         msecTimeout is how much the operation should last - no more - if not any (all) data read then return false  
         timeout behaviour depends on class characteristics and sync mode.
+        return false implies failure to comply with minimum requirements:
+        timeout and complete and data read  != size
+        timeout and data read == 0
+        error in the stream  ==> no point to try again      
+        parameters error, for instance buffer = NULL 
     */
     virtual bool        Read(
                             char*               buffer,
@@ -73,6 +78,11 @@ public:
         actual written size is returned in size. 
         msecTimeout is how much the operation should last.
         timeout behaviour depends on class characteristics and sync mode. 
+        return false implies failure to comply with minimum requirements:
+        timeout and complete and data written  != size
+        timeout and data written == 0
+        error in the stream ==> no point to try again       
+        parameters error, for instance buffer = NULL 
     */
     virtual bool        Write(
                             const char*         buffer,
@@ -85,8 +95,7 @@ public:
 
     /** whether it can be  read */
     virtual bool        CanRead()const =0;
-    
-    
+        
     /// simply write to buffer if space exist and if operatingModes allows
     inline bool         PutC(char c){
     	uint32 size = 1;
@@ -122,7 +131,7 @@ public:
     // RANDOM ACCESS INTERFACE
 
     /** The size of the stream */
-    virtual int64       Size()  = 0;
+    virtual int64       Size() = 0;
 
     /** Moves within the file to an absolute location */
     virtual bool        Seek(int64 pos) = 0;
@@ -242,31 +251,41 @@ public:
 
     /** 
     */
-    inline bool Printf(const char *format, const AnyType& par1){
+    inline bool 		Printf(const char *format, const AnyType& par1){
     	AnyType pars[2] = { par1,voidAnyType};
     	return PrintFormatted(format, pars);
     }
     
     /** 
     */
-    inline bool Printf(const char *format, const AnyType& par1, const AnyType& par2){
+    inline bool 		Printf(const char *format, const AnyType& par1, const AnyType& par2){
     	AnyType pars[3] = { par1,par2,voidAnyType}; 
     	return PrintFormatted(format, pars);
     }
 
     /** 
     */
-    inline bool Printf(const char *format, const AnyType& par1, const AnyType& par2, const AnyType& par3){
+    inline bool 		Printf(const char *format, const AnyType& par1, const AnyType& par2, const AnyType& par3){
     	AnyType pars[4] = { par1,par2,par3,voidAnyType}; 
     	return PrintFormatted(format, pars);
     }
 
     /** 
     */
-    inline bool Printf(const char *format, const AnyType& par1, const AnyType& par2, const AnyType& par3, const AnyType& par4){
+    inline bool 		Printf(const char *format, const AnyType& par1, const AnyType& par2, const AnyType& par3, const AnyType& par4){
     	AnyType pars[5] = { par1,par2,par3,par4,voidAnyType}; 
     	return PrintFormatted(format, pars);
     }
+    
+    /**
+     * copies a const char* into this stream from current position
+    */
+    virtual bool 		Copy(const char *buffer) = 0;
+
+    /**
+     * copies from stream current Position to end
+    */
+    virtual bool 		Copy(StreamInterface &stream) = 0; 
     
 };
 

@@ -123,25 +123,5 @@ bool StreamMemoryReference::CanSeek() const {
 	return true; 
 };
 
-/** how many streams are available */
-uint32 StreamMemoryReference::NOfStreams() { return 0; }
-
-/** select the stream to read from. Switching may reset the stream to the start. */
-bool StreamMemoryReference::Switch(uint32 n){ return false; }
-
-/** select the stream to read from. Switching may reset the stream to the start. */
-bool StreamMemoryReference::Switch(const char *name){ return false; }
-
-/** how many streams are available */
-uint32 StreamMemoryReference::SelectedStream(){ return 0; }
-
-/** the name of the stream we are using */
-bool StreamMemoryReference::StreamName(uint32 n,char *name,int nameSize)const { return false; }
-
-/**  add a new stream to write to. */
-bool StreamMemoryReference::AddStream(const char *name){ return false; }
-
-/**  remove an existing stream . */
-bool StreamMemoryReference::RemoveStream(const char *name){ return false; }
 
 

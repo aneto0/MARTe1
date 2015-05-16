@@ -109,7 +109,7 @@ public:
     virtual bool        CanRead() const ;
     
     /** The size of the stream */
-    virtual int64       Size() ;
+    virtual int64       Size();
 
     /** Moves within the file to an absolute location */
     virtual bool        Seek(int64 pos);
@@ -129,29 +129,6 @@ public:
     /** can you move the pointer */
     virtual bool        CanSeek() const ;
 
-    // MULTISTREAM INTERFACE
-    
-    /** how many streams are available */
-    virtual uint32      NOfStreams();
-
-    /** select the stream to read from. Switching may reset the stream to the start. */
-    virtual bool        Switch(uint32 n);
-
-    /** select the stream to read from. Switching may reset the stream to the start. */
-    virtual bool        Switch(const char *name);
-
-    /** how many streams are available */
-    virtual uint32      SelectedStream();
-
-    /** the name of the stream we are using */
-    virtual bool        StreamName(uint32 n,char *name,int nameSize) const ;
-
-    /**  add a new stream to write to. */
-    virtual bool        AddStream(const char *name);
-
-    /**  remove an existing stream . */
-    virtual bool        RemoveStream(const char *name);
-    
 public: // DIRECT ACCESS FUNCTIONS
       
 

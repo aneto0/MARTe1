@@ -25,6 +25,9 @@
 
 #include "StreamString.h"
 #include "ErrorManagement.h"
+#include "StreamHelper.h"
+#include "StreamWrapperIOBuffer.h"
+
 
 /** Destructor */
 StreamString::~StreamString() {
@@ -128,25 +131,93 @@ bool StreamString::CanSeek() const {
 };
 
 
-/** how many streams are available */
-uint32 StreamString::NOfStreams() { return 0; }
+/**
+ * @brief Copy a character into the StreamString buffer.
+ * @param  c the character to be copied.
+ * @return True if successful. False otherwise.
+ */
+bool StreamString::AppendOrSet(char c, bool append) {
+    if (append){
+    	buffer.Seek(buffer.UsedSize());
+	} else {
+		buffer.Empty();
+	}
+	bool ret = buffer.PutC(c);
+	buffer.Terminate();
+	return ret;
+}
 
-/** select the stream to read from. Switching may reset the stream to the start. */
-bool StreamString::Switch(uint32 n){ return false; }
+/**
+ * @brief Copy a string into the StreamString buffer.
+ * @param  s The pointer to the string to be copied
+ * @return True if successful. False otherwise.
+ */
+bool StreamString::AppendOrSet(const char *s, bool append) {
+    if (s == NULL){
+        return false;
+    }
+    uint32 size = StringHelper::Length(s);
 
-/** select the stream to read from. Switching may reset the stream to the start. */
-bool StreamString::Switch(const char *name){ return false; }
+    if (append){
+    	buffer.Seek(buffer.UsedSize());
+	} else {
+		buffer.Empty();
+	} 
+	buffer.Write(s,size);
+	buffer.Terminate();
+	return true;
+}
 
-/** how many streams are available */
-uint32 StreamString::SelectedStream(){ return 0; }
+/**
+ * @brief Copy a StreamString into a StreamString.
+ * @param  s The StreamString to be copied.
+ * @return True if successful. False otherwise.
+ */
+bool StreamString::AppendOrSet(const StreamString &s, bool append) {
+    uint32 size = s.buffer.UsedSize();
 
-/** the name of the stream we are using */
-bool StreamString::StreamName(uint32 n,char *name,int nameSize)const { return false; }
+    if (append){
+    	buffer.Seek(buffer.UsedSize());
+	} else {
+		buffer.Empty();
+	} 
 
-/**  add a new stream to write to. */
-bool StreamString::AddStream(const char *name){ return false; }
+    buffer.Write(s.Buffer(),size);
+	buffer.Terminate();
+	return true;
+}
 
-/**  remove an existing stream . */
-bool StreamString::RemoveStream(const char *name){ return false; }
+/** Checks if a char is in the string
+ @param c The character to look for.
+ @return >0 the first position if found. -1 otherwise.
+ */
+int32 StreamString::Locate(char c) const {
+	// Stream::Size is not const!
+    if (buffer.UsedSize() == 0){
+        return -1;
+    }
+	const char *p = StringHelper::SearchChar(Buffer(), c);
+	if (p == NULL) return -1;
+	
+	return (int32) (p -Buffer());
+}
+
+/** Checks if a string is contained in the string.
+ @param x The string to look for.
+ @return >0 the first position if found. -1 otherwise.
+ */
+int32 StreamString::Locate(const StreamString &x) const {
+    if (x.buffer.UsedSize() == 0){
+        return False;
+    }
+    if (x.buffer.UsedSize() > buffer.UsedSize()){
+        return False;
+    }
+	const char *p = StringHelper::SearchString(Buffer(), x.Buffer());
+	if (p == NULL) return -1;
+	
+	return (int32) (p -Buffer());
+}
+
 
 

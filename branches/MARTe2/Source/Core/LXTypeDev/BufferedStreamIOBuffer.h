@@ -3,47 +3,74 @@
 
 //#include "TypeConversion.h"
 #include "TimeoutType.h"
-#include "StreamInterface.h"
+#include "BufferedStream.h"
 #include "IOBuffer.h"
+/**
+ * @file BufferedStreamIOBuffer.h
+ * @brief Implementation of the IOBuffer for streamable types.
+ * 
+ * This class derives from IOBuffer and implements Refill, Resync and Flush functions specifically 
+ * for streamable types.*/ 
 
+class BufferedStream;
 
-/// Read buffer Mechanism for Streamable
+/** @brief BufferedStreamIOBuffer class. */
 class BufferedStreamIOBuffer:public IOBuffer{
 private:
-	///
-	StreamInterface *stream;
+    /** the stream related to the IOBuffer. */
+    BufferedStream *stream;
+    
        
 public: // read buffer private methods
 
-    /// allocate from dynamic memory
-    BufferedStreamIOBuffer(StreamInterface *s,uint32 size){
+    /** @brief Default constructor */
+    BufferedStreamIOBuffer(BufferedStream *s){
         stream=s;
-        SetBufferHeapMemory(size);
     }
 
-    /// allocate from any memory
-    BufferedStreamIOBuffer(StreamInterface *s,char *buffer,uint32 size){
-        stream=s;
-        SetBufferReferencedMemory(buffer,size);
+    /**  
+      * @brief Refill readBuffer assuming that the read position is now at the end of buffer.
+      * @param msecTimeout is the timeout.
+      * @return false in case of errors.
+    */
+    virtual bool 		NoMoreDataToRead( TimeoutType         msecTimeout     = TTDefault);
+    
+    /// for this type of buffer the NoMoreSpaceToWrite operates as a flush
+    inline bool Refill(TimeoutType         msecTimeout     = TTDefault){
+    	return NoMoreDataToRead(msecTimeout);
     }
     
-    /**  
-        refill readBuffer
-        assumes that the read position is now at the end of buffer
-    */
-    virtual bool 		Refill(TimeoutType      msecTimeout     = TTDefault);
+    /**
+     * @brief Flushes the buffer writing on the stream.
+     * @param msecTimeout is the timeout. 
+     * @return false in case of errors. */
+    virtual bool 		NoMoreSpaceToWrite(
+                uint32              neededSize      = 1,
+                TimeoutType         msecTimeout     = TTDefault);
     
-    ///
-    virtual bool 		Flush(TimeoutType     	msecTimeout     = TTDefault);
+    /// for this type of buffer the NoMoreSpaceToWrite operates as a flush
+    inline bool Flush(TimeoutType         msecTimeout     = TTDefault){
+    	return NoMoreSpaceToWrite(0, msecTimeout);
+    }
 
     /**
-        sets the readBufferFillAmount to 0
-        adjust the seek position
+        @brief Sets the readBufferFillAmount to 0 and adjusts the seek position.
+        @param msecTimeout is the timeout.
+        @return false in case of errors. 
     */
-    virtual bool 		Resync(TimeoutType     	msecTimeout     = TTDefault);
+    virtual bool 		Resync(TimeoutType      msecTimeout     = TTDefault);    
+    
+    /**
+        @brief Allocate or reallocate memory to the desired size.
+        @param size is the desired size for the buffer.
+        @return false in case of errors. 
+    */ 
+    bool SetBufferSize(uint32 size){
+    	return IOBuffer::SetBufferHeapMemory(size);
+    }
     
 };
 
 
 
-#endif 
+#endif
