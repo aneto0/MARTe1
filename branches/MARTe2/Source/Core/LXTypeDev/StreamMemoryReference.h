@@ -34,14 +34,14 @@
 
 #include "GeneralDefinitions.h"
 #include "MemoryReferenceIOBuffer.h"
-#include "BufferedStream.h"
+#include "Streamable.h"
 #include "TimeoutType.h"
 
 /**
     A basic implementation of a stream .
     allows reading / writing to a memory location
 */
-class StreamMemoryReference: public BufferedStream {
+class StreamMemoryReference: public Streamable {
 
 private:    
 

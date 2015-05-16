@@ -41,7 +41,7 @@ INCLUDE += -I../LXTypeDev
 
 all: $(OBJS)    \
 	        $(BUILD_DIR)/LXTypeDev$(LIBEXT)  \
-#	        $(BUILD_DIR)/TestString$(EXEEXT)  \
+	        $(BUILD_DIR)/TestString$(EXEEXT)  \
 #	        $(BUILD_DIR)/Test$(EXEEXT)  \
 #	        $(BUILD_DIR)/TestDI$(EXEEXT)  
 	echo  $(OBJS)

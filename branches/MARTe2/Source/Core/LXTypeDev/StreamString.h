@@ -52,14 +52,14 @@
 #include "Memory.h"
 #include "CharBuffer.h"
 #include "StreamStringIOBuffer.h"
-#include "BufferedStream.h"
+#include "Streamable.h"
 #include "TimeoutType.h"
 #include "StringHelper.h"
 
 
 
 /** @brief StreamString class. */
-class StreamString: public BufferedStream {
+class StreamString: public Streamable {
 
 private:    
 
