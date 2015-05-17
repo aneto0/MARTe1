@@ -35,6 +35,12 @@ int main(){
         s.Printf("The pointer to a constant char  (%p) \n",(void *)constantChar);
         s.Printf("A constant char as a pointer (%x) \n",constantChar);
 
+	StreamString ss("urca loca!");
+        s.Printf("A StreamString (%s) \n",ss);
+
+        ss.Seek(5);
+        s.Printf("A StreamInterface (%s) \n",*((Streamable *)&ss));
+
 	printf("value = %s\n",s.Buffer());
 
 

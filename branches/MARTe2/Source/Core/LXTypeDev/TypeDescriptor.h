@@ -66,6 +66,7 @@ struct TypeDescriptor {
             pointer = char ** 
             BTConvert will free and re allocate memory 
             size field is not used
+            not supported by Anytype
         */
         PCString              = 9,
 
@@ -73,20 +74,21 @@ struct TypeDescriptor {
             pointer = char[size] 
             string will be 0 terminated and (size-1) truncated
             size field is in bytes
+            not supported by Anytype
         */
         CArray                = 10,
 
-        /** BString class, 
-            pointer = BasicString *
-            it is a pointer to a single BString
+        /** StreamString class, 
+            it is a pointer to a single StreamString
             size field is not used
+            not supported by Anytype
         */
-        BasicString           = 11,
+        StreamString          = 11,
 
-        /** StreamAble class, 
+        /** StreamInterface class, 
             size field is meaningless 
      	 */
-        StreamAble            = 12
+        StreamInterface       = 12
 
     };	
 	
@@ -170,8 +172,6 @@ const TypeDescriptor SignedInteger64Bit         = { False, False, {{ TypeDescrip
 /// describes uint64
 const TypeDescriptor UnsignedInteger64Bit       = { False, False, {{ TypeDescriptor::UnsignedInteger , 64}} };
 
-/// describes const int8
-const TypeDescriptor ConstSignedInteger8Bit     = { False, True , {{ TypeDescriptor::SignedInteger , 8}} };
 
 #endif
 

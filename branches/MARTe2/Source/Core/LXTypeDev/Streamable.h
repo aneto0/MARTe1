@@ -29,6 +29,7 @@
 //#include "TypeConversion.h"
 #include "TimeoutType.h"
 #include "StreamInterface.h"
+#include "AnyType.h"
 
 /** 
  * common point of implementtion between Streamable descendent 
@@ -95,6 +96,17 @@ protected: // mode switch methods
     
     
 public:  // auxiliary functions based on buffering
+
+    /** */
+    operator AnyType(){
+    	AnyType at;
+    	at.dataPointer = (void *)this;
+    	at.bitAddress  = 0;
+    	at.dataDescriptor.type = TypeDescriptor::StreamInterface;
+    	at.dataDescriptor.isConstant = false;
+    	
+    	return at;
+    }   
     
     /** extract a token from the stream into a string data until a terminator or 0 is found.
         Skips all skip characters and those that are also terminators at the beginning

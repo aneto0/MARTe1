@@ -106,7 +106,8 @@ public:
     AnyType(const int8 &i){
 		dataPointer = (void *) &i; 
 		bitAddress  = 0;
-		dataDescriptor = ConstSignedInteger8Bit;
+		dataDescriptor = SignedInteger8Bit;
+		dataDescriptor.isConstant = true;
 	}   	
 
 	/// constructor from an integer 8 bit

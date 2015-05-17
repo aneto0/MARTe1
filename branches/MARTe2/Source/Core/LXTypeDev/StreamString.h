@@ -55,6 +55,7 @@
 #include "Streamable.h"
 #include "TimeoutType.h"
 #include "StringHelper.h"
+#include "AnyType.h"
 
 
 
@@ -76,10 +77,18 @@ protected: // methods to be implemented by deriving classes
 public: // usable constructors
 
     /** @brief Creates an empty string */
-    StreamString(){}
+    StreamString(const char *initialisationString=NULL){
+    	if (initialisationString != NULL) AppendOrSet(initialisationString,false);
+    }
     
     /** @brief Destructor */
     virtual ~StreamString() ;
+    
+    /** */
+    operator AnyType(){
+    	AnyType at(Buffer());
+    	return at;
+    }
     
 public:
     /** 
