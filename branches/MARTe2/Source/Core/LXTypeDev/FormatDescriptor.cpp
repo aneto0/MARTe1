@@ -69,7 +69,7 @@ static const FDLookup typesLookup[] = {
     { 'G', 	FormatDescriptor(0,0,False,False,Notation::CompactNotation   , Notation::DecimalNotation,False,False) },  //
     { 'a', 	FormatDescriptor(0,0,False,False,Notation::FixedPointNotation, Notation::HexNotation   ,False,False) },  //a
     { 'x', 	FormatDescriptor(0,0,False,False,Notation::FixedPointNotation, Notation::HexNotation   ,False,False) },  //x
-    { 'p', 	FormatDescriptor(0,0,False,False,Notation::FixedPointNotation, Notation::HexNotation   ,False,False) },  //p
+    { 'p', 	FormatDescriptor(0,0,False,False,Notation::FixedPointNotation, Notation::HexNotation   ,True ,True ) },  //p
     { 'o', 	FormatDescriptor(0,0,False,False,Notation::FixedPointNotation, Notation::OctalNotation ,False,False) },  //o
     { 'b', 	FormatDescriptor(0,0,False,False,Notation::FixedPointNotation, Notation::BitNotation   ,False,False) },  //b
     { 0  ,  FormatDescriptor(0)}

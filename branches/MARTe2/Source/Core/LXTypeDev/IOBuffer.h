@@ -243,7 +243,9 @@ public:
         
         // check later so that to give a chance to allocate memory
         // if that is the policy of this buffering scheme
-        if (!CanWrite()) return false;
+        if (!CanWrite()) {
+        	return false;
+        }
        
         *bufferPtr = c;
         
@@ -277,11 +279,32 @@ public:
     }
     
     /** copies buffer of size size at the end of writeBuffer
-     * before calling check that bufferPtr is not NULL
-     * can be overridden to allow resizeable buffers
+     * writes only up to size left of buffer
+     * made to be overwritten to allow resizeable buffers
+     * or to support smart schemes
 	 */ 
     virtual void 		Write(const char *buffer, uint32 &size);
 
+
+    /** copies buffer of size size at the end of writeBuffer
+     * writes the whole buffer and returns true
+     * if it cannot it returns false and the size written
+	 */ 
+    inline bool 		WriteAll(const char *buffer, uint32 &size){
+    	uint32 leftSize = size;
+    	while (leftSize > 0){
+    		uint32 toDo = leftSize;
+    		Write(buffer,toDo);
+    		if (toDo == 0) {
+    			size -= leftSize; 
+    			return false;
+    		}
+    		buffer   += toDo;
+    		leftSize -= toDo;
+    	}
+		return true;
+    }
+    
     /** 
      * reads from buffer at current position
     */ 

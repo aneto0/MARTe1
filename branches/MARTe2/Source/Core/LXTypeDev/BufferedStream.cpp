@@ -25,7 +25,6 @@
 #include "BufferedStream.h"
 #include "ErrorManagement.h"
 #include "StringHelper.h"
-#include "StreamHelper.h"
 
 /// default destructor
 BufferedStream::~BufferedStream(){

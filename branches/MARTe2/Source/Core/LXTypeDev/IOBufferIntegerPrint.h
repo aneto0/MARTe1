@@ -25,8 +25,8 @@
  * @file 
  * @brief Functions to print integer numbers on generic streams.
 */
-#if !defined INTEGER_TO_STREAM
-#define INTEGER_TO_STREAM
+#if !defined IOBUFFER_INTEGER_PRINT
+#define IOBUFFER_INTEGER_PRINT
 
 #include "GeneralDefinitions.h"
 #include "FormatDescriptor.h"
@@ -261,8 +261,8 @@ template <typename T> uint16 GetNumberOfDigitsBinaryNotation(T number){
   * NumberFillLength is used to specify how many digits to prints at least (this would include trailingzeros).
   * It will never prints more trailing zeros than the maximum size of a number of that format.
   * Streamer must have a PutC(char) method. It will be used to output the digits. */
-template <typename T, class streamer> 
-static inline void Number2StreamDecimalNotationPrivate(streamer &s, T positiveNumber,int16 numberFillLength=0){
+template <typename T> 
+static inline void Number2StreamDecimalNotationPrivate(IOBuffer &s, T positiveNumber,int16 numberFillLength=0){
 
 	// no negative!
 	if (numberFillLength < 0) numberFillLength=0;
@@ -385,9 +385,9 @@ static inline void PutS(streamer & stream,const char *s){
   * Converts any integer type, signed and unsigned to a sequence of characters inserted into the stream stream by mean of a method PutC.
   * Respects maximumSize and number integrity. 
   * If not possible (maximum size minor than the minimum space for the number print) outputs is ? */
-template <typename T, class streamer> 
+template <typename T> 
 bool IntegerToStreamDecimalNotation(
-			streamer &		stream,                        // must have a GetC(c) function where c is of a type that can be obtained from chars  
+			IOBuffer &		stream,                        // must have a GetC(c) function where c is of a type that can be obtained from chars  
 			T 				number,			
 			uint16 			maximumSize			= 0,       // 0 means that the number is printed in its entirety
 			bool 			padded				= false,   // if maximumSize!=0 & align towards the right or the left
@@ -495,9 +495,9 @@ bool IntegerToStreamDecimalNotation(
   * Uses hexadecimal notation. 
   * Respects maximumSize and number integrity. 
   * If not possible (maximum size minor than the minimum space for the number print) output is ? */
-template <typename T, class streamer> 
+template <typename T> 
 bool IntegerToStreamExadecimalNotation(
-			streamer &		stream, 
+			IOBuffer &		stream, 
 			T 				number,
 			uint16 			maximumSize			= 0,       // 0 means that the number is printed in its entirety
 			bool 			padded				= false,   // if maximumSize!=0 & align towards the right or the left
@@ -612,9 +612,9 @@ bool IntegerToStreamExadecimalNotation(
   * Uses octal notation.
   * Respects maximumSize and number integrity.
   * If not possible (maximum size minor than the minimum space for the number print) output is ?  */
-template <typename T, class streamer> 
+template <typename T> 
 bool IntegerToStreamOctalNotation(       
-	streamer &		stream, 
+	IOBuffer &		stream, 
 	T 				number,
 	uint16 			maximumSize			= 0,       // 0 means that the number is printed in its entirety
 	bool 			padded				= false,   // if maximumSize!=0 & align towards the right or the left
@@ -730,9 +730,9 @@ bool IntegerToStreamOctalNotation(
   * Uses binary notation. 
   * Respects maximumSize and number integrity. 
   * If not possible (maximum size minor than the minimum space for the number print) output is ?  */
-template <typename T, class streamer> 
+template <typename T> 
 bool IntegerToStreamBinaryNotation(
-		streamer &		stream, 
+		IOBuffer &		stream, 
 		T 				number,
 		uint16 			maximumSize			= 0,       // 0 means that the number is printed in its entirety
 		bool 			padded				= false,   // if maximumSize!=0 & align towards the right or the left
@@ -745,8 +745,7 @@ bool IntegerToStreamBinaryNotation(
 	if (maximumSize == 0){
 		maximumSize = 1000;
 		padded = false;
-	}
-		
+	}	
 	
 	// put here size of number
 	uint16 headerSize       = 0;
@@ -844,9 +843,9 @@ bool IntegerToStreamBinaryNotation(
   * Also respects all relevant format parameters.
   * Respects format.size and number integrity. 
   * If not possible output is ? */
-template <typename T, class streamer> 
+template <typename T> 
 bool IntegerToStream(
-		streamer &			stream, 
+		IOBuffer &			stream, 
 		T 					number,
 		FormatDescriptor	format,
 		uint16              actualBitSize=(sizeof(T)*8)){
@@ -883,9 +882,9 @@ bool IntegerToStream(
   * Also respects all relevant format parameters.
   * Respects format.size and number integrity.
   * If not possible output is ? */
-template < class streamer> 
+static  
 bool BitSetToStream(
-		streamer &			stream, 
+		IOBuffer &			stream, 
 		unsigned int *		numberAddress,
 		uint8               numberBitShift,
 		uint8               numberBitSize,

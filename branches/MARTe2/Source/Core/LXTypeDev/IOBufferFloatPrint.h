@@ -26,12 +26,13 @@
  * @brief Functions to print float numbers on generic streams.
 */
 
-#if !defined FLOAT_TO_STREAM
-#define FLOAT_TO_STREAM
+#if !defined IOBUFFER_FLOAT_PRINT
+#define IOBUFFER_FLOAT_PRINT
 
 #include "GeneralDefinitions.h"
-#include "IntegerToStream.h"
+#include "IOBufferIntegerPrint.h"
 #include "FormatDescriptor.h"
+#include "IOBuffer.h"
 #include <math.h>
 
 #define CHECK_AND_REDUCE(number,step,exponent)\
@@ -695,9 +696,9 @@ static inline int16 NumberOfDigitsNotation(
   *
   * Converts a couple of positiveNumber-exponent to a string using fixed format.
   * PositiveNumber is not 0 nor Nan nor Inf and is positive, precision should be strictly positive. */
-template<typename T, class streamer>
+template<typename T>
 bool FloatToFixedPrivate(
-		streamer & 		stream, 
+		IOBuffer & 		stream, 
 		T 				positiveNumber, 
 		int16 			exponent,
 		int16 			precision) {
@@ -765,8 +766,7 @@ bool FloatToFixedPrivate(
   * @param stream is the generic stream.
   * @param exponent is the exponent of the number.
   */
-template<class streamer>
-static inline void ExponentToStreamPrivate(streamer & stream, int16 exponent) {
+static inline void ExponentToStreamPrivate(IOBuffer & stream, int16 exponent) {
     // output exponent if exists
     if (exponent != 0) {
         stream.PutC('E');
@@ -791,10 +791,10 @@ static inline void ExponentToStreamPrivate(streamer & stream, int16 exponent) {
   * @param exponent is the exponent of the number.
   * @param precision is the number of the first significative digits to print.
   */
-template<typename T, class streamer>
+template<typename T>
 bool FloatToStreamPrivate(
 		Notation::Float 	notation,
-		streamer & 			stream,   
+		IOBuffer & 			stream,   
         T 					normalizedNumber,
         int16 				exponent,
         int16 				precision) {
@@ -975,9 +975,9 @@ T RoundUpNumber(T number, int16 precision) {
   * In case of incorrect characters a '!' will be printed.
   * If the number cannot fit in the desired maximum size  because the overflow '?' will be printed, '0' in case of underflow.
   * It prints NaN in case of nan (i.e 0/0) or +Inf (i.e 1/0) or -Inf (i.e -1/0). */
-template<typename T, class streamer>
+template<typename T>
 bool FloatToStream(
-		streamer & 			stream, // must have a GetC(c) function where c is of a type that can be obtained from chars  
+		IOBuffer & 			stream, // must have a GetC(c) function where c is of a type that can be obtained from chars  
         T 					number, 
         FormatDescriptor 	format) {
 
@@ -993,9 +993,6 @@ bool FloatToStream(
         maximumSize = 1000;
         format.padded = false;
     }
-
-    
-
 
     // on precision 0 the max useful precision is chosen 
     // based on the ieee float format number of significative digits

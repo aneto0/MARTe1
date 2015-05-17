@@ -25,7 +25,7 @@
 #include "Streamable.h"
 #include "ErrorManagement.h"
 #include "StringHelper.h"
-#include "StreamHelper.h"
+#include "IOBufferFunctions.h"
 #include "StreamWrapperIOBuffer.h"
 
 

@@ -121,7 +121,7 @@ public:
 		0x4ABCD has precision 5     -> (precision =8) unchanged  still precision 5  
 		1-64 
 	*/	 
-    int 			precision:8;
+    int 					precision:8;
 
     /**
 		True means produce a number of characters equal to width 
@@ -268,9 +268,16 @@ public:
 		constructor from unsigned integer
 		Just copy bit by bit
 	*/
-    FormatDescriptor(uint8 size, uint8 precision, bool padded, bool leftAligned, 
-                        Notation::Float floatNotation,Notation::Binary binaryNotation, 
-                        bool binaryPadded, bool fullNotation ){
+    FormatDescriptor(
+    		uint8 				size, 
+    		uint8 				precision, 
+    		bool 				padded, 
+    		bool 				leftAligned, 
+    		Notation::Float 	floatNotation,
+    		Notation::Binary 	binaryNotation, 
+    		bool 				binaryPadded, 
+    		bool 				fullNotation 
+){
 
 		this->size = size;
 		this->precision = precision;

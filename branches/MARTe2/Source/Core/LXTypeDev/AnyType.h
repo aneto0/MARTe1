@@ -55,9 +55,16 @@ public:
 public:
 	/// constructor from an integer 8 bit
     AnyType(void){
-		dataPointer = NULL; 
-		bitAddress  = 0;
-		dataDescriptor = VoidType;
+		dataPointer 		= NULL; 
+		bitAddress  		= 0;
+		dataDescriptor 		= VoidType;
+	}   	
+    
+    ///
+    AnyType(const AnyType &x){
+		dataPointer 		= x.dataPointer; 
+		bitAddress  		= x.bitAddress;
+		dataDescriptor 		= x.dataDescriptor;
 	}   	
     
     /// check for void type
@@ -70,7 +77,8 @@ public:
 		dataPointer = (void *) &i; 
 		bitAddress  = 0;
 		dataDescriptor = Float32Bit;
-	}   	
+	}   
+    
     /// constructor from a float
     AnyType(const float &i){
 		dataPointer = (void *) &i; 
@@ -133,20 +141,48 @@ public:
 		dataPointer = &i;
 		bitAddress  = 0;
 		dataDescriptor = UnsignedInteger32Bit;
-	}   	
+	}   
+    
 	/// constructor from an integer 8 bit
     AnyType(int32 &i){
 		dataPointer = &i;
 		bitAddress  = 0;
 		dataDescriptor = SignedInteger32Bit;
-	}   	
+	}   
+    
 	/// 
     AnyType(const int32 &i){
 		dataPointer = (void *)&i;
 		bitAddress  = 0;
 		dataDescriptor = SignedInteger32Bit;
 		dataDescriptor.isConstant = true;
-	}   	
+	}   
+    
+	/// 
+    AnyType(const void * p){
+		dataPointer = (void *)p;
+		bitAddress  = 0;
+		dataDescriptor.type = TypeDescriptor::Pointer;
+		dataDescriptor.isConstant = true;
+		dataDescriptor.size = 8 * sizeof(void *);	
+	} 
+   
+	/// 
+    AnyType(void * p){
+		dataPointer = (void *)p;
+		bitAddress  = 0;
+		dataDescriptor.type = TypeDescriptor::Pointer;
+		dataDescriptor.isConstant = false;
+		dataDescriptor.size = 8 * sizeof(void *);
+	}
+    
+	/// 
+    AnyType(const char *p){
+		dataPointer = (void *)p; // we will either print the variable or the string
+		bitAddress  = 0;
+		dataDescriptor.type = TypeDescriptor::CCString;
+		dataDescriptor.isConstant = true;
+	} 
 };
 
 // void data marker

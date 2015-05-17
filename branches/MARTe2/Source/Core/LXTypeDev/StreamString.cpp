@@ -25,7 +25,6 @@
 
 #include "StreamString.h"
 #include "ErrorManagement.h"
-#include "StreamHelper.h"
 #include "StreamWrapperIOBuffer.h"
 
 

@@ -25,14 +25,15 @@
  * @file 
  * @brief Functions to print integer numbers on generic streams.
 */
-#if !defined STREAM_HELPER
-#define STREAM_HELPER
+#if !defined IOBUFFER_FUNCTIONS
+#define IOBUFFER_FUNCTIONS
 
 #include "ErrorManagement.h"
 #include "FormatDescriptor.h"
 #include "BitSetToInteger.h"
-#include "IntegerToStream.h"
-#include "FloatToStream.h"
+#include "IOBufferIntegerPrint.h"
+#include "IOBufferFloatPrint.h"
+#include "IOBuffer.h"
 
 
 
@@ -42,9 +43,9 @@
     The terminator (just the first encountered) is consumed in the process and saved in saveTerminator if provided
     skipCharacters=NULL is equivalent to skipCharacters = terminator
     {BUFFERED}    */
-template< class streamer>
+static inline
 bool GetTokenFromStream(
-	                    streamer &          stream,
+	                    	IOBuffer &          stream,
                             char *              outputBuffer,
                             const char *        terminator,
                             uint32              outputBufferSize,
@@ -114,10 +115,10 @@ bool GetTokenFromStream(
     2) skip                 the character is not copied
     3) skip + terminator    the character is not copied, the string is terminated if not empty
 */
-template< class streamer>
+static inline
 bool GetTokenFromStream(
-		            streamer &          inputStream,
-		            streamer &  	outputStream,
+		            		IOBuffer &          inputStream,
+		            		IOBuffer &  		outputStream,
                             const char *        terminator,
                             char *              saveTerminator,
                             const char *        skipCharacters){
@@ -159,9 +160,9 @@ bool GetTokenFromStream(
 
 /** to skip a series of tokens delimited by terminators or 0
     {BUFFERED}    */
-template< class streamer>
+static inline  
 bool SkipTokensInStream(
-							streamer &          stream,
+							IOBuffer &          stream,
                             uint32              count,
                             const char *        terminator){
 
@@ -188,16 +189,53 @@ bool SkipTokensInStream(
     return True;
 }
 
+static inline
+bool PrintString(
+		IOBuffer &    			stream,
+		const char *			string,
+		FormatDescriptor 		fd)
+{
+	
+	if (string == NULL) string = "NULL";
+	
+	uint32 stringSize = (uint32)StringHelper::Length(string);
+	uint32 paddingSize = 0;
+	
+	if (fd.size != 0){
+		if (stringSize > fd.size) stringSize = fd.size; 
+		
+		if (fd.padded){
+			if (stringSize < fd.size){
+				paddingSize = fd.size - stringSize;  
+			}			
+		}
+	}
+	
+	bool ret = true;
+	uint32 i;
+	if (!fd.leftAligned && (paddingSize > 0)){
+		for (i=0;i < paddingSize;i++) ret = ret && stream.PutC(' ');		
+	}
+	
+	ret = ret && stream.WriteAll(string,stringSize);
+	
+	if (fd.leftAligned && (paddingSize > 0)){
+		for (i=0;i < paddingSize;i++) ret = ret && stream.PutC(' ');		
+	}
+	
+	return ret;
+}
+
+
 /**
  *  Prints any object of 
  */
-template< class streamer>
+static 
 bool PrintToStream(
-						streamer &    			stream,
+						IOBuffer &    			stream,
 						const AnyType & 		par,
 						FormatDescriptor 		fd)
 {
-
 
 	/// empty - an error?
 	if (par.dataPointer == NULL) return false;
@@ -206,7 +244,7 @@ bool PrintToStream(
 		ErrorManagement::ReportError(UnsupportedError, "Streamable::Print StructuredData not supported");
 		return false;
 	}
-
+	
 	switch (par.dataDescriptor.type){
 
 	case TypeDescriptor::UnsignedInteger: 
@@ -285,9 +323,25 @@ bool PrintToStream(
 		}
 		} 
 	}break;
-
+	case TypeDescriptor::Pointer:{
+		AnyType at(par);
+		at.dataDescriptor.type = TypeDescriptor::UnsignedInteger;
+		// the UnsignedInteger expects a pointer to the number
+		at.dataPointer = (void *)&par.dataPointer;
+		return PrintToStream(stream,at,fd);
+	}	
+	case TypeDescriptor::CCString:{
+		if (fd.binaryNotation == Notation::HexNotation){
+			AnyType at(par);
+			at.dataDescriptor.type = TypeDescriptor::UnsignedInteger;
+			//the UnsignedInteger expects a pointer to the number
+			at.dataPointer = (void *)&par.dataPointer;
+			return PrintToStream(stream,at,fd);
+		} 
+		const char *string = (const char *)par.dataPointer;
+		return PrintString(stream,string,fd);	
+	} break;
 	default:{
-		
 	}
 	}
 
@@ -295,9 +349,9 @@ bool PrintToStream(
 	return false;
 }
 
-template< class streamer>
+static
 bool PrintFormattedToStream(
-				streamer &				stream,
+				IOBuffer &				stream,
 				const char *			format, 
 				const AnyType 			pars[])
 {
