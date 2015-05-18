@@ -68,7 +68,7 @@ TEST_F(IntegerToStreamGTest,TestBinaryStream) {
 
 TEST_F(IntegerToStreamGTest,TestIntegerToStream) {
     IntegerToStreamTest numbertest;
-    ASSERT_TRUE(numbertest.TestBinaryStream());
+    ASSERT_TRUE(numbertest.TestIntegerToStream());
 }
 
 TEST_F(IntegerToStreamGTest,TestBitSetToStream) {

@@ -54,12 +54,6 @@ TEST_F(StreamStringGTest,TestOperators) {
 }
 
 
-TEST_F(StreamStringGTest,TestUseless) {
-    StreamStringTest stringtest;
-    ASSERT_TRUE(stringtest.TestUseless());
-}
-
-
 TEST_F(StreamStringGTest,TestPrint) {
     StreamStringTest stringtest;
     ASSERT_TRUE(stringtest.TestPrint());

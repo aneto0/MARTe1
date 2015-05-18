@@ -31,14 +31,9 @@ TEST_F(StreamMemoryReferenceGTest,TestPutC) {
 }
 
 
-TEST_F(StreamMemoryReferenceGTest,TestRead) {
+TEST_F(StreamMemoryReferenceGTest,TestReadAndWrite) {
     StreamMemoryReferenceTest stringtest;
-    ASSERT_TRUE(stringtest.TestRead());
-}
-/*
-TEST_F(StreamMemoryReferenceGTest,TestWrite) {
-    StreamMemoryReferenceTest stringtest;
-    ASSERT_TRUE(stringtest.TestWrite("HelloWorld"));
+    ASSERT_TRUE(stringtest.TestReadAndWrite());
 }
 
 
@@ -48,16 +43,6 @@ TEST_F(StreamMemoryReferenceGTest,TestSeek) {
 }
 
 
-TEST_F(StreamMemoryReferenceGTest,TestOperators) {
-    StreamMemoryReferenceTest stringtest;
-    ASSERT_TRUE(stringtest.TestOperators("ThisIsTheStringToRead","ThisIsTheStringToWrite"));
-}
-
-
-TEST_F(StreamMemoryReferenceGTest,TestUseless) {
-    StreamMemoryReferenceTest stringtest;
-    ASSERT_TRUE(stringtest.TestUseless());
-}
 
 
 TEST_F(StreamMemoryReferenceGTest,TestPrint) {
@@ -69,4 +54,4 @@ TEST_F(StreamMemoryReferenceGTest,TestPrint) {
 TEST_F(StreamMemoryReferenceGTest,TestToken) {
     StreamMemoryReferenceTest stringtest;
     ASSERT_TRUE(stringtest.TestToken());
-}*/
+}
