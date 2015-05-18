@@ -1,17 +1,30 @@
 
-
-#include "Streamable.h"
+#include "StreamString.h"
+#include "BufferedStream.h"
 #include "Memory.h"
 #define MAX_DIMENSION 128
 #define MAX_STREAM_DIMENSION 256
 
-//A generic stream class used for types print.
-class MyStream{
-private:
-	char buffer[MAX_DIMENSION];
-	int32 size;
-public:
 
+
+
+
+
+//A generic stream class used for types print.
+class MyStream : public StreamString{ 
+private:
+/*	char oBuffer[MAX_DIMENSION];
+	int32 size;*/
+public:
+	IOBuffer *GetMyOutputBuffer(){
+		return GetOutputBuffer();
+	}
+
+	bool Clear(){
+		StreamString* me=this;
+		return (*me)="";
+	}
+/*
 	MyStream(){
 		size=0;
 	}
@@ -20,8 +33,8 @@ public:
 		size%=(MAX_DIMENSION-1);
 			
 		
-		buffer[size]=c;
-		buffer[size+1]=0;
+		oBuffer[size]=c;
+		oBuffer[size+1]=0;
 		size++;		
 	}
 	
@@ -31,13 +44,13 @@ public:
 
 	void Clear(){
 		size=0;
-	}
+	}*/
 };
 
 
 
 //A simple stream for streamable which implement unbuffered functions.
-class SimpleStreamable : public Streamable{
+class SimpleBufferedStream : public BufferedStream{
 public:
 	char buffer1[MAX_STREAM_DIMENSION];
 	char buffer2[MAX_STREAM_DIMENSION];
@@ -50,7 +63,7 @@ public:
 public:
 
 
-	SimpleStreamable(){
+	SimpleBufferedStream(){
 		size1=0;
 		size2=0;
 		nBuffers=2;
@@ -60,7 +73,7 @@ public:
 		for(int i=0; i<MAX_DIMENSION; i++) buffer[i]=0;
 	}
 
-	~SimpleStreamable(){
+	~SimpleBufferedStream(){
 		FlushAndResync();
 	}
 	

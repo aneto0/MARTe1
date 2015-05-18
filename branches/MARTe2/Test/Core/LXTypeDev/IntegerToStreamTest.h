@@ -33,7 +33,7 @@
 #ifndef INTEGER_TO_STREAM_TEST_H
 #define INTEGER_TO_STREAM_TEST_H
 
-#include "IntegerToStream.h"
+#include "IOBufferIntegerPrint.h"
 #include "FormatDescriptor.h"
 #define MAX_DIMENSION 128 
 
@@ -43,34 +43,62 @@ private:
 
 public:
 
-    /** @brief Tests the goodness of the function which returns the exponent of a decimal number.*/ 
+    /** 
+     * @brief Tests the goodness of the function which returns the exponent of a decimal number.
+     * @return true if the magnitude is equal to the number or digits minus one.*/ 
     bool TestDecimalMagnitude();
 
-    /** @brief Tests the goodness of the function which returns the number of digits for an exadecimal notation. */
+    /** 
+     * @brief Tests the goodness of the function which returns the number of digits for an exadecimal notation.
+     * @return true if the function returns the number of digits of hex numbers.*/
     bool TestHexadecimalMagnitude();
 
-    /** @brief Tests the goodness of the function which returns the number of digits for an octal notation. */
+    /**
+     * @brief Tests the goodness of the function which returns the number of digits for an octal notation.
+     * @return true if the function returns the number of digits of octal numbers. */
     bool TestOctalMagnitude();
    
-    /** @brief Tests the goodness of the function which returns the number of digits for a binary notation. */
+    /**
+     * @brief Tests the goodness of the function which returns the number of digits for a binary notation.
+     * @return true if the function returns the number of digits of binary numbers. */
     bool TestBinaryMagnitude();
     
-    /** @brief Tests the print of an integer on a generic stream using the decimal notation. */
+    /**
+     * @brief Tests the print of an integer on a generic stream using the decimal notation.
+     * @return false if something fails.
+     * 
+     * Check the print on a stream in decimal notation try to trigger all cases. */
     bool TestDecimalStream();
 
-    /** @brief Tests the print of an integer on a generic stream using the exadecimal notation. */
+    /**
+     * @brief Tests the print of an integer on a generic stream using the exadecimal notation.
+     * @return false if something fails.
+     * 
+     * @Check the print on a stream in exadecimal notation try to trigger all cases. */
     bool TestHexadecimalStream();
     
-    /** @brief Tests the print of an integer on a generic stream using the octal notation. */
-    bool TestOctalStream();
+    /**
+     * @brief Tests the print of an integer on a generic stream using the octal notation. 
+     * @return false if something fails.
+     * 
+     * @Check the print on a stream in octal notation try to trigger all cases. */ 
+     bool TestOctalStream();
     
-    /** @brief Tests the print of an integer on a generic stream using the binary notation. */
+    /**
+     * @brief Tests the print of an integer on a generic stream using the binary notation.
+     * @return false if something fails.
+     * 
+     * @Check the print on a stream in binary notation try to trigger all cases. */ 
     bool TestBinaryStream();
     
-    /** @brief Tests the print of an integer on a generic stream using different notations. */
+    /**
+     * @brief Tests the print of an integer on a generic stream using different notations.
+     * @return false if something fails. */
     bool TestIntegerToStream();
     
-    /** @brief Tests the print of a bitSet on a generic stream. */
+    /**
+     * @brief Tests the print of a bitSet on a generic stream.
+     * @return false if something fails. */
     bool TestBitSetToStream();
 };
 

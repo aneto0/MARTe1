@@ -41,13 +41,19 @@ class BitSetToIntegerTest {
 private:
 
 public:
-	/** @brief Tests the write from source bitSet to destination bitSet. */
+	/**
+         * @brief Tests the write from source bitSet to destination bitSet.
+	 * @return true if succesful, false otherwise. */
 	bool TestBitSetToBitSet();
 
-	/** @brief Tests the write from a bitSet to an integer. */
+	/**
+         * @brief Tests the write from a bitSet to an integer.
+         * @return true if succesful, false otherwise. */
 	bool TestBitSetToInteger();
 
-	/** @brief Tests the write from an integer to a bitSet. */
+	/**
+         * @brief Tests the write from an integer to a bitSet.
+         * @return true if succesful, false otherwise. */
 	bool TestIntegerToBitSet();
 };
 

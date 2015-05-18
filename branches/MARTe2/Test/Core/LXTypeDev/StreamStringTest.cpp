@@ -150,8 +150,19 @@ bool StreamStringTest::TestRead(const char* inputString){
 
 
 bool StreamStringTest::TestWrite(const char* inputString){
-	//UnBuffered Way
+	
 	StreamString myString;
+
+	//All is allowed for StreamString
+	if(!myString.CanSeek() || !myString.CanRead() || ! myString.CanWrite()){
+		return False;
+	}
+
+	//Allocate granularity, at least one byte is allocated because of the terminator char.
+	if(!myString.SetSize(0)){
+		return False;
+	}
+
 	char test[128];
 	StringHelper::Copy(test, inputString);
 
@@ -391,69 +402,63 @@ bool StreamStringTest::TestOperators(const char* firstString, const char* second
 	}
 
 
+	//Locate function with char
+
+	//empty string return false.
+	myString1="";
+	if(myString1.Locate('\0')!=-1){
+		return False;
+	}
+
+
+	myString1="HelloWorld";
+	
+	if(myString1.Locate('W')!=5){
+		return False;
+	}
+
+
+
+
+	//Locate function with another StreamString
+	
+	myString2="World";
+	if(myString1.Locate(myString2)!=5){
+		return False;
+	}
+
+
+	//not found
+	myString2="ImNotIn";
+	
+	if(myString1.Locate(myString2)!=-1){
+		return False;
+	}
+
+	//greater string
+	myString2="HelloWorld!";
+	if(myString1.Locate(myString2)!=-1){
+		return False;
+	}
+
+
+	//empty string
+	myString2="";
+	if(myString1.Locate(myString2)!=-1){
+		return False;
+	}
+
+
+
+	
+
 
 	return True;
 }
 
 
 
-bool StreamStringTest::TestUseless(){
-	StreamString myString;
-	StreamStringIOBuffer myStringBuffer;
-	myString="Hello";
-	uint32 dummy=1;
 
-	//Resync return true
-	if(!myStringBuffer.Resync()){
-		return False;
-	}
-
-	//Refill return true
-	if(!myStringBuffer.Refill()){
-		return False;
-	}
-
-	//Flush allocate again the minimum granularity defined and 
-        //return true in case of success.
-	if(!myStringBuffer.Flush()){
-		return False;
-	}
-
-	if(myString.NOfStreams()!=0){
-		return False;
-	}
-
-	if(myString.Switch("a") || myString.Switch(dummy)){
-		return False;
-	}	
-
-	if(myString.SelectedStream()!=0){
-		return False;
-	}
-	
-	if(myString.StreamName(dummy, NULL, 1)){
-		return False;
-	}
-
-	if(myString.AddStream(NULL)){
-		return False;
-	}
-
-	if(myString.RemoveStream(NULL)){
-		return False;
-	}
-	
-	if(!myString.CanSeek() || !myString.CanRead() || !myString.CanWrite()){
-		return False;
-	}
-
-
-	if(!myString.SetSize(dummy)){
-		return True;
-	}
-
-	return True;
-}
 
 
 bool StreamStringTest::TestPrint(){
@@ -461,9 +466,6 @@ bool StreamStringTest::TestPrint(){
 	//Create a read&write streamable.
 	StreamString myString;
 
-	//make writable the string.
-	myString="a";
-	myString.Seek(0);
 
 	uint8 ubit8=1;
 	uint16 ubit16=2;
@@ -472,7 +474,8 @@ bool StreamStringTest::TestPrint(){
 	DoubleInteger<uint64> ubit128Tmp=5;	
 	AnyType ubit128;
 	ubit128.dataPointer=&ubit128Tmp;
-	ubit128.dataDescriptor={False,False,{{TypeDescriptor::UnsignedInteger, 128}}};
+	const TypeDescriptor UnsignedInt128={False,False,{{TypeDescriptor::UnsignedInteger, 128}}};
+	ubit128.dataDescriptor=UnsignedInt128;
 	ubit128.bitAddress=0;
 
 
@@ -486,14 +489,18 @@ bool StreamStringTest::TestPrint(){
 	sbit128Tmp=-5;
 	AnyType sbit128;
 	sbit128.dataPointer=&sbit128Tmp;
-	sbit128.dataDescriptor={False,False,{{TypeDescriptor::SignedInteger, 128}}};
+	const TypeDescriptor SignedInt128={False,False,{{TypeDescriptor::SignedInteger, 128}}};
+
+	sbit128.dataDescriptor=SignedInt128;
 	sbit128.bitAddress=0;
 	float fbit32=1.2;
 	double dbit64=3.4;
 	__float128 fbit128Tmp=5.6Q;
 	AnyType fbit128;
 	fbit128.dataPointer=&fbit128Tmp;
-	fbit128.dataDescriptor={False,False,{{TypeDescriptor::Float, 128}}};
+	const TypeDescriptor Float128={False,False,{{TypeDescriptor::Float, 128}}};
+
+	fbit128.dataDescriptor=Float128;
 	fbit128.bitAddress=0;
 
 
@@ -515,7 +522,7 @@ bool StreamStringTest::TestPrint(){
 	myString.Printf("% 3u % 3c % 3d\n", sbit64, ubit32, fbit32);
 
 	//Use the unbuffered PutC, 3 parameters.
-	myString.Printf("% 3u % 3c % 3d\n", sbit128, ubit128, fbit32);
+	myString.Printf("% 3i % 3c % 3d\n", sbit128, ubit128, fbit32);
 
 	//Use the unbuffered PutC, 2 parameters.
 	myString.Printf("% 3c % 3F\n", ubit8, dbit64);
@@ -545,6 +552,91 @@ bool StreamStringTest::TestPrint(){
 	if(myString.Printf("%3l",fbit32)){
 		return False;
 	}
+
+	const char* Hello="HelloWorld";
+	
+	//cast const char* to anytype.
+	myString="";
+	myString.Printf("string:%s, number:%3d",Hello, dbit64);
+	if(myString!="string:HelloWorld, number:3.4"){
+		return False;
+	}
+	printf("\n|%s|\n",myString.Buffer());
+	//Clip the string
+	myString="";
+	myString.Printf("string:%5s, number:%3d",Hello, dbit64);
+	if(myString!="string:Hello, number:3.4"){
+		return False;
+	}
+	//Padd right the string
+	myString="";
+	myString.Printf("string:% 11s, number:%3d",Hello, dbit64);
+	if(myString!="string: HelloWorld, number:3.4"){
+		return False;
+	}
+
+	//Padd left the string
+	myString="";
+	myString.Printf("string:%- 11s, number:%3d",Hello, dbit64);
+	if(myString!="string:HelloWorld , number:3.4"){
+		return False;
+	}
+
+
+
+	//cast StreamString to anytype.
+	myString="";
+	StreamString input="HelloWorld";
+	myString.Printf("string:%s, number:%3d",input, dbit64);
+	if(myString!="string:HelloWorld, number:3.4"){
+		return False;
+	}
+
+	//Clip the stream.
+	myString="";
+	input="HelloWorld";
+	myString.Printf("string:%5s, number:%3d",input, dbit64);
+	if(myString!="string:Hello, number:3.4"){
+		return False;
+	}
+	
+	//right padd
+	myString="";
+	input="HelloWorld";
+	myString.Printf("string:% 12s, number:%3d",input, dbit64);
+	if(myString!="string:  HelloWorld, number:3.4"){
+		return False;
+	}
+
+	//left padd
+	myString="";
+	input="HelloWorld";
+	myString.Printf("string:%-12s, number:%3d",input, dbit64);
+	if(myString!="string:HelloWorld  , number:3.4"){
+		return False;
+	}
+
+	//return the pointer thanks to hex notation.
+	myString="";
+	input="";
+	const char *charPointer="Hello";
+	uint64 pointer=(uint64)charPointer;
+	myString.Printf("%x",charPointer);
+	input.Printf("%x", pointer);
+	if(myString!=input){
+		return False;
+	}
+	
+	//%p format as the complete 32 bit pointer with header
+	myString="";
+	input="";
+	myString.Printf("%p",charPointer);
+	input.Printf("% #0x",pointer);
+	if(myString!=input){
+		return False;
+	}
+
+
 	
 	return True;
 }		
@@ -636,7 +728,7 @@ bool StreamStringTest::TestToken(){
 
 	myString.Seek(0);
 
-    SimpleStreamable outputStream;
+    SimpleBufferedStream outputStream;
     outputStream.doubleBuffer=True;
 
     uint32 buffOutputSize=1;

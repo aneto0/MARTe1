@@ -88,11 +88,6 @@ public:
  	 * Using the string parameters the streamString operators are tested. */
 	bool TestOperators(const char* firstString, const char* secondString);
 
-	/** 
-         * @brief Tests the return of unused functions (implemented because pure virtual otherwise).
-         * @return true if all functions returns as expected. */
-	bool TestUseless();
-
 	bool TestPrint();
 	
 	bool TestToken();

@@ -62,13 +62,8 @@ public:
 	 * @brief Tests the streamString read function.
 	 * @param inputString is the string on the streamString.
  	 * @return true if the read string is equal to inputString using Read function. */ 
-	bool TestRead();
+	bool TestReadAndWrite();
 
-	/**
-	 * @brief Tests the streamString write function.
-	 * @param inputString is the string to write on the streamString.
- 	 * @return true if the string written on the streamString using Write function is equal to inputString.*/
-//	bool TestWrite(const char* inputString);
 
 	/**
  	 * @brief Tests the streamString Seek and RelativeSeek.
@@ -77,25 +72,12 @@ public:
 	 * @return true if the seek operations returns the correct result. 
 	 *
 	 * Test the seek functions in different conditions, for example using a positions which falls out of bounds. */	 
-//	bool TestSeek(const char* inputString);
+	bool TestSeek(const char* inputString);
 
-	/** 
-	 * @brief Tests the streamString operators. 
-         * @param firstString is the first string parameter.
-  	 * @param secondString is the second string string parameter.
- 	 * @return true if tests goes fine.
-         *
- 	 * Using the string parameters the streamString operators are tested. */
-//	bool TestOperators(const char* firstString, const char* secondString);
 
-	/** 
-         * @brief Tests the return of unused functions (implemented because pure virtual otherwise).
-         * @return true if all functions returns as expected. */
-//	bool TestUseless();
-
-//	bool TestPrint();
+	bool TestPrint();
 	
-//	bool TestToken();
+	bool TestToken();
 
 };
 

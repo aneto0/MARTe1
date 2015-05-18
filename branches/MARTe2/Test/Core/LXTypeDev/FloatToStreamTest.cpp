@@ -37,16 +37,19 @@ bool FloatToStreamTest::TestFixedPoint() {
     //Left padded, negative number, exact precision.
     pformat = "- 12.7f";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit32, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit32, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("-1.1234567  ", thisStream.Buffer())) {
         return False;
     }
+
     thisStream.Clear();
 
     //6 decimal numbers by default.
     pformat = "f";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit32, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit32, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("-1.123457", thisStream.Buffer())) {
         return False;
     }
@@ -55,7 +58,8 @@ bool FloatToStreamTest::TestFixedPoint() {
     //Less precision.
     pformat = "- 12.3f";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit32, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit32, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("-1.123      ", thisStream.Buffer())) {
         return False;
     }
@@ -65,28 +69,30 @@ bool FloatToStreamTest::TestFixedPoint() {
     sbit32 = 112345.67; //112345,...
     pformat = " 12.2f";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit32, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit32, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("   112345.67", thisStream.Buffer())) {
         return False;
     }
     thisStream.Clear();
 
-
     //Print 0
     sbit32 = 0; //112345,...
     pformat = " 3.2f";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit32, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit32, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("  0", thisStream.Buffer())) {
         return False;
     }
     thisStream.Clear();
-    
+
     //Underflow
     sbit32 = 0.09; //112345,...
     pformat = " 1.2f";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit32, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit32, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("0", thisStream.Buffer())) {
         return False;
     }
@@ -96,7 +102,8 @@ bool FloatToStreamTest::TestFixedPoint() {
     double sbit64 = 12345.9999;
     pformat = " 10.3f";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit64, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit64, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare(" 12346.000", thisStream.Buffer())) {
         return False;
     }
@@ -105,7 +112,8 @@ bool FloatToStreamTest::TestFixedPoint() {
     //Get the integer part.
     pformat = " 10.0f";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit64, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit64, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("     12346", thisStream.Buffer())) {
         return False;
     }
@@ -115,7 +123,8 @@ bool FloatToStreamTest::TestFixedPoint() {
     sbit64 = 999999.99996;
     pformat = " 17.9f"; //
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit64, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit64, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare(" 999999.999960000", thisStream.Buffer())) {
         return False;
     }
@@ -124,7 +133,8 @@ bool FloatToStreamTest::TestFixedPoint() {
 
     //Overflow and not enough space, because the rounding up we need at least seven digits.
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit64, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit64, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("     ?", thisStream.Buffer())) {
         return False;
     }
@@ -133,8 +143,9 @@ bool FloatToStreamTest::TestFixedPoint() {
     //Point removing and overflow.
     pformat = "- 8.4f"; //
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit64, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit64, format);
 
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("1000000 ", thisStream.Buffer())) {
         return False;
     }
@@ -143,7 +154,8 @@ bool FloatToStreamTest::TestFixedPoint() {
     thisStream.Clear();
     pformat = "- 9.4f"; //
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit64, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit64, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("1000000.0", thisStream.Buffer())) {
         return False;
     }
@@ -153,8 +165,9 @@ bool FloatToStreamTest::TestFixedPoint() {
     sbit64 = -222222.5255;
     pformat = "7.4f";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit64, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit64, format);
 
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("-222223", thisStream.Buffer())) {
         return False;
     }
@@ -163,7 +176,8 @@ bool FloatToStreamTest::TestFixedPoint() {
     //No space for the fraction part again.
     pformat = " 8.4f";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit64, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit64, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare(" -222223", thisStream.Buffer())) {
         return False;
     }
@@ -172,8 +186,9 @@ bool FloatToStreamTest::TestFixedPoint() {
     //Space enouh for one decimal number. Approximation at the second digit after .
     pformat = " 9.4f";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit64, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit64, format);
 
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("-222222.5", thisStream.Buffer())) {
         return False;
     }
@@ -182,8 +197,9 @@ bool FloatToStreamTest::TestFixedPoint() {
     //Space enouh for two decimal numbers. Approximation at the third digit after .
     pformat = " 10.4f";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit64, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit64, format);
 
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("-222222.53", thisStream.Buffer())) {
         return False;
     }
@@ -192,44 +208,45 @@ bool FloatToStreamTest::TestFixedPoint() {
     //Not enough space for the integer part.
     pformat = " 5.4f";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit64, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit64, format);
 
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("    ?", thisStream.Buffer())) {
         return False;
     }
 
     thisStream.Clear();
 
-
     //Negative exponent.
-    sbit64=0.009;
+    sbit64 = 0.009;
     pformat = " 5.2f";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit64, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit64, format);
 
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare(" 0.01", thisStream.Buffer())) {
         return False;
     }
 
     thisStream.Clear();
 
-
     //Not enough space (it must be at least 12+1(zero)+1(point)=14)
     __float128 sbit128 = 1e-12Q;
     pformat = " 12.10f";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit128, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit128, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("           0", thisStream.Buffer())) {
         return False;
     }
     thisStream.Clear();
 
-
     //Not enough space with 1 as maxSize and for negative number (it must be at least 12+1(zero)+1(point)=14)
     sbit128 = -1e-12Q;
     pformat = " 1.10f";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit128, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit128, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("0", thisStream.Buffer())) {
         return False;
     }
@@ -239,7 +256,8 @@ bool FloatToStreamTest::TestFixedPoint() {
     float inf = 1.0 / 0.0;
     pformat = "10.10f";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, inf, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), inf, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("+Inf", thisStream.Buffer())) {
         return False;
     }
@@ -249,7 +267,8 @@ bool FloatToStreamTest::TestFixedPoint() {
     double ninf = -1.0 / 0.0;
     pformat = " 10.10f";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, ninf, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), ninf, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("      -Inf", thisStream.Buffer())) {
         return False;
     }
@@ -258,8 +277,9 @@ bool FloatToStreamTest::TestFixedPoint() {
     //Not enough space to print -Inf
     pformat = "- 1.10f";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, ninf, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), ninf, format);
 
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("?", thisStream.Buffer())) {
         return False;
     }
@@ -269,7 +289,8 @@ bool FloatToStreamTest::TestFixedPoint() {
     __float128 nan = 0.0 / 0.0;
     pformat = "- 10.10f";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, nan, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), nan, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("NaN       ", thisStream.Buffer())) {
         return False;
     }
@@ -278,7 +299,8 @@ bool FloatToStreamTest::TestFixedPoint() {
     //Nan with automatic size
     pformat = " 0.10f";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, nan, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), nan, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("NaN", thisStream.Buffer())) {
         return False;
     }
@@ -287,7 +309,8 @@ bool FloatToStreamTest::TestFixedPoint() {
     //Not enough space to print Nan
     pformat = " 2.10f";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, nan, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), nan, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare(" ?", thisStream.Buffer())) {
         return False;
     }
@@ -305,17 +328,18 @@ bool FloatToStreamTest::TestFixedRelativePoint() {
     //Left padded, negative number, exact precision
     pformat = "- 12.8F";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit32, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit32, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("-1.1234567  ", thisStream.Buffer())) {
         return False;
     }
     thisStream.Clear();
 
-
     //Automatic precision set to 7 for 32 bit numbers.
     pformat = "- 12.F";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit32, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit32, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("-1.123457   ", thisStream.Buffer())) {
         return False;
     }
@@ -324,7 +348,8 @@ bool FloatToStreamTest::TestFixedRelativePoint() {
     //Precision 0.
     pformat = "- 12.0F";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit32, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit32, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("0           ", thisStream.Buffer())) {
         return False;
     }
@@ -333,7 +358,8 @@ bool FloatToStreamTest::TestFixedRelativePoint() {
     //Less precision.
     pformat = "- 12.4F";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit32, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit32, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("-1.123      ", thisStream.Buffer())) {
         return False;
     }
@@ -343,7 +369,8 @@ bool FloatToStreamTest::TestFixedRelativePoint() {
     sbit32 = 112345.67; //112345,...
     pformat = " 12.8F";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit32, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit32, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("   112345.67", thisStream.Buffer())) {
         return False;
     }
@@ -353,7 +380,8 @@ bool FloatToStreamTest::TestFixedRelativePoint() {
     double sbit64 = 12345.9999;
     pformat = " 10.8F";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit64, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit64, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare(" 12346.000", thisStream.Buffer())) {
         return False;
     }
@@ -362,7 +390,8 @@ bool FloatToStreamTest::TestFixedRelativePoint() {
     //Less precision than the size of integer part.
     pformat = " 10.3F";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit64, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit64, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("     12300", thisStream.Buffer())) {
         return False;
     }
@@ -372,7 +401,8 @@ bool FloatToStreamTest::TestFixedRelativePoint() {
     sbit64 = 999999.99996;
     pformat = " 17.15F"; //
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit64, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit64, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare(" 999999.999960000", thisStream.Buffer())) {
         return False;
     }
@@ -381,7 +411,8 @@ bool FloatToStreamTest::TestFixedRelativePoint() {
     //Overflow and not enough space because the round up.
     pformat = " 6.10F"; //
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit64, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit64, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("     ?", thisStream.Buffer())) {
         return False;
     }
@@ -390,7 +421,8 @@ bool FloatToStreamTest::TestFixedRelativePoint() {
     //Overflow, no space for decimals.
     pformat = "- 8.10F"; //
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit64, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit64, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("1000000 ", thisStream.Buffer())) {
         return False;
     }
@@ -399,7 +431,8 @@ bool FloatToStreamTest::TestFixedRelativePoint() {
     //Enough space for the point and a decimal number.
     pformat = "- 9.10F"; //
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit64, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit64, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("1000000.0", thisStream.Buffer())) {
         return False;
     }
@@ -409,7 +442,8 @@ bool FloatToStreamTest::TestFixedRelativePoint() {
     sbit64 = -222222.5255;
     pformat = "7.10F"; //
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit64, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit64, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("-222223", thisStream.Buffer())) {
         return False;
     }
@@ -418,7 +452,8 @@ bool FloatToStreamTest::TestFixedRelativePoint() {
     //No space for decimal numbers again.
     pformat = " 8.10F";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit64, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit64, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare(" -222223", thisStream.Buffer())) {
         return False;
     }
@@ -427,7 +462,8 @@ bool FloatToStreamTest::TestFixedRelativePoint() {
     //Space enough for one decimal number. Approximation at the second digit after .
     pformat = " 9.10F";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit64, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit64, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("-222222.5", thisStream.Buffer())) {
         return False;
     }
@@ -436,7 +472,8 @@ bool FloatToStreamTest::TestFixedRelativePoint() {
     //Space enouh for two numbers. Approximation at the third digit after .
     pformat = " 10.10F";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit64, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit64, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("-222222.53", thisStream.Buffer())) {
         return False;
     }
@@ -445,7 +482,8 @@ bool FloatToStreamTest::TestFixedRelativePoint() {
     //Not enough space for the integer part
     pformat = " 5.10F";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit64, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit64, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("    ?", thisStream.Buffer())) {
         return False;
     }
@@ -455,7 +493,8 @@ bool FloatToStreamTest::TestFixedRelativePoint() {
     __float128 sbit128 = 1e-12Q;
     pformat = " 12.12F";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit128, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit128, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("           0", thisStream.Buffer())) {
         return False;
     }
@@ -465,7 +504,8 @@ bool FloatToStreamTest::TestFixedRelativePoint() {
     float inf = 1.0 / 0.0;
     pformat = "10.10F";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, inf, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), inf, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("+Inf", thisStream.Buffer())) {
         return False;
     }
@@ -475,7 +515,8 @@ bool FloatToStreamTest::TestFixedRelativePoint() {
     double ninf = -1.0 / 0.0;
     pformat = " 10.10F";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, ninf, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), ninf, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("      -Inf", thisStream.Buffer())) {
         return False;
     }
@@ -484,7 +525,8 @@ bool FloatToStreamTest::TestFixedRelativePoint() {
     //Not enough space to print -Inf
     pformat = "- 1.10F";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, ninf, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), ninf, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("?", thisStream.Buffer())) {
         return False;
     }
@@ -494,17 +536,18 @@ bool FloatToStreamTest::TestFixedRelativePoint() {
     __float128 nan = 0.0 / 0.0;
     pformat = "- 10.10F";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, nan, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), nan, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("NaN       ", thisStream.Buffer())) {
         return False;
     }
     thisStream.Clear();
-    
 
     //Nan with automatic size
     pformat = " 0.10F";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, nan, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), nan, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("NaN", thisStream.Buffer())) {
         return False;
     }
@@ -513,7 +556,8 @@ bool FloatToStreamTest::TestFixedRelativePoint() {
     //Not enough space to print Nan
     pformat = " 2.10F";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, nan, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), nan, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare(" ?", thisStream.Buffer())) {
         return False;
     }
@@ -531,7 +575,8 @@ bool FloatToStreamTest::TestExponential() {
     //Left alignment padded	
     pformat = "- 15.8e";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit32, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit32, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("-1.1234567E+1  ", thisStream.Buffer())) {
         return False;
     }
@@ -540,7 +585,8 @@ bool FloatToStreamTest::TestExponential() {
     //Left alignment, clip the number without rounding (the next is 4).
     pformat = "- 9.4e";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit32, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit32, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("-1.123E+1", thisStream.Buffer())) {
         return False;
     }
@@ -550,8 +596,9 @@ bool FloatToStreamTest::TestExponential() {
     sbit32 = 112345.67; //112345,...
     pformat = " 10.8e";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit32, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit32, format);
 
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("1.12346E+5", thisStream.Buffer())) {
         return False;
     }
@@ -561,8 +608,10 @@ bool FloatToStreamTest::TestExponential() {
     double sbit64 = -12345.9999;
     pformat = " 21.e";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit64, format);
-    if (!StringTestHelper::Compare(" -1.23459999000000E+4", thisStream.Buffer())) {
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit64, format);
+    thisStream.PutC(0);
+    if (!StringTestHelper::Compare(" -1.23459999000000E+4",
+                                   thisStream.Buffer())) {
         return False;
     }
     thisStream.Clear();
@@ -571,18 +620,19 @@ bool FloatToStreamTest::TestExponential() {
     sbit64 = -12345.9999;
     pformat = " 13.8e";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit64, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit64, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("-1.2346000E+4", thisStream.Buffer())) {
         return False;
     }
     thisStream.Clear();
 
-
     //In case of round up overflow.
     __float128 sbit128 = 999999.55556Q;
     pformat = ".6e"; //
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit128, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit128, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("1.00000E+6", thisStream.Buffer())) {
         return False;
     }
@@ -591,7 +641,8 @@ bool FloatToStreamTest::TestExponential() {
     //Clip the precision because the size.
     pformat = "- 5.6e";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit128, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit128, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("1E+6 ", thisStream.Buffer())) {
         return False;
     }
@@ -600,18 +651,19 @@ bool FloatToStreamTest::TestExponential() {
     //Too few space for number + exponent.
     pformat = "- 3.2e";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit128, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit128, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("?  ", thisStream.Buffer())) {
         return False;
     }
     thisStream.Clear();
 
-
     //The number initially does not fit but later yes thanks to the approximation.
     sbit128 = 9.5e-10Q;
     pformat = "- 4.2e";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit128, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit128, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("1E-9", thisStream.Buffer())) {
         return False;
     }
@@ -621,18 +673,19 @@ bool FloatToStreamTest::TestExponential() {
     sbit128 = 9.4999e-10Q;
     pformat = "- 4.2e";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit128, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit128, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("?   ", thisStream.Buffer())) {
         return False;
     }
     thisStream.Clear();
 
-
     //Support exponent with 3 digits
     sbit128 = 9.9999e-101Q;
     pformat = "- 6.2e";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit128, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit128, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("1E-100", thisStream.Buffer())) {
         return False;
     }
@@ -642,12 +695,13 @@ bool FloatToStreamTest::TestExponential() {
     sbit128 = 9.9999e+999Q;
     pformat = "- 7.2e";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit128, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit128, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("1E+1000", thisStream.Buffer())) {
         return False;
     }
     thisStream.Clear();
-    
+
     return True;
 
 }
@@ -661,7 +715,8 @@ bool FloatToStreamTest::TestEngeneering() {
     float sbit32 = -11.234567;
     pformat = ".9E";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit32, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit32, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("-11.2345671", thisStream.Buffer())) {
         return False;
     }
@@ -671,7 +726,8 @@ bool FloatToStreamTest::TestEngeneering() {
     sbit32 *= 100;
     pformat = "- 10.4E";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit32, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit32, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("-1.123E+3 ", thisStream.Buffer())) {
         return False;
     }
@@ -681,7 +737,8 @@ bool FloatToStreamTest::TestEngeneering() {
     sbit32 = 112345.67;
     pformat = " 10.8E";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit32, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit32, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("112.346E+3", thisStream.Buffer())) {
         return False;
     }
@@ -691,7 +748,8 @@ bool FloatToStreamTest::TestEngeneering() {
     double sbit64 = 12345.9999;
     pformat = " 10.9E";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit64, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit64, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("12.3460E+3", thisStream.Buffer())) {
         return False;
     }
@@ -701,8 +759,9 @@ bool FloatToStreamTest::TestEngeneering() {
     sbit64 = -0.9999;
     pformat = " 3.3E";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit64, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit64, format);
 
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare(" -1", thisStream.Buffer())) {
         return False;
     }
@@ -712,7 +771,8 @@ bool FloatToStreamTest::TestEngeneering() {
     sbit64 = -0.9999;
     pformat = " 3.5E";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit64, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit64, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare(" -1", thisStream.Buffer())) {
         return False;
     }
@@ -722,7 +782,8 @@ bool FloatToStreamTest::TestEngeneering() {
     __float128 sbit128 = 999999.99999Q;
     pformat = " 20.10E"; //
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit128, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit128, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("      1.000000000E+6",
                                    thisStream.Buffer())) {
         return False;
@@ -733,7 +794,8 @@ bool FloatToStreamTest::TestEngeneering() {
     sbit128 = 999999.9999900000000000000000000000Q;
     pformat = " 19E"; //
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit128, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit128, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("999.999999990000E+3",
                                    thisStream.Buffer())) {
         return False;
@@ -743,7 +805,8 @@ bool FloatToStreamTest::TestEngeneering() {
     sbit128 = -9.99999e9Q;
     pformat = "- 7.3E"; //
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit128, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit128, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("-10E+9 ", thisStream.Buffer())) {
         return False;
     }
@@ -753,7 +816,8 @@ bool FloatToStreamTest::TestEngeneering() {
     sbit128 *= 10; //-99e9
     pformat = " 6.4E";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit128, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit128, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("     ?", thisStream.Buffer())) {
         return False;
     }
@@ -762,7 +826,8 @@ bool FloatToStreamTest::TestEngeneering() {
     //Also increasing the precision, it is clipped because the size then with the overflow the size is not sufficient.
     pformat = " 6.6E";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit128, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit128, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("     ?", thisStream.Buffer())) {
         return False;
     }
@@ -772,7 +837,8 @@ bool FloatToStreamTest::TestEngeneering() {
     thisStream.Clear();
     pformat = "5.2E";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit128, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit128, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("?", thisStream.Buffer())) {
         return False;
     }
@@ -782,7 +848,8 @@ bool FloatToStreamTest::TestEngeneering() {
     sbit128 = 999.9Q;
     pformat = " 4.10E";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit128, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit128, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("1E+3", thisStream.Buffer())) {
         return False;
     }
@@ -791,7 +858,8 @@ bool FloatToStreamTest::TestEngeneering() {
     //The number enter as 999 not approximated, but with approximation exceed the size then ?
     pformat = " 3.10E";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit128, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit128, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("  ?", thisStream.Buffer())) {
         return False;
     }
@@ -801,7 +869,8 @@ bool FloatToStreamTest::TestEngeneering() {
     sbit128 = 999.9e3Q;
     pformat = " 4.10E";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit128, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit128, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("1E+6", thisStream.Buffer())) {
         return False;
     }
@@ -811,7 +880,8 @@ bool FloatToStreamTest::TestEngeneering() {
     sbit128 = 950.0e-6Q;
     pformat = " 4.10E";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit128, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit128, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("1E-3", thisStream.Buffer())) {
         return False;
     }
@@ -821,7 +891,8 @@ bool FloatToStreamTest::TestEngeneering() {
     sbit128 = 949.9e-6Q;
     pformat = " 4.10E";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit128, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit128, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("   ?", thisStream.Buffer())) {
         return False;
     }
@@ -838,8 +909,9 @@ bool FloatToStreamTest::TestSmart() {
 
     pformat = ".9g";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit32, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit32, format);
     //Precision lost (with float this happens frequently)!
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("-11.2345671", thisStream.Buffer())) {
         return False;
     }
@@ -849,7 +921,8 @@ bool FloatToStreamTest::TestSmart() {
     sbit32 *= 100; //1123.4567	
     pformat = "- 10.4g";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit32, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit32, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("-1.123K   ", thisStream.Buffer())) {
         return False;
     }
@@ -859,7 +932,8 @@ bool FloatToStreamTest::TestSmart() {
     sbit32 = 112345.67; //112345,...
     pformat = " 8.6g";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit32, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit32, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("112.346K", thisStream.Buffer())) {
         return False;
     }
@@ -869,7 +943,8 @@ bool FloatToStreamTest::TestSmart() {
     double sbit64 = 12345.9999;
     pformat = " 10.6g";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit64, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit64, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("  12.3460K", thisStream.Buffer())) {
         return False;
     }
@@ -878,7 +953,8 @@ bool FloatToStreamTest::TestSmart() {
     sbit64 = -0.9999;
     pformat = " 3.3g";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit64, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit64, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare(" -1", thisStream.Buffer())) {
         return False;
     }
@@ -890,8 +966,9 @@ bool FloatToStreamTest::TestSmart() {
     pformat = " 20.10g"; //
 
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit128, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit128, format);
 
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("        1.000000000M",
                                    thisStream.Buffer())) {
         return False;
@@ -904,7 +981,8 @@ bool FloatToStreamTest::TestSmart() {
     pformat = "- 7.3g"; //
 
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit128, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit128, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("-10.0G ", thisStream.Buffer())) {
         return False;
     }
@@ -914,7 +992,8 @@ bool FloatToStreamTest::TestSmart() {
     sbit128 *= 10; //-9.9e10
     pformat = "- 4.4g";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit128, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit128, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("?   ", thisStream.Buffer())) {
         return False;
     }
@@ -924,7 +1003,8 @@ bool FloatToStreamTest::TestSmart() {
     thisStream.Clear();
     pformat = " 4.5g";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit128, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit128, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare(" -1T", thisStream.Buffer())) {
         return False;
     }
@@ -934,7 +1014,8 @@ bool FloatToStreamTest::TestSmart() {
     sbit128 = 999.9Q;
     pformat = " 4.10g";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit128, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit128, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("1.0K", thisStream.Buffer())) {
         return False;
     }
@@ -944,7 +1025,8 @@ bool FloatToStreamTest::TestSmart() {
     sbit128 = 999.9e3Q;
     pformat = " 3.10g";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit128, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit128, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare(" 1M", thisStream.Buffer())) {
         return False;
     }
@@ -954,7 +1036,8 @@ bool FloatToStreamTest::TestSmart() {
     sbit128 = 9e28Q;
     pformat = "- 7.10g";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit128, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit128, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("90E+27 ", thisStream.Buffer())) {
         return False;
     }
@@ -963,7 +1046,8 @@ bool FloatToStreamTest::TestSmart() {
     sbit64 = -9.9e-28;
     pformat = " 9.10g";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit64, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit64, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare(" -990E-30", thisStream.Buffer())) {
         return False;
     }
@@ -980,8 +1064,9 @@ bool FloatToStreamTest::TestCompact() {
 
     pformat = ".9G";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit32, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit32, format);
     //Precision lost (with float this happens frequently)!
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("-11.2345671", thisStream.Buffer())) {
         return False;
     }
@@ -991,7 +1076,8 @@ bool FloatToStreamTest::TestCompact() {
     sbit32 *= 100; //1123.4567	
     pformat = "- 10.4G";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit32, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit32, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("-1.123K   ", thisStream.Buffer())) {
         return False;
     }
@@ -1001,7 +1087,8 @@ bool FloatToStreamTest::TestCompact() {
     sbit32 = 112345.67; //112345,...
     pformat = " 8.6G";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit32, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit32, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("112.346K", thisStream.Buffer())) {
         return False;
     }
@@ -1011,7 +1098,8 @@ bool FloatToStreamTest::TestCompact() {
     double sbit64 = 12345.9999;
     pformat = " 10.6G";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit64, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit64, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("  12.3460K", thisStream.Buffer())) {
         return False;
     }
@@ -1020,7 +1108,8 @@ bool FloatToStreamTest::TestCompact() {
     sbit64 = -0.9999;
     pformat = " 3.3G";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit64, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit64, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare(" -1", thisStream.Buffer())) {
         return False;
     }
@@ -1032,8 +1121,9 @@ bool FloatToStreamTest::TestCompact() {
     pformat = " 20.10G"; //
 
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit128, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit128, format);
 
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("        1.000000000M",
                                    thisStream.Buffer())) {
         return False;
@@ -1046,7 +1136,8 @@ bool FloatToStreamTest::TestCompact() {
     pformat = "- 7.3G"; //
 
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit128, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit128, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("-10.0G ", thisStream.Buffer())) {
         return False;
     }
@@ -1056,7 +1147,8 @@ bool FloatToStreamTest::TestCompact() {
     sbit128 *= 10; //-9.9e10
     pformat = "- 4.4G";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit128, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit128, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("?   ", thisStream.Buffer())) {
         return False;
     }
@@ -1066,7 +1158,8 @@ bool FloatToStreamTest::TestCompact() {
     thisStream.Clear();
     pformat = " 4.5G";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit128, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit128, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare(" -1T", thisStream.Buffer())) {
         return False;
     }
@@ -1076,7 +1169,8 @@ bool FloatToStreamTest::TestCompact() {
     sbit128 = 999.9Q;
     pformat = " 4.10G";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit128, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit128, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("1.0K", thisStream.Buffer())) {
         return False;
     }
@@ -1086,7 +1180,8 @@ bool FloatToStreamTest::TestCompact() {
     sbit128 = 999.9e3Q;
     pformat = " 3.10G";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit128, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit128, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare(" 1M", thisStream.Buffer())) {
         return False;
     }
@@ -1096,7 +1191,8 @@ bool FloatToStreamTest::TestCompact() {
     sbit128 = 9e28Q;
     pformat = "- 7.10G";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit128, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit128, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("9.0E+28", thisStream.Buffer())) {
         return False;
     }
@@ -1105,7 +1201,8 @@ bool FloatToStreamTest::TestCompact() {
     sbit64 = -9.9e-28;
     pformat = " 9.10G";
     format.InitialiseFromString(pformat);
-    FloatToStream(thisStream, sbit64, format);
+    FloatToStream(*(thisStream.GetMyOutputBuffer()), sbit64, format);
+    thisStream.PutC(0);
     if (!StringTestHelper::Compare("-9.90E-28", thisStream.Buffer())) {
         return False;
     }

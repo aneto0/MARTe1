@@ -28,8 +28,9 @@ OBJSX= IntegerToStreamTest.x \
 	FloatToStreamTest.x \
 	BitSetToIntegerTest.x \
 	DoubleIntegerTest.x \
-	StreamableTest.x \
-	StreamStringTest.x           	
+	BufferedStreamTest.x \
+	StreamStringTest.x \
+	StreamMemoryReferenceTest.x
 		
 PACKAGE=Core
 ROOT_DIR=../../..

@@ -24,7 +24,7 @@
  **/
 /**
  * @class FloatToStreamTest
- * @brief Tests the Float To stream functions.
+ * @brief Tests the IOBufferFloatPrint functions.
  *
  * The test consists in observing the results of the conversions from float (or equivalent) numbers and strings and their correct
  * print on a generic stream which implements a PutC(c) function.
@@ -33,7 +33,7 @@
 #ifndef FLOAT_TO_STREAM_TEST_H
 #define FLOAT_TO_STREAM_TEST_H
 
-#include "FloatToStream.h"
+#include "IOBufferFloatPrint.h"
 #include "FormatDescriptor.h"
 
 class FloatToStreamTest {
@@ -42,22 +42,46 @@ private:
 
 public:
 
-    /** Tests the print of a float on a stream in fixed point notation (precision = #decimals) */
+    /** 
+     * @brief Tests the print of a float on a stream in fixed point notation (precision = #decimals)
+     * @return false if something fails.
+     *
+     * Test the print of float number on stream try to trigger all special cases. */
     bool TestFixedPoint();
  
-    /** Tests the print of a float on a stream in fixed point relative notation (precision = #significative digits). */
+    /**
+     * @brief Tests the print of a float on a stream in fixed point relative notation (precision = #significative digits).   
+     * @return false if something fails.
+     *
+     * Test the print of float number on stream try to trigger all special cases. */
     bool TestFixedRelativePoint();
     
-    /** Tests the print of a float on a stream in engineering notation (precision = #significative digits). */
+    /**
+     * @brief Tests the print of a float on a stream in engineering notation (precision = #significative digits).
+     * @return false if something fails.
+     *
+     * Test the print of float number on stream try to trigger all special cases. */ 
     bool TestEngeneering();
     
-    /** Tests the print of a float on a stream in smart notation (precision = #significative digits). */
+    /**
+     * @brief Tests the print of a float on a stream in smart notation (precision = #significative digits).
+     * @return false if something fails.
+     *
+     * Test the print of float number on stream try to trigger all special cases. */ 
     bool TestSmart();
 
-    /** Tests the print of a float on a stream in exponential notation (precision = #significative digits). */
+    /**
+     * @brief Tests the print of a float on a stream in exponential notation (precision = #significative digits).
+     * @return false if something fails.
+     *
+     * Test the print of float number on stream try to trigger all special cases. */ 
     bool TestExponential();
     
-    /** Tests the print of a float on a stream in compact notation (precision = #significative digits). */
+    /**
+     * @brief Tests the print of a float on a stream in compact notation (precision = #significative digits).
+     * @return false if something fails.
+     *
+     * Test the print of float number on stream try to trigger all special cases. */ 
     bool TestCompact();
 };
 
