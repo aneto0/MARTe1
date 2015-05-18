@@ -207,10 +207,10 @@ int32 StreamString::Locate(char c) const {
  */
 int32 StreamString::Locate(const StreamString &x) const {
     if (x.buffer.UsedSize() == 0){
-        return False;
+        return -1;
     }
     if (x.buffer.UsedSize() > buffer.UsedSize()){
-        return False;
+        return -1;
     }
 	const char *p = StringHelper::SearchString(Buffer(), x.Buffer());
 	if (p == NULL) return -1;
