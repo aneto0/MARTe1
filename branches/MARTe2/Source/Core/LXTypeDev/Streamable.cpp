@@ -173,10 +173,14 @@ bool Streamable::Print(const AnyType& par,FormatDescriptor fd){
 		char stackBuffer[64];		
 		StreamWrapperIOBuffer outputBuffer (this,stackBuffer,sizeof (stackBuffer));
 
-		return PrintToStream(outputBuffer,par,fd);
+		if(!PrintToStream(outputBuffer,par,fd)) return false;
+		outputBuffer->Terminate();
+		return true;
 	}
 		
-	return PrintToStream(*outputBuffer,par,fd);
+	if(!PrintToStream(*outputBuffer,par,fd)) return false;
+	outputBuffer->Terminate();
+	return true;
 }
 
 bool Streamable::PrintFormatted(const char *format, const AnyType pars[]){
@@ -188,9 +192,13 @@ bool Streamable::PrintFormatted(const char *format, const AnyType pars[]){
 		char stackBuffer[64];
 		StreamWrapperIOBuffer outputBuffer (this,stackBuffer,sizeof (stackBuffer));
 		
-		return PrintFormattedToStream(outputBuffer,format,pars);
+		if(!PrintFormattedToStream(outputBuffer,format,pars)) return false;
+		outputBuffer->Terminate();
+		return true;
 	}
-	return PrintFormattedToStream(*outputBuffer,format,pars);
+	if(!PrintFormattedToStream(*outputBuffer,format,pars)) return false;
+	outputBuffer->Terminate();
+	return true;
 }
 
 

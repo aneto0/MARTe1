@@ -159,6 +159,27 @@ public:
 		dataDescriptor.isConstant = true;
 	}   
     
+	/// constructor from an integer 64 bit
+    AnyType(uint64 &i){
+		dataPointer = &i;
+		bitAddress  = 0;
+		dataDescriptor = UnsignedInteger64Bit;
+	}   
+    
+	/// constructor from an integer 64 bit
+    AnyType(int64 &i){
+		dataPointer = &i;
+		bitAddress  = 0;
+		dataDescriptor = SignedInteger64Bit;
+	}   
+    
+	/// 
+    AnyType(const int64 &i){
+		dataPointer = (void *)&i;
+		bitAddress  = 0;
+		dataDescriptor = SignedInteger64Bit;
+		dataDescriptor.isConstant = true;
+	}
 	/// 
     AnyType(const void * p){
 		dataPointer = (void *)p;
