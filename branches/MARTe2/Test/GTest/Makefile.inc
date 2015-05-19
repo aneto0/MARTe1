@@ -61,7 +61,8 @@ OBJSX=  EndianityGTest.x \
 	BufferedStreamGTest.x \
 	StreamStringGTest.x \
 	StreamMemoryReferenceGTest.x \
-	ErrorManagementGTest.x 
+	ErrorManagementGTest.x \
+	StreamableGTest.x 
 
 PACKAGE=
 ROOT_DIR=../..

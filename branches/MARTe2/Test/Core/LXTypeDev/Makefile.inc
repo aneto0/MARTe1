@@ -31,7 +31,8 @@ OBJSX= IntegerToStreamTest.x \
 	BufferedStreamTest.x \
 	StreamStringTest.x \
 	StreamMemoryReferenceTest.x \
-	ErrorManagementTest.x
+	ErrorManagementTest.x \
+	StreamableTest.x
 		
 PACKAGE=Core
 ROOT_DIR=../../..

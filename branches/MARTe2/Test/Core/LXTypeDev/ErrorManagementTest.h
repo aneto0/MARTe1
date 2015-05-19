@@ -42,9 +42,8 @@
 #define BUFF_SIZE 128
 
 
-void PrintErrorManagement(ErrorInformation& errorInfo, const char* description);
-	
-
+void ReportTestFunction(ErrorInformation& errorInfo, const char* description);	
+void ReportParametersTestFunction(ErrorInformation& errorInfo, const char* description);
 
 
 class ErrorManagementTest {
@@ -119,19 +118,18 @@ public:
 		
 
 
-		ErrorManagement_SetErrorMessageProcessFunction(PrintErrorManagement);
-		StreamString test;
-		test.Printf("Type:%s Des:%s Line:%d Fun:%s", expected, errorDescription, lineNumber, functionName);
+		ErrorManagement_SetErrorMessageProcessFunction(ReportParametersTestFunction);
 
-		REPORT_ERROR_PARAMETERS(buffer, BUFF_SIZE, code, "Type:%s Des:%s Line:%d Fun:%s", expected, errorDescription, lineNumber, functionName);
+		
 
-		printf("\n%s\n",buffer);
+		REPORT_ERROR_PARAMETERS(code, "Type:%s File:%s Line:%d Fun:%s", expected, filename, lineNumber, functionName);
+
+		if(!retVal) return False;
+
+
+   		ErrorManagement_SetErrorMessageProcessFunction(ReportTestFunction);
 	
-		if(test!=buffer){
-			return False;
-		}
-
-		for(int32 i=0; i<nOfThreads; i++){
+         	for(int32 i=0; i<nOfThreads; i++){
 			retVal=False;
 			ErrorManagement::ReportError(code, errorDescription, filename, lineNumber, functionName);
 			ErrorManagement::ReportErrorFullContext(code, errorDescription, filename, lineNumber, functionName);
