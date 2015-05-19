@@ -2,6 +2,7 @@
 #include "StreamString.h"
 #include "BufferedStream.h"
 #include "Memory.h"
+#include "StreamWrapperIOBuffer.h"
 #define MAX_DIMENSION 128
 #define MAX_STREAM_DIMENSION 256
 
@@ -24,28 +25,11 @@ public:
 		StreamString* me=this;
 		return (*me)="";
 	}
-/*
-	MyStream(){
-		size=0;
-	}
-	
-	void PutC(char c){
-		size%=(MAX_DIMENSION-1);
-			
-		
-		oBuffer[size]=c;
-		oBuffer[size+1]=0;
-		size++;		
-	}
-	
-	char* Buffer(){
-		return buffer;
-	}
 
-	void Clear(){
-		size=0;
-	}*/
 };
+
+
+
 
 
 
@@ -204,3 +188,115 @@ public:
 	}
 
 };
+
+
+
+//Uses the Wrapper IOBuffer
+class SimpleStreamable : public Streamable{
+
+public:
+	uint32 size;
+	char buffer[MAX_STREAM_DIMENSION];
+	bool seekFlag;
+	StreamWrapperIOBuffer outputBuff;
+	char window[64];
+protected:
+	
+	IOBuffer* GetInputBuffer(){
+		if(seekFlag){
+			return &outputBuff;	
+		}	
+		return NULL;
+	}
+
+	IOBuffer* GetOutputBuffer(){
+		return NULL;
+	}
+
+public:
+
+	SimpleStreamable(bool flag=false):outputBuff(this, window, sizeof(window)){
+		for(int32 i=0; i<MAX_STREAM_DIMENSION; i++) buffer[i]=0;
+		size=0;
+		seekFlag=flag;
+	}
+
+	
+	void Clear(){
+		size=0;
+		for(int32 i=0; i<MAX_STREAM_DIMENSION; i++) buffer[i]=0;
+	}
+
+
+	bool Sync(){
+		if(seekFlag)	return outputBuff.Resync();
+		else return true;
+	}
+
+	//Copy buffer in inBuffer for the read from stream.
+	bool Read(char* inBuffer, uint32 &inSize, TimeoutType timeout=TTDefault, bool complete=false){
+	
+		if((size+inSize) >= MAX_STREAM_DIMENSION){
+			size=0;
+		}
+	
+		if(!MemoryCopy(inBuffer, &buffer[size], inSize)){
+			return false;
+		}
+	
+		size+=inSize;
+		return true;
+
+	}		
+
+	//Copy outBuffer in buffer for the write to stream.
+	bool Write(const char* outBuffer, uint32 &outSize, TimeoutType timeout=TTDefault, bool complete=false){
+
+		if((size+outSize) >= MAX_STREAM_DIMENSION){
+			size=0;
+		}
+		if(!MemoryCopy(&buffer[size], outBuffer, outSize)){
+			return false;
+		}
+		size+=outSize;
+		return true;
+	}
+
+
+	
+	bool Seek(int64 seek){
+		size=seek;	
+		return true;
+	}
+
+	bool RelativeSeek(int32 delta){
+		size+=delta;
+		return true;
+	}
+
+	bool CanWrite()const{
+		return true;
+	}
+
+	bool CanSeek()const{
+		return true;
+	}
+	
+	bool CanRead()const{
+		return true;
+	}
+
+	int64 Size(){
+		return MAX_DIMENSION;
+	}	
+
+	int64 Position(){
+		return size;
+	}
+
+	bool SetSize(int64 s){
+		return True;
+	}
+};
+
+

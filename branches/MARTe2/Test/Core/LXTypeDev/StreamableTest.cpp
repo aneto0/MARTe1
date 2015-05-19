@@ -36,23 +36,20 @@
 
 
 bool StreamableTest::TestSeek(){
-	SimpleStreamable myStream;
-/*	uint32 size=64;
+	SimpleStreamable myStream(true);
+	uint32 size=64;
 	char buffer[64];
-	StreamWrapperIOBuffer nullWrapBuffer(&myStream,buffer, 0);
-	if(!nullWrapBuffer.Resync()){
-		return False;
-	}
 
-	StreamWrapperIOBuffer wrapBuffer(&myStream, buffer, size);
 	const char *toWrite="HelloWorld.";
 	uint32 toWriteSize=11;
 
 	StringHelper::Copy(myStream.buffer, toWrite);
 	char output[32];
-	
-		
-	wrapBuffer.Read();
+	uint32 sizeOutput=32;	
+
+	myStream.GetToken(output,".",sizeOutput,0,0); 
+
+			
 	
 	printf("\n%d\n",myStream.Position());	
 	//After write position is 64
@@ -60,15 +57,14 @@ bool StreamableTest::TestSeek(){
 		return False;
 	}	
 	
-	wrapBuffer.Resync();
-
+	myStream.Sync();
 	printf("\n%d\n",myStream.Position());
 	
-	if(myStream.Position()!=(toWriteSize-1)){
+	if(myStream.Position()!=toWriteSize){
 		return False;
 	}
 	
-*/
+
 	return True;
 }
 
