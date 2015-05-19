@@ -58,7 +58,7 @@ public: // read buffer private methods
     virtual void 		Write(const char *buffer, uint32 &size);    
 
     /** @brief Add the termination character. */
-    virtual void Terminate();
+    virtual void 		Terminate();
 
 };
 

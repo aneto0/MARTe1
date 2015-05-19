@@ -24,7 +24,7 @@
  **/
 
 #include "StreamMemoryReference.h"
-#include "ErrorManagement.h"
+#include "AdvancedErrorManagement.h"
 
 /** Destructor */
 StreamMemoryReference::~StreamMemoryReference() {
@@ -95,12 +95,12 @@ bool StreamMemoryReference::SetSize(int64 size){
     return true; 
 }
 
-
 /** Moves within the file to an absolute location */
 bool StreamMemoryReference::Seek(int64 pos){
-	if (pos > buffer.UsedSize()) {
-		REPORT_ERROR(ParametersError,"pos out of range")
-		buffer.Seek(buffer.UsedSize());
+	uint32 usedSize = buffer.UsedSize(); 
+	if (pos > usedSize) {
+		REPORT_ERROR_PARAMETERS(ParametersError,"pos=%i out of range=[0-%i] , moving to end of stream",pos,usedSize)
+		buffer.Seek(usedSize);
 		return false;
 	}
 	

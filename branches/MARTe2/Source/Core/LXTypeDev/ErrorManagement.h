@@ -88,7 +88,6 @@ struct ErrorInformation{
 		/// implies that ObjectPointer and ClassName are sent as well
 		bool        isObject:1;
 
-
 	} header;
 
 
@@ -134,7 +133,9 @@ struct ErrorInformation{
 };
 
 /** the type of an user provided ErrorProcessing function */
-typedef void (*ErrorMessageProcessFunctionType)(ErrorInformation &errorInfo,const char *errorDescription);
+typedef void (*ErrorMessageProcessFunctionType)(
+		ErrorInformation &			errorInfo,
+		const char *				errorDescription);
 
 /**
  * pointer to the function that will process the errors
@@ -177,7 +178,10 @@ public:
 		errorInfo.header.lineNumber = lineNumber;
 		errorInfo.fileName 	 		= fileName;
 		errorInfo.functionName      = functionName;
-		errorInfo.hrtTime 			= HighResolutionTimer::Counter();		
+		errorInfo.hrtTime 			= HighResolutionTimer::Counter();
+#if !INTERRUPT_SUPPORTED		
+		errorInfo.threadId 			= Threads::Id();
+#endif		
 		errorMessageProcessFunction(errorInfo, errorDescription);
 	}
 
@@ -188,10 +192,10 @@ public:
 	 */
 	static inline void ReportErrorFullContext(
 			ErrorType 			code, 
-			const char *		errorDescription,
-			const char *        fileName			= NULL,
+			const char *		errorDescription,             /// memory volatile - will not be touched but is not expected to be persistent
+			const char *        fileName			= NULL,   /// permanent in memory- accessible to all threads
 			unsigned int		lineNumber  		= 0,
-			const char *		functionName        = NULL
+			const char *		functionName        = NULL    /// permanent in memory- accessible to all threads
 			){
 
 		ErrorInformation errorInfo;

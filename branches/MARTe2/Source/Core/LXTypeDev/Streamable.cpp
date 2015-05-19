@@ -23,7 +23,7 @@
 **/
 
 #include "Streamable.h"
-#include "ErrorManagement.h"
+#include "AdvancedErrorManagement.h"
 #include "StringHelper.h"
 #include "IOBufferFunctions.h"
 #include "StreamWrapperIOBuffer.h"
@@ -119,12 +119,12 @@ bool Streamable::GetToken(
 			outputIOBuffer   = &outputIOBufferS;
 
 			ret = GetTokenFromStream(*inputIOBuffer, *outputIOBuffer,terminator,saveTerminator,skipCharacters);		
-			outputIOBuffer->Terminate();
+//			outputIOBuffer->Terminate();
 			
 			
 		} else { 	
 			ret = GetTokenFromStream(*inputIOBuffer, *outputIOBuffer,terminator,saveTerminator,skipCharacters);
-			outputIOBuffer->Terminate();		
+//			outputIOBuffer->Terminate();		
 		}
 	} else {
 		
@@ -134,12 +134,12 @@ bool Streamable::GetToken(
 			outputIOBuffer = &outputIOBufferS; 
 
 			ret = GetTokenFromStream(*inputIOBuffer, *outputIOBuffer,terminator,saveTerminator,skipCharacters);
-			outputIOBuffer->Terminate();
+//			outputIOBuffer->Terminate();
 			
 		} else { 
 		
 			ret = GetTokenFromStream(*inputIOBuffer, *outputIOBuffer,terminator,saveTerminator,skipCharacters);		
-			outputIOBuffer->Terminate();
+//			outputIOBuffer->Terminate();
 		}		
 	}
 
@@ -174,12 +174,12 @@ bool Streamable::Print(const AnyType& par,FormatDescriptor fd){
 		StreamWrapperIOBuffer outputBuffer (this,stackBuffer,sizeof (stackBuffer));
 
 		if(!PrintToStream(outputBuffer,par,fd)) return false;
-		outputBuffer.Terminate();
+//		outputBuffer.Terminate();
 		return true;
 	}
 		
 	if(!PrintToStream(*outputBuffer,par,fd)) return false;
-	outputBuffer->Terminate();
+//	outputBuffer->Terminate();
 	return true;
 }
 
@@ -192,12 +192,16 @@ bool Streamable::PrintFormatted(const char *format, const AnyType pars[]){
 		char stackBuffer[64];
 		StreamWrapperIOBuffer outputBuffer (this,stackBuffer,sizeof (stackBuffer));
 		
-		if(!PrintFormattedToStream(outputBuffer,format,pars)) return false;
-		outputBuffer.Terminate();
+		if(!PrintFormattedToStream(outputBuffer,format,pars)) {
+			return false;
+		}
+//		outputBuffer.Terminate();
 		return true;
 	}
-	if(!PrintFormattedToStream(*outputBuffer,format,pars)) return false;
-	outputBuffer->Terminate();
+	if(!PrintFormattedToStream(*outputBuffer,format,pars)) {
+		return false;
+	}
+//	outputBuffer->Terminate();
 	return true;
 }
 

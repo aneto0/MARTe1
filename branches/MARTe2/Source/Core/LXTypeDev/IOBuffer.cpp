@@ -29,6 +29,7 @@
  */
 
 #include "IOBuffer.h"
+#include "AdvancedErrorManagement.h"
 
 
 /**
@@ -51,15 +52,17 @@ bool IOBuffer::RelativeSeek(int32 delta){
 		//cannot seek beyond fillLeft
 		if ((uint32)delta > actualLeft){
 			delta = actualLeft;
-			/// maybe saturate at the end?
+			///  saturate at the end
 			ret =  false;
+			REPORT_ERROR_PARAMETERS(ParametersError,"delta=%i at position %i moves out of range %i, moving to end of stream",delta,Position(),MaxUsableAmount())			
 		}
 	} else {
 		// cannot seek below 0
 		if ((uint32)(-delta) > Position()){
-			/// maybe saturate at the beginning?
+			///  saturate at the beginning
 			ret =  false;
 			delta = -Position();
+			REPORT_ERROR_PARAMETERS(ParametersError,"delta=%i at position %i moves out of range 0, moving to beginning of stream",delta,Position())			
 		}
 	}
 	amountLeft -= delta;
@@ -108,7 +111,7 @@ bool IOBuffer::SetBufferHeapMemory(
 
 	bufferPtr = ( char *)Buffer();
 
-   	 maxUsableAmount = BufferSize();
+	maxUsableAmount = BufferSize();
 	if (maxUsableAmount <= reservedSpaceAtEnd){
 		maxUsableAmount = 0;
 	} else {
@@ -176,9 +179,8 @@ bool IOBuffer::Resync(TimeoutType         msecTimeout){
 	return false; 
 }   
 
-void IOBuffer::Terminate(){
-	
-}
+//void IOBuffer::Terminate(){
+//}
 
 
 /** copies buffer of size size at the end of writeBuffer

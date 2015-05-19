@@ -180,8 +180,11 @@ public: // DIRECT ACCESS FUNCTIONS
     /**
      * @brief Read Only access to the internal buffer.
      * @return The pointer to the buffer.
+     * NOTE this pointer may not be conserved as it might be invalid after any write operation
+     * this is because a realloc may be used
      */
-    inline const char *Buffer() const {
+    inline const char *Buffer()  {
+    	buffer.Terminate();
         return buffer.Buffer();
     }
 
@@ -189,7 +192,8 @@ public: // DIRECT ACCESS FUNCTIONS
      * @brief Read Write access top the internal buffer.
      * @return The pointer to the buffer
      */
-    inline char *BufferReference() const {
+    inline char *BufferReference()  {
+    	buffer.Terminate();
         return buffer.BufferReference();
     }
 
@@ -291,7 +295,7 @@ public:
         if (buffer.UsedSize() != s.buffer.UsedSize()){
             return false;
         }
-        if (StringHelper::Compare(Buffer(), s.Buffer()) != 0){
+        if (StringHelper::CompareN(buffer.Buffer(), s.buffer.Buffer(),buffer.UsedSize()) != 0){
             return false;
         }
         return true;
@@ -306,7 +310,10 @@ public:
         if (s == NULL){
             return false;
         }
-        if (StringHelper::Compare(Buffer(), s) != 0){
+        if ((uint32)StringHelper::Length(s) != buffer.UsedSize()){
+        	return false;
+        }
+        if (StringHelper::CompareN(buffer.Buffer(),s,buffer.UsedSize()) != 0){
             return false;
         }
         return true;

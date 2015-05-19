@@ -143,6 +143,14 @@ public:
 		bitAddress  = 0;
 		dataDescriptor = UnsignedInteger32Bit;
 	}   
+
+	/// constructor from an integer 8 bit
+    AnyType(const uint32 &i){
+		dataPointer = (void *)&i;
+		bitAddress  = 0;
+		dataDescriptor = UnsignedInteger32Bit;
+		dataDescriptor.isConstant = true;
+	}   
     
 	/// constructor from an integer 8 bit
     AnyType(int32 &i){

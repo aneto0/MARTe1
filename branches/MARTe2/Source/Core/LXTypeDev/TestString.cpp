@@ -1,7 +1,20 @@
 #include "StreamString.h"
+#include "ErrorManagement.h"
 #include <stdio.h>
 
+void MyErrorReportFunction(ErrorInformation &errorInfo,const char *errorDescription){
+	if ((errorInfo.fileName!=NULL) && (errorInfo.header.lineNumber!=0)){
+		printf ("[%s:%i:%s()] ", errorInfo.fileName,errorInfo.header.lineNumber,errorInfo.functionName);		
+	}
+	
+	printf ("%s : %s \n", ErrorManagement::ErrorName(errorInfo.header.errorType),errorDescription);	
+	
+}
+
+
 int main(){
+	ErrorManagement::SetErrorMessageProcessFunction(MyErrorReportFunction);
+
 	printf("TEST\n");
 	
 	StreamString s;

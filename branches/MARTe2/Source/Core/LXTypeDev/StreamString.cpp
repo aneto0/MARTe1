@@ -24,7 +24,7 @@
  **/
 
 #include "StreamString.h"
-#include "ErrorManagement.h"
+#include "AdvancedErrorManagement.h"
 #include "StreamWrapperIOBuffer.h"
 
 
@@ -73,7 +73,7 @@ bool StreamString::Write(
                         bool                complete){
 	this->buffer.Write(buffer,size);
 	
-	this->buffer.Terminate();
+//	this->buffer.Terminate();
 	return true;
 	
 }
@@ -95,9 +95,10 @@ int64 StreamString::Size(){
 
 /** Moves within the file to an absolute location */
 bool StreamString::Seek(int64 pos){
-	if (pos > buffer.UsedSize()) {
-		REPORT_ERROR(ParametersError,"pos out of range")
-		buffer.Seek(buffer.UsedSize());
+	uint32 usedSize = buffer.UsedSize(); 
+	if (pos > usedSize) {
+		REPORT_ERROR_PARAMETERS(ParametersError,"pos=%i out of range=[0-%i] , moving to end of stream",pos,usedSize)
+		buffer.Seek(usedSize);
 		return false;
 	}
 	
@@ -142,7 +143,7 @@ bool StreamString::AppendOrSet(char c, bool append) {
 		buffer.Empty();
 	}
 	bool ret = buffer.PutC(c);
-	buffer.Terminate();
+//	buffer.Terminate();
 	return ret;
 }
 
@@ -153,6 +154,7 @@ bool StreamString::AppendOrSet(char c, bool append) {
  */
 bool StreamString::AppendOrSet(const char *s, bool append) {
     if (s == NULL){
+		REPORT_ERROR(ParametersError,"s == NULL")
         return false;
     }
     uint32 size = StringHelper::Length(s);
@@ -163,7 +165,7 @@ bool StreamString::AppendOrSet(const char *s, bool append) {
 		buffer.Empty();
 	} 
 	buffer.Write(s,size);
-	buffer.Terminate();
+//	buffer.Terminate();
 	return true;
 }
 
@@ -173,7 +175,6 @@ bool StreamString::AppendOrSet(const char *s, bool append) {
  * @return True if successful. False otherwise.
  */
 bool StreamString::AppendOrSet(const StreamString &s, bool append) {
-    uint32 size = s.buffer.UsedSize();
 
     if (append){
     	buffer.Seek(buffer.UsedSize());
@@ -181,8 +182,9 @@ bool StreamString::AppendOrSet(const StreamString &s, bool append) {
 		buffer.Empty();
 	} 
 
-    buffer.Write(s.Buffer(),size);
-	buffer.Terminate();
+    uint32 size = s.buffer.UsedSize();
+    buffer.Write(s.buffer.Buffer(),size);
+//	buffer.Terminate();
 	return true;
 }
 
@@ -195,10 +197,19 @@ int32 StreamString::Locate(char c) const {
     if (buffer.UsedSize() == 0){
         return -1;
     }
-	const char *p = StringHelper::SearchChar(Buffer(), c);
-	if (p == NULL) return -1;
+    const char *string = buffer.Buffer(); 
+	if (string == NULL) {
+		return -1;
+	}
+	int32 index = 0;
+    while (index < buffer.UsedSize()){
+    	if (string[index]==c) {
+    		return index;
+    	}
+    	index++;
+    }
 	
-	return (int32) (p -Buffer());
+	return -1;
 }
 
 /** Checks if a string is contained in the string.
@@ -212,10 +223,32 @@ int32 StreamString::Locate(const StreamString &x) const {
     if (x.buffer.UsedSize() > buffer.UsedSize()){
         return -1;
     }
-	const char *p = StringHelper::SearchString(Buffer(), x.Buffer());
-	if (p == NULL) return -1;
-	
-	return (int32) (p -Buffer());
+    if (x.buffer.Buffer() == NULL) return -1;
+    if (buffer.Buffer() == NULL) return -1;
+    const char *string = buffer.Buffer(); 
+    const char *pattern = x.buffer.Buffer();
+    
+	int32 index = 0;
+	// no point to try match the tail of the string if it is smaller than the pattern
+	int32 maxIndex = (1+buffer.UsedSize()-x.buffer.UsedSize()); 
+	// loop through the string characters
+    while (index < maxIndex){
+    	// detect the start as a potential match
+    	if (string[index]==pattern[0])   {
+    		int32 index2 = 1;
+    		const char *stringSegment = string+index;
+    		// check the remainder
+    		while (index2 < x.buffer.UsedSize()){
+    			if (stringSegment[index2] != pattern[index2]) break;
+    			index2++;
+    		}
+    		// found it as we exit with index2 at the max value 
+    		if (index2 == x.buffer.UsedSize()) return index;
+    	}
+    	index++;
+    }
+    
+	return -1;
 }
 
 

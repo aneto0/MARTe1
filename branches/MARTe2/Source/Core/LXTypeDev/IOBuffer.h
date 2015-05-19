@@ -113,7 +113,7 @@ public:
      * used for instance by string to add terminator 0
      * default empty implementation
      */
-    virtual void 		Terminate();
+//    virtual void 		Terminate();  // removed as I have put it in the .Buffer() operation of StringStream
     
     /**
      * position is set relative to start of buffer
