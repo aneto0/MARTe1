@@ -293,12 +293,16 @@ public:
     inline bool 		WriteAll(const char *buffer, uint32 &size){
     	uint32 leftSize = size;
     	while (leftSize > 0){
+		if(AmountLeft()==0){
+			NoMoreSpaceToWrite(leftSize);
+			if(AmountLeft()==0){
+				return false;
+			}
+		}
+
     		uint32 toDo = leftSize;
     		Write(buffer,toDo);
-    		if (toDo == 0) {
-    			size -= leftSize; 
-    			return false;
-    		}
+    	
     		buffer   += toDo;
     		leftSize -= toDo;
     	}

@@ -193,6 +193,7 @@ public:
 		dataPointer = (void *)p;
 		bitAddress  = 0;
 		dataDescriptor.type = TypeDescriptor::Pointer;
+		dataDescriptor.isStructuredData=false;
 		dataDescriptor.isConstant = true;
 		dataDescriptor.size = 8 * sizeof(void *);	
 	} 
@@ -202,6 +203,7 @@ public:
 		dataPointer = (void *)p;
 		bitAddress  = 0;
 		dataDescriptor.type = TypeDescriptor::Pointer;
+		dataDescriptor.isStructuredData=false;
 		dataDescriptor.isConstant = false;
 		dataDescriptor.size = 8 * sizeof(void *);
 	}
@@ -211,6 +213,7 @@ public:
 		dataPointer = (void *)p; // we will either print the variable or the string
 		bitAddress  = 0;
 		dataDescriptor.type = TypeDescriptor::CCString;
+		dataDescriptor.isStructuredData=false;
 		dataDescriptor.isConstant = true;
 	} 
 };

@@ -112,10 +112,9 @@ bool Streamable::GetToken(
 		StreamWrapperIOBuffer inputIOBufferS (this,stackBuffer,sizeof (stackBuffer));
 		inputIOBuffer   = &inputIOBufferS;
 		
-		IOBuffer *outputIOBuffer  = GetOutputBuffer();		
 		if (outputIOBuffer == NULL){
 			char stackBuffer[64];		
-			StreamWrapperIOBuffer outputIOBufferS (this,stackBuffer,sizeof (stackBuffer));		
+			StreamWrapperIOBuffer outputIOBufferS (&output,stackBuffer,sizeof (stackBuffer));		
 			outputIOBuffer   = &outputIOBufferS;
 
 			ret = GetTokenFromStream(*inputIOBuffer, *outputIOBuffer,terminator,saveTerminator,skipCharacters);		
@@ -130,7 +129,7 @@ bool Streamable::GetToken(
 		
 		if (outputIOBuffer == NULL){
 			char stackBuffer[64];		
-			StreamWrapperIOBuffer outputIOBufferS (this,stackBuffer,sizeof (stackBuffer));		
+			StreamWrapperIOBuffer outputIOBufferS (&output,stackBuffer,sizeof (stackBuffer));		
 			outputIOBuffer = &outputIOBufferS; 
 
 			ret = GetTokenFromStream(*inputIOBuffer, *outputIOBuffer,terminator,saveTerminator,skipCharacters);

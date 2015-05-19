@@ -201,7 +201,7 @@ int32 StreamString::Locate(char c) const {
 	if (string == NULL) {
 		return -1;
 	}
-	int32 index = 0;
+	uint32 index = 0;
     while (index < buffer.UsedSize()){
     	if (string[index]==c) {
     		return index;
@@ -228,14 +228,14 @@ int32 StreamString::Locate(const StreamString &x) const {
     const char *string = buffer.Buffer(); 
     const char *pattern = x.buffer.Buffer();
     
-	int32 index = 0;
+	uint32 index = 0;
 	// no point to try match the tail of the string if it is smaller than the pattern
-	int32 maxIndex = (1+buffer.UsedSize()-x.buffer.UsedSize()); 
+	uint32 maxIndex = (1+buffer.UsedSize()-x.buffer.UsedSize()); 
 	// loop through the string characters
     while (index < maxIndex){
     	// detect the start as a potential match
     	if (string[index]==pattern[0])   {
-    		int32 index2 = 1;
+    		uint32 index2 = 1;
     		const char *stringSegment = string+index;
     		// check the remainder
     		while (index2 < x.buffer.UsedSize()){
