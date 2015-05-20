@@ -64,19 +64,30 @@ class StreamString: public Streamable {
 
 private:    
 
-	/** memory allocated buffer. */
-	StreamStringIOBuffer 	buffer;	
+    /*
+     * All read and write operations are performed on this buffer.
+     * Also if each streamable implementation has its own read and write buffers,
+     * defining all of them as descendants of IOBuffers specific functions are called 
+     * passing truth the virtual table.
+     * The function IOBuffer::Write and IOBuffer::NoMoreSpaceToWrite are overloaded to reallocate new memory in case of full buffer.*/
+     StreamStringIOBuffer 	buffer;	
    
 protected: // methods to be implemented by deriving classes
-    /** @brief Implemented because pure virtual. */
+
+    /**
+     * @brief Returns buffer as the read buffer. It is both read and write buffer.
+     * @return a pointer to the StreamStringIOBuffer buffer.
+    */
     virtual IOBuffer *GetInputBuffer();
 
-    /** @brief Implemented because pure virtual. */
+    /**
+     * @brief Returns buffer as the write buffer.
+     * @return a pointer to the StreamStringIOBuffer buffer. */
     virtual IOBuffer *GetOutputBuffer();
 
 public: // usable constructors
 
-    /** @brief Creates an empty string */
+    /** @brief Copy constructor from a const char*. */
     StreamString(const char *initialisationString=NULL){
     	if (initialisationString != NULL) AppendOrSet(initialisationString,false);
     }
@@ -84,7 +95,7 @@ public: // usable constructors
     /** @brief Destructor */
     virtual ~StreamString() ;
     
-    /** */
+    /** @brief Automatic cast to AnyType as a const char passing Buffer() return value. */
     operator AnyType(){
     	AnyType at(Buffer());
     	return at;
@@ -94,11 +105,12 @@ public:
     /** 
      * @brief Reads data into buffer.
      * @param buffer is the output buffer.
-     * @param size is the number of bytes (char) to copy.
+     * @param size is the number of bytes to copy.
      * @param msecTimeout is the timeout.
      * @param complete is a flag which specifies if the read operation is completed.
      * @return false in case of errors.   
      *
+     * This function calls IOBuffer::Read. See it for more informations.
      *  As much as size byte are read, 
      *  actual read size is returned in size. (unless complete = True)
      *  msecTimeout is how much the operation should last - no more - if not any (all) data read then return false  
@@ -113,11 +125,12 @@ public:
     /**
      * @brief Write from a buffer to the string.
      * @param buffer is the input buffer.
-     * @param size is the number of bytes (char) to copy.
+     * @param size is the number of bytes to copy.
      * @param msecTimeout is the timeout.
      * @param complete is a flag which specifies if the write operation is completed.
      * @return false in case of errors.
      *
+     * This function calls IOBuffer::Write. See it for more infomations.
      *  As much as size byte are written, 
      *  actual written size is returned in size. 
      *  msecTimeout is how much the operation should last.
@@ -131,47 +144,61 @@ public:
     
     /**
       * @brief Specifies if the string can be written.
-      * @return true if write operations are allowed.
+      * @return true.
       */
     virtual bool        CanWrite() const ;
 
     /**
      * @brief Specifies if the string can be read.
-     * @return true if read operations are allowed. */
+     * @return true. */
     virtual bool        CanRead() const ;
     
     /**
      * @brief The size of the string.
-     * @return the current string size. */
+     * @return the current string size.
+     *
+     * StreamStringIOBuffer type allocates memory dinamically on the heap,
+     * then it returns the memory currently allocated for the buffer. */
     virtual int64       Size() ;
 
     /**
      * @brief Moves within the string to an absolute location.
      * @param pos is the desired cursor position.
-     * @return false in case of cursor out of ranges or other errors. */
+     * @return false in case of cursor out of ranges or other errors.
+     * 
+     * If the position is out of ranges, position becomes the end of the stream.
+     * This function calls IOBuffer::Seek, see it for more informations. */
     virtual bool        Seek(int64 pos);
     
     /** 
      * @brief Moves within the string relative to current location.
      * @param deltaPos is the desired gap from the current position.
-     * @return false in case of cursor out of ranges or other errors. */
+     * @return false in case of cursor out of ranges or other errors.
+     * 
+     * If the desired position falls out of ranges, position becomes one of the bounds.
+     * This function calls IOBuffer::RelativeSeek, see it for more informations. */
     virtual bool        RelativeSeek(int32 deltaPos);
     
     /** 
      * @brief Returns current position.
-     * @return the current position. */
+     * @return the current position.
+     *
+     * This function calls IOBuffer::Position, see it for more informations. */
     virtual int64       Position() ;
 
     /**
-     * @brief Clip the string size to a specified point
+     * @brief Set the size of the buffer.
      * @param size The desired size of the buffer.
      * @return True if successful. False otherwise.
+     * 
+     * This function calls IOBuffer::SetAllocationSize, passing size+1 for the final \0.
      */
     virtual bool        SetSize(int64 size);
 
     /** 
      * @brief Specifies if you can move the cursor.
-     * @return true if you can move the cursor in the string. */
+     * @return true.
+     */
     virtual bool        CanSeek() const ;
    
 public: // DIRECT ACCESS FUNCTIONS
@@ -180,8 +207,11 @@ public: // DIRECT ACCESS FUNCTIONS
     /**
      * @brief Read Only access to the internal buffer.
      * @return The pointer to the buffer.
+     *
+     * This function returns the pointer at the beginning of the buffer. It is a CharBuffer function.
      * NOTE this pointer may not be conserved as it might be invalid after any write operation
-     * this is because a realloc may be used
+     * this is because a realloc is used
+     * The final \0 is added before the return.
      */
     inline const char *Buffer()  {
     	buffer.Terminate();
@@ -190,7 +220,10 @@ public: // DIRECT ACCESS FUNCTIONS
 
     /**
      * @brief Read Write access top the internal buffer.
-     * @return The pointer to the buffer
+     * @return The pointer to the buffer.
+     *
+     * This function returns the pointer at the beginning of the buffer. It is a CharBuffer function.
+     * The final \0 is added before the return.
      */
     inline char *BufferReference()  {
     	buffer.Terminate();
@@ -212,15 +245,20 @@ public: // DIRECT ACCESS FUNCTIONS
 private: // DIRECT MANIPULATION FUNCTIONS
 
     /**
-     * @brief Copy a character into the StreamString buffer.
+     * @brief Copy a character into the StreamString buffer or append it at the end.
      * @param  c the character to be copied.
+     * @param append defines if the character must be appended or assigned.
      * @return True if successful. False otherwise.
+     *
+     * If append is true there is an IOBuffer::Seek at the buffer size and then a IOBuffer::PutC.
+     * If append is false the string is cleaned calling IOBuffer::Empty and then used a IOBuffer::PutC.
      */
     virtual bool AppendOrSet(char c, bool append=true) ;
 
     /**
      * @brief Copy a string into the StreamString buffer.
-     * @param  s The pointer to the string to be copied
+     * @param  s The pointer to the string to be copied or appended.
+     * @param append defines if s must be appended or assigned.
      * @return True if successful. False otherwise.
      */
     virtual bool AppendOrSet(const char *s, bool append=true) ;
@@ -228,6 +266,7 @@ private: // DIRECT MANIPULATION FUNCTIONS
     /**
      * @brief Copy a StreamString into a StreamString.
      * @param  s The StreamString to be copied.
+     * @param append defines if s must be appended or assigned.
      * @return True if successful. False otherwise.
      */
     virtual bool AppendOrSet(const StreamString &s, bool append=true) ;
@@ -319,12 +358,17 @@ public:
         return true;
     }
 
-    ///
+    /**
+     * @brief Compare the buffer content with the input content.
+     * @param s The StreamString to be compared with.
+     * @return trye if the two buffer are different, false otherwise. */
     inline bool operator!=(StreamString &s) const {
         return !((*this) == s);
     }
-
-    ///
+    /**
+     * @brief Compare the buffer content with the input content.
+     * @param s The StreamString to be compared with.
+     * @return trye if the two buffer are different, false otherwise. */  
     inline bool operator!=(const char *s) const {
         return !((*this) == s);
     }
@@ -341,15 +385,17 @@ public:
         return buffer.BufferReference()[pos];
     }
     
-    /** Checks if a char is in the string
-     @param c The character to look for.
-     @return >0 the first position if found. -1 otherwise.
+    /** 
+     * @brief Checks if a char is in the string
+     * @param c The character to look for.
+     * @return >0 the first position if found. -1 otherwise.
      */
     virtual int32 Locate(char c) const ;
 
-    /** Checks if a string is contained in the string.
-     @param x The string to look for.
-     @return >0 the first position if found. -1 otherwise.
+    /** 
+     * @brief Checks if a string is contained in the string.
+     * @param x The string to look for.
+     * @return >0 the first position if found. -1 otherwise.
      */
     virtual int32 Locate(const StreamString &x) const ;
 };

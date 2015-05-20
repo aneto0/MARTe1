@@ -108,37 +108,36 @@ bool Streamable::GetToken(
 	bool ret = false; 
 	
 	if (inputIOBuffer == NULL){
-		char stackBuffer[64];		
+		char stackBuffer[64];
+		//create a buffer on the stack as the read buffer.		
 		StreamWrapperIOBuffer inputIOBufferS (this,stackBuffer,sizeof (stackBuffer));
 		inputIOBuffer   = &inputIOBufferS;
 		
 		if (outputIOBuffer == NULL){
-			char stackBuffer[64];		
+			char stackBuffer[64];
+			//create a buffer on the stack as the write buffer		
 			StreamWrapperIOBuffer outputIOBufferS (&output,stackBuffer,sizeof (stackBuffer));		
 			outputIOBuffer   = &outputIOBufferS;
-
+			
 			ret = GetTokenFromStream(*inputIOBuffer, *outputIOBuffer,terminator,saveTerminator,skipCharacters);		
-//			outputIOBuffer->Terminate();
 			
 			
 		} else { 	
 			ret = GetTokenFromStream(*inputIOBuffer, *outputIOBuffer,terminator,saveTerminator,skipCharacters);
-//			outputIOBuffer->Terminate();		
 		}
 	} else {
 		
 		if (outputIOBuffer == NULL){
 			char stackBuffer[64];		
+			//create a buffer on the stack as write buffer.
 			StreamWrapperIOBuffer outputIOBufferS (&output,stackBuffer,sizeof (stackBuffer));		
 			outputIOBuffer = &outputIOBufferS; 
 
 			ret = GetTokenFromStream(*inputIOBuffer, *outputIOBuffer,terminator,saveTerminator,skipCharacters);
-//			outputIOBuffer->Terminate();
 			
 		} else { 
 		
 			ret = GetTokenFromStream(*inputIOBuffer, *outputIOBuffer,terminator,saveTerminator,skipCharacters);		
-//			outputIOBuffer->Terminate();
 		}		
 	}
 
@@ -172,14 +171,10 @@ bool Streamable::Print(const AnyType& par,FormatDescriptor fd){
 		char stackBuffer[64];		
 		StreamWrapperIOBuffer outputBuffer (this,stackBuffer,sizeof (stackBuffer));
 
-		if(!PrintToStream(outputBuffer,par,fd)) return false;
-//		outputBuffer.Terminate();
-		return true;
+		return PrintToStream(outputBuffer,par,fd);
 	}
 		
-	if(!PrintToStream(*outputBuffer,par,fd)) return false;
-//	outputBuffer->Terminate();
-	return true;
+	return PrintToStream(*outputBuffer,par,fd);
 }
 
 bool Streamable::PrintFormatted(const char *format, const AnyType pars[]){
@@ -191,17 +186,10 @@ bool Streamable::PrintFormatted(const char *format, const AnyType pars[]){
 		char stackBuffer[64];
 		StreamWrapperIOBuffer outputBuffer (this,stackBuffer,sizeof (stackBuffer));
 		
-		if(!PrintFormattedToStream(outputBuffer,format,pars)) {
-			return false;
-		}
-//		outputBuffer.Terminate();
-		return true;
+		return PrintFormattedToStream(outputBuffer,format,pars);
+		
 	}
-	if(!PrintFormattedToStream(*outputBuffer,format,pars)) {
-		return false;
-	}
-//	outputBuffer->Terminate();
-	return true;
+	return PrintFormattedToStream(*outputBuffer,format,pars);
 }
 
 

@@ -121,30 +121,47 @@ private: // read and write buffers
 friend class BufferedStreamIOBuffer; 
 //friend class StreamableWriteBuffer; 
        
-    /** starts empty, 
-        used for separate input operations or dual operations
-        to be sized up by final class appropriately 
-    */
+	/** this is the read buffer. It is used just like
+         * a middle buffer between the stream and the output.
+         * For each read operation this buffer is filled completely
+         * and then the desired size is copied on the output.
+         * Using the buffer mode, the GetC function always use this buffer,
+         * while for Read function it is used only if the size to read is minor
+         * than a quarter than the buffer size.
+         * Function BufferedStreamIOBuffer::NoMoreSpaceToWrite acts
+         * as a flush and the more confidencial function Flush calls it.
+         * @see BufferedStreamBuffer for more informations.*/
 	BufferedStreamIOBuffer		readBuffer;
     
 
-    /** starts empty, 
-        used exclusively for separate output operations 
-        to be sized up by final class appropriately 
-    */
+        /** this is the write buffer. It is used just like an
+         * intermediate between the input and the stream. Write 
+         * operations copies data from the input to this buffer 
+         * and only when the buffer is full (or in case of an explicit
+         * FlushAndResync call) the buffer is flushed on the stream.
+         * Using the buffer mode, the PutC function always use this buffer,
+         * while for Write function it is used only if the buffer is 4 times greater
+         * than the size to write.
+	 * Function BufferedStreamIOBuffer::NoMoreSpaceToRead acts
+	 * as a refill and the more confidential function Refill calls it.
+        */
 	BufferedStreamIOBuffer   	writeBuffer;
     
 protected: // methods to be implemented by deriving classes
 
     /**
-     * switches to input mode and returns input buffer
-     * used in read operations 
+     * @brief Get the read buffer.
+     * @return BufferedStreamIOBuffer readBuffer pointer.
+     *
+     * This function is used by Printf and GetToken functions.
     */
     virtual IOBuffer *			GetInputBuffer();
     
     /** 
-     * switches to output mode and returns output buffer
-     * used in write operations 
+     * @brief Get the write buffer.
+     * @return BufferedStreamIOBuffer writeBuffer pointer. 
+     *
+     * This function is used by Printf and GetToken functions.
      */ 
     virtual IOBuffer *			GetOutputBuffer();
     
@@ -154,9 +171,9 @@ protected: // methods to be implemented by deriving classes
      * @brief Reads data into buffer.
      * @param buffer is the buffer where stream datas must be written
      * @param size is the number of bytes to read.
-     * @param msecTimeout is the timeout.
-     * @param complete is a flag which specifies if the read operation is completed.
-     *
+     * @param msecTimeout is the timeout unused here.
+     * @param complete is a flag unused here.
+     * 
      *  As much as size byte are read, 
      *  actual read size is returned in size. 
      *  msecTimeout is how much the operation should last - no more.
@@ -171,11 +188,11 @@ protected: // methods to be implemented by deriving classes
 
   
     /** 
-     * @brief Write data from a buffer to the stream.
+     * @brief Write data from a buffer to the stream directly.
      * @param buffer is the buffer which contains datas to write on the stream.
      * @param size is the number of bytes to write.
      * @param msecTimeout is the timeout.
-     * @param complete is a flag which specifies if the read operation is completed.
+     * @param complete is a flag unused here.
      *
      *  This function is not implemented here but depends from the derived classes.
      *  As much as size byte are written, 
@@ -192,39 +209,39 @@ protected: // methods to be implemented by deriving classes
 
     // RANDOM ACCESS INTERFACE
 
-    /** @brief The size of the stream.
+    /** @brief Pure virtual function. The size of the stream.
       * 
       * Not implemented here. */
     virtual int64       UnBufferedSize()const =0;
 
-    /** @brief Moves within the file to an absolute location.
+    /** @brief Pure virtual function. Moves within the file to an absolute location.
      *
      * Not implemented here. */
     virtual bool        UnBufferedSeek(int64 pos)=0;
 
-    /** @brief Returns current position.
+    /** @brief Pure virtual function. Returns current position.
      *
      * Not implemented here. */
     virtual int64       UnBufferedPosition()const =0;
 
-    /** @brief Clip the stream size to a specified point.
+    /** @brief Pure virtual function. Clip the stream size to a specified point.
       * 
       * Not implemented here. */
     virtual bool        UnBufferedSetSize(int64 size)=0;
 
     // Extended Attributes or Multiple Streams INTERFACE
 
-    /** @brief Select the stream to read from. Switching may reset the stream to the start.
+    /** @brief Pure virtual function. Select the stream to read from. Switching may reset the stream to the start.
       * 
       * Not implemented here. */
     virtual bool        UnBufferedSwitch(uint32 n)=0;
 
-    /** @brief Select the stream to read from. Switching may reset the stream to the start.
+    /** @brief Pure virtual function. Select the stream to read from. Switching may reset the stream to the start.
       * 
       * Not implemented here. */
     virtual bool        UnBufferedSwitch(const char *name)=0;
     
-    /** @brief Remove a stream.
+    /** @brief Pure virtual function. Remove a stream.
       * 
       * Not implemented here. */
     virtual bool        UnBufferedRemoveStream(const char *name)=0;
@@ -237,7 +254,7 @@ private: // mode switch methods
      * @return false if the resyncronization goes wrong.
      *
      *  Sets the readBufferFillAmount to 0.
-     *  Adjust the seek position
+     *  Syncronize the position in the stream.
      *  Sets the mutexWriteMode.
      *  Does not check for mutexBuffering to be active
     */
@@ -250,14 +267,13 @@ private: // mode switch methods
     
     /** 
      * @brief Switch to the read mode.
-     * @return false if the flush goes wrong.
+     * @return false if the flush function fails.
      *
-     *  Flushes write buffer.
+     *  Flushes writeBuffer.
      *  Resets mutexWriteMode.
      *  Does not refill the buffer nor check the mutexBuffering is active.
     */
     inline bool SwitchToReadMode(){
-        // adjust seek position
         if (!writeBuffer.Flush()) return false;
         operatingModes.mutexWriteMode = false;
         operatingModes.mutexReadMode = true; 
@@ -265,7 +281,10 @@ private: // mode switch methods
     }
    
 protected:
-    /** @brief Default constructor. */
+    /**
+     * @brief Default constructor.
+     * 
+     * At the beginning the stream is monodirectional. */
     BufferedStream() : readBuffer(this),writeBuffer(this)
     {
     	operatingModes.canSeek      	= false;
@@ -281,10 +300,13 @@ protected:
      * @param readBufferSize is the desired size for the read buffer.
      * @param readBufferSize is the desired size for the write buffer.
      * @return true if the memory is allocated correctly.
-     *  
-     * Sets appropriate buffer sizes and adjusts operatingModes depending on CanRead, CanWrite and CanSeek functions.
-     * Must be called by descendant before any operation is enabled.
-     * Can be overridden but is not meant to - just accessed via VT.
+     * 
+     * If readBufferSize and writeBufferSize are minor than 8, they becomes equalt to 8.
+     * If CanRead return false readBufferSize becomes 0.
+     * If CanWrite return false writeBufferSize becomes 0.
+     * If both returns true and also CanSeek return true, the mutex mode is activated.
+     * The function calls FlushAndResync and then allocates the desired sizes for
+     * readBuffer and writeBuffer using IOBuffer::SetBufferHeapMemory.
     */
     virtual bool SetBufferSize(uint32 readBufferSize=0, uint32 writeBufferSize=0);
 
@@ -297,7 +319,10 @@ public:  // special inline methods for buffering
      *
      * On dual separate buffering (CanSeek=False) just Flush output.
      * On joint buffering (CanSeek= True) depending on read/write mode 
-     * either Resync or Flush. */
+     * either Resync or Flush. 
+     * The function BufferedStream::Resync adjusts the position on the stream
+     * after a read operation, shifted because of the Refill.
+     */
     inline bool FlushAndResync(TimeoutType         msecTimeout     = TTDefault){
     	// if there is something in the buffer, and canSeek it means we can and need to resync
     	// if the buffers are separated (!canseek) than resync cannot be done
@@ -316,6 +341,9 @@ public:  // special inline methods for buffering
      * @brief Simply write a character to the stream if space exist and if operatingModes allows.
      * @param c is the character to be written on the stream.
      * @return false in case of errors.
+     *
+     * In buffered mode uses the inline IOBuffer::PutC of writeBuffer
+     * but with the specific implementations of BufferedStreamIOBuffer.
      */  
     inline bool         PutC(char c)
     {   	
@@ -335,6 +363,9 @@ public:  // special inline methods for buffering
      * @brief Simply read a character from stream.
      * @param c is the character by reference in return.
      * @return false in case of errors.
+     *
+     * In buffered mode uses the inline IOBuffer::GetC of readBuffer
+     * but with the specific implementations of BufferedStreamIOBuffer.
      */
     inline bool         GetC(char &c) {
 
@@ -358,6 +389,14 @@ public:
       * @param size is the number of bytes to read from stream.
       * @param msecTimeout is the timeout.
       * @param completeRead is a flag which specified is the read operation is completed.
+      * @return true if successful, false otherwise.
+      *
+      * In unbuffered mode calls UnBufferedRead function.
+      * In buffered mode reads from the readBuffer to the outpur buffer. If not all the desired
+      * size is copied, the readBuffer is refilled again if the remained size is minor than
+      * a quarter of the readBuffer size, otherwise calls UnBufferedRead which should copy
+      * directly datas from the stream to the output buffer.
+      *
       * As much as size byte are written, actual size
       * is returned in size. msecTimeout is how much the operation should last.
       * Timeout behaviour is class specific. I.E. sockets with blocking activated wait forever
@@ -376,7 +415,16 @@ public:
      * @param size is the desired number of bytes to write.
      * @param msecTimeout is the timeout.
      * @param completeWrite is a flac which specified is the write operations is completed.
-     * 
+     * @return true if successful, false otherwise. 
+     *
+     * In unbuffered mode calls UnBufferedWrite function.
+     * In buffered mode writes from the input buffer to writeBuffer if the size to write is
+     * minor than a quarter of the writeBuffer size. If not all the size can be written,
+     * flushes the buffer on the stream and write the remained size on writeBuffer.
+     * Again, If the size to copy is greater than a quarter of the writeBuffer size,
+     * it flushes the writeBuffer and then calls UnBufferedWrite
+     * which should copy data from input buffer to the stream directly. 
+     *
      * As much as size byte are written, actual size
      * is returned in size. msecTimeout is how much the operation should last.
      * Timeout behaviour is class specific. I.E. sockets with blocking activated wait forever
@@ -393,29 +441,36 @@ public:
     // RANDOM ACCESS INTERFACE
 
     /** @brief The size of the stream.
+      * @return the size of the filled memory.
       * 
-      * Depends on UnBufferedSize and should return the current size of the stream. */
+      * Calls FlushAndResync and then UnBufferedSize. */
     virtual int64       Size() ;
 
     /** @brief Moves within the file to an absolute location.
       * @param pos is the absolute desired position in the stream.
+      * @return false if CanSeek returns false or in case of errors.
       *
-      * Depends in UnBufferedSeek and should move the cursor to the desired position in the stream/file.
+      * If writeBuffer is not empty, flushes it and then calls UnBufferedSeek.
+      * If readBuffer is not empty, if the position falls in the readBuffer range calls readBuffer.Seek
+      * otherwise empties the readBuffer and calls UnBufferedSeek.  
       */
     virtual bool        Seek(int64 pos);
     // NOTE: Implemented in .cpp but no need to have c- mangling functions as function will be normally acceessed via VT 
 
     /** @brief Moves within the file relative to current location.
       * @param deltaPos is the desired relative position from the current.
-      * 
-      * Depends on UnBufferedSeek and should move the cursor to current+deltaPos in the stream.*/
+      * @return false if canSeek returns false or in case of errors.
+      *
+      * If writeBuffer is not empty, flushes it and calls UnBufferedSeek with the current position + deltaPos
+      * If readBuffer is not empty, if the final position falls in the range calls readBuffer.RelativeSeek
+      * otherwise calls UnBufferedSeek passing currentStreamPos-readBuffer.Size+readBuffer.Position+deltaPos  */
     virtual bool        RelativeSeek(int32 deltaPos);
     // NOTE: Implemented in .cpp but no need to have c- mangling functions as function will be normally acceessed via VT 
     
     /** @brief Returns current position.
       * @return the current position in the stream.
       *
-      * Depends on UnBufferedPosition. */
+      * Flushed the writeBuffer if it is not empty, then return currentPos-readBuffer.Size+readBuffer.Position */
     virtual int64       Position() ;
     // NOTE: Implemented in .cpp but no need to have c- mangling functions as function will be normally acceessed via VT 
 

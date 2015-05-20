@@ -29,7 +29,7 @@
 /// default destructor
 BufferedStream::~BufferedStream(){
 
-	writeBuffer.Flush();
+//	writeBuffer.Flush();
 }
 
 

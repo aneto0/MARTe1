@@ -631,6 +631,16 @@ bool StreamStringTest::TestToken() {
         return False;
     }
 
+    //return before the :::
+    myString.Seek(7);
+
+    //skip "u" and "p"
+    myString.GetToken(buffer, ".:", size, &saveTerminator, "up");
+    if (StringHelper::Compare(buffer, " Gisee") != 0
+            || saveTerminator != '.') {
+        return False;
+    }
+
     //The function does not skips because the terminator character is not correct
     myString.Seek(4);
 
@@ -706,6 +716,19 @@ bool StreamStringTest::TestToken() {
             || saveTerminator != '.') {
         return False;
     }
+
+    outputStream.Clear();
+    //return after the :::
+    myString.Seek(7);
+
+    //skips "u" and "p"
+    myString.GetToken(outputStream, ".:", &saveTerminator, "up");
+    outputStream.Seek(0);
+    if (StringHelper::Compare(outputStream.buffer, " Gisee") != 0
+            || saveTerminator != '.') {
+        return False;
+    }
+
     outputStream.Clear();
     //The function does not skips because the terminator character is not correct
     myString.Seek(4);
