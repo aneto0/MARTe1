@@ -23,17 +23,16 @@
  *
  **/
 /**
- * @class StreamableTest.h
+ * @file StreamableTest.h
  * @brief Tests the Streamable functions.
  *
- * Tests the Streamable functions and operators. */
+ * Tests the Streamable functions using the StreamWrapperIOBuffer class functions. */
 
 #ifndef STREAM_STRING_TEST_H
 #define STREAM_STRING_TEST_H
 
 #include "Streamable.h"
 #include "FormatDescriptor.h"
-
 
 /** @brief Class for testing of Streamable functions. */
 class StreamableTest {
@@ -42,19 +41,27 @@ private:
 
 public:
 
-	/**
- 	 * @brief Tests the streamString Seek and RelativeSeek.
-         * @param stringToRead is the string already on the stream.
-	 * @param stringToWrite is the string to write on the stream.
-	 * @return true if the seek operations returns the correct result. 
-	 *
-	 * Test the seek functions in different conditions, for example using a positions which falls out of bounds. */	 
-	bool TestSeek();
+    /**
+     * @brief Assign a StreamWrapperIOBuffer to a streamable and test the seek and resync functions.
+     * @return true if succesful, false otherwise.
+     *
+     * Using SimpleStreamable class defined in StreamTestHelper, assigns to it a StreamWrapperIOBuffer
+     * and then, after a buffered getToken, resyncronizes the position. */
+    bool TestSeek();
 
+    /**
+     * @brief Tests the printf function when the streamable does not have an IOBuffer. 
+     * @return true if succesful, false otherwise.
+     *
+     * Uses printf with a string greater then 64 bytes to tests if it flushes on the streamable. */
+    bool TestPrint();
 
-	bool TestPrint();
-	
-	bool TestToken();
+    /**
+     * @brief Tests GetToken in different conditions.
+     * @return true if succesful, false otherwise.
+     *
+     * Uses GetToken against two streamable without IOBuffers, and against a streamable without IOBuffer and one provided. */
+    bool TestToken();
 
 };
 

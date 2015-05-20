@@ -23,7 +23,7 @@
  *
  **/
 /**
- * @class FloatToStreamTest
+ * @file FloatToStreamTest.h
  * @brief Tests the IOBufferFloatPrint functions.
  *
  * The test consists in observing the results of the conversions from float (or equivalent) numbers and strings and their correct
@@ -36,6 +36,7 @@
 #include "IOBufferFloatPrint.h"
 #include "FormatDescriptor.h"
 
+/** @brief Class for testing of IOBufferFloatPrint functions. */
 class FloatToStreamTest {
 
 private:
@@ -48,40 +49,40 @@ public:
      *
      * Test the print of float number on stream try to trigger all special cases. */
     bool TestFixedPoint();
- 
+
     /**
      * @brief Tests the print of a float on a stream in fixed point relative notation (precision = #significative digits).   
      * @return false if something fails.
      *
      * Test the print of float number on stream try to trigger all special cases. */
     bool TestFixedRelativePoint();
-    
+
     /**
      * @brief Tests the print of a float on a stream in engineering notation (precision = #significative digits).
      * @return false if something fails.
      *
-     * Test the print of float number on stream try to trigger all special cases. */ 
+     * Test the print of float number on stream try to trigger all special cases. */
     bool TestEngeneering();
-    
+
     /**
      * @brief Tests the print of a float on a stream in smart notation (precision = #significative digits).
      * @return false if something fails.
      *
-     * Test the print of float number on stream try to trigger all special cases. */ 
+     * Test the print of float number on stream try to trigger all special cases. */
     bool TestSmart();
 
     /**
      * @brief Tests the print of a float on a stream in exponential notation (precision = #significative digits).
      * @return false if something fails.
      *
-     * Test the print of float number on stream try to trigger all special cases. */ 
+     * Test the print of float number on stream try to trigger all special cases. */
     bool TestExponential();
-    
+
     /**
      * @brief Tests the print of a float on a stream in compact notation (precision = #significative digits).
      * @return false if something fails.
      *
-     * Test the print of float number on stream try to trigger all special cases. */ 
+     * Test the print of float number on stream try to trigger all special cases. */
     bool TestCompact();
 };
 

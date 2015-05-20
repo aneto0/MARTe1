@@ -23,10 +23,10 @@
  *
  **/
 /**
- * @class IntegerToStreamTest
- * @brief Tests the Integer to Stream functions.
+ * @file IntegerToStreamTest.h
+ * @brief Tests the IOBufferIntegerPrint functions.
  *
- * The test consists in observing the results of the conversion from integer-bitSet to a string, and its corrent print
+ * The test consists in observing the results of the conversion from integer or bitSet to a string, and its corrent print
  * on a generic stream which implements a generic PutC(c) function.
  */
 
@@ -37,6 +37,7 @@
 #include "FormatDescriptor.h"
 #define MAX_DIMENSION 128 
 
+/** @brief Class for testing of IOBufferIntegerPrint functions. */
 class IntegerToStreamTest {
 
 private:
@@ -45,7 +46,7 @@ public:
 
     /** 
      * @brief Tests the goodness of the function which returns the exponent of a decimal number.
-     * @return true if the magnitude is equal to the number or digits minus one.*/ 
+     * @return true if the magnitude is equal to the number or digits minus one.*/
     bool TestDecimalMagnitude();
 
     /** 
@@ -57,12 +58,12 @@ public:
      * @brief Tests the goodness of the function which returns the number of digits for an octal notation.
      * @return true if the function returns the number of digits of octal numbers. */
     bool TestOctalMagnitude();
-   
+
     /**
      * @brief Tests the goodness of the function which returns the number of digits for a binary notation.
      * @return true if the function returns the number of digits of binary numbers. */
     bool TestBinaryMagnitude();
-    
+
     /**
      * @brief Tests the print of an integer on a generic stream using the decimal notation.
      * @return false if something fails.
@@ -76,26 +77,26 @@ public:
      * 
      * @Check the print on a stream in exadecimal notation try to trigger all cases. */
     bool TestHexadecimalStream();
-    
+
     /**
      * @brief Tests the print of an integer on a generic stream using the octal notation. 
      * @return false if something fails.
      * 
-     * @Check the print on a stream in octal notation try to trigger all cases. */ 
-     bool TestOctalStream();
-    
+     * @Check the print on a stream in octal notation try to trigger all cases. */
+    bool TestOctalStream();
+
     /**
      * @brief Tests the print of an integer on a generic stream using the binary notation.
      * @return false if something fails.
      * 
-     * @Check the print on a stream in binary notation try to trigger all cases. */ 
+     * @Check the print on a stream in binary notation try to trigger all cases. */
     bool TestBinaryStream();
-    
+
     /**
      * @brief Tests the print of an integer on a generic stream using different notations.
      * @return false if something fails. */
     bool TestIntegerToStream();
-    
+
     /**
      * @brief Tests the print of a bitSet on a generic stream.
      * @return false if something fails. */

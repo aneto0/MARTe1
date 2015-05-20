@@ -23,7 +23,7 @@
  *
  **/
 /**
- * @class DoubleIntegerTest
+ * @file DoubleIntegerTest.h
  * @brief Tests the DoubleInteger functions.
  *
  * The tests consist in observing the resut of the logical and mathematical operations 
@@ -36,23 +36,23 @@
 #include "DoubleInteger.h"
 #include "FormatDescriptor.h"
 
-class DoubleIntegerTest{
+/** @brief Class for testing of DoubleInteger functions. */
+class DoubleIntegerTest {
 
 public:
-	/** @brief Tests the shift operations.
-	  * @return true if all operations return the expected result. */
-	bool TestShift();
+    /** @brief Tests the shift operations.
+     * @return true if all operations return the expected result. */
+    bool TestShift();
 
-	/** @brief Tests the Logical operations.
- 	  * @return true if all operations return the expected result. */
-	bool TestLogicalOperators();
+    /** @brief Tests the Logical operations.
+     * @return true if all operations return the expected result. */
+    bool TestLogicalOperators();
 
- 	/** @brief Tests the Mathematic operations.
-          * @return true of all operations return the expected result. */
-	bool TestMathematicOperators();
+    /** @brief Tests the Mathematic operations.
+     * @return true of all operations return the expected result. */
+    bool TestMathematicOperators();
 
 };
 
 #endif
-
 

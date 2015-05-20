@@ -23,10 +23,10 @@
  *
  **/
 /**
- * @class StreamMemoryReferenceTest.h
- * @brief Tests the StreamString functions.
+ * @file StreamMemoryReferenceTest.h
+ * @brief Tests the StreamMemoryReferenceTest functions.
  *
- * Tests the StreamMemoryReference functions and operators. */
+ * Tests the StreamMemoryReference functions. */
 
 #ifndef STREAM_STRING_TEST_H
 #define STREAM_STRING_TEST_H
@@ -34,50 +34,53 @@
 #include "StreamMemoryReference.h"
 #include "FormatDescriptor.h"
 
-
-/** @brief Class for testing of StreamString functions. */
+/** @brief Class for testing of StreamMemoryReference functions. */
 class StreamMemoryReferenceTest {
 
 private:
 
 public:
 
-  	/**
-	 * @brief Tests the streamString GetC function.
-	 * @param inputString is the string.
-         * @return true if the read string is equal to the parameter.
-         *
-         * The inputString is copied on the streamString and then read using GetC.*/ 
-	bool TestGetC();
+    /**
+     * @brief Tests the StreamMemoryReference GetC function.
+     * @return true if successful, false otherwise.
+     *
+     * Gets chars from the stream and checks that they are equal to the expected ones.*/
+    bool TestGetC();
 
-	/** 
-         * @brief Test the streamString PutC function.
-	 * @param inputString is the string to put on the streamString. 
-         * @return true if on the stream is copied the parameter.
-         *
-         * The inputString is written on the stream using the PutC function. */
-	bool TestPutC();
+    /** 
+     * @brief Test the StreamMemoryReference PutC function.
+     * @return true if successful, false otherwise.
+     *
+     * Puts chars on the stream and checks at the end if all chars until the stream size are on the stream. */
+    bool TestPutC();
 
-	/**
-	 * @brief Tests the streamString read function.
-	 * @param inputString is the string on the streamString.
- 	 * @return true if the read string is equal to inputString using Read function. */ 
-	bool TestReadAndWrite();
+    /**
+     * @brief Tests the StreamMemoryReference read function.
+     * @return true if succesful, false otherwise.
+     * 
+     * Uses read and write functions with different sizes to test their behavior. */
+    bool TestReadAndWrite();
 
+    /**
+     * @brief Tests the StreamMemoryReference Seek and RelativeSeek.
+     * @param inputString is the string already on the stream.
+     * @return true if the seek operations returns the correct result. 
+     *
+     * Tests the seek functions in different conditions, for example using a position which falls out of bounds. */
+    bool TestSeek(const char* inputString);
 
-	/**
- 	 * @brief Tests the streamString Seek and RelativeSeek.
-         * @param stringToRead is the string already on the stream.
-	 * @param stringToWrite is the string to write on the stream.
-	 * @return true if the seek operations returns the correct result. 
-	 *
-	 * Test the seek functions in different conditions, for example using a positions which falls out of bounds. */	 
-	bool TestSeek(const char* inputString);
+    /**
+     * @brief Tests the printf function.
+     * @return true if succesful, false otherwise.
+     *
+     * tests the printf function. It must write until the stream size. */
+    bool TestPrint();
 
-
-	bool TestPrint();
-	
-	bool TestToken();
+    /**
+     * @brief Tests the GetToken functions.
+     * @return true if successful, false otherwise. */
+    bool TestToken();
 
 };
 
