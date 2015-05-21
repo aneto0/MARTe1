@@ -586,7 +586,7 @@ bool StreamStringTest::TestPrint() {
     //%p format as the complete 32 bit pointer with header
     myString = "";
     input = "";
-    myString.Printf("%p", charPointer);
+    myString.Printf("%p", (void*)charPointer);
     input.Printf("% #0x", pointer);
     if (myString != input) {
         return False;
@@ -683,7 +683,7 @@ bool StreamStringTest::TestToken() {
     myString.Seek(0);
 
     SimpleBufferedStream outputStream;
-    outputStream.doubleBuffer = True;
+    outputStream.seekable = True;
 
     uint32 buffOutputSize = 1;
     if (!outputStream.SetBuffered(buffOutputSize)) {

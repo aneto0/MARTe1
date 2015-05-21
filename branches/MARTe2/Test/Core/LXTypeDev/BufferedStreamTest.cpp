@@ -108,7 +108,7 @@ bool BufferedStreamTest::TestPutC(const char* inputString) {
 bool BufferedStreamTest::TestGetCAndPutC(const char *inputString) {
 
     SimpleBufferedStream myStream;
-    myStream.doubleBuffer = True;
+    myStream.seekable = True;
 
     //Buffered operations.
     uint32 buffSize = StringHelper::Length(inputString);
@@ -192,7 +192,7 @@ bool BufferedStreamTest::TestRead(const char* inputString) {
 bool BufferedStreamTest::TestWrite(const char* inputString) {
     //UnBuffered Way
     SimpleBufferedStream myStream;
-    myStream.doubleBuffer = True;
+    myStream.seekable = True;
     const char *toWrite = inputString;
     uint32 size = StringHelper::Length(inputString);
     myStream.Write(toWrite, size);
@@ -245,7 +245,7 @@ bool BufferedStreamTest::TestWrite(const char* inputString) {
 bool BufferedStreamTest::TestReadAndWrite(const char *stringToRead,
                                           const char *stringToWrite) {
     SimpleBufferedStream myStream;
-    myStream.doubleBuffer = True;
+    myStream.seekable = True;
     //Upload the string to write in the stream. The buffer size is small so it chooses the unbuffered read/write.
     StringHelper::Copy(myStream.buffer, stringToRead);
 
@@ -284,7 +284,7 @@ bool BufferedStreamTest::TestReadAndWrite(const char *stringToRead,
 
     //Increase the buffer size to allow buffered read/write.
     SimpleBufferedStream myNewStream;
-    myNewStream.doubleBuffer = true;
+    myNewStream.seekable = true;
     StringHelper::Copy(myNewStream.buffer, stringToRead);
 
     //Buffer size enough large to allow buffered operations.
@@ -328,7 +328,7 @@ bool BufferedStreamTest::TestSeek(const char *stringToRead,
         return False;
     }
 
-    myStream.doubleBuffer = True;
+    myStream.seekable = True;
 
     //Upload the string to write in the stream. The buffer size is small so it chooses the unbuffered seek.
     StringHelper::Copy(myStream.buffer, stringToRead);
@@ -519,7 +519,7 @@ bool BufferedStreamTest::TestSwitch(const char* onStream1,
     }
 
     //enable canSeek
-    myStream.doubleBuffer = True;
+    myStream.seekable = True;
     uint32 fakeSize = 2;
     myStream.SetBuffered(fakeSize);
 
@@ -535,7 +535,7 @@ bool BufferedStreamTest::TestPrint() {
 
     //Create a read&write bufferedStream.
     SimpleBufferedStream myStream;
-    myStream.doubleBuffer = True;
+    myStream.seekable = True;
 
     uint32 buffSize = 1;
 
@@ -625,6 +625,115 @@ bool BufferedStreamTest::TestPrint() {
         return False;
     }
 
+	//print the stream
+	myStream.Clear();
+	SimpleBufferedStream streamToPrint;
+
+
+
+
+	const char* onStream="HelloWorld";
+	uint32 sizeOnStream=StringHelper::Length(onStream);
+	streamToPrint.Write(onStream, sizeOnStream);
+
+	//Now the stream to print is not seekable... print an error message on the stream
+	streamToPrint.Seek(0);
+	myStream.Printf("%s", streamToPrint);
+
+	myStream.FlushAndResync();
+
+
+	if(StringHelper::Compare(myStream.buffer, "!!stream !seek!!")!=0){
+		return False;
+	}
+
+
+	//make the stream seekable
+	streamToPrint.seekable=True;
+
+	//impose buffer mode for the stream to print
+	uint32 streamToPrintBuffSize=8;
+	if(!streamToPrint.SetBuffered(streamToPrintBuffSize)){
+		return False;
+	}
+
+	myStream.Clear();
+
+	streamToPrint.Seek(0);
+	myStream.Printf("%s", streamToPrint);
+
+	myStream.FlushAndResync();
+
+	if(StringHelper::Compare(myStream.buffer, "HelloWorld")!=0){
+		return False;
+	}
+
+
+	//print the stream with a greater size left padd
+	myStream.Clear();
+
+	streamToPrint.Seek(0);
+	myStream.Printf("% 12s", streamToPrint);
+	myStream.FlushAndResync();
+
+
+	if(StringHelper::Compare(myStream.buffer, "  HelloWorld")!=0){
+		return False;
+	}
+
+	//print the stream with a greater size right padd
+	myStream.Clear();
+
+	streamToPrint.Seek(0);
+	myStream.Printf("%-12s", streamToPrint);
+	myStream.FlushAndResync();
+
+	if(StringHelper::Compare(myStream.buffer, "HelloWorld  ")!=0){
+		return False;
+	}
+
+	//clip the size.
+	myStream.Clear();
+
+	streamToPrint.Seek(0);
+	myStream.Printf("%7s", streamToPrint);
+	myStream.FlushAndResync();
+
+	if(StringHelper::Compare(myStream.buffer, "HelloWo")!=0){
+		return False;
+	}
+
+
+	//test the copy function with a buffer in input.
+	myStream.Clear();
+	myStream.Copy(onStream);
+	
+	if(StringHelper::Compare(onStream, myStream.buffer)!=0){
+		return False;
+	}
+
+	//test the copy function with a stream in input.
+	myStream.Clear();
+	streamToPrint.Seek(0);
+
+	char test[512];
+	StringHelper::Copy(test, "");
+
+	//copy 300 chars on the stream
+	for(int32 i=0; i < 30; i++){
+		streamToPrint.Write(onStream, sizeOnStream);
+		StringHelper::Concatenate(test, onStream);
+	}
+	streamToPrint.Seek(0);
+
+	myStream.Copy(streamToPrint);
+	
+	myStream.FlushAndResync();
+	
+	if(StringHelper::Compare(test, myStream.buffer)!=0){
+		return False;
+	}
+
     return True;
 }
 
@@ -633,7 +742,7 @@ bool BufferedStreamTest::TestToken() {
     const char* inputString = "Nome::: Giuseppe. Cognome: Ferrò:)";
     uint32 size = StringHelper::Length(inputString);
     SimpleBufferedStream myStream;
-    myStream.doubleBuffer = True;
+    myStream.seekable = True;
 
     uint32 buffSize = 1;
     if (!myStream.SetBuffered(buffSize)) {
@@ -706,8 +815,10 @@ bool BufferedStreamTest::TestToken() {
 
 //TESTS ON TOKEN FUNCTIONS BETWEEN A STREAM AND STREAM
 
+    myStream.Seek(0);
+
     SimpleBufferedStream outputStream;
-    outputStream.doubleBuffer = True;
+    outputStream.seekable = True;
 
     uint32 buffOutputSize = 1;
     if (!outputStream.SetBuffered(buffOutputSize)) {

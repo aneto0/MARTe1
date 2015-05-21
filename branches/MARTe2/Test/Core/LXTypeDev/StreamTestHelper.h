@@ -2,8 +2,7 @@
 #include "BufferedStream.h"
 #include "Memory.h"
 #include "StreamWrapperIOBuffer.h"
-#define MAX_DIMENSION 128
-#define MAX_STREAM_DIMENSION 256
+#define MAX_STREAM_DIMENSION 512
 
 /**
  * @file StreamTestHelper.h
@@ -46,30 +45,42 @@ public:
     char* buffer;
 
     /** current position of the first buffer */
-    uint32 size1;
+    uint32 position1;
 
     /** current position of the second buffer */
-    uint32 size2;
+    uint32 position2;
 
     /** pointer to the position of the current buffer */
+    uint32 *positionPtr;
+
+    /** size of the first buffer */
+    uint32 size1;
+ 
+    /** size of the second buffer */
+    uint32 size2;
+
+    /** pointer to the size of the current buffer */
     uint32 *sizePtr;
 
     /** number of the current used buffer. */
     uint32 nBuffers;
 
     /** true if the buffers are used in read&write mode. */
-    bool doubleBuffer;
+    bool seekable;
 public:
 
     /** @brief Default constructor. */
     SimpleBufferedStream() {
-        size1 = 0;
-        size2 = 0;
+        position1 = 0;
+        position2 = 0;
+	size1 = 0;
+	size2 = 0;
         nBuffers = 2;
         buffer = buffer1;
-        sizePtr = &size1;
-        doubleBuffer = false;
-        for (int i = 0; i < MAX_DIMENSION; i++)
+        positionPtr = &position1;
+	sizePtr = &size1;
+        seekable = false;
+        for (int i = 0; i < MAX_STREAM_DIMENSION; i++)
             buffer[i] = 0;
     }
 
@@ -80,8 +91,9 @@ public:
 
     /** @brief Clean the buffer. */
     void Clear() {
-        (*sizePtr) = 0;
-        for (int i = 0; i < MAX_DIMENSION; i++)
+        (*positionPtr) = 0;
+	(*sizePtr) = 0;
+        for (int i = 0; i < MAX_STREAM_DIMENSION; i++)
             buffer[i] = 0;
     }
 
@@ -96,17 +108,17 @@ public:
                                 TTDefault,
                         bool complete = false) {
 
-        uint32 size = *sizePtr;
-        if ((size + inSize) >= MAX_DIMENSION) {
-            size = 0;
+        uint32 position = *positionPtr;
+        if ((position + inSize) >= MAX_STREAM_DIMENSION) {
+            inSize = MAX_STREAM_DIMENSION - position - 1;
         }
 
-        if (!MemoryCopy(outBuffer, &buffer[size], inSize)) {
+        if (!MemoryCopy(outBuffer, &buffer[position], inSize)) {
             return false;
         }
 
-        size += inSize;
-        *sizePtr = size;
+        position += inSize;
+        *positionPtr = position;
         return true;
 
     }
@@ -122,15 +134,21 @@ public:
                          TimeoutType timeout = TTDefault,
                          bool complete = false) {
 
-        uint32 size = *sizePtr;
-        if ((size + outSize) >= MAX_DIMENSION) {
-            size = 0;
+        uint32 position = *positionPtr;
+        if (((*sizePtr) + outSize) >= MAX_STREAM_DIMENSION) {
+            outSize = MAX_STREAM_DIMENSION - (*sizePtr) -1;
         }
-        if (!MemoryCopy(&buffer[size], inBuffer, outSize)) {
+        if (!MemoryCopy(&buffer[position], inBuffer, outSize)) {
             return false;
         }
-        size += outSize;
-        *sizePtr = size;
+
+
+        position += outSize;
+        *positionPtr = position;
+	
+	if (position > *sizePtr) *sizePtr = position;	
+	
+
         return true;
     }
 
@@ -153,7 +171,7 @@ public:
      * @param seek is the desired absolute position.
      * @return true. */
     bool UnBufferedSeek(int64 seek) {
-        (*sizePtr) = seek;
+        (*positionPtr) = seek;
         return true;
     }
 
@@ -162,7 +180,7 @@ public:
      * @return the current stream position.
      */
     int64 UnBufferedPosition() const {
-        return *sizePtr;
+        return *positionPtr;
     }
 
     /**
@@ -180,11 +198,13 @@ public:
     bool UnBufferedSwitch(uint32 a) {
         if (a == 2) {
             buffer = buffer2;
-            sizePtr = &size2;
+            positionPtr = &position2;
+	    sizePtr = &size2;
         }
         if (a == 1) {
             buffer = buffer1;
-            sizePtr = &size1;
+            positionPtr = &position1;
+	    sizePtr = &size1;
         }
         return true;
     }
@@ -195,11 +215,13 @@ public:
      * @return true. */
     bool UnBufferedSwitch(const char* a) {
         if (*a == '1') {
+            positionPtr = &position1;
             sizePtr = &size1;
             buffer = buffer1;
         }
         if (*a == '2') {
-            sizePtr = &size2;
+            positionPtr = &position2;
+	    sizePtr = &size2;
             buffer = buffer2;
         }
         return true;
@@ -226,7 +248,7 @@ public:
      * @brief Defines if seek operations are allowed on the stream.
      * @return true if both read and write operations are allowed on the same buffer. */
     bool CanSeek() const {
-        return doubleBuffer;
+        return seekable;
     }
 
     /**
@@ -428,7 +450,7 @@ public:
      * @brief Returns the stream size.
      * @return the stream size. */
     int64 Size() {
-        return MAX_DIMENSION;
+        return MAX_STREAM_DIMENSION;
     }
 
     /**
