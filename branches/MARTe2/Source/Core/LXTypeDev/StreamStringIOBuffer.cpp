@@ -25,9 +25,8 @@ bool  StreamStringIOBuffer::SetBufferAllocationSize(
  */ 
 void StreamStringIOBuffer::Write(const char *buffer, uint32 &size){
 	
-	// clip to spaceLeft
 	if (size > AmountLeft()) {
-		SetBufferAllocationSize(UsedSize() + size);
+		SetBufferAllocationSize(Position() + size);
 	}
 	
 	IOBuffer::Write(buffer,size);

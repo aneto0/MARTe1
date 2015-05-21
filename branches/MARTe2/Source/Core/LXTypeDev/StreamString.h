@@ -64,7 +64,7 @@ class StreamString: public Streamable {
 
 private:    
 
-    /*
+    /**
      * All read and write operations are performed on this buffer.
      * Also if each streamable implementation has its own read and write buffers,
      * defining all of them as descendants of IOBuffers specific functions are called 
@@ -157,8 +157,8 @@ public:
      * @brief The size of the string.
      * @return the current string size.
      *
-     * StreamStringIOBuffer type allocates memory dinamically on the heap,
-     * then it returns the memory currently allocated for the buffer. */
+     * StreamStringIOBuffer type allocates memory dinamically on the heap.
+     * It returns the size of the filled memory. */
     virtual int64       Size() ;
 
     /**

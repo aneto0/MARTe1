@@ -100,10 +100,18 @@ bool IOBuffer::SetBufferHeapMemory(
 	uint32 position = Position();
 	uint32 usedSize = UsedSize();
 
+	
+	//special case: if we consider the difference
+        //between two uint we can obtain bigger numbers (overflow).
+	if(desiredSize < reservedSpaceAtEnd){
+		usedSize = 0;
+	}
+
 	// truncating
 	if ((desiredSize-reservedSpaceAtEnd) < usedSize){
 		usedSize = desiredSize-reservedSpaceAtEnd;
 	}
+
 	// saturate index 
 	if (position > usedSize) position = usedSize;  
 	
@@ -112,11 +120,14 @@ bool IOBuffer::SetBufferHeapMemory(
 	bufferPtr = ( char *)Buffer();
 
 	maxUsableAmount = BufferSize();
+
 	if (maxUsableAmount <= reservedSpaceAtEnd){
 		maxUsableAmount = 0;
-	} else {
-        maxUsableAmount = BufferSize() - reservedSpaceAtEnd;
 	}
+	 else {
+        	maxUsableAmount = BufferSize() - reservedSpaceAtEnd;
+	}
+
 	amountLeft = maxUsableAmount - position;
 	fillLeft   = maxUsableAmount - usedSize;
 

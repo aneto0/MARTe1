@@ -94,7 +94,7 @@
 class BufferedStream: public Streamable {
 protected:    
     /**
-       Defines the operation mode and statsu of a basic stream
+       Defines the operation mode and status of a basic stream
        one only can be set of the first 4.
     */
     struct OperatingModes{
@@ -121,7 +121,8 @@ private: // read and write buffers
 friend class BufferedStreamIOBuffer; 
 //friend class StreamableWriteBuffer; 
        
-	/** this is the read buffer. It is used just like
+	/** 
+         * The read buffer. It is used just like
          * a middle buffer between the stream and the output.
          * For each read operation this buffer is filled completely
          * and then the desired size is copied on the output.
@@ -134,7 +135,8 @@ friend class BufferedStreamIOBuffer;
 	BufferedStreamIOBuffer		readBuffer;
     
 
-        /** this is the write buffer. It is used just like an
+        /**
+         * The write buffer. It is used just like an
          * intermediate between the input and the stream. Write 
          * operations copies data from the input to this buffer 
          * and only when the buffer is full (or in case of an explicit
@@ -168,7 +170,7 @@ protected: // methods to be implemented by deriving classes
 protected: // methods to be implemented by deriving classes
     
     /** 
-     * @brief Reads data into buffer.
+     * @brief Reads data into an output buffer directly.
      * @param buffer is the buffer where stream datas must be written
      * @param size is the number of bytes to read.
      * @param msecTimeout is the timeout unused here.
@@ -188,7 +190,7 @@ protected: // methods to be implemented by deriving classes
 
   
     /** 
-     * @brief Write data from a buffer to the stream directly.
+     * @brief Write data from an input buffer to the stream directly.
      * @param buffer is the buffer which contains datas to write on the stream.
      * @param size is the number of bytes to write.
      * @param msecTimeout is the timeout.

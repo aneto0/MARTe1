@@ -12,7 +12,7 @@ bool BufferedStreamIOBuffer::Resync(TimeoutType         msecTimeout){
     }
     
     // distance to end 
-    uint32 deltaToEnd = UsedSize() - Position();   
+    uint32 deltaToEnd = UsedAmountLeft();   
     
     // adjust seek position
     // in read mode the actual stream 

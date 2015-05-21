@@ -31,6 +31,7 @@
 #include "GeneralDefinitions.h"
 #include "FormatDescriptor.h"
 #include "BitSetToInteger.h"
+#include "IOBuffer.h"
 #include "Shift.h"
 #include <math.h>
 

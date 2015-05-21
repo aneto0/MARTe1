@@ -24,8 +24,12 @@
  **/
 
 /** 
- * @file
- * Implementation of a buffer with allocation and reallocation and access functions
+ * @file CharBuffer.h
+ * @brief Implementation of a buffer with allocation and reallocation and access functions.
+ * 
+ * This class implements a generic buffer which could be allocated and reallocated dinamically
+ * on the heap or assigned passing a memory reference in input. It consists in a char* pointer
+ * to the begin of the buffer and some attributes like the size of the buffer.
  */
 #ifndef CHAR_BUFFER_H
 #define CHAR_BUFFER_H
@@ -33,10 +37,12 @@
 #include "GeneralDefinitions.h"
 
 /**
-    A basic implementation of a buffer of character.
-    A replacement for dealing directly with mallocs and reallocs 
-    Access as char * both read-only and read-write
-    Supports up to 4G of ram 
+ * @brief CharBuffer class.
+ *
+ *  A basic implementation of a buffer of character.
+    A replacement for dealing directly with mallocs and reallocs.
+    Access as char * both read-only and read-write.
+    Supports up to 4G of ram. 
 */
 class CharBuffer {
 private:
@@ -54,20 +60,25 @@ private:
     /** the size of the allocated memory block  */
     uint32 		bufferSize;
 
-    /**  the memory buffer  */
+    /**  a pointer at the beginning of the memory buffer  */
     char * 		buffer;
 	   
 private:
 
     /** 
-     * deallocates memory if appropriate
-     * sets all members to default  
+     * @brief Clean the buffer.
+     * 
+     * Sets the size to zero.
+     * In case of heap buffer, frees the memory too.
      */
     virtual void Clean();
 
 public:
 
-    /** Creates a buffer of a given size */
+    /** 
+     * @brief Default constructor.
+     * 
+     * At the beginning the buffer pointer is null. */
     CharBuffer() {
     	this->bufferSize 		= 0;
         this->buffer 			= NULL;
@@ -75,24 +86,39 @@ public:
         bufferMode.allocated 	= false;
     }
 
-    /** Destructor */
+    /** 
+     * @brief Default destructor.
+     */
     virtual ~CharBuffer();
     
     /**
-        allocate or reallocate memory to the desired size
-        content is preserved by copy, if contiguus memory is not available, as long as it fits the newsize
-        allocationGranularityMask defines how many bits to consider 
-        for the buffer size. round up the others
+     * @brief Allocate or reallocate memory to the desired size on the heap.
+     * @param desiredSize is the desired size of the buffer.
+     * @param allocationGranularityMask impose granularity and maximum size.
+     * @return false if desiredSize is greater than the maximum possible or if the allocation fails.
+     *
+     * AllocationGranularityMask should be composed by ones and at the end by the desired number of zeros 
+     * (i.e 0xfffffff0 ==> 4 zeros ==> granularity: 2^4=16 bytes)
+     * The granularity is defined as the 2 complement of AllocationGranularityMask (default 1).
+     * The maximum possible size is allocationGranularityMask << 1.
+     * The minimum possible size is 1, in this case it allocates the granularity, if desiredSize is zero frees the memory.
+     * In case of no errors, it allocates k*granularity bytes with k integer such that k*granularity >= desiredSize.
+     *
+        Content is preserved by copy, if contiguus memory is not available, as long as it fits the newsize.
+        AllocationGranularityMask defines how many bits to consider 
+        for the buffer size, round up the others
     */
     virtual bool SetBufferAllocationSize(
     		uint32 			desiredSize,
             uint32 			allocationGranularityMask 		= 0xFFFFFFFF);
     
     /**
-        allocate or reallocate memory to the desired size
-        content is preserved by copy, if contiguus memory is not available, as long as it fits the newsize
-        allocationGranularityMask defines how many bits to consider 
-        for the buffer size. round up the others
+     * @brief Memory assignment of a preallocated buffer in read and write mode.
+     * @param buffer is a pointer to the writable buffer.
+     * @param bufferSize is the size of the buffer.
+     *
+     * If buffer is null just call clean and set allocated=false and readOnly=true,
+     * If buffer is valid set the buffer pointer and the buffer size by input parameters and readOnly=false.
     */
     virtual void SetBufferReference(
     		char *			buffer, 
@@ -100,10 +126,13 @@ public:
     );
     
     /**
-        allocate or reallocate memory to the desired size
-        content is preserved by copy, if contiguus memory is not available, as long as it fits the newsize
-        allocationGranularityMask defines how many bits to consider 
-        for the buffer size. round up the others
+     * @brief Memory assignment of a preallocated buffer in read mode.
+     * @param buffer is a pointer to the buffer without write access.
+     * @param bufferSize is the size of the buffer.
+     *
+     * If buffer is null just call clean and set allocated=false and readOnly=true,
+     * If buffer is valid set the buffer pointer and the buffer size by input parameters.
+     * ReadOnly flag remains true.
     */
     virtual void SetBufferReference(
     		const char *	buffer, 
@@ -112,14 +141,16 @@ public:
     
 public:
     
-    /** Read Only access to the internal buffer
-     @return The pointer to the buffer
+    /** 
+     * @brief Read Only access to the internal buffer.
+     * @return The pointer to the buffer.
      */
     inline const char *Buffer() const {
         return buffer;
     }
 
-    /** Read Write access top the internal buffer
+    /**
+     * @brief  Read Write access top the internal buffer
        @return The pointer to the buffer
      */
     inline char *BufferReference() const {
@@ -127,12 +158,16 @@ public:
         return buffer;
     }
 
-    /// how much memory used by buffer
+    /**
+     * @brief Get the size of the memory associated to the buffer.
+     * @return the size of the memory associated to the buffer. */
     inline uint32 BufferSize() const{
         return bufferSize;
     }
     
-    ///
+    /**
+     * @brief If the buffer is writable.
+     * @return true if readOnly flag is false, false otherwise. */
     bool CanWrite() const {
     	return !bufferMode.readOnly;
     }

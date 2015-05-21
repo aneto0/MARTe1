@@ -14,7 +14,16 @@
  */
 
 
-/** @brief StreamStringIOBuffer class. */
+/**
+ * @brief StreamStringIOBuffer class.
+ *
+ * This class inherits from IOBuffer and implements NoMoreSpaceToWrite accordingly to
+ * the string requirements, namely allocating new space when the buffer is full in case of write operations.
+ *
+ * It implements also a Terminate function to put the final \0 at the end of the string.
+ *
+ * For memory allocations it adds one to the desired size passed by argument and sets reservedSpaceAtEnd = 1 for the 
+ * final \0 character.   */
 class StreamStringIOBuffer:public IOBuffer {
        
 public: // 
@@ -30,9 +39,11 @@ public: //
          *
          * Truncates stringSize to desiredSize-1.
          *
-         * @param desiredSize is the desired size to allocate.
-         * @param allocationGranularityMask specifoutputIOBufferies the minimum size to be allocated.
-         * @return false in case of errors.
+         * @param desiredSize is the desired size to allocate without considering the final \0.
+         * @param allocationGranularityMask defines the desired granularity (see CharBuffer::SetBufferAllocationSize), default is granularity=64 bytes.
+         * @return false in case of errors in the allocation.
+         *
+         * This function calls IOBuffer::SetBufferHeapMemory with desiredSize+1 and reservedSpaceAtEnd=1.
 	*/
     virtual bool  		SetBufferAllocationSize(
                 uint32 			desiredSize,
@@ -42,22 +53,26 @@ public: // read buffer private methods
     
     /** 
      * @brief If buffer is full this is called to allocate new memory.
-     * @param msecTimeout is the timeout. 
-     * @return false in case of errors. */    
+     * @param neededSize is the desired size to allocate.
+     * @param msecTimeout is the timeout not used here. 
+     * @return false in case of errors in the allocation.
+     *
+     * This function calls SetBufferAllocationSize passing neededSize. */    
     virtual bool 		NoMoreSpaceToWrite(
                 uint32              neededSize      = 1,
                 TimeoutType         msecTimeout     = TTDefault);
      
     /**
      * @brief Copies buffer the end of writeBuffer.
-     * @param buffer contains datas to be written.
+     * @param buffer contains data to be written.
      * @param size is the desired number of bytes to copy.
      * 
-     * Before calling be sure that bufferPtr is not NULL.
+     * If size is greater than amountLeft allocates new memory calling SetBufferAllocationSize passing the size of the filled memory + size;
+     * then calls IOBuffer::Write.
      */ 
     virtual void 		Write(const char *buffer, uint32 &size);    
 
-    /** @brief Add the termination character. */
+    /** @brief Add the termination character at the end of the filled memory. */
     virtual void 		Terminate();
 
 };

@@ -213,19 +213,30 @@ bool Streamable::Copy(StreamInterface &stream){
 
 	char buffer[256];
 	uint32 size = sizeof(buffer);
+
+	//read in buffer
 	bool ret = stream.Read(buffer,size);
 	while ((ret) && (size > 0)){
+		
+		//write in buffer
 		ret = Write(buffer,size,TTDefault,true);
-		size = 0;
+	        //in case of ret false don't write again
+         	size = 0;
 
+		//if successful, read again and size becomes zero if 
+                //there is no more data to read
 		if (ret){
 			size = sizeof(buffer);
 			ret = stream.Read(buffer,size);
 		}
 	}
+	//if exit because ret is false
+        //something was read in buffer
 	if (size > 0){
-		ret = ret && Write(buffer,size,TTDefault,true);
-		size = 0;
+		//write on the stream
+		//ret = ret && Write(buffer,size,TTDefault,true);
+	        Write(buffer,size,TTDefault,true);
+	//	size = 0;
 	}
 	
 	return ret;
