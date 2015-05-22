@@ -23,7 +23,7 @@
 **/
 /**
  * @file 
- * @brief Functions to print integer numbers on generic streams.
+ * @brief Definition of Printf and GetToken functions.
 */
 #if !defined IOBUFFER_FUNCTIONS
 #define IOBUFFER_FUNCTIONS
@@ -38,12 +38,27 @@
 
 
 
-/** extract a token from the stream into a string data until a terminator or 0 is found.
-    Skips all skip characters and those that are also terminators at the beginning
-    returns true if some data was read before any error or file termination. False only on error and no data available
-    The terminator (just the first encountered) is consumed in the process and saved in saveTerminator if provided
-    skipCharacters=NULL is equivalent to skipCharacters = terminator
-    {BUFFERED}    */
+    /**
+     * @brief Reads a token from a stream buffer and writes it on a char* output buffer.
+     * @param terminator is a list of terminator characters.
+     * @param outputBufferSize is the size of the output buffer.
+     * @param saveTerminator is the found terminator in return.
+     * @param skipCharacters is a list of characters to be skipped.
+     * @return false if no data read, true otherwise.
+     *
+     * This function is performed for buffered streams, namely the stream should have an IOBuffer type as read buffer, actually
+     * in this function is passed an IOBuffer type. 
+     ** Extract a token from the stream into a string data until a terminator or 0 is found.
+        Skips all skip characters, if you want to skip also terminator characters at the beginning add them to the skip characters.
+        returns true if some data was read before any error or file termination. False only on error and no data available
+        The terminator (just the first encountered) is consumed in the process and saved in saveTerminator if provided
+        skipCharacters=NULL is equivalent to skipCharacters = terminator
+        A character can be found in the terminator or in the skipCharacters list  in both or in none
+        0) none                 the character is copied
+        1) terminator           the character is not copied the string is terminated
+        2) skip                 the character is not copied
+        3) skip + terminator    the character is not copied, the string is terminated only if not empty
+    */
 static inline
 bool GetTokenFromStream(
 	                    	IOBuffer &          iobuff,
@@ -104,9 +119,21 @@ bool GetTokenFromStream(
 }
 
 
-/** extract a token from the stream into a string data until a terminator or 0 is found.
-    Skips all skip characters and those that are also terminators at the beginning
-    returns true if some data was read before any error or file termination. False only on error and no data available
+ 
+    /**
+     * @brief Reads a token from a stream buffer and writes it on another stream buffer.
+     * @param inputStream is the input stream buffer.
+     * @param outputStream is the output stream buffer.
+     * @param terminator is a list of terminator characters.
+     * @param skipCharacters is a list of characters to be skipped.
+     * @return false if no data read, true otherwise.
+     *
+     * This function is performed for buffered streams, namely the input and output streams should have an IOBuffer type as read buffer, actually
+     * in this function are passed two IOBuffer types.
+
+    Extract a token from the stream into a string data until a terminator or 0 is found.
+    Skips all skip characters and those that are also terminators at the beginning.
+    Returns true if some data was read before any error or file termination. False only on error and no data available.
     The terminator (just the first encountered) is consumed in the process and saved in saveTerminator if provided
     skipCharacters=NULL is equivalent to skipCharacters = terminator
     {BUFFERED}
@@ -159,8 +186,13 @@ bool GetTokenFromStream(
 }
 
 
-/** to skip a series of tokens delimited by terminators or 0
-    {BUFFERED}    */
+/** 
+ * @brief Skips a number of tokens on a stream buffer.
+ * @param iobuff is the stream buffer.
+ * @param count is the number of tokens to be skipped.
+ * @param terminator is a list of terminator characters for the tokenize operation.
+ * @return false if the number of skipped tokens is minor than the desired.
+*/ 
 static inline  
 bool SkipTokensInStream(
 							IOBuffer &          iobuff,
@@ -190,21 +222,37 @@ bool SkipTokensInStream(
     return True;
 }
 
+
+
+/** 
+ * @brief Print a const char* string on a stream buffer.
+ * @param iobuff is the output stream buffer.
+ * @param string is the string to be printed.
+ * @param fd specifies the desired format for the string.
+ * @return true if the string is printed correctly. 
+ *
+ * This function calls IOBuffer::WriteAll to write the complete string size on the stream buffer.
+ */
 static inline
 bool PrintString(
 		IOBuffer &    			iobuff,
 		const char *			string,
 		FormatDescriptor 		fd)
 {
-	
+	//if the string is null print NULL pointer on the stream.	
 	if (string == NULL) string = "NULL pointer";
 	
+	//get the string size
 	uint32 stringSize = (uint32)StringHelper::Length(string);
 	uint32 paddingSize = 0;
 	
+	//is the desired size is 0 print completely the string without padd.
 	if (fd.size != 0){
+                //clip the string size if the desired size is minor.
 		if (stringSize > fd.size) stringSize = fd.size; 
 		
+		//if padded and desired size is greater than the string size
+                //the difference is the padding size.
 		if (fd.padded){
 			if (stringSize < fd.size){
 				paddingSize = fd.size - stringSize;  
@@ -214,47 +262,68 @@ bool PrintString(
 	
 	bool ret = true;
 	uint32 i;
+
+        //if right aligned put the padding at the beginning
 	if (!fd.leftAligned && (paddingSize > 0)){
 		for (i=0;i < paddingSize;i++) ret = ret && iobuff.PutC(' ');		
 	}
 	
+        //print the string on the buffer completely.
 	ret = ret && iobuff.WriteAll(string,stringSize);
 	
+        //if left aligned put the padding at the end
 	if (fd.leftAligned && (paddingSize > 0)){
 		for (i=0;i < paddingSize;i++) ret = ret && iobuff.PutC(' ');		
 	}
-	
+
 	return ret;
 }
 
+
+
+/** 
+ * @brief Prints the bytes contained on a stream to a stream buffer.
+ * @param iobuff is the output stream buffer.
+ * @param stream is the stream in input which contains data to be copied.
+ * @param fd specifies the desired printing format.
+ * @return false in case of errors in read and write operations. 
+ *
+ * This function calls the function StreamInterface::GetC which calls the specific stream Write function truth the virtual table.
+ * Gets a character from the stream and use IOBuffer::PutC to write it on the output stream buffer doing this operation for
+ * each character from the cursor to the end of the input stream.*/
 static inline
 bool PrintStream(
 		IOBuffer &    			iobuff,
 		StreamInterface *		stream,
 		FormatDescriptor 		fd)
 {
+        //print NULL pointer if the input stream is null.
 	if (stream == NULL) {
 		return PrintString(iobuff,"!!NULL pointer!!",fd);
 	}
 	
+        //the input stream must be seekable, otherwise the cursor is always at the end.
 	if (!stream->CanSeek()){
 		return PrintString(iobuff,"!!stream !seek!!",fd);
 	}
 	
-	// must be s
+	//calculates the size from the cursor to the end of the filled memory in the input stream
 	int64 streamSizeL = (uint32)(stream->Size()-stream->Position());
 	uint32 paddingSize = 0;
 	
 	if (fd.size != 0){
+                //if the desired size is minor, clip the stream size.
 		if (streamSizeL > fd.size) streamSizeL = fd.size; 
 		
 		if (fd.padded){
+			//if the desired size is greater and padded is true
+  			//calculates the padding size as the difference.
 			if (streamSizeL < fd.size){
 				paddingSize = fd.size - streamSizeL;  
 			}			
 		}
 	}
-	// limit within 32 bit and further limit to 10000 chars
+	//limit within 32 bit and further limit to 10000 chars
 	if (streamSizeL > 10000){
 		return PrintString(iobuff,"!! too big > 10000 characters!!",fd);
 	}
@@ -262,10 +331,12 @@ bool PrintStream(
 	
 	bool ret = true;
 	uint32 i;
+	//if right aligned put the padding at the beginning
 	if (!fd.leftAligned && (paddingSize > 0)){
 		for (i=0;i < paddingSize;i++) ret = ret && iobuff.PutC(' ');		
 	}
 
+	//write the stream input on the stream buffer output
 	char c;
 	while (streamSize > 0){
 		if (!stream->GetC(c)){
@@ -277,6 +348,7 @@ bool PrintStream(
 		streamSize--;
 	}
 		
+	//if left aligned put the padding at the end.
 	if (fd.leftAligned && (paddingSize > 0)){
 		for (i=0;i < paddingSize;i++) ret = ret && iobuff.PutC(' ');		
 	}
@@ -286,7 +358,13 @@ bool PrintStream(
 
 
 /**
- *  Prints any object of 
+ * @brief Prints a generic AnyType object on a stream buffer.
+ * @param iobuff is the stream buffer output.
+ * @param par is the generic object to be printed.
+ * @param fd specifies the desired printing format.
+ *
+ * Looking at the AnyType structure fields, calls the right function
+ * for the conversion to string and the print of each type.
  */
 static 
 bool PrintToStream(
@@ -295,9 +373,10 @@ bool PrintToStream(
 						FormatDescriptor 		fd)
 {
 
-	/// empty - an error?
+	// void anytype
 	if (par.dataPointer == NULL) return false;
 
+	//if the element is structured, the print is not supported.
 	if (par.dataDescriptor.isStructuredData ){
 		ErrorManagement::ReportError(UnsupportedError, "Streamable::Print StructuredData not supported");
 		return false;
@@ -307,6 +386,7 @@ bool PrintToStream(
 
 	case TypeDescriptor::UnsignedInteger: 
 	{
+		//native unsigned integer types.
 		if (par.bitAddress == 0){
 			switch (par.dataDescriptor.size){
 			case 8:{
@@ -335,6 +415,7 @@ bool PrintToStream(
 	} break;
 	case TypeDescriptor::SignedInteger:
 	{
+		//native signed integer types.
 		if (par.bitAddress == 0){
 			switch (par.dataDescriptor.size){
 			case 8:{
@@ -362,6 +443,7 @@ bool PrintToStream(
 		
 	}break;
 	case TypeDescriptor::Float:{
+		//native float types. Float 128 bit is not supported.
 		switch (par.dataDescriptor.size){
 		case 32:{
 			float *data = (float *)par.dataPointer;
@@ -381,6 +463,8 @@ bool PrintToStream(
 		}
 		} 
 	}break;
+
+	//pointer type.
 	case TypeDescriptor::Pointer:{
 		AnyType at(par);
 		at.dataDescriptor.type = TypeDescriptor::UnsignedInteger;
@@ -388,6 +472,9 @@ bool PrintToStream(
 		at.dataPointer = (void *)&par.dataPointer;
 		return PrintToStream(iobuff,at,fd);
 	}	
+        //const char* string type.
+        //if in the format descriptor is specified the hex notation (%p or %x)
+        //print the value of the pointer.
 	case TypeDescriptor::CCString:{
 		if (fd.binaryNotation == Notation::HexNotation){
 			AnyType at(par);
@@ -399,6 +486,8 @@ bool PrintToStream(
 		const char *string = (const char *)par.dataPointer;
 		return PrintString(iobuff,string,fd);	
 	} break;
+
+	//general stream type.
 	case TypeDescriptor::StreamInterface:{
 		StreamInterface * stream = (StreamInterface *)par.dataPointer;
 		return PrintStream(iobuff,stream,fd);
@@ -413,6 +502,17 @@ bool PrintToStream(
 	return false;
 }
 
+
+
+/** 
+ * @brief The function called by all Printf operations.
+ * @param iobuff is the stream buffer in the output.
+ * @param format is a printf like string format.
+ * @param pars is a list of AnyType elements to print.
+ * @return the return of PrintToStream function.
+ *
+ * This function read the format, builds the related format descriptor and then
+ * calls the PrintToStream function passing the next AnyType element in the list.*/
 static
 bool PrintFormattedToStream(
 				IOBuffer &				iobuff,

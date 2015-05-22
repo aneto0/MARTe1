@@ -24,7 +24,7 @@
 
 /** 
  * @file
- * Logging management functions
+ * @brief Error management functions
  */
 #ifndef _ERROR_MANAGEMENT_H
 #define _ERROR_MANAGEMENT_H
@@ -152,21 +152,34 @@ extern "C" {
 }
 
 /**
- * Collection of functions and  types to manage error reporting
+ * @brief Collection of functions and  types to manage error reporting.
+ *
+ * These functions allows an error reporting mechanism. The user should only pass the code of the error
+ * and a description but automatically the name of the file, the line number and the function 
+ * are stored in the ErrorInformation structure. The user can implement a routine that will be called
+ * by the report error function to manage errors in specific ways.
  */
 class ErrorManagement{
 
 public:    
-    /** translate ErrorManagement::ErrorType to ErrorName */
+    /** 
+     * @brief Returns the name string associated to the error code.
+     * @param errorCode is the error code. */
 	static inline const char *ErrorName(ErrorType errorCode){
 		return ErrorManagement_ErrorName(errorCode);
 	}
 
-    /** 
-        Simplest error report function
-        Non blocking. Thread and interrupt safe        
-	 */
-	static inline void ReportError(
+    /**       
+     * @brief Store the error informations in the ErrorInformation structure, then calls a predefined routine.
+     * @param code is the error code.
+     * @param errorDescription is the error description.
+     * @param fileName is the file name where the error was triggered.
+     * @param lineNumber is the line number where the error was triggered.
+     * @param functionName is the function name in witch the error was triggered.
+     *
+     * The thread id is stored in the structure only if interrupts are disabled, because
+     * it is not possible get the thread id in an interrupt routine. */
+ 	static inline void ReportError(
 				ErrorType 			code, 
 				const char *		errorDescription,
 				const char *        fileName			= NULL,
@@ -186,10 +199,13 @@ public:
 	}
 
     /** 
-        Simplest error report function
-        Non blocking. Thread safe     
-        Not Interrupt safe   
-	 */
+     * @brief Report completely the error within the thread. 
+     * @param code is the error code.
+     * @param errorDescription is the error description.
+     * @param fileName is the file name where the error was triggered.
+     * @param lineNumber is the line number where the error was triggered.
+     * @param functionName is the function name where the error was triggered.
+     */
 	static inline void ReportErrorFullContext(
 			ErrorType 			code, 
 			const char *		errorDescription,             /// memory volatile - will not be touched but is not expected to be persistent
@@ -209,7 +225,9 @@ public:
 	}
 
 public:    
-    /** set the handler for error messages */
+    /** 
+     * @brief Sets the routine for error messages.
+     * @param ErrorMessageProcessFunctionType is a pointer to the function called by ReportError. */
 	static inline void SetErrorMessageProcessFunction(ErrorMessageProcessFunctionType userFun=NULL){
 		ErrorManagement_SetErrorMessageProcessFunction(userFun);
 	}
@@ -229,9 +247,10 @@ public:
 
 #endif // __FUNCTION_NAME__
 
+/** @brief The function to call in case of errors: passed automatically to ReportError the file name and the line number where the error was triggered.*/
 #define REPORT_ERROR(code,message)\
 		ErrorManagement::ReportError(code,message,__FILE__,__LINE__,__FUNCTION_NAME__);
-
+/** @brief The function to call in case of errors: passed automatically to ReportError the file name and the line number where the error was triggered.*/
 #define REPORT_ERROR_FULL(code,message)\
 		ErrorManagement::ReportErrorFullContext(code,message,__FILE__,__LINE__,__FUNCTION_NAME__);
 

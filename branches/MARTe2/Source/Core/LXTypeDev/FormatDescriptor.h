@@ -23,7 +23,9 @@
  *
  **/
 /**
- * @file
+ * @file FormatDescriptor.h
+ *
+ * A structure which contains all the necessary informations for an element print.
  */
 #ifndef FORMAT_DESCRIPTOR_H
 #define FORMAT_DESCRIPTOR_H
@@ -97,9 +99,19 @@ struct Notation{
 
 class FormatDescriptor;
 
+/** @see FormatDescriptor::InitialiseFromString */
 extern "C"  bool FDInitialiseFromString(FormatDescriptor &fd,const char *&string);
 
-/** Describes how a basic type shall be printed (transformed into a string) */
+
+
+/**
+ * @brief FormatDescriptor class.
+ * 
+ * This class contains a structure to store the informations the print of each type.
+ * It defines also functions due to fill the structure getting the information from
+ * a printf like constant char* string which specifies the desired print format.
+ *
+ * It is the basic brick for all Printf functions. */
 class FormatDescriptor{
 public:
 //*** MAYBE REPLACE with finite set of options ( *' ' *0  *' '0x *' ', ....)
@@ -157,7 +169,12 @@ public:
     //       
     int                     spareBits:7;
     
-	/** takes a printf like string already pointing at the character after % (see below format)
+	/** 
+         * @brief Converts a const char* string to a FormatDescriptor structure.
+         * @param string is the string which contains a printf like format.
+         * @return false if string is null or empty.
+  	 *
+	   Takes a printf like string already pointing at the character after % (see below format)
 	    and parses it recovering all the useful information, discarding all redundant ones,
 		and fills up the fields in this structure.
 	    At the end the pointer string is moved to the next character after the parsed block
@@ -196,7 +213,7 @@ public:
         E --> engineering format
 		g --> smart format   - like E but replaces E-12 to E+12 with one of the following letters "TGMK munp" 
 		G --> compact format 
-		a,x,p --> activate exadecimal display
+		a,x,p --> activate exadecimal display (p activates full notation: header+trailing zeros)
         o --> activate octal display
         b --> activate binary display
 	*/
@@ -205,7 +222,9 @@ public:
     }
 
     /**
-     * Format descriptor is not initialised
+     * @brief Default constructor.
+     *
+     * Precision -1 means default precision for float types.
      */
 	FormatDescriptor(){
 		this->size = 0;
@@ -220,16 +239,18 @@ public:
     }
 
 	/** 
-		constructor from unsigned integer
-		Just copy bit by bit
-	*/
+	 * @brief Constructor from unsigned integer.
+         * @param x contains the bits for the FormatDescriptor structure.
+         *
+	 * Just copy bit by bit. */
 	FormatDescriptor(uint32 x){
 		uint32 *p = (uint32 * )this;
 		*p = x;
 	}
     
-	/**
-        Copy operator 
+    /**
+     * @brief Copy operator. 
+     * @param src is the format descriptor to be copied in this.
     */
     void operator=(const FormatDescriptor &src){
         uint32 *d = (uint32 *)this;
@@ -237,8 +258,9 @@ public:
         *d = *s;
     }
 
-	/**
-        or bits operator
+    /**
+     * @brief Bitwise or operator
+     * @param src is format descriptor argument.
     */
     void operator |=(const FormatDescriptor &src){
         uint32 *d = (uint32 *)this;
@@ -247,7 +269,9 @@ public:
     }
     
     /**
-        Two FormatDescriptors are equal if every field is equal
+     * @brief Is equal operator.
+     * @param src is the other format descriptor to be compared with this.
+     * @return true if every field is equal.
     */
     bool operator ==(const FormatDescriptor &src){
         uint32 *p = (uint32 * )this;
@@ -256,8 +280,10 @@ public:
     }
 
     /**
-        Two FormatDescriptors are different if one of the fields is different 
-    */
+     * @brief Is different operator.
+     * @param src is the other format descriptor to be compared with this.
+     * @return true if one field is different.
+     */
     bool operator !=(const FormatDescriptor &src){
         uint32 *p = (uint32 * )this;
         uint32 *s = (uint32 * )&src;
@@ -265,8 +291,15 @@ public:
     }
 
 	/** 
-		constructor from unsigned integer
-		Just copy bit by bit
+         * @brief Constructor field by field.
+ 	 * @param size is the desired maximum size for the print.
+ 	 * @param precision specifies the precision for float number print.
+ 	 * @param padded specifies if the space remained until the desired size must be filled with ' '.
+         * @param leftAligned specifies if the padding is at the beginning (false) or at the end (true).
+         * @param floatNotation specifies the desired notation for float numbers (fixed point, exponential, ...)
+         * @param binaryNotation specifies the desired notation for integer numbers (decimal, exadecimal, ...)
+         * @param binaryPadded specifies if the trailing zeros must be added for integer prints.
+         * @param fullNotation specifies if the header (0x, 0o, 0b) must be added for integer prints.
 	*/
     FormatDescriptor(
     		uint8 				size, 

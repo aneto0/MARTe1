@@ -28,7 +28,7 @@
 static inline void NULLErrorMessageProcessFunction(ErrorInformation &errorInfo,const char *errorDescription){}
 
 /**
- * pointer to the function that will process the errors
+ * @brief Pointer to the function that will process the errors
  */
 ErrorMessageProcessFunctionType errorMessageProcessFunction = NULLErrorMessageProcessFunction; 
 
@@ -38,7 +38,7 @@ void ErrorManagement_SetErrorMessageProcessFunction(ErrorMessageProcessFunctionT
 }
 
 
-// a structure pairing an error code with its explanation
+/** a structure pairing an error code with its explanation. */
 static const 
 struct {
     const char *	name;
@@ -64,7 +64,7 @@ struct {
 };
 
 
-/** translate errorCode to ErrorName */
+/** @brief Translate errorCode to ErrorName */
 const char *ErrorManagement_ErrorName(ErrorType errorCode ){
     int i=0;
     while ( errorNames[i].name != NULL){

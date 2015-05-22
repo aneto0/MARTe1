@@ -23,7 +23,8 @@
  *
  **/
 /**
- * @file
+ * @file AnyType.h
+ * @brief A pointer to each type of data.
  */
 #ifndef ANY_TYPE_H
 #define ANY_TYPE_H
@@ -34,52 +35,76 @@
 #include <stdio.h>
 
 /**
-   a pointer and a type descriptor
-   used to process data on the basis of its type
+ * @brief AnyType class.
+ *
+ * This class provide a smart mechanism for the manipulation of each type.
+ * It is composed by a void* pointer to the element and by a descriptor
+ * which gives information about the type (the size, if it is a signed or
+ * unsigned number, if it is constant, if it is an object or a native element, ecc). 
+ * For each type a constructor can automatically built the relative AnyType 
+ * object and this is very useful for example in the Printf function. 
 */
 class AnyType{
 public:
 	
-    /// data may be RW or RO
+    /** A pointer to the element. */
 	void * 				dataPointer;
 
-	/// what type is the data 
+    /**
+     * The descriptor of the element. It gives
+     * all the necessary information about the specific element
+     * type. See TypeDescriptor. */
     TypeDescriptor      dataDescriptor;
  
 	/** 
-	 * used only for bit range types
-	 * range is 0 - 255 
+	 * Used for BitSet typer.
+	 * The maximum range is 255.
 	 */
     uint8               bitAddress;	
 	
 public:
-	/// constructor from an integer 8 bit
+    /** 
+     * @brief Default constructor.
+     * 
+     * It is used as the terminated element in a Printf list.
+     * The data descriptor is void, the pointer null. */
     AnyType(void){
 		dataPointer 		= NULL; 
 		bitAddress  		= 0;
 		dataDescriptor 		= VoidType;
 	}   	
     
-    ///
+    /**
+     * @brief Copy constructor.
+     * @param x is the AnyType to be copied in this.
+    */
     AnyType(const AnyType &x){
 		dataPointer 		= x.dataPointer; 
 		bitAddress  		= x.bitAddress;
 		dataDescriptor 		= x.dataDescriptor;
 	}   	
     
-    /// check for void type
+    /** 
+     * @brief Checks if the AnyType is empty.
+     * @return true if the data descriptor is VoidType. */
     bool IsVoid() const{
     	return (dataDescriptor == VoidType);
     }
 
-    /// constructor from a float
+    /**
+     * @brief Constructor by float.
+     * @param i is a pointer to the float number. */
     AnyType(float &i){
 		dataPointer = (void *) &i; 
 		bitAddress  = 0;
 		dataDescriptor = Float32Bit;
 	}   
     
-    /// constructor from a float
+    /**
+     * @brief Constructor by const float.
+     * @param i is a pointer to the const float number.
+     * 
+     * The flag isConstant is settes to true. */
     AnyType(const float &i){
 		dataPointer = (void *) &i; 
 		bitAddress  = 0;
@@ -87,14 +112,19 @@ public:
 		dataDescriptor.isConstant = true;
 	}   	
 
-    /// constructor from a float
+    /**
+     * @brief Constructor from a double.
+     * @param i is a pointer to the data number.
+     */
     AnyType(double &i){
 		dataPointer = (void *) &i; 
 		bitAddress  = 0;
 		dataDescriptor = Float64Bit;
 	}   	
 
-    /// constructor from a float
+    /**
+     * @brief Constructor from a const double.
+     * @param i is a pointer to the const double number. */
     AnyType(const double &i){
 		dataPointer = (void *) &i; 
 		bitAddress  = 0;
@@ -102,7 +132,9 @@ public:
 		dataDescriptor.isConstant = true;
 	}   	
 
-    /// constructor from an integer 8 bit
+    /**
+     * @brief Constructor from an 8 bit integer constant.
+     * @param i is the const 8 bit integer (const char). */
     AnyType(const int8 &i){
 		dataPointer = (void *) &i; 
 		bitAddress  = 0;
@@ -110,41 +142,54 @@ public:
 		dataDescriptor.isConstant = true;
 	}   	
 
-	/// constructor from an integer 8 bit
+    /**
+     * @brief Constructor from an integer 8 bit.
+     * @param i is the 8 bit integer (char). */
     AnyType(int8 &i){
 		dataPointer = &i;
 		bitAddress  = 0;
 		dataDescriptor = SignedInteger8Bit;
 	}   	
 
-	/// constructor from an integer 8 bit
+    /** 
+     * @brief Constructor from an unsigned integer 8 bit.
+     * @param i is the unsigned 8 bit integer. */
     AnyType(uint8 &i){
 		dataPointer = &i;
 		bitAddress  = 0;
 		dataDescriptor = UnsignedInteger8Bit;
 	}   	
-	/// constructor from an integer 8 bit
+
+    /**
+     * @brief Constructor from an integer 16 bit.
+     * @param i is the 16 bit integer. */
     AnyType(int16 &i){
 		dataPointer = &i;
 		bitAddress  = 0;
 		dataDescriptor = SignedInteger16Bit;
 	}   	
 
-	/// constructor from an integer 8 bit
+    /** 
+     * @brief Constructor from an unsigned integer 16 bit.
+     * @param i is the 16 bit unsigned integer. */
     AnyType(uint16 &i){
 		dataPointer = &i;
 		bitAddress  = 0;
 		dataDescriptor = UnsignedInteger16Bit;
 	}   	
 
-	/// constructor from an integer 8 bit
+    /** 
+     * @brief Constructor from an unsigned integer 32 bit.
+     * @param i is the unsigned 32 bit integer. */
     AnyType(uint32 &i){
 		dataPointer = &i;
 		bitAddress  = 0;
 		dataDescriptor = UnsignedInteger32Bit;
 	}   
 
-	/// constructor from an integer 8 bit
+    /** 
+     * @brief Constructor from an unsigned constant integer 32 bit.
+     * @param i is the constant unsigned 32 bit integer. */
     AnyType(const uint32 &i){
 		dataPointer = (void *)&i;
 		bitAddress  = 0;
@@ -152,14 +197,18 @@ public:
 		dataDescriptor.isConstant = true;
 	}   
     
-	/// constructor from an integer 8 bit
+    /** 
+     * @brief Constructor from an integer 32 bit.
+     * @param i is the 32 bit integer. */
     AnyType(int32 &i){
 		dataPointer = &i;
 		bitAddress  = 0;
 		dataDescriptor = SignedInteger32Bit;
 	}   
     
-	/// 
+    /** 
+     * @brief Constructor from a constant integer 32 bit.
+     * @param i is the constant 32 bit integer. */
     AnyType(const int32 &i){
 		dataPointer = (void *)&i;
 		bitAddress  = 0;
@@ -167,28 +216,37 @@ public:
 		dataDescriptor.isConstant = true;
 	}   
     
-	/// constructor from an integer 64 bit
+    /** 
+     * @brief Constructor from an unsigned integer 64 bit.
+     * @param i is the unsigned 64 bit integer. */
     AnyType(uint64 &i){
 		dataPointer = &i;
 		bitAddress  = 0;
 		dataDescriptor = UnsignedInteger64Bit;
 	}   
     
-	/// constructor from an integer 64 bit
+    /**
+     * @brief Constructor from an integer 64 bit.
+     * @param i is the 64 bit integer. */
     AnyType(int64 &i){
 		dataPointer = &i;
 		bitAddress  = 0;
 		dataDescriptor = SignedInteger64Bit;
 	}   
     
-	/// 
+    /** 
+     * @brief Constructor from a constant 64 bit integer.
+     * @param i is the 64 bit constant integer. */
     AnyType(const int64 &i){
 		dataPointer = (void *)&i;
 		bitAddress  = 0;
 		dataDescriptor = SignedInteger64Bit;
 		dataDescriptor.isConstant = true;
 	}
-	/// 
+
+    /**
+     * @brief Constructor from a const void* pointer.
+     * @param i is the const void* pointer. */
     AnyType(const void * p){
 		dataPointer = (void *)p;
 		bitAddress  = 0;
@@ -198,7 +256,9 @@ public:
 		dataDescriptor.size = 8 * sizeof(void *);	
 	} 
    
-	/// 
+    /**
+     * @brief Constructor from a void* pointer.
+     * @param i is the const void* pointer. */
     AnyType(void * p){
 		dataPointer = (void *)p;
 		bitAddress  = 0;
@@ -208,7 +268,9 @@ public:
 		dataDescriptor.size = 8 * sizeof(void *);
 	}
     
-	/// 
+    /**
+     * @brief Constructor from a const char* string.
+     * @param i is the const char pointer. */
     AnyType(const char *p){
 		dataPointer = (void *)p; // we will either print the variable or the string
 		bitAddress  = 0;
@@ -218,7 +280,7 @@ public:
 	} 
 };
 
-// void data marker
+/** definition of the void AnyType (empty contructor). */
 static const AnyType voidAnyType;
 
 #endif

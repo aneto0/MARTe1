@@ -23,18 +23,17 @@
  *
  **/
 /**
- * @file
+ * @file TypeDescriptor.h
+ * @brief A structure which contains informations about types.
  */
 #ifndef TYPE_DESCRIPTOR
 #define TYPE_DESCRIPTOR
 
 /** 
-   Used to describe the type pointed to by a pointer
+   Used to describe the type pointed to by a pointer.
    Depending on the first bit isStructuredData it may contain a code identifying a structure
-   or the remaining bit can be used to identify a specific basic type
-   basic types are ints 8-64 bit floats doubles char *
-   basic types also include exotic definitions like 23 bit integers
-   see BasicType for more information
+   or the remaining bit can be used to identify a specific basic type.
+   Basic types are ints 8-64 bit, floats, doubles, char pointers and void pointers.
 */
 struct TypeDescriptor {
     /// The basic types that can be used 
@@ -136,40 +135,40 @@ struct TypeDescriptor {
     }
 };
 
-/// describes float
+/** describes float. */
 const TypeDescriptor Float32Bit                 = {  False, False, {{ TypeDescriptor::Float , 32}} };
 
-/// describes double
+/** describes double. */
 const TypeDescriptor Float64Bit                 = {  False, False, {{ TypeDescriptor::Float , 64}} };
 
-/// describes double double
+/** describes double double */
 const TypeDescriptor Float128Bit                = {  False, False, {{ TypeDescriptor::Float , 128}} };
 
-/// describes int0
+/** describes int0 */
 const TypeDescriptor VoidType                   = {  False, False, {{ TypeDescriptor::SignedInteger , 0}} };
 
-/// describes int8
+/** describes int8 */
 const TypeDescriptor SignedInteger8Bit          = {  False, False, {{ TypeDescriptor::SignedInteger , 8}} };
 
-/// describes uint8
+/** describes uint8 */
 const TypeDescriptor UnsignedInteger8Bit        = { False, False, {{ TypeDescriptor::UnsignedInteger , 8}} };
 
-/// describes int16
+/** describes int16 */
 const TypeDescriptor SignedInteger16Bit         = { False, False, {{ TypeDescriptor::SignedInteger , 16}} };
 
-/// describes uint16
+/** describes uint16 */
 const TypeDescriptor UnsignedInteger16Bit       = { False, False, {{ TypeDescriptor::UnsignedInteger , 16}} };
 
-/// describes int32
+/** describes int32 */
 const TypeDescriptor SignedInteger32Bit         = { False, False, {{ TypeDescriptor::SignedInteger , 32}} };
 
-/// describes uint32
+/** describes uint32 */
 const TypeDescriptor UnsignedInteger32Bit       = { False, False, {{ TypeDescriptor::UnsignedInteger , 32}} };
 
-/// describes int64
+/** describes int64 */
 const TypeDescriptor SignedInteger64Bit         = { False, False, {{ TypeDescriptor::SignedInteger , 64}} };
 
-/// describes uint64
+/** describes uint64 */
 const TypeDescriptor UnsignedInteger64Bit       = { False, False, {{ TypeDescriptor::UnsignedInteger , 64}} };
 
 
