@@ -105,12 +105,14 @@ bool BasicConsoleOSWrite(BasicConsole &con, const void* buffer, uint32 &size) {
     char* buffString = (char*) buffer;
     char nextRow = '\n';
     int32 n = 0;
-    uint32 index = 0, sizeT = 0, start = 0;
+    uint32 index = 0, start = 0;
+    uint32 sizeT = 0;
     uint32 columnLimit = (uint32) con.numberOfColumns;
     while (1) {
-        while (sizeT < columnLimit && index < size) {
-            if (buffString[index] == '\0' || buffString[index] == '\n')
+        while ((con.colCount + sizeT) < columnLimit && index < size) {
+            if (buffString[index] == '\0' || buffString[index] == '\n') {
                 break;
+	    }
             index++;
             sizeT = index - start;
         }
@@ -118,10 +120,14 @@ bool BasicConsoleOSWrite(BasicConsole &con, const void* buffer, uint32 &size) {
         if (sizeT > 0)
             n += write(STDOUT, buffString + start, sizeT);
 
-        if (index >= size)
+        if (index >= size) {
+	    con.colCount += sizeT; 
             break;
-        if (buffString[index] == '\0')
+	}
+        if (buffString[index] == '\0') {
+	    con.colCount = sizeT;
             break;
+        }
 
         write(STDOUT, &nextRow, 1);
         if (buffString[index] == '\n') {
@@ -130,6 +136,7 @@ bool BasicConsoleOSWrite(BasicConsole &con, const void* buffer, uint32 &size) {
         }
         start = index;
         sizeT = 0;
+	con.colCount = 0;
     }
 
     size = n;

@@ -33,6 +33,7 @@ bool BasicConsoleOpen(BasicConsole &con, ConsoleOpeningMode openingMode,
 
     con.msecTimeout = msecTimeout;
     con.lineCount = 0;
+    con.colCount = 0;
     con.lastPagingTime = 0;
     con.openingMode = openingMode;
     con.numberOfColumns=numberOfColumns;
@@ -51,10 +52,9 @@ bool BasicConsoleShow(BasicConsole &con) {
 bool BasicConsoleWrite(BasicConsole &con, const void* buffer, uint32 &size,
                        TimeoutType msecTimeout) {
 
-    int32 numberOfColumns;
-    int32 numberOfRows;
-    if ((con.openingMode & EnablePaging)
-            && (BasicConsoleGetWindowSize(con, numberOfColumns, numberOfRows))) {
+    uint32 numberOfColumns = (uint32)(con.numberOfColumns);
+    uint32 numberOfRows = (uint32)(con.numberOfRows);
+    if ((con.openingMode & EnablePaging)) {
 
         int64 t0 = con.lastPagingTime;
         int64 t1 = HighResolutionTimer::Counter();

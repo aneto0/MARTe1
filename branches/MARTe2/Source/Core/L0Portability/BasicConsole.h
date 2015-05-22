@@ -187,16 +187,21 @@ bool BasicConsolePlotChar(BasicConsole &con, char c, Colours foreGroundColour,
 
 
 class BasicConsole {
-    /** how many lines since last paging. */
-    int32 lineCount;
+
 
     /** how long since last paging. */
     int64 lastPagingTime;
 
-    /** how long to wait when reading. */
+   /** how long to wait when reading. */
     TimeoutType msecTimeout;
 
 public:
+     /** how many lines since last paging. */
+    uint32 lineCount; 
+
+    /** the column counter. */
+    uint32 colCount;
+  
     /** sets of flags describing the console status. */
     ConsoleOpeningMode openingMode;
     
@@ -271,7 +276,6 @@ public:
         return BasicConsoleShow(*this);
     }
 
-protected:
     /** @brief The actual Write.
 	@see BasicConsoleWrite(). */
     inline bool Write(const void* buffer, uint32 & size,
@@ -285,7 +289,6 @@ protected:
         return BasicConsoleRead(*this, buffer, size, msecTimeout);
     }
 
-public:
 
     /** @brief Set Title Bar text.
       * @see BasicConsoleSetTitleBar(). */
