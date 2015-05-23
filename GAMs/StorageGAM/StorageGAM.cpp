@@ -466,8 +466,8 @@ bool StorageGAM::RetrieveSignal(const FString &sigName, GCRTemplate<Signal> &sig
         // Signal found ... copying data
         BasicTypeDescriptor btd = ((SignalInformation *)(master.signalInfo.ListPeek(signalIndex)))->GetBasicTypeDescriptor();
         
-        intptr startPointer = (uint32)(((SignalInformation *)(master.signalInfo.ListPeek(signalIndex)))->acqBuffManager.linearBuffer.DataBuffer());
-        intptr endPointer = (uint32)(((SignalInformation *)(master.signalInfo.ListPeek(signalIndex)))->acqBuffManager.linearBuffer.WritePtr());
+        intptr startPointer = (uint64)(((SignalInformation *)(master.signalInfo.ListPeek(signalIndex)))->acqBuffManager.linearBuffer.DataBuffer());
+        intptr endPointer = (uint64)(((SignalInformation *)(master.signalInfo.ListPeek(signalIndex)))->acqBuffManager.linearBuffer.WritePtr());
         uint32 byteSize = ((SignalInformation *)(master.signalInfo.ListPeek(signalIndex)))->GetBasicTypeDescriptor().ByteSize();
         uint32 numberOfSamples = (endPointer-startPointer)/byteSize;
         
