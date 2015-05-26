@@ -438,15 +438,7 @@ bool StreamStringTest::TestPrint() {
     int32 sbit32 = -3;
     int64 sbit64 = -4;
 
-    DoubleInteger< int64 > sbit128Tmp;
-    sbit128Tmp = -5;
-    AnyType sbit128;
-    sbit128.dataPointer = &sbit128Tmp;
-    const TypeDescriptor SignedInt128 = { False, False, { {
-            TypeDescriptor::SignedInteger, 128 } } };
 
-    sbit128.dataDescriptor = SignedInt128;
-    sbit128.bitAddress = 0;
     float fbit32 = 1.2;
     double dbit64 = 3.4;
     __float128 fbit128Tmp = 5.6Q;
@@ -457,6 +449,18 @@ bool StreamStringTest::TestPrint() {
 
     fbit128.dataDescriptor = Float128;
     fbit128.bitAddress = 0;
+
+
+	AnyType shifted64bit;
+	int64 shifted64bitNumber=0xffffffffffffb234;
+	shifted64bit.dataPointer=&shifted64bitNumber;
+	shifted64bit.bitAddress=12;
+	const TypeDescriptor SignedShift={False,False,{{TypeDescriptor::SignedInteger, 52}}};
+	shifted64bit.dataDescriptor=SignedShift;
+
+
+
+
 
     //Use the unbuffered PutC, 4 parameters.	
     //For integer the letter is useless
@@ -470,7 +474,7 @@ bool StreamStringTest::TestPrint() {
     myString.Printf("% 3u % 3c % 3d\n", sbit64, ubit32, fbit32);
 
     //Use the unbuffered PutC, 3 parameters.
-    myString.Printf("% 3i % 3c % 3d\n", sbit128, ubit128, fbit32);
+    myString.Printf("% 3i % 3c % 3d\n", shifted64bit, ubit128, fbit32);
 
     //Use the unbuffered PutC, 2 parameters.
     myString.Printf("% 3c % 3F\n", ubit8, dbit64);
@@ -481,7 +485,7 @@ bool StreamStringTest::TestPrint() {
     myString.Printf("% 3o\n", sbit32);
 
     if (StringHelper::Compare(
-            " -1 1.2  -2  FF\n  4 1.2   2  FF\n -4   3 1.2\n  0   5 1.2\n  1 3.4\n  1 3.4\n  ?\n",
+            " -1 1.2  -2  FF\n  4 1.2   2  FF\n -4   3 1.2\n -5   5 1.2\n  1 3.4\n  1 3.4\n  ?\n",
             myString.Buffer()) != 0) {
         return False;
     }
@@ -502,8 +506,8 @@ bool StreamStringTest::TestPrint() {
     }
 
     //structured data anytype
-    sbit128.dataDescriptor.isStructuredData = true;
-    if (myString.Printf("% 3d", sbit128)) {
+    ubit128.dataDescriptor.isStructuredData = true;
+    if (myString.Printf("% 3d", ubit128)) {
         return False;
     }
 
