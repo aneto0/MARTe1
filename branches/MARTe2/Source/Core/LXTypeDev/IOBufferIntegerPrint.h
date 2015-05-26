@@ -898,31 +898,57 @@ bool BitSetToStream(
 	if (numberBitSize <= 16){
 
 		if (numberBitSize <= 8){
-			uint8 destination;
-			ret = BitSetToInteger(destination,numberAddress,numberBitShift,numberBitSize,numberIsSigned);
-			
-			if (ret) ret = IntegerToStream(stream,destination,format,numberBitSize);			
+			if(numberIsSigned){
+				int8 destination;
+				ret = BitSetToInteger(destination,numberAddress,numberBitShift,numberBitSize,numberIsSigned);
+				if (ret) return IntegerToStream(stream,destination,format,numberBitSize);
+			}
+			else{
+				uint8 destination;	
+				ret = BitSetToInteger(destination,numberAddress,numberBitShift,numberBitSize,numberIsSigned);
+				if (ret) return IntegerToStream(stream,destination,format,numberBitSize);
+			}
 			
 		} else {
-			uint16 destination;
-			ret = BitSetToInteger(destination,numberAddress,numberBitShift,numberBitSize,numberIsSigned);
-			
-			if (ret) ret = IntegerToStream(stream,destination,format,numberBitSize);			
+			if(numberIsSigned){
+				int16 destination;
+				ret = BitSetToInteger(destination,numberAddress,numberBitShift,numberBitSize,numberIsSigned);
+				if (ret) return IntegerToStream(stream,destination,format,numberBitSize);
+
+			}
+			else{
+				uint16 destination;
+				ret = BitSetToInteger(destination,numberAddress,numberBitShift,numberBitSize,numberIsSigned);
+				if (ret) return IntegerToStream(stream,destination,format,numberBitSize);
+
+			}
 		}
 		
 	} else {
 		
 		if (numberBitSize <= 32){
-			uint32 destination;
-			ret = BitSetToInteger(destination,numberAddress,numberBitShift,numberBitSize,numberIsSigned);
-			
-			if (ret) ret = IntegerToStream(stream,destination,format,numberBitSize);
+			if(numberIsSigned){
+				int32 destination;
+				ret = BitSetToInteger(destination,numberAddress,numberBitShift,numberBitSize,numberIsSigned);
+				if (ret) return IntegerToStream(stream,destination,format,numberBitSize);
+			}
+			else{
+				uint32 destination;
+				ret = BitSetToInteger(destination,numberAddress,numberBitShift,numberBitSize,numberIsSigned);
+				if (ret) return IntegerToStream(stream,destination,format,numberBitSize);
+			}
 			
 		} else {
-			uint64 destination;
-			ret = BitSetToInteger(destination,numberAddress,numberBitShift,numberBitSize,numberIsSigned);
-			
-			if (ret) ret = IntegerToStream(stream,destination,format,numberBitSize);					
+			if(numberIsSigned){
+				int64 destination;
+				ret = BitSetToInteger(destination,numberAddress,numberBitShift,numberBitSize,numberIsSigned);
+				if (ret) return IntegerToStream(stream,destination,format,numberBitSize);
+			}
+			else{
+				uint64 destination;
+				ret = BitSetToInteger(destination,numberAddress,numberBitShift,numberBitSize,numberIsSigned);
+				if (ret) return IntegerToStream(stream,destination,format,numberBitSize);
+			}
 		}		
 	}
 		

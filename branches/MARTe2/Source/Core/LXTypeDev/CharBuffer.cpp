@@ -69,7 +69,12 @@ bool CharBuffer::SetBufferAllocationSize(
 	
     // the mask is the 2 complement of the actual granularity
     uint32 allocationGranularity = ~allocationGranularityMask + 1;
-    uint32 allocationBoundary    = ~(2 * allocationGranularity - 1);
+//    uint32 allocationBoundary    = ~(2 * allocationGranularity - 1);
+
+
+    //If you want to allocate allocationGranularityMask neededMemory= (allocationGranularityMask+ ~(allocationGranularityMask))&(allocationGranularityMask)
+    //= allocationGranularityMask  then you can allocate it but no more (otherwise it's overflow).      
+    uint32 allocationBoundary = allocationGranularityMask;
 
     // stay within matematical limits
     if (desiredSize > allocationBoundary ) {
