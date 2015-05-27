@@ -559,14 +559,14 @@ bool BufferedStreamTest::TestPrint() {
     int16 sbit16 = -2;
     int32 sbit32 = -3;
     int64 sbit64 = -4;
-    
-	AnyType shifted64bit;
-	int64 shifted64bitNumber=0xffffffffffffb234;
-	shifted64bit.dataPointer=&shifted64bitNumber;
-	shifted64bit.bitAddress=12;
-	const TypeDescriptor SignedShift={False,False,{{TypeDescriptor::SignedInteger, 52}}};
-	shifted64bit.dataDescriptor=SignedShift;
 
+    AnyType shifted64bit;
+    int64 shifted64bitNumber = 0xffffffffffffb234;
+    shifted64bit.dataPointer = &shifted64bitNumber;
+    shifted64bit.bitAddress = 12;
+    const TypeDescriptor SignedShift = { False, False, { {
+            TypeDescriptor::SignedInteger, 52 } } };
+    shifted64bit.dataDescriptor = SignedShift;
 
     float fbit32 = 1.2;
     double dbit64 = 3.4;
@@ -577,7 +577,6 @@ bool BufferedStreamTest::TestPrint() {
             128 } } };
     fbit128.dataDescriptor = Float128;
     fbit128.bitAddress = 0;
-
 
     //Use the unbuffered PutC, 4 parameters.	
     //For integer the letter is useless
@@ -625,114 +624,112 @@ bool BufferedStreamTest::TestPrint() {
         return False;
     }
 
-	//print the stream
-	myStream.Clear();
-	SimpleBufferedStream streamToPrint;
+    //print the stream
+    myStream.Clear();
+    SimpleBufferedStream streamToPrint;
 
+    const char* onStream = "HelloWorld";
+    uint32 sizeOnStream = StringHelper::Length(onStream);
+    streamToPrint.Write(onStream, sizeOnStream);
 
+    //Now the stream to print is not seekable... print an error message on the stream
+    streamToPrint.Seek(0);
+    myStream.Printf("%s", streamToPrint);
 
+    myStream.FlushAndResync();
 
-	const char* onStream="HelloWorld";
-	uint32 sizeOnStream=StringHelper::Length(onStream);
-	streamToPrint.Write(onStream, sizeOnStream);
+    if (StringHelper::Compare(myStream.buffer, "!!stream !seek!!") != 0) {
+        return False;
+    }
 
-	//Now the stream to print is not seekable... print an error message on the stream
-	streamToPrint.Seek(0);
-	myStream.Printf("%s", streamToPrint);
+    //make the stream seekable
+    streamToPrint.seekable = True;
 
-	myStream.FlushAndResync();
+    //impose buffer mode for the stream to print
+    uint32 streamToPrintBuffSize = 8;
+    if (!streamToPrint.SetBuffered(streamToPrintBuffSize)) {
+        return False;
+    }
 
+    myStream.Clear();
 
-	if(StringHelper::Compare(myStream.buffer, "!!stream !seek!!")!=0){
-		return False;
-	}
+    streamToPrint.Seek(0);
+    myStream.Printf("%s", streamToPrint);
 
+    myStream.FlushAndResync();
 
-	//make the stream seekable
-	streamToPrint.seekable=True;
+    if (StringHelper::Compare(myStream.buffer, "HelloWorld") != 0) {
+        return False;
+    }
 
-	//impose buffer mode for the stream to print
-	uint32 streamToPrintBuffSize=8;
-	if(!streamToPrint.SetBuffered(streamToPrintBuffSize)){
-		return False;
-	}
+    //print the stream with a greater size left padd
+    myStream.Clear();
 
-	myStream.Clear();
+    streamToPrint.Seek(0);
+    myStream.Printf("% 12s", streamToPrint);
+    myStream.FlushAndResync();
 
-	streamToPrint.Seek(0);
-	myStream.Printf("%s", streamToPrint);
+    if (StringHelper::Compare(myStream.buffer, "  HelloWorld") != 0) {
+        return False;
+    }
 
-	myStream.FlushAndResync();
+    //print the stream with a greater size right padd
+    myStream.Clear();
 
-	if(StringHelper::Compare(myStream.buffer, "HelloWorld")!=0){
-		return False;
-	}
+    streamToPrint.Seek(0);
+    myStream.Printf("%-12s", streamToPrint);
+    myStream.FlushAndResync();
 
+    if (StringHelper::Compare(myStream.buffer, "HelloWorld  ") != 0) {
+        return False;
+    }
 
-	//print the stream with a greater size left padd
-	myStream.Clear();
+    //clip the size.
+    myStream.Clear();
 
-	streamToPrint.Seek(0);
-	myStream.Printf("% 12s", streamToPrint);
-	myStream.FlushAndResync();
+    streamToPrint.Seek(0);
+    myStream.Printf("%7s", streamToPrint);
+    myStream.FlushAndResync();
 
+    if (StringHelper::Compare(myStream.buffer, "HelloWo") != 0) {
+        return False;
+    }
 
-	if(StringHelper::Compare(myStream.buffer, "  HelloWorld")!=0){
-		return False;
-	}
+    //test the copy function with a buffer in input.
+    myStream.Clear();
+    myStream.Copy(onStream);
 
-	//print the stream with a greater size right padd
-	myStream.Clear();
+    if (StringHelper::Compare(onStream, myStream.buffer) != 0) {
+        return False;
+    }
 
-	streamToPrint.Seek(0);
-	myStream.Printf("%-12s", streamToPrint);
-	myStream.FlushAndResync();
+    //test the copy function with a null input
+    myStream.Clear();
+    if (myStream.Copy(NULL)) {
+        return False;
+    }
 
-	if(StringHelper::Compare(myStream.buffer, "HelloWorld  ")!=0){
-		return False;
-	}
+    //test the copy function with a stream in input.
+    myStream.Clear();
+    streamToPrint.Seek(0);
 
-	//clip the size.
-	myStream.Clear();
+    char test[512];
+    StringHelper::Copy(test, "");
 
-	streamToPrint.Seek(0);
-	myStream.Printf("%7s", streamToPrint);
-	myStream.FlushAndResync();
+    //copy 300 chars on the stream
+    for (int32 i = 0; i < 30; i++) {
+        streamToPrint.Write(onStream, sizeOnStream);
+        StringHelper::Concatenate(test, onStream);
+    }
+    streamToPrint.Seek(0);
 
-	if(StringHelper::Compare(myStream.buffer, "HelloWo")!=0){
-		return False;
-	}
+    myStream.Copy(streamToPrint);
 
+    myStream.FlushAndResync();
 
-	//test the copy function with a buffer in input.
-	myStream.Clear();
-	myStream.Copy(onStream);
-	
-	if(StringHelper::Compare(onStream, myStream.buffer)!=0){
-		return False;
-	}
-
-	//test the copy function with a stream in input.
-	myStream.Clear();
-	streamToPrint.Seek(0);
-
-	char test[512];
-	StringHelper::Copy(test, "");
-
-	//copy 300 chars on the stream
-	for(int32 i=0; i < 30; i++){
-		streamToPrint.Write(onStream, sizeOnStream);
-		StringHelper::Concatenate(test, onStream);
-	}
-	streamToPrint.Seek(0);
-
-	myStream.Copy(streamToPrint);
-	
-	myStream.FlushAndResync();
-	
-	if(StringHelper::Compare(test, myStream.buffer)!=0){
-		return False;
-	}
+    if (StringHelper::Compare(test, myStream.buffer) != 0) {
+        return False;
+    }
 
     return True;
 }

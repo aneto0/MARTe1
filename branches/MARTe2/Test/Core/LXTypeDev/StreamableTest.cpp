@@ -155,6 +155,53 @@ bool StreamableTest::TestToken() {
         return False;
     }
 
+    myStream1.Seek(0);
+    myString = "";
+    uint32 tokens2skip = 1;
+    myStream1.SkipTokens(tokens2skip, ".");
+
+    //it reads two 64 bits wrapper buffer from the stream.
+    if (myStream1.Position() != 128) {
+        return False;
+    }
+
     return True;
 
 }
+
+/*
+ bool StreamableTest::TestUseless(){
+ SimpleStreamable myStream;
+ if(myStream.NOfStreams()!=0){
+ return False;
+ }
+
+ uint32 dummy=1;
+ if(myStream.Switch(dummy)){
+ return False;
+ }
+ 
+ if(myStream.Switch("")){
+ return False;
+ }
+ 
+ if(myStream.SelectedStream()!=0){
+ return False;
+ }
+ 
+ if(myStream.StreamName(dummy, "", dummy)){
+ return False;
+ }
+ 
+ if(myStream.AddStream("")){
+ return False;
+ }
+
+ if(myStream.RemoveStream("")){
+ return False;
+ }
+
+
+ return True;
+
+ }*/

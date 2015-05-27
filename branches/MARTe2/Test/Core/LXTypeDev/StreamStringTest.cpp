@@ -438,7 +438,6 @@ bool StreamStringTest::TestPrint() {
     int32 sbit32 = -3;
     int64 sbit64 = -4;
 
-
     float fbit32 = 1.2;
     double dbit64 = 3.4;
     __float128 fbit128Tmp = 5.6Q;
@@ -450,17 +449,13 @@ bool StreamStringTest::TestPrint() {
     fbit128.dataDescriptor = Float128;
     fbit128.bitAddress = 0;
 
-
-	AnyType shifted64bit;
-	int64 shifted64bitNumber=0xffffffffffffb234;
-	shifted64bit.dataPointer=&shifted64bitNumber;
-	shifted64bit.bitAddress=12;
-	const TypeDescriptor SignedShift={False,False,{{TypeDescriptor::SignedInteger, 52}}};
-	shifted64bit.dataDescriptor=SignedShift;
-
-
-
-
+    AnyType shifted64bit;
+    int64 shifted64bitNumber = 0xffffffffffffb234;
+    shifted64bit.dataPointer = &shifted64bitNumber;
+    shifted64bit.bitAddress = 12;
+    const TypeDescriptor SignedShift = { False, False, { {
+            TypeDescriptor::SignedInteger, 52 } } };
+    shifted64bit.dataDescriptor = SignedShift;
 
     //Use the unbuffered PutC, 4 parameters.	
     //For integer the letter is useless
@@ -590,7 +585,7 @@ bool StreamStringTest::TestPrint() {
     //%p format as the complete 32 bit pointer with header
     myString = "";
     input = "";
-    myString.Printf("%p", (void*)charPointer);
+    myString.Printf("%p", (void*) charPointer);
     input.Printf("% #0x", pointer);
     if (myString != input) {
         return False;
@@ -640,8 +635,7 @@ bool StreamStringTest::TestToken() {
 
     //skip "u" and "p"
     myString.GetToken(buffer, ".:", size, &saveTerminator, "up");
-    if (StringHelper::Compare(buffer, " Gisee") != 0
-            || saveTerminator != '.') {
+    if (StringHelper::Compare(buffer, " Gisee") != 0 || saveTerminator != '.') {
         return False;
     }
 
