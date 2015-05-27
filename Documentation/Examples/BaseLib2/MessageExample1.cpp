@@ -69,7 +69,7 @@ public:
         }
         //Get the message
         GCRTemplate<Message> message = envelope->GetMessage();
-        if (!envelope.IsValid()) {
+            if (!message.IsValid()) {
             AssertErrorCondition(FatalError, "%s::ProcessMessage: message is not valid!!", Name());
             return False;
         }
