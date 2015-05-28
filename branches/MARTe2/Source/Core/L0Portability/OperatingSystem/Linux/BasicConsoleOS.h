@@ -52,18 +52,41 @@
  * @param numberOfRows is the desired number of rows.
  * @return true if the console is opened correctly.
  */
+
+
+void SetImmediateRead(BasicConsole &con, struct termio &consoleMode){
+	consoleMode.c_lflag &=~ ICANON;
+	con.consoleDefaultParam.minReadByte=consoleMode.c_cc[VMIN];
+	consoleMode.c_cc[VMIN] = 1;
+	con.consoleDefaultParam.minTimeBetweenInputs=consoleMode.c_cc[VTIME];
+	consoleMode.c_cc[VTIME] = 0;
+}
+		
+void UnSetImmediateRead(BasicConsole &con, struct termio &consoleMode){
+	consoleMode.c_lflag |= ICANON;
+	consoleMode.c_cc[VMIN] = con.consoleDefaultParam.minReadByte;
+	consoleMode.c_cc[VTIME] = con.consoleDefaultParam.minTimeBetweenInputs;
+}
+
 bool BasicConsoleOSOpen(BasicConsole &con, int32 numberOfColumns,
                         int32 numberOfRows) {
 
+    //In this case read immediately from the console without wait \n.
     if (con.openingMode & PerformCharacterInput) {
         struct termio modifyConsoleModes;
-        if (ioctl(fileno(stdin), TCGETA, &con.inputConsoleHandle) < 0) {
+        if (ioctl(fileno(stdin), TCGETA, &modifyConsoleModes) < 0) {
             return False;
         }
-        modifyConsoleModes = con.inputConsoleHandle;
+
+	SetImmediateRead(con, modifyConsoleModes);
+
+/*
+        modifyConsoleModes = originalConsoleModes;
+        //don't wait the ret line to read
         modifyConsoleModes.c_lflag &= ~ICANON;
+        //read immediately
         modifyConsoleModes.c_cc[VMIN] = 1;
-        modifyConsoleModes.c_cc[VTIME] = 0;
+        modifyConsoleModes.c_cc[VTIME] = 0;*/
         ioctl(fileno(stdin), TCSETAW, &modifyConsoleModes);
     }
     fflush (stdin);
@@ -78,7 +101,11 @@ bool BasicConsoleOSOpen(BasicConsole &con, int32 numberOfColumns,
  */
 bool BasicConsoleOSClose(BasicConsole &con) {
     if (con.openingMode & PerformCharacterInput) {
-        ioctl(fileno(stdin), TCSETAW, &con.inputConsoleHandle);
+        //reset the original console modes
+	struct termio modifiedConsoleModes;
+	ioctl(fileno(stdin), TCGETA, &modifiedConsoleModes);
+	UnSetImmediateRead(con, modifiedConsoleModes);
+        ioctl(fileno(stdin), TCSETAW, &modifiedConsoleModes);
     }
     return True;
 }
@@ -121,7 +148,7 @@ bool BasicConsoleOSWrite(BasicConsole &con, const void* buffer, uint32 &size) {
             n += write(STDOUT, buffString + start, sizeT);
 
         if (index >= size) {
-	    con.colCount += sizeT; 
+	    con.colCount += sizeT;
             break;
 	}
         if (buffString[index] == '\0') {
@@ -187,7 +214,7 @@ bool BasicConsoleOSSetTitleBar(BasicConsole &con, const char *title) {
  * @param con is the console.
  * @param numberOfColumns is the desired number of columns.
  * @param numberOfRows is the desired number of rows.
- * @return true.  
+ * @return true.
  */
 bool BasicConsoleOSSetWindowSize(BasicConsole &con, int numberOfColumns,
                                  int numberOfRows) {

@@ -52,9 +52,16 @@ bool BasicConsoleShow(BasicConsole &con) {
 bool BasicConsoleWrite(BasicConsole &con, const void* buffer, uint32 &size,
                        TimeoutType msecTimeout) {
 
-    uint32 numberOfColumns = (uint32)(con.numberOfColumns);
-    uint32 numberOfRows = (uint32)(con.numberOfRows);
-    if ((con.openingMode & EnablePaging)) {
+    int32 numberOfColumnsTmp;
+    int32 numberOfRowsTmp;
+
+	//The paging mechanism is portable. Just write a number of lines and then 
+        //read a character to continue.
+    if ((con.openingMode & EnablePaging) &&
+        (BasicConsoleGetWindowSize(con,numberOfColumnsTmp,numberOfRowsTmp))){
+
+	//-1 means the maximum size.
+	uint32 numberOfRows=(uint32) numberOfRowsTmp;
 
         int64 t0 = con.lastPagingTime;
         int64 t1 = HighResolutionTimer::Counter();
@@ -93,6 +100,7 @@ bool BasicConsoleWrite(BasicConsole &con, const void* buffer, uint32 &size,
                 sizeT = strlen(message);
                 BasicConsoleOSWrite(con, message, sizeT);
                 char buffer[32];
+		//The buffer should contain one char + /0 terminator.
                 sizeT = 2;
                 BasicConsoleRead(con, buffer, sizeT, msecTimeout);
             }

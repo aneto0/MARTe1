@@ -52,7 +52,7 @@ enum ConsoleOpeningMode {
     EnablePaging = 8
 };
 
-/** @brief Allows combining ConsoleOpeningMode data doing a logical or between ConsoleOpeningMode flags. 
+/** @brief Allows combining ConsoleOpeningMode data doing a logical or between ConsoleOpeningMode flags.
   * @param a is the first flag.
   * @param b is the second flag. */
 static inline ConsoleOpeningMode operator|(ConsoleOpeningMode a,
@@ -69,7 +69,7 @@ static inline ConsoleOpeningMode operator&(ConsoleOpeningMode a,
 }
 
 /** @brief Allows combining ConsoleOpeningMode data doing a not operator on a ConsoleOpeningMode flags.
-  * This function 
+  * This function
   * @param a is the flag which must be inverted. */
 static inline ConsoleOpeningMode Not(ConsoleOpeningMode a) {
     return (ConsoleOpeningMode) (~(int) a);
@@ -96,17 +96,17 @@ bool BasicConsoleShow(BasicConsole &con);
   * @return true. */
 bool BasicConsoleClose(BasicConsole &con);
 
-/** @brief Write operation on the console con. 
-  * The buffer passed by argument is written on the console until a /0 char is 
-  * found or for the size passed by argument. If the mode is paging, it writes until the 
+/** @brief Write operation on the console con.
+  * The buffer passed by argument is written on the console until a /0 char is
+  * found or for the size passed by argument. If the mode is paging, it writes until the
   * number of rows of the console then advices the user to press enter for the pagination.
-  * It writes characters on the same row until they are less than the number of columns, then it 
-  * writes automatically on the next row. 
+  * It writes characters on the same row until they are less than the number of columns, then it
+  * writes automatically on the next row.
   * @param con is the console.
   * @param buffer is the data to write on the console.
   * @param size is maximum size in byte to write on the console. If a minor number of bytes is written,
   * size become the number of bytes written.
-  * @param msecTimeout is the timeout (not implemented in linux). 
+  * @param msecTimeout is the timeout (not implemented in linux).
   * @return true if a number greater than 0 of bytes is written. */
 bool BasicConsoleWrite(BasicConsole &con, const void* buffer, uint32 &size,
                        TimeoutType msecTimeout);
@@ -177,12 +177,12 @@ bool BasicConsolePlotChar(BasicConsole &con, char c, Colours foreGroundColour,
 /**
  * @brief Development of read and write operation on a console.
  *
- * Most of the implementation is therefore delegated in BasicConsoleOS.h implementation 
+ * Most of the implementation is therefore delegated in BasicConsoleOS.h implementation
  * which is different for each operating system due to implement portable functions.
- * 
+ *
  * These methods are particularly useful to obtain a first basic portable human interface,
- * where the user can interact with the system truth read and write operations allowing 
- * for example commands, debugging ecc.  
+ * where the user can interact with the system truth read and write operations allowing
+ * for example commands, debugging ecc.
  */
 
 
@@ -197,23 +197,30 @@ class BasicConsole {
 
 public:
      /** how many lines since last paging. */
-    uint32 lineCount; 
+    uint32 lineCount;
 
     /** the column counter. */
     uint32 colCount;
-  
+
     /** sets of flags describing the console status. */
     ConsoleOpeningMode openingMode;
-    
+
     /** sets the number of rows and columns. */
     int32 numberOfColumns;
 
     int32 numberOfRows;
- 
-    /** input and output console handles. */
-    struct termio inputConsoleHandle;
 
-    struct termio outputConsoleHandle;
+    /** input and output console handles (aka void*), used in windows. */
+    HANDLE inputConsoleHandle;
+    HANDLE outputConsoleHandle;
+
+
+    /** to save the original console parameters in case of modifications.*/
+    struct DefaultParam {
+	uint32 minReadByte;
+	uint32 minTimeBetweenInputs;
+    } consoleDefaultParam;
+
 
 private:
 
@@ -255,7 +262,7 @@ private:
 
 public:
 
-    /** 
+    /**
      * @brief Constructor.
      * @see BasicConsoleOpen() */
     BasicConsole(ConsoleOpeningMode openingMode = ConsoleDefault,
