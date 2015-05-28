@@ -60,7 +60,7 @@ bool StringPortableTest::TestEqual(const char* string,
     const char* string1 = "HelloWorld";
     const char* string2 = "Hello";
 
-    int32 size = 5;
+    uint32 size = 5;
 
     //Check the equality until size chars.
     if (!StringPortable::EqualN(string1, string2, size)) {
@@ -95,7 +95,7 @@ bool StringPortableTest::TestCopy(const char* string) {
 
     //Test the copy function until sizeToCopy chars.
     const char* stringPartial = "HelloWorld";
-    int32 sizeToCopy = 5;
+    uint32 sizeToCopy = 5;
     if (!StringPortable::CopyN(buffer, stringPartial, sizeToCopy)) {
         return False;
     }
@@ -161,7 +161,7 @@ bool StringPortableTest::TestAppend(const char* string1, const char* string2) {
         return False;
     }
 
-    int32 sizeToAppend = 2;
+    uint32 sizeToAppend = 2;
 
     if (!StringPortable::AppendN(bufferTry, buffer, result, sizeToAppend)) {
         return False;
@@ -419,7 +419,7 @@ bool StringPortableTest::TestToken() {
 
 bool StringPortableTest::TestNull() {
 
-    int32 size = 2;
+    uint32 size = 2;
 
     if (StringPortable::Length(NULL) != -1) {
         return False;

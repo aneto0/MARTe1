@@ -24,6 +24,7 @@
  **/
 #include "BasicConsole.h"
 #include "HighResolutionTimer.h"
+#include "StringHelper.h"
 #include INCLUDE_FILE_OPERATING_SYSTEM(OPERATING_SYSTEM,BasicConsoleOS.h)
 
 bool BasicConsoleOpen(BasicConsole &con, ConsoleOpeningMode openingMode,
@@ -97,7 +98,7 @@ bool BasicConsoleWrite(BasicConsole &con, const void* buffer, uint32 &size,
                 con.lastPagingTime = t1;
                 con.lineCount = 0;
                 const char *message = "[PAGING] ENTER TO CONTINUE\015";
-                sizeT = strlen(message);
+                sizeT = StringHelper::Length(message);
                 BasicConsoleOSWrite(con, message, sizeT);
                 char buffer[32];
 		//The buffer should contain one char + /0 terminator.

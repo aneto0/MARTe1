@@ -60,6 +60,9 @@ bool TimerStartTimer(Timer &t);
 /** @see Timer::StopTimer(). */
 bool TimerStopTimer(Timer &t);
 
+/** @see Timer::DeleteTimer; */
+bool TimerDeleteTimer(Timer &t);
+
 /** @see Timer::TimerServiceRoutine(). */
 void TimerCServiceRoutine(Timer &t);
 }
@@ -87,6 +90,7 @@ private:
     friend void TimerInit(Timer &t);
     friend bool TimerStartTimer(Timer &t);
     friend bool TimerStopTimer(Timer &t);
+    friend bool TimerDeleteTimer(Timer &t);
     friend void TimerCServiceRoutine(Timer &t);
 
 public:
@@ -134,10 +138,11 @@ public:
     /** @brief Destructor. */
     virtual ~Timer() {
         if (timerStatus == RUNNING) {
-            if (!StopTimer()) {
+            if (!StopTimer()) {	
                 //CStaticAssertErrorCondition(InitialisationError, "Timer::~Timer() -> StopTimer() failed");
             }
         }
+	TimerDeleteTimer(*this);
     }
 
     /** @brief Configure the timer

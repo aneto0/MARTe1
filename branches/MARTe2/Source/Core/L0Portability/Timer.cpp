@@ -107,3 +107,10 @@ bool TimerResetTimer(Timer &t) {
 
     return True;
 }
+
+
+bool TimerDeleteTimer(Timer &t) {
+   //timer destructor
+   return TimerOSDeleteTimer(t);
+}
+

@@ -66,9 +66,9 @@ bool StringPortableEqual(const char* string1, const char* string2) {
 
 //Returns true if the strings are equal, false otherwise
 bool StringPortableEqualN(const char* string1, const char* string2,
-                          int32 size) {
+                          uint32 size) {
 
-    int32 i = 0;
+    uint32 i = 0;
     while (i < size) {
 
         if ((string1 + i) == NULL || (string2 + i) == NULL) {
@@ -124,14 +124,14 @@ bool StringPortableAppend(char* string1, const char* string2, char* result) {
 
 //Concatenate two strings giving result in another string
 bool StringPortableAppendN(char* string1, const char* string2, char* result,
-                           int32 &size) {
+                           uint32 &size) {
 
     if (result == NULL) {
         result = string1;
     }
 
-    int32 i = 0;
-    int32 j = 0;
+    uint32 i = 0;
+    uint32 j = 0;
     while (1) {
         if ((string1 + i) == NULL || (result + i) == NULL) {
             return False;
@@ -180,8 +180,8 @@ bool StringPortableCat(char* string1, const char* string2) {
 }
 
 //Concatenate the second string to the first
-bool StringPortableCatN(char* string1, const char* string2, int32 &size) {
-    int32 j = 0;
+bool StringPortableCatN(char* string1, const char* string2, uint32 &size) {
+    uint32 j = 0;
 
     if (string1 == NULL || string2 == NULL || size < 0) {
         return False;
@@ -242,9 +242,9 @@ bool StringPortableCopy(char* destination, const char* source) {
     return False;
 }
 
-bool StringPortableCopyN(char* destination, const char* source, int32 &size) {
+bool StringPortableCopyN(char* destination, const char* source, uint32 &size) {
 
-    int32 i = 0;
+    uint32 i = 0;
     while (i < size) {
         if ((destination + i) == NULL || (source + i) == NULL) {
             return False;

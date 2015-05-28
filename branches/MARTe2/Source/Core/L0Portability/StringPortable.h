@@ -43,7 +43,7 @@ bool StringPortableEqual(const char* string1, const char* string2);
 
 //Returns true if the strings are equal, false otherwise
 /** @see StringPortable:EqualN() */
-bool StringPortableEqualN(const char* string1, const char* string2, int32 size);
+bool StringPortableEqualN(const char* string1, const char* string2, uint32 size);
 
 //Concatenate two strings giving result in another string
 /** @see StringPortable:Append() */
@@ -52,7 +52,7 @@ bool StringPortableAppend(char* string1, const char* string2, char* result);
 //Concatenate two strings giving result in another string
 /** @see StringPortable:AppendN() */
 bool StringPortableAppendN(char* string1, const char* string2, char* result,
-                           int32 &size);
+                           uint32 &size);
 
 //Concatenate the second string to the first
 /** @see StringPortable:Cat() */
@@ -60,7 +60,7 @@ bool StringPortableCat(char* string1, const char* string2);
 
 //Concatenate the second string to the first
 /** @see StringPortable:CatN() */
-bool StringPortableCatN(char* string1, const char* string2, int32 &size);
+bool StringPortableCatN(char* string1, const char* string2, uint32 &size);
 
 /** @see StringPortable:SearchChar() */
 const char* StringPortableSearchChar(const char* string, char c);
@@ -69,7 +69,7 @@ const char* StringPortableSearchChar(const char* string, char c);
 bool StringPortableCopy(char* destination, const char* source);
 
 /** @see StringPortable:CopyN() */
-bool StringPortableCopyN(char* destination, const char* source, int32 &size);
+bool StringPortableCopyN(char* destination, const char* source, uint32 &size);
 
 //return the index of the first occurrence in string1 of a char in string2
 /** @see StringPortable:SearchIndex() */
@@ -131,7 +131,7 @@ public:
      * @param string2 is the second string.
      * @param size is the max number of bytes to compare.
      * @return true if strings are equal for 'size' characters. */
-    static bool EqualN(const char* string1, const char* string2, int32 size) {
+    static bool EqualN(const char* string1, const char* string2, uint32 size) {
         return StringPortableEqualN(string1, string2, size);
     }
 
@@ -151,7 +151,7 @@ public:
      * @param size is the maximum number of characters to append.
      * @return true if strings are not NULL. */
     static bool AppendN(char* string1, const char* string2, char* result,
-                        int32 &size) {
+                        uint32 &size) {
         return StringPortableAppendN(string1, string2, result, size);
     }
 
@@ -168,7 +168,7 @@ public:
       * @param string2 is the string to append.
       * @param size is the maximum number of characters to append.
       * @return true if strings are not NULL. */   
-    static bool CatN(char* string1, const char* string2, int32 &size) {
+    static bool CatN(char* string1, const char* string2, uint32 &size) {
         return StringPortableCatN(string1, string2, size);
     }
 
@@ -193,7 +193,7 @@ public:
      * @param source is the source string.
      * @param size is the max number of bytes to copy.
      * @return true if strings are not NULL. */
-    static bool CopyN(char* destination, const char* source, int32 &size) {
+    static bool CopyN(char* destination, const char* source, uint32 &size) {
         return StringPortableCopyN(destination, source, size);
     }
 

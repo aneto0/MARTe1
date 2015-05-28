@@ -92,3 +92,10 @@ bool TimerOSStopTimer(Timer &t) {
 
     return True;
 }
+
+
+/** @see TimerDeleteTimer */
+bool TimerOSDeleteTimer(Timer &t) {
+	return True;
+}
+

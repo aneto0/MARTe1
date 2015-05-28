@@ -44,16 +44,6 @@
  */
 #define BASIC_CONSOLE_LINUX_CLEAR_ROWS 40
 
-/**
- * @see BasicConsoleOpen
- * @brief Open a console.
- * @param con is the console.
- * @param numberOfColumns is the desired number of columns.
- * @param numberOfRows is the desired number of rows.
- * @return true if the console is opened correctly.
- */
-
-
 void SetImmediateRead(BasicConsole &con, struct termio &consoleMode){
 	consoleMode.c_lflag &=~ ICANON;
 	con.consoleDefaultParam.minReadByte=consoleMode.c_cc[VMIN];
@@ -68,6 +58,15 @@ void UnSetImmediateRead(BasicConsole &con, struct termio &consoleMode){
 	consoleMode.c_cc[VTIME] = con.consoleDefaultParam.minTimeBetweenInputs;
 }
 
+
+/**
+ * @see BasicConsoleOpen
+ * @brief Open a console.
+ * @param con is the console.
+ * @param numberOfColumns is the desired number of columns.
+ * @param numberOfRows is the desired number of rows.
+ * @return true if the console is opened correctly.
+ */
 bool BasicConsoleOSOpen(BasicConsole &con, int32 numberOfColumns,
                         int32 numberOfRows) {
 
