@@ -117,7 +117,7 @@ TID ThreadsOSBeginThread(StandardThreadFunction function,
 	os_pthread threadFunction=(os_pthread)function;
 	osPriority threadPriority=ConvertToPriority(threadInfo->priorityLevel);
 	uint32 instances=0;
-	const osThreadDef_t threadDefinition={threadFunction, threadPriority, instances , stacksize};
+	const osThreadDef_t threadDefinition={(char*)threadInfo->ThreadName(),threadFunction, threadPriority, instances , stacksize};
 	
  	return osThreadCreate(&threadDefinition, threadInfo);
 }

@@ -66,9 +66,13 @@
 #define COUNTOF(__BUFFER__)   (sizeof(__BUFFER__) / sizeof(*(__BUFFER__)))
 /* Exported functions ------------------------------------------------------- */
 
+inline void* operator new(uint32 x){
+	return pvPortMalloc(x);
+}
 
-
-
+inline void operator delete(void *ptr){
+	vPortFree(ptr);	
+}
 
 #endif
 
