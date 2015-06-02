@@ -40,17 +40,52 @@
 #include <typeinfo.h>
 #include "../../HighResolutionTimer.h"
 
+bool BasicConsoleOSSetSize(BasicConsole &con,int numberOfColumns, int numberOfRows){
+
+    COORD max = GetLargestConsoleWindowSize(con.outputConsoleHandle);
+
+    CONSOLE_SCREEN_BUFFER_INFO info;
+    GetConsoleScreenBufferInfo(con.outputConsoleHandle,&info);
+
+    COORD stage1BufferSize;
+    stage1BufferSize.X =info.dwSize.X;
+    if (stage1BufferSize.X < numberOfColumns) stage1BufferSize.X = numberOfColumns;
+    stage1BufferSize.Y =info.dwSize.Y;
+    if (stage1BufferSize.Y < numberOfRows) stage1BufferSize.Y = numberOfRows;
+    if (!SetConsoleScreenBufferSize(con.outputConsoleHandle,stage1BufferSize)){
+       // CStaticAssertPlatformErrorCondition(OSError,"BasicConsole:SetSize:failed SetConsoleScreenBufferSize ");
+        return False;
+    }
+
+    int windowColumns = info.srWindow.Right  - info.srWindow.Left + 1;
+    int windowRows    = info.srWindow.Bottom - info.srWindow.Top   + 1;
+
+    if (windowColumns > numberOfColumns)  windowColumns = numberOfColumns;
+    if (windowRows    > numberOfRows)     windowRows    = numberOfRows;
+
+    SMALL_RECT srect;
+    srect.Left   = info.srWindow.Left;
+    srect.Top    = info.srWindow.Top;
+    srect.Right  = srect.Left + windowColumns - 1;
+    srect.Bottom = srect.Top  + windowRows - 1;
+
+    if (!SetConsoleWindowInfo(con.outputConsoleHandle,TRUE,&srect)){
+      //  CStaticAssertPlatformErrorCondition(OSError,"BasicConsole:SetSize:failed SetConsoleWindowInfo ");
+        return False;
+    }
+
+    COORD stage2BufferSize;
+    stage2BufferSize.X =numberOfColumns;
+    stage2BufferSize.Y =numberOfRows;
+    return (SetConsoleScreenBufferSize(con.outputConsoleHandle,stage2BufferSize) != FALSE);
+
+}
+
 bool BasicConsoleOSOpen(
     BasicConsole             &con,
-    ConsoleOpeningMode  openingMode,
     int                 numberOfColumns,
-    int                 numberOfRows,
-    TimeoutType         msecTimeout){
+    int                 numberOfRows){
 
-    con.msecTimeout         = msecTimeout;
-    con.lineCount           = 0;
-    con.lastPagingTime      = 0;
-    con.openingMode         = openingMode;
 //    con.selectedStream      = NormalStreamMode;
 
     int stdConsoleColumns;
@@ -60,7 +95,7 @@ bool BasicConsoleOSOpen(
     //get the screen information (size, cursor position, ecc...)
     GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE),&info);
 
-    if (openingMode & CreateNewBuffer){
+    if (con.openingMode & CreateNewBuffer){
         //get the console handles
         con.inputConsoleHandle  = GetStdHandle(STD_INPUT_HANDLE);
         con.outputConsoleHandle = CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE,0,NULL,CONSOLE_TEXTMODE_BUFFER,NULL);
@@ -79,14 +114,14 @@ bool BasicConsoleOSOpen(
     BasicConsoleOSSetSize(con,numberOfColumns,numberOfRows);
 
     DWORD consoleMode = 0;
-    if (openingMode & PerformCharacterInput){
+    if (con.openingMode & PerformCharacterInput){
         consoleMode |= 0;
     } else {
         consoleMode |= ENABLE_ECHO_INPUT;
         consoleMode |= ENABLE_LINE_INPUT;
     }
 
-    if (openingMode & DisableControlBreak){
+    if (con.openingMode & DisableControlBreak){
         consoleMode |= 0;
     } else {
         consoleMode |= ENABLE_PROCESSED_INPUT;
@@ -114,16 +149,16 @@ bool BasicConsoleOSShow(BasicConsole &con){
 }
 
 
-bool BasicConsoleOSWrite(BasicConsole &con,const void* buffer, uint32 &size,TimeoutType msecTimeout){
+bool BasicConsoleOSWrite(BasicConsole &con,const void* buffer, uint32 &size){
 
         return WriteConsole(con.outputConsoleHandle,buffer,size,(unsigned long *)&size,NULL);
 
 }
 
 bool BasicConsoleOSRead(BasicConsole &con,void* buffer, uint32 &size,TimeoutType msecTimeout){
-
+    DWORD ret=0;
     if (con.msecTimeout.IsFinite()){
-        DWORD ret;
+       
         FlushConsoleInputBuffer(con.inputConsoleHandle);
         ret = WaitForSingleObject(con.inputConsoleHandle,(DWORD)con.msecTimeout.msecTimeout);
         FlushConsoleInputBuffer(con.inputConsoleHandle);
@@ -145,13 +180,13 @@ bool BasicConsoleOSRead(BasicConsole &con,void* buffer, uint32 &size,TimeoutType
 	    //anyway terminate the string
 	    ((char*)buffer)[size]='\0';
         }
-    return ret;
+    return ret!=0;
 
 
 }
 
 
-bool BasicConsoleOSSetTitleBar(const char *title){
+bool BasicConsoleOSSetTitleBar(BasicConsole &con, const char *title){
     return SetConsoleTitle(title);
 
 }
@@ -191,47 +226,6 @@ bool BasicConsoleOSGetWindowSize(BasicConsole &con,int &numberOfColumns, int &nu
     numberOfRows    = info.srWindow.Bottom - info.srWindow.Top   + 1;
     return True;
 
-
-}
-
-bool BasicConsoleOSSetSize(BasicConsole &con,int numberOfColumns, int numberOfRows){
-
-    COORD max = GetLargestConsoleWindowSize(con.outputConsoleHandle);
-
-    CONSOLE_SCREEN_BUFFER_INFO info;
-    GetConsoleScreenBufferInfo(con.outputConsoleHandle,&info);
-
-    COORD stage1BufferSize;
-    stage1BufferSize.X =info.dwSize.X;
-    if (stage1BufferSize.X < numberOfColumns) stage1BufferSize.X = numberOfColumns;
-    stage1BufferSize.Y =info.dwSize.Y;
-    if (stage1BufferSize.Y < numberOfRows) stage1BufferSize.Y = numberOfRows;
-    if (!SetConsoleScreenBufferSize(con.outputConsoleHandle,stage1BufferSize)){
-       // CStaticAssertPlatformErrorCondition(OSError,"BasicConsole:SetSize:failed SetConsoleScreenBufferSize ");
-        return False;
-    }
-
-    int windowColumns = info.srWindow.Right  - info.srWindow.Left + 1;
-    int windowRows    = info.srWindow.Bottom - info.srWindow.Top   + 1;
-
-    if (windowColumns > numberOfColumns)  windowColumns = numberOfColumns;
-    if (windowRows    > numberOfRows)     windowRows    = numberOfRows;
-
-    SMALL_RECT srect;
-    srect.Left   = info.srWindow.Left;
-    srect.Top    = info.srWindow.Top;
-    srect.Right  = srect.Left + windowColumns - 1;
-    srect.Bottom = srect.Top  + windowRows - 1;
-
-    if (!SetConsoleWindowInfo(con.outputConsoleHandle,TRUE,&srect)){
-      //  CStaticAssertPlatformErrorCondition(OSError,"BasicConsole:SetSize:failed SetConsoleWindowInfo ");
-        return False;
-    }
-
-    COORD stage2BufferSize;
-    stage2BufferSize.X =numberOfColumns;
-    stage2BufferSize.Y =numberOfRows;
-    return (SetConsoleScreenBufferSize(con.outputConsoleHandle,stage2BufferSize) != FALSE);
 
 }
 
