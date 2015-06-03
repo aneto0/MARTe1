@@ -10,4 +10,4 @@ make -f Makefile.linux
 cd -
 cd ../../../Build/linux/GTest
 
-./MainGTest.ex --gtest_filter=*NumberToString* < input
+./MainGTest.ex --gtest_filter=* < input

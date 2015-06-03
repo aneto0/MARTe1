@@ -166,6 +166,11 @@ public:
         errFunction = functionName;
         nThreads = nOfThreads;
 
+
+	//Set NULL as the error function
+	ErrorManagement_SetErrorMessageProcessFunction(NULL);
+
+
         //Set the error function. 
         ErrorManagement_SetErrorMessageProcessFunction(
                 ReportParametersTestFunction);
@@ -206,7 +211,7 @@ public:
                 return False;
 
         }
-
+	
         //succesful, return true.
         return retVal;
     }
