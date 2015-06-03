@@ -26,10 +26,12 @@ ctags : %.cpp %.c %.h
 	ctags -R
 
 $(BUILD_DIR)/%.o : %.cpp
+	mkdir -p $(BUILD_DIR)
 	$(COMPILER) -c $(OPTIM) $(INCLUDE) $(CPPFLAGS) $(CFLAGSPEC) $(DEBUG)  $*.cpp -o $(BUILD_DIR)/$*.o
 #	$(COMPILER) -S $(OPTIM) $(CFLAGS) $(CFLAGSPEC) $(DEBUG)  $*.cpp -o $(BUILD_DIR)/$*.s
 
 $(BUILD_DIR)/%.o : %.c
+	mkdir -p $(BUILD_DIR)
 	$(COMPILER) -c $(OPTIM) $(INCLUDE) $(CFLAGS) $(CFLAGSPEC) $(DEBUG)  $*.c -o $(BUILD_DIR)/$*.o
 #	$(COMPILER) -S $(CFLAGS) $(CFLAGSPEC) $(DEBUG) $(OPTIM)  $*.c -o $(BUILD_DIR)/$*.s
 
