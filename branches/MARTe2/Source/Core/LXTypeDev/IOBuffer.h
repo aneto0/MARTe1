@@ -161,7 +161,9 @@ public:
     
 public:
     
-    ///
+    /** 
+     * @brief Default constructor.
+     */
     IOBuffer(){
     	amountLeft 		= 0;
     	maxUsableAmount = 0;
@@ -170,7 +172,8 @@ public:
     	undoLevel 		= 0;
     }
     
-    ///
+    /**
+     * @brief Default constructor. */
     virtual ~IOBuffer();
     
 

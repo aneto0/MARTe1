@@ -15,6 +15,12 @@ void MyErrorReportFunction(ErrorInformation &errorInfo,const char *errorDescript
 int main(){
 	ErrorManagement::SetErrorMessageProcessFunction(MyErrorReportFunction);
 
+	uint32 one=1;
+	uint32 two=2;
+	uint32 zero=0;
+
+	if((one-two) > zero) printf("ahahah");
+
 	printf("TEST\n");
 	
 	StreamString s;
@@ -45,8 +51,8 @@ int main(){
 
         s.Printf("A constant char (%7s) \n",constantChar);
 
-        s.Printf("The pointer to a constant char  (%p) \n",(void *)constantChar);
-        s.Printf("A constant char as a pointer (%x) \n",constantChar);
+        s.Printf("The pointer to a constant char  (%x) \n",(void *)constantChar);
+        s.Printf("A constant char as a pointer (%p) \n",constantChar);
 
 	StreamString ss("urca loca!");
         s.Printf("A StreamString (%s) \n",ss);
