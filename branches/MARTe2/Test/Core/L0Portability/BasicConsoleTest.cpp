@@ -135,7 +135,7 @@ bool BasicConsoleTest::TestPaging(int32 overflow, int32 rows, int32 columns) {
     //define the size of the string to print
     int32 n = 0;
     int32 limit = 2 * (rows + overflow - 1);
-    char string[limit];
+    char string[64];
 
     //define the string to print
     while (n < limit) {

@@ -45,7 +45,7 @@ public:
         eventSemEndManagement.Create();
         nOfThreads1 = 0;
         threadIdTarget = 0;
-        falseId = 1;
+        falseId = (TID)1;
         mutexSem.Create(False);
         nameThreadTest = "F4EThread";
     }

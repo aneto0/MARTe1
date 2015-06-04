@@ -450,7 +450,7 @@ bool ThreadsTest::ThreadEndTest() {
     eventSem.Reset();
     Threads::BeginThread((ThreadFunctionType) EndTarget, this,
     THREADS_DEFAULT_STACKSIZE,
-                         "\EndTarget\n");
+                         "\nEndTarget\n");
     //Waiting the initialization of the thread INFINITE
     if (!eventSem.Wait()) {
         printf("\nImpossible to wait initialization EndTarget\n");
