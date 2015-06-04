@@ -32,8 +32,8 @@ ROOT_DIR=../../..
 MAKEDEFAULTDIR=$(ROOT_DIR)/MakeDefaults
 include $(MAKEDEFAULTDIR)/MakeStdLibDefs.$(TARGET)
 
-INCLUDE += -I.
-INCLUDE += -I../L0Portability
+INCLUDES += -I.
+INCLUDES += -I../L0Portability
 
 all: $(OBJS)    \
                 $(BUILD_DIR)/L1CLib$(LIBEXT) 

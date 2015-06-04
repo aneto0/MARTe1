@@ -40,10 +40,10 @@ MAKEDEFAULTDIR=$(ROOT_DIR)/MakeDefaults
 
 include $(MAKEDEFAULTDIR)/MakeStdLibDefs.$(TARGET)
 
-INCLUDE += -I../../../Source/Core/L0Portability
-INCLUDE += -I../../../Source/Core/L1CLib
-INCLUDE += -I../../../Source/Core/LXTypeDev
-INCLUDE += -I../L0Portability
+INCLUDES += -I../../../Source/Core/L0Portability
+INCLUDES += -I../../../Source/Core/L1CLib
+INCLUDES += -I../../../Source/Core/LXTypeDev
+INCLUDES += -I../L0Portability
 
 all: $(OBJS) \
                 $(BUILD_DIR)/LXTypeDevTest$(LIBEXT)                 

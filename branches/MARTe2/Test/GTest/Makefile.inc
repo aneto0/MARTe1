@@ -42,27 +42,27 @@ OBJSX=  EndianityGTest.x \
 	FastPollingMutexGTest.x	\
 	StringPortableGTest.x \
 	StringHelperGTest.x \
-	LinkedListableGTest.x \
-	BStringGTest.x \
-	LinkedListHolderGTest.x \
-	StaticListHolderGTest.x \
-	StaticListTemplateGTest.x \
-	StaticQueueHolderGTest.x \
-	StaticStackHolderGTest.x \
-	CStreamGTest.x \
-	ComplexGTest.x \
-	StackHolderGTest.x \
-	QueueHolderGTest.x \
-	IntegerToStreamGTest.x \
-	FloatToStreamGTest.x \
-	BitSetToIntegerGTest.x \
-	SafeShiftGTest.x \
-	DoubleIntegerGTest.x \
-	BufferedStreamGTest.x \
-	StreamStringGTest.x \
-	StreamMemoryReferenceGTest.x \
-	ErrorManagementGTest.x \
-	StreamableGTest.x 
+	#	LinkedListableGTest.x \
+	#BStringGTest.x \
+	#LinkedListHolderGTest.x \
+	#StaticListHolderGTest.x \
+	#StaticListTemplateGTest.x \
+	#StaticQueueHolderGTest.x \
+	#StaticStackHolderGTest.x \
+	#CStreamGTest.x \
+	#ComplexGTest.x \
+	#StackHolderGTest.x \
+	#QueueHolderGTest.x \
+	#	IntegerToStreamGTest.x \
+	#FloatToStreamGTest.x \
+	#BitSetToIntegerGTest.x \
+	#SafeShiftGTest.x \
+	#DoubleIntegerGTest.x \
+	#BufferedStreamGTest.x \
+	#StreamStringGTest.x \
+	#StreamMemoryReferenceGTest.x \
+	#ErrorManagementGTest.x \
+	#StreamableGTest.x 
 
 PACKAGE=
 ROOT_DIR=../..
@@ -70,14 +70,14 @@ MAKEDEFAULTDIR=$(ROOT_DIR)/MakeDefaults
 
 include $(MAKEDEFAULTDIR)/MakeStdLibDefs.$(TARGET)
 
-INCLUDE += -I../ 
-INCLUDE += -I../Core/L0Portability
-INCLUDE += -I../Core/L1CLib
-INCLUDE += -I../Core/LXTypeDev
-INCLUDE += -I../../Source/Core/L0Portability
-INCLUDE += -I../../Source/Core/L1CLib
-INCLUDE += -I../../Source/Core/LXTypeDev
-INCLUDE += -I../../Lib/gtest-1.7.0/include
+INCLUDES += -I../ 
+INCLUDES += -I../Core/L0Portability
+INCLUDES += -I../Core/L1CLib
+INCLUDES += -I../Core/LXTypeDev
+INCLUDES += -I../../Source/Core/L0Portability
+INCLUDES += -I../../Source/Core/L1CLib
+INCLUDES += -I../../Source/Core/LXTypeDev
+INCLUDES += -I../../Lib/gtest-1.7.0/include
 
 all: $(OBJS)    \
                 $(BUILD_DIR)/MainGTest$(EXEEXT)

@@ -24,8 +24,15 @@
 #############################################################
 
 $(BUILD_DIR)/%.obj : %.cpp
-	$(COMPILER) -c $(CFLAGS) $(CFLAGSPEC) $(DEBUG) $(OPTIM)  $*.cpp  -Fa
+	@echo $(BUILD_DIR)
+	@test -d (BUILD_DIR) || mkdir (BUILD_DIR)
 	@mkdir -p $(BUILD_DIR)
+	$(COMPILER) -c $(CFLAGS) $(CFLAGSPEC) $(DEBUG) $(OPTIM) $(INCLUDES)  $*.cpp  -Fa
+#	ifneq ($(wildcard $(BUILD_DIR)), )
+#		@mkdir -p $(BUILD_DIR)
+#		@echo "ok"
+#	endif
+#	if [ ! -d $(BUILD_DIR) ] ; then mkdir $(BUILD_DIR) ; fi
 	@touch $(BUILD_DIR)/$*.obj >temp/temp
 	@rm $(BUILD_DIR)/$*.obj >temp/temp
 	@mv $*.obj $(BUILD_DIR) >temp/temp
@@ -35,8 +42,8 @@ $(BUILD_DIR)/%.obj : %.cpp
 	@mv $*.asm $(BUILD_DIR) >temp/temp
 
 $(BUILD_DIR)/%.obj : %.c
-	$(COMPILER) -c $(CFLAGS) $(CFLAGSPEC) $(DEBUG) $(OPTIM)  $*.c  -Fa
 	@mkdir -p $(BUILD_DIR)
+	$(COMPILER) -c $(CFLAGS) $(CFLAGSPEC) $(DEBUG) $(OPTIM)  $(INCLUDES) $*.c  -Fa
 	@touch $(BUILD_DIR)/$*.obj >temp/temp
 	@rm $(BUILD_DIR)/$*.obj >temp/temp
 	@mv $*.obj $(BUILD_DIR) >temp/temp
@@ -46,8 +53,8 @@ $(BUILD_DIR)/%.obj : %.c
 	@mv $*.asm $(BUILD_DIR) >temp/temp
 
 $(BUILD_DIR)/%.obj : %.f
-	$(FCOMPILER) -compile_only $(FFLAGS) $(FOPTS) $*.f
-	@mkdir -p $(BUILD_DIR)  
+	@mkdir -p $(BUILD_DIR)
+	$(FCOMPILER) -compile_only $(FFLAGS) $(FOPTS) $*.f  
 	@touch $(BUILD_DIR)/$*.obj >temp/temp
 	@rm $(BUILD_DIR)/$*.obj >temp/temp
 	@mv $*.obj $(BUILD_DIR) >temp/temp

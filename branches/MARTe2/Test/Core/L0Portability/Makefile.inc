@@ -50,11 +50,10 @@ MAKEDEFAULTDIR=$(ROOT_DIR)/MakeDefaults
 
 include $(MAKEDEFAULTDIR)/MakeStdLibDefs.$(TARGET)
 
-INCLUDE += -I../../../Source/Core/L0Portability
-
+INCLUDES += -I../../../Source/Core/L0Portability
 all: $(OBJS) \
                 $(BUILD_DIR)/L0PortabilityTest$(LIBEXT) \
-                $(BUILD_DIR)/Test$(EXEEXT) 
+		#         $(BUILD_DIR)/Test$(EXEEXT) 
 	echo  $(OBJS)
 
 include depends.$(TARGET)

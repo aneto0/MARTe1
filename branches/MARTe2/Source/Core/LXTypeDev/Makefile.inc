@@ -34,10 +34,10 @@ PACKAGE=Core
 ROOT_DIR=../../..
 include $(MAKEDEFAULTDIR)/MakeStdLibDefs.$(TARGET)
 
-INCLUDE += -I.
-INCLUDE += -I../L0Portability
-INCLUDE += -I../L1CLib
-INCLUDE += -I../LXTypeDev
+INCLUDES += -I.
+INCLUDES += -I../L0Portability
+INCLUDES += -I../L1CLib
+INCLUDES += -I../LXTypeDev
 
 all: $(OBJS)    \
 	        $(BUILD_DIR)/LXTypeDev$(LIBEXT)  \
