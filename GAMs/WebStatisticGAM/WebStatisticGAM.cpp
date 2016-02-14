@@ -311,11 +311,13 @@ bool WebStatisticGAM::ProcessHttpMessageTextMode(HttpStream &hStream){
                 counter++;
             }
         }
+        else{
+            counter++;
+        }
         descriptor = descriptor->Next();
     }
 
-
-    hStream.WriteReplyHeader(False);
+    hStream.WriteReplyHeader(true);
     return True;
 }
 
