@@ -170,7 +170,7 @@ int main(int argc,char **argv){
 #if (defined(_LINUX) || defined(_SOLARIS))
     if(mlockall(MCL_CURRENT|MCL_FUTURE) != 0){
         printf("Failed to do mlockall\n\n");
-        return -1;
+    //    return -1;
     }
 #endif
     FString serviceName;
