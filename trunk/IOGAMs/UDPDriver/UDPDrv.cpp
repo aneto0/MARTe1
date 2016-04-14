@@ -94,6 +94,7 @@ bool  UDPDrv::Init(){
     receiverThreadPriority              = 0;
     packetNumber                        = 0;
     freshPacket                         = False;
+    applyEndianity                      = True;
 
     destinationServerAddress.SetSize(0);
     destinationServerAddress            = -1;
@@ -229,6 +230,10 @@ bool UDPDrv::ObjectLoadSetup(ConfigurationDataBase &info,StreamInterface *err){
         } else {
             AssertErrorCondition(Warning, "UDPDrv::ObjectLoadSetup: %s ThreadPriority parameter not specified", Name());
         }
+
+        int32 applyEndianityInt32 = 1;
+        cdb.ReadInt32(applyEndianityInt32, "ApplyEndianity", 1);
+        applyEndianity = (applyEndianityInt32 == 1);
 
         /// Read the UsecPeriod of the UDP packet producer
         cdb.ReadInt32(producerUsecPeriod, "ProducerUsecPeriod", -1);
@@ -522,7 +527,12 @@ void UDPDrv::RecCallback(void* arg){
         }
 
         // Copy dataSource in the write only buffer; does endianity swap
-        Endianity::MemCopyFromMotorola((uint32 *)dataBuffer[writeBuffer],(uint32 *)dataSource,packetByteSize/sizeof(int32));
+        if(applyEndianity) {
+            Endianity::MemCopyFromMotorola((uint32 *)dataBuffer[writeBuffer],(uint32 *)dataSource,packetByteSize/sizeof(int32));
+        }
+        else {
+            Endianity::MemCopyFromIntel((uint32 *)dataBuffer[writeBuffer],(uint32 *)dataSource,packetByteSize/sizeof(int32));
+        }
 
         // Checks if packets have been lost
         UDPMsgHeaderStruct *header = (UDPMsgHeaderStruct *)dataBuffer[writeBuffer];

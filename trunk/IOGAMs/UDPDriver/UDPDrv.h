@@ -144,6 +144,9 @@ private:
     /** The packet number to be sent in producer mode*/
     uint32 packetNumber;
 
+    /** If true the endianity will be applied*/
+    bool applyEndianity;
+
 public:
 
     /** Gets Data From the Module to the DDB
