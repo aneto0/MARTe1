@@ -109,6 +109,23 @@ bool MDSWriterDrv::ObjectLoadSetup(ConfigurationDataBase &info,StreamInterface *
     if(!cdb.ReadInt32(refreshTime, "TimeRefresh", 5)){
         AssertErrorCondition(Warning, "MDSWriterDrv::ObjectLoadSetup: %s refreshTime not specified. Using default %d", Name(), refreshTime);
     }
+    //Check for the latest pulse number
+    if(pulseNumber == -1){
+        try {
+            tree = new MDSplus::Tree(treeName.Buffer(), -1);
+            pulseNumber = tree->getCurrent(treeName.Buffer());
+            pulseNumber++;
+            tree->setCurrent(treeName.Buffer(), pulseNumber);
+            tree->createPulse(pulseNumber);	
+            delete tree; 
+        }
+        catch(MDSplus::MdsException &exc){
+            pulseNumber = 1;
+            delete tree;
+            tree = NULL;
+        }
+
+    }
     //Create a pulse. It assumes that the tree template is already created!!
     try {
         tree = new MDSplus::Tree(treeName.Buffer(), pulseNumber);
@@ -121,6 +138,7 @@ bool MDSWriterDrv::ObjectLoadSetup(ConfigurationDataBase &info,StreamInterface *
     if(tree == NULL){
         try{
             tree = new MDSplus::Tree(treeName.Buffer(), -1);
+            tree->setCurrent(treeName.Buffer(), pulseNumber);
             tree->createPulse(pulseNumber);	
         }
         catch(MDSplus::MdsException &exc){
