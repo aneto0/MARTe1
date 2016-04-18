@@ -218,7 +218,7 @@ bool MDSWriterDrv::ObjectLoadSetup(ConfigurationDataBase &info,StreamInterface *
     FString threadName = Name();
     threadName += "_WriteDataToMDS";
 
-    threadID = Threads::BeginThread((ThreadFunctionType)MDSThreadWriterCallback, (void*)this, THREADS_DEFAULT_STACKSIZE * 10, threadName.Buffer(), XH_NotHandled, cpuMask);
+    threadID = Threads::BeginThread((ThreadFunctionType)MDSThreadWriterCallback, (void*)this, THREADS_DEFAULT_STACKSIZE * 100, threadName.Buffer(), XH_NotHandled, cpuMask);
     int counter = 0;
     while((!running) && (counter++ < 100)) {
         SleepMsec(1);

@@ -32,8 +32,9 @@ MDSWriterNode::MDSWriterNode(){
     numberOfWords = 0;
     decimatedMinMax = false;
     char *bufferedData = 0;
-    uint32 currentBuffer = 0;
-    uint32 makeSegmentAfterNWrites = 0;
+    currentBuffer = 0;
+    makeSegmentAfterNWrites = 0;
+    minMaxResampleFactor = 100;
 }
 
 MDSWriterNode::~MDSWriterNode(){
@@ -96,6 +97,7 @@ bool MDSWriterNode::ObjectLoadSetup(ConfigurationDataBase &config, StreamInterfa
         AssertErrorCondition(Warning, "MDSWriterNode::ObjectLoadSetup: %s SamplePhase not specified for node with name %s. Using default: %d", Name(), nodeName.Buffer(), phaseShift);
     }
     cdb.ReadInt32(makeSegmentAfterNWrites, "MakeSegmentAfterNWrites", 1);
+    cdb.ReadInt32(minMaxResampleFactor, "MinMaxResampleFactor", 100);
 
     uint32 typeMultiplier = 0;
     
@@ -178,7 +180,7 @@ bool MDSWriterNode::Write(void *data){
         }
         if(array != NULL){
             if(decimatedMinMax){
-                node->makeSegmentMinMax(startD, endD, dimension, array, decimatedNode);
+                node->makeSegmentMinMax(startD, endD, dimension, array, decimatedNode, minMaxResampleFactor);
             }
             else{
                 node->makeSegment(startD, endD, dimension, array);

@@ -123,6 +123,7 @@ private:
     char *bufferedData;
     uint32 currentBuffer;
     int32 makeSegmentAfterNWrites;
+    int32 minMaxResampleFactor;
 };
 
 #endif
