@@ -153,7 +153,7 @@ bool MDSWriterNode::Write(void *data){
         memcpy(bufferedData + (currentBuffer * numberOfWords * sizeof(int32)), data, numberOfWords * sizeof(int32));
         currentBuffer++;
     }
-    if(currentBuffer == (makeSegmentAfterNWrites - 1)){
+    if(currentBuffer == (makeSegmentAfterNWrites)){
         currentBuffer = 0;
         double start = nOfWriteCalls * numberOfSamples * period;
         start += phaseShift * period;
