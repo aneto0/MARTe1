@@ -407,7 +407,6 @@ bool InputGAM::Execute(GAM_FunctionNumbers functionNumber){
                 UpdateGAMPersistentCDB(cdb);
                 performOffsetCheck = False;
             }
-
             if(inputModule->GetData(time,output->Buffer()) == -1){
                 AssertErrorCondition(FatalError,"InputGAM::Execute:: Module %s GetData Failed for driver %s",Name(), inputModule->Name());
                 return False;
