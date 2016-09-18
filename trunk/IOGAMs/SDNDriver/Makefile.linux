@@ -19,33 +19,14 @@
 # See the Licence for the specific language governing 
 # permissions and limitations under the Licence. 
 #
-# $Id$
+# $Id: Makefile.linux 3 2012-01-15 16:26:07Z aneto $
 #
 #############################################################
-OBJSX=
-SPB=module.x
-MAKEDEFAULTDIR=../../MakeDefaults
+TARGET=linux
 
-include $(MAKEDEFAULTDIR)/MakeStdLibDefs.$(TARGET)
+include Makefile.inc
 
-CFLAGS+= -I.
-CFLAGS+= -I..
-CFLAGS+= -Imodule
-CFLAGS+= -I../../MARTe/MARTeSupportLib
-CFLAGS+= -I../../BaseLib2/Level0
-CFLAGS+= -I../../BaseLib2/Level1
-CFLAGS+= -I../../BaseLib2/Level2
-CFLAGS+= -I../../BaseLib2/Level3
-CFLAGS+= -I../../BaseLib2/Level4
-CFLAGS+= -I../../BaseLib2/Level5
-CFLAGS+= -I../../BaseLib2/Level6
-CFLAGS+= -I../../BaseLib2/LoggerService
-
-all:	$(OBJS) $(SUBPROJ) $(TARGET)/ATCAadcDrv$(GAMEXT) \
-	                   $(TARGET)/driver_test$(EXEEXT)
-	echo  $(OBJS)
-
-include depends.$(TARGET)
-
-include $(MAKEDEFAULTDIR)/MakeStdLibRules.$(TARGET)
+LIBRARIES += -L../../BaseLib2/$(TARGET) -lBaseLib2
+LIBRARIES += -L../../MARTe/MARTeSupportLib/$(TARGET) -lMARTeSupLib 
+LIBRARIES += -L$(SDNDIR)/target/lib/ -lsdn-core
 
