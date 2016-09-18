@@ -19,18 +19,19 @@
 # See the Licence for the specific language governing 
 # permissions and limitations under the Licence. 
 #
-# $Id$
+# $Id: Makefile.inc 3 2012-01-15 16:26:07Z aneto $
 #
 #############################################################
 OBJSX=
-SPB=module.x
+
 MAKEDEFAULTDIR=../../MakeDefaults
+SDNDIR=../../../../SDN/v1.x
 
 include $(MAKEDEFAULTDIR)/MakeStdLibDefs.$(TARGET)
 
 CFLAGS+= -I.
-CFLAGS+= -I..
-CFLAGS+= -Imodule
+CFLAGS+= -I../
+CFLAGS+= -I../../
 CFLAGS+= -I../../MARTe/MARTeSupportLib
 CFLAGS+= -I../../BaseLib2/Level0
 CFLAGS+= -I../../BaseLib2/Level1
@@ -40,9 +41,11 @@ CFLAGS+= -I../../BaseLib2/Level4
 CFLAGS+= -I../../BaseLib2/Level5
 CFLAGS+= -I../../BaseLib2/Level6
 CFLAGS+= -I../../BaseLib2/LoggerService
+CFLAGS+= -I$(SDNDIR)/src/main/c++/include/
 
-all:	$(OBJS) $(SUBPROJ) $(TARGET)/ATCAadcDrv$(GAMEXT) \
-	                   $(TARGET)/driver_test$(EXEEXT)
+all: $(OBJS) \
+	$(TARGET)/SDNDrv$(GAMEXT) \
+	$(TARGET)/test.ex
 	echo  $(OBJS)
 
 include depends.$(TARGET)
