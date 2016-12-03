@@ -30,24 +30,26 @@
 #include "MessageHandler.h"
 
 /**
- * @brief TODO
+ * @brief Forwards messages to the Adapter::ReceiveMessageFromBaseLib2
  */
 OBJECT_DLL(AdapterMessageHandler)
 class AdapterMessageHandler : public GCNamedObject, public MessageHandler {
 OBJECT_DLL_STUFF(AdapterMessageHandler)
 public:
     /**
-     * @brief TODO
+     * @brief Constructor. NOOP.
      */
     AdapterMessageHandler();
 
     /**
-     * @brief TODO
+     * @brief Desstructor. NOOP.
      */
-    ~AdapterMessageHandler();
+    virtual ~AdapterMessageHandler();
 
     /**
-     * @brief TODO
+     * @brief Forwards the message to the Adapter::ReceiveMessageFromBaseLib2 (replies are currently not supported).
+     * @param[in] envelope the message to be forwarded.
+     * @return true if the message was successfully forwarded.
      */
     virtual bool ProcessMessage(GCRTemplate<MessageEnvelope> envelope);
 
