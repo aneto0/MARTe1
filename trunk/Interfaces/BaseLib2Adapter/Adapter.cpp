@@ -52,7 +52,7 @@ bool Adapter::LoadObjects(const char *config) {
     return ok;
 }
 
-bool Adapter::SendMessageTo(const char *destination, const char *content, unsigned int code) {
+bool Adapter::SendMessageToBaseLib2(const char *destination, const char *content, unsigned int code) {
     GCRTemplate<Message> gcrtm(GCFT_Create);
     GCRTemplate<MessageEnvelope> mec(GCFT_Create);
     gcrtm->Init(code, content); 

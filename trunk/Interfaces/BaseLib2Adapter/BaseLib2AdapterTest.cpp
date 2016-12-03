@@ -98,7 +98,7 @@ const char *config = ""
     "}";
 
 
-bool Adapter::ReceiveMessageFrom(const char *destination, const char *content, unsigned int code) {
+bool Adapter::ReceiveMessageFromBaseLib2(const char *destination, const char *content, unsigned int code) {
     printf("Received message to %s with content %s and code %d\n", destination, content, code);
 }
 
@@ -107,7 +107,7 @@ int main(int argc, char **argv) {
     Adapter *plumber = Adapter::Instance();
     bool ok = plumber->LoadObjects(webConfig);
     printf("ok = %d\n", ok);
-    plumber->SendMessageTo("StateMachine", "START", 0); 
+    plumber->SendMessageToBaseLib2("StateMachine", "START", 0); 
 
     uint32 idx;
     GAMAdapter *gamAdapter = GAMAdapter::Instance();

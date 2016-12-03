@@ -29,6 +29,12 @@
  * @brief TODO
  */
 namespace BaseLib2 {
+/**
+ * Interface type definition
+ */
+typedef unsigned int uint32;
+typedef char char8;
+
 class Adapter {
 public:
     /**
@@ -44,17 +50,17 @@ public:
     /**
      * @brief TODO
      */
-    bool LoadObjects(const char *config);
+    bool LoadObjects(const char8 *config);
     
     /**
      *@brief TODO
      */
-    bool SendMessageTo(const char *destination, const char *content, uint32 code);
+    bool SendMessageToBaseLib2(const char8 *destination, const char8 *content, uint32 code);
 
     /**
      *@brief TODO
      */
-    bool ReceiveMessageFrom(const char *destination, const char *content, uint32 code);
+    bool ReceiveMessageFromBaseLib2(const char8 *destination, const char8 *content, uint32 code);
 
 private:
     /**
