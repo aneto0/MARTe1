@@ -2,31 +2,31 @@
  * Copyright 2011 EFDA | European Fusion Development Agreement
  *
  * Licensed under the EUPL, Version 1.1 or - as soon they 
-   will be approved by the European Commission - subsequent  
-   versions of the EUPL (the "Licence"); 
+ will be approved by the European Commission - subsequent
+ versions of the EUPL (the "Licence");
  * You may not use this work except in compliance with the 
-   Licence. 
+ Licence.
  * You may obtain a copy of the Licence at: 
  *  
  * http://ec.europa.eu/idabc/eupl
  *
  * Unless required by applicable law or agreed to in 
-   writing, software distributed under the Licence is 
-   distributed on an "AS IS" basis, 
+ writing, software distributed under the Licence is
+ distributed on an "AS IS" basis,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
-   express or implied. 
+ express or implied.
  * See the Licence for the specific language governing 
-   permissions and limitations under the Licence. 
+ permissions and limitations under the Licence.
  *
  * $Id: $
  *
-**/
+ **/
 
 #ifndef BASELIB2_ADAPTER_INTERFACE_H_
 #define BASELIB2_ADAPTER_INTERFACE_H_
 
 /**
- * @brief TODO
+ * @brief Allows to load a BaseLib2 objects using an anonymous C interface.
  */
 namespace BaseLib2 {
 /**
@@ -38,33 +38,50 @@ typedef char char8;
 class Adapter {
 public:
     /**
-     * @brief TODO
+     * @brief Singleton interface to the Adapter.
      */
     static Adapter *Instance();
 
     /**
-     * @brief TODO
+     * @brief Destructor
+     * @post
+     *   ProcessorType::defaultCPUs = 1u;
      */
     ~Adapter();
 
     /**
-     * @brief TODO
+     * @brief Loads the config into the GlobalObjectDatabase.
+     * @param[in] config the configuration to load.
+     * @return true if the configuration can be successfully loaded.
      */
     bool LoadObjects(const char8 *config);
-    
-    /**
-     *@brief TODO
-     */
-    bool SendMessageToBaseLib2(const char8 *destination, const char8 *content, uint32 code);
 
     /**
-     *@brief TODO
+     * @brief Sends a Message to BaseLib2 (replies are currently not supported).
+     * @param[in] destination the name of the destination object in the GlobalObjectDatabase.
+     * @param[in] content the message content.
+     * @param[in] code the message code.
+     * @return true if the message was successfully received.
      */
-    bool ReceiveMessageFromBaseLib2(const char8 *destination, const char8 *content, uint32 code);
+    bool SendMessageToBaseLib2(const char8 *destination,
+                               const char8 *content,
+                               uint32 code);
+
+    /**
+     * @brief Receives a Message from BaseLib2 (replies are currently not supported).
+     * @details This function shall be implemented by the library that wants to interface to BaseLib2.
+     * @param[in] destination the name of the destination object in the GlobalObjectDatabase.
+     * @param[in] content the message content.
+     * @param[in] code the message code.
+     * @return true if the message was successfully received.
+     */
+    bool ReceiveMessageFromBaseLib2(const char8 *destination,
+                                    const char8 *content,
+                                    uint32 code);
 
 private:
     /**
-     * @brief TODO
+     * @brief Constructor. NOOP.
      */
     Adapter();
 };

@@ -18,7 +18,7 @@
  * See the Licence for the specific language governing 
    permissions and limitations under the Licence. 
  *
- * $Id: RelayLogger.cpp 3 2012-01-15 16:26:07Z aneto $
+ * $Id: $
  *
 **/
 #include "GenDefs.h"

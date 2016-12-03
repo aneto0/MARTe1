@@ -18,7 +18,7 @@
  * See the Licence for the specific language governing 
    permissions and limitations under the Licence. 
  *
- * $Id: RelayLogger.cpp 3 2012-01-15 16:26:07Z aneto $
+ * $Id: $
  *
 **/
 
@@ -257,27 +257,6 @@ bool GAMAdapter::FinaliseGAM(uint32 gamIdx, void *& inputToGAM, void *&outputFro
     return ok;
 }
 
-bool GAMAdapter::LoadObjects(const char *config) {
-    ConfigurationDataBase cdb;
-    FString configStr = config;
-    configStr.Seek(0);
-    bool ok = cdb->ReadFromStream(configStr);
-    if (ok) {
-        ok = GetGlobalObjectDataBase()->ObjectLoadSetup(cdb, NULL);
-    }
-    return ok;
-}
-
-bool GAMAdapter::SendMessage(const char *destination, const char *content, unsigned int code) {
-    GCRTemplate<Message> gcrtm(GCFT_Create);
-    GCRTemplate<MessageEnvelope> mec(GCFT_Create);
-    gcrtm->Init(code, content); 
-    bool ok = mec->PrepareMessageEnvelope(gcrtm, destination);
-    if (ok) {
-        ok = MessageHandler::SendMessage(mec);
-    }
-    return ok;
-}
 
 bool GAMAdapter::ExecuteGAM(unsigned int gamIdx, uint32 executionCode) {
     GAM_FunctionNumbers execNumber = static_cast<GAM_FunctionNumbers>(executionCode);
