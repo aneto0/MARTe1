@@ -25,7 +25,14 @@
 #ifndef GAM_ADAPTER_INTERFACE_H_
 #define GAM_ADAPTER_INTERFACE_H_
 
+
 namespace BaseLib2 {
+/**
+ * Interface type definition
+ */
+typedef unsigned int uint32;
+typedef char char8;
+
 /**
  * @brief TODO
  */
@@ -44,42 +51,42 @@ public:
     /**
      * @brief TODO
      */
-    bool AddGAM(const char *gamName, const char *gamInfo, unsigned int &gamIdx);
+    bool AddGAM(const char8 *gamName, const char8 *gamInfo, uint32 &gamIdx);
 
     /**
      * @brief TODO
      */
-    bool RemoveGAM(unsigned int gamIdx);
+    bool RemoveGAM(uint32 gamIdx);
 
     /**
      * @brief TODO
      */
-    bool AddGAMInputSignal(unsigned int gamIdx, const char *gamSignalName, const char *gamSignalType);
+    bool AddGAMInputSignal(uint32 gamIdx, const char8 *gamSignalName, const char8 *gamSignalType);
 
     /**
      * @brief TODO
      */
-    bool AddGAMOutputSignal(unsigned int gamIdx, const char *gamSignalName, const char *gamSignalType);
+    bool AddGAMOutputSignal(uint32 gamIdx, const char8 *gamSignalName, const char8 *gamSignalType);
 
     /**
      * @brief TODO
      */
-    bool FinaliseGAM(unsigned int gamIdx, void *& inputToGAM, void *&outputFromGAM);
+    bool FinaliseGAM(uint32 gamIdx, void *& inputToGAM, void *&outputFromGAM);
     
     /**
      * @brief TODO
      */
-    bool ExecuteGAM(unsigned int gamIdx);
+    bool ExecuteGAM(uint32 gamIdx);
 
     /**
      * @brief TODO
      */
-    bool LoadObjects(const char *config);
+    bool LoadObjects(const char8 *config);
     
     /**
      *@brief TODO
      */
-    bool SendMessage(const char *destination, const char *content, unsigned int code);
+    bool SendMessage(const char8 *destination, const char8 *content, uint32 code);
 
 private:
     /**
