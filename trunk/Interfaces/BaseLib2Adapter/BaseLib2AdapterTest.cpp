@@ -52,7 +52,7 @@ const char *webConfig = ""
     "    Class = HttpThreadListResource"
     "}"
     "+Adapter = {"
-    "    Class = Adapter::AdapterMessageHandler"
+    "    Class = BaseLib2Adapter::AdapterMessageHandler"
     "}"
     "+StateMachine = {"
     "    Class = StateMachine"
@@ -124,7 +124,7 @@ int main(int argc, char **argv) {
     unsigned int i = 0;
     while(1) {
         *test = i++;
-        gamAdapter->ExecuteGAM(idx);
+        gamAdapter->ExecuteGAM(idx, 0x00010000);
         SleepSec(0.1);
     } 
     return 0;

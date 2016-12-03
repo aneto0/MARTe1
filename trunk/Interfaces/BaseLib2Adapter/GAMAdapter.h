@@ -76,7 +76,7 @@ public:
     /**
      * @brief TODO
      */
-    bool ExecuteGAM(uint32 gamIdx);
+    bool ExecuteGAM(uint32 gamIdx, uint32 executionCode);
 
     /**
      * @brief TODO
