@@ -279,7 +279,8 @@ bool GAMAdapter::SendMessage(const char *destination, const char *content, unsig
     return ok;
 }
 
-bool GAMAdapter::ExecuteGAM(unsigned int gamIdx) {
+bool GAMAdapter::ExecuteGAM(unsigned int gamIdx, uint32 executionCode) {
+    GAM_FunctionNumbers execNumber = static_cast<GAM_FunctionNumbers>(executionCode);
     bool ok = (gamIdx < gamListSize);
     GAM *gam = NULL;
     if (ok) {
@@ -291,7 +292,7 @@ bool GAMAdapter::ExecuteGAM(unsigned int gamIdx) {
         }
     }
     if (ok) {
-        ok = gam->Execute(GAMOffline);
+        ok = gam->Execute(execNumber);
     }
     if (ok) {
         if(gamList[gamIdx].outputFromGAM != NULL) {
