@@ -98,16 +98,21 @@ const char *config = ""
     "}";
 
 
-bool Adapter::ReceiveMessageFromBaseLib2(const char *destination, const char *content, unsigned int code) {
-    printf("Received message to %s with content %s and code %d\n", destination, content, code);
-}
+class AdapterMessageListenerTest : public BaseLib2::AdapterMessageListener {
+public:
+    bool HandleBaseLib2Message(const char *destination, const char *content, unsigned int code) {
+        printf("Received message to %s with content %s and code %d\n", destination, content, code);
+    }
+};
 
 
 int main(int argc, char **argv) {
-    Adapter *plumber = Adapter::Instance();
-    bool ok = plumber->LoadObjects(webConfig);
+    AdapterMessageListenerTest listener;
+    Adapter *adapter = Adapter::Instance();
+    adapter->SetAdapterMessageListener(&listener);
+    bool ok = adapter->LoadObjects(webConfig);
     printf("ok = %d\n", ok);
-    plumber->SendMessageToBaseLib2("StateMachine", "START", 0); 
+    adapter->SendMessageToBaseLib2("StateMachine", "START", 0); 
 
     uint32 idx;
     GAMAdapter *gamAdapter = GAMAdapter::Instance();

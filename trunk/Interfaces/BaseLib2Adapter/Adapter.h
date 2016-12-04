@@ -22,8 +22,10 @@
  *
  **/
 
-#ifndef BASELIB2_ADAPTER_INTERFACE_H_
-#define BASELIB2_ADAPTER_INTERFACE_H_
+#ifndef BASELIB2_ADAPTER_H_
+#define BASELIB2_ADAPTER_H_
+
+#include "AdapterMessageListener.h"
 
 /**
  * @brief Allows to load a BaseLib2 objects using an anonymous C interface.
@@ -68,8 +70,7 @@ public:
                                uint32 code);
 
     /**
-     * @brief Receives a Message from BaseLib2 (replies are currently not supported).
-     * @details This function shall be implemented by the library that wants to interface to BaseLib2.
+     * @brief Receives a Message from BaseLib2 (replies are currently not supported) and calls AdapterMessageListener::HandleBaseLib2Message
      * @param[in] destination the name of the destination object in the GlobalObjectDatabase.
      * @param[in] content the message content.
      * @param[in] code the message code.
@@ -79,11 +80,23 @@ public:
                                     const char8 *content,
                                     uint32 code);
 
+
+    /**
+     * @brief Sets the AdapterMessageListener
+     * @param[in] listener the AdapterMessageListener to be called when new messages arrive
+     */
+    void SetAdapterMessageListener(AdapterMessageListener *listener);
+
 private:
     /**
      * @brief Constructor. NOOP.
      */
     Adapter();
+
+    /**
+     * The AdapterMessageListener 
+     */
+    AdapterMessageListener *messageListener;
 };
 }
 #endif
