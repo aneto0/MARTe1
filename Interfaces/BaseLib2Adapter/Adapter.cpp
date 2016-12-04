@@ -22,20 +22,22 @@
  *
 **/
 
-#include "ConfigurationDataBase.h"
 #include "Adapter.h"
+#include "AdapterMessageListener.h"
+#include "ConfigurationDataBase.h"
 #include "GlobalObjectDataBase.h"
 #include "MenuContainer.h"
 #include "LoggerService.h"
 
 namespace BaseLib2 {
 Adapter *Adapter::Instance() {
-    static Adapter plumber;
-    return &plumber;
+    static Adapter adapter;
+    return &adapter;
 }
 
 Adapter::Adapter() {
     ProcessorType::defaultCPUs = 1u;
+    messageListener = NULL;
 }
 
 Adapter::~Adapter() {
@@ -62,5 +64,20 @@ bool Adapter::SendMessageToBaseLib2(const char *destination, const char *content
     }
     return ok;
 }
+
+bool Adapter::ReceiveMessageFromBaseLib2(const char8 *destination,
+                                const char8 *content,
+                                uint32 code) {
+    bool ok = false;
+    if (messageListener != NULL) {
+        ok = messageListener->HandleBaseLib2Message(destination, content, code);
+    }
+    return ok;
+}
+
+void Adapter::SetAdapterMessageListener(AdapterMessageListener *listener) {
+    messageListener = listener; 
+}
+
 }
 

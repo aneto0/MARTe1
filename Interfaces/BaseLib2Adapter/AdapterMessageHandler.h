@@ -22,8 +22,8 @@
  *
 **/
 
-#ifndef PLUMBER_MESSAGE_HANDLER_H_
-#define PLUMBER_MESSAGE_HANDLER_H_
+#ifndef ADAPTER_MESSAGE_HANDLER_H_
+#define ADAPTER_MESSAGE_HANDLER_H_
 
 #include "GCRTemplate.h"
 #include "MessageEnvelope.h"

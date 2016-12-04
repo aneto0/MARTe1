@@ -43,8 +43,8 @@ bool AdapterMessageHandler::ProcessMessage(GCRTemplate<MessageEnvelope> envelope
         realMsg = msg->Find(0);
     }
     if (ok) {
-        Adapter *plumber = Adapter::Instance();
-        plumber->ReceiveMessageFromBaseLib2(realMsg->Name(), msg->Content(), msg->GetMessageCode().Code());
+        Adapter *adapter = Adapter::Instance();
+        adapter->ReceiveMessageFromBaseLib2(realMsg->Name(), msg->Content(), msg->GetMessageCode().Code());
     }
     return ok;
 }

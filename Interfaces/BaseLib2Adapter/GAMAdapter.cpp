@@ -47,8 +47,8 @@ static GAMAdapterInfo *gamList = NULL;
 static uint32 gamListSize = 0;
 
 GAMAdapter *GAMAdapter::Instance() {
-    static GAMAdapter plumber;
-    return &plumber;
+    static GAMAdapter adapter;
+    return &adapter;
 }
 
 GAMAdapter::GAMAdapter() {
