@@ -36,16 +36,19 @@ typedef unsigned int uint32;
 typedef char char8;
 
 class AdapterMessageListener {
-    public:
-        /**
-         * @brief Receives a Message from BaseLib2 (replies are currently not supported).
-         * @details This function shall be implemented by the library that wants to interface to BaseLib2.
-         * @param[in] destination the name of the destination object in the GlobalObjectDatabase.
-         * @param[in] content the message content.
-         * @param[in] code the message code.
-         * @return true if the message was successfully received.
-         */
-        virtual bool HandleBaseLib2Message(const char8 *destination, const char8 *content, uint32 code) = 0;
+public:
+    /**
+     * @brief Receives a Message from BaseLib2 (replies are currently not supported).
+     * @details This function shall be implemented by the library that wants to interface to BaseLib2.
+     * @param[in] destination the name of the destination object in the GlobalObjectDatabase.
+     * @param[in] content the message content.
+     * @param[in] code the message code.
+     * @return true if the message was successfully received.
+     */
+    virtual bool HandleBaseLib2Message(const char8 *destination, const char8 *content, uint32 code) = 0;
+
+    virtual ~AdapterMessageListener() {
+    }
 
 };
 }
