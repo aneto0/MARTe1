@@ -27,8 +27,6 @@
 #include "GAMAdapter.h"
 #include "Adapter.h"
 
-using namespace BaseLib2;
-
 const char *webConfig = ""
     "+WEB = {"
     "    Class = HttpGroupResource"
@@ -108,14 +106,14 @@ public:
 
 int main(int argc, char **argv) {
     AdapterMessageListenerTest listener;
-    Adapter *adapter = Adapter::Instance();
+    BaseLib2::Adapter *adapter = BaseLib2::Adapter::Instance();
     adapter->SetAdapterMessageListener(&listener);
     bool ok = adapter->LoadObjects(webConfig);
     printf("ok = %d\n", ok);
     adapter->SendMessageToBaseLib2("StateMachine", "START", 0); 
 
-    uint32 idx;
-    GAMAdapter *gamAdapter = GAMAdapter::Instance();
+    BaseLib2::uint32 idx;
+    BaseLib2::GAMAdapter *gamAdapter = BaseLib2::GAMAdapter::Instance();
     ok = gamAdapter->AddGAM("WebStatistic", config, idx);
     printf("ok = %d idx = %d\n", ok, idx);
     ok = gamAdapter->AddGAMInputSignal(idx, "usecTime", "uint32");
@@ -125,7 +123,7 @@ int main(int argc, char **argv) {
     void *outputFromGAM;
     ok = gamAdapter->FinaliseGAM(idx, inputToGAM, outputFromGAM);
     printf("ok = %d idx = %d %p %p\n", ok, idx, inputToGAM, outputFromGAM);
-    uint32 *test = (uint32 *)inputToGAM;
+    BaseLib2::uint32 *test = (BaseLib2::uint32 *)inputToGAM;
     unsigned int i = 0;
     while(1) {
         *test = i++;
