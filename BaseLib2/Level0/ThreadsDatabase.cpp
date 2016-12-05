@@ -162,6 +162,8 @@ ThreadInitialisationInterface *          TDB_RemoveEntry(){
                 // free at the end
                 if (TDB_NOfEntries == 0){
                     free ((void *&)TDB_entries);
+                    TDB_entries = NULL;
+                    TDB_MaxNOfEntries = 0;
                 }
                 return tii;
             }
