@@ -24,6 +24,7 @@
 #include "GenDefs.h"
 #include "Adapter.h"
 #include "AdapterMessageHandler.h"
+#include "FString.h"
 
 using namespace BaseLib2;
 AdapterMessageHandler::AdapterMessageHandler() : GCNamedObject(), MessageHandler() {
@@ -34,17 +35,23 @@ AdapterMessageHandler::~AdapterMessageHandler() {
 
 bool AdapterMessageHandler::ProcessMessage(GCRTemplate<MessageEnvelope> envelope) {
     GCRTemplate<Message> msg = envelope->GetMessage();
-    GCRTemplate<Message> realMsg;
     bool ok = msg.IsValid();
+    FString destination;
+    FString content;
+    FString function;
+    Adapter *adapter = Adapter::Instance();
     if (ok) {
-        ok = (msg->Size() > 0); 
+        function = msg->Content();
+        ok = function.Seek(0ULL);
     }
     if (ok) {
-        realMsg = msg->Find(0);
+        ok = function.GetToken(destination, "::");
     }
     if (ok) {
-        Adapter *adapter = Adapter::Instance();
-        adapter->ReceiveMessageFromBaseLib2(realMsg->Name(), msg->Content(), msg->GetMessageCode().Code());
+        ok = function.GetToken(content, "::");
+    }
+    if (ok) {
+        ok = adapter->ReceiveMessageFromBaseLib2(destination.Buffer(), content.Buffer(), msg->GetMessageCode().Code());
     }
     return ok;
 }

@@ -48,6 +48,8 @@ public:
 
     /**
      * @brief Forwards the message to the Adapter::ReceiveMessageFromBaseLib2 (replies are currently not supported).
+     * @details The message content shall be coded as DESTINATION::FUNCTION, where DESTINATION is the name of the 
+     * Object to be called in the remote system and FUNCTION is the method to be called in the remote system.
      * @param[in] envelope the message to be forwarded.
      * @return true if the message was successfully forwarded.
      */
