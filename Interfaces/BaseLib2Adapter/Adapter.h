@@ -59,6 +59,11 @@ public:
     bool LoadObjects(const char8 *config);
 
     /**
+     * @brief Destroys the GlobalObjectDatase
+     */
+    void UnloadObjects();
+
+    /**
      * @brief Sends a Message to BaseLib2 (replies are currently not supported).
      * @param[in] destination the name of the destination object in the GlobalObjectDatabase.
      * @param[in] content the message content.
