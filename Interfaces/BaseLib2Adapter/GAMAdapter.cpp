@@ -162,7 +162,6 @@ bool GAMAdapter::AddGAMInputSignal(uint32 gamIdx, const char *gamSignalName, con
         inputToGAM = gamList[gamIdx].inputToGAM;
     }
     if (ok) {
-        printf("+++%s+++\n", gamSignalName);
         ok = inputToGAM->AddSignal(gamSignalName, gamSignalType);
     }
 
