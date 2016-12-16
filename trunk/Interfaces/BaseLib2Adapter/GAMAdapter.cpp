@@ -244,6 +244,17 @@ bool GAMAdapter::FinaliseGAM(uint32 gamIdx, void *& inputToGAM, void *&outputFro
         ok = ddb->CreateLink(gam);
     }
     if (ok) {
+        //GAMs which contain other GAMs
+        uint32 numberOfChildren = gam->Size();
+        uint32 i;
+        for (i=0; i<numberOfChildren; i++) {
+            GCRTemplate<GAM> g = gam->Find(i);
+            if (g.IsValid()) {
+                ok = ddb->CreateLink(g);
+            }
+        }
+    }
+    if (ok) {
         if(gamList[gamIdx].inputToGAM != NULL) {
             ok = ddb->CreateLink(*gamList[gamIdx].inputToGAM);
         }
