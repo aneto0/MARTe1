@@ -54,7 +54,10 @@ all: $(OBJS)    \
 	$(TARGET)/CDBExample1$(EXEEXT)\
 	$(TARGET)/CDBExample2$(EXEEXT)\
 	$(TARGET)/CDBExample3$(EXEEXT)\
+	$(TARGET)/CDBExample4$(EXEEXT)\
 	$(TARGET)/GODBExample1$(EXEEXT)\
+	$(TARGET)/UDPPing$(EXEEXT)\
+	$(TARGET)/UDPPong$(EXEEXT)\
 	$(TARGET)/BTDExample1$(EXEEXT)
 	echo  $(OBJS)
 
