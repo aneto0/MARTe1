@@ -85,11 +85,7 @@ linux/%.drv : linux/%.o $(OBJS)
 
 clean:  $(SUBPROJC)
 	rm -f depends*
-	rm -f $(TARGET)/*$(OBJEXT)
-	rm -f $(TARGET)/*$(DLLEXT)
-	rm -f $(TARGET)/*$(EXEEXT)
-	rm -f $(TARGET)/*$(LIBEXT)
-	rm -f $(TARGET)/*$(GAMEXT)
-	rm -f $(TARGET)/*$(DRVEXT)
-	rm -f $(TARGET)/*$(ASMEXT)
+	rm -rf temp
+	rm -rf $(TARGET)
+
 
