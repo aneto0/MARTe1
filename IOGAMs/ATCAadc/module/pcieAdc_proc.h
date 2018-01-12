@@ -24,9 +24,17 @@
 
 #ifndef PCIEADC_PROC_H_
 #define PCIEADC_PROC_H_
+#include <linux/version.h>
+#include <linux/seq_file.h>
 
+#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 10, 0)
 int pcieAdc_procinfo(char *buf, char **start, off_t fpos, int length, int *eof, void *data);
 int pcieAdc_proccmd(struct file *file, const char __user *buffer, unsigned long count, void *data);
+#else
+int pcieAdc_show(struct seq_file *fl, void *v);
+int pcieAdc_open(struct inode *inode, struct file *file);
+int pcieAdc_proccmd(struct file * flp, const char __user *usr, size_t count, loff_t * fost);
+#endif
 void register_proc(void);
 void unregister_proc(void);
 

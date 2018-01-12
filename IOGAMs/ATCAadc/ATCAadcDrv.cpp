@@ -330,38 +330,118 @@ int32 SingleATCAModule::GetLatestBufferIndex(){
 
 
 int32 SingleATCAModule::CurrentBufferIndex(){
+    //time
+    uint32 actualTime = HRT::HRTCounter();
+    uint32 stopAcquisition    = actualTime + dataAcquisitionUsecTimeOut;
+    bool wrapped = actualTime > stopAcquisition ? True : False;
+   
+    uint32 bufferFooters[DMA_BUFFS] = {0,0,0,0};
+    uint32 bufferHeaders[DMA_BUFFS] = {0,0,0,0};
+    int dmaIndex = 0; 
+    int nextdmaIndex = 0;
+    int nChannels = NumberOfInputChannels();
+    uint32 *header = NULL;
+    uint32 *footer = NULL;    
+    uint32 oldestBufferIndex = 0;
+    uint32 freshestBufferIndex = 0;
+    bool boardsReset = False;
+    uint32 oldestTimeMark = 0;
 
-    uint32 *oldestBufferHeader = (uint32 *)dmaBuffers[0];
-    uint32 oldestBufferIndex  = 0;
+    //make a local snapshot
+    for(dmaIndex = 0; dmaIndex < DMA_BUFFS; dmaIndex++){
+	header = (uint32 *)dmaBuffers[dmaIndex];
+	footer = header + nChannels + HEADER_LENGTH;
+	bufferHeaders[dmaIndex] = *header;
+	bufferFooters[dmaIndex] = *footer;
+  
+    	if (bufferFooters[oldestBufferIndex] > bufferFooters[dmaIndex]){
+		oldestBufferIndex = dmaIndex;
+	}
 
-    int64  stopAcquisition    = HRT::HRTCounter()  + dataAcquisitionUsecTimeOut;
+	if(bufferFooters[freshestBufferIndex] < bufferFooters[dmaIndex]){
+		freshestBufferIndex = dmaIndex;
+	}
 
-    // check which one is the oldest buffer
-    int dmaIndex = 0;
-    for (dmaIndex = 1; dmaIndex < DMA_BUFFS; dmaIndex++) {
-        // Pointer to the header
-        uint32 *header     = (uint32 *)dmaBuffers[dmaIndex];
-        if (*header < *oldestBufferHeader) {
-            oldestBufferHeader = header;
-            oldestBufferIndex  = dmaIndex;
-        }
+	if((bufferFooters[freshestBufferIndex] - bufferFooters[oldestBufferIndex]) > 5000){
+		boardsReset = True;
+		CStaticAssertErrorCondition(Information, "SingleATCAModule::CurrentBufferIndex: Module %d reset detected.", moduleIdentifier);    
+	}
+    }
+    
+    if(boardsReset){
+    	//a reset has (probably) occured and the newestBufferHeader is actually the oldest
+	//i.e. counting begins from 0i
+	
+        stopAcquisition += dataAcquisitionUsecTimeOut; //give a bit more time on this cycles
+	wrapped = actualTime > stopAcquisition ? True : False;
+
+	dmaIndex = oldestBufferIndex;
+	nextdmaIndex = (dmaIndex+1)%DMA_BUFFS;
+	while((bufferFooters[dmaIndex] + 50) == bufferFooters[nextdmaIndex]){
+	//consume all complete dmaBuffers which follow.
+		dmaIndex = nextdmaIndex;
+	//        CStaticAssertErrorCondition(Information, "Skipping to index=%d", dmaIndex);
+		oldestBufferIndex = dmaIndex;
+		nextdmaIndex = (dmaIndex + 1) % DMA_BUFFS;
+	}
+
+	oldestBufferIndex = (oldestBufferIndex + 1) %DMA_BUFFS;
     }
 
-    uint32 *oldestBufferFooter = oldestBufferHeader + NumberOfInputChannels() + HEADER_LENGTH;
-    uint32 oldestTimeMark      = *oldestBufferFooter;
+    oldestTimeMark = bufferFooters[oldestBufferIndex] + 25;
+    header = (uint32 *)dmaBuffers[oldestBufferIndex];
+    footer = header + nChannels + HEADER_LENGTH;
+    
+    uint32 *header0 = (uint32*)dmaBuffers[0];
+    uint32 *footer0 = header0 + nChannels + HEADER_LENGTH;
+    int loops = 0;
+    while(oldestTimeMark != *footer){
+	//necessary for version firmware which could do the reset in the middle of this loop and start from DMA 0
+	 /*if(*footer0 == 50 && (*footer0 != bufferFooters[0])){ 
+		oldestBufferIndex = 0;
+		oldestTimeMark = 50;
+		footer = footer0;
+		header = header0;
+		stopAcquisition += dataAcquisitionUsecTimeOut; 
+		wrapped = actualTime > stopAcquisition ? True : False;
+	 }*/
 
-    // If the data transfer is not in progress it means that the new data will
-    // be stored in the oldest buffer. 
-    int64 actualTime = HRT::HRTCounter();
-    while (oldestTimeMark == *oldestBufferFooter) {
-        if(actualTime > stopAcquisition) {
-            return -1;
-        }
-        actualTime = HRT::HRTCounter();
+
+
+	//perform the time check; 
+	if(!wrapped && (actualTime > stopAcquisition)){                                                                                                                              
+		CStaticAssertErrorCondition(FatalError, "SingleATCAModule::CurrentBufferIndex: Module %d, failed to detect header=footer (oldest) DMA buffer index %d in time, Loops=%d.", moduleIdentifier, oldestBufferIndex, loops);
+		
+		for(int i = 0; i < DMA_BUFFS; i ++){
+			CStaticAssertErrorCondition(FatalError, "SingleATCAModule::CurrentBufferIndex: Module %d, buffer index=%d h=%u fh=%u f=%u ff=%u.", moduleIdentifier, i, *(uint32 *)dmaBuffers[i], bufferHeaders[i], *(((uint32 *)dmaBuffers[i]) + nChannels + HEADER_LENGTH), bufferFooters[i]);
+		 }
+
+		return -1;
+ 	}
+	
+	//perform the footer changed check
+	if(oldestTimeMark != (*footer + 25)){
+		//footer has changed since last read so
+		//implicitly compare header == footer
+		oldestTimeMark = *header;
+	 }
+
+	//update actual time
+	actualTime = HRT::HRTCounter();
+
+	if(wrapped && actualTime < stopAcquisition){
+		wrapped = False;
+	}
+
+	loops ++;
+    }    
+
+    int timeRemaining = (actualTime - stopAcquisition) * -1; //if timeRemaining is positive we have overrun so map to a negative time
+    if(timeRemaining < (dataAcquisitionUsecTimeOut/4)){
+	CStaticAssertErrorCondition(Information, "SingleATCAModule::CurrentBufferIndex: Module %d is running out of dataAcquisitionUsecTimeOut/4 on fresh DMA aquisition Tout=%d  Tact=%d", moduleIdentifier, dataAcquisitionUsecTimeOut, (timeRemaining+1)); //the +1 is just for fun    
     }
 
-    if(*oldestBufferHeader == *oldestBufferFooter) return oldestBufferIndex;
-    return -2;
+    return oldestBufferIndex;
 }
 
 bool SingleATCAModule::WriteData(const int32 *&buffer){    
@@ -423,15 +503,16 @@ bool SingleATCAModule::Poll(){
             }
             int32 previousAcquisitionIndex = currentDMABufferIndex;
             int32 currentDMA = CurrentBufferIndex();
+            // Update NextExecTime with a guess regardless of whether CurrentBufferIndex returned an error
+            // The aim is to avoid oversampling in case of an error.
+            nextExpectedAcquisitionCPUTicks = HRT::HRTCounter() + boardInternalCycleTicks;  
             if(currentDMA < 0){
-                CStaticAssertErrorCondition(Warning,"SingleATCAModule::GetData: Returned -1");
+                CStaticAssertErrorCondition(Warning,"SingleATCAModule::Poll Module %d, failed to detect a fresh DMA buffer.", moduleIdentifier);
                 return False;
             }
 
             currentDMABufferIndex = currentDMA;
 
-            // Update NextExecTime with a guess
-            nextExpectedAcquisitionCPUTicks = HRT::HRTCounter() + boardInternalCycleTicks;
             int deltaBuffer    = *dmaBuffers[currentDMABufferIndex] - *dmaBuffers[previousAcquisitionIndex];
             int nOfLostPackets = deltaBuffer - boardInternalCycleTime;
             if (( nOfLostPackets > 0)){
@@ -729,25 +810,28 @@ int32 ATCAadcDrv::GetData(uint32 usecTime, int32 *buffer, int32 bufferNum){
     }
 
     int32 *lBuffer = buffer;
+    int fatalFlag = 1;
     for(int i = 0; i < numberOfBoards; i++){
         if(!modules[i].GetData(lBuffer)){
-            AssertErrorCondition(FatalError,"ATCAadcDrv::GetData: %s. Module %d failed acquiring data",Name(),i);
-            return -1;
+            AssertErrorCondition(FatalError,"ATCAadcDrv::GetData: %s. Module %d failed acquiring data",Name(),modules[i].BoardIdentifier());
+            fatalFlag = -1;
         }
     }
 
 
-    return 1;
+    return fatalFlag;
 }
 
 bool ATCAadcDrv::Poll(){
     if(autoSoftwareTrigger){
         if(lastCycleUsecTime > autoSoftwareTriggerAfterUs){
+	    AssertErrorCondition(Information, "ATCAadcDrv::Poll Automatic software trigger initiated at %d.", lastCycleUsecTime);
             SoftwareTrigger();
         }
     }
     bool ok = modules[masterBoardIdx].Poll();
     if(!ok){
+        AssertErrorCondition(FatalError, "ATCAadcDrv::Poll Master card [module=%d] returned false.", modules[masterBoardIdx].BoardIdentifier());
         return ok;
     }
     // If the module is the timingATMDrv call the Trigger() method of

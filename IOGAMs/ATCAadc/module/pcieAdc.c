@@ -49,13 +49,14 @@ static int master_board_index = -1;
 
 static int DMA_NBYTES         = 0;
 
-MODULE_DEVICE_TABLE(pci, ids);
 
 // Static structures
 static struct pci_error_handlers pcieAdc_err_handler = {
     .error_detected = pcieAdc_error_detected,
-    .mmio_enabled = pcieAdc_mmio_enabled, .link_reset = pcieAdc_link_reset,
-    .slot_reset = pcieAdc_slot_reset, .resume = pcieAdc_resume,
+    .mmio_enabled = pcieAdc_mmio_enabled, 
+    .link_reset = pcieAdc_link_reset,
+    .slot_reset = pcieAdc_slot_reset, 
+    .resume = pcieAdc_resume,
 };
 
 static struct pci_device_id ids[] = {
@@ -67,14 +68,18 @@ static struct pci_device_id ids[] = {
     },
 };
 
-static struct pci_driver pcieAdc_pci = {.name = "pcieAdc", .id_table = ids,
-    .probe = pcieAdc_probe, .remove = pcieAdc_remove,
-    .err_handler = &pcieAdc_err_handler,
+MODULE_DEVICE_TABLE(pci, ids);
+
+static struct pci_driver pcieAdc_driver = {
+  .name = "pcieAdc", 
+  .id_table = ids,
+  .probe = pcieAdc_probe, 
+  .remove = pcieAdc_remove,
+  .err_handler = &pcieAdc_err_handler,
 };
 
 struct pci_dev* global_pdev;
-
-/* the ordinary device operations */
+#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 5, 0)
 static struct file_operations pcieAdcDrvFileOps = {
     owner:   THIS_MODULE,
     mmap:    pcieAdcMmap,
@@ -83,6 +88,17 @@ static struct file_operations pcieAdcDrvFileOps = {
     ioctl:   pcieAdcIoctl,
     write:   pcieAdcWrite
 };
+#else
+/* the ordinary device operations */
+static struct file_operations pcieAdcDrvFileOps = {
+    owner:   THIS_MODULE,
+    mmap:    pcieAdcMmap,
+    open:    pcieAdcOpen,
+    release: pcieAdcRelease,
+    unlocked_ioctl:   pcieAdcIoctl, 
+	write:   pcieAdcWrite
+};
+#endif
 //char device
 static struct cdev charDevice;
 //char device number
@@ -120,25 +136,45 @@ static int SlotNumberToBoardIndex(int slotNum) {
 //* DMA management functions *
 //****************************
 
-int enableDMAonboard(struct pci_dev *pdev) {
+int pcieAdcEnableDMAonboard(struct pci_dev *pdev) {
     int ret;
+#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 10, 0)
     ret = pci_dma_supported(pdev, DMA_32BIT_MASK);
     if (!ret) {
-        printk("pcieAdc: DMA not supported. Aborting.\n");
+        printk(KERN_DEBUG "pcieAdc: DMA not supported. Aborting.\n");
         return ret;
     }
     ret = pci_set_dma_mask(pdev, DMA_32BIT_MASK);
     if (ret) {
-        printk("pcieAdc: pci_set_dma_mask error [%d]. Aborting.\n", ret);
+        printk(KERN_DEBUG "pcieAdc: pci_set_dma_mask error [%d]. Aborting.\n", ret);
         return ret;
     }
     ret = pci_set_consistent_dma_mask(pdev, DMA_32BIT_MASK);
     if (ret) {
-        printk(
+        printk(KERN_DEBUG
                 "pcieAdc: pci_set_consistent_dma_mask error [%d]. Aborting.\n",
                 ret);
         return ret;
     }
+#else
+    ret = pci_dma_supported(pdev, DMA_BIT_MASK(32));
+    if (!ret) {
+        printk(KERN_DEBUG "pcieAdc: DMA not supported. Aborting.\n");
+        return ret;
+    }
+    ret = pci_set_dma_mask(pdev, DMA_BIT_MASK(32));
+    if (ret) {
+        printk(KERN_DEBUG "pcieAdc: pci_set_dma_mask error [%d]. Aborting.\n", ret);
+        return ret;
+    }
+    ret = pci_set_consistent_dma_mask(pdev, DMA_BIT_MASK(32));
+    if (ret) {
+        printk(KERN_DEBUG
+                "pcieAdc: pci_set_consistent_dma_mask error [%d]. Aborting.\n",
+                ret);
+        return ret;
+    }
+#endif
     //setting DMA mastering mode
     (void) pci_set_master(pdev);
     ret = pci_set_mwi(pdev);
@@ -230,6 +266,7 @@ int setupDMA(PCIE_DEV *pcieDev, DMA_REG dmaReg, COMMAND_REG commandReg) {
     dmaReg.reg32 = 0;
     dmaReg.dmaFlds.Size = DMA_NBYTES;
     dmaReg.dmaFlds.BuffsNumber = DMA_BUFFS;
+    printk("DMAREG: 0x%08x\n", dmaReg.reg32);
     PCIE_WRITE32(dmaReg.reg32, (void*) & pcieDev->pHregs->dmaReg);
     pcieDev->counter = PCIE_READ32((void*) & pcieDev->pHregs->hwcounter);
     commandReg.reg32 = PCIE_READ32((void*) & pcieDev->pHregs->command);
@@ -281,7 +318,7 @@ int resetBoard(PCIE_DEV *pcieDev) {
     return 0;
 }
 
-int configurePCI(struct pci_dev *pdev, PCIE_DEV *pcieDev) {
+int pcieAdcConfigurePCI(struct pci_dev *pdev, PCIE_DEV *pcieDev) {
     u16 reg16 = 0;
     int i = 0;
     int ret = 0;
@@ -589,51 +626,63 @@ int pcieAdc_probe(struct pci_dev *pdev, const struct pci_device_id *id) {
 
     current_board++;
 
-    printk("current_board is = %d\n", current_board);
+    printk("pcieADC: Variable current_board is = %d\n", current_board);
 
     //allocate the device instance block
     pcieDev = kzalloc(sizeof (PCIE_DEV), GFP_KERNEL);
-    if (!pcieDev) {
-        return -ENOMEM;
+    if (!pcieDev) { 
+      printk(KERN_DEBUG "pcieADC: Failed to allocate memory");
+      return -ENOMEM;
     }
 
     //enable PCI board
     ret = pci_enable_device(pdev);
     if (ret != 0) {
-        printk(KERN_DEBUG "pcieAdc_probe pci_enable_device error(%d). EXIT\n", ret);
+        printk(KERN_DEBUG "pcieADC: pcieAdc_probe pci_enable_device error(%d). EXIT\n", ret);
         return ret;
     }
 
     //enable DMA transfers
-    ret = enableDMAonboard(pdev);
+    ret = pcieAdcEnableDMAonboard(pdev);
     if (ret != 0) {
-        printk("pcieAdc: error in DMA initialization. Aborting.\n");
+        printk(KERN_DEBUG "pcieAdc: Error in DMA initialization. Aborting.\n");
         return ret;
     }
 
     // configure PCI and remap I/O
-    ret = configurePCI(pdev, pcieDev);
+    ret = pcieAdcConfigurePCI(pdev, pcieDev);
     if (ret != 0) {
-        printk("pcieAdc: error in PCI configuration. Aborting.\n");
+        printk(KERN_DEBUG "pcieAdc: error in PCI configuration. Aborting.\n");
         return ret;
     }
 
     //init spinlock
+    //not so sure as the spin_lock_init macro has been available even before 2.0.40
+    //but old driver used direct assignment
+#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 10, 0)
     pcieDev->irq_lock = SPIN_LOCK_UNLOCKED;
-
+#else
+    spin_lock_init(&pcieDev->irq_lock);
+#endif
     // reset board
-    resetBoard(pcieDev);
+    //resetBoard(pcieDev);
 
     pcieDev->pdev = pdev;
     pcieDev->wt_tmout = 20 * HZ;
     pci_set_drvdata(pdev, pcieDev);
+#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 5, 0)
     init_MUTEX(&pcieDev->open_sem);
+#else
+    mutex_init(&pcieDev->open_mutex);
+#endif
 
 #ifdef _MSI_ENABLE    
     ret = pci_enable_msi(pdev);
     if (ret) {
-        printk(KERN_WARNING "pci_enable_msi %d error[%d]\n", pcieDev->pdev->irq, ret);
+        printk(KERN_WARNING "pcieADC: pci_enable_msi %d error[%d]\n", pcieDev->pdev->irq, ret);
         return ret;
+    } else {
+	printk("pcieADC: pci_enable_msi IRQ %d\n", pdev->irq);
     }
 #endif
     // Waitqueue initialization
@@ -738,7 +787,7 @@ int __init pcieAdcInit(void) {
         board_slot_numbers[i] = -1;
     }
     /* registering the board */
-    ret = pci_register_driver(&pcieAdc_pci);
+    ret = pci_register_driver(&pcieAdc_driver);
     if (ret) {
         printk(KERN_ALERT "pcieAdcInit pci_register_driver error(%d).\n", ret);
         return ret;
@@ -758,7 +807,7 @@ void pcieAdcExit(void) {
     /* unregistering proc fs */
     unregister_proc();
     /* unregistering the board */
-    pci_unregister_driver(&pcieAdc_pci);
+    pci_unregister_driver(&pcieAdc_driver);
     // unregister char device
     CleanUpCharDeviceInterface();
 }
@@ -770,7 +819,7 @@ ssize_t pcieAdcMmap(struct file *file, struct vm_area_struct *vma){
     int j               = 0;
     unsigned long page  = 0;
     unsigned long start = vma->vm_start;
-
+    printk("pcieAdc: Mapping memory for %d boards\n", GetNumberOfBoards());
     if((vma->vm_end - vma->vm_start) < (PAGE_SIZE * DMA_BUFFS * GetNumberOfBoards())){
         printk("Not enough memory to mmap vma->vm_start = %ld vma->vm_end = %ld required = %d!\n",
                 vma->vm_start,
@@ -828,7 +877,12 @@ ssize_t pcieAdcRelease(struct inode *inode, struct file *file) {
 }
 
 //ioctl
+
+#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 5, 0)
 ssize_t pcieAdcIoctl(struct inode *inode, struct file *file, unsigned int cmd, unsigned long arg){
+#else
+long pcieAdcIoctl(struct file *file, unsigned int cmd, unsigned long arg){
+#endif
     int err       = 0;
     u32 tempValue = 0;
 
