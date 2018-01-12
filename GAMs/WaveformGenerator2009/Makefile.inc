@@ -29,6 +29,7 @@ OBJSX= WaveformGenericClass.x \
        WaveformClassTriangular.x \
        WaveformClassSine.x \
        WaveformClassSequencer.x \
+       WaveformClassEventSequencer.x \
        WaveformClassOpt.x  \
        WaveformClassTime.x \
        TriggerObj.x \
