@@ -431,4 +431,8 @@ void RTDataStorageSystem::HTMLInfo(HttpStream &hStream) {
     hStream.Printf("<h2>Total already read Samples = %d</h2>\n", CLOCKInit.nOfReadSamples);
 }
 
+int RTDataStorageSystem::GetTotalSamplesCollected(){
+  return CLOCKInit.nOfReadSamples;
+}
+
 OBJECTREGISTER(RTDataStorageSystem,"$Id$")

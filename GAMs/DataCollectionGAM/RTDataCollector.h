@@ -151,6 +151,8 @@ public:
     }
 
     void HTMLInfo(HttpStream &hStream);
+
+    int GetTotalSamplesCollected();
 };
 
 #endif

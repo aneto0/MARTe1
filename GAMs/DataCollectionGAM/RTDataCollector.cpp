@@ -264,4 +264,8 @@ void RTDataCollector::HTMLInfo(HttpStream &hStream) {
     dataStorage.HTMLInfo(hStream);
 }
 
+int RTDataCollector::GetTotalSamplesCollected(){
+  return dataStorage.GetTotalSamplesCollected();
+}
+
 OBJECTREGISTER(RTDataCollector,"$Id$")

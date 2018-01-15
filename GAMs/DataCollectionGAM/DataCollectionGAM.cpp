@@ -354,4 +354,8 @@ bool DataCollectionGAM::ProcessHttpMessage(HttpStream &hStream) {
     return True;
 }
 
+int DataCollectionGAM::GetTotalSamplesCollected(){
+  return dataCollector.GetTotalSamplesCollected();
+}
+
 OBJECTLOADREGISTER(DataCollectionGAM,"$Id$")

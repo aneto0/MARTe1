@@ -202,6 +202,10 @@ RealTimeThread::RealTimeThread(){
     realTimeThreadCleanSem.Create();
 }
 
+bool RealTimeThread::CheckStatus(int32 rqstatus){
+    return rtStatus==rqstatus;
+}
+
 void RTAppThread(RealTimeThread &rTThread){
     rTThread.RTThread();
 }
@@ -236,7 +240,7 @@ void RealTimeThread::RTThread(){
             rtStatus = RTAPP_READY;
             for(int i = 0; i < nOfOnlineGams; i++){
                 if(!onlineModules[i].Reference()->Execute(GAMPrepulse)){
-                    AssertErrorCondition(FatalError,"RealTimeThread::PulseStart: GAM %s reported error during Pre Pulse",onlineModules[i].Reference()->GamName());
+                    AssertErrorCondition(FatalError,"RealTimeThread::PulseStart: Online GAM %s reported error during Pre-pulse. Setting RT-state to safety.",onlineModules[i].Reference()->GamName());
                     rtStatus = RTAPP_SAFETY;
                     break;
                 }
@@ -258,7 +262,7 @@ void RealTimeThread::RTThread(){
 
             for(int i = 0; i < nOfOnlineGams; i++){
                 if(!onlineModules[i].Reference()->Execute(GAMPostpulse)){
-                    AssertErrorCondition(FatalError,"RealTimeThread::PostPulse: GAM %s reported error during Post Pulse",onlineModules[i].Reference()->GamName());
+                    AssertErrorCondition(FatalError,"RealTimeThread::PostPulse: Online GAM %s reported error during Post-pulse. Setting RT-state to safety.",onlineModules[i].Reference()->GamName());
                     rtStatus = RTAPP_SAFETY;
                 }
             }
@@ -272,7 +276,7 @@ void RealTimeThread::RTThread(){
                 for(int i = 0; i < nOfOnlineGams; i++){
                     performanceMonitor.StartGAMMeasureCounter();
                     if(!onlineModules[i].Execute()){
-                        AssertErrorCondition(FatalError,"RealTimeThread::%s : GAM %s failed during online   pulsing",Name(),onlineModules[i].Reference()->GamName());
+                        AssertErrorCondition(FatalError,"RealTimeThread::%s : Online GAM %s failed during pulsing. Setting RT-state to safety",Name(),onlineModules[i].Reference()->GamName());
                         rtStatus = RTAPP_SAFETY;
                         break;
                     }
@@ -314,7 +318,7 @@ void RealTimeThread::RTThread(){
                         if(!offlineModules[i].Execute()){
                             rtStatus = RTAPP_SAFETY;
                             GMDSendMessageDeliveryRequest(sendFatalErrorMessage, TTInfiniteWait ,False);
-                            AssertErrorCondition(FatalError,"RealTimeThread::%s : GAM %s failed during offline pulsing",Name(),offlineModules[i].Reference()->GamName());
+                            AssertErrorCondition(FatalError,"RealTimeThread::%s : GAM %s failed during offline cycle. Setting RT-Status to safety.",Name(),offlineModules[i].Reference()->GamName());
                         }
                         performanceMonitor.StorePerformance(i);
                     }
@@ -441,7 +445,7 @@ bool RealTimeThread::Check(){
     }
 
     if(!rtStatus.Request(RTAPP_UNINITIALISED)){
-        AssertErrorCondition(FatalError,"RealTimeThread::Check: Failed requesting state change of the RealTimeThread to status UNINITIALISED");
+        AssertErrorCondition(FatalError,"RealTimeThread::Check: Requesting state change of the RealTimeThread to status UNINITIALISED timed out");
         return False;
     }
 
@@ -454,7 +458,7 @@ bool RealTimeThread::Check(){
     }
 
     if(!rtStatus.Request(RTAPP_READY)){
-        AssertErrorCondition(FatalError,"RealTimeThread::Check: Failed requesting state change of the RealTimeThread to status READY");
+        AssertErrorCondition(FatalError,"RealTimeThread::Check: Requesting state change of the RealTimeThread to status READY timed out");
         return False;
     }
 
