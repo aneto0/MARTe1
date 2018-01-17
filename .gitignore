@@ -1,0 +1,11 @@
+.cproject
+.project
+*.err
+depends.*
+dependsRaw.*
+*.o
+*.a
+*.s
+*.so
+*.ex
+file.compile.list
