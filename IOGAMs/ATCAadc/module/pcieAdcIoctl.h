@@ -38,7 +38,9 @@
  * H means "sHift": T and Q atomically
  */
 
-
+/**********************************************************************
+ *                         IOCTL FUNCTIONS                            *
+ *********************************************************************/
 #define PCIE_ATCA_ADC_IOCT_ACQ_ENABLE         _IO(PCIE_ATCA_ADC_IOCT_MAGIC, 1)
 #define PCIE_ATCA_ADC_IOCT_ACQ_DISABLE        _IO(PCIE_ATCA_ADC_IOCT_MAGIC, 2)
 #define PCIE_ATCA_ADC_IOCT_NUM_BOARDS         _IOR(PCIE_ATCA_ADC_IOCT_MAGIC, 3, u_int32_t)

@@ -238,7 +238,7 @@ public:
 #if defined(_MACOSX)
 	snprintf(name,nameSize,"stream%u",selectedStream);
 #else
-        snprintf(name,nameSize,"stream%lu",selectedStream);
+        snprintf(name,nameSize,"stream%lu",(long unsigned)selectedStream);
 #endif
         return True;
     }

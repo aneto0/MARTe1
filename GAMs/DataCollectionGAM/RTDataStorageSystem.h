@@ -152,6 +152,8 @@ public:
     void TimeWindowsMenu(StreamInterface &in,StreamInterface &out);
 
     void HTMLInfo(HttpStream &hStream);
+    
+    int GetTotalSamplesCollected();
 
 };
 

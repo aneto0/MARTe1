@@ -369,6 +369,8 @@ public:
 
     RealTimeThread();
 
+    bool CheckStatus(int32 rqstatus);
+
     virtual ~RealTimeThread(){
         Stop();
         if(onlineModules        != NULL) delete[] onlineModules;

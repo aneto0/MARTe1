@@ -171,6 +171,7 @@ bool WaveformGenerator::Execute(GAM_FunctionNumbers functionNumber){
     float *output = (float *)ddbOutputInterface->Buffer();
     
     for(i = 0 ; i < Size() ; i++) {
+        waveformList[i]->SetState(functionNumber);
         if(isIntOutputList[i]) {
             *((int32*)output) = (int32)(waveformList[i]->GetValueInt32(usecTime));
         } else {

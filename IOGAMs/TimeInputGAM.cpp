@@ -77,7 +77,7 @@ bool TimeInputGAM::Execute(GAM_FunctionNumbers functionNumber){
     //////////////////////////////////////////
     
     if(!trigger->Synchronise()){
-        AssertErrorCondition(FatalError,"TimeInputGAM::Execute: Timeout on Execute");
+        AssertErrorCondition(FatalError,"TimeInputGAM::Execute: Timeout on Execute(FunctionNumber = %d)", (int)functionNumber);
     }
     return InputGAM::Execute(functionNumber);
 }

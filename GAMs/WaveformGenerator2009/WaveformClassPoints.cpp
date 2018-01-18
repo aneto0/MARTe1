@@ -61,7 +61,7 @@ float WaveformClassPoints::GetValue(int32 usecTime){
         }else{
             // Periodic
             // Normalisation between 0 and 1
-            timeRef = (int32)(localPhase*actFrequency*1000000);
+            timeRef = (int32)round(localPhase*actFrequency*1000000);
         }
 
         int k = 0;
@@ -163,8 +163,11 @@ bool WaveformClassPoints::ObjectLoadSetup(ConfigurationDataBase &cdbData, Stream
 
     int j;
     for( j = 0; j < numberOfValues; j++ ){
-        //timeBase[j] = (int32)(timeBaseSec[j]*1000000);
-        timeBase[j] = (int32)((timeBaseSec[j]-tStart)*1000000);  // removed normalisation to tStart
+        if(frequency == 0) {
+            timeBase[j] = (int32)round((timeBaseSec[j]-tStart)*1000000);  // removed normalisation to tStart
+        } else {
+            timeBase[j] = (int32)round((timeBaseSec[j])*1000000);  // dalves
+        }
     }
 
     if( timeBaseSec != NULL ) free((void*&)timeBaseSec);

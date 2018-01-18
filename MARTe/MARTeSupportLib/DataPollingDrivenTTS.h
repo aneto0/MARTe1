@@ -70,6 +70,7 @@ public:
         while(!polledDataReady){
             ok = timeModule->Poll();
             if(!ok){
+	    	AssertErrorCondition(FatalError, "DataPollingDrivenTTS::Syncronise exiting with false due to timing module.");
                 break;
             }
         }

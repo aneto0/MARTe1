@@ -24,6 +24,7 @@
 
 #ifndef PCIEADC_H_
 #define PCIEADC_H_
+#include <linux/version.h>
 
 /* board PCI id */
 #define PCI_DEVICE_ID_FPGA          0x0007
@@ -237,8 +238,11 @@ typedef struct _PCIE_DEV {
     unsigned open_count;
     
     unsigned flags;
-    struct semaphore open_sem;
-    
+#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 5, 0)
+  struct semaphore open_sem;
+#else
+  struct mutex open_mutex;
+#endif    
     //Read queues
     wait_queue_head_t rd_q;
     
@@ -279,7 +283,12 @@ int uninstall_irq(struct pci_dev *pdev);
 ssize_t pcieAdcMmap(struct file *file, struct vm_area_struct *vma);
 ssize_t pcieAdcOpen(struct inode *inode, struct file *file);
 ssize_t pcieAdcRelease(struct inode *inode, struct file *file);
+
+#if LINUX_VERSION_CODE < KERNEL_VERSION(3, 5, 0)
 ssize_t pcieAdcIoctl(struct inode *inode, struct file *file, unsigned int cmd, unsigned long arg);
+#else
+long pcieAdcIoctl(struct file *file, unsigned int cmd, unsigned long arg);
+#endif
 ssize_t pcieAdcWrite(struct file *file, const char *buf, size_t count, loff_t * ppos);
 #endif //__cplusplus
 #endif //PCIEADC_H_

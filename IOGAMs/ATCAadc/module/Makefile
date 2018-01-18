@@ -30,9 +30,9 @@ KDIR = /lib/modules/$(CURRENT)/build
 KPWD = $(shell pwd)
 DEST = /lib/modules/$(CURRENT)/kernel/$(MDIR)
 
-obj-m	:= $(TARGET).o
+obj-m	+= $(TARGET).o
 
-$(TARGET)-objs := pcieAdc.o pcieAdc_proc.o
+$(TARGET)-objs += pcieAdc.o pcieAdc_proc.o
 
 default:
 	make -C $(KDIR) SUBDIRS=$(KPWD) modules

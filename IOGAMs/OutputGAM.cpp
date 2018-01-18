@@ -321,7 +321,7 @@ bool OutputGAM::Execute(GAM_FunctionNumbers functionNumber){
         }
     }
     if(!outputModule->WriteData(time,input->Buffer())){
-        AssertErrorCondition(FatalError,"OutputGAM::Execute:: Module %s GetData Failed for driver %s",Name(), outputModule->Name());
+        AssertErrorCondition(FatalError,"OutputGAM::Execute:: Module %s WriteData Failed for driver %s",Name(), outputModule->Name());
         return False;
     }
 
