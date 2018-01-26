@@ -42,5 +42,6 @@ all: $(OBJS) $(SUBPROJ)\
 	     $(TARGET)/ExpEvalGAM$(GAMEXT)
 	     echo $(OBJS)
 
+include depends.$(TARGET)
 include $(MAKEDEFAULTDIR)/MakeStdLibRules.$(TARGET)
 

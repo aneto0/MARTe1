@@ -86,6 +86,7 @@ linux/%.drv : linux/%.o $(OBJS)
 clean:  $(SUBPROJC)
 	rm -f depends*
 	rm -rf temp
+	rm -rf *sinfo*
 	rm -rf $(TARGET)
 
 
