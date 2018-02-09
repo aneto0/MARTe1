@@ -321,7 +321,7 @@ int32 UDPDrv::GetData(uint32 usecTime, int32 *buffer, int32 bufferNumber) {
     // Check data age
     uint32 sampleNo = header->nSampleNumber;
     if(freshPacket) {
-        if(abs(usecTime-header->nSampleTime) > maxDataAgeUsec) {
+        if((usecTime-header->nSampleTime) > maxDataAgeUsec) {
             // Packet too old
             // return the last received data and put 0xFFFFFFFF as nSampleNumber
             sampleNo = 0xFFFFFFFF;
@@ -552,7 +552,7 @@ void UDPDrv::RecCallback(void* arg){
         if(producerUsecPeriod != -1) {
             int64 counter = HRT::HRTCounter();
             /// Allow for a 10% deviation from the specified producer usec period
-            if(abs((uint32)((counter-lastCounter)*HRT::HRTPeriod()*1000000)-(uint32)((header->nSampleNumber-originalNSampleNumber)*producerUsecPeriod)) > 0.1*producerUsecPeriod) {
+            if(abs(((counter-lastCounter)*HRT::HRTPeriod()*1000000)-(int64)((header->nSampleNumber-originalNSampleNumber)*producerUsecPeriod)) > 0.1*producerUsecPeriod) {
                 deviationErrorCounter++;
             }
             originalNSampleNumber = header->nSampleNumber;
