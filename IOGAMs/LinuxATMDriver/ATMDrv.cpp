@@ -35,8 +35,8 @@
 #endif
 
 struct AtmMsgHeaderStruct{
-    unsigned int nSampleNumber; // the sample number since the last t=0
-    unsigned int nSampleTime;   // the time since t=0, going to PRE as microseconds
+    uint32 nSampleNumber; // the sample number since the last t=0
+    uint32 nSampleTime;   // the time since t=0, going to PRE as microseconds
 };
 
 // Timing ATM module
@@ -322,7 +322,7 @@ int32 ATMDrv::GetData(uint32 usecTime, int32 *buffer, int32 bufferNumber) {
     // Check data age
     uint32 sampleNo = header->nSampleNumber;
     if(freshPacket) {
-        if((usecTime-header->nSampleTime) > maxDataAgeUsec) {
+        if(abs((int64)usecTime-(int64)(header->nSampleTime)) > (int64)maxDataAgeUsec) {
             // Packet too old
             // return the last received data and put 0xFFFFFFFF as nSampleNumber
             sampleNo = 0xFFFFFFFF;
@@ -550,7 +550,11 @@ void ATMDrv::RecCallback(void* arg){
         if(producerUsecPeriod != -1) {
             int64 counter = HRT::HRTCounter();
             /// Allow for a 10% deviation from the specified producer usec period
-            if(abs(((counter-lastCounter)*HRT::HRTPeriod()*1000000)-(int64)((header->nSampleNumber-originalNSampleNumber)*producerUsecPeriod)) > 0.1*producerUsecPeriod) {
+            //Computation involving HRTPeriod will promote the int64s to double.
+	    //Computation involving producerUsecPeriod is uint*int so needs explicit cast int64 or in this case double
+	    //0.1 would have promoted the comparison to a float anyway therefore decided to perform the whole comparison in double
+            if( abs( (double)(((counter-lastCounter)*1000000)*HRT::HRTPeriod()) -
+			((double)(header->nSampleNumber-originalNSampleNumber)*producerUsecPeriod) ) > (0.1L*producerUsecPeriod)) {
                 deviationErrorCounter++;
             }
             originalNSampleNumber = header->nSampleNumber;

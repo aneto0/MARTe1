@@ -29,8 +29,8 @@
 #include "FastPollingMutexSem.h"
 
 struct UDPMsgHeaderStruct{
-    unsigned int nSampleNumber; // the sample number since the last t=0
-    unsigned int nSampleTime;   // the sample time
+    uint nSampleNumber; // the sample number since the last t=0
+    uint nSampleTime;   // the sample time
 };
 
 /**
@@ -321,7 +321,7 @@ int32 UDPDrv::GetData(uint32 usecTime, int32 *buffer, int32 bufferNumber) {
     // Check data age
     uint32 sampleNo = header->nSampleNumber;
     if(freshPacket) {
-        if((usecTime-header->nSampleTime) > maxDataAgeUsec) {
+        if(abs((int64)usecTime-(int64)header->nSampleTime) > (int64)maxDataAgeUsec) {
             // Packet too old
             // return the last received data and put 0xFFFFFFFF as nSampleNumber
             sampleNo = 0xFFFFFFFF;
@@ -552,7 +552,8 @@ void UDPDrv::RecCallback(void* arg){
         if(producerUsecPeriod != -1) {
             int64 counter = HRT::HRTCounter();
             /// Allow for a 10% deviation from the specified producer usec period
-            if(abs(((counter-lastCounter)*HRT::HRTPeriod()*1000000)-(int64)((header->nSampleNumber-originalNSampleNumber)*producerUsecPeriod)) > 0.1*producerUsecPeriod) {
+            if(abs( ((double)((counter-lastCounter)*1000000)*HRT::HRTPeriod()) -
+			(double)((header->nSampleNumber-originalNSampleNumber)*producerUsecPeriod) ) > (0.1L*producerUsecPeriod)) {
                 deviationErrorCounter++;
             }
             originalNSampleNumber = header->nSampleNumber;
