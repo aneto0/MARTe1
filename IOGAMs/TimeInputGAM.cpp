@@ -65,7 +65,7 @@ bool TimeInputGAM::Initialise(ConfigurationDataBase& cdbData){
         return False;
     }
     
-    AssertErrorCondition(Warning,"TimeInputGAM::Initialise: %s: Module %s Has been Successfully Loaded", Name(),inputModule->Name());
+    AssertErrorCondition(Information,"TimeInputGAM::Initialise: %s: Module %s has been successfully loaded", Name(),inputModule->Name());
 
     return True;
 }

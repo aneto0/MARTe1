@@ -29,8 +29,8 @@
 #include "FastPollingMutexSem.h"
 
 struct UDPMsgHeaderStruct{
-    uint nSampleNumber; // the sample number since the last t=0
-    uint nSampleTime;   // the sample time
+    uint32 nSampleNumber; // the sample number since the last t=0
+    uint32 nSampleTime;   // the sample time
 };
 
 /**
