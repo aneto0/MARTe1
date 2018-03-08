@@ -65,6 +65,8 @@ bool TimeInputGAM::Initialise(ConfigurationDataBase& cdbData){
         return False;
     }
     
+    reportSyncError = True;
+
     AssertErrorCondition(Information,"TimeInputGAM::Initialise: %s: Module %s has been successfully loaded", Name(),inputModule->Name());
 
     return True;
@@ -77,7 +79,12 @@ bool TimeInputGAM::Execute(GAM_FunctionNumbers functionNumber){
     //////////////////////////////////////////
     
     if(!trigger->Synchronise()){
-        AssertErrorCondition(FatalError,"TimeInputGAM::Execute: Timeout on Execute(FunctionNumber = %d)", (int)functionNumber);
+	if(reportSyncError == True){
+            AssertErrorCondition(FatalError,"TimeInputGAM::Execute: Timeout on Execute(FunctionNumber = %d)", (int)functionNumber);
+	    reportSyncError = False;
+	}
+    } else {
+	reportSyncError = True;
     }
     return InputGAM::Execute(functionNumber);
 }

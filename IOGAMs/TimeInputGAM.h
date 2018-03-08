@@ -40,6 +40,7 @@ class TimeInputGAM: public InputGAM{
     OBJECT_DLL_STUFF(TimeInputGAM)
     
 private:
+    bool reportSyncError;
 
     /** Reference to the triggering service facility */
     GCRTemplate<TimeTriggeringServiceInterface>  trigger;
