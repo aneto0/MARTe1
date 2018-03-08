@@ -36,10 +36,12 @@ JAVAC = javac $(JFLAGS) -d $(BUILD_DIR)
 
 all : jar
 
-compile :
-	mkdir $(BUILD_DIR)
+compile : $(BUILD_DIR)
 	$(shell find . -name \*.java -print > file.compile.list)
 	$(JAVAC) @file.compile.list
+
+$(BUILD_DIR):
+	mkdir $(BUILD_DIR);
 
 jar : compile
 	rm -f $(BUILD_DIR)/JTLogger.jar
