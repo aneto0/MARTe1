@@ -144,10 +144,6 @@ bool FilteredInputGAM::Execute(GAM_FunctionNumbers functionNumber){
                 intBuffer[sig] = intB[sig];
             }
         }
-
-        for(sig = 0; sig < output->BufferWordSize(); sig++){
-            floatBuffer[sig] += buffer[sig]*filterCoefficients[i]; 
-        }
     }
     
     output->Write();
