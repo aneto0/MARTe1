@@ -48,7 +48,7 @@ bool FileSignalList::LoadData(){
         } 
         //Check signal size consistency
         int32 signalCounter = 0;
-        while(line.GetToken(token, " ")){
+        while(line.GetToken(token, separator.Buffer())){
             signalCounter++;
             token.SetSize(0);
         }
@@ -176,6 +176,8 @@ void *FileSignalList::GetNextSample(uint32 usecTime){
     }
     //Moves the internal counter to the next sample after the specified time
     //and returns the previous sample
+    if (sampleCounter < 0)
+        sampleCounter = 0;
     while(time[sampleCounter] <= usecTime){
         sampleCounter++;
         if(sampleCounter == numberOfSamples){
