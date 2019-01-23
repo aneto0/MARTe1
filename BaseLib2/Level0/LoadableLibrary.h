@@ -127,8 +127,7 @@ public:
 
         module = dlopen(dllName, RTLD_NOW|RTLD_GLOBAL);
         if (module==NULL) {
-            if(dllName[0]=='A')
-                CStaticAssertErrorCondition(Information,"LoadableLibrary: %s", dlerror());
+            CStaticAssertErrorCondition(Information,"LoadableLibrary: %s", dlerror());
             return False;
         }
         return True;
