@@ -74,7 +74,7 @@ public:
 
     /** Add a the top */
     inline void         ListInsert(const T &element){
-        StaticListHolder::ListAdd((const intptr *)&element,SLH_StartOfList);
+        return StaticListHolder::ListAdd((const intptr *)&element,SLH_StartOfList);
     }
 
     /** removes at the specified position */
