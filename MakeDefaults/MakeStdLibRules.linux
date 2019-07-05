@@ -73,7 +73,7 @@ linux/%.gam : linux/%.o $(OBJS)
 	$(COMPILER) -shared -fPIC $(OBJS) $(LIBRARIES) linux/$*.o -o $@
 
 linux/%.drv : linux/%.o $(OBJS)
-	$(COMPILER) -shared -fPIC $(OBJS) $(LIBRARIES) linux/$*.o -o $@
+	$(COMPILER) -shared -fPIC $(OBJS) linux/$*.o $(LIBRARIES) -o $@
 
 %.spb : 
 	$(MAKE) -C $* -f Makefile.$(TARGET)
