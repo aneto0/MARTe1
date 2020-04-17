@@ -28,6 +28,7 @@ include Makefile.inc
 
 LIBRARIES   += -L ../../BaseLib2/$(TARGET) -lBaseLib2
 LIBRARIES   += -L../../MARTe/MARTeSupportLib/$(TARGET) -lMARTeSupLib 
+LIBRARIES   += -ldl
 
 $(TARGET)/test.ex: $(TARGET)/test.o $(TARGET)/ATMDrv$(OBJEXT)
-	$(COMPILER) $(LIBRARIES) $(CFLAGSPEC) $(CFLAGS) $(LFLAGS) $(TARGET)/ATMDrv$(OBJEXT) $(TARGET)/test$(OBJEXT) -o $(TARGET)/test.ex
+	$(COMPILER) $(CFLAGSPEC) $(CFLAGS) $(LFLAGS) $(TARGET)/ATMDrv$(OBJEXT) $(TARGET)/test$(OBJEXT) $(LIBRARIES) -o $(TARGET)/test.ex

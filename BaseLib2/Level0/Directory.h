@@ -59,6 +59,7 @@ class DirectoryEntry: public LinkedListable{
 #if (defined (_VXWORKS) || defined(_RTAI) || defined(_LINUX) || (defined _SOLARIS) || defined(_MACOSX))
     /** attributes of the file */
     struct stat fileStatistics;
+    int fileStatisticsErr;
 #elif defined(_WIN32)
     /** all the data about the file or directory */
     WIN32_FIND_DATA fileData;
@@ -97,7 +98,7 @@ public:
     /** is it a directory */
     bool IsDirectory(){
 #if (defined (_VXWORKS)||defined(_RTAI)|| defined(_LINUX) || defined(_SOLARIS) || defined(_MACOSX))
-        return S_ISDIR(fileStatistics.st_mode);
+        return (fileStatisticsErr == 0 && S_ISDIR(fileStatistics.st_mode));
 #elif defined(_WIN32)
         return ((fileData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)!=0);
 #else
@@ -108,7 +109,7 @@ public:
     /** is it a file */
     bool IsFile(){
 #if (defined (_VXWORKS)||defined(_RTAI)|| defined(_LINUX) || defined(_SOLARIS) || defined(_MACOSX))
-        return S_ISREG(fileStatistics.st_mode);
+        return (fileStatisticsErr == 0 && S_ISREG(fileStatistics.st_mode));
 #else
         return IsDirectory() == False;
 #endif
@@ -129,7 +130,10 @@ public:
     /** the file size */
     int64 Size(){
 #if (defined (_VXWORKS)||defined(_RTAI)|| defined(_LINUX) || defined(_SOLARIS) || defined(_MACOSX))
-        return  fileStatistics.st_size;
+        // st_size is of type "off_t" which the standard specifies "shall be signed integer type."
+        // We will return 0 as the size when stat(...) has returned an error, because the size
+        // is still used to calculate total size of files in a LinkedListHolder
+        return (fileStatisticsErr == 0 ? fileStatistics.st_size : (off_t)(0));
 #elif defined(_WIN32)
         uint64 sz = fileData.nFileSizeHigh;
         sz <<= 32;
@@ -143,7 +147,8 @@ public:
     /** last write time */
     time_t Time(){
 #if (defined (_VXWORKS)||defined(_RTAI)|| defined(_LINUX) || defined(_SOLARIS) || defined(_MACOSX))
-        return fileStatistics.st_mtime;
+        // time( time_t *arg ) returns a time_t with value of -1 for an error, so we will do the same
+        return (fileStatisticsErr == 0 ? fileStatistics.st_mtime : (time_t)(-1));
 #elif defined(_WIN32)
         uint64 t = *((uint64 *)&fileData.ftLastWriteTime);
         uint64 t2;
@@ -160,7 +165,8 @@ public:
     /** last access time */
     time_t LastAccessTime(){
 #if (defined (_VXWORKS)||defined(_RTAI)|| defined(_LINUX) || defined(_SOLARIS) || defined(_MACOSX))
-        return fileStatistics.st_atime;
+        // time( time_t *arg ) returns a time_t with value of -1 for an error, so we will do the same
+        return (fileStatisticsErr == 0 ? fileStatistics.st_atime : (time_t)(-1));
 #elif defined(_WIN32)
         uint64 t = *((uint64 *)&fileData.ftLastAccessTime);
         uint64 t2;
@@ -231,7 +237,7 @@ public:
                     strcat(statAddr, "/");
 
                 strcat(statAddr, entry->fname);
-                stat(statAddr,&entry->fileStatistics);
+                entry->fileStatisticsErr = stat(statAddr,&entry->fileStatistics);
                 size += entry->Size();
             }
             free((void *&)de);
@@ -263,7 +269,7 @@ public:
                     strcat(statAddr, "/");
 
                 strcat(statAddr, entry->fname);
-                stat(statAddr,&entry->fileStatistics);
+                entry->fileStatisticsErr = stat(statAddr,&entry->fileStatistics);
                 size += entry->Size();
             }
         }
@@ -298,7 +304,7 @@ public:
                     strcat(statAddr, "/");
 
                 strcat(statAddr, entry->fname);
-                stat(statAddr,&entry->fileStatistics);
+                &entry->fileStatisticsErr = stat(statAddr,&entry->fileStatistics);
                 size += entry->Size();
             }            
             closedir(d);
@@ -320,7 +326,7 @@ public:
                     strcat(statAddr, "/");
 
                 strcat(statAddr, entry->fname);
-                stat(statAddr,&entry->fileStatistics);
+                &entry->fileStatisticsErr = stat(statAddr,&entry->fileStatistics);
                 size += entry->Size();
             }            
             closedir(d);
@@ -432,8 +438,11 @@ public:
         return (attrs & FILE_ATTRIBUTE_DIRECTORY);
 #elif (defined(_LINUX) || defined(_MACOSX))
         struct stat fileStats;
-        stat(address, &fileStats);
-        return S_ISDIR(fileStats.st_mode);
+        if (stat(address, &fileStats) == 0) {
+            return S_ISDIR(fileStats.st_mode);
+        } else {
+            return False;
+        }
 #else
 // NOT IMPLEMENTED
         return False;

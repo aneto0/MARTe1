@@ -30,6 +30,7 @@
 #define LOADABLE_LIBRARY_H
 
 #include "System.h"
+#include "ErrorManagement.h"
 
 #if defined _VXWORKS
 /**  */
@@ -125,7 +126,10 @@ public:
         if (module != 0) Close();
 
         module = dlopen(dllName, RTLD_NOW|RTLD_GLOBAL);
-        if (module==NULL) return False;
+        if (module==NULL) {
+            CStaticAssertErrorCondition(Information,"LoadableLibrary: %s", dlerror());
+            return False;
+        }
         return True;
 #elif (defined (_WIN32) || defined(_RSXNT))
         if (dllName == NULL) return False;

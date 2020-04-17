@@ -65,7 +65,7 @@ CPPFLAGS = -fPIC -frtti
 
 CFLAGSPEC= -D_LINUX -DUSE_PTHREAD -pthread
 
-LIBRARIES =  -lm -ldl -lnsl -lpthread -lrt -lncurses
+LIBRARIES =  
 
 .SUFFIXES:   .c  .cpp  .o .a .exe .ex .ex_ .so .gam
 

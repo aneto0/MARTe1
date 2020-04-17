@@ -31,6 +31,7 @@
 #include "TriggerObj.h"
 #include "HttpInterface.h"
 #include "HttpJScopeInterface.h"
+#include "GAM.h"
 
 //#define PI2 6.28318530717959
 
@@ -118,6 +119,11 @@ protected:
     /** */
     bool                                simMode;
 
+/*******************************************/
+
+    /** */
+    GAM_FunctionNumbers                 currentState;
+
 public:
 
     /** */
@@ -137,6 +143,7 @@ public:
         xGraphData          = "";
         yGraphData          = "";
         simMode             = False;
+        currentState        = GAMOffline;
     }
 
     /** Copy constructor */
@@ -156,6 +163,7 @@ public:
         this->xGraphData          = wave.xGraphData;
         this->yGraphData          = wave.yGraphData;
         this->simMode             = wave.simMode;
+        this->currentState        = wave.currentState;
 
         if( this->variableOffset ) this->offsetWaveform = wave.offsetWaveform;
         if( this->variableGain   ) this->gainWaveform   = wave.gainWaveform;
@@ -191,6 +199,11 @@ public:
     void SetTEnd(int32 tEnd){
         this->tEndUsec = tEndUsec;
         this->tEnd     = (float)(tEndUsec)/1000000;
+    }
+
+    /** */
+    virtual void SetState(GAM_FunctionNumbers currentState) {
+        this->currentState = currentState;
     }
 
     /** */

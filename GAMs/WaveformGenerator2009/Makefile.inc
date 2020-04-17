@@ -51,10 +51,14 @@ CFLAGS+= -I../../BaseLib2/Level4
 CFLAGS+= -I../../BaseLib2/Level5
 CFLAGS+= -I../../BaseLib2/Level6
 
+CFLAGS+= -I ../ExpressionEvaluator2009
+CFLAGS+= -I ../ExpressionEvaluator2009/Module
+
 all: $(OBJS)    \
 		$(TARGET)/WaveformGenerator$(GAMEXT)
 	echo  $(OBJS)
 
+include depends.$(TARGET)
 
 include $(MAKEDEFAULTDIR)/MakeStdLibRules.$(TARGET)
 

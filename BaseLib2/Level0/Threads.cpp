@@ -406,7 +406,15 @@ TID  ThreadsBeginThread(ThreadFunctionType function,
     pthread_attr_init(&stackSizeAttribute);
     pthread_attr_setstacksize(&stackSizeAttribute, stacksize);
     StandardThreadFunction Function = (StandardThreadFunction)SystemThreadFunction;
-    pthread_create(&ID, &stackSizeAttribute, Function, tii);
+    int threadCreationReturn = pthread_create(&ID, &stackSizeAttribute, Function, tii);
+    if (threadCreationReturn != 0) {
+        if (threadCreationReturn == 11) {
+            CStaticAssertErrorCondition(FatalError,"Threads::BeginThread (%s) pthread_create failed with error number 11! Usually 11=EAGAIN, no memory or too many threads. Check `ulimit -a`",name);
+        } else {
+            CStaticAssertErrorCondition(FatalError,"Threads::BeginThread (%s) pthread_create failed with error number %d! ",name);
+        }
+        return 0;
+    }
     pthread_detach(ID);
     pthread_setaffinity_np(ID, sizeof(runOnCPUs.processorMask), (cpu_set_t *)&runOnCPUs.processorMask);
 #elif (defined _SOLARIS || defined(_MACOSX)) && (defined USE_PTHREAD)

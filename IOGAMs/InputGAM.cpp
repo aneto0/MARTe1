@@ -286,7 +286,7 @@ bool InputGAM::Initialise(ConfigurationDataBase& cdbData){
     calibrationRequested = False;
     startUpCycleNumber   = 0;
     
-    AssertErrorCondition(Warning,"InputGAM::Initialise: %s: Module %s Has been Successfully Loaded", Name(),inputModule->Name());
+    AssertErrorCondition(Information,"InputGAM::Initialise: %s: Module %s has been successfully loaded", Name(),inputModule->Name());
 
     return True;
 }

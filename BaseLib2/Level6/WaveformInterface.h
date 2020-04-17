@@ -30,6 +30,7 @@
 #define WAVEFORMINTERFACE_H_
 
 #include "System.h"
+#include "GAM.h"
 
 class WaveformInterface {
 public:
@@ -50,6 +51,8 @@ public:
     inline virtual double GetValueD64(int64 usecTime) {
         return (double)GetValue((int32)usecTime);
     }
+
+    inline virtual void SetState(GAM_FunctionNumbers state) {}
 
     virtual void  Reset()                           = 0;
 };

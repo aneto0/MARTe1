@@ -173,6 +173,9 @@ public:
         char dllName_[maxSize];
         const char *dllName;
 
+        // check for empty className
+        if (className[0] == 0) return NULL;
+
         // check for dllName::className syntax
         if (hasDllName){
             int size = hasDllName-className;			
@@ -204,6 +207,24 @@ public:
 //            ret = ll->Open(fullName);
 //        }
 
+#if defined(_MACOSX)
+        // MAC OS X NAME FOR DLL
+        if (!ret) {
+            sprintf(fullName,"%s.dylib",dllName);
+            ret = ll->Open(fullName);
+        }
+#else
+        // LINUX NAME FOR DLL
+        if (!ret) {
+            sprintf(fullName,"%s.so",dllName);
+            ret = ll->Open(fullName);
+        }
+        // STD NAME FOR DLL
+        if (!ret) {
+            sprintf(fullName,"%s.dll",dllName);
+            ret = ll->Open(fullName);
+        }
+#endif
         // GENERAL APPLICATION MODULE
         if (!ret) {
             sprintf(fullName,"%s.gam",dllName);
@@ -214,24 +235,6 @@ public:
             sprintf(fullName,"%s.drv",dllName);
             ret = ll->Open(fullName);
         }
-#if defined(_MACOSX)
-        // MAC OS X NAME FOR DLL
-        if (!ret) {
-            sprintf(fullName,"%s.dylib",dllName);
-            ret = ll->Open(fullName);
-        }
-#else
-        // STD NAME FOR DLL
-        if (!ret) {
-            sprintf(fullName,"%s.dll",dllName);
-            ret = ll->Open(fullName);
-        }
-        // LINUX NAME FOR DLL
-        if (!ret) {
-            sprintf(fullName,"%s.so",dllName);
-            ret = ll->Open(fullName);
-        }
-#endif
 
         free((void *&)fullName);
         if (!ret) return NULL;

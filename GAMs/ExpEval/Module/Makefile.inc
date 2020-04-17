@@ -43,5 +43,6 @@ all: $(OBJS) \
 	     $(TARGET)/ExpEval$(DLLEXT)
 	     echo $(OBJS)
 
+include depends.$(TARGET)
 include $(MAKEDEFAULTDIR)/MakeStdLibRules.$(TARGET)
 

@@ -28,4 +28,4 @@ include Makefile.inc
 
 LIBRARIES  += -L../../BaseLib2/$(TARGET) -lBaseLib2
 LIBRARIES  += -L../../MARTe/MARTeSupportLib/$(TARGET) -lMARTeSupLib    
-
+LIBRARIES  += -lm -ldl -lnsl -lpthread -lrt -lncurses

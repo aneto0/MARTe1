@@ -27,9 +27,10 @@ TARGET=linux
 include Makefile.inc
 
 LIBRARIES   += -L../../BaseLib2/$(TARGET) -lBaseLib2
-LIBRARIES   += -L../../MARTe/MARTeSupportLib/$(TARGET) -lMARTeSupLib 
+LIBRARIES   += -L../../MARTe/MARTeSupportLib/$(TARGET) -lMARTeSupLib
+LIBRARIES   += -lm -ldl -lnsl -lpthread -lrt -lncurses 
 #
 #OPTIM= -G6 -O2 -Ob2
 
 $(TARGET)/test.ex: $(TARGET)/test.o $(TARGET)/SrTrATCADrv$(OBJEXT)
-	$(COMPILER) $(LIBRARIES) $(CFLAGSPEC) $(CFLAGS) $(LFLAGS) $(TARGET)/SrTrATCADrv$(OBJEXT) $(TARGET)/test$(OBJEXT) -o $(TARGET)/test.ex
+	$(COMPILER) $(CFLAGSPEC) $(CFLAGS) $(LFLAGS) $(TARGET)/SrTrATCADrv$(OBJEXT) $(TARGET)/test$(OBJEXT) $(LIBRARIES) -o $(TARGET)/test.ex
